@@ -1,0 +1,159 @@
+/** Page styles */
+.page {
+    &--error,
+    &--success {
+        background: #fff!important;
+
+        .page-content {
+            .content-inner {
+                width: 100% !important;
+            }
+        }
+    }
+
+    &.page-anketa {
+        /*.page-container {
+            max-width: 700px
+        }*/
+    }
+}
+
+/** Anketa styles */
+.anketa {
+    &__addnew {
+        width: 100%;
+        padding: 20px;
+        border: 1px dashed $gray;
+        text-align: center;
+        margin-bottom: 30px;
+        color: $gray;
+        font-size: 40px;
+        vertical-align: center;
+    }
+}
+
+.anketa-bordered,
+.cloning-clone{
+    border: 1px dashed $lightgray;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.cloning-clone {
+    background: #fcfcfc;
+    margin: 20px 0px;
+}
+
+// Snippets
+.m-center {
+    margin-left: auto;
+    display: block;
+    margin-right: auto;
+}
+
+.anketa-tech {
+    background-color: #EEF5F9!important;
+}
+
+.anketa-Dop {
+    background-color: #fffce8!important;
+}
+
+.app-checker-prop {
+    font-size: $font-size-sm;
+}
+
+.toggle-hidden {
+    display: none!important;
+}
+
+.border-radius-0 {
+    border-radius: 0px;
+}
+
+.card {
+    overflow-x: auto
+}
+
+.field {
+    position: relative;
+
+    i {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        font-size: 20px;
+        transform: translateY(-50%);
+        cursor: pointer;
+    }
+}
+
+.Doc {
+    padding: 60px 40px;
+    background: white;
+    font-family: 'Times New Roman', serif;
+
+    p {
+        margin-bottom: 5px;
+        margin-top: 15px;
+    }
+
+    .doc-input[name] {
+        cursor: pointer;
+    }
+
+    .doc-input {
+        font-weight: bold;
+        padding: 0;
+        background: transparent;
+        width: 100%;
+        min-width: 350px;
+        border: none;
+        border-bottom: 1px solid #000;
+
+        &--row {
+            width: auto;
+            margin: 0;
+        }
+    }
+}
+
+/*
+Snippets
+ */
+label {
+    margin-bottom: .2rem;
+    font-size: 13px;
+}
+
+.table th,
+.table td {
+    font-size: 13px;
+}
+
+[data-field="photo"] input {
+    color: transparent
+}
+
+/**
+PRINT
+ */
+ body {
+     font-family: DejaVu Sans, Arial, sans-serif!important;
+ }
+
+.w-100 {
+    width: 100%;
+    display: block;
+}
+
+@page { margin-left: 1.18in; margin-right: 0.59in; margin-top: 0.59in; margin-bottom: 0.37in }
+P { margin-bottom: 0.08in; direction: ltr; widows: 2; orphans: 2 }
+
+@media print
+{
+    .no-print, .no-print *
+    {
+        display: none !important;
+    }
+}

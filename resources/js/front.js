@@ -1,0 +1,729 @@
+import axios from 'axios'
+import swal from 'sweetalert2'
+import { v4 as uidv4 } from 'uuid'
+import {ApiController} from "./components/ApiController";
+import { Fancybox } from "@fancyapps/ui";
+
+require('./init-plugins')
+require('chosen-js')
+require('croppie')
+require('suggestions-jquery')
+
+$(document).ready(function () {
+    const API_CONTROLLER = new ApiController(),
+        API = API_CONTROLLER.client
+
+    const LIBS = {
+        docFields: {
+            'особенности_поведения': [
+                'напряженность, раздражительность, суетливость',
+                'иногда речь приобретает скандальный оттенок',
+                'повышенная отвлекаемость',
+                'попытки диссимуляции',
+                'заторможенность, замкнутость, апатия',
+                'нарушения ориентировки, непонимание смысла вопросов',
+                'фрагментарность высказываний',
+                'нарушение последовательности изложения мысли',
+                'резкая заторможенность, сонливость',
+                'агрессия'
+            ],
+
+            'жалобы': [
+                'отсутствуют',
+                'наличие следов от инъекций',
+                'присутствие расчесов, ссадин'
+            ],
+
+            'кп_окраска': [
+                'гиперемированы',
+                'бледные',
+                'без особенностей'
+            ],
+
+            'кп_наличие_повреждений': [
+                'отсутствуют',
+                'наличие следов от инъекций',
+                'присутствие расчесов, ссадин'
+            ],
+
+            'слизистые': [
+                'гиперемированы',
+                'инъецированы',
+                'желтушность',
+                'без особенностей'
+            ],
+
+            'особенности_походки': [
+                'шаткая',
+                'разбрасывание при ходьбе',
+                'походка ровная',
+                'неустойчивость при стоянии и ходьбе',
+                'отчетливые нарушения координации движений'
+            ],
+
+            'оп_точность': [
+                'неточность выполнения движений и координарных проб',
+                'точное выполнение движений и координарных проб'
+            ],
+
+            'оп_тремор_пальцев': [
+                'присутствует',
+                'отсутствует'
+            ],
+
+            'оп_тремор_век': [
+                'присутствует',
+                'отсутствует'
+            ],
+
+            'оп_наличие_запаха': [
+                'запах алкоголя изо рта',
+                'ацетона',
+                'жженой резины или пластмассы',
+                'уксуса',
+                'серы',
+                'отсутствует',
+            ],
+
+            'экспресс_тест_мочи': [
+                'не проводились',
+                'в приложении протокол тестирования наркотических веществ в моче №',
+            ],
+
+            'предв_закл': [
+                'алкогольное опьянение',
+                'установлен факт потребления алкоголя',
+                'трезв',
+            ],
+
+            'примечания': [
+                'особых отметок нет.',
+                'водителю протокол контроля трезвости был зачитан вслух, от подписи отказался',
+            ]
+        },
+
+        initChosen () {
+            $('.js-chosen').chosen({
+                width: '100%',
+                search_contains: true,
+                no_results_text: 'Совпадений не найдено',
+                placeholder_text_single: 'Выберите значение'
+            });
+        },
+
+        initDoc () {
+            $('.Doc textarea').each(function () {
+                let name = this.name
+
+                $(this).click(async function () {
+                    if(LIBS.docFields[name]) {
+                        let df = LIBS.docFields[name]
+
+                        const { value: dataField } = await swal.fire({
+                            input: 'select',
+                            inputOptions: df,
+                            inputPlaceholder: 'Выберите опцию',
+                            showCancelButton: true
+                        })
+
+                        if(dataField) {
+                            this.value = df[dataField]
+                        }
+                    }
+                })
+            })
+
+            /**
+             * Сохраняем документ
+             */
+            $('#DOC_FORM').each(function () {
+                let protokol = $(this).data('protokol')
+
+                if(protokol) {
+                    for(let i in protokol) {
+                        if(i !== 'id') {
+                            let inp = $(this).find(`*[name="${i}"]`)
+
+                            inp.val(protokol[i])
+                        }
+                    }
+                }
+
+                $(this).submit(function (e) {
+                    e.preventDefault()
+
+                    let data = {}
+
+                    let id = this.id.value;
+
+                    $(this).find('input,textarea').each(function () {
+                        if(this.name) {
+                            data[this.name] = this.value
+                        }
+                    })
+
+                    API_CONTROLLER.updateModelProperty({
+                        item_model: 'Anketa',
+                        item_field: 'protokol_path',
+                        item_id: id,
+                        new_value: JSON.stringify(data)
+                    }).then(response => {
+                        window.print()
+                    })
+                })
+            })
+        },
+
+        initAll () {
+            LIBS.initDoc()
+            LIBS.initChosen()
+        }
+    }
+
+    function initCroppies ()
+    {
+        let Croppies = {}
+
+        $('.croppie-demo').each(function () {
+            let id = $(this).data('croppieId')
+
+            Croppies[id] = $(this).croppie({
+                enableOrientation: true,
+                viewport: {
+                    width: 170,
+                    height: 170,
+                    type: 'circle' // or 'square'
+                },
+                boundary: {
+                    width: 200,
+                    height: 200
+                }
+            })
+        })
+
+        $('[id*="croppie-input"]').on('change', function () {
+            let reader = new FileReader(), croppId = this.id.replace('croppie-input', '')
+
+            reader.onload = function (e) {
+                $('#croppie-block' + croppId).show()
+
+                Croppies[croppId].croppie('bind', {
+                    url: e.target.result
+                });
+            }
+
+            reader.readAsDataURL(this.files[0]);
+
+            this.files = null
+            this.value = ''
+        });
+
+        $('.croppie-save').click(function () {
+            let id = $(this).data('croppieId')
+
+            Croppies[id].croppie('result', {
+                type: 'canvas',
+                size: 'viewport'
+            }).then(image => {
+                //$('#croppie-block' + id).hide()
+
+                // success message
+                swal.fire({
+                    title: 'Изображение обрезано',
+                    icon: 'info'
+                });
+
+                $(`#croppie-result-base64${id}`).val(image)
+            })
+        })
+
+        $('.croppie-delete').click(function () {
+            let id = $(this).data('croppieId')
+            let input = $(`#croppie-input${id}`);
+
+            if(input && id) {
+                input[0].files = null;
+                input[0].value = '';
+
+                $(`#croppie-result-base64${id}`).val('')
+                $('#croppie-block' + id).hide()
+            }
+        })
+    }
+    initCroppies()
+
+    // Подгрузка в полей в Журналах: CHOSEN
+    $.get(location.search ? location.href+'&getFormFilter=1' : '?getFormFilter=1').done(response => {
+        if(response) {
+            $('#filter-groupsContent').html(response)
+            LIBS.initChosen()
+        }
+    });
+
+    $(window).on('load', function () {
+        // Форма поиска по анкетам
+        function anketsFormCheckFieldsToShow ()
+        {
+            const showTableData = el => {
+                if(el) {
+                    let index = Number(el.attr('data-value')) + 1, prop_checked = el.prop('checked');
+
+                    let anketsTable = $(`.ankets-table thead th:nth-child(${index}), .ankets-table tbody tr td:nth-child(${index})`),
+                        displayProp = (!prop_checked ? 'none' : 'table-cell')
+
+                    anketsTable.attr('hidden', !prop_checked).css({'display': displayProp })
+                } else {
+                    $('.ankets-form input').each(function () {
+                        let $t = $(this)
+
+                        if(this.name !== '_token') {
+                            showTableData($t)
+                        }
+
+                    })
+                }
+            }
+
+            $('.ankets-form input').change(e => {
+                let el = $(e.target)
+
+                showTableData(el)
+            })
+
+            showTableData()
+        }
+
+        anketsFormCheckFieldsToShow()
+    })
+
+
+    /**
+     * Показываем данные в сущностях в карточках Анкеты
+     * @param model
+     * @param data
+     */
+    const showAnketsCardDBitemData = async (model, data, fieldsValues, fullData) => {
+        if(data) {
+            let dbItemId = 'CARD_' + model.toUpperCase(), msg = `<form id="form_${model}">`,
+                inputClass = model + '_' + 'input'
+
+            $(`#${dbItemId}`).html('<b class="text-info">Загружаем данные...</b>')
+
+            /**
+             * Вставляем поля
+             */
+            for(let i in data) {
+                let fvItem = fieldsValues[i]
+
+                if(fvItem) {
+                   if(i != 'id' && i != 'hash_id') {
+                       let field = '',
+                           otherHtmlItems = '',
+                           fId = uidv4()
+
+                       otherHtmlItems = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
+
+                       if(fvItem['type'] == 'select') {
+
+                            await API_CONTROLLER.getFieldHTML({ field: i, model, default_value: encodeURIComponent(data[i]) }).then(response => {
+                                field = response.data
+                            })
+                        } else {
+                           if(i === 'note') {
+                               field = `<textarea id="${fId}" data-model="${model}" class="form-control" name="${i}">${(data[i] ? data[i] : '').trim()}</textarea>`
+                           } else if(i === 'photo') {
+                               otherHtmlItems = ''
+
+                               if(data[i]) {
+                                   field = `<img src="/storage/${data[i]}" width="60%" />`
+                               }
+                           } else {
+                               field = `<input id="${fId}" data-model="${model}" class="form-control" type="${fvItem['type']}" value='${data[i] ? data[i] : ''}' name="${i}" />`
+                           }
+                        }
+
+                        msg += `
+                            <p style="${i === 'dismissed' ? data[i].toUpperCase() === 'ДА' ? 'color: red; font-weight: bold;' : '' : ''}" data-field-card="${model}_${i}" class="text-small m-0">${fvItem.label}:<br/>
+                                ${otherHtmlItems}
+                                <div class="form-group ${inputClass}">
+                                    ${field}
+                                </div>
+                            </p>`
+
+                    }
+                }
+            }
+
+            msg += `<button type="submit" class="btn btn-sm btn-success">Сохранить</button></form>`
+
+            $(`#${dbItemId}`).html(msg)
+
+            LIBS.initChosen()
+
+            $(`#form_${model}`).submit(function (e) {
+                e.preventDefault()
+
+                if(confirm('Сохранить?')) {
+                    $(this).find(`.${inputClass} input, .${inputClass} select`).each(function () {
+                        let val = this.value, name = this.name
+
+                        if(name) {
+                            API_CONTROLLER.updateModelProperty({
+                                item_model: model,
+                                item_field: name,
+                                item_id: data['id'],
+                                new_value: val
+                            })
+                        }
+                    })
+                }
+            })
+
+            /**
+             * Контроль дат (DDATE)
+             */
+            let redDates = fullData.redDates
+            if(redDates && typeof redDates === "object" && !Array.isArray(redDates)) {
+                for(let i in redDates) {
+                    $(`*[data-field-card="${model}_${i}"]`).css({
+                        'color': 'red',
+                        'font-weight': 'bold'
+                    })
+                }
+            }
+
+        }
+    }
+
+    // Проверка свойства по модели на бэкенда
+    window.checkInputProp = (prop = '0', model = '0', val = '0', label, parent) => {
+        const PARENT_ELEM = parent;
+
+        $.ajax({
+            url: `/api/check-prop/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
+            headers: {'Authorization': 'Bearer ' + API_TOKEN},
+            success:  (data) => {
+                const PROP_HAS_EXISTS = data.data.exists
+                const DATA = data.data.message;
+
+                showAnketsCardDBitemData(model, DATA, data.data.fieldsValues, data.data)
+
+                if(PARENT_ELEM.length) {
+                    const APP_CHECKER_PARENT = PARENT_ELEM.find('.app-checker-prop')
+
+                    if(PROP_HAS_EXISTS){
+                        APP_CHECKER_PARENT.removeClass('text-danger').addClass('text-success').text(DATA[label])
+                    } else {
+                        PARENT_ELEM.find('input, textarea, select').val('');
+                        APP_CHECKER_PARENT.removeClass('text-success').addClass('text-danger').text(`Не найдено`)
+                    }
+                }
+
+                if(!!DATA.company_id) {
+                    checkInputProp('id', 'Company', DATA.company_id, 'name', [])
+                }
+
+                return
+            }
+        });
+    }
+
+    window.addFieldToHistory = (value, field) => {
+        API.post('/api/field-history', {
+            value, field
+        })
+    }
+
+    // ЭКСПОРТ таблицы в xlsx
+    window.exportTable = (function() {
+        let uri = 'data:application/vnd.ms-excel;base64,'
+            , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>'
+            , base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
+            , format = function(s, c) {
+            return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; })
+        }
+            , downloadURI = function(uri, name) {
+            let link = document.createElement("a");
+            link.download = name;
+            link.href = uri;
+            link.click();
+        }
+
+        //  exportTable('resultTable','Смета', 'Ремрайон_смета.xls');
+        return function(table, name, fileName) {
+            if (!table.nodeType) table = document.getElementById(table)
+            let ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+            let resuri = uri + base64(format(template, ctx))
+            downloadURI(resuri, fileName);
+        }
+    })();
+
+    // Открытие/закртие элементов
+    $('[data-toggle-show]').click(function (e) {
+        e.preventDefault()
+
+        let $this = $(this), el = $($this.data('toggle-show')), title = $this.find('.toggle-title'),
+            hiddenClass = 'toggle-hidden', titleData = 'Показать'
+
+        if(el.length && title.length) {
+
+            titleData = (el.hasClass(hiddenClass)) ? 'Скрыть' : titleData
+
+            title.text(titleData)
+            el.toggleClass(hiddenClass);
+        }
+    })
+
+    $('.field').each(function () {
+        let $t = $(this),
+            $i = $t.find('> i'),
+            $input = $t.find('> input')
+
+        if($t.hasClass('field--password')) {
+            $i.click(function () {
+                if($(this).hasClass('fa-eye')) {
+                    $(this).removeClass('fa-eye').addClass('fa-eye-slash')
+                    $input.attr('type', 'password')
+                } else {
+                    $(this).removeClass('fa-eye-slash').addClass('fa-eye')
+                    $input.attr('type', 'text')
+                }
+            })
+        }
+    })
+
+    // ЭКШЕНЫ
+    $('*[class*="ACTION_"]').click(function (e) {
+        e.preventDefault();
+
+        let confirms = {
+            'ACTION_DELETE': 'Точно хотите удалить?'
+        }
+
+        this.classList.forEach(cls=> {
+            if(confirms[cls])
+                if(confirm(confirms[cls]))
+                    location.href = this.href;
+        })
+    })
+
+    $('.TRIGGER_CLICK').trigger('click');
+
+    // Клонируем анкету
+    let count_anketa = 1;
+    $('#ANKETA_CLONE_TRIGGER').click(e => {
+        const CLONE_ID = 'cloning'
+
+        if(count_anketa+1 === 9) {
+            swal.fire({
+                title: 'Нельзя добавлять более 9 осмотров',
+                icon: 'warning'
+            });
+
+            return
+        }
+
+        let clone_first = $(`#${CLONE_ID}-first`), clone_to = $(`#${CLONE_ID}-append`)
+        let clone = clone_first.clone()
+        let randId = 'ANKETA_DOUBLE_' + count_anketa
+
+        if(clone_to.find('.cloning-clone').length) {
+            clone = clone_to.find('.cloning-clone').last().clone()
+        }
+
+        // Выставляем параметры
+        clone.removeAttr('id').addClass('cloning-clone')
+
+        clone.attr('id', randId)
+
+        // Создаем клон
+        clone_to.append(clone)
+
+        clone.find('input,select').each(function () {
+            this.name = this.name.replace('anketa['+(count_anketa-1)+']', 'anketa['+count_anketa+']')
+        })
+
+        count_anketa++
+
+        clone.find('.anketa-delete').html('<a href="" onclick="'+randId+'.remove(); return false;" class="text-danger">Удалить</a>')
+    })
+
+    // Отправка данных с форма по CTRL + ENTER
+    $('.anketa-fields input, .anketa-fields textarea').keydown(e => {
+        if(e.ctrlKey & e.keyCode == 13) {
+            $('.anketa-fields form').trigger('submit');
+        }
+    })
+
+
+    /**
+     * API:
+     * ИЗМЕНЕНИЕ ПОЛЕЙ НА BACKEND
+     */
+    $('.JS_CHANGE_FIELD_MODEL').click(function (e) {
+        e.preventDefault()
+
+        let url = this.href, field = $(this).data('field')
+
+        field = $(field)
+
+        if(field.length) {
+            let new_value = field.val()
+
+            API.put(url.replace(location.origin, ''), { new_value }).then(response => {
+                const data = response.data
+
+                if(data.success)
+                    alert('Данные успешно обновлены!')
+            })
+        }
+    })
+
+    // ------------------------------------------------------- //
+    // Card Close
+    // ------------------------------------------------------ //
+    $('.card-close a.remove').on('click', function (e) {
+        e.preventDefault();
+        $(this).parents('.card').fadeOut();
+    });
+
+    // ------------------------------------------------------- //
+    // Tooltips init
+    // ------------------------------------------------------ //
+
+    $('[data-toggle="tooltip"]').tooltip()
+
+    // ------------------------------------------------------- //
+    // Adding fade effect to dropdowns
+    // ------------------------------------------------------ //
+    $('.dropdown').on('show.bs.dropdown', function () {
+        $(this).find('.dropdown-menu').first().stop(true, true).fadeIn();
+    });
+    $('.dropdown').on('hide.bs.dropdown', function () {
+        $(this).find('.dropdown-menu').first().stop(true, true).fadeOut();
+    });
+
+    // ------------------------------------------------------- //
+    // Sidebar Functionality
+    // ------------------------------------------------------ //
+    $('#toggle-btn').on('click', function (e) {
+        e.preventDefault();
+        $(this).toggleClass('active');
+
+        $('.side-navbar').toggleClass('shrinked');
+        $('.content-inner').toggleClass('active');
+        $(document).trigger('sidebarChanged');
+
+        if ($(window).outerWidth() > 1183) {
+            if ($('#toggle-btn').hasClass('active')) {
+                $('.navbar-header .brand-small').hide();
+                $('.navbar-header .brand-big').show();
+            } else {
+                $('.navbar-header .brand-small').show();
+                $('.navbar-header .brand-big').hide();
+            }
+        }
+
+        if ($(window).outerWidth() < 1183) {
+            $('.navbar-header .brand-small').show();
+        }
+    })
+
+    // Меню (dropdown)
+    $('[data-btn-collapse]').click(function (e) {
+        e.preventDefault()
+
+        let t = $(this), menu = $(t.data('btn-collapse')), clsCollapse = 'collapse'
+
+        t.attr('aria-expanded', menu.hasClass(clsCollapse))
+
+        if(menu.length) {
+            menu.toggleClass(clsCollapse)
+        }
+    })
+
+    // Проверяем ссылки в меню
+    $('a[data-btn-collapse] + ul a').each(function () {
+        let $href = this.href.replace(location.origin, '')
+
+        if(location.pathname.indexOf($href) > -1) {
+            let $parent = $(this).parent().parent()
+
+            $parent.prev().trigger('click')
+        }
+    })
+
+    // ------------------------------------------------------- //
+    // Material Inputs
+    // ------------------------------------------------------ //
+
+    var materialInputs = $('input.input-material');
+
+    // activate labels for prefilled values
+    materialInputs.filter(function() { return $(this).val() !== ""; }).siblings('.label-material').addClass('active');
+
+    // move label on focus
+    materialInputs.on('focus', function () {
+        $(this).siblings('.label-material').addClass('active');
+    });
+
+    // remove/keep label on blur
+    materialInputs.on('blur', function () {
+        $(this).siblings('.label-material').removeClass('active');
+
+        if ($(this).val() !== '') {
+            $(this).siblings('.label-material').addClass('active');
+        } else {
+            $(this).siblings('.label-material').removeClass('active');
+        }
+    });
+
+    // ------------------------------------------------------- //
+    // Footer
+    // ------------------------------------------------------ //
+
+    var contentInner = $('.content-inner');
+
+    $(document).on('sidebarChanged', function () {
+        adjustFooter();
+    });
+
+    $(window).on('resize', function () {
+        adjustFooter();
+    })
+
+    function adjustFooter() {
+        var footerBlockHeight = $('.main-footer').outerHeight();
+        contentInner.css('padding-bottom', footerBlockHeight + 'px');
+    }
+
+    // ------------------------------------------------------- //
+    // External links to new window
+    // ------------------------------------------------------ //
+    $('.external').on('click', function (e) {
+
+        e.preventDefault();
+        window.open($(this).attr("href"));
+    })
+
+    // ADAPTIVE
+    if(screen.width <= 900) {
+        $('#toggle-btn').trigger('click')
+    }
+
+    $('*[data-field="Company_name"]').suggestions({
+        token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
+        type: "PARTY",
+        /* Вызывается, когда пользователь выбирает одну из подсказок */
+        onSelect: function(suggestion) {
+            if(suggestion.data) {
+                const { inn } = suggestion.data
+
+                $('#elements-modal-add input[name="inn"]').val(inn)
+            }
+        }
+    });
+
+    LIBS.initAll()
+
+});

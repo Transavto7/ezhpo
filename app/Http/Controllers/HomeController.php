@@ -1,0 +1,244 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Anketa;
+use App\Car;
+use App\Company;
+use App\Driver;
+use App\Exports\AnketasExport;
+use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+use Maatwebsite\Excel\Facades\Excel;
+
+class HomeController extends Controller
+{
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public static function searchFieldsAnkets ($anketa, $anketaModel, $fieldsKeys)
+    {
+        $valueWhere = $anketa[$anketaModel['connectTo']];
+
+        if(isset($anketaModel['connectItemProp'])) {
+            $connectItemProp = $anketaModel['connectItemProp'];
+            $connectModel = $fieldsKeys[$anketaModel['connectTo']];
+
+            $valueWhere = app($connectModel['model'])
+                ->where($connectItemProp['check'], $anketa[$connectModel['connectTo']])
+                ->first()[$connectItemProp['get']];
+        }
+
+        return app($anketaModel['model'])
+            ->where($anketaModel['key'], $valueWhere)
+            ->first()[$anketaModel['resultKey']];
+    }
+
+    public function SaveCheckedFieldsFilter (Request $request)
+    {
+        $fields = $request->all();
+        $type_ankets = $request->type_ankets;
+
+        unset($fields['_token']);
+
+        session(["fields_$type_ankets" => $fields]);
+
+        return redirect( $_SERVER['HTTP_REFERER'] );
+    }
+
+    public function index(Request $request)
+    {
+        $queryString = '';
+
+        $oKey = 'orderKey';
+        $oBy = 'orderBy';
+
+        /**
+         * All Query String Without Params
+         */
+        foreach($_GET as $getK => $getV) {
+            if($getK !== $oKey && $getK !== $oBy) {
+                $queryString .= '&' . $getK . '=' . (is_array($getV) ? join(',', $getV) : $getV);
+            }
+        }
+
+        $user = \Auth::user();
+
+        $validTypeAnkets = User::$userRolesKeys[$user->role];
+        $typeAnkets = $request->type_ankets;
+
+        $anketasModel = new Anketa();
+        $anketas = $anketasModel;
+
+        $take = $request->get('take', 20);
+        $orderKey = $request->get($oKey, 'date');
+        $orderBy = $request->get($oBy, 'DESC');
+
+        // Если пользователь менее менеджера - то показываем только свои анкеты, заполненные
+        if(isset(Anketa::$anketsKeys[$typeAnkets])) {
+            $validTypeAnkets = $typeAnkets;
+        }
+
+
+        /**
+         * Фильтрация анкет
+         */
+        $filter_activated = !empty( $request->get('filter') );
+        $filter_params = $request->all(); // ИСПРАВИЛ: array_diff($request->all(), array(''))
+        $is_export = isset($_GET['export']);
+        $trash = $request->get('trash', 0);
+
+        unset($filter_params['trash']);
+        unset($filter_params['export']);
+        unset($filter_params['filter']);
+        unset($filter_params['take']);
+        unset($filter_params['orderBy']);
+        unset($filter_params['orderKey']);
+        unset($filter_params['page']);
+        unset($filter_params['getFormFilter']);
+
+        // Уникальные и независимые поля
+        $filterExcept = [
+            'TO_created_at' => 'created_at',
+            'TO_date' => 'date'
+        ];
+
+        $dataExcept = [
+            'pv_id' => 1
+        ];
+
+        // Фильтр
+        if(count($filter_params) > 0 && $filter_activated) {
+            foreach($filter_params as $fk => $fv) {
+                $is_filter_except = isset($filterExcept[$fk]) ? $filterExcept[$fk] : null;
+
+                if((in_array($fk, $anketasModel->fillable) || $is_filter_except)) {
+                    // Поиск по дефолтным полям в таблице Anketas
+
+                    // Проверяем пустые поля
+                    if(!empty($fv)) {
+
+                        if($is_filter_except) {
+                            // Проверка, одинаковые ли данные
+                            $fromFilterValue = $filter_params[$is_filter_except];
+                            $isFromEqualToValue = $fromFilterValue === $fv;
+                            $fromToValues = [$filter_params[$is_filter_except], $fv];
+
+                            /**
+                             * Поправил дату
+                             */
+                            $anketas = $isFromEqualToValue ?
+                                  $anketas->whereDate($is_filter_except, $fromFilterValue)
+                                : $anketas->whereRaw("($is_filter_except >= ? AND $is_filter_except <= ?)", [
+                                    $fromToValues[0]." 00:00:00",
+                                    $fromToValues[1]." 23:59:59"
+                                ]);
+                        } else if ($fk !== 'date' && $fk !== 'created_at') {
+                            if(is_array($fv)) {
+                                $anketas = $anketas->where(function ($q) use ($fv, $fk) {
+
+                                    foreach($fv as $fvItemKey => $fvItemValue) {
+                                        $q = $q->orWhere($fk, 'LIKE', '%' . $fvItemValue . '%');
+                                    }
+
+                                    return $q;
+                                });
+                            } else {
+                                $anketas = $anketas->where($fk, 'LIKE', '%' . $fv . '%');
+                            }
+                        }
+
+                    }
+                } else if (!empty($fv)) {
+                    $anketas = $anketas->where($fk, 'LIKE', '%' . $fv . '%');
+                }
+            }
+        }
+
+        if(User::getUserCompanyId('hash_id') && auth()->user()->hasRole('client', '==')) {
+            $anketas = $anketas->where('company_id', User::getUserCompanyId('hash_id'));
+        }
+
+        $anketas = $anketas->where('type_anketa', $validTypeAnkets)->where('in_cart', $trash);
+
+        /**
+         * <Измеряем количество Авто и Водителей (уникальные ID)>
+         */
+        $anketasCountDrivers = 0;
+        $anketasCountCars = 0;
+
+        if($filter_activated) {
+            $anketasCountCars = $anketas;
+            $anketasCountDrivers = $anketas;
+
+            $anketasCountDrivers = $anketasCountDrivers->get()->groupBy('driver_id')->count();
+            $anketasCountCars = $anketasCountCars->get()->groupBy('car_id')->count();
+        }
+
+        /**
+         * </Измеряем количество Авто и Водителей (уникальные ID)>
+         */
+
+        $anketas = $anketas->orderBy($orderKey, $orderBy)->paginate($take);
+        $anketasCountResult = $anketas->total();
+
+        $fieldsKeys = Anketa::$fieldsKeys[$validTypeAnkets];
+        $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$validTypeAnkets]) ? Anketa::$fieldsGroupFirst[$validTypeAnkets] : [];
+
+        $anketsFields = array_keys($fieldsKeys);
+        $anketasArray = [];
+
+        /**
+         * Если фильтр не активный - то возвращаем все анкеты
+         */
+        $anketasArray = $anketas;
+
+        /**
+         * Check Export
+         */
+        if($is_export) {
+            return (new AnketasExport($anketasArray))->download('export-anketas.xlsx');
+        }
+
+        /**
+         * Check VIEW
+         */
+        $_view = isset($_GET['getFormFilter']) ? 'home_filters' : 'home';
+
+        return view($_view, [
+            'title' => Anketa::$anketsKeys[$validTypeAnkets],
+            'name' => $user->name,
+            'ankets' => $anketasArray,
+            'filter_activated' => $filter_activated,
+            'type_ankets' => $validTypeAnkets,
+            'anketsFields' => $anketsFields,
+            'fieldsKeys' => $fieldsKeys,
+            'fieldsGroupFirst' => $fieldsGroupFirst,
+
+            'anketasCountResult' => $anketasCountResult,
+            'CountCars' => $anketasCountCars,
+            'CountDrivers' => $anketasCountDrivers,
+
+            'currentRole' => $validTypeAnkets === 'Dop' ? 'medic' : $validTypeAnkets,
+
+            'take' => $take,
+            'orderBy' => $orderBy,
+            'orderKey' => $orderKey,
+            'queryString' => $queryString
+        ]);
+    }
+}

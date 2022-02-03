@@ -1,0 +1,165 @@
+<?php
+
+use App\Http\Middleware\ {
+    CheckAdmin, CheckManager
+};
+
+// Маршруты статичных и главных страниц
+Route::get('/', 'IndexController@RenderIndex')->name('index');
+
+/**
+ * API-маршруты
+ */
+
+// Сброс пункта выпуска
+Route::get('/api/pv-reset/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', 'ApiController@ResetAllPV')->name('api.resetpv');
+Route::get('/api/getField/{model}/{field}/{default_value?}', 'IndexController@GetFieldHTML');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('driver-dashboard', function () {
+        return view('pages.driver');
+    })->name('page.driver');
+
+    Route::get('driver-bdd', function () {
+        $instrs = \App\Instr::where('active', 1)->get();
+        $pv_id = \App\Driver::where('hash_id', auth()->user()->id)->first();
+
+        if($pv_id) {
+            $pv_id = \App\Company::find($pv_id->company_id);
+
+            if($pv_id) {
+                $pv_id = $pv_id->pv_id;
+            } else {
+                $pv_id = 0;
+            }
+        } else {
+            $pv_id = 0;
+        }
+
+        return view('pages.driver_bdd', [
+            'instrs' => $instrs,
+            'pv_id' => $pv_id
+        ]);
+    })->name('page.driver_bdd');
+
+    Route::prefix('profile')->group(function () {
+        Route::post('/anketa', 'AnketsController@AddForm')->name('addAnket');
+    });
+});
+
+/**
+ * Профиль, анкета, авторзация
+ */
+Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(function () {
+    Route::get('/home/{type_ankets?}', 'HomeController@index')->name('home');
+
+    Route::prefix('profile')->group(function () {
+        Route::get('/anketa', 'IndexController@RenderForms')->name('forms');
+
+        Route::get('/', 'ProfileController@RenderIndex')->name('profile');
+        Route::post('/', 'ProfileController@UpdateData')->name('updateProfile');
+    });
+
+    Route::prefix('docs')->group(function () {
+        Route::get('{type}/{anketa_id}', 'DocsController@Get')->name('docs.get');
+    });
+
+    // Рендер элемента (водитель, компания и т.д.)
+    Route::get('/elements/{type}', 'IndexController@RenderElements')->name('renderElements');
+});
+
+
+/**
+ * Элементы CRM
+ */
+Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(function () {
+    Route::prefix('elements')->group(function () {
+        // Удаление элемента (водитель, компания и т.д.)
+        Route::get('/{type}/{id}', 'IndexController@RemoveElement')->name('removeElement');
+        // Добавление элемента (водитель, компания и т.д.)
+        Route::post('/{type}', 'IndexController@AddElement')->name('addElement');
+        // Обновление элемента (водитель, компания и т.д.)
+        Route::post('/{type}/{id}', 'IndexController@updateElement')->name('updateElement');
+
+        // Удаление файла
+        Route::get('/delete-file/{model}/{id}/{field}', 'IndexController@DeleteFileElement')->name('deleteFileElement');
+    });
+
+    Route::post('/elements-import/{type}', 'IndexController@ImportElements')->name('importElements');
+    Route::get('/elements-syncdata/{fieldFindId}/{fieldFind}/{model}/{fieldSync}/{fieldSyncValue?}', 'IndexController@SyncDataElement')->name('syncDataElement');
+
+    Route::prefix('anketa')->group(function () {
+        Route::delete('/{id}', 'AnketsController@Delete')->name('forms.delete');
+        Route::post('/{id}', 'AnketsController@Update')->name('forms.update');
+        Route::get('/{id}', 'AnketsController@Get')->name('forms.get');
+    });
+
+    Route::prefix('report')->group(function () {
+        Route::get('{type_report}', 'ReportController@GetReport')->name('report.get');
+    });
+
+    // Сохранение полей в HOME
+    Route::post('/save-fields-home/{type_ankets}', 'HomeController@SaveCheckedFieldsFilter')->name('home.save-fields');
+
+    Route::get('/anketa-trash/{id}/{action}', 'AnketsController@Trash')->name('forms.trash');
+});
+
+/**
+ * Панель администратора
+ */
+Route::middleware(['auth', CheckAdmin::class])->group(function () {
+    Route::prefix('admin')->group(function () {
+        // Модернизация пользователей
+        Route::get('/users', 'AdminController@ShowUsers')->name('adminUsers');
+        Route::post('/users', 'AdminController@CreateUser')->name('adminCreateUser');
+        Route::get('/users/{id}', 'AdminController@DeleteUser')->name('adminDeleteUser');
+        Route::post('/users/{id}', 'AdminController@UpdateUser')->name('adminUpdateUser');
+
+        Route::get('/add-client', 'IndexController@RenderAddClient')->name('pages.add_client');
+    });
+
+
+    /**
+     * SNIPPETS
+     */
+
+    Route::prefix('snippet')->group(function () {
+        Route::get('/driver-to-user-all', function () {
+            foreach(\App\Driver::all() as $driver) {
+                if(!\App\User::where('login', $driver->hash_id)->get()->count()) {
+                    $pv_id = isset($driver->company_id) ? \App\Company::where('id', $driver->company_id)->first()->pv_id : 0;
+
+                    if(!$pv_id) {
+                        $pv_id = 0;
+                    }
+
+                    $register = new \App\Http\Controllers\Auth\RegisterController();
+                    $register->create([
+                        'hash_id' => $driver->hash_id,
+                        'email' => mt_rand(100000,499999) . '@ta-7.ru',
+                        'login' => $driver->hash_id,
+                        'password' => $driver->hash_id,
+                        'name' => $driver->fio,
+                        'pv_id' => $pv_id,
+                        'role' => 3
+                    ]);
+                }
+            }
+        });
+
+        Route::get('/register-user-admin/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', function () {
+            $reg = new \App\Http\Controllers\Auth\RegisterController();
+            return response()->json($reg->create([
+                'name' => 'ADMIN',
+                'email' => 'webmazaretto@gmail.com',
+                'role' => 777,
+                'password' => 'webmazaretto@gmail.com',
+                'login' => 'webmazaretto@gmail.com'
+            ]));
+        });
+    });
+});
+
+// Маршруты авторизации
+Auth::routes();
+

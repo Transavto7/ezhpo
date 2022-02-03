@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="45.141.76.143" id="c85f5850-b657-43cf-94ea-319b1ad3e2a5" port="22" customName="Calculation" nameFormat="CUSTOM" username="root">
+        <option name="customName" value="Calculation" />
+      </sshConfig>
+      <sshConfig authType="PASSWORD" host="213.139.210.53" id="dfa796f2-94e2-4e15-bda4-29c24541568e" port="22" customName="crm.ta-7.ru" nameFormat="CUSTOM" username="root">
+        <option name="customName" value="crm.ta-7.ru" />
+      </sshConfig>
+    </configs>
+  </component>
+</project>
