@@ -30,8 +30,9 @@
                                     </p>
                                 @endif
 
+                                <iframe width="100%" height="300" src="https://www.youtube.com/embed/{{ str_replace('https://www.youtube.com/watch?v=', '', $instr->youtube) }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                                 <a href="{{ $instr->youtube }}">Посмотреть видео на YouTube</a>
-                                <br>
+                                <br><br>
                                 <p>{{ $instr->descr }}</p>
 
                                 <hr>
@@ -39,7 +40,7 @@
 
                                 <div class="row">
                                     <div class="col-md-1">
-                                        <form id="API_FORM_ANKETS" method="POST" action="{{ route('addAnket') }}">
+                                        <form id="API_FORM_ANKETS_{{ $instr->id }}" data-success-title="Инструктаж пройден!" class="API_FORM_SEND" method="post" action="{{ route('api.addform') }}">
                                             @csrf
 
                                             <input type="hidden" name="type_anketa" value="bdd" />
@@ -50,6 +51,7 @@
 
                                             <button type="submit" class="btn btn-success">Да</button>
                                         </form>
+
                                     </div>
 
                                     <div class="col-md-1">

@@ -91,7 +91,9 @@
                                         <th>#</th>
                                     @endrole
 
-                                    <th>#</th>
+                                    @role(['admin', 'manager', 'medic', 'tech'])
+                                        <th>#</th>
+                                    @endrole
                                 </tr>
                             </thead>
                             <tbody>
@@ -145,16 +147,18 @@
                                                 </form>
                                             @endmanager
 
-                                            <a href="{{ route('forms.trash', [
-                                                'id' => $anketa->id,
-                                                'action' => isset($_GET['trash']) ? 0 : 1
-                                            ]) }}" class="btn btn-warning">
-                                                @isset($_GET['trash'])
-                                                    <i class="fa fa-undo"></i>
-                                                @else
-                                                    <i class="fa fa-trash"></i>
-                                                @endisset
-                                            </a>
+                                            @role(['admin', 'manager', 'medic', 'tech'])
+                                                <a href="{{ route('forms.trash', [
+                                                    'id' => $anketa->id,
+                                                    'action' => isset($_GET['trash']) ? 0 : 1
+                                                ]) }}" class="btn btn-warning">
+                                                    @isset($_GET['trash'])
+                                                        <i class="fa fa-undo"></i>
+                                                    @else
+                                                        <i class="fa fa-trash"></i>
+                                                    @endisset
+                                                </a>
+                                            @endrole
 
                                         </td>
 

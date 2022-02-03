@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="container text-center">
-        <h1>Здравствуйте!</h1>
+        <h1>Здравствуйте, {{ auth()->user()->getName() }}!</h1>
         <hr>
 
         <div class="row">

@@ -642,6 +642,28 @@ $(document).ready(function () {
         }
     })
 
+    $('.API_FORM_SEND').submit(function (e) {
+        e.preventDefault()
+
+        let data = $(this).serialize(), action = this.action, method = this.method,
+            formData = new FormData(this), successTitle = $(this).data('successTitle')
+
+        successTitle = successTitle ? successTitle : 'Успешно!'
+
+        axios[method](action, data, {
+            headers: {
+                'Authorization': 'Bearer ' + API_TOKEN
+            }
+        }).then(response => {
+            console.log(response)
+
+            swal.fire({
+                title: successTitle,
+                icon: 'info'
+            });
+        })
+    })
+
     // Проверяем ссылки в меню
     $('a[data-btn-collapse] + ul a').each(function () {
         let $href = this.href.replace(location.origin, '')
