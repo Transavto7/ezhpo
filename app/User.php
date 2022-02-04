@@ -69,6 +69,8 @@ class User extends Authenticatable
 
             if($company) {
                 return $company->$field;
+            } else {
+                return 0;
             }
         }
 

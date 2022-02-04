@@ -14,7 +14,7 @@
                     </div>
 
                     @manager
-                    <div class="badge badge-rounded bg-blue">Менеджер</div>
+                        <div class="badge badge-rounded bg-blue">Менеджер</div>
                     @endmanager
                 </article>
             </div>

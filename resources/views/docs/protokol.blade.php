@@ -46,9 +46,12 @@
             <p>7. Особенности походки:	</p>
             <textarea rows="1" name="особенности_походки" class="doc-input"></textarea>
 
-            <p>точность движения: <textarea name="оп_точность" rows="1" class="doc-input doc-input--row"></textarea></p>
-            <p>тремор пальцев рук: <textarea name="оп_тремор_пальцев" rows="1" class="doc-input doc-input--row"></textarea></p>
-            <p>тремор век: <textarea name="оп_тремор_век" rows="1" class="doc-input doc-input--row"></textarea></p>
+            <p>точность движения:
+                <textarea name="оп_точность" rows="1" class="doc-input"></textarea></p>
+            <p>тремор пальцев рук:
+                <textarea name="оп_тремор_пальцев" rows="1" class="doc-input"></textarea></p>
+            <p>тремор век:
+                <textarea name="оп_тремор_век" rows="1" class="doc-input"></textarea></p>
 
             <p>8.Наличие запаха алкоголя или другого вещества изо рта:	</p>
             <textarea name="оп_наличие_запаха" rows="1" class="doc-input"></textarea>
@@ -98,27 +101,27 @@
             <br><br>
             <table>
                 <tbody>
-                <tr>
-                    <td>
-                        Подпись медицинского работника &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    </td>
-                    <td class="text-center">
-                        ________________ /<br/>
-                        <i>(подпись)</i>
-                    </td>
-                    <td class="text-center">
-                        ____________________________________ /<br/>
-                        <i>(расшифровка подписи медработника)</i>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <br/>
-                        <br/>
-                        _________________________<br/>
-                        М.П.
-                    </td>
-                </tr>
+                    <tr>
+                        <td>
+                            Подпись медицинского работника &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        </td>
+                        <td class="text-center">
+                            ________________ /<br/>
+                            <i>(подпись)</i>
+                        </td>
+                        <td class="text-center">
+                            ____________________________________ /<br/>
+                            <i>(расшифровка подписи медработника)</i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <br/>
+                            <br/>
+                            _________________________<br/>
+                            М.П.
+                        </td>
+                    </tr>
                 </tbody>
             </table>
 

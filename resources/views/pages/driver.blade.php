@@ -8,17 +8,17 @@
         <hr>
 
         <div class="row">
-            <div class="col-md-3">
-                <a href="{{ route('page.driver_bdd') }}" class="btn btn-lg btn-info">БДД</a>
+            <div class="col-md-12 mb-2">
+                <a href="{{ route('page.driver_bdd') }}" class="w-100 btn btn-default">БДД</a>
             </div>
-            <div class="col-md-3">
-                <a href="" class="btn btn-lg btn-info">Информация</a>
+            <div class="col-md-12 mb-2">
+                <a href="" class="btn btn-lg btn-default w-100">Информация</a>
             </div>
-            <div class="col-md-3">
-                <a href="" class="btn btn-lg btn-info">ДТП?</a>
+            <div class="col-md-12 mb-2">
+                <a href="" class="btn btn-lg btn-default w-100">ДТП?</a>
             </div>
-            <div class="col-md-3">
-                <a href="" class="btn btn-lg btn-info">Карта</a>
+            <div class="col-md-12 mb-2">
+                <a href="" class="btn btn-lg btn-default w-100">Карта</a>
             </div>
         </div>
 

@@ -169,8 +169,10 @@ class HomeController extends Controller
             }
         }
 
-        if(User::getUserCompanyId('hash_id') && auth()->user()->hasRole('client', '==')) {
-            $anketas = $anketas->where('company_id', User::getUserCompanyId('hash_id'));
+        if(auth()->user()->hasRole('client', '==')) {
+            $company_id_client = User::getUserCompanyId('hash_id');
+
+            $anketas = $anketas->where('company_id', $company_id_client);
         }
 
         $anketas = $anketas->where('type_anketa', $validTypeAnkets)->where('in_cart', $trash);
