@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('class-page', 'page-protokol')
 
 @section('content')
     @if($protokol_path)
@@ -10,14 +11,13 @@
     <div id="DOC">
         <form class="container Doc" id="DOC_FORM" data-protokol="{{ $protokol_path }}">
             <div class="text-center">
-                <h1>ПРОТОКОЛ<br/>
-                    КОНТРОЛЯ ТРЕЗВОСТИ ВОДИТЕЛЯ АВТОТРАНСПОРТНОГО СРЕДСТВА</h1>
-                <h2>№ {{ $id }} от {{ date('d.m.Y', time($date)) }} года</h2>
+                <h2>ПРОТОКОЛ<br/>
+                    КОНТРОЛЯ ТРЕЗВОСТИ ВОДИТЕЛЯ АВТОТРАНСПОРТНОГО СРЕДСТВА</h2>
+                <h3>№ {{ $id }} от {{ date('d.m.Y', time($date)) }} года</h3>
             </div>
 
             <input type="hidden" name="id" value="{{ $id }}">
 
-            <br>
             <p>1. Фамилия, имя, отчество, год рождения, место работы, должность:</p>
 
             <textarea rows="1" class="doc-input">{{ $driver_fio ? $driver_fio . ',' : '' }} {{ $driver_year_birthday }} г.р., {{ $driver_pv }}</textarea>

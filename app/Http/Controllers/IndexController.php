@@ -876,6 +876,10 @@ class IndexController extends Controller
     {
         $user = Auth::user();
 
+        if($user->hasRole('client')) {
+            return redirect( route('home') );
+        }
+
         $type = $request->get('type', ($user->role === 1 ? 'tech' : 'medic') );
         $company_fields = $this->elements['Driver']['fields']['company_id'];
         $company_fields['getFieldKey'] = 'name';
@@ -900,7 +904,6 @@ class IndexController extends Controller
         $anketa['points'] = $points;
         $anketa['type_anketa'] = $anketa_key;
         $anketa['default_pv_id'] = $user->pv_id;
-        $anketa['odometer'] = rand(78,200);
         $anketa['company_fields'] = $company_fields;
 
         $anketa['Driver'] = Driver::class;

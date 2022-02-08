@@ -11,6 +11,14 @@
         }
     }
 
+    &.page-protokol {
+        .page-content {
+            .content-inner {
+                margin: 0 auto;
+            }
+        }
+    }
+
     &.page-anketa {
         /*.page-container {
             max-width: 700px
@@ -92,9 +100,10 @@
     padding: 25px;
     background: white;
     font-family: 'Times New Roman', serif;
+    font-size: 13px;
 
     p {
-        margin: 5px 0px;
+        margin: 5px 0px 2.5px 0px;
     }
 
     .doc-input[name] {
