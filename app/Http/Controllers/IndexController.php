@@ -830,7 +830,13 @@ class IndexController extends Controller
             }
 
             if(User::getUserCompanyId() && auth()->user()->hasRole('client', '==')) {
-                $element['elements'] = $element['elements']->where('company_id', User::getUserCompanyId());
+                $company_user_id = User::getUserCompanyId();
+
+                if($model == 'Driver' || $model == 'Car') {
+                    $element['elements'] = $element['elements']->where('company_id', $company_user_id);
+                } else if ($model == 'Company') {
+                    $element['elements'] = $element['elements']->where('id', $company_user_id);
+                }
             }
 
             $element['elements_count_all'] = $MODEL_ELEMENTS->all()->count();

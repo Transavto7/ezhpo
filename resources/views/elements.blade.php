@@ -379,7 +379,11 @@
 
         @include('templates.take_form')
 
-        <p>Элементов всего: {{ $elements_count_all }}</p>
+        @role(['client'])
+            <p>Элементов найдено: {{ $elements->total() }}</p>
+        @else
+            <p>Элементов всего: {{ $elements_count_all }}</p>
+        @endrole
     </div>
 </div>
 
