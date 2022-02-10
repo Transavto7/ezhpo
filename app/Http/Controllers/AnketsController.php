@@ -613,7 +613,7 @@ class AnketsController extends Controller
                     // Генерируем номер ПЛ
                     $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->get();
                     $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
-                    $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id) . '-' . date('Y-m-d H:i', strtotime($anketa['date'])) . $suffix_anketa;
+                    $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id) . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
 
                     // Проверка записи в Журнале ПЛ, если у нас ТО
                     if($anketa['type_anketa'] === 'tech') {

@@ -342,19 +342,27 @@ $(document).ready(function () {
                            }
                         }
 
-                        msg += `
-                            <p style="${i === 'dismissed' ? data[i].toUpperCase() === 'ДА' ? 'color: red; font-weight: bold;' : '' : ''}" data-field-card="${model}_${i}" class="text-small m-0">${fvItem.label}:<br/>
-                                ${otherHtmlItems}
-                                <div class="form-group ${inputClass}">
-                                    ${field}
-                                </div>
-                            </p>`
+                       msg += `
+                        <p style="${i === 'dismissed' ? data[i].toUpperCase() === 'ДА' ? 'color: red; font-weight: bold;' : '' : ''}" data-field-card="${model}_${i}" class="text-small m-0">${fvItem.label}:<br/>
+                            ${otherHtmlItems}
+                            <div class="form-group ${inputClass}">
+                                ${field}
+                            </div>
+                        </p>`
 
                     }
                 }
             }
 
-            msg += `<button type="submit" class="btn btn-sm btn-success">Сохранить</button></form>`
+            console.log(model)
+            /**
+             * Запрещаем Мед.сотр и Тех.сотр редактировать компанию
+             */
+            if((userRole() !== 1 || userRole() !== 2) && model == 'Company') {
+
+            } else {
+                msg += `<button type="submit" class="btn btn-sm btn-success">Сохранить</button></form>`
+            }
 
             $(`#${dbItemId}`).html(msg)
 

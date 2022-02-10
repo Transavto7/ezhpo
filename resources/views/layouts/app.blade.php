@@ -28,10 +28,16 @@
     @auth
         <script type="text/javascript">
             window.API_TOKEN = '{{ Auth::user()->api_token }}';
+            window.userRole = function () {
+              return {{ auth()->user()->role }}
+            };
         </script>
     @elseauth
         <script type="text/javascript">
             window.API_TOKEN = '';
+            window.userRole = function () {
+                return 0;
+            };
         </script>
     @endauth
 

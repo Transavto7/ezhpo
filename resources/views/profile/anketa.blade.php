@@ -8,19 +8,17 @@
 
 <div class="row" data-anketa="{{ $anketa_view }}">
     <!-- Анкета -->
-    @role(['manager', 'client', 'admin'])
-        <div class="col-lg-2">
-            <div class="card">
-                <div class="card-body">
-                    <p><b>Карточка компании</b></p>
+    <div class="col-lg-2">
+        <div class="card">
+            <div class="card-body">
+                <p><b>Карточка компании</b></p>
 
-                    <div id="CARD_COMPANY">
-                        Не найдено
-                    </div>
+                <div id="CARD_COMPANY">
+                    Не найдено
                 </div>
             </div>
         </div>
-    @endrole
+    </div>
 
     <div class="col-lg-6">
         <div class="card">

@@ -12,10 +12,13 @@
 
                     <div class="col-md-12">
                         <div class="row bg-light p-2">
-                            <div class="col-md-6">
-                                <button type="button" data-toggle-show="#ankets-filters" class="btn btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
-                                <a href="?trash=1" class="btn btn-warning">Корзина <i class="fa fa-trash"></i></a>
-                            </div>
+                            @role(['admin', 'manager', $currentRole])
+                                <div class="col-md-6">
+                                    <button type="button" data-toggle-show="#ankets-filters" class="btn btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
+                                    <a href="?trash=1" class="btn btn-warning">Корзина <i class="fa fa-trash"></i></a>
+                                </div>
+                            @endrole
+
 
                             @manager
                                 <div class="col-md-6 text-right">

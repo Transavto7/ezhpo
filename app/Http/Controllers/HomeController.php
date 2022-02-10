@@ -204,6 +204,11 @@ class HomeController extends Controller
         $anketsFields = array_keys($fieldsKeys);
         $anketasArray = [];
 
+        if(auth()->user()->hasRole('client', '==')) {
+            unset($fieldsKeys['created_at']);
+            unset($fieldsKeys['is_pak']);
+        }
+
         /**
          * Если фильтр не активный - то возвращаем все анкеты
          */
