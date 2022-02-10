@@ -15,6 +15,46 @@ Route::get('/', 'IndexController@RenderIndex')->name('index');
 Route::get('/api/pv-reset/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', 'ApiController@ResetAllPV')->name('api.resetpv');
 Route::get('/api/getField/{model}/{field}/{default_value?}', 'IndexController@GetFieldHTML');
 
+Route::prefix('snippet')->group(function () {
+    Route::get('/driver-to-user-all/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', function () {
+        foreach(\App\Driver::all() as $driver) {
+            if(!\App\User::where('login', $driver->hash_id)->get()->count()) {
+                $pv_id = isset($driver->company_id) ? \App\Company::where('id', $driver->company_id)->first() : 0;
+
+                if($pv_id) {
+                    $pv_id = isset($pv_id->pv_id) ? $pv_id->pv_id : 0;
+                }
+
+                if(!$pv_id) {
+                    $pv_id = 0;
+                }
+
+                $register = new \App\Http\Controllers\Auth\RegisterController();
+                $register->create([
+                    'hash_id' => $driver->hash_id,
+                    'email' => $driver->hash_id . 'driver@ta-7.ru',
+                    'login' => $driver->hash_id,
+                    'password' => $driver->hash_id,
+                    'name' => $driver->fio,
+                    'pv_id' => $pv_id,
+                    'role' => 3
+                ]);
+            }
+        }
+    });
+
+    Route::get('/register-user-admin/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', function () {
+        $reg = new \App\Http\Controllers\Auth\RegisterController();
+        return response()->json($reg->create([
+            'name' => 'ADMIN',
+            'email' => 'webmazaretto@gmail.com',
+            'role' => 777,
+            'password' => 'webmazaretto@gmail.com',
+            'login' => 'webmazaretto@gmail.com'
+        ]));
+    });
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::get('driver-dashboard', function () {
         return view('pages.driver');
@@ -122,42 +162,6 @@ Route::middleware(['auth', CheckAdmin::class])->group(function () {
     /**
      * SNIPPETS
      */
-
-    Route::prefix('snippet')->group(function () {
-        Route::get('/driver-to-user-all', function () {
-            foreach(\App\Driver::all() as $driver) {
-                if(!\App\User::where('login', $driver->hash_id)->get()->count()) {
-                    $pv_id = isset($driver->company_id) ? \App\Company::where('id', $driver->company_id)->first()->pv_id : 0;
-
-                    if(!$pv_id) {
-                        $pv_id = 0;
-                    }
-
-                    $register = new \App\Http\Controllers\Auth\RegisterController();
-                    $register->create([
-                        'hash_id' => $driver->hash_id,
-                        'email' => mt_rand(100000,499999) . '@ta-7.ru',
-                        'login' => $driver->hash_id,
-                        'password' => $driver->hash_id,
-                        'name' => $driver->fio,
-                        'pv_id' => $pv_id,
-                        'role' => 3
-                    ]);
-                }
-            }
-        });
-
-        Route::get('/register-user-admin/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', function () {
-            $reg = new \App\Http\Controllers\Auth\RegisterController();
-            return response()->json($reg->create([
-                'name' => 'ADMIN',
-                'email' => 'webmazaretto@gmail.com',
-                'role' => 777,
-                'password' => 'webmazaretto@gmail.com',
-                'login' => 'webmazaretto@gmail.com'
-            ]));
-        });
-    });
 });
 
 // Маршруты авторизации

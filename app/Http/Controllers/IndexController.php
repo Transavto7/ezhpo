@@ -882,7 +882,7 @@ class IndexController extends Controller
     {
         $user = Auth::user();
 
-        if($user->hasRole('client')) {
+        if($user->hasRole('client', '==')) {
             return redirect( route('home') );
         }
 
