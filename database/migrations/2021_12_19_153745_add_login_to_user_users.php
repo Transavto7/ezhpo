@@ -14,7 +14,7 @@ class AddLoginToUserUsers extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('login')->unique();
+            $table->string('login')->nullable();
             $table->string('user_post')->nullable();
         });
     }
