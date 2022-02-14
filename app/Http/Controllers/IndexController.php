@@ -467,7 +467,7 @@ class IndexController extends Controller
             'anketa_view' => 'profile.ankets.Dop'
         ],
         'pechat_pl' => [
-            'title' => 'Реестр выданнных путевых листов',
+            'title' => 'Реестр выданных путевых листов',
             'anketa_view' => 'profile.ankets.pechat_pl'
         ],
 
