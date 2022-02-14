@@ -37,7 +37,7 @@ class CreateDriversTable extends Migration
             $table->date('time_card_driver')->nullable(); // Срок действия карты водителя
 
             // Группа риска (множественное поле)
-            $table->string('group_risk')->default('Возраст');
+            $table->string('group_risk')->nullable();
 
             $table->timestamps();
         });

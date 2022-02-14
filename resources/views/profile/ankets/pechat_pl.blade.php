@@ -17,6 +17,33 @@
     </article>
 </div>
 
+<div class="form-group row">
+    <label class="form-control-label col-md-3">ID водителя:</label>
+    <article class="col-md-9">
+        <input value="{{ $driver_id ?? '' }}" type="number" onchange="checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent())" min="6" name="driver_id" class="MASK_ID_ELEM form-control">
+        <p class="app-checker-prop"></p>
+    </article>
+</div>
+
+<div class="form-group row">
+    <label class="col-md-3 form-control-label">ID автомобиля:</label>
+    <article class="col-md-9">
+        <input value="{{ $car_id ?? '' }}" type="number" onchange="checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent())" min="6" name="car_id" class="MASK_ID_ELEM form-control">
+        <p class="app-checker-prop"></p>
+    </article>
+</div>
+
+<div class="form-group row">
+    <label class="form-control-label col-md-3">Внесено в журнал ПЛ:</label>
+    <article class="col-md-9">
+        @include('profile.ankets.fields.added_to_dop', [
+            'type_ankets' => $type_anketa,
+            'field' => 'added_to_dop',
+            'field_default_value' => 'нет'
+        ])
+    </article>
+</div>
+
 <div class="cloning" id="cloning-first">
     <div class="form-group row">
         <label class="col-md-3 form-control-label">Дата печати:</label>
@@ -27,9 +54,16 @@
     </div>
 
     <div class="form-group row">
-        <label class="col-md-3 form-control-label">Количество распечатанных ПЛ:</label>
+        <label class="col-md-3 form-control-label">Количество выданных ПЛ:</label>
         <article class="col-md-9">
             <input type="number" required name="anketa[0][count_pl]" class="form-control">
+        </article>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-md-3 form-control-label">Период выданных ПЛ:</label>
+        <article class="col-md-9">
+            <input type="text" required name="anketa[0][period_pl]" class="form-control">
         </article>
     </div>
 

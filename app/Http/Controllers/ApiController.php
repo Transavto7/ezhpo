@@ -97,7 +97,7 @@ class ApiController extends Controller
         /**
          * Блокируем поля если НЕ АДМИН
          */
-        if(!$user->hasRole('admin')) {
+        /*if(!$user->hasRole('admin')) {
             array_push($blockedFields,
                 'date_bdd', 'date_prmo',
                 'date_report_driver',
@@ -105,7 +105,7 @@ class ApiController extends Controller
                 'date_prto', 'date_techview',
                 'time_skzi', 'date_osago'
             );
-        }
+        }*/
 
         if(isset($models[$model]) && !empty($val)) {
             $_model = $models[$model];

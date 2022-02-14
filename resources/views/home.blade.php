@@ -123,13 +123,11 @@
                                                         @endif
 
                                                     @else
-
                                                         {{ $anketa[$anketaTDkey] }}
 
                                                         @if($type_ankets === 'medic' && $anketaTDkey === 'admitted' && $anketa[$anketaTDkey] === 'Недопущен')
                                                             <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
                                                         @endif
-
                                                     @endif
                                                 </td>
                                             @endif

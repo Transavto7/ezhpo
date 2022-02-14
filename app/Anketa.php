@@ -28,6 +28,8 @@ class Anketa extends Model
         // Журнал печати ПЛ
         'date_pechat_pl',
         'count_pl',
+        'period_pl',
+        'added_to_dop',
 
         // Журнал БДД
         'type_briefing',
@@ -48,7 +50,7 @@ class Anketa extends Model
         'tech' => 'Журнал предрейсовых технических осмотров',
         'bdd' => 'Журнал инструктажей по БДД',
         'report_cart' => 'Журнал снятия отчетов с карт',
-        'pechat_pl' => 'Журнал печати путевых листов',
+        'pechat_pl' => 'Реестр выданнных путевых листов',
         'pak' => 'Журнал СДПО'
     ];
 
@@ -58,7 +60,8 @@ class Anketa extends Model
             'company_name' => 'Место работы',
             'driver_fio' => 'Водитель',
             'pv_id' => 'Пункт выпуска',
-            'car_mark_model' => 'Автомобиль'
+            'car_mark_model' => 'Автомобиль',
+            'is_pak' => 'СДПО'
         ],
 
         'pak' => [
@@ -66,7 +69,8 @@ class Anketa extends Model
             'company_name' => 'Место работы',
             'driver_fio' => 'Водитель',
             'pv_id' => 'Пункт выпуска',
-            'car_mark_model' => 'Автомобиль'
+            'car_mark_model' => 'Автомобиль',
+            'is_pak' => 'СДПО'
         ],
 
         'tech' => [
@@ -76,7 +80,8 @@ class Anketa extends Model
             'driver_fio' => 'Водитель',
 
             // Доп поля
-            'pv_id' => 'Пункт выпуска'
+            'pv_id' => 'Пункт выпуска',
+            'is_pak' => 'СДПО'
         ],
 
         'Dop' => [
@@ -86,7 +91,8 @@ class Anketa extends Model
             'driver_fio' => 'Водитель',
 
             // Доп поля
-            'pv_id' => 'Пункт выпуска'
+            'pv_id' => 'Пункт выпуска',
+            'is_pak' => 'СДПО'
         ],
 
         'bdd' => [
@@ -113,6 +119,8 @@ class Anketa extends Model
             'count_pl' => 'Количество распечатанных ПЛ',
             'user_name' => 'Ф.И.О сотрудника, который готовил ПЛ',
             'pv_id' => 'Пункт выпуска',
+            'added_to_dop' => 'Внесено в журнал ПЛ',
+            'period_pl' => 'Период выданных ПЛ'
         ]
     ];
 
@@ -148,7 +156,6 @@ class Anketa extends Model
             'number_list_road' => 'Номер путевого листа',
             //'date_number_list_road' => 'Срок действия путевого листа',
             'type_view' => 'Тип осмотра',
-            'is_pak' => 'СДПО'
         ],
 
         'pak' => [
@@ -211,7 +218,6 @@ class Anketa extends Model
             'user_name' => 'Фамилия, имя, отчество (при наличии) лица, проводившего контроль',
             'user_eds' => 'Подпись лица, проводившего контроль',
             'pv_id' => 'Пункт выпуска',
-            'is_pak' => 'СДПО'
         ],
 
         /**
@@ -237,7 +243,6 @@ class Anketa extends Model
             'user_name' => 'ФИО сотрудника',
             'user_eds' => 'ЭЦП контролера',
             'created_at' => 'Дата создания',
-            'is_pak' => 'СДПО'
         ],
 
         /**
@@ -260,7 +265,13 @@ class Anketa extends Model
             'count_pl' => 'Количество распечатанных ПЛ',
             'user_name' => 'Ф.И.О сотрудника, который готовил ПЛ',
             'user_eds' => 'ЭЦП сотрудника',
-            'pv_id' => 'Пункт выпуска'
+            'pv_id' => 'Пункт выпуска',
+            'driver_id' => 'ID водителя',
+            'driver_fio' => 'Ф.И.О водителя',
+            'car_id' => 'ID автомобиля',
+            'car_gos_number' => 'Государственный регистрационный номер транспортного средства',
+            'added_to_dop' => 'Внесено в журнал ПЛ',
+            'period_pl' => 'Период выданных ПЛ'
         ],
 
         'bdd' => [

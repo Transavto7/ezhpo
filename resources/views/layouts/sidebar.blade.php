@@ -51,7 +51,7 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('forms', ['type' => 'pechat_pl']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести запись в реестр печати ПЛ</a>
+                    <a href="{{ route('forms', ['type' => 'pechat_pl']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести запись в Реестр выданнных ПЛ</a>
                 </li>
 
                 <li>
@@ -80,7 +80,7 @@
 
                     <li><a href="{{ route('home', 'bdd') }}"><i class="fa fa-book"></i>Журнал инструктажей по БДД </a></li>
                     <li><a href="{{ route('home', 'report_cart') }}"><i class="fa fa-book"></i>Журнал снятия отчетов с карт</a></li>
-                    <li><a href="{{ route('home', 'pechat_pl') }}"><i class="fa fa-book"></i>Журнал печати путевых листов</a></li>
+                    <li><a href="{{ route('home', 'pechat_pl') }}"><i class="fa fa-book"></i>Реестр выданнных путевых листов</a></li>
                     <li><a href="{{ route('home', 'pak') }}"><i class="fa fa-close"></i>Реестр ошибок СДПО</a></li>
                 </ul>
             </li>
@@ -98,11 +98,11 @@
                 <ul id="phoenic" class="collapse list-unstyle">
                     <li><a href="{{ route('renderElements', 'Driver') }}">Водители</a></li>
                     <li><a href="{{ route('renderElements', 'Car') }}">Автомобили</a></li>
+                    <li><a href="{{ route('renderElements', 'Company') }}">Компании</a></li>
 
                     @manager
                         <li><a href="{{ route('renderElements', 'Product') }}">Услуги</a></li>
                         <li><a href="{{ route('renderElements', 'Discount') }}">Скидки</a></li>
-                        <li><a href="{{ route('renderElements', 'Company') }}">Компании</a></li>
                         <li><a href="{{ route('renderElements', 'Instr') }}">Инструктажи</a></li>
                     @endmanager
                 </ul>

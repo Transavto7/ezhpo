@@ -2,9 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f6a199b1-6d31-48a4-b894-b6045514cb71" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/resources/views/profile/ankets/fields/added_to_dop.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/profile/ankets/pak.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2014_10_12_000000_create_users_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2014_10_12_000000_create_users_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2021_12_19_153745_add_login_to_user_users.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_12_19_153745_add_login_to_user_users.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Anketa.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Anketa.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ApiController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ApiController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/IndexController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/IndexController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_12_01_171959_create_drivers_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_12_01_171959_create_drivers_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/home.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layouts/sidebar.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/sidebar.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/pages/reports/all.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/pages/reports/all.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/pechat_pl.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/pechat_pl.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -321,7 +332,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="editor.config.ad.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views/profile/ankets/fields" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
@@ -330,6 +341,7 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\OpenServer\domains\transauto\resources\views\profile\ankets\fields" />
       <recent name="C:\OpenServer\domains\transauto\resources\views\profile\ankets" />
       <recent name="C:\OpenServer\domains\transauto\resources\views\pages" />
       <recent name="F:\openserver\OSPanel\domains\transauto\resources\views\profile\ankets" />
@@ -528,7 +540,11 @@
       <workItem from="1644412392161" duration="3214000" />
       <workItem from="1644487629456" duration="2219000" />
       <workItem from="1644503027574" duration="958000" />
-      <workItem from="1644504306488" duration="2839000" />
+      <workItem from="1644504306488" duration="4037000" />
+      <workItem from="1644593725705" duration="8000" />
+      <workItem from="1644594976800" duration="1566000" />
+      <workItem from="1644729481454" duration="8000" />
+      <workItem from="1644810061427" duration="2616000" />
     </task>
     <servers />
   </component>

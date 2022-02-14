@@ -601,8 +601,6 @@ class AnketsController extends Controller
 
                     array_push($errorsAnketa, $errMsg);
 
-                    $this->savePakForm($anketa, $errMsg);
-
                     continue;
                 }
 

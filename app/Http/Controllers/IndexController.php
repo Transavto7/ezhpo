@@ -155,7 +155,7 @@ class IndexController extends Controller
                     'Возраст' => 'Возраст',
                     'Алкоголь' => 'Алкоголь',
                     'Наркотики' => 'Наркотики'
-                ], 'noRequired' => 1],
+                ], 'defaultValue' => 'Не установлено', 'noRequired' => 1],
                 'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company', 'noRequired' => 1],
                 'payment_form' => ['label' => 'Форма оплаты', 'type' => 'select', 'values' => [
                     'Абонентская оплата' => 'Абонентская оплата',
@@ -467,7 +467,7 @@ class IndexController extends Controller
             'anketa_view' => 'profile.ankets.Dop'
         ],
         'pechat_pl' => [
-            'title' => 'Журнал печати путевых листов',
+            'title' => 'Реестр выданнных путевых листов',
             'anketa_view' => 'profile.ankets.pechat_pl'
         ],
 
