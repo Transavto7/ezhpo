@@ -46,7 +46,7 @@
     </div>
 </div>
 
-<div id="elements-modal-import" tabindex="-1" role="dialog" aria-labelledby="elements-modal-import" aria-hidden="true" class="modal fade text-left">
+{{--<div id="elements-modal-import" tabindex="-1" role="dialog" aria-labelledby="elements-modal-import" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -70,7 +70,7 @@
 
         </div>
     </div>
-</div>
+</div>--}}
 
 {{--NAVBAR--}}
 @if(!(count($elements) >= $max) || !$max)
@@ -85,7 +85,8 @@
             <div class="col-md-5">
                 <button type="button" data-toggle-show="#elements-filters" class="btn btn-info"><i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры</button>
             </div>
-            <div class="col-md-3 text-right">
+
+            {{--<div class="col-md-3 text-right">
                 <div class="row">
                     <button type="button" data-toggle="modal" data-target="#elements-modal-import" class="btn btn-primary">Импорт <i class="fa fa-download"></i></button>
                     <button type="button" onclick="exportTable('export-elements-table', '{{ $title }}', '{{ $title }}.xls')" class="btn btn-default">Шаблон .xls <i class="fa fa-download"></i></button>
@@ -100,9 +101,10 @@
                         </tr>
                     </thead>
                 </table>
-            </div>
+            </div>--}}
+
             <div class="col-md-2 text-right">
-                <button type="button" onclick="exportTable('elements-table', '{{ $title }}', '{{ $title }}.xls')" class="btn btn-dark">Экспорт <i class="fa fa-download"></i></button>
+{{--                <button type="button" onclick="exportTable('elements-table', '{{ $title }}', '{{ $title }}.xls')" class="btn btn-dark">Экспорт <i class="fa fa-download"></i></button>--}}
             </div>
 
             <div class="toggle-hidden col-md-12" id="elements-filters">

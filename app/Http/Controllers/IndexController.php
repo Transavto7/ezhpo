@@ -559,16 +559,21 @@ class IndexController extends Controller
 
                     $pv_id = isset($data['company_id']) ? Company::where('id', $data['company_id'])->first()->pv_id : 0;
 
-                    $register = new RegisterController();
-                    $register->create([
+                    $userData = [
                         'hash_id' => $data['hash_id'],
                         'email' => mt_rand(100000,499999) . '@ta-7.ru',
                         'login' => $data['hash_id'],
                         'password' => $data['hash_id'],
                         'name' => $data['fio'],
-                        'pv_id' => $pv_id,
                         'role' => 3
-                    ]);
+                    ];
+
+                    if($pv_id) {
+                        $userData['pv_id'] = $pv_id;
+                    }
+
+                    $register = new RegisterController();
+                    $register->create($userData);
 
                     // СИНХРОНИЗАЦИЯ ПОЛЕЙ
                     if(isset($data['company_id'])) {

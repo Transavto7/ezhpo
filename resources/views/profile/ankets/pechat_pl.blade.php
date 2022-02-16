@@ -10,7 +10,7 @@
             'k' => 'company_name',
             'is_required' => 'required',
             'model' => 'Company',
-            'default_value' => request()->get('company_name')
+            'default_value' => isset($company_name) ? $company_name : request()->get('company_name')
         ])
 
         <div class="app-checker-prop"></div>
@@ -56,14 +56,14 @@
     <div class="form-group row">
         <label class="col-md-3 form-control-label">Количество выданных ПЛ:</label>
         <article class="col-md-9">
-            <input type="number" required name="anketa[0][count_pl]" class="form-control">
+            <input type="number" value="{{ isset($count_pl) ? $count_pl : '' }}" required name="anketa[0][count_pl]" class="form-control">
         </article>
     </div>
 
     <div class="form-group row">
         <label class="col-md-3 form-control-label">Период выданных ПЛ:</label>
         <article class="col-md-9">
-            <input type="text" required name="anketa[0][period_pl]" class="form-control">
+            <input type="text" value="{{ isset($period_pl) ? $period_pl : '' }}" required name="anketa[0][period_pl]" class="form-control">
         </article>
     </div>
 

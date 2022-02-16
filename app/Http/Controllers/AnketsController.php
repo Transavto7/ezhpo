@@ -61,6 +61,11 @@ class AnketsController extends Controller
         $point = Point::getPointText($anketa->pv_id);
         $points = Point::getAll();
 
+        $iController = new IndexController();
+
+        $company_fields = $iController->elements['Driver']['fields']['company_id'];
+        $company_fields['getFieldKey'] = 'name';
+
         // Дефолтные значения
         $data['title'] = 'Редактирование осмотра';
         $data['default_current_date'] = date('Y-m-d\TH:i', strtotime($anketa->date)); // date('Y-m-d\TH:i')
@@ -69,6 +74,7 @@ class AnketsController extends Controller
         $data['anketa_view'] = 'profile.ankets.' . ($anketa->type_anketa === 'Dop' ? 'medic' : $anketa->type_anketa);
         $data['default_pv_id'] = $anketa->pv_id;
         $data['anketa_route'] = 'forms.update';
+        $data['company_fields'] = $company_fields;
 
         return view('profile.anketa', $data);
     }
@@ -107,7 +113,7 @@ class AnketsController extends Controller
 
                     case 'car_id':
 
-                        if($type_anketa === 'tech') {
+                        if($type_anketa === 'tech' || $type_anketa === 'pechat_pl') {
                             $car = Car::where('hash_id', $daV)->first();
 
                             if($car) {
@@ -162,7 +168,7 @@ class AnketsController extends Controller
 
                 case 'car_id':
 
-                    if($type_anketa === 'tech') {
+                    if($type_anketa === 'tech' || $type_anketa === 'pechat_pl') {
                         $car = Car::where('hash_id', $dV)->first();
 
                         if($car) {
@@ -315,7 +321,7 @@ class AnketsController extends Controller
                 // Выделение красных дат
                 $redDates = [];
                 // ID автомобиля
-                $c_id = isset($anketa['car_id']) ? $anketa['car_id'] : 0;
+                $c_id = isset($anketa['car_id']) ? $anketa['car_id'] : isset($data['car_id']) ? $data['car_id'] : 0;
                 $Car = Car::where('hash_id', $c_id)->first();
                 $Driver = Driver::where('hash_id', $d_id)->first();
 
@@ -537,10 +543,10 @@ class AnketsController extends Controller
                             }
                         }
                     }
-                } else if ($anketa['type_anketa'] === 'tech') {
+                } else if ($anketa['type_anketa'] === 'tech' || $anketa['type_anketa'] === 'pechat_pl') {
                     $anketaTech = Anketa::where('car_id', $c_id)
                         ->where('type_anketa', 'tech')
-                        ->where('type_view', $anketa['type_view'])
+                        ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '')
                         ->orderBy('date', 'desc')
                         ->get();
 

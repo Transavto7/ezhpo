@@ -1,8 +1,13 @@
-<div>
-    <label>
-        <input type="radio" @if(request()->get('is_pak') === '1') checked @endif name="is_pak" value="1"> Да
-    </label>
-    <label>
-        <input type="radio" @if(request()->get('is_pak') === '0') checked @endif name="is_pak" value="0"> Нет
-    </label>
-</div>
+@include('templates.elements_field', [
+    'v' => [
+        'type' => 'select',
+        'values' => [
+            '1' => 'Да',
+            '0' => 'Нет'
+        ]
+    ],
+    'model' => '',
+    'k' => 'is_pak',
+    'is_required' => '',
+    'default_value' => $field_default_value
+])

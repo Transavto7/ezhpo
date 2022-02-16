@@ -22,8 +22,7 @@
 
                             @manager
                                 <div class="col-md-6 text-right">
-{{--                                    <button type="button" onclick="exportTable('ankets-table', '{{ $title }}','{{ $title }}.xls')" class="btn btn-default">Экспорт таблицы <i class="fa fa-download"></i></button>--}}
-
+                                    <button type="button" onclick="exportTable('ankets-table', '{{ $title }}','{{ $title }}.xls')" class="btn btn-default">Экспорт таблицы <i class="fa fa-download"></i></button>
                                     <a href="?{{ request()->getQueryString() }}&export=1" class="btn btn-success">Экспорт результатов <i class="fa fa-download"></i></a>
                                 </div>
                             @endmanager
