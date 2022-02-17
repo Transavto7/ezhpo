@@ -46,7 +46,7 @@
 
 <div class="cloning" id="cloning-first">
     <div class="form-group row">
-        <label class="col-md-3 form-control-label">Дата печати:</label>
+        <label class="col-md-3 form-control-label">Дата выдачи:</label>
         <article class="col-md-9">
             <input min="1900-02-20T20:20"
                    max="2999-02-20T20:20" type="datetime-local" required value="{{ $default_current_date }}" name="anketa[0][date]" class="form-control">

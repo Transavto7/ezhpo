@@ -4,6 +4,18 @@
 @section('sidebar', 1)
 @section('class-page', 'anketa-' . $type_ankets)
 
+@section('custom-scripts')
+    @if($isExport)
+        <script type="text/javascript">
+            window.onload = function () {
+                setTimeout(function () {
+                    exportTable('ankets-table')
+                }, 1500)
+            };
+        </script>
+    @endif
+@endsection
+
 @section('content')
     <div class="col-md-12">
         <div class="card">
@@ -22,8 +34,8 @@
 
                             @manager
                                 <div class="col-md-6 text-right">
-                                    <button type="button" onclick="exportTable('ankets-table', '{{ $title }}','{{ $title }}.xls')" class="btn btn-default">Экспорт таблицы <i class="fa fa-download"></i></button>
-                                    <a href="?{{ request()->getQueryString() }}&export=1" class="btn btn-success">Экспорт результатов <i class="fa fa-download"></i></a>
+                                    <button type="button" onclick="exportTable('ankets-table')" class="btn btn-default">Экспорт результатов <i class="fa fa-download"></i></button>
+                                    <a href="?export=1{{ $queryString }}" class="btn btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
                                 </div>
                             @endmanager
 
@@ -79,10 +91,10 @@
 
                                     @foreach($anketsFields as $field)
                                         @isset($fieldsKeys[$field])
-                                            <th data-field-key="{{ $field }}">
+                                            <th @isset($blockedToExportFields[$field]) class="not-export" @endif data-field-key="{{ $field }}">
                                                 {{ (isset($fieldsKeys[$field]['name'])) ? $fieldsKeys[$field]['name'] : $fieldsKeys[$field] }}
 
-                                                <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field . $queryString }}">
+                                                <a class="not-export" href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field . $queryString }}">
                                                     <i class="fa fa-sort"></i>
                                                 </a>
                                             </th>
@@ -90,11 +102,11 @@
                                     @endforeach
 
                                     @role(['admin', 'manager', $currentRole])
-                                        <th>#</th>
+                                        <th class="not-export">#</th>
                                     @endrole
 
                                     @role(['admin', 'manager', 'medic', 'tech'])
-                                        <th>#</th>
+                                        <th class="not-export">#</th>
                                     @endrole
                                 </tr>
                             </thead>
@@ -104,7 +116,7 @@
                                         <td>{{ $anketa->id }}</td>
                                         @foreach($anketsFields as $anketaTDkey)
                                             @if(isset($fieldsKeys[$anketaTDkey]))
-                                                <td data-field-key="{{ $anketaTDkey }}">
+                                                <td @isset($blockedToExportFields[$anketaTDkey]) class="not-export" @endisset data-field-key="{{ $anketaTDkey }}">
                                                     @if($anketaTDkey === 'date' || strpos($anketaTDkey, '_at') > 0)
                                                         {{ date('d-m-Y H:i:s', strtotime($anketa[$anketaTDkey])) }}
                                                     @elseif($anketaTDkey === 'photos')
@@ -133,12 +145,12 @@
                                         @endforeach
 
                                         @role(['admin', 'manager', $currentRole])
-                                            <td class="td-option">
+                                            <td class="td-option not-export">
                                                 <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info"><i class="fa fa-edit"></i></a>
                                             </td>
                                         @endrole
 
-                                        <td class="td-option">
+                                        <td class="td-option not-export">
                                             @manager
                                                 <form action="{{ route('forms.delete', $anketa->id) }}" onsubmit="if(!confirm('Хотите удалить?')) return false;" method="POST">
                                                     @csrf

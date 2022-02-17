@@ -79,6 +79,7 @@ class HomeController extends Controller
         $user = \Auth::user();
 
         $validTypeAnkets = User::$userRolesKeys[$user->role];
+        $blockedToExportFields = [];
         $typeAnkets = $request->type_ankets;
 
         $anketasModel = new Anketa();
@@ -93,6 +94,9 @@ class HomeController extends Controller
             $validTypeAnkets = $typeAnkets;
         }
 
+        if(isset(Anketa::$blockedToExportFields[$typeAnkets])) {
+            $blockedToExportFields = Anketa::$blockedToExportFields[$typeAnkets];
+        }
 
         /**
          * Фильтрация анкет
@@ -101,6 +105,10 @@ class HomeController extends Controller
         $filter_params = $request->all(); // ИСПРАВИЛ: array_diff($request->all(), array(''))
         $is_export = isset($_GET['export']);
         $trash = $request->get('trash', 0);
+
+        if($is_export) {
+            $take = 10000;
+        }
 
         unset($filter_params['trash']);
         unset($filter_params['export']);
@@ -220,9 +228,9 @@ class HomeController extends Controller
         /**
          * Check Export
          */
-        if($is_export) {
+        /*if($is_export) {
             return (new AnketasExport($anketasArray))->download('export-anketas.xlsx');
-        }
+        }*/
 
         /**
          * Check VIEW
@@ -238,10 +246,13 @@ class HomeController extends Controller
             'anketsFields' => $anketsFields,
             'fieldsKeys' => $fieldsKeys,
             'fieldsGroupFirst' => $fieldsGroupFirst,
+            'blockedToExportFields' => $blockedToExportFields,
 
             'anketasCountResult' => $anketasCountResult,
             'CountCars' => $anketasCountCars,
             'CountDrivers' => $anketasCountDrivers,
+
+            'isExport' => $is_export,
 
             'currentRole' => $validTypeAnkets === 'Dop' ? 'medic' : $validTypeAnkets,
 

@@ -114,10 +114,10 @@ class Anketa extends Model
         ],
 
         'pechat_pl' => [
-            'date' => 'Дата распечатки ПЛ',
+            'date' => 'Дата выдачи ПЛ',
             'company_name' => 'Компания',
-            'count_pl' => 'Количество распечатанных ПЛ',
-            'user_name' => 'Ф.И.О сотрудника, который готовил ПЛ',
+            'count_pl' => 'Количество выданных ПЛ',
+            'user_name' => 'Ф.И.О сотрудника, который выдал ПЛ',
             'pv_id' => 'Пункт выпуска',
             'added_to_dop' => 'Внесено в журнал ПЛ',
             'period_pl' => 'Период выданных ПЛ',
@@ -125,24 +125,8 @@ class Anketa extends Model
         ]
     ];
 
-    public static $fieldsKeys = [ // Группа 2 (скрыты по умолчанию)
+    public static $blockedToExportFields = [
         'medic' => [
-            'date' => 'Дата и время осмотра',
-            'user_name' => 'ФИО работника',
-            'driver_gender' => 'Пол',
-            'driver_year_birthday' => 'Дата рождения',
-            'company_name' => 'Место работы',
-            'complaint' => 'Жалобы',
-            'condition_visible_sliz' => 'Состояние видимых слизистых',
-            'condition_koj_pokr' => 'Состояние кожных покровов',
-            't_people' => 'Температура тела',
-            'tonometer' => "Артериальное давление",
-            'pulse' => 'Пульс',
-            'proba_alko' => 'Признаки опьянения', // Проба на алкоголь
-            'test_narko' => 'Тест на наркотики',
-            'admitted' => 'Заключение о результатах осмотра',
-            'user_eds' => 'ЭЦП медицинского работника',
-
             // Поля не в выгрузку
             'created_at' => 'Дата создания',
             'driver_group_risk' => 'Группа риска',
@@ -155,7 +139,41 @@ class Anketa extends Model
             'car_mark_model' => 'Автомобиль',
             'car_id' => 'ID автомобиля',
             'number_list_road' => 'Номер путевого листа',
-            //'date_number_list_road' => 'Срок действия путевого листа',
+            'type_view' => 'Тип осмотра',
+            'is_pak' => 'ПАК'
+        ]
+    ];
+
+    public static $fieldsKeys = [ // Группа 2 (скрыты по умолчанию)
+        'medic' => [
+            'date' => 'Дата и время осмотра',
+            'driver_fio' => 'ФИО работника',
+            'driver_gender' => 'Пол',
+            'driver_year_birthday' => 'Дата рождения',
+            'company_name' => 'Место работы',
+            'complaint' => 'Жалобы',
+            'condition_visible_sliz' => 'Состояние видимых слизистых',
+            'condition_koj_pokr' => 'Состояние кожных покровов',
+            't_people' => 'Температура тела',
+            'tonometer' => "Артериальное давление",
+            'pulse' => 'Пульс',
+            'proba_alko' => 'Признаки опьянения', // Проба на алкоголь
+            'test_narko' => 'Тест на наркотики',
+            'admitted' => 'Заключение о результатах осмотра',
+            'user_name' => 'ФИО медицинского работника',
+            'user_eds' => 'ЭЦП медицинского работника',
+
+            // Поля не в выгрузку
+            'created_at' => 'Дата создания',
+            'driver_group_risk' => 'Группа риска',
+            'company_id' => 'ID компании',
+            'driver_id' => 'ID водителя',
+            'photos' => 'Фото',
+            'med_view' => 'Мед показания',
+            'pv_id' => 'Пункт выпуска',
+            'car_mark_model' => 'Автомобиль',
+            'car_id' => 'ID автомобиля',
+            'number_list_road' => 'Номер путевого листа',
             'type_view' => 'Тип осмотра',
             'is_pak' => 'ПАК',
         ],
@@ -264,10 +282,10 @@ class Anketa extends Model
         ],
 
         'pechat_pl' => [
-            'date' => 'Дата распечатки ПЛ',
+            'date' => 'Дата выдачи ПЛ',
             'company_name' => 'Компания',
-            'count_pl' => 'Количество распечатанных ПЛ',
-            'user_name' => 'Ф.И.О сотрудника, который готовил ПЛ',
+            'count_pl' => 'Количество выданных ПЛ',
+            'user_name' => 'Ф.И.О сотрудника, который выдал ПЛ',
             'user_eds' => 'ЭЦП сотрудника',
             'pv_id' => 'Пункт выпуска',
             'driver_id' => 'ID водителя',

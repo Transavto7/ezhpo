@@ -316,8 +316,6 @@ class AnketsController extends Controller
             $errorsAnketa = array();
 
             foreach($data_anketa as $anketa) {
-                $anketa['is_pak'] = 1;
-
                 // Выделение красных дат
                 $redDates = [];
                 // ID автомобиля
