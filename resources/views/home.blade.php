@@ -87,7 +87,7 @@
                         <table id="ankets-table" class="ankets-table table table-striped table-sm">
                             <thead>
                                 <tr>
-                                    <th width="60">ID</th>
+                                    <th width="60" class="not-export">ID</th>
 
                                     @foreach($anketsFields as $field)
                                         @isset($fieldsKeys[$field])
@@ -113,7 +113,7 @@
                             <tbody>
                                 @foreach($ankets as $anketaKey => $anketa)
                                     <tr data-field="{{ $anketaKey }}">
-                                        <td>{{ $anketa->id }}</td>
+                                        <td class="not-export">{{ $anketa->id }}</td>
                                         @foreach($anketsFields as $anketaTDkey)
                                             @if(isset($fieldsKeys[$anketaTDkey]))
                                                 <td @isset($blockedToExportFields[$anketaTDkey]) class="not-export" @endisset data-field-key="{{ $anketaTDkey }}">

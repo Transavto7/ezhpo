@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcher;
 
-
 class AnketsController extends Controller
 {
     public function Delete (Request $request)
@@ -527,6 +526,7 @@ class AnketsController extends Controller
                     $anketaMedic = Anketa::where('driver_id', $d_id)
                         ->where('type_anketa', 'medic')
                         ->where('type_view', $anketa['type_view'])
+                        ->where('in_cart', 0)
                         ->orderBy('date', 'desc')
                         ->get();
 
@@ -545,6 +545,7 @@ class AnketsController extends Controller
                     $anketaTech = Anketa::where('car_id', $c_id)
                         ->where('type_anketa', 'tech')
                         ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '')
+                        ->where('in_cart', 0)
                         ->orderBy('date', 'desc')
                         ->get();
 
@@ -615,7 +616,7 @@ class AnketsController extends Controller
                  */
                 if(empty($anketa['number_list_road'])) {
                     // Генерируем номер ПЛ
-                    $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->get();
+                    $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
                     $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
                     $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id) . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
 
@@ -623,6 +624,7 @@ class AnketsController extends Controller
                     if($anketa['type_anketa'] === 'tech') {
                         $anketaPL = Anketa::where('car_id', $c_id)
                             ->where('type_anketa', 'Dop')
+                            ->where('in_cart', 0)
                             ->orderBy('date', 'desc')
                             ->get();
 
