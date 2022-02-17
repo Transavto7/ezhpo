@@ -4,14 +4,8 @@
     <list default="true" id="f6a199b1-6d31-48a4-b894-b6045514cb71" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Anketa.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Anketa.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/IndexController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/IndexController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/elements.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/elements.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/home.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/fields/is_pak.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/fields/is_pak.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/pechat_pl.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/pechat_pl.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/home_filters.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/home_filters.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -545,7 +539,8 @@
       <workItem from="1644835191793" duration="110000" />
       <workItem from="1644926203965" duration="31000" />
       <workItem from="1644926687227" duration="326000" />
-      <workItem from="1644941951084" duration="5213000" />
+      <workItem from="1644941951084" duration="5325000" />
+      <workItem from="1645069245929" duration="748000" />
     </task>
     <servers />
   </component>

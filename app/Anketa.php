@@ -139,6 +139,7 @@ class Anketa extends Model
             'tonometer' => "Артериальное давление",
             'pulse' => 'Пульс',
             'proba_alko' => 'Признаки опьянения', // Проба на алкоголь
+            'test_narko' => 'Тест на наркотики',
             'admitted' => 'Заключение о результатах осмотра',
             'user_eds' => 'ЭЦП медицинского работника',
 
@@ -149,7 +150,6 @@ class Anketa extends Model
             'company_id' => 'ID компании',
             'driver_id' => 'ID водителя',
             'photos' => 'Фото',
-            'test_narko' => 'Тест на наркотики',
             'med_view' => 'Мед показания',
             'pv_id' => 'Пункт выпуска',
             'car_mark_model' => 'Автомобиль',

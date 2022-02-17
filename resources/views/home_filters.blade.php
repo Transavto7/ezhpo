@@ -1,5 +1,7 @@
 <input type="hidden" name="filter" value="1">
 
+<input type="hidden" name="take" value="{{ request()->get('take', '') }}">
+
 <div class="tab-pane fade show active" id="filter-group-1" role="tabpanel" aria-labelledby="filter-group-1">
     {{--ОТКРЫТЫЕ ПО УМОЛЧАНИЮ ГРУППЫ ПОЛЕЙ--}}
     @if($fieldsGroupFirst)

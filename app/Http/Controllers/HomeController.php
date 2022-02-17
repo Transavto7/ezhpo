@@ -148,17 +148,20 @@ class HomeController extends Controller
                                     $fromToValues[1]." 23:59:59"
                                 ]);
                         } else if ($fk !== 'date' && $fk !== 'created_at') {
-                            if(is_array($fv)) {
-                                $anketas = $anketas->where(function ($q) use ($fv, $fk) {
+                            $explodeData = is_array($fv) ? $fv : explode(',', $fv);
+                            $explodeData = (count($explodeData) == 1) ? $explodeData[0] : $explodeData;
 
-                                    foreach($fv as $fvItemKey => $fvItemValue) {
+                            if(is_array($explodeData)) {
+                                $anketas = $anketas->where(function ($q) use ($explodeData, $fk) {
+
+                                    foreach($explodeData as $fvItemKey => $fvItemValue) {
                                         $q = $q->orWhere($fk, 'LIKE', '%' . $fvItemValue . '%');
                                     }
 
                                     return $q;
                                 });
                             } else {
-                                $anketas = $anketas->where($fk, 'LIKE', '%' . $fv . '%');
+                                $anketas = $anketas->where($fk, 'LIKE', '%' . $explodeData . '%');
                             }
                         }
 
