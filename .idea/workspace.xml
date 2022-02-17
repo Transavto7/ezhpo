@@ -5,13 +5,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Anketa.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Anketa.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2021_12_19_151457_add_protokol_to_anketas_pull7_anketas.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_12_19_151457_add_protokol_to_anketas_pull7_anketas.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/front.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/front.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/home.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/pechat_pl.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/pechat_pl.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -548,7 +541,8 @@
       <workItem from="1644941951084" duration="5325000" />
       <workItem from="1645069245929" duration="909000" />
       <workItem from="1645070308388" duration="100000" />
-      <workItem from="1645077703474" duration="1647000" />
+      <workItem from="1645077703474" duration="1866000" />
+      <workItem from="1645087581011" duration="645000" />
     </task>
     <servers />
   </component>

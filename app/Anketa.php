@@ -130,7 +130,6 @@ class Anketa extends Model
             // Поля не в выгрузку
             'created_at' => 'Дата создания',
             'driver_group_risk' => 'Группа риска',
-            'driver_fio' => 'Водитель',
             'company_id' => 'ID компании',
             'driver_id' => 'ID водителя',
             'photos' => 'Фото',

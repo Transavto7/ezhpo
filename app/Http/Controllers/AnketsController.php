@@ -605,6 +605,8 @@ class AnketsController extends Controller
 
                     array_push($errorsAnketa, $errMsg);
 
+                    // Убрали добавление в журнал СДПО
+
                     continue;
                 }
 
