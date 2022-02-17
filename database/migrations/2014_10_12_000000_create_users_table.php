@@ -26,8 +26,10 @@ class CreateUsersTable extends Migration
             $table->string('eds')->nullable();
             $table->text('photo')->nullable();
             $table->string('email')->nullable();
+            $table->string('login')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('user_post')->nullable();
             $table->string('timezone')->nullable();
             $table->text('api_token')->nullable();
             $table->rememberToken();
