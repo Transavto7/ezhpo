@@ -373,10 +373,7 @@ class IndexController extends Controller
         if($model === 'Point' && $field_key === 'pv_id') {
             $points = Point::getAll();
 
-            return view('profile.ankets.components.pvs', [
-                'points' => $points,
-                'default_pv_id' => $default_value
-            ]);
+            return response()->json($points);
         }
 
         if($field) {
