@@ -112,7 +112,7 @@ class AnketsController extends Controller
 
                     case 'car_id':
 
-                        if($type_anketa === 'tech' || $type_anketa === 'pechat_pl') {
+                        if($type_anketa === 'tech' || $type_anketa === 'vid_pl') {
                             $car = Car::where('hash_id', $daV)->first();
 
                             if($car) {
@@ -167,7 +167,7 @@ class AnketsController extends Controller
 
                 case 'car_id':
 
-                    if($type_anketa === 'tech' || $type_anketa === 'pechat_pl') {
+                    if($type_anketa === 'tech' || $type_anketa === 'vid_pl') {
                         $car = Car::where('hash_id', $dV)->first();
 
                         if($car) {
@@ -355,7 +355,7 @@ class AnketsController extends Controller
                  * Проверка водителя по: тесту наркотиков, возрасту
                  */
                 if($d_id || isset($Driver)) {
-                    if(!Driver::DriverChecker($d_id, $tonometer, $test_narko, $proba_alko) && !in_array($anketa['type_anketa'], ['bdd', 'pechat_pl', 'report_cart'])) {
+                    if(!Driver::DriverChecker($d_id, $tonometer, $test_narko, $proba_alko) && !in_array($anketa['type_anketa'], ['bdd', 'pechat_pl', 'vid_pl', 'report_cart'])) {
 
                         if($anketa['type_anketa'] !== 'tech') {
                             $errMsg = 'Водитель не найден';
@@ -541,7 +541,7 @@ class AnketsController extends Controller
                             }
                         }
                     }
-                } else if ($anketa['type_anketa'] === 'tech' || $anketa['type_anketa'] === 'pechat_pl') {
+                } else if ($anketa['type_anketa'] === 'tech' || $anketa['type_anketa'] === 'vid_pl') {
                     $anketaTech = Anketa::where('car_id', $c_id)
                         ->where('type_anketa', 'tech')
                         ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '')

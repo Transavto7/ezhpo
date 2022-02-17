@@ -51,7 +51,11 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('forms', ['type' => 'pechat_pl']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести запись в Реестр выданнных ПЛ</a>
+                    <a href="{{ route('forms', ['type' => 'pechat_pl']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести запись в Реестр печати ПЛ</a>
+                </li>
+
+                <li>
+                    <a href="{{ route('forms', ['type' => 'vid_pl']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести запись в Реестр выданных ПЛ</a>
                 </li>
 
                 <li>
@@ -80,7 +84,8 @@
 
                     <li><a href="{{ route('home', 'bdd') }}"><i class="fa fa-book"></i>Журнал инструктажей по БДД </a></li>
                     <li><a href="{{ route('home', 'report_cart') }}"><i class="fa fa-book"></i>Журнал снятия отчетов с карт</a></li>
-                    <li><a href="{{ route('home', 'pechat_pl') }}"><i class="fa fa-book"></i>Реестр выданнных путевых листов</a></li>
+                    <li><a href="{{ route('home', 'pechat_pl') }}"><i class="fa fa-book"></i>Журнал печати ПЛ</a></li>
+                    <li><a href="{{ route('home', 'vid_pl') }}"><i class="fa fa-book"></i>Реестр выданных ПЛ</a></li>
                     <li><a href="{{ route('home', 'pak') }}"><i class="fa fa-close"></i>Реестр ошибок СДПО</a></li>
                 </ul>
             </li>
