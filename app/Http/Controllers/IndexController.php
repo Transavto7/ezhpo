@@ -472,9 +472,15 @@ class IndexController extends Controller
             'title' => 'Журнал ПЛ',
             'anketa_view' => 'profile.ankets.Dop'
         ],
+
         'pechat_pl' => [
-            'title' => 'Реестр выданных путевых листов',
+            'title' => 'Журнал печати путевых листов',
             'anketa_view' => 'profile.ankets.pechat_pl'
+        ],
+
+        'vid_pl' => [
+            'title' => 'Реестр выданных путевых листов',
+            'anketa_view' => 'profile.ankets.vid_pl'
         ],
 
         'bdd' => [
