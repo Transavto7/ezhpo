@@ -50,7 +50,9 @@
                                                 <br/> ID осмотра: {{ $cId }}
 
                                                 @isset($anketa->driver_id)
-                                                    <br /> <b>Водитель: {{ \App\Driver::where('hash_id', $anketa->driver_id)->first()->fio }}</b>
+                                                    @isset(\App\Driver::where('hash_id', $anketa->driver_id)->first()->fio)
+                                                        <br /> <b>Водитель: {{ \App\Driver::where('hash_id', $anketa->driver_id)->first()->fio }}</b>
+                                                    @endisset
                                                 @endisset
                                                 <div>
                                                     <i>Дата проведения осмотра: <br/><b>{{ $anketa->date }}</b></i>
@@ -58,8 +60,16 @@
                                             @else
                                                 <b>"{{ $title }}" (ID: {{ $cId }}) успешно создан!</b>
 
+                                                @isset($anketa->driver_id)
+                                                    @isset(\App\Driver::where('hash_id', $anketa->driver_id)->first()->fio)
+                                                        <br /> <b>Водитель: {{ \App\Driver::where('hash_id', $anketa->driver_id)->first()->fio }}</b>
+                                                    @endisset
+                                                @endisset
+
                                                 @isset($anketa->car_id)
-                                                    <br /> <b>Госномер автомобиля: {{ \App\Driver::where('hash_id', $anketa->car_id)->first()->gos_number }}</b>
+                                                    @isset(\App\Driver::where('hash_id', $anketa->car_id)->first()->gos_number)
+                                                        <br /> <b>Госномер автомобиля: {{ \App\Driver::where('hash_id', $anketa->car_id)->first()->gos_number }}</b>
+                                                    @endisset
                                                 @endisset
 
                                                 <div>
