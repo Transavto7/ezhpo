@@ -3,13 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="f6a199b1-6d31-48a4-b894-b6045514cb71" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/IndexController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/IndexController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/home_filters.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/home_filters.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/Dop.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/Dop.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/pechat_pl.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/pechat_pl.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/vid_pl.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/vid_pl.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/profile/anketa.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/anketa.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -551,7 +548,9 @@
       <workItem from="1645093506400" duration="599000" />
       <workItem from="1645100616842" duration="968000" />
       <workItem from="1645101624341" duration="2000" />
-      <workItem from="1645201744961" duration="1795000" />
+      <workItem from="1645201744961" duration="2132000" />
+      <workItem from="1645204597944" duration="486000" />
+      <workItem from="1645248233016" duration="768000" />
     </task>
     <servers />
   </component>

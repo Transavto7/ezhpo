@@ -44,22 +44,24 @@
                                 @isset($anketa)
                                     <div class="col-md-6">
                                         <div class="card p-2 text-xsmall">
+
                                             @if($type_anketa === 'medic')
                                                 <b>"{{ $title }}" успешно создан!</b>
-                                                    <br/> ID осмотра: {{ $cId }}
+                                                <br/> ID осмотра: {{ $cId }}
 
-                                                    @if($anketa->driver_id)
-                                                        <br /> <b>Водитель: {{ $Driver::where('hash_id', $anketa->driver_id)->first()->fio }}</b>
-                                                    @endif
+                                                @isset($anketa->driver_id)
+                                                    <br /> <b>Водитель: {{ \App\Driver::where('hash_id', $anketa->driver_id)->first()->fio }}</b>
+                                                @endisset
                                                 <div>
                                                     <i>Дата проведения осмотра: <br/><b>{{ $anketa->date }}</b></i>
                                                 </div>
                                             @else
                                                 <b>"{{ $title }}" (ID: {{ $cId }}) успешно создан!</b>
 
-                                                    @if($anketa->car_id)
-                                                        <br /> <b>Госномер автомобиля: {{ $Car::where('hash_id', $anketa->car_id)->first()->gos_number }}</b>
-                                                    @endif
+                                                @isset($anketa->car_id)
+                                                    <br /> <b>Госномер автомобиля: {{ \App\Driver::where('hash_id', $anketa->car_id)->first()->gos_number }}</b>
+                                                @endisset
+
                                                 <div>
                                                     Дата проведения осмотра <b>{{ $anketa->date }}</b>
                                                 </div>

@@ -317,8 +317,11 @@ class AnketsController extends Controller
             foreach($data_anketa as $anketa) {
                 // Выделение красных дат
                 $redDates = [];
+
                 // ID автомобиля
-                $c_id = isset($anketa['car_id']) ? $anketa['car_id'] : isset($data['car_id']) ? $data['car_id'] : 0;
+                $c_id = isset($anketa['car_id']) ? $anketa['car_id'] :
+                    (isset($data['car_id']) ? $data['car_id'] : 0);
+
                 $Car = Car::where('hash_id', $c_id)->first();
                 $Driver = Driver::where('hash_id', $d_id)->first();
 
