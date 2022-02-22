@@ -180,7 +180,7 @@ class IndexController extends Controller
                 'dismissed' => ['label' => 'Уволен', 'type' => 'select', 'values' => [
                     'Нет' => 'Нет',
                     'Да' => 'Да'
-                ]],
+                ], 'defaultValue' => 'Нет'],
                 'autosync_fields' => ['label' => 'Автоматическая синхронизация Полей с компанией (по умолч.)', 'type' => 'select', 'values' => [
                     'payment_form' => 'Форма оплаты',
                     'products_id' => 'Услуги'
@@ -230,7 +230,7 @@ class IndexController extends Controller
                 'dismissed' => ['label' => 'Уволен', 'type' => 'select', 'values' => [
                     'Нет' => 'Нет',
                     'Да' => 'Да'
-                ]],
+                ], 'defaultValue' => 'Нет'],
                 'autosync_fields' => ['label' => 'Автоматическая синхронизация Полей с компанией (по умолч.)', 'type' => 'select', 'values' => [
                     'payment_form' => 'Форма оплаты',
                     'products_id' => 'Услуги'
@@ -280,7 +280,7 @@ class IndexController extends Controller
                 'dismissed' => ['label' => 'Черный список', 'type' => 'select', 'values' => [
                     'Нет' => 'Нет',
                     'Да' => 'Да'
-                ]]
+                ], 'defaultValue' => 'Нет']
             ]
         ],
 

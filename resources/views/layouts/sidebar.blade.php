@@ -63,11 +63,9 @@
                 </li>
             @endif
 
-            @manager
-                <li>
-                    <a href="{{ route('pages.add_client') }}" class="bg-info text-white"><i class="icon-user"></i>Добавить клиента</a>
-                </li>
-            @endmanager
+            <li>
+                <a href="{{ route('pages.add_client') }}" class="bg-info text-white"><i class="icon-user"></i>Добавить клиента</a>
+            </li>
 
             <li>
                 <a href="#" data-btn-collapse="#views" role="button"> <i class="icon-grid"></i>Журналы осмотров</a>

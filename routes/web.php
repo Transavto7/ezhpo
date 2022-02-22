@@ -60,6 +60,8 @@ Route::middleware(['auth'])->group(function () {
         return view('pages.driver');
     })->name('page.driver');
 
+    Route::get('/add-client', 'IndexController@RenderAddClient')->name('pages.add_client');
+
     Route::get('driver-bdd', function () {
         $instrs = \App\Instr::where('active', 1)->get();
         $pv_id = \App\Driver::where('hash_id', auth()->user()->id)->first();
@@ -154,8 +156,6 @@ Route::middleware(['auth', CheckAdmin::class])->group(function () {
         Route::post('/users', 'AdminController@CreateUser')->name('adminCreateUser');
         Route::get('/users/{id}', 'AdminController@DeleteUser')->name('adminDeleteUser');
         Route::post('/users/{id}', 'AdminController@UpdateUser')->name('adminUpdateUser');
-
-        Route::get('/add-client', 'IndexController@RenderAddClient')->name('pages.add_client');
     });
 
 
