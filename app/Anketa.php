@@ -41,7 +41,8 @@ class Anketa extends Model
         'in_cart',
         'is_pak',
         'protokol_path',
-        'comments'
+        'comments',
+        'flag_pak'
     ];
 
     public static $anketsKeys = [
@@ -53,6 +54,7 @@ class Anketa extends Model
         'pechat_pl' => 'Журнал печати путевых листов',
         'vid_pl' => 'Реестр выданных путевых листов',
         'pak' => 'Журнал СДПО',
+        'pak_queue' => 'Очередь СДПО',
     ];
 
     public static $fieldsGroupFirst = [ // Группа 1 (показываем сразу в HOME)
@@ -62,7 +64,8 @@ class Anketa extends Model
             'driver_fio' => 'Водитель',
             'pv_id' => 'Пункт выпуска',
             'car_mark_model' => 'Автомобиль',
-            'is_pak' => 'СДПО'
+            'is_pak' => 'СДПО',
+            'flag_pak' => 'Флаг СДПО'
         ],
 
         'pak' => [
@@ -71,7 +74,18 @@ class Anketa extends Model
             'driver_fio' => 'Водитель',
             'pv_id' => 'Пункт выпуска',
             'car_mark_model' => 'Автомобиль',
-            'is_pak' => 'СДПО'
+            'is_pak' => 'СДПО',
+            'flag_pak' => 'Флаг СДПО'
+        ],
+
+        'pak_queue' => [
+            'date' => 'Дата и время осмотра',
+            'company_name' => 'Место работы',
+            'driver_fio' => 'Водитель',
+            'pv_id' => 'Пункт выпуска',
+            'car_mark_model' => 'Автомобиль',
+            'is_pak' => 'СДПО',
+            'flag_pak' => 'Флаг СДПО'
         ],
 
         'tech' => [
@@ -148,7 +162,8 @@ class Anketa extends Model
             'car_id' => 'ID автомобиля',
             'number_list_road' => 'Номер путевого листа',
             'type_view' => 'Тип осмотра',
-            'is_pak' => 'ПАК'
+            'is_pak' => 'ПАК',
+            'flag_pak' => 'Флаг СДПО'
         ]
     ];
 
@@ -184,6 +199,7 @@ class Anketa extends Model
             'number_list_road' => 'Номер путевого листа',
             'type_view' => 'Тип осмотра',
             'is_pak' => 'ПАК',
+            'flag_pak' => 'Флаг СДПО'
         ],
 
         'pak' => [
@@ -217,7 +233,43 @@ class Anketa extends Model
             'number_list_road' => 'Номер путевого листа',
             //'date_number_list_road' => 'Срок действия путевого листа',
             'type_view' => 'Тип осмотра',
-            'comments' => 'Комментарий'
+            'comments' => 'Комментарий',
+            'flag_pak' => 'Флаг СДПО'
+        ],
+
+        'pak_queue' => [
+            'date' => 'Дата и время осмотра',
+            'user_name' => 'ФИО работника',
+            'driver_gender' => 'Пол',
+            'driver_year_birthday' => 'Дата рождения',
+            'company_name' => 'Место работы',
+            'complaint' => 'Жалобы',
+            'condition_visible_sliz' => 'Состояние видимых слизистых',
+            'condition_koj_pokr' => 'Состояние кожных покровов',
+            't_people' => 'Температура тела',
+            'tonometer' => "Артериальное давление",
+            'pulse' => 'Пульс',
+            'proba_alko' => 'Признаки опьянения', // Проба на алкоголь
+            'admitted' => 'Заключение о результатах осмотра',
+            'user_eds' => 'ЭЦП медицинского работника',
+
+            // Поля не в выгрузку
+            'created_at' => 'Дата создания',
+            'driver_group_risk' => 'Группа риска',
+            'driver_fio' => 'Водитель',
+            'company_id' => 'ID компании',
+            'driver_id' => 'ID водителя',
+            'photos' => 'Фото',
+            'test_narko' => 'Тест на наркотики',
+            'med_view' => 'Мед показания',
+            'pv_id' => 'Пункт выпуска',
+            'car_mark_model' => 'Автомобиль',
+            'car_id' => 'ID автомобиля',
+            'number_list_road' => 'Номер путевого листа',
+            //'date_number_list_road' => 'Срок действия путевого листа',
+            'type_view' => 'Тип осмотра',
+            'comments' => 'Комментарий',
+            'flag_pak' => 'Флаг СДПО'
         ],
 
         /**

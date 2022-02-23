@@ -46,13 +46,15 @@ class User extends Authenticatable
         'driver' => 3,
         'terminal' => 778,
         'manager' => 11,
-        'admin' => 777
+        'admin' => 777,
+        'operator_pak' => 4
     ];
 
     public static $userRolesKeys = [
         '0' => '',
         '1' => 'tech',
         '2' => 'medic',
+        '4' => 'medic',
         '12' => 'medic',
         '11' => 'medic',
         '777' => 'medic',

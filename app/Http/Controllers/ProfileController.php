@@ -22,6 +22,7 @@ class ProfileController extends Controller
 
         switch($user->role) {
             case 12: $role = 'Клиент'; break;
+            case 4: $role = 'Оператор СДПО'; break;
             case 1: $role = 'Контролёр ТС'; break;
             case 2: $role = 'Медицинский сотрудник'; break;
             case 3: $role = 'Водитель'; break;

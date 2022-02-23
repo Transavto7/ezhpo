@@ -61,6 +61,10 @@
                 <li>
                     <a href="{{ route('forms', ['type' => 'Dop']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести запись в Журнал ПЛ</a>
                 </li>
+
+                <li>
+                    <li><a href="{{ route('home', 'pak_queue') }}"><i class="fa fa-users"></i>Очередь СДПО <span class="badge bg-primary text-white">{{ \App\Anketa::where('type_anketa', 'pak_queue')->count() }}</span></a></li>
+                </li>
             @endif
 
             <li>

@@ -478,6 +478,16 @@ class IndexController extends Controller
             'anketa_view' => 'profile.ankets.pechat_pl'
         ],
 
+        'pak' => [
+            'title' => 'СДПО',
+            'anketa_view' => 'profile.ankets.pak'
+        ],
+
+        'pak_queue' => [
+            'title' => 'Очередь СДПО',
+            'anketa_view' => 'profile.ankets.pak_queue'
+        ],
+
         'vid_pl' => [
             'title' => 'Реестр выданных путевых листов',
             'anketa_view' => 'profile.ankets.vid_pl'

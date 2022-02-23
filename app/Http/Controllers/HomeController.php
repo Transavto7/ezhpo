@@ -98,6 +98,16 @@ class HomeController extends Controller
             $blockedToExportFields = Anketa::$blockedToExportFields[$typeAnkets];
         }
 
+        if(isset($_GET['clear']) && isset($_GET['type_anketa']) && $user->hasRole('admin', '==')) {
+            $typeClearAnkets = trim($_GET['type_anketa']);
+
+            if($typeClearAnkets === 'pak_queue') {
+                Anketa::where('type_anketa', 'pak_queue')->delete();
+
+               return redirect( route('home', $typeClearAnkets) );
+            }
+        }
+
         /**
          * Фильтрация анкет
          */
