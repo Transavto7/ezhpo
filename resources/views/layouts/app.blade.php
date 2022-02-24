@@ -48,6 +48,8 @@
     <div id="app" class="page @yield('class-page')">
         @include('layouts.header')
 
+        <notify></notify>
+
         <main class="page-content d-flex align-items-stretch">
 
             @hasSection ('sidebar')
@@ -83,7 +85,7 @@
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <p>ТРАНСАВТО-7 &copy; 2021</p>
+                                    <p>ТРАНСАВТО-7 &copy; 2021 (release 0.7)</p>
                                 </div>
                             </div>
                         </div>
