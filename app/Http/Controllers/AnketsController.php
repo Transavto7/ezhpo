@@ -358,7 +358,7 @@ class AnketsController extends Controller
                 /**
                  * ОЧЕРЕДЬ ПАК
                  */
-                if($anketa['type_anketa'] == 'medic') {
+                if($anketa['type_anketa'] == 'pak_queue') {
                     $notifyTo = new Notify();
                     $notifyTo->sendMsgToUsersFrom('role', '4', 'Новый осмотр в очереди СДПО');
                 }
