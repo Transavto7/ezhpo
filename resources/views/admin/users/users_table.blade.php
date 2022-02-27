@@ -152,6 +152,7 @@
                                             <option value="12">Клиент</option>
                                             <option value="1">Контролёр ТС</option>
                                             <option value="2">Медицинский сотрудник</option>
+                                            <option value="4">Оператор СДПО</option>
                                             <option value="778">Терминал</option>
                                             <option value="11">Менеджер</option>
                                             <option value="777">Администратор</option>

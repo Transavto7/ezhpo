@@ -385,6 +385,7 @@
             <p>Элементов найдено: {{ $elements->total() }}</p>
         @else
             <p>Элементов всего: {{ $elements_count_all }}</p>
+            <p>Элементов найдено: {{ $elements->total() }}</p>
         @endrole
     </div>
 </div>

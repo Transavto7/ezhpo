@@ -48,7 +48,11 @@
     <div id="app" class="page @yield('class-page')">
         @include('layouts.header')
 
-        <notify></notify>
+        @auth
+            @role(['operator_pak'])
+                <notify></notify>
+            @endrole
+        @endauth
 
         <main class="page-content d-flex align-items-stretch">
 

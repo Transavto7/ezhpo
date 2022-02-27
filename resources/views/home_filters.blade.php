@@ -1,7 +1,10 @@
 <input type="hidden" name="filter" value="1">
 
+@isset($_GET['trash'])
+    <input type="hidden" name="trash" value="{{ request()->get('trash', 0) }}">
+@endisset
+
 <input type="hidden" name="take" value="{{ request()->get('take', '') }}">
-<input type="hidden" name="trash" value="{{ request()->get('trash', 0) }}">
 
 <div class="tab-pane fade show active" id="filter-group-1" role="tabpanel" aria-labelledby="filter-group-1">
     {{--ОТКРЫТЫЕ ПО УМОЛЧАНИЮ ГРУППЫ ПОЛЕЙ--}}

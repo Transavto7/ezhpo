@@ -108,7 +108,7 @@
                                         @endisset
                                     @endforeach
 
-                                    @role(['admin', 'manager', $currentRole])
+                                    @role(['admin', 'manager', 'medic', 'tech', $currentRole])
                                         <th class="not-export">#</th>
                                     @endrole
 
@@ -126,6 +126,12 @@
                                                 <td @isset($blockedToExportFields[$anketaTDkey]) class="not-export" @endisset data-field-key="{{ $anketaTDkey }}">
                                                     @if($anketaTDkey === 'date' || strpos($anketaTDkey, '_at') > 0)
                                                         {{ date('d-m-Y H:i:s', strtotime($anketa[$anketaTDkey])) }}
+
+                                                        <!-- Очередь ПАК -->
+                                                        @if($type_ankets === 'pak_queue' && $anketaTDkey === 'created_at')
+                                                            <div class="App-Timer" data-date="{{ $anketa['created_at'] }}"></div>
+                                                        @endif
+
                                                     @elseif($anketaTDkey === 'photos')
 
                                                         @if($anketa[$anketaTDkey])
@@ -151,7 +157,7 @@
                                             @endif
                                         @endforeach
 
-                                        @role(['admin', 'manager', $currentRole])
+                                        @role(['admin', 'manager', 'medic', 'tech', $currentRole])
                                             <td class="td-option not-export">
                                                 <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info"><i class="fa fa-edit"></i></a>
                                             </td>

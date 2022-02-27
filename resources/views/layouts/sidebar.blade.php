@@ -34,13 +34,17 @@
             </li>
 
             @if(($user_role < 11) || $user_role >= 777)
-                <li>
-                    <a href="{{ route('forms', ['type' => 'medic']) }}" class="bg-red text-white"><i class="icon-padnote"></i>Провести мед. осмотр</a>
-                </li>
+                @role(['manager', 'medic', 'client', 'terminal'])
+                    <li>
+                        <a href="{{ route('forms', ['type' => 'medic']) }}" class="bg-red text-white"><i class="icon-padnote"></i>Провести мед. осмотр</a>
+                    </li>
+                @endrole
 
-                <li>
-                    <a href="{{ route('forms', ['type' => 'tech']) }}" class="bg-blue text-white"><i class="icon-padnote"></i>Провести тех. осмотр</a>
-                </li>
+                @role(['manager', 'tech', 'client', 'terminal'])
+                    <li>
+                        <a href="{{ route('forms', ['type' => 'tech']) }}" class="bg-blue text-white"><i class="icon-padnote"></i>Провести тех. осмотр</a>
+                    </li>
+                @endrole
 
                 <li>
                     <a href="{{ route('forms', ['type' => 'bdd']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести Инструктаж БДД</a>
@@ -62,14 +66,19 @@
                     <a href="{{ route('forms', ['type' => 'Dop']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести запись в Журнал ПЛ</a>
                 </li>
 
-                <li>
-                    <li><a href="{{ route('home', 'pak_queue') }}"><i class="fa fa-users"></i>Очередь СДПО <span class="badge bg-primary text-white">{{ \App\Anketa::where('type_anketa', 'pak_queue')->count() }}</span></a></li>
-                </li>
+                @role(['manager', 'operator_pak', 'terminal'])
+                    @php
+                        $countPakQueue = \App\Anketa::where('type_anketa', 'pak_queue')->count();
+                    @endphp
+                    <li><a href="{{ route('home', 'pak_queue') }}"><i class="fa fa-users"></i>Очередь СДПО <span class="badge bg-primary text-white">{{ $countPakQueue < 99 ? $countPakQueue : '99+' }}</span></a></li>
+                @endrole
             @endif
 
-            <li>
-                <a href="{{ route('pages.add_client') }}" class="bg-info text-white"><i class="icon-user"></i>Добавить клиента</a>
-            </li>
+            @role(['admin', 'manager', 'client', 'terminal'])
+                <li>
+                    <a href="{{ route('pages.add_client') }}" class="bg-info text-white"><i class="icon-user"></i>Добавить клиента</a>
+                </li>
+            @endrole
 
             <li>
                 <a href="#" data-btn-collapse="#views" role="button"> <i class="icon-grid"></i>Журналы осмотров</a>

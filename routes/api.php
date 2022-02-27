@@ -54,6 +54,21 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($points);
     });
 
+    Route::prefix('notify')->group(function () {
+        Route::get('/', function () {
+            $user_id = request()->user()->id;
+            $notifyes = \App\Notify::where('user_id', $user_id)->get();
+
+            return response()->json($notifyes);
+        })->name('api.notify.get');
+
+        Route::post('clear', function () {
+            $user_id = request()->user()->id;
+
+            \App\Notify::where('user_id', $user_id)->delete();
+        })->name('api.notify.clear');
+    });
+
     Route::post('/anketa', 'AnketsController@ApiAddForm')->name('api.addform');
     Route::get('/check-prop/{prop}/{model}/{val}', 'ApiController@CheckProperty');
 

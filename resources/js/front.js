@@ -717,6 +717,31 @@ $(document).ready(function () {
         }
     })
 
+    // Таймер
+
+
+    $('.App-Timer[data-date]').each(function () {
+        let $t = $(this),
+            timerDateStart = new Date($t.data('date'))
+
+        function showDiff(date1, date2){
+            var diff = (date2 - date1)/1000
+            diff = Math.abs(Math.floor(diff))
+
+            var days = Math.floor(diff/(24*60*60))
+            var leftSec = diff - days * 24*60*60
+            var hrs = Math.floor(leftSec/(60*60))
+            var leftSec = leftSec - hrs * 60*60
+
+            var min = Math.floor(leftSec/(60))
+            var leftSec = leftSec - min * 60
+
+            $t.html("<b class='text-red'>" + (days < 10 ? '0' + days : days) + ":" + (hrs < 10 ? '0' + hrs : hrs) + ":" + (min < 10 ? '0' + min : min) + ":" + (leftSec < 10 ? '0' + leftSec : leftSec) + "</b>")
+        }
+
+        setInterval(() => { showDiff(timerDateStart, new Date()) }, 1000)
+    })
+
     // ------------------------------------------------------- //
     // Material Inputs
     // ------------------------------------------------------ //

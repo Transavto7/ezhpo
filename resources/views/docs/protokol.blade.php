@@ -13,7 +13,7 @@
             <div class="text-center">
                 <h2>ПРОТОКОЛ<br/>
                     КОНТРОЛЯ ТРЕЗВОСТИ ВОДИТЕЛЯ АВТОТРАНСПОРТНОГО СРЕДСТВА</h2>
-                <h3>№ {{ $id }} от {{ date('d.m.Y', time($date)) }} года</h3>
+                <h3>№ {{ $id }} от {{ date('d.m.Y', strtotime($date)) }} года</h3>
             </div>
 
             <input type="hidden" name="id" value="{{ $id }}">

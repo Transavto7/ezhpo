@@ -1,6 +1,6 @@
 <template>
     <div class="Notify">
-        <a v-if="messages.length" @click.prevent="clearMsgs" href="#">Очистить всё</a>
+        <a v-if="messages.length" @click.prevent="clearMsgs" href="#">Очистить всё ({{ messages.length }})</a>
 
         <div v-for="msg in messages" class="Notify__message">
             <i class="fa fa-info-circle"></i> {{ msg.message }}
@@ -9,56 +9,23 @@
 </template>
 
 <script>
+    import {ApiController} from "../components/ApiController";
+
+    const API = new ApiController()
 
     export default {
         data () {
             return {
-                messages: [
-                    {
-                        id: 0,
-                        user_id: 0,
-                        message: 'Появился новый осмотр в очереди СДПО'
-                    },
-                    {
-                        id: 0,
-                        user_id: 0,
-                        message: 'Появился новый осмотр в очереди СДПО'
-                    },
-                    {
-                        id: 0,
-                        user_id: 0,
-                        message: 'Появился новый осмотр в очереди СДПО'
-                    },
-                    {
-                        id: 0,
-                        user_id: 0,
-                        message: 'Появился новый осмотр в очереди СДПО'
-                    },{
-                        id: 0,
-                        user_id: 0,
-                        message: 'Появился новый осмотр в очереди СДПО'
-                    },{
-                        id: 0,
-                        user_id: 0,
-                        message: 'Появился новый осмотр в очереди СДПО'
-                    },{
-                        id: 0,
-                        user_id: 0,
-                        message: 'Появился новый осмотр в очереди СДПО'
-                    },{
-                        id: 0,
-                        user_id: 0,
-                        message: 'Появился новый осмотр в очереди СДПО'
-                    },
-
-
-                ]
+                messages: [],
+                inited: 0
             }
         },
 
         methods: {
             clearMsgs () {
-                this.messages = []
+                API.clearNotifies().then(r => {
+                    this.messages = []
+                })
             },
 
             playAudio () {
@@ -66,17 +33,24 @@
                 audio.play()
             },
 
-            getNotifications () {
+            async getNotifications () {
+                let data = await API.getNotify()
 
+                if(this.messages.length !== data.length && this.inited) {
+                    this.playAudio()
+                }
+
+                this.messages = data
             }
         },
 
-        mounted () {
-            this.getNotifications()
+        async mounted () {
+            await this.getNotifications()
+
+            this.inited = 1
 
             setInterval(() => {
-                console.log(Math.random())
-                //this.playAudio()
+                this.getNotifications()
             }, 5000)
         }
     }

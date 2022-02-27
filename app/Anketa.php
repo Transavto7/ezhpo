@@ -80,11 +80,16 @@ class Anketa extends Model
 
         'pak_queue' => [
             'date' => 'Дата и время осмотра',
-            'company_name' => 'Место работы',
+            'complaint' => 'Жалобы',
+            't_people' => 'Температура тела',
+            'tonometer' => "Артериальное давление",
+            'admitted' => 'Заключение о результатах осмотра',
+            'created_at' => 'Дата создания',
             'driver_fio' => 'Водитель',
+            'company_id' => 'ID компании',
+            'driver_id' => 'ID водителя',
+            'photos' => 'Фото',
             'pv_id' => 'Пункт выпуска',
-            'car_mark_model' => 'Автомобиль',
-            'is_pak' => 'СДПО',
             'flag_pak' => 'Флаг СДПО'
         ],
 
@@ -239,36 +244,16 @@ class Anketa extends Model
 
         'pak_queue' => [
             'date' => 'Дата и время осмотра',
-            'user_name' => 'ФИО работника',
-            'driver_gender' => 'Пол',
-            'driver_year_birthday' => 'Дата рождения',
-            'company_name' => 'Место работы',
             'complaint' => 'Жалобы',
-            'condition_visible_sliz' => 'Состояние видимых слизистых',
-            'condition_koj_pokr' => 'Состояние кожных покровов',
             't_people' => 'Температура тела',
             'tonometer' => "Артериальное давление",
-            'pulse' => 'Пульс',
-            'proba_alko' => 'Признаки опьянения', // Проба на алкоголь
             'admitted' => 'Заключение о результатах осмотра',
-            'user_eds' => 'ЭЦП медицинского работника',
-
-            // Поля не в выгрузку
             'created_at' => 'Дата создания',
-            'driver_group_risk' => 'Группа риска',
             'driver_fio' => 'Водитель',
             'company_id' => 'ID компании',
             'driver_id' => 'ID водителя',
             'photos' => 'Фото',
-            'test_narko' => 'Тест на наркотики',
-            'med_view' => 'Мед показания',
             'pv_id' => 'Пункт выпуска',
-            'car_mark_model' => 'Автомобиль',
-            'car_id' => 'ID автомобиля',
-            'number_list_road' => 'Номер путевого листа',
-            //'date_number_list_road' => 'Срок действия путевого листа',
-            'type_view' => 'Тип осмотра',
-            'comments' => 'Комментарий',
             'flag_pak' => 'Флаг СДПО'
         ],
 

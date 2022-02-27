@@ -1,11 +1,14 @@
 @include('profile.ankets.components.pvs')
 
+<input type="hidden" name="type_anketa" value="medic">
+<input type="hidden" name="flag_pak" value="СДПО Р">
+
 <div class="form-group row">
-    <label class="col-md-3 form-control-label">Отправить в журнал осмотров (#{{ $id }}):</label>
+    <label class="col-md-3 form-control-label"><b>Решение</b></label>
     <article class="col-md-9">
-        <select name="type_anketa" class="form-control">
-            <option value="{{ $type_anketa }}">ПАК</option>
-            <option value="medic">Медицинский осмотр</option>
+        <select name="admitted" class="form-control">
+            <option value="Допущен">Принять</option>
+            <option value="Недопущен">Отклонить</option>
         </select>
     </article>
 </div>
@@ -35,40 +38,6 @@
         </article>
     </div>
 
-    <div class="form-group row">
-        <label class="col-md-3 form-control-label">Тип осмотра:</label>
-        <article class="col-md-9">
-            <select name="anketa[0][type_view]" required class="form-control">
-                @isset($type_view)
-                    <option disabled selected value="{{ $type_view }}">{{ $type_view }}</option>
-                @endisset
-
-                <option selected value="Предрейсовый">Предрейсовый</option>
-                <option value="Послерейсовый">Послерейсовый</option>
-                <option value="Предсменный">Предсменный</option>
-                <option value="Послесменный">Послесменный</option>
-            </select>
-        </article>
-    </div>
-
-    <div class="anketa-bordered">
-
-        <div class="form-group row">
-            <label class="col-md-3 form-control-label">Номер путевого листа:</label>
-            <article class="col-md-9">
-                <input value="{{ $number_list_road ?? '' }}" type="text" name="anketa[0][number_list_road]" class="form-control">
-            </article>
-        </div>
-
-        {{--<div class="form-group row">
-            <label class="col-md-3 form-control-label">Срок действия путевого листа:</label>
-            <article class="col-md-9">
-                <input value="{{ $date_number_list_road ?? '' }}" type="date" name="anketa[0][date_number_list_road]" class="form-control">
-            </article>
-        </div>--}}
-
-    </div>
-
     <div class="anketa-delete"></div>
 </div>
 
@@ -79,45 +48,3 @@
     </article>
 </div>
 
-<div class="form-group row">
-    <label class="col-md-3 form-control-label">Проба на алкоголь:</label>
-    <article class="col-md-9">
-        <select name="proba_alko" required class="form-control">
-            @isset($proba_alko)
-                <option disabled selected value="{{ $proba_alko }}">{{ $proba_alko }}</option>
-            @endisset
-
-            <option selected value="Отрицательно">Отрицательно</option>
-            <option value="Положительно">Положительно</option>
-        </select>
-    </article>
-</div>
-
-<div class="form-group row">
-    <label class="col-md-3 form-control-label">Тест на наркотики:</label>
-    <article class="col-md-9">
-        <select name="test_narko" required class="form-control">
-            @isset($test_narko)
-                <option disabled selected value="{{ $test_narko }}">{{ $test_narko }}</option>
-            @endisset
-
-            <option selected value="Не проводился">Не проводился</option>
-            <option value="Отрицательно">Отрицательно</option>
-            <option value="Положительно">Положительно</option>
-        </select>
-    </article>
-</div>
-
-<div class="form-group row">
-    <label class="col-md-3 form-control-label">Мед показания:</label>
-    <article class="col-md-9">
-        <select name="med_view" required class="form-control">
-            @isset($med_view)
-                <option disabled selected value="{{ $med_view }}">{{ $med_view }}</option>
-            @endisset
-
-            <option selected value="В норме">В норме</option>
-            <option value="Отстранение">Отстранение</option>
-        </select>
-    </article>
-</div>

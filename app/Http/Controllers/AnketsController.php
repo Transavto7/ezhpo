@@ -7,6 +7,7 @@ use App\Car;
 use App\Company;
 use App\DDates;
 use App\Driver;
+use App\Notify;
 use App\Point;
 use App\Settings;
 use App\User;
@@ -352,6 +353,14 @@ class AnketsController extends Controller
                     if(empty($anketa[$dfKey])) {
                         $anketa[$dfKey] = $dfData;
                     }
+                }
+
+                /**
+                 * ОЧЕРЕДЬ ПАК
+                 */
+                if($anketa['type_anketa'] == 'medic') {
+                    $notifyTo = new Notify();
+                    $notifyTo->sendMsgToUsersFrom('role', '4', 'Новый осмотр в очереди СДПО');
                 }
 
                 /**
