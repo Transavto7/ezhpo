@@ -51,7 +51,7 @@
         @include('admin.users.users_table')
 
         <div class="col-md-12">
-            {{ $users->render() }}
+            {{ $users->appends($_GET)->render() }}
 
             <p>Количество элементов: {{ count($users) }}</p>
 

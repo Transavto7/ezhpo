@@ -63,7 +63,7 @@ class Anketa extends Model
             'company_name' => 'Место работы',
             'driver_fio' => 'Водитель',
             'pv_id' => 'Пункт выпуска',
-            'car_mark_model' => 'Автомобиль',
+            //'car_mark_model' => 'Автомобиль',
             'is_pak' => 'СДПО',
             'flag_pak' => 'Флаг СДПО'
         ],
@@ -147,7 +147,7 @@ class Anketa extends Model
             'count_pl' => 'Количество выданных ПЛ',
             'user_name' => 'Ф.И.О сотрудника, который выдал ПЛ',
             'pv_id' => 'Пункт выпуска',
-            'added_to_dop' => 'Внесено в журнал ПЛ',
+            'added_to_dop' => 'Внесено в журнал осмотров',
             'period_pl' => 'Период выданных ПЛ',
             'car_gos_number' => 'Госномер автомобиля'
         ]
@@ -199,9 +199,9 @@ class Anketa extends Model
             'photos' => 'Фото',
             'med_view' => 'Мед показания',
             'pv_id' => 'Пункт выпуска',
-            'car_mark_model' => 'Автомобиль',
-            'car_id' => 'ID автомобиля',
-            'number_list_road' => 'Номер путевого листа',
+            //'car_mark_model' => 'Автомобиль',
+            //'car_id' => 'ID автомобиля',
+            //'number_list_road' => 'Номер путевого листа',
             'type_view' => 'Тип осмотра',
             'is_pak' => 'ПАК',
             'flag_pak' => 'Флаг СДПО'
@@ -346,7 +346,7 @@ class Anketa extends Model
             'driver_fio' => 'Ф.И.О водителя',
             'car_gos_number' => 'Государственный регистрационный номер транспортного средства',
             'car_id' => 'ID автомобиля',
-            'added_to_dop' => 'Внесено в журнал ПЛ',
+            'added_to_dop' => 'Внесено в журнал осмотров',
             'period_pl' => 'Период выданных ПЛ'
         ],
 

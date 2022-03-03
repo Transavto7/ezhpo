@@ -67,7 +67,9 @@
             @endguest
 
             @auth
-                <div class="content-inner">
+                <div
+                    class="content-inner @hasSection ('sidebar') @else w-100 @endif"
+                >
                     @hasSection ('sidebar')
                         <!-- Хэдер-->
                         <header class="page-header">
@@ -89,7 +91,7 @@
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <p>ТРАНСАВТО-7 &copy; 2021 (release 0.7)</p>
+                                    <p>ТРАНСАВТО-7 &copy; 2021 (release 0.9)</p>
                                 </div>
                             </div>
                         </div>

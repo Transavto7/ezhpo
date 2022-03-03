@@ -34,7 +34,7 @@
 </div>
 
 <div class="form-group row">
-    <label class="form-control-label col-md-3">Внесено в журнал ПЛ:</label>
+    <label class="form-control-label col-md-3">Внесено в журнал осмотров:</label>
     <article class="col-md-9">
         @include('profile.ankets.fields.added_to_dop', [
             'type_ankets' => $type_anketa,

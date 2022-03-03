@@ -382,10 +382,10 @@
         @include('templates.take_form')
 
         @role(['client'])
-            <p>Элементов найдено: {{ $elements->total() }}</p>
+            <p>Элементов найдено: {{ isset($elements->total) ? $elements->total() : $elements_count_all }}</p>
         @else
             <p>Элементов всего: {{ $elements_count_all }}</p>
-            <p>Элементов найдено: {{ $elements->total() }}</p>
+            <p>Элементов найдено: {{ isset($elements->total) ? $elements->total() : $elements_count_all }}</p>
         @endrole
     </div>
 </div>

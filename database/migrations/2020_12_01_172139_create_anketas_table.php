@@ -44,7 +44,6 @@ class CreateAnketasTable extends Migration
 
             $table->timestamp('date')->useCurrent();
             $table->string('number_list_road')->nullable();
-            //$table->date('date_number_list_road')->nullable(); // срок действия ПЛ
 
 
             $table->string('type_view')->default('Предрейсовый'); // Тип осмотра

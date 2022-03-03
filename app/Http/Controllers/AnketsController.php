@@ -391,13 +391,9 @@ class AnketsController extends Controller
                         $anketa['driver_group_risk'] = $Driver->group_risk;
 
                         if($Driver->dismissed === 'Да') {
-                            $errMsg = 'Водитель уволен';
-
-                            $this->savePakForm($anketa, $errMsg);
+                            $errMsg = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
 
                             array_push($errorsAnketa, $errMsg);
-
-                            continue;
                         }
 
                         /**
@@ -566,13 +562,9 @@ class AnketsController extends Controller
                         $Company_Car = Company::where('id', $Car->company_id)->first();
 
                         if($Car->dismissed === 'Да') {
-                            $errMsg = 'Автомобиль уволен';
+                            $errMsg = 'Автомобиль уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
 
                             array_push($errorsAnketa, $errMsg);
-
-                            $this->savePakForm($anketa, $errMsg);
-
-                            continue;
                         }
 
                         if($Company_Car) {
@@ -627,10 +619,12 @@ class AnketsController extends Controller
                  * Генерация номера ПЛ
                  */
                 if(empty($anketa['number_list_road'])) {
-                    // Генерируем номер ПЛ
-                    $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
-                    $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
-                    $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id) . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
+                    if($anketa['type_anketa'] !== 'medic') {
+                        // Генерируем номер ПЛ
+                        $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
+                        $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
+                        $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id) . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
+                    }
 
                     // Проверка записи в Журнале ПЛ, если у нас ТО
                     if($anketa['type_anketa'] === 'tech') {

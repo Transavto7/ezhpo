@@ -324,7 +324,6 @@ $(document).ready(function () {
                        otherHtmlItems = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
 
                        if(fvItem['type'] == 'select') {
-
                             await API_CONTROLLER.getFieldHTML({ field: i, model, default_value: encodeURIComponent(data[i]) }).then(response => {
                                 field = response.data
                             })

@@ -26,6 +26,7 @@
                 <option selected value="Вводный">Вводный</option>
                 <option value="Предрейсовый">Предрейсовый</option>4
                 <option value="Сезонный (осенне-зимний)">Сезонный (осенне-зимний)</option>
+                <option value="Сезонный (весенне-летний)">Сезонный (весенне-летний)</option>
                 <option value="Специальный">Специальный</option>
             </select>
         </article>

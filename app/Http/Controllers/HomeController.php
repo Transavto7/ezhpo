@@ -173,7 +173,7 @@ class HomeController extends Controller
                                 $anketas = $anketas->where(function ($q) use ($explodeData, $fk) {
 
                                     foreach($explodeData as $fvItemKey => $fvItemValue) {
-                                        $q = $q->orWhere($fk, 'LIKE', '%' . $fvItemValue . '%');
+                                        $q = $q->orWhere($fk, $fvItemValue); // TODO: поправили Like
                                     }
 
                                     return $q;

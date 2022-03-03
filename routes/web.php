@@ -17,29 +17,35 @@ Route::get('/api/getField/{model}/{field}/{default_value?}', 'IndexController@Ge
 
 Route::prefix('snippet')->group(function () {
     Route::get('/driver-to-user-all/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', function () {
-        foreach(\App\Driver::all() as $driver) {
-            if(!\App\User::where('login', $driver->hash_id)->get()->count()) {
-                $pv_id = isset($driver->company_id) ? \App\Company::where('id', $driver->company_id)->first() : 0;
+        $drivers = DB::select('select * from drivers WHERE hash_id NOT IN (SELECT login FROM users)');
 
-                if($pv_id) {
-                    $pv_id = isset($pv_id->pv_id) ? $pv_id->pv_id : 0;
-                }
+        if(count($drivers) <= 0) {
+            echo 'все водители добавлены как пользователи';
+        }
 
-                if(!$pv_id) {
-                    $pv_id = 0;
-                }
+        foreach($drivers as $driver) {
+            $pv_id = isset($driver->company_id) ? \App\Company::where('id', $driver->company_id)->first() : 0;
 
-                $register = new \App\Http\Controllers\Auth\RegisterController();
-                $register->create([
-                    'hash_id' => $driver->hash_id,
-                    'email' => $driver->hash_id . 'driver@ta-7.ru',
-                    'login' => $driver->hash_id,
-                    'password' => $driver->hash_id,
-                    'name' => $driver->fio,
-                    'pv_id' => $pv_id,
-                    'role' => 3
-                ]);
+            if($pv_id) {
+                $pv_id = isset($pv_id->pv_id) ? $pv_id->pv_id : 0;
             }
+
+            if(!$pv_id) {
+                $pv_id = 0;
+            }
+
+            $register = new \App\Http\Controllers\Auth\RegisterController();
+            $created = $register->create([
+                'hash_id' => $driver->hash_id . rand(999,99999),
+                'email' => $driver->hash_id . 'driver@ta-7.ru',
+                'login' => $driver->hash_id,
+                'password' => $driver->hash_id,
+                'name' => $driver->fio,
+                'pv_id' => $pv_id,
+                'role' => 3
+            ]);
+
+            echo '['.$driver->hash_id.'] Создан Водитель Как Пользователь ' . '  ('.count($drivers).')<br/>';
         }
     });
 

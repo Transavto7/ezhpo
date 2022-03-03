@@ -74,7 +74,7 @@
                 @endrole
             @endif
 
-            @role(['admin', 'manager', 'client', 'terminal'])
+            @role(['admin', 'manager', 'terminal'])
                 <li>
                     <a href="{{ route('pages.add_client') }}" class="bg-info text-white"><i class="icon-user"></i>Добавить клиента</a>
                 </li>
@@ -114,7 +114,10 @@
                 <ul id="phoenic" class="collapse list-unstyle">
                     <li><a href="{{ route('renderElements', 'Driver') }}">Водители</a></li>
                     <li><a href="{{ route('renderElements', 'Car') }}">Автомобили</a></li>
-                    <li><a href="{{ route('renderElements', 'Company') }}">Компании</a></li>
+
+                    @role(['admin', 'manager', 'medic', 'tech', 'terminal'])
+                        <li><a href="{{ route('renderElements', 'Company') }}">Компании</a></li>
+                    @endrole
 
                     @manager
                         <li><a href="{{ route('renderElements', 'Product') }}">Услуги</a></li>
