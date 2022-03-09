@@ -72,11 +72,11 @@ class User extends Authenticatable
             if($company) {
                 return $company->$field;
             } else {
-                return 0;
+                return -1;
             }
         }
 
-        return 0;
+        return -1;
     }
 
     public function hasRole ($role, $prefix = '>=')

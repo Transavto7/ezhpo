@@ -349,6 +349,7 @@ class IndexController extends Controller
                     'Вводный' => 'Вводный',
                     'Предрейсовый' => 'Предрейсовый',
                     'Сезонный (осенне-зимний)' => 'Сезонный (осенне-зимний)',
+                    'Сезонный (весенне-летний)' => 'Сезонный (весенне-летний)',
                     'Специальный' => 'Специальный'
                 ], 'defaultValue' => 'Вводный'],
                 'youtube' => ['label' => 'Ссылка на YouTube', 'type' => 'text'],
@@ -841,9 +842,14 @@ class IndexController extends Controller
                         if(is_array($aFv)) {
 
                             $element['elements'] = $element['elements']->where(function ($q) use ($aFv, $aFk) {
+                                $isId = strpos($aFk, '_id');
 
                                 foreach($aFv as $aFvItemKey => $aFvItemValue) {
-                                    $q = $q->orWhere($aFk, 'LIKE', '%' . $aFvItemValue . '%');
+                                    if($isId) {
+                                        $q = $q->orWhere($aFk, $aFvItemValue);
+                                    } else {
+                                        $q = $q->orWhere($aFk, 'LIKE', '%' . $aFvItemValue . '%');
+                                    }
                                 }
 
                                 return $q;

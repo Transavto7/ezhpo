@@ -13,14 +13,14 @@
             <div class="text-center">
                 <h2>ПРОТОКОЛ<br/>
                     КОНТРОЛЯ ТРЕЗВОСТИ ВОДИТЕЛЯ АВТОТРАНСПОРТНОГО СРЕДСТВА</h2>
-                <h3>№ {{ $id }} от {{ date('d.m.Y', strtotime($date)) }} года</h3>
+                <h3>№ <input style="min-width: 50px;width: 100px;" type="number" value="{{ $id }}" class="doc-input doc-input--row"> от {{ date('d.m.Y', strtotime($date)) }} года</h3>
             </div>
 
             <input type="hidden" name="id" value="{{ $id }}">
 
             <p>1. Фамилия, имя, отчество, год рождения, место работы, должность:</p>
 
-            <textarea rows="1" class="doc-input">{{ $driver_fio ? $driver_fio . ',' : '' }} {{ $driver_year_birthday }} г.р., {{ $driver_pv }}</textarea>
+            <textarea rows="1" class="doc-input">{{ $driver_fio ? $driver_fio . ',' : '' }} {{ $driver_year_birthday }} г.р., {{ $driver_pv }}, {{ app('app\Company')->getName($company_id, 'hash_id') }}</textarea>
             <br>
             кем и когда (точное время) произведен контроль трезвости
             <textarea rows="1" readonly class="doc-input">{{ $user_post ? $user_post . ',' : '' }} {{ $user_name }}, {{ $date }}</textarea>

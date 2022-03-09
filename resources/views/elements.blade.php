@@ -77,9 +77,12 @@
     <div class="col-md-12">
         <div class="row bg-light p-2">
             @role(['manager', 'admin', 'tech', 'medic', 'client'])
-                <div class="col-md-2">
-                    <button type="button" data-toggle="modal" data-target="#elements-modal-add" class="@isset($_GET['continue']) TRIGGER_CLICK @endisset btn btn-success">Добавить <i class="fa fa-plus"></i></button>
-                </div>
+                @if($model === 'Company' && (auth()->user()->hasRole('tech', '==') || auth()->user()->hasRole('medic', '==')))
+                @else
+                    <div class="col-md-2">
+                        <button type="button" data-toggle="modal" data-target="#elements-modal-add" class="@isset($_GET['continue']) TRIGGER_CLICK @endisset btn btn-success">Добавить <i class="fa fa-plus"></i></button>
+                    </div>
+                @endif
             @endrole
 
             <div class="col-md-5">

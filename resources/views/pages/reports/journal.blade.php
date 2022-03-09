@@ -11,19 +11,30 @@
         <tbody>
         @if(count($reports) > 0)
             @foreach($reports->unique('driver_id') as $report)
-                @php $predr = \App\Anketa::where('type_view', 'Предрейсовый')->where('company_id', $company_id)->where('type_anketa', 'medic')->where('driver_id', $report->driver_id)->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                @php $predr = \App\Anketa::where('type_view', 'Предрейсовый')
+->where('company_id', $company_id)
+->where('in_cart', 0)->whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+->where('driver_id', $report->driver_id)->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])->count(); @endphp
-                @php $posler = \App\Anketa::where('type_view', 'Послерейсовый')->where('company_id', $company_id)->where('type_anketa', 'medic')->where('driver_id', $report->driver_id)->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                @php $posler = \App\Anketa::where('type_view', 'Послерейсовый')
+->where('company_id', $company_id)->where('in_cart', 0)
+->whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+->where('driver_id', $report->driver_id)->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])->count(); @endphp
-                @php $bdd = \App\Anketa::where('type_anketa', 'bdd')->where('company_id', $company_id)->where('driver_id', $report->driver_id)->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                @php $bdd = \App\Anketa::where('type_anketa', 'bdd')
+->where('company_id', $company_id)->where('in_cart', 0)
+->whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])->count(); @endphp
-                @php $report_cart = \App\Anketa::where('type_anketa', 'report_cart')->where('company_id', $company_id)->where('driver_id', $report->driver_id)->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                @php $report_cart = \App\Anketa::where('type_anketa', 'report_cart')
+->where('company_id', $company_id)->whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+->where('driver_id', $report->driver_id)->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])->count(); @endphp
@@ -83,11 +94,11 @@
         <tbody>
         @if(count($reports2) > 0)
             @foreach($reports2 as $report)
-                @php $predr = \App\Anketa::where('type_view', 'Предрейсовый')->where('company_id', $company_id)->where('type_anketa', 'tech')->where('car_gos_number', $report->car_gos_number)->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                @php $predr = \App\Anketa::where('type_view', 'Предрейсовый')->where('in_cart', 0)->where('company_id', $company_id)->where('type_anketa', 'tech')->where('car_gos_number', $report->car_gos_number)->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                         $date_from." 00:00:00",
                         $date_to." 23:59:59"
                     ])->count(); @endphp
-                @php $posler = \App\Anketa::where('type_view', 'Послерейсовый')->where('company_id', $company_id)->where('type_anketa', 'tech')->where('car_gos_number', $report->car_gos_number)->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                @php $posler = \App\Anketa::where('type_view', 'Послерейсовый')->where('in_cart', 0)->where('company_id', $company_id)->where('type_anketa', 'tech')->where('car_gos_number', $report->car_gos_number)->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                         $date_from." 00:00:00",
                         $date_to." 23:59:59"
                     ])->count(); @endphp
@@ -130,6 +141,7 @@
     </thead>
     <tbody>
         <td>{{ \App\Anketa::where('type_anketa', 'pechat_pl')
+            ->where('in_cart', 0)
             ->where('company_name', \App\Company::where('hash_id', $company_id)->first()->name)
             ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                 $date_from." 00:00:00",
@@ -170,11 +182,13 @@
                                             <td>{{ $report->driver_fio }}</td>
                                             <td>{{ \App\Anketa::where('type_view', 'Предрейсовый')
         ->where('type_anketa', 'medic')
+        ->where('in_cart', 0)
         ->where('company_id', $company_id)
         ->where('driver_id', $report->driver_id)
         ->whereMonth('date', $month['month'])->count() }}</td>
                                             <td>{{ \App\Anketa::where('type_view', 'Послерейсовый')
         ->where('type_anketa', 'medic')
+        ->where('in_cart', 0)
         ->where('company_id', $company_id)
         ->where('driver_id', $report->driver_id)
         ->whereMonth('date', $month['month'])->count() }}</td>

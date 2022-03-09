@@ -91,21 +91,10 @@ class ApiController extends Controller
         ];
 
         $blockedFields = [
-            'old_id', 'req_id', 'inn'
+            'old_id', 'req_id', 'inn',
+            'date_bdd',
+            'date_report_driver'
         ];
-
-        /**
-         * Блокируем поля если НЕ АДМИН
-         */
-        /*if(!$user->hasRole('admin')) {
-            array_push($blockedFields,
-                'date_bdd', 'date_prmo',
-                'date_report_driver',
-                'time_card_driver',
-                'date_prto', 'date_techview',
-                'time_skzi', 'date_osago'
-            );
-        }*/
 
         if(isset($models[$model]) && !empty($val)) {
             $_model = $models[$model];
@@ -121,9 +110,9 @@ class ApiController extends Controller
             /**
              * Фильтрация полей
              */
-            $fields = array_filter($fields, function ($item) use ($blockedFields) {
+            /*$fields = array_filter($fields, function ($item) use ($blockedFields) {
                 return !in_array($item, $blockedFields);
-            });
+            });*/
 
             $fieldsValues = new IndexController();
             $fieldsValues = $fieldsValues->elements[$model]['fields'];
@@ -142,7 +131,7 @@ class ApiController extends Controller
                 }
             }
 
-            return ApiController::r(['exists' => $data_exists, 'model' => $model, 'message' => $data, 'fieldsValues' => $fieldsValues, 'redDates' => $redDates], 1);
+            return ApiController::r(['exists' => $data_exists, 'model' => $model, 'blockedFields' => $blockedFields, 'message' => $data, 'fieldsValues' => $fieldsValues, 'redDates' => $redDates], 1);
         }
 
         return ApiController::r(['exists' => false, 'message' => '', 'model' => $model], 0);

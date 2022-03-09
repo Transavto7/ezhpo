@@ -71,7 +71,7 @@ class AnketsController extends Controller
         $data['default_current_date'] = date('Y-m-d\TH:i', strtotime($anketa->date)); // date('Y-m-d\TH:i')
         $data['default_point'] = $point;
         $data['points'] = $points;
-        $data['anketa_view'] = 'profile.ankets.' . ($anketa->type_anketa === 'Dop' ? 'medic' : $anketa->type_anketa);
+        $data['anketa_view'] = 'profile.ankets.' . $anketa->type_anketa;
         $data['default_pv_id'] = $anketa->pv_id;
         $data['anketa_route'] = 'forms.update';
         $data['company_fields'] = $company_fields;
@@ -533,7 +533,7 @@ class AnketsController extends Controller
                 if ($anketa['type_anketa'] === 'medic') {
                     $anketaMedic = Anketa::where('driver_id', $d_id)
                         ->where('type_anketa', 'medic')
-                        ->where('type_view', $anketa['type_view'])
+                        ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '')
                         ->where('in_cart', 0)
                         ->orderBy('date', 'desc')
                         ->get();

@@ -24,7 +24,7 @@
         <article class="col-md-9">
             <select name="anketa[0][type_briefing]" required class="form-control">
                 <option selected value="Вводный">Вводный</option>
-                <option value="Предрейсовый">Предрейсовый</option>4
+                <option value="Предрейсовый">Предрейсовый</option>
                 <option value="Сезонный (осенне-зимний)">Сезонный (осенне-зимний)</option>
                 <option value="Сезонный (весенне-летний)">Сезонный (весенне-летний)</option>
                 <option value="Специальный">Специальный</option>

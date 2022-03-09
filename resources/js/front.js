@@ -319,7 +319,8 @@ $(document).ready(function () {
                    if(i != 'id' && i != 'hash_id') {
                        let field = '',
                            otherHtmlItems = '',
-                           fId = uidv4()
+                           fId = uidv4(),
+                           isBlocked = fullData.blockedFields.includes(i) ? 'disabled' : ''
 
                        otherHtmlItems = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
 
@@ -329,7 +330,7 @@ $(document).ready(function () {
                             })
                         } else {
                            if(i === 'note') {
-                               field = `<textarea id="${fId}" data-model="${model}" class="form-control" name="${i}">${(data[i] ? data[i] : '').trim()}</textarea>`
+                               field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${(data[i] ? data[i] : '').trim()}</textarea>`
                            } else if(i === 'photo') {
                                otherHtmlItems = ''
 
@@ -337,7 +338,7 @@ $(document).ready(function () {
                                    field = `<img src="/storage/${data[i]}" width="60%" />`
                                }
                            } else {
-                               field = `<input id="${fId}" data-model="${model}" class="form-control" type="${fvItem['type']}" value='${data[i] ? data[i] : ''}' name="${i}" />`
+                               field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${data[i] ? data[i] : ''}' name="${i}" />`
                            }
                         }
 
@@ -352,8 +353,6 @@ $(document).ready(function () {
                     }
                 }
             }
-
-            console.log(model)
             /**
              * Запрещаем Мед.сотр и Тех.сотр редактировать компанию
              */
@@ -384,6 +383,10 @@ $(document).ready(function () {
                         }
                     })
                 }
+            })
+
+            $('.ANKETAS_TEXTAREA').each(function () {
+                this.style.height = this.scrollHeight + 'px';
             })
 
             /**

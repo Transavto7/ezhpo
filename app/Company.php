@@ -14,12 +14,22 @@ class Company extends Model
     ];
 
     public static function getAll () {
+        $user = auth()->user();
+
+        if($user->hasRole('client', '==')) {
+            $c_id = User::getUserCompanyId('id');
+
+            if($c_id) {
+                return self::where('id', $c_id)->get();
+            }
+        }
+
         return self::all();
     }
 
-    public function getName ($id)
+    public function getName ($id, $field = 'id')
     {
-        $company = Company::find($id);
+        $company = Company::where($field, $id)->first();
 
         if(!$company) $company = '';
         else $company = $company['name'];
