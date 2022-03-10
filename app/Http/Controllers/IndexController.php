@@ -139,7 +139,7 @@ class IndexController extends Controller
             'title' => 'Водители',
             'role' => 0,
             'popupTitle' => 'Водителя',
-            'otherRoles' => ['medic', 'tech'],
+            'otherRoles' => ['medic', 'tech', 'client'],
             'editOnField' => 'fio',
 
             'model' => 'Driver',
@@ -191,7 +191,7 @@ class IndexController extends Controller
             'title' => 'Автомобили',
             'role' => 0,
             'popupTitle' => 'Автомобиля',
-            'otherRoles' => ['medic', 'tech'],
+            'otherRoles' => ['medic', 'tech', 'client'],
             'editOnField' => 'gos_number',
 
             'model' => 'Car',

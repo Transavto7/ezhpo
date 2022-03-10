@@ -405,13 +405,9 @@ class AnketsController extends Controller
                             if($Company) {
 
                                 if($Driver->dismissed === 'Да') {
-                                    $errMsg = 'Компания водителя в черном списке';
+                                    $errMsg = 'Осмотр зарегистрирован. Обратите внимание, что компания в черном списке!';
 
                                     array_push($errorsAnketa, $errMsg);
-
-                                    $this->savePakForm($anketa, $errMsg);
-
-                                    continue;
                                 } else {
                                     $anketa['company_id'] = $Company->hash_id;
                                     $anketa['company_name'] = $Company->name;
@@ -557,26 +553,29 @@ class AnketsController extends Controller
                         ->orderBy('date', 'desc')
                         ->get();
 
-                    // Если нет водителя И есть Авто - то ставим компанию из Авто
-                    if(!isset($Driver->id) && $Car) {
-                        $Company_Car = Company::where('id', $Car->company_id)->first();
 
+                    /**
+                     * Уволенный АВТО
+                     */
+                    if($Car) {
                         if($Car->dismissed === 'Да') {
                             $errMsg = 'Автомобиль уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
 
                             array_push($errorsAnketa, $errMsg);
                         }
+                    }
+
+                    // Если нет водителя И есть Авто - то ставим компанию из Авто
+
+                    if(!isset($Driver->id) && $Car) {
+                        $Company_Car = Company::where('id', $Car->company_id)->first();
 
                         if($Company_Car) {
 
                             if($Company_Car->dismissed === 'Да') {
-                                $errMsg = 'Компания Автомобиля в черном списке';
+                                $errMsg = 'Осмотр зарегистрирован. Обратите внимание, что компания в черном списке!';
 
                                 array_push($errorsAnketa, $errMsg);
-
-                                $this->savePakForm($anketa, $errMsg);
-
-                                continue;
                             } else {
                                 $anketa['company_id'] = $Company_Car->hash_id;
                                 $anketa['company_name'] = $Company_Car->name;

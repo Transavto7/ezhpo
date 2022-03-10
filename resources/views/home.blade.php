@@ -24,19 +24,17 @@
 
                     <div class="col-md-12">
                         <div class="row bg-light p-2">
-                            @role(['admin', 'manager', $currentRole])
-                                <div class="col-md-6">
-                                    <button type="button" data-toggle-show="#ankets-filters" class="btn btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
-                                    <a href="?trash=1" class="btn btn-warning">Корзина <i class="fa fa-trash"></i></a>
+                            <div class="col-md-6">
+                                <button type="button" data-toggle-show="#ankets-filters" class="btn btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
+                                <a href="?trash=1" class="btn btn-warning">Корзина <i class="fa fa-trash"></i></a>
 
-                                    {{-- ОЧИСТКА ОЧЕРЕДИ СДПО --}}
-                                    @if($type_ankets === 'pak_queue')
-                                        @role(['admin'])
-                                            <a href="?clear=1&type_anketa={{ $type_ankets }}" class="btn btn-warning">Очистить очередь</a>
-                                        @endrole
-                                    @endif
-                                </div>
-                            @endrole
+                                {{-- ОЧИСТКА ОЧЕРЕДИ СДПО --}}
+                                @if($type_ankets === 'pak_queue')
+                                    @role(['admin'])
+                                        <a href="?clear=1&type_anketa={{ $type_ankets }}" class="btn btn-warning">Очистить очередь</a>
+                                    @endrole
+                                @endif
+                            </div>
 
 
                             @manager
