@@ -112,9 +112,9 @@ class User extends Authenticatable
      * @return string
      */
 
-    public function getName ($id = 0)
+    public function getName ($id = -1, $authId = true)
     {
-        $id = $id ? $id : auth()->user()->id;
+        $id = $id ? $id : ($authId ? auth()->user()->id : -1);
 
         $userName = User::find($id);
 

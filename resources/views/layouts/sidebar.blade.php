@@ -70,7 +70,7 @@
                     @php
                         $countPakQueue = \App\Anketa::where('type_anketa', 'pak_queue')->count();
                     @endphp
-                    <li><a href="{{ route('home', 'pak_queue') }}"><i class="fa fa-users"></i>Очередь СДПО <span class="badge bg-primary text-white">{{ $countPakQueue < 99 ? $countPakQueue : '99+' }}</span></a></li>
+                    <li><a href="{{ route('home', 'pak_queue') }}"><i class="fa fa-users"></i>Очередь на утверждение <span class="badge bg-primary text-white">{{ $countPakQueue < 99 ? $countPakQueue : '99+' }}</span></a></li>
                 @endrole
             @endif
 

@@ -156,7 +156,7 @@ class IndexController extends Controller
                     'Алкоголь' => 'Алкоголь',
                     'Наркотики' => 'Наркотики'
                 ], 'defaultValue' => 'Не установлено', 'noRequired' => 1],
-                'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company', 'noRequired' => 1],
+                'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
                 'payment_form' => ['label' => 'Форма оплаты', 'type' => 'select', 'values' => [
                     'Абонентская оплата' => 'Абонентская оплата',
                     'Разовые осмотры' => 'Разовые осмотры'
@@ -209,7 +209,7 @@ class IndexController extends Controller
                 'products_id' => ['label' => 'Услуги', 'multiple' => 1, 'type' => 'select', 'values' => 'Product'],
 
                 'trailer' => ['label' => 'Прицеп', 'type' => 'select', 'values' => ['Нет' => 'Нет', 'Да' => 'Да'], 'noRequired' => 1],
-                'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company', 'noRequired' => 1],
+                'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
                 'payment_form' => ['label' => 'Форма оплаты', 'type' => 'select', 'values' => [
                     'Абонентская оплата' => 'Абонентская оплата',
                     'Разовые осмотры' => 'Разовые осмотры'
@@ -485,7 +485,7 @@ class IndexController extends Controller
         ],
 
         'pak_queue' => [
-            'title' => 'Очередь СДПО',
+            'title' => 'Очередь на утверждение',
             'anketa_view' => 'profile.ankets.pak_queue'
         ],
 
@@ -872,14 +872,16 @@ class IndexController extends Controller
                 }
             }
 
-            $element['elements_count_all'] = $MODEL_ELEMENTS->all()->count();
-            $element['elements'] = $element['elements']->orderBy($orderKey, $orderBy);
             $element['max'] = isset($element['max']) ? $element['max'] : null;
+            $element['elements_count_all'] = $MODEL_ELEMENTS->count();
+            $element['elements'] = $element['elements']->orderBy($orderKey, $orderBy);
 
-            if($element['max']) {
-                $element['elements'] = $element['elements']->take($element['max'])->get();
-            } else {
-                $element['elements'] = $element['elements']->paginate($take);
+            if($filter || $type === 'Settings') {
+                if($element['max']) {
+                    $element['elements'] = $element['elements']->take($element['max'])->get();
+                } else {
+                    $element['elements'] = $element['elements']->paginate($take);
+                }
             }
 
             // Проверка прав доступа

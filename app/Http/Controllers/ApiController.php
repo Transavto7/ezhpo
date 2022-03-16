@@ -96,6 +96,10 @@ class ApiController extends Controller
             'date_report_driver'
         ];
 
+        $deleteImportantFields = [
+            'inn'
+        ];
+
         if(isset($models[$model]) && !empty($val)) {
             $_model = $models[$model];
             $data = app($_model['model']);
@@ -110,9 +114,9 @@ class ApiController extends Controller
             /**
              * Фильтрация полей
              */
-            /*$fields = array_filter($fields, function ($item) use ($blockedFields) {
-                return !in_array($item, $blockedFields);
-            });*/
+            $fields = array_filter($fields, function ($item) use ($deleteImportantFields) {
+                return !in_array($item, $deleteImportantFields);
+            });
 
             $fieldsValues = new IndexController();
             $fieldsValues = $fieldsValues->elements[$model]['fields'];

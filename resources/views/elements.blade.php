@@ -219,7 +219,7 @@
                                     @if($elK === 'products_id' || $elK === 'company_id' || $elK === 'req_id' || $elK === 'pv_id' || $elK === 'user_id' || $elK === 'town_id')
                                         @if($elK === 'company_id')
 
-                                            @if(($model === 'Driver' || $model === 'Car') && $el->$elK)
+                                            @if(($model === 'Driver' || $model === 'Car') && $el->$elK && auth()->user()->hasRole('client', '!='))
                                                 <div>
                                                     <a href="{{ route('renderElements', ['model' => 'Company', 'filter' => 1, 'id' => $el->company_id ]) }}">{{ app('App\Company')->getName($el->company_id) }}</a>
 
@@ -233,7 +233,7 @@
                                             @endif
 
                                         @elseif ($elK === 'user_id')
-                                            {{ app('App\User')->getName($el->user_id) }}
+                                            {{ app('App\User')->getName($el->user_id, false) }}
                                         @elseif ($elK === 'req_id')
                                             {{ app('App\Req')->getName($el->req_id) }}
                                         @elseif ($elK === 'town_id')
@@ -329,7 +329,7 @@
                                                                             ])
 
                                                                             {{--Синхронизация полей--}}
-                                                                            @isset($v['syncData'])
+                                                                            @if(isset($v['syncData']) && $model !== 'Company')
                                                                                 @foreach($v['syncData'] as $syncData)
                                                                                     <a href="{{ route('syncDataElement', [
                                                                                         'model' => $syncData['model'],
@@ -339,7 +339,7 @@
                                                                                         'fieldSyncValue' => $el[$k]
                                                                                     ]) }}" target="_blank" class="text-info btn-link"><i class="fa fa-spinner"></i> Синхронизация с: {{ $syncData['text'] }}</a>
                                                                                 @endforeach
-                                                                            @endisset
+                                                                            @endif
                                                                         </div>
                                                                     @endif
                                                                 @endforeach
@@ -385,7 +385,7 @@
         @include('templates.take_form')
 
         @role(['client'])
-            <p>Элементов найдено: {{ isset($elements->total) ? $elements->total() : $elements_count_all }}</p>
+            <p>Элементов найдено: {{ method_exists($elements, 'total') ? $elements->total() : '' }}</p>
         @else
             <p>Элементов всего: {{ $elements_count_all }}</p>
             <p>Элементов найдено: {{ isset($elements->total) ? $elements->total() : $elements_count_all }}</p>

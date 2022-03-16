@@ -216,8 +216,11 @@ class HomeController extends Controller
          * </Измеряем количество Авто и Водителей (уникальные ID)>
          */
 
-        $anketas = $anketas->orderBy($orderKey, $orderBy)->paginate($take);
-        $anketasCountResult = $anketas->total();
+        $anketas = ($filter_activated || $typeAnkets === 'pak_queue')
+            ? $anketas->orderBy($orderKey, $orderBy)->paginate($take) : [];
+
+        $anketasCountResult = ($filter_activated || $typeAnkets === 'pak_queue')
+            ? $anketas->total() : 0;
 
         $fieldsKeys = Anketa::$fieldsKeys[$validTypeAnkets];
         $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$validTypeAnkets]) ? Anketa::$fieldsGroupFirst[$validTypeAnkets] : [];
@@ -247,6 +250,12 @@ class HomeController extends Controller
          */
         $_view = isset($_GET['getFormFilter']) ? 'home_filters' : 'home';
 
+        $currentRole = $validTypeAnkets === 'Dop' ? 'medic' : $validTypeAnkets;
+
+        if($typeAnkets === 'pak_queue' && $user->hasRole('operator_pak', '==')) {
+            $currentRole = 'operator_pak';
+        }
+
         return view($_view, [
             'title' => Anketa::$anketsKeys[$validTypeAnkets],
             'name' => $user->name,
@@ -264,7 +273,7 @@ class HomeController extends Controller
 
             'isExport' => $is_export,
 
-            'currentRole' => $validTypeAnkets === 'Dop' ? 'medic' : $validTypeAnkets,
+            'currentRole' => $currentRole,
 
             'take' => $take,
             'orderBy' => $orderBy,

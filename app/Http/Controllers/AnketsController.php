@@ -404,13 +404,13 @@ class AnketsController extends Controller
 
                             if($Company) {
 
-                                if($Driver->dismissed === 'Да') {
+                                $anketa['company_id'] = $Company->hash_id;
+                                $anketa['company_name'] = $Company->name;
+
+                                if($Company->dismissed === 'Да') {
                                     $errMsg = 'Осмотр зарегистрирован. Обратите внимание, что компания в черном списке!';
 
                                     array_push($errorsAnketa, $errMsg);
-                                } else {
-                                    $anketa['company_id'] = $Company->hash_id;
-                                    $anketa['company_name'] = $Company->name;
                                 }
 
                             } else {
@@ -572,13 +572,13 @@ class AnketsController extends Controller
 
                         if($Company_Car) {
 
+                            $anketa['company_id'] = $Company_Car->hash_id;
+                            $anketa['company_name'] = $Company_Car->name;
+
                             if($Company_Car->dismissed === 'Да') {
                                 $errMsg = 'Осмотр зарегистрирован. Обратите внимание, что компания в черном списке!';
 
                                 array_push($errorsAnketa, $errMsg);
-                            } else {
-                                $anketa['company_id'] = $Company_Car->hash_id;
-                                $anketa['company_name'] = $Company_Car->name;
                             }
                         } else {
                             $errMsg = "У Автомобиля не найдена компания";

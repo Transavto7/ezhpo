@@ -6,10 +6,19 @@
 <div class="form-group row">
     <label class="col-md-3 form-control-label"><b>Решение</b></label>
     <article class="col-md-9">
-        <select name="admitted" class="form-control">
-            <option value="Допущен">Принять</option>
-            <option value="Недопущен">Отклонить</option>
-        </select>
+        <label>
+            <i class="fa fa-check-circle"></i> Принять
+            <input type="radio" value="Допущен" name="admitted" />
+        </label>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;
+
+        <label>
+            <i class="fa fa-close"></i>
+            Отклонить
+            <input type="radio" value="Недопущен" name="admitted" />
+        </label>
+
     </article>
 </div>
 

@@ -54,7 +54,7 @@ class Anketa extends Model
         'pechat_pl' => 'Журнал печати путевых листов',
         'vid_pl' => 'Реестр выданных путевых листов',
         'pak' => 'Журнал СДПО',
-        'pak_queue' => 'Очередь СДПО',
+        'pak_queue' => 'Очередь на утверждение',
     ];
 
     public static $fieldsGroupFirst = [ // Группа 1 (показываем сразу в HOME)

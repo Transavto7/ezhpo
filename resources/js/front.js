@@ -10,6 +10,18 @@ require('croppie')
 require('suggestions-jquery')
 
 $(document).ready(function () {
+    const Toast = swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', swal.stopTimer)
+            toast.addEventListener('mouseleave', swal.resumeTimer)
+        }
+    })
+
     const API_CONTROLLER = new ApiController(),
         API = API_CONTROLLER.client
 
@@ -445,11 +457,15 @@ $(document).ready(function () {
     }
 
     // ЭКСПОРТ таблицы в xlsx
-    window.exportTable = function(table) {
+    window.exportTable = function(table, withNotExport = false) {
         table = document.getElementById(table)
         table = table.cloneNode(true)
 
-        $(table).find('.not-export, .modal').remove()
+        if(!withNotExport) {
+            $(table).find('.not-export').remove()
+        }
+
+        $(table).find('.modal').remove()
 
         table = table.innerHTML
 
@@ -683,6 +699,32 @@ $(document).ready(function () {
 
         if(menu.length) {
             menu.toggleClass(clsCollapse)
+        }
+    })
+
+    /**
+     * Elements FORMS (edit, add)
+     * Check Requireds / Validate
+     */
+    $('[id*="elements-modal"] form').submit(function (e) {
+        let requireds = $(this).find('[required]'), errors = []
+
+        requireds.each(function () {
+            let val = $(this).val(), name = $(this).data('label')
+
+            if(!val)
+                errors.push(`Поле "${name}" не заполнено`)
+        })
+
+        if(errors.length) {
+            e.preventDefault()
+
+            Toast.fire({
+                icon: 'error',
+                text: errors[0]
+            })
+
+            return
         }
     })
 
