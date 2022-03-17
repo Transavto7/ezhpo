@@ -388,7 +388,7 @@
             <p>Элементов найдено: {{ method_exists($elements, 'total') ? $elements->total() : '' }}</p>
         @else
             <p>Элементов всего: {{ $elements_count_all }}</p>
-            <p>Элементов найдено: {{ isset($elements->total) ? $elements->total() : $elements_count_all }}</p>
+            <p>Элементов найдено: {{ method_exists($elements, 'total') ? $elements->total() : $elements_count_all }}</p>
         @endrole
     </div>
 </div>
