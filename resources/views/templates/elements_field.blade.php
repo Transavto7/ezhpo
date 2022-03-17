@@ -14,7 +14,7 @@
         value="{{ $default_value }}"
         type="{{ $v['type'] }}" {{ $is_required }}
         name="{{ $k }}"
-        data-label="{{ $v['label'] }}"
+        data-label="{{ isset($v['label']) ? $v['label'] : $k }}"
         placeholder="{{ $v['label'] }}"
         data-field="{{ $model }}_{{ $k }}"
         @if ($v['type'] !== 'file') class="form-control {{ isset($v['classes']) ? $v['classes'] : '' }}" @endif
@@ -57,7 +57,7 @@
         @endisset
 
         {{ $is_required }}
-        data-label="{{ $v['label'] }}"
+        data-label="{{ isset($v['label']) ? $v['label'] : $k }}"
         data-field="{{ $model }}_{{ $k }}"
         class="js-chosen"
     >

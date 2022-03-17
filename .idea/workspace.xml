@@ -2,24 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f6a199b1-6d31-48a4-b894-b6045514cb71" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/resources/views/profile/ankets/fields/car_gos_number.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Anketa.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Anketa.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ApiController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ApiController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/IndexController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/IndexController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/User.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/session.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/session.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/front.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/front.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/v-components/Chart.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/v-components/Chart.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/elements.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/elements.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/home.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layouts/sidebar.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/sidebar.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/pages/driver.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/pages/driver.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/pak_queue.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/pak_queue.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/templates/elements_field.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/templates/elements_field.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -580,7 +565,8 @@
       <workItem from="1646838138713" duration="7561000" />
       <workItem from="1646924217445" duration="5320000" />
       <workItem from="1647070528144" duration="8000" />
-      <workItem from="1647440176500" duration="8241000" />
+      <workItem from="1647440176500" duration="8311000" />
+      <workItem from="1647531058855" duration="402000" />
     </task>
     <servers />
   </component>
