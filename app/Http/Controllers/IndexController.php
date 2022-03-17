@@ -882,6 +882,8 @@ class IndexController extends Controller
                 } else {
                     $element['elements'] = $element['elements']->paginate($take);
                 }
+            } else {
+                $element['elements'] = [];
             }
 
             // Проверка прав доступа

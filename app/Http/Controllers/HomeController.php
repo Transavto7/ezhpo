@@ -122,6 +122,7 @@ class HomeController extends Controller
 
         unset($filter_params['trash']);
         unset($filter_params['export']);
+        unset($filter_params['exportPrikaz']);
         unset($filter_params['filter']);
         unset($filter_params['take']);
         unset($filter_params['orderBy']);

@@ -9,7 +9,7 @@
         <script type="text/javascript">
             window.onload = function () {
                 setTimeout(function () {
-                    exportTable('ankets-table')
+                    exportTable('ankets-table', {{ isset($_GET['exportPrikaz']) ? false : true }})
                 }, 1500)
             };
         </script>
@@ -39,9 +39,10 @@
 
                             @manager
                                 <div class="col-md-6 text-right">
-                                    <button type="button" onclick="exportTable('ankets-table', true)" class="btn btn-default">Экспорт результатов <i class="fa fa-download"></i></button>
-                                    <button type="button" onclick="exportTable('ankets-table')" class="btn btn-default">Экспорт результатов по приказу <i class="fa fa-download"></i></button>
+<!--                                    <button type="button" onclick="exportTable('ankets-table', true)" class="btn btn-default">Экспорт результатов <i class="fa fa-download"></i></button>-->
+<!--                                    <button type="button" onclick="exportTable('ankets-table')" class="btn btn-default">Экспорт результатов по приказу <i class="fa fa-download"></i></button>-->
                                     <a href="?export=1{{ $queryString }}" class="btn btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
+                                    <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-default">Экспорт таблицы по приказу <i class="fa fa-download"></i></a>
                                 </div>
                             @endmanager
 
