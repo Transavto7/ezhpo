@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Driver extends Model
 {
     public $fillable = [
-        'hash_id', 'old_id', 'photo', 'fio', 'year_birthday', 'phone', 'gender', 'group_risk', 'company_id',
+        'hash_id',
+        //'old_id',
+        'photo', 'fio', 'year_birthday', 'phone', 'gender', 'group_risk', 'company_id',
         'payment_form', 'products_id', 'count_pl', 'note', 'procedure_pv',
         'date_bdd', 'date_prmo',
         'date_report_driver',

@@ -408,9 +408,11 @@ class AnketsController extends Controller
                                 $anketa['company_name'] = $Company->name;
 
                                 if($Company->dismissed === 'Да') {
-                                    $errMsg = 'Осмотр зарегистрирован. Обратите внимание, что компания в черном списке!';
+                                    $errMsg = 'Компания в черном списке. Необходимо связаться с менеджером!';
 
                                     array_push($errorsAnketa, $errMsg);
+
+                                    continue;
                                 }
 
                             } else {
@@ -576,9 +578,11 @@ class AnketsController extends Controller
                             $anketa['company_name'] = $Company_Car->name;
 
                             if($Company_Car->dismissed === 'Да') {
-                                $errMsg = 'Осмотр зарегистрирован. Обратите внимание, что компания в черном списке!';
+                                $errMsg = 'Компания в черном списке. Необходимо связаться с менеджером!';
 
                                 array_push($errorsAnketa, $errMsg);
+
+                                continue;
                             }
                         } else {
                             $errMsg = "У Автомобиля не найдена компания";

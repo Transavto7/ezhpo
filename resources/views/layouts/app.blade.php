@@ -32,14 +32,16 @@
               return {{ auth()->user()->role }}
             };
         </script>
-    @elseauth
+    @endauth
+
+    @guest
         <script type="text/javascript">
             window.API_TOKEN = '';
             window.userRole = function () {
                 return 0;
             };
         </script>
-    @endauth
+    @endguest
 
     @yield('custom-styles')
 </head>

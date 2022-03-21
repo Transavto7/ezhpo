@@ -144,7 +144,7 @@ class IndexController extends Controller
 
             'model' => 'Driver',
             'fields' => [
-                'old_id' => ['label' => 'Старый ID', 'type' => 'number', 'noRequired' => 1],
+                //'old_id' => ['label' => 'Старый ID', 'type' => 'number', 'noRequired' => 1],
                 'photo' => ['label' => 'Фото', 'type' => 'file', 'resize' => 1, 'noRequired' => 1],
                 'fio' => ['label' => 'ФИО', 'type' => 'text'],
                 'year_birthday' => ['label' => 'Дата рождения', 'type' => 'date', 'noRequired' => 1],
@@ -196,7 +196,7 @@ class IndexController extends Controller
 
             'model' => 'Car',
             'fields' => [
-                'old_id' => ['label' => 'Старый ID', 'type' => 'number', 'noRequired' => 1],
+                //'old_id' => ['label' => 'Старый ID', 'type' => 'number', 'noRequired' => 1],
                 'gos_number' => ['label' => 'Гос.номер', 'type' => 'text'],
                 'mark_model' => ['label' => 'Марка и модель', 'type' => 'text'],
                 'type_auto' => ['label' => 'Тип автомобиля', 'type' => 'select', 'values' => [
