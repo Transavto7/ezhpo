@@ -119,7 +119,8 @@ $(document).ready(function () {
                 width: '100%',
                 search_contains: true,
                 no_results_text: 'Совпадений не найдено',
-                placeholder_text_single: 'Выберите значение'
+                placeholder_text_single: 'Выберите значение',
+                placeholder_text_multiple: 'Выберите значения',
             });
         },
 
@@ -382,7 +383,7 @@ $(document).ready(function () {
                 e.preventDefault()
 
                 if(confirm('Сохранить?')) {
-                    $(this).find(`.${inputClass} input, .${inputClass} select`).each(function () {
+                    $(this).find(`.${inputClass} input, .${inputClass} select, .${inputClass} textarea`).each(function () {
                         let val = this.value, name = this.name
 
                         if(name) {

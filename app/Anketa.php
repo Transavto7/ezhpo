@@ -148,7 +148,7 @@ class Anketa extends Model
             'user_name' => 'Ф.И.О сотрудника, который выдал ПЛ',
             'pv_id' => 'Пункт выпуска',
             'added_to_dop' => 'Внесено в журнал осмотров',
-            'period_pl' => 'Период выданных ПЛ',
+            'period_pl' => 'Комментарий',
             'car_gos_number' => 'Госномер автомобиля'
         ]
     ];
@@ -168,7 +168,8 @@ class Anketa extends Model
             'number_list_road' => 'Номер путевого листа',
             'type_view' => 'Тип осмотра',
             'is_pak' => 'ПАК',
-            'flag_pak' => 'Флаг СДПО'
+            'flag_pak' => 'Флаг СДПО',
+            'company_name' => 'Место работы'
         ]
     ];
 
@@ -347,7 +348,7 @@ class Anketa extends Model
             'car_gos_number' => 'Государственный регистрационный номер транспортного средства',
             'car_id' => 'ID автомобиля',
             'added_to_dop' => 'Внесено в журнал осмотров',
-            'period_pl' => 'Период выданных ПЛ'
+            'period_pl' => 'Комментарий'
         ],
 
         'bdd' => [

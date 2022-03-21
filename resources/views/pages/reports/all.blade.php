@@ -25,7 +25,9 @@
                                         'default_value' => request()->get('company_id')
                                     ])
                                 </div>
-                                <div class="col-md-2">
+
+                                <input type="hidden" name="is_finance" value="1">
+                                {{--<div class="col-md-2">
                                     <label>Финансовая информация</label>
 
                                     @include('templates.elements_field', [
@@ -42,7 +44,7 @@
                                         'model' => '',
                                         'default_value' => request()->get('is_finance', 0)
                                     ])
-                                </div>
+                                </div>--}}
 
                                 <div class="col-md-2">
                                     <label>Сортировать по:</label>

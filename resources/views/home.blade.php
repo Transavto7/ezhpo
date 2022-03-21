@@ -204,11 +204,15 @@
 
                 <p class="text-success">Найдено осмотров: <b>{{ $anketasCountResult }}</b></p>
 
-                @if($CountDrivers > 0 && $filter_activated)
+                @if($CountCompanies > 0 && $filter_activated)
+                    <p class="text-success">Кол-во компаний: <b>{{ $CountCompanies }}</b></p>
+                @endif
+
+                @if($CountDrivers > 0 && $filter_activated && $type_ankets !== 'tech')
                     <p class="text-success">Кол-во Водителей: <b>{{ $CountDrivers }}</b></p>
                 @endif
 
-                @if($CountCars > 0 && $filter_activated)
+                @if($CountCars > 0 && $filter_activated && $type_ankets !== 'medic')
                     <p class="text-success">Кол-во Автомобилей: <b>{{ $CountCars }}</b></p>
                 @endif
             </div>

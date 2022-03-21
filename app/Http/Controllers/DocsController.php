@@ -15,6 +15,8 @@ class DocsController extends Controller
         $type = $request->type;
         $user = auth()->user();
 
+        $user_post = ProfileController::getUserRole(true, $user->id);
+
         $data = [
             'type' => $type,
             'anketa_id' => $anketa_id,
@@ -24,7 +26,7 @@ class DocsController extends Controller
             'driver_pv' => '',
 
             'user_name' => '',
-            'user_post' => $user->user_post,
+            'user_post' => $user_post,
             'user_fio' => '',
             'user_company' => '',
             'date' => ''

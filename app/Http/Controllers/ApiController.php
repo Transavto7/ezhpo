@@ -97,7 +97,7 @@ class ApiController extends Controller
         ];
 
         $deleteImportantFields = [
-            'inn', 'old_id'
+            'inn', 'old_id', 'autosync_fields'
         ];
 
         if(isset($models[$model]) && !empty($val)) {

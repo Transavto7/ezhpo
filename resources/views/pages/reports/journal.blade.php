@@ -52,28 +52,28 @@
                     <td>
                         {{ $predr }}
 
-                        @if(request()->get('is_finance'))
+                        @if(request()->get('is_finance') && $predr > 0)
                             {!! \App\Driver::calcServices($report->driver_id, 'medic', 'Предрейсовый', $predr) !!}
                         @endif
                     </td>
                     <td>
                         {{ $posler }}
 
-                        @if(request()->get('is_finance'))
+                        @if(request()->get('is_finance') && $posler > 0)
                             {!! \App\Driver::calcServices($report->driver_id, 'medic', 'Послерейсовый', $predr) !!}
                         @endif
                     </td>
                     <td>
                         {{ $bdd }}
 
-                        @if(request()->get('is_finance'))
+                        @if(request()->get('is_finance') && $bdd > 0)
                             {!! \App\Driver::calcServices($report->driver_id, 'bdd', 'БДД', $predr) !!}
                         @endif
                     </td>
                     <td>
                         {{ $report_cart }}
 
-                        @if(request()->get('is_finance'))
+                        @if(request()->get('is_finance') && $report_cart > 0)
                             {!! \App\Driver::calcServices($report->driver_id, 'report_cart', 'Отчеты с карт', $predr) !!}
                         @endif
                     </td>
@@ -116,14 +116,14 @@
                     <td>
                         {{ $predr }}
 
-                        @if(request()->get('is_finance'))
+                        @if(request()->get('is_finance') && $predr > 0)
                             {!! \App\Car::calcServices($report->car_id, 'tech', 'Предрейсовый', $predr) !!}
                         @endif
                     </td>
                     <td>
                         {{ $posler }}
 
-                        @if(request()->get('is_finance'))
+                        @if(request()->get('is_finance') && $posler > 0)
                             {!! \App\Car::calcServices($report->car_id, 'tech', 'Послерейсовый', $predr) !!}
                         @endif
                     </td>

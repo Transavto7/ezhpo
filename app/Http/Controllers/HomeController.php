@@ -72,7 +72,14 @@ class HomeController extends Controller
          */
         foreach($_GET as $getK => $getV) {
             if($getK !== $oKey && $getK !== $oBy) {
-                $queryString .= '&' . $getK . '=' . (is_array($getV) ? join(',', $getV) : $getV);
+                if(is_array($getV)) {
+                    foreach($getV as $getVkey => $getVvalue) {
+                        $queryString .= '&' . $getK . "[$getVkey]" . '=' . $getVvalue;
+                    }
+                } else {
+                    $queryString .= '&' . $getK . '=' . $getV;
+                }
+
             }
         }
 
@@ -204,13 +211,16 @@ class HomeController extends Controller
          */
         $anketasCountDrivers = 0;
         $anketasCountCars = 0;
+        $anketasCountCompany = 0;
 
         if($filter_activated) {
             $anketasCountCars = $anketas;
             $anketasCountDrivers = $anketas;
+            $anketasCountCompany = $anketas;
 
             $anketasCountDrivers = $anketasCountDrivers->get()->groupBy('driver_id')->count();
             $anketasCountCars = $anketasCountCars->get()->groupBy('car_id')->count();
+            $anketasCountCompany = $anketasCountCompany->get()->groupBy('company_id')->count();
         }
 
         /**
@@ -271,6 +281,7 @@ class HomeController extends Controller
             'anketasCountResult' => $anketasCountResult,
             'CountCars' => $anketasCountCars,
             'CountDrivers' => $anketasCountDrivers,
+            'CountCompanies' => $anketasCountCompany,
 
             'isExport' => $is_export,
 

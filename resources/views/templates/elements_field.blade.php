@@ -61,7 +61,8 @@
         data-field="{{ $model }}_{{ $k }}"
         class="js-chosen"
     >
-        <option disabled selected value="0">Не установлено</option>
+        {{-- disabled selected --}}
+        <option value="">Не установлено</option>
 
         @if(is_array($v['values']))
             @foreach($v['values'] as $optionK => $optionV)

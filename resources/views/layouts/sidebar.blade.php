@@ -20,14 +20,16 @@
             </div>
         </div>
         <!-- Sidebar Navidation Menus-->
-        <span class="heading">
-        <div class="client">
-            <div class="client-avatar">
-                <img src="{{ $user_avatar }}" width="100%" alt="avatar">
-            </div>
-        </div>
+        @if(auth()->user()->hasRole('client', '!='))
+            <span class="heading">
+                <div class="client">
+                    <div class="client-avatar">
+                        <img src="{{ $user_avatar }}" width="100%" alt="avatar">
+                    </div>
+                </div>
+            </span>
+        @endif
 
-    </span>
         <ul class="list-unstyled">
             <li>
                 <a class="bg-info text-white">МЕНЮ</a>
