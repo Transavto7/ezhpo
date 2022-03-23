@@ -55,7 +55,7 @@ class ReportController extends Controller
                     break;
 
                 case 'journal':
-                    $reports = Anketa::where('type_anketa', 'medic')
+                    $reports = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
                         ->where('company_id', $data['company_id'])
                         ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",

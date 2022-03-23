@@ -64,7 +64,6 @@ class Anketa extends Model
             'driver_fio' => 'Водитель',
             'pv_id' => 'Пункт выпуска',
             //'car_mark_model' => 'Автомобиль',
-            'is_pak' => 'СДПО',
             'flag_pak' => 'Флаг СДПО'
         ],
 
@@ -204,7 +203,7 @@ class Anketa extends Model
             //'car_id' => 'ID автомобиля',
             //'number_list_road' => 'Номер путевого листа',
             'type_view' => 'Тип осмотра',
-            'is_pak' => 'ПАК',
+            //'is_pak' => 'ПАК',
             'flag_pak' => 'Флаг СДПО'
         ],
 

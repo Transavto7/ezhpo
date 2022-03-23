@@ -6,14 +6,15 @@
 <div class="form-group row">
     <label class="col-md-3 form-control-label"><b>Решение</b></label>
     <article class="col-md-9">
-        <label>
+
+        <label class="btn btn-success btn-sm">
             <i class="fa fa-check-circle"></i> Принять
             <input type="radio" value="Допущен" name="admitted" />
         </label>
 
         &nbsp;&nbsp;&nbsp;&nbsp;
 
-        <label>
+        <label class="btn btn-danger btn-sm">
             <i class="fa fa-close"></i>
             Отклонить
             <input type="radio" value="Недопущен" name="admitted" />

@@ -62,6 +62,10 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
+        if($user->hasRole('client', '==')) {
+            return redirect( route('home') );
+        }
+
         // Получение пункта выпуска
         $point = Point::getPointText($user->pv_id);
 
