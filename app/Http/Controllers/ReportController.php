@@ -47,6 +47,7 @@ class ReportController extends Controller
                 case 'graph_pv':
 
                     $reports = Anketa::whereIn('pv_id', $pv_id)
+                        ->where('type_anketa', 'medic')
                         ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"

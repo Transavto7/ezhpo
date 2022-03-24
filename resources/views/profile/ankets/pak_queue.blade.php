@@ -4,26 +4,6 @@
 <input type="hidden" name="flag_pak" value="СДПО Р">
 
 <div class="form-group row">
-    <label class="col-md-3 form-control-label"><b>Решение</b></label>
-    <article class="col-md-9">
-
-        <label class="btn btn-success btn-sm">
-            <i class="fa fa-check-circle"></i> Принять
-            <input type="radio" value="Допущен" name="admitted" />
-        </label>
-
-        &nbsp;&nbsp;&nbsp;&nbsp;
-
-        <label class="btn btn-danger btn-sm">
-            <i class="fa fa-close"></i>
-            Отклонить
-            <input type="radio" value="Недопущен" name="admitted" />
-        </label>
-
-    </article>
-</div>
-
-<div class="form-group row">
     <label class="col-md-3 form-control-label">ID водителя:</label>
     <article class="col-md-9">
         <input value="{{ $driver_id ?? '' }}" type="number" onchange="checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent())" required min="6" name="driver_id" class="MASK_ID_ELEM form-control">
@@ -57,4 +37,21 @@
         <input type="number" value="{{ $t_people ?? '' }}" name="t_people" class="form-control">
     </article>
 </div>
+
+@section('ankets_submit')
+    <div class="text-center m-center">
+        <label class="btn btn-success btn-sm">
+            <i class="fa fa-check-circle"></i> Принять
+            <input onchange="ANKETA_FORM.submit()" class="d-none" type="radio" value="Допущен" name="admitted" />
+        </label>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;
+
+        <label class="btn btn-danger btn-sm">
+            <i class="fa fa-close"></i>
+            Отклонить
+            <input onchange="ANKETA_FORM.submit()" class="d-none" type="radio" value="Недопущен" name="admitted" />
+        </label>
+    </div>
+@endsection
 

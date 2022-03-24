@@ -19,6 +19,26 @@
         </article>
     </div>
 
+    @accessSetting('id_auto', 'medic')
+        <div class="form-group row">
+            <label class="form-control-label col-md-3">ID автомобиля:</label>
+            <article class="col-md-9">
+                <input value="{{ $car_id ?? '' }}"
+                       type="number"
+                       onchange="checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent())"
+                       min="6"
+                       name="anketa[0][car_id]"
+                       class="MASK_ID_ELEM form-control"
+
+                       @accessSetting('id_auto_required', 'medic')
+                            required
+                       @endaccessSetting
+                />
+                <p class="app-checker-prop"></p>
+            </article>
+        </div>
+    @endaccessSetting
+
     <div class="form-group row">
         <label class="col-md-3 form-control-label">Показания тонометра:</label>
         <article class="col-md-9">

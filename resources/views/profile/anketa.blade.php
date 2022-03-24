@@ -117,6 +117,7 @@
                           class="form-horizontal"
 
                           enctype="multipart/form-data"
+                          id="ANKETA_FORM"
                     >
                         @csrf
 
@@ -131,7 +132,11 @@
                         @endif
 
                         <div class="form-group row">
-                            <button type="submit" class="m-center btn btn-success">{{ __('ankets.submit') }}</button>
+                            @hasSection('ankets_submit')
+                                @yield('ankets_submit')
+                            @else
+                                <button type="submit" class="m-center btn btn-success">{{ __('ankets.submit') }}</button>
+                            @endif
                         </div>
                     </form>
                 </article>

@@ -108,6 +108,10 @@
                                         @endisset
                                     @endforeach
 
+                                    @accessSetting('id_auto', 'medic')
+                                        <th class="not-export">ID автомобиля</th>
+                                    @endaccessSetting
+
                                     @role(['admin', 'manager', 'medic', 'tech', $currentRole])
                                         <th class="not-export">#</th>
                                     @endrole
@@ -156,6 +160,12 @@
                                                 </td>
                                             @endif
                                         @endforeach
+
+                                        @accessSetting('id_auto', 'medic')
+                                            <td class="td-option not-export">
+                                                {{ $anketa->car_id }}
+                                            </td>
+                                        @endaccessSetting
 
                                         @role(['admin', 'manager', 'medic', 'tech', $currentRole])
                                             <td class="td-option not-export">

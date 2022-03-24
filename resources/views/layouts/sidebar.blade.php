@@ -136,6 +136,7 @@
                 <ul id="spis-pol" class="collapse list-unstyle">
                     @admin
                         <li><a href="{{ route('renderElements', 'Settings') }}">Система</a></li>
+                        <li><a href="{{ route('systemSettings') }}">Системные настройки</a></li>
                         <li><a href="{{ route('renderElements', 'Town') }}">Города</a></li>
                         <li><a href="{{ route('renderElements', 'Point') }}">Пункты выпуска</a></li>
                         <li><a href="{{ route('adminUsers') }}">Сотрудники</a></li>
