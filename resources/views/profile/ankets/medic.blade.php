@@ -29,7 +29,24 @@
 
     <div class="anketa-bordered">
 
-{{--        <div class="form-group row">--}}
+
+        <div class="form-group row">
+            <label class="form-control-label col-md-3">Тип осмотра:</label>
+            <article class="col-md-9">
+                <select name="anketa[0][type_view]" required class="form-control">
+                    @isset($type_view)
+                        <option disabled selected value="{{ $type_view }}">{{ $type_view }}</option>
+                    @endisset
+
+                    <option selected value="Предрейсовый">Предрейсовый</option>
+                    <option value="Послерейсовый">Послерейсовый</option>
+                    <option value="Предсменный">Предсменный</option>
+                    <option value="Послесменный">Послесменный</option>
+                </select>
+            </article>
+        </div>
+
+        {{--        <div class="form-group row">--}}
 {{--            <label class="col-md-3 form-control-label">Номер путевого листа:</label>--}}
 {{--            <article class="col-md-9">--}}
 {{--                <input value="{{ $number_list_road ?? '' }}" type="text" name="anketa[0][number_list_road]" class="form-control">--}}

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Notify extends Model
 {
     public $fillable = [
-        'user_id', 'message', 'status'
+        'user_id', 'message', 'status', 'role'
     ];
 
     public function sendMsgToUsersFrom ($field, $value, $msg) {

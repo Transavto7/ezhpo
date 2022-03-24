@@ -707,7 +707,7 @@ $(document).ready(function () {
      * Elements FORMS (edit, add)
      * Check Requireds / Validate
      */
-    $('[id*="elements-modal"] form').submit(function (e) {
+    $('[id*="elements-modal"] form, [id="elements-modal-add"] form').submit(function (e) {
         let requireds = $(this).find('[required]'), errors = []
 
         requireds.each(function () {

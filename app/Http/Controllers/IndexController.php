@@ -162,7 +162,7 @@ class IndexController extends Controller
                     'Разовые осмотры' => 'Разовые осмотры'
                 ], 'noRequired' => 1],
 
-                'products_id' => ['label' => 'Услуги', 'multiple' => 1, 'type' => 'select', 'values' => 'Product'],
+                'products_id' => ['label' => 'Услуги', 'multiple' => 1, 'type' => 'select', 'values' => 'Product', 'noRequired' => 1],
 
                 'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1, 'saveToHistory' => 1],
                 'note' => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
@@ -204,11 +204,11 @@ class IndexController extends Controller
                     'С (свыше 3.5 т.)' => 'С (свыше 3.5 т.)',
                     'D' => 'D',
                     'E' => 'E'
-                ], 'defaultValue' => 'Не установлено', 'noRequired' => 1],
+                ], 'defaultValue' => 'Не установлено'],
 
                 'products_id' => ['label' => 'Услуги', 'multiple' => 1, 'type' => 'select', 'values' => 'Product'],
 
-                'trailer' => ['label' => 'Прицеп', 'type' => 'select', 'values' => ['Нет' => 'Нет', 'Да' => 'Да'], 'noRequired' => 1],
+                'trailer' => ['label' => 'Прицеп', 'type' => 'select', 'values' => ['Нет' => 'Нет', 'Да' => 'Да'], 'defaultValue' => 'Нет', 'noRequired' => 1],
                 'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
                 'payment_form' => ['label' => 'Форма оплаты', 'type' => 'select', 'values' => [
                     'Абонентская оплата' => 'Абонентская оплата',
@@ -248,7 +248,7 @@ class IndexController extends Controller
                 'name' => ['label' => 'Название компании клиента', 'type' => 'text', 'filterJournalLinkKey' => 'company_name'],
                 'note' => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
                 'user_id' => ['label' => 'Ответственный', 'type' => 'select', 'values' => 'User', 'noRequired' => 1],
-                'req_id' => ['label' => 'Реквизиты нашей компании', 'type' => 'select', 'values' => 'Req', 'noRequired' => 1],
+                'req_id' => ['label' => 'Реквизиты нашей компании', 'type' => 'select', 'values' => 'Req'],
                 'pv_id' => ['label' => 'ПВ', 'type' => 'select', 'values' => 'Point', 'noRequired' => 1],
                 'town_id' => ['label' => 'Город', 'multiple' => 1, 'type' => 'select', 'values' => 'Town', 'noRequired' => 1, 'syncData' => [
                     ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],

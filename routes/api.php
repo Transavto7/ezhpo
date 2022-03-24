@@ -56,16 +56,23 @@ Route::middleware('auth:api')->group(function () {
 
     Route::prefix('notify')->group(function () {
         Route::get('/', function () {
-            $user_id = request()->user()->id;
-            $notifyes = \App\Notify::where('user_id', $user_id)->get();
+            $user = request()->user();
 
-            return response()->json($notifyes);
+            $notifies = \Illuminate\Support\Facades\DB::select('select * from notifies where role=? and id not in (select notify_id from notify_statuses where user_id=?)', [$user->role, $user->id]);
+
+            return response()->json($notifies);
         })->name('api.notify.get');
 
         Route::post('clear', function () {
-            $user_id = request()->user()->id;
+            $user = request()->user();
+            $notifies = \App\Notify::where('role', $user->role)->get();
 
-            \App\Notify::where('user_id', $user_id)->delete();
+            foreach($notifies as $notify) {
+                \App\NotifyStatuse::create([
+                    'user_id' => $user->id,
+                    'notify_id' => $notify->id
+                ]);
+            }
         })->name('api.notify.clear');
     });
 
