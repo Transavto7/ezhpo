@@ -408,7 +408,7 @@ class AnketsController extends Controller
                                 $anketa['company_name'] = $Company->name;
 
                                 if($Company->dismissed === 'Да') {
-                                    $errMsg = 'Компания в черном списке. Необходимо связаться с менеджером!';
+                                    $errMsg = 'Компания в черном списке. Необходимо связаться с руководителем!';
 
                                     array_push($errorsAnketa, $errMsg);
 
@@ -528,7 +528,7 @@ class AnketsController extends Controller
                     'date' => ''
                 ];
 
-                if ($anketa['type_anketa'] === 'medic') {
+                if ($anketa['type_anketa'] === 'medic' || $anketa['type_anketa'] === 'pak') {
                     $anketaMedic = Anketa::where('driver_id', $d_id)
                         ->where('type_anketa', 'medic')
                         ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '')
@@ -578,7 +578,7 @@ class AnketsController extends Controller
                             $anketa['company_name'] = $Company_Car->name;
 
                             if($Company_Car->dismissed === 'Да') {
-                                $errMsg = 'Компания в черном списке. Необходимо связаться с менеджером!';
+                                $errMsg = 'Компания в черном списке. Необходимо связаться с руководителем!';
 
                                 array_push($errorsAnketa, $errMsg);
 
@@ -706,7 +706,6 @@ class AnketsController extends Controller
                 /**
                  * Проверка на "Дополнительный осмотр"
                  */
-
                 if($is_tech_dop) {
                     $dopAnketa = $anketa;
                     $dopAnketa['type_anketa'] = 'Dop';
@@ -714,7 +713,15 @@ class AnketsController extends Controller
                 }
 
                 /**
-                 * Создаем анкет$createdAnketasу
+                 * Проверяем ПАК на наличие осмотра
+                 * Выставляем автоматический режим если осмотр пришел с ПАК
+                 */
+                if($anketa['is_pak']) {
+                    $anketa['flag_pak'] = 'СДПО А';
+                }
+
+                /**
+                 * Создаем анкету
                  */
                 $createdAnketa = Anketa::create($anketa);
                 array_push($createdAnketas, $createdAnketa->id);

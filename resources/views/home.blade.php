@@ -22,73 +22,75 @@
             <div class="card-body">
                 <div class="table-responsive">
 
-                    <div class="col-md-12">
-                        <div class="row bg-light p-2">
-                            <div class="col-md-6">
-                                <button type="button" data-toggle-show="#ankets-filters" class="btn btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
-                                <a href="?trash=1" class="btn btn-warning">Корзина <i class="fa fa-trash"></i></a>
+                    @if($type_ankets !== 'pak_queue')
+                        <div class="col-md-12">
+                            <div class="row bg-light p-2">
+                                <div class="col-md-6">
+                                    <button type="button" data-toggle-show="#ankets-filters" class="btn btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
+                                    <a href="?trash=1" class="btn btn-warning">Корзина <i class="fa fa-trash"></i></a>
 
-                                {{-- ОЧИСТКА ОЧЕРЕДИ СДПО --}}
-                                @if($type_ankets === 'pak_queue')
-                                    @role(['admin'])
-                                        <a href="?clear=1&type_anketa={{ $type_ankets }}" class="btn btn-warning">Очистить очередь</a>
-                                    @endrole
-                                @endif
-                            </div>
-
-
-                            @manager
-                                <div class="col-md-6 text-right">
-<!--                                    <button type="button" onclick="exportTable('ankets-table', true)" class="btn btn-default">Экспорт результатов <i class="fa fa-download"></i></button>-->
-<!--                                    <button type="button" onclick="exportTable('ankets-table')" class="btn btn-default">Экспорт результатов по приказу <i class="fa fa-download"></i></button>-->
-                                    <a href="?export=1{{ $queryString }}" class="btn btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
-                                    <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-default">Экспорт таблицы по приказу <i class="fa fa-download"></i></a>
+                                    {{-- ОЧИСТКА ОЧЕРЕДИ СДПО --}}
+                                    @if($type_ankets === 'pak_queue')
+                                        @role(['admin'])
+                                            <a href="?clear=1&type_anketa={{ $type_ankets }}" class="btn btn-warning">Очистить очередь</a>
+                                        @endrole
+                                    @endif
                                 </div>
-                            @endmanager
 
-                            <div class="toggle-hidden p-3" id="ankets-filters">
-                                <form action="{{ route('home.save-fields', $type_ankets) }}" method="POST" class="ankets-form">
-                                    @csrf
 
-                                    @foreach($anketsFields as $fieldKey => $fieldValue)
-                                        @isset($fieldsKeys[$fieldValue])
+                                @manager
+                                    <div class="col-md-6 text-right">
+    <!--                                    <button type="button" onclick="exportTable('ankets-table', true)" class="btn btn-default">Экспорт результатов <i class="fa fa-download"></i></button>-->
+    <!--                                    <button type="button" onclick="exportTable('ankets-table')" class="btn btn-default">Экспорт результатов по приказу <i class="fa fa-download"></i></button>-->
+                                        <a href="?export=1{{ $queryString }}" class="btn btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
+                                        <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-default">Экспорт таблицы по приказу <i class="fa fa-download"></i></a>
+                                    </div>
+                                @endmanager
 
-                                            <label>
-                                                <input
-                                                    @if(session()->exists("fields_$type_ankets"))
-                                                        @isset(session()->get("fields_$type_ankets")[$fieldValue])
-                                                        checked
-                                                        @endisset
-                                                    @else
-                                                        checked
-                                                    @endif
+                                <div class="toggle-hidden p-3" id="ankets-filters">
+                                    <form action="{{ route('home.save-fields', $type_ankets) }}" method="POST" class="ankets-form">
+                                        @csrf
 
-                                                    type="checkbox" name="{{ $fieldValue }}" data-value="{{ $fieldKey+1 }}" />
-                                                {{ (isset($fieldsKeys[$fieldValue]['name'])) ? $fieldsKeys[$fieldValue]['name'] : $fieldsKeys[$fieldValue] }} &nbsp;
-                                            </label>
-                                        @endisset
-                                    @endforeach
+                                        @foreach($anketsFields as $fieldKey => $fieldValue)
+                                            @isset($fieldsKeys[$fieldValue])
 
-                                    <button type="submit" class="btn btn-success btn-sm"><i class="fa fa-save"></i> Сохранить в сессию</button>
-                                </form>
+                                                <label>
+                                                    <input
+                                                        @if(session()->exists("fields_$type_ankets"))
+                                                            @isset(session()->get("fields_$type_ankets")[$fieldValue])
+                                                            checked
+                                                            @endisset
+                                                        @else
+                                                            checked
+                                                        @endif
+
+                                                        type="checkbox" name="{{ $fieldValue }}" data-value="{{ $fieldKey+1 }}" />
+                                                    {{ (isset($fieldsKeys[$fieldValue]['name'])) ? $fieldsKeys[$fieldValue]['name'] : $fieldsKeys[$fieldValue] }} &nbsp;
+                                                </label>
+                                            @endisset
+                                        @endforeach
+
+                                        <button type="submit" class="btn btn-success btn-sm"><i class="fa fa-save"></i> Сохранить в сессию</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <ul class="nav nav-tabs" id="filter-groups" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="filter-group-1-tab" data-toggle="tab" href="#filter-group-1" role="tab" aria-controls="filter-group-1" aria-selected="true"><i class="fa fa-filter"></i> Первая группа фильтров</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="filter-group-2-tab" data-toggle="tab" href="#filter-group-2" role="tab" aria-controls="filter-group-2" aria-selected="false"><i class="fa fa-filter"></i> Вторая группа фильтров</a>
-                        </li>
-                    </ul>
+                        <ul class="nav nav-tabs" id="filter-groups" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="filter-group-1-tab" data-toggle="tab" href="#filter-group-1" role="tab" aria-controls="filter-group-1" aria-selected="true"><i class="fa fa-filter"></i> Первая группа фильтров</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="filter-group-2-tab" data-toggle="tab" href="#filter-group-2" role="tab" aria-controls="filter-group-2" aria-selected="false"><i class="fa fa-filter"></i> Вторая группа фильтров</a>
+                            </li>
+                        </ul>
 
-                    <form action="" method="GET" class="tab-content ankets-form-filter mb-3 pt-3" id="filter-groupsContent">
-                        <div class="text-center">
-                            <img src="{{ asset('images/loader.gif') }}" width="30" class="mb-4" />
-                        </div>
-                    </form>
+                        <form action="" method="GET" class="tab-content ankets-form-filter mb-3 pt-3" id="filter-groupsContent">
+                            <div class="text-center">
+                                <img src="{{ asset('images/loader.gif') }}" width="30" class="mb-4" />
+                            </div>
+                        </form>
+                    @endif
 
                     @if(count($ankets) > 0)
                         <table id="ankets-table" class="ankets-table table table-striped table-sm">

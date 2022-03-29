@@ -97,8 +97,6 @@
     <div class="card">
         @if(isset($_GET['filter']))
             @include('pages.reports.' . $type_report)
-
-            <p class="col">Отчет сформирован по @if(request()->get('date_field') == 'date') Дате осмотра @else Дате создания @endif</p>
         @endif
     </div>
 

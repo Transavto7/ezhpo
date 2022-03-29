@@ -48,7 +48,14 @@ class ReportController extends Controller
 
                     $reports = Anketa::whereIn('pv_id', $pv_id)
                         ->where('type_anketa', 'medic')
-                        ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                        ->whereRaw("(created_at >= ? AND created_at <= ?)", [
+                            $date_from." 00:00:00",
+                            $date_to." 23:59:59"
+                        ])->get();
+
+                    $reports2 = Anketa::whereIn('pv_id', $pv_id)
+                        ->where('type_anketa', 'medic')
+                        ->whereRaw("(date >= ? AND date <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])->get();

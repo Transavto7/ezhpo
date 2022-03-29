@@ -5,7 +5,7 @@
 <div class="form-group">
     <label class="form-control-label">ID водителя:</label>
     <article>
-        <input value="{{ $driver_id ?? '' }}" type="number" onchange="checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent())" min="6" name="driver_id" class="MASK_ID_ELEM form-control">
+        <input value="{{ $driver_id ?? '' }}" type="number" oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent())" min="6" name="driver_id" class="MASK_ID_ELEM form-control">
         <p class="app-checker-prop"></p>
     </article>
 </div>
@@ -22,7 +22,7 @@
     <div class="form-group">
         <label class="form-control-label">ID автомобиля:</label>
         <article>
-            <input value="{{ $car_id ?? '' }}" type="number" required onchange="checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent())" min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control">
+            <input value="{{ $car_id ?? '' }}" type="number" required oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent())" min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control">
             <p class="app-checker-prop"></p>
         </article>
     </div>

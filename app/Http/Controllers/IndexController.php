@@ -155,7 +155,7 @@ class IndexController extends Controller
                     'Возраст' => 'Возраст',
                     'Алкоголь' => 'Алкоголь',
                     'Наркотики' => 'Наркотики'
-                ], 'defaultValue' => 'Не установлено', 'noRequired' => 1],
+                ], 'defaultValue' => 'Возраст', 'noRequired' => 1],
                 'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
                 'payment_form' => ['label' => 'Форма оплаты', 'type' => 'select', 'values' => [
                     'Абонентская оплата' => 'Абонентская оплата',
@@ -263,13 +263,13 @@ class IndexController extends Controller
                 'where_call' => ['label' => 'Кому звонить при отстранении', 'classes' => 'MASK_PHONE', 'type' => 'text', 'noRequired' => 1],
 
                 'inn' => ['label' => 'ИНН', 'type' => 'text', 'noRequired' => 1],
-                'payment_form' => ['label' => 'Форма оплаты', 'type' => 'select', 'values' => [
+                /*'payment_form' => ['label' => 'Форма оплаты', 'type' => 'select', 'values' => [
                     'Абонентская оплата' => 'Абонентская оплата',
                     'Разовые осмотры' => 'Разовые осмотры'
                 ], 'noRequired' => 1, 'syncData' => [
                     ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
                     ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель']
-                ]],
+                ]],*/
                 'procedure_pv' => ['label' => 'Порядок выпуска', 'type' => 'select', 'values' => [
                     'Наперед без дат' => 'Наперед без дат',
                     'Наперёд с датами' => 'Наперёд с датами',
@@ -323,13 +323,15 @@ class IndexController extends Controller
                     'tech' => 'Технический',
                     'Dop' => 'Учет ПЛ',
                     'pechat_pl' => 'Печать ПЛ',
-                    'report_cart' => 'Отчеты с карт'
+                    'report_cart' => 'Отчеты с карт',
                 ], 'defaultValue' => 'Не установлено'],
                 'type_view' => ['label' => 'Тип осмотра', 'type' => 'select', 'values' => [
                     'Предрейсовый' => 'Предрейсовый',
                     'Послерейсовый' => 'Послерейсовый',
                     'БДД' => 'БДД',
                     'Отчёты с карт' => 'Отчёты с карт',
+                    'Учет ПЛ' => 'Учет ПЛ',
+                    'Печать ПЛ' => 'Печать ПЛ'
                 ], 'defaultValue' => 'Не установлено', 'multiple' => 1],
             ]
         ],
@@ -876,7 +878,10 @@ class IndexController extends Controller
             $element['elements_count_all'] = $MODEL_ELEMENTS->all()->count();
             $element['elements'] = $element['elements']->orderBy($orderKey, $orderBy);
 
-            if($filter || $type === 'Settings') {
+            // Автоматическая загрузка справочников
+            $excludeElementTypes = ['Settings', 'Discount', 'DDates', 'Product', 'Instr', 'Town', 'Point', 'FieldHistory', 'Req'];
+
+            if($filter || in_array($type, $excludeElementTypes)) {
                 if($element['max']) {
                     $element['elements'] = $element['elements']->take($element['max'])->get();
                 } else {

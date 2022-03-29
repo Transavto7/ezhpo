@@ -47,7 +47,7 @@ class Car extends Model
 
                     if($discounts->count()) {
                         foreach($discounts as $discount) {
-                            eval('$is_discount_valid = ' . $discount->porog . $discount->trigger . $count . ';');
+                            eval('$is_discount_valid = ' . $count . $discount->porog . $discount->trigger . ';');
 
                             if($is_discount_valid) {
                                 $disc = ($service->price_unit * $discount->discount) / 100;

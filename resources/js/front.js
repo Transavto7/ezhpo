@@ -266,12 +266,14 @@ $(document).ready(function () {
     initCroppies()
 
     // Подгрузка в полей в Журналах: CHOSEN
-    $.get(location.search ? location.href+'&getFormFilter=1' : '?getFormFilter=1').done(response => {
-        if(response) {
-            $('#filter-groupsContent').html(response)
-            LIBS.initChosen()
-        }
-    });
+    if(location.pathname.indexOf('home') > -1) {
+        $.get(location.search ? location.href+'&getFormFilter=1' : '?getFormFilter=1').done(response => {
+            if(response) {
+                $('#filter-groupsContent').html(response)
+                LIBS.initChosen()
+            }
+        });
+    }
 
     $(window).on('load', function () {
         // Форма поиска по анкетам
@@ -442,8 +444,10 @@ $(document).ready(function () {
                     }
                 }
 
-                if(!!DATA.company_id) {
-                    checkInputProp('id', 'Company', DATA.company_id, 'name', [])
+                if(DATA) {
+                    if(!!DATA.company_id) {
+                        checkInputProp('id', 'Company', DATA.company_id, 'name', [])
+                    }
                 }
 
                 return
@@ -707,8 +711,9 @@ $(document).ready(function () {
      * Elements FORMS (edit, add)
      * Check Requireds / Validate
      */
-    $('[id*="elements-modal"] form, [id="elements-modal-add"] form').submit(function (e) {
-        let requireds = $(this).find('[required]'), errors = []
+    function checkElementsFormDataRequireds (form, event = null) {
+        let $form = $(form),
+            requireds = $form.find('[required]'), errors = []
 
         requireds.each(function () {
             let val = $(this).val(), name = $(this).data('label')
@@ -718,7 +723,8 @@ $(document).ready(function () {
         })
 
         if(errors.length) {
-            e.preventDefault()
+            if(event)
+                event.preventDefault()
 
             Toast.fire({
                 icon: 'error',
@@ -727,8 +733,25 @@ $(document).ready(function () {
 
             return
         }
-    })
+    }
 
+    function initElementsModalCheckFields () {
+        $('[id*="elements-modal"] form, [id="elements-modal-add"] form').submit(function (e) {
+            checkElementsFormDataRequireds(this, e)
+        })
+
+        $('[id*="elements-modal"] button[type="submit"], [id="elements-modal-add"] button[type="submit"]').click(function (e) {
+            let $form = $(this).parents('form')
+
+            if($form.length)
+                checkElementsFormDataRequireds($form)
+        })
+    }
+    initElementsModalCheckFields()
+
+    /**
+     * АВТО-ОТПРАВКА ФОРМ
+     */
     $('.API_FORM_SEND').submit(function (e) {
         e.preventDefault()
 

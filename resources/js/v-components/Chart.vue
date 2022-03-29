@@ -64,7 +64,7 @@ export default {
     },
 
     props: [
-        'data'
+        'data', 'data2'
     ],
 
     data () {
@@ -92,9 +92,9 @@ export default {
     mounted () {
         let labels = this.datacollection.labels
 
+        // ДАТА ОСМОТРА
         this.data.forEach((dataItem, dataIndex) => {
-            let created_at = new Date( '2021-11-25 ' + dataItem.created_at.replace(/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/g, '').trim() ),
-                date = new Date( '2021-11-25 ' + dataItem.date.replace(/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/g, '').trim() )
+            let date = new Date( '2021-11-25 ' + dataItem.date.replace(/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/g, '').trim() )
 
             labels.forEach((item, index) => {
                 let dateCheck = new Date('2021-11-25 ' + item),
@@ -104,6 +104,16 @@ export default {
                 if(date >= dateCheck && date <= nextDateCheck) {
                     this.datacollection.datasets[0].data[index]++
                 }
+            })
+        })
+
+        // ДАТА СОЗДАНИЯ
+        this.data2.forEach((dataItem, dataIndex) => {
+            let created_at = new Date( '2021-11-25 ' + dataItem.created_at.replace(/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/g, '').trim() )
+
+            labels.forEach((item, index) => {
+                let dateCheck = new Date('2021-11-25 ' + item),
+                    nextDateCheck = new Date('2021-11-25 ' + (labels[index+1] ? labels[index+1] : labels[0]))
 
                 // Дата создания
                 if(created_at >= dateCheck && created_at <= nextDateCheck) {

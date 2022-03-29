@@ -167,6 +167,7 @@ class HomeController extends Controller
                             /**
                              * Поправил дату
                              */
+
                             $anketas = $isFromEqualToValue ?
                                   $anketas->whereDate($is_filter_except, $fromFilterValue)
                                 : $anketas->whereRaw("($is_filter_except >= ? AND $is_filter_except <= ?)", [
@@ -178,6 +179,7 @@ class HomeController extends Controller
                             $explodeData = (count($explodeData) == 1) ? $explodeData[0] : $explodeData;
 
                             if(is_array($explodeData)) {
+
                                 $anketas = $anketas->where(function ($q) use ($explodeData, $fk) {
 
                                     foreach($explodeData as $fvItemKey => $fvItemValue) {
@@ -187,7 +189,12 @@ class HomeController extends Controller
                                     return $q;
                                 });
                             } else {
-                                $anketas = $anketas->where($fk, 'LIKE', '%' . $explodeData . '%');
+                                /**
+                                 * Проверяем что данные есть (повлияло на ФЛАГ СДПО)
+                                 */
+                                if($explodeData) {
+                                    $anketas = $anketas->where($fk, 'LIKE', '%' . $explodeData . '%');
+                                }
                             }
                         }
 

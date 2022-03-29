@@ -271,8 +271,14 @@
                                         @if($model === 'Company' && $elK === 'name')
 
                                             <p>
+                                                @php
+                                                    $pre_month = (date('m')-1);
+                                                    $date_from_company = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . '01';
+                                                    $date_to_company = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . cal_days_in_month(CAL_GREGORIAN, 2, date('Y'));
+                                                @endphp
+
                                                 <a class="btn btn-sm btn-outline-success"
-                                                   href="{{ route('report.get', ['type' => 'journal', 'filter' => 1, 'company_id' => $el->hash_id, 'date_from' => date('Y-m') . '-01', 'date_to' => date('Y-m-t')]) }}">
+                                                   href="{{ route('report.get', ['type' => 'journal', 'filter' => 1, 'is_finance' => 1, 'company_id' => $el->hash_id, 'date_from' => $date_from_company, 'date_to' => $date_to_company]) }}">
                                                     ₽
                                                 </a>
                                                 <a class="btn btn-sm btn-default"
