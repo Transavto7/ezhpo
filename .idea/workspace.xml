@@ -3,29 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f6a199b1-6d31-48a4-b894-b6045514cb71" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Car.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Car.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/DocsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/DocsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/IndexController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/IndexController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/front.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/front.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/v-components/Chart.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/v-components/Chart.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/elements.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/elements.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/home.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/pages/driver.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/pages/driver.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/pages/reports/all.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/pages/reports/all.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/pages/reports/graph_pv.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/pages/reports/graph_pv.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/Dop.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/Dop.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/bdd.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/bdd.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/medic.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/medic.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/pak.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/pak.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/pak_queue.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/pak_queue.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/report_cart.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/report_cart.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/tech.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/tech.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/vid_pl.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/vid_pl.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Notify.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Notify.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -597,7 +576,8 @@
       <workItem from="1648132962856" duration="5250000" />
       <workItem from="1648384116766" duration="9000" />
       <workItem from="1648488941496" duration="25000" />
-      <workItem from="1648558205670" duration="7410000" />
+      <workItem from="1648558205670" duration="7664000" />
+      <workItem from="1648652237007" duration="424000" />
     </task>
     <servers />
   </component>

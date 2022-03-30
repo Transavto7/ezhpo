@@ -17,6 +17,7 @@ class Notify extends Model
             foreach($users as $user) {
                 return $this->create([
                     'user_id' => $user->id,
+                    'role' => $user->role,
                     'message' => $msg
                 ]);
             }

@@ -55,10 +55,11 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::prefix('notify')->group(function () {
+
         Route::get('/', function () {
             $user = request()->user();
 
-            $notifies = \Illuminate\Support\Facades\DB::select('select * from notifies where role=? and id not in (select notify_id from notify_statuses where user_id=?)', [$user->role, $user->id]);
+            $notifies = \Illuminate\Support\Facades\DB::select('select * from notifies where role=? and id NOT IN (select notify_id from notify_statuses where user_id=?)', [$user->role, $user->id]);
 
             return response()->json($notifies);
         })->name('api.notify.get');
@@ -74,6 +75,7 @@ Route::middleware('auth:api')->group(function () {
                 ]);
             }
         })->name('api.notify.clear');
+
     });
 
     Route::post('/anketa', 'AnketsController@ApiAddForm')->name('api.addform');
