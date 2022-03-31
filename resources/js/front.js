@@ -868,6 +868,26 @@ $(document).ready(function () {
         $('#toggle-btn').trigger('click')
     }
 
+    $('input[type="checkbox"][data-connect-field]').each(function () {
+        let connectField = $(this).data('connectField')
+            connectField = $(`*[name="${connectField}"]`)
+
+        let triggerField = () => {
+            if(this.checked) {
+                connectField.removeAttr('disabled')
+            } else {
+                connectField.attr('disabled', 'disabled')
+                connectField.removeAttr('checked')
+            }
+        }
+
+        $(this).change(function () {
+            triggerField()
+        })
+
+        triggerField()
+    })
+
     $('*[data-field="Company_name"]').suggestions({
         token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
         type: "PARTY",
@@ -882,5 +902,6 @@ $(document).ready(function () {
     });
 
     LIBS.initAll()
+    $('.MASK_ID_ELEM').trigger('input')
 
 });

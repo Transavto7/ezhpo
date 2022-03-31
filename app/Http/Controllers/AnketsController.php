@@ -716,8 +716,10 @@ class AnketsController extends Controller
                  * Проверяем ПАК на наличие осмотра
                  * Выставляем автоматический режим если осмотр пришел с ПАК
                  */
-                if($anketa['is_pak']) {
-                    $anketa['flag_pak'] = 'СДПО А';
+                if(isset($anketa['is_pak'])) {
+                    if($anketa['is_pak']) {
+                        $anketa['flag_pak'] = 'СДПО А';
+                    }
                 }
 
                 /**

@@ -24,7 +24,7 @@
                         @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
                         @php $default_value = isset($v['defaultValue']) ? $v['defaultValue'] : '' @endphp
 
-                        @if($k !== 'id' )
+                        @if($k !== 'id' && !isset($v['hidden']))
                             <div class="form-group" data-field="{{ $k }}">
                                 <label>
                                     @if($is_required) <b class="text-danger text-bold">*</b> @endif
@@ -128,7 +128,7 @@
                         @foreach($fields as $fk => $fv)
                             @php $fv['multiple'] = true; @endphp
 
-                            @if(!in_array($fk, ['photo']))
+                            @if(!in_array($fk, ['photo']) && !isset($fv['hidden']))
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label>{{ $fv['label'] }}</label>
@@ -186,13 +186,15 @@
                 @endif
 
                 @foreach ($fields as $k => $v)
-                    <th title="Ключ: {{ $k }}" data-key="{{ $k }}">
-                        {{ $v['label'] }}
+                    @if(!isset($v['hidden']))
+                        <th title="Ключ: {{ $k }}" data-key="{{ $k }}">
+                            {{ $v['label'] }}
 
-                        <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $k }}">
-                            <i class="fa fa-sort"></i>
-                        </a>
-                    </th>
+                            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $k }}">
+                                <i class="fa fa-sort"></i>
+                            </a>
+                        </th>
+                    @endif
                 @endforeach
 
                 @role(['manager', 'admin'])
@@ -207,7 +209,7 @@
                 @foreach ($elements as $el)
                     <tr>
                         @foreach ($el->fillable as $elIndex => $elK)
-                            @if(!(isset($notShowHashId) && $elK === 'hash_id'))
+                            @if(!(isset($notShowHashId) && $elK === 'hash_id') && $elK !== 'autosync_fields')
                                 <td class="td-option">
                                     @if($elK === $editOnField)
                                         {{-- Если пользователь Менеджер --}}
@@ -278,7 +280,7 @@
                                                 @endphp
 
                                                 <a class="btn btn-sm btn-outline-success"
-                                                   href="{{ route('report.get', ['type' => 'journal', 'filter' => 1, 'is_finance' => 1, 'company_id' => $el->hash_id, 'date_from' => $date_from_company, 'date_to' => $date_to_company]) }}">
+                                                   href="{{ route('report.get', ['type' => 'journal', 'date_field' => 'date', 'filter' => 1, 'is_finance' => 1, 'company_id' => $el->hash_id, 'date_from' => $date_from_company, 'date_to' => $date_to_company]) }}">
                                                     ₽
                                                 </a>
                                                 <a class="btn btn-sm btn-default"
@@ -321,7 +323,7 @@
                                                                 @foreach ($fields as $k => $v)
                                                                     @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
 
-                                                                    @if($k !== 'id')
+                                                                    @if($k !== 'id' && !isset($v['hidden']))
                                                                         <div class="form-group" data-field="{{ $k }}">
                                                                             <label>
                                                                                 @if($is_required) <b class="text-danger text-bold">*</b> @endif

@@ -27,6 +27,10 @@
                                                    value="{{ $setting->val }}"
                                                @endif
 
+                                               @isset($setting->connect_field)
+                                                   data-connect-field="{{ $setting->connect_field }}"
+                                               @endisset
+
                                                name="{{ $setting->param }}">
                                     </div>
                                 </label>

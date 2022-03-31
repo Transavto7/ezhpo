@@ -48,14 +48,16 @@ class ReportController extends Controller
 
                     $reports = Anketa::whereIn('pv_id', $pv_id)
                         ->where('type_anketa', 'medic')
-                        ->whereRaw("(created_at >= ? AND created_at <= ?)", [
+                        ->where('in_cart', 0)
+                        ->whereRaw("(date >= ? AND date <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])->get();
 
                     $reports2 = Anketa::whereIn('pv_id', $pv_id)
                         ->where('type_anketa', 'medic')
-                        ->whereRaw("(date >= ? AND date <= ?)", [
+                        ->where('in_cart', 0)
+                        ->whereRaw("(created_at >= ? AND created_at <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])->get();
@@ -65,13 +67,23 @@ class ReportController extends Controller
                 case 'journal':
                     $reports = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
                         ->where('company_id', $data['company_id'])
-                        ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                        ->where('in_cart', 0)
+                        ->whereRaw("(created_at >= ? AND created_at <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])
                         ->get();
 
-                    if($date_field === 'created_at') {
+                    $reportsDate = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+                        ->where('company_id', $data['company_id'])
+                        ->where('in_cart', 0)
+                        ->whereRaw("(date >= ? AND date <= ?)", [
+                            $date_from." 00:00:00",
+                            $date_to." 23:59:59"
+                        ])
+                        ->get();
+
+                    if($reports) {
                         $dates = $reports->sortByDesc('date');
 
                         if(isset($dates->first()->date)) {
@@ -109,6 +121,7 @@ class ReportController extends Controller
 
                     $reports2 = Anketa::where('type_anketa', 'tech')
                         ->where('company_id', $data['company_id'])
+                        ->where('in_cart', 0)
                         ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"

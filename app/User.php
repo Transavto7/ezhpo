@@ -54,7 +54,7 @@ class User extends Authenticatable
         '0' => '',
         '1' => 'tech',
         '2' => 'medic',
-        '4' => 'medic',
+        '4' => 'pak_queue',
         '12' => 'medic',
         '11' => 'medic',
         '777' => 'medic',

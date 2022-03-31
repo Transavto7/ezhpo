@@ -182,9 +182,8 @@ class IndexController extends Controller
                     'Да' => 'Да'
                 ], 'defaultValue' => 'Нет'],
                 'autosync_fields' => ['label' => 'Автоматическая синхронизация Полей с компанией (по умолч.)', 'type' => 'select', 'values' => [
-                    'payment_form' => 'Форма оплаты',
                     'products_id' => 'Услуги'
-                ], 'defaultValue' => 'payment_form,products_id', 'multiple' => 1]
+                ], 'defaultValue' => 'payment_form,products_id', 'multiple' => 1, 'hidden' => 1]
             ]
         ],
         'Car' => [
@@ -232,9 +231,8 @@ class IndexController extends Controller
                     'Да' => 'Да'
                 ], 'defaultValue' => 'Нет'],
                 'autosync_fields' => ['label' => 'Автоматическая синхронизация Полей с компанией (по умолч.)', 'type' => 'select', 'values' => [
-                    'payment_form' => 'Форма оплаты',
                     'products_id' => 'Услуги'
-                ], 'defaultValue' => 'payment_form,products_id', 'multiple' => 1]
+                ], 'defaultValue' => 'payment_form,products_id', 'multiple' => 1, 'hidden' => 1]
             ]
         ],
         'Company' => [
@@ -727,7 +725,9 @@ class IndexController extends Controller
                     }
                 }
 
-                if($model_text === 'Driver' || $model_text === 'Car') {
+                /*
+                 * АВТО <- КОМПАНИЯ (СИНХРОНИЗАЦИЯ ПОЛЕЙ)
+                 * if($model_text === 'Driver' || $model_text === 'Car') {
                     if(isset($element->company_id)) {
                         if($element->company_id) {
                             $aSyncFields = explode(',', $element->autosync_fields);
@@ -737,7 +737,9 @@ class IndexController extends Controller
                             }
                         }
                     }
-                } else if ($model_text === 'Company') {
+                } */
+
+                if ($model_text === 'Company') {
 
                     if(isset($element->products_id)) {
                         $this->syncDataFunc([
@@ -754,24 +756,6 @@ class IndexController extends Controller
                             'fieldFindId' => $element->id,
                             'fieldSync' => 'products_id',
                             'fieldSyncValue' => $element->products_id
-                        ]);
-                    }
-
-                    if(isset($element->payment_form)) {
-                        $this->syncDataFunc([
-                            'model' => 'Car',
-                            'fieldFind' => 'company_id',
-                            'fieldFindId' => $element->id,
-                            'fieldSync' => 'payment_form',
-                            'fieldSyncValue' => $element->payment_form
-                        ]);
-
-                        $this->syncDataFunc([
-                            'model' => 'Driver',
-                            'fieldFind' => 'company_id',
-                            'fieldFindId' => $element->id,
-                            'fieldSync' => 'payment_form',
-                            'fieldSyncValue' => $element->payment_form
                         ]);
                     }
 

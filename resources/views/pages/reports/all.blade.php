@@ -45,14 +45,6 @@
                                         'default_value' => request()->get('is_finance', 0)
                                     ])
                                 </div>--}}
-
-                                <div class="col-md-2">
-                                    <label>Сортировать по:</label>
-                                    <select class="js-chosen" name="date_field">
-                                        <option @if(!isset($_GET['date_field']) || request()->get('date_field') == 'created_at') selected @endif value="created_at">Дате создания</option>
-                                        <option @if(request()->get('date_field') == 'date') selected @endif value="date">Дате осмотра</option>
-                                    </select>
-                                </div>
                             @break
 
                             @case('graph_pv')

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddSyncdataAutofieldToDrivers extends Migration
+class AddConnectFieldToSystemSettings extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddSyncdataAutofieldToDrivers extends Migration
      */
     public function up()
     {
-        Schema::table('drivers', function (Blueprint $table) {
-            $table->string('autosync_fields')->default('products_id');
+        Schema::table('system_settings', function (Blueprint $table) {
+            $table->text('connect_field')->nullable();
         });
     }
 
@@ -25,7 +25,7 @@ class AddSyncdataAutofieldToDrivers extends Migration
      */
     public function down()
     {
-        Schema::table('drivers', function (Blueprint $table) {
+        Schema::table('system_settings', function (Blueprint $table) {
             //
         });
     }

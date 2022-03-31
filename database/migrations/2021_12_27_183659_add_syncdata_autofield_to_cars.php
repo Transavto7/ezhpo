@@ -14,7 +14,7 @@ class AddSyncdataAutofieldToCars extends Migration
     public function up()
     {
         Schema::table('cars', function (Blueprint $table) {
-            $table->string('autosync_fields')->default('payment_form,products_id');
+            $table->string('autosync_fields')->default('products_id');
         });
     }
 

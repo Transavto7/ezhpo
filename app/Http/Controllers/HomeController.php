@@ -188,13 +188,31 @@ class HomeController extends Controller
 
                                     return $q;
                                 });
+
                             } else {
                                 /**
                                  * Проверяем что данные есть (повлияло на ФЛАГ СДПО)
                                  */
+
                                 if($explodeData) {
-                                    $anketas = $anketas->where($fk, 'LIKE', '%' . $explodeData . '%');
+                                    // Для строгих значений
+                                    if(in_array($fk, ['company_name', 'driver_fio']) || strpos($fk, '_id') || $fk === 'id') {
+                                        $anketas = $anketas->where($fk, $explodeData);
+                                    }
+                                    // Для динамичных значений
+                                    else {
+                                        $anketas = $anketas->where($fk, 'LIKE', '%' . $explodeData . '%');
+                                    }
+                                } else if ($explodeData === null) {
+                                    $anketas = $anketas->where($fk, null);
                                 }
+                            }
+                        } else {
+                            // Если даты
+                            if($fk === 'date' || $fk === 'created_at') {
+                                $anketas = $anketas->where($fk, '>=', $fv);
+                            } else {
+                                $anketas = $anketas->where($fk, $fv);
                             }
                         }
 

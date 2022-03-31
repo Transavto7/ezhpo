@@ -26,7 +26,7 @@ class CreateCompaniesTable extends Migration
             $table->string('where_call')->nullable(); // Кому звонить при отстранении”, тип - текст. Маска - сотовый номер телефона
 
             $table->longText('name');
-            $table->string('payment_form')->nullable(); // Порядок оплаты
+            //$table->string('payment_form')->nullable();
             $table->string('procedure_pv')->default('Фактовый'); // Форма выпуска
 
             $table->longText('note')->nullable(); // Примечание
