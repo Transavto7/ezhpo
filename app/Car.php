@@ -10,7 +10,7 @@ class Car extends Model
         'hash_id',
         //'old_id',
         'gos_number', 'mark_model', 'type_auto', 'products_id', 'trailer', 'company_id',
-        'payment_form', 'count_pl', 'note', 'procedure_pv', 'date_prto', 'date_techview',
+        'count_pl', 'note', 'procedure_pv', 'date_prto', 'date_techview',
         'time_skzi', 'date_osago',
         'town_id', 'dismissed',
         'autosync_fields'
@@ -39,7 +39,6 @@ class Car extends Model
 
                 $services = Product::whereIn('id', $services)
                     ->where('type_anketa', $type_anketa)
-                    ->where('type_product', isset($element->payment_form) ? $element->payment_form : '')
                     ->where('type_view', 'LIKE', "%$type_view%")->get();
 
                 foreach($services as $serviceKey => $service) {
@@ -63,8 +62,6 @@ class Car extends Model
                     $data['summ'] = $services->sum('price_unit') . '₽';
                 } else if(!isset($element->products_id)) {
                     $data['summ'] = "<span class='text-red'>Услуги не указаны</span>";
-                } else if(!isset($element->payment_form)) {
-                    $data['summ'] = "<span class='text-red'>Не указана форма оплаты</span>";
                 } else {
                     $data['summ'] = "<span class='text-red'>Услуги не найдены</span>";
                 }

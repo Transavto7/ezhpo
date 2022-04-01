@@ -17,7 +17,7 @@
                             @foreach($settings as $setting)
                                 <div class="line"></div>
                                 <label class="form-group row">
-                                    <div class="col-sm-3 form-control-label"><b>[{{ $setting->category }}]</b> {{ $setting->label }}</div>
+                                    <div class="col-sm-3 form-control-label">{{ $setting->label }}</div>
                                     <div class="col-sm-9">
                                         <input type="{{ $setting->input_type }}"
 

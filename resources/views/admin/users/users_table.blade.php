@@ -149,13 +149,17 @@
                                         <label>Роль</label>
                                         <select name="role" required class="form-control">
                                             <option disabled selected value="{{ $user->role }}">{{ \App\Http\Controllers\ProfileController::getUserRole(true, $user->id) }}</option>
-                                            <option value="12">Клиент</option>
-                                            <option value="1">Контролёр ТС</option>
-                                            <option value="2">Медицинский сотрудник</option>
-                                            <option value="4">Оператор СДПО</option>
+
+                                            @if(!$is_pak)
+                                                <option value="12">Клиент</option>
+                                                <option value="1">Контролёр ТС</option>
+                                                <option value="2">Медицинский сотрудник</option>
+                                                <option value="4">Оператор СДПО</option>
+                                                <option value="11">Менеджер</option>
+                                                <option value="777">Администратор</option>
+                                            @endif
+
                                             <option value="778">Терминал</option>
-                                            <option value="11">Менеджер</option>
-                                            <option value="777">Администратор</option>
                                         </select>
                                     </div>
 

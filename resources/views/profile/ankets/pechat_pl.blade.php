@@ -27,6 +27,16 @@
     </div>
 
     <div class="form-group row">
+        <label class="col-md-3 form-control-label">ID водителя:</label>
+        <article class="col-md-9">
+            <input value="{{ $driver_id ?? '' }}" type="number"
+                   oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent())"
+                   required min="6" name="anketa[0][driver_id]" class="MASK_ID_ELEM form-control">
+            <div class="app-checker-prop"></div>
+        </article>
+    </div>
+
+    <div class="form-group row">
         <label class="col-md-3 form-control-label">Количество распечатанных ПЛ:</label>
         <article class="col-md-9">
             <input type="number" required name="anketa[0][count_pl]" class="form-control">
@@ -35,3 +45,5 @@
 
     <div class="anketa-delete"></div>
 </div>
+
+

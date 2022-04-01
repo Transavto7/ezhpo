@@ -83,7 +83,7 @@ class ReportController extends Controller
                         ])
                         ->get();
 
-                    if($reports) {
+                    if(true) {
                         $dates = $reports->sortByDesc('date');
 
                         if(isset($dates->first()->date)) {

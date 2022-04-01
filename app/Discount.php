@@ -10,7 +10,7 @@ class Discount extends Model
         'hash_id',
         'products_id',
         'trigger',
-        'discount',
-        'porog'
+        'porog',
+        'discount'
     ];
 }

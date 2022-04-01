@@ -10,7 +10,6 @@ class Company extends Model
         'hash_id', 'name',
         'note', 'user_id', 'req_id',
         'pv_id', 'town_id', 'products_id', 'where_call', 'inn',
-        //'payment_form',
         'procedure_pv',
         'dismissed'
     ];

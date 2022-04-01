@@ -10,7 +10,7 @@ class Driver extends Model
         'hash_id',
         //'old_id',
         'photo', 'fio', 'year_birthday', 'phone', 'gender', 'group_risk', 'company_id',
-        'payment_form', 'products_id', 'count_pl', 'note', 'procedure_pv',
+        'products_id', 'count_pl', 'note', 'procedure_pv',
         'date_bdd', 'date_prmo',
         'date_report_driver',
         'time_card_driver',
@@ -41,7 +41,6 @@ class Driver extends Model
 
                 $services = Product::whereIn('id', $services)
                     ->where('type_anketa', $type_anketa)
-                    ->where('type_product', isset($element->payment_form) ? $element->payment_form : '')
                     ->where('type_view', 'LIKE', "%$type_view%")->get();
 
                 foreach($services as $serviceKey => $service) {
@@ -65,8 +64,6 @@ class Driver extends Model
                     $data['summ'] = $services->sum('price_unit') . '₽';
                 } else if(!isset($element->products_id)) {
                     $data['summ'] = "<span class='text-red'>Услуги не указаны</span>";
-                } else if(!isset($element->payment_form)) {
-                    $data['summ'] = "<span class='text-red'>Не указана форма оплаты</span>";
                 } else {
                     $data['summ'] = "<span class='text-red'>Услуги не найдены</span>";
                 }

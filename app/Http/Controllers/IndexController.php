@@ -157,10 +157,6 @@ class IndexController extends Controller
                     'Наркотики' => 'Наркотики'
                 ], 'defaultValue' => 'Возраст', 'noRequired' => 1],
                 'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
-                'payment_form' => ['label' => 'Форма оплаты', 'type' => 'select', 'values' => [
-                    'Абонентская оплата' => 'Абонентская оплата',
-                    'Разовые осмотры' => 'Разовые осмотры'
-                ], 'noRequired' => 1],
 
                 'products_id' => ['label' => 'Услуги', 'multiple' => 1, 'type' => 'select', 'values' => 'Product', 'noRequired' => 1],
 
@@ -183,7 +179,7 @@ class IndexController extends Controller
                 ], 'defaultValue' => 'Нет'],
                 'autosync_fields' => ['label' => 'Автоматическая синхронизация Полей с компанией (по умолч.)', 'type' => 'select', 'values' => [
                     'products_id' => 'Услуги'
-                ], 'defaultValue' => 'payment_form,products_id', 'multiple' => 1, 'hidden' => 1]
+                ], 'defaultValue' => 'products_id', 'multiple' => 1, 'hidden' => 1]
             ]
         ],
         'Car' => [
@@ -209,10 +205,6 @@ class IndexController extends Controller
 
                 'trailer' => ['label' => 'Прицеп', 'type' => 'select', 'values' => ['Нет' => 'Нет', 'Да' => 'Да'], 'defaultValue' => 'Нет', 'noRequired' => 1],
                 'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
-                'payment_form' => ['label' => 'Форма оплаты', 'type' => 'select', 'values' => [
-                    'Абонентская оплата' => 'Абонентская оплата',
-                    'Разовые осмотры' => 'Разовые осмотры'
-                ], 'noRequired' => 1],
                 'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1],
                 'note' => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
                 'procedure_pv' => ['label' => 'Порядок выпуска', 'type' => 'select', 'values' => [
@@ -232,7 +224,7 @@ class IndexController extends Controller
                 ], 'defaultValue' => 'Нет'],
                 'autosync_fields' => ['label' => 'Автоматическая синхронизация Полей с компанией (по умолч.)', 'type' => 'select', 'values' => [
                     'products_id' => 'Услуги'
-                ], 'defaultValue' => 'payment_form,products_id', 'multiple' => 1, 'hidden' => 1]
+                ], 'defaultValue' => 'products_id', 'multiple' => 1, 'hidden' => 1]
             ]
         ],
         'Company' => [
@@ -261,13 +253,6 @@ class IndexController extends Controller
                 'where_call' => ['label' => 'Кому звонить при отстранении', 'classes' => 'MASK_PHONE', 'type' => 'text', 'noRequired' => 1],
 
                 'inn' => ['label' => 'ИНН', 'type' => 'text', 'noRequired' => 1],
-                /*'payment_form' => ['label' => 'Форма оплаты', 'type' => 'select', 'values' => [
-                    'Абонентская оплата' => 'Абонентская оплата',
-                    'Разовые осмотры' => 'Разовые осмотры'
-                ], 'noRequired' => 1, 'syncData' => [
-                    ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
-                    ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель']
-                ]],*/
                 'procedure_pv' => ['label' => 'Порядок выпуска', 'type' => 'select', 'values' => [
                     'Наперед без дат' => 'Наперед без дат',
                     'Наперёд с датами' => 'Наперёд с датами',
@@ -295,8 +280,8 @@ class IndexController extends Controller
                     '>' => '>',
                     '<' => '<'
                 ], 'defaultValue' => '>'],
-                'discount' => ['label' => 'Скидка (%)', 'type' => 'porog'],
-                'porog' => ['label' => 'Пороговое значение', 'type' => 'number']
+                'porog' => ['label' => 'Пороговое значение', 'type' => 'number'],
+                'discount' => ['label' => 'Скидка (%)', 'type' => 'porog']
             ]
         ],
 
@@ -311,7 +296,7 @@ class IndexController extends Controller
                 'name' => ['label' => 'Название', 'type' => 'text'],
                 'type_product' => ['label' => 'Тип', 'type' => 'select', 'values' => [
                     'Абонентская оплата' => 'Абонентская оплата',
-                    'Разовые осмотры' => 'Разовые осмотры'
+                    'Разовые осмотры' => 'Разовые осмотры',
                 ], 'defaultValue' => 'Абонентская оплата'],
                 'unit' => ['label' => 'Ед.изм.', 'type' => 'text'],
                 'price_unit' => ['label' => 'Стоимость за единицу', 'type' => 'number'],
@@ -326,6 +311,8 @@ class IndexController extends Controller
                 'type_view' => ['label' => 'Тип осмотра', 'type' => 'select', 'values' => [
                     'Предрейсовый' => 'Предрейсовый',
                     'Послерейсовый' => 'Послерейсовый',
+                    'Предсменный' => 'Предсменный',
+                    'Послесменный' => 'Послесменный',
                     'БДД' => 'БДД',
                     'Отчёты с карт' => 'Отчёты с карт',
                     'Учет ПЛ' => 'Учет ПЛ',
@@ -557,11 +544,15 @@ class IndexController extends Controller
 
                     // СИНХРОНИЗАЦИЯ ПОЛЕЙ
                     if(isset($data['company_id'])) {
-                        $fieldsSync = $data['autosync_fields'];
+                        $fieldsSync = isset($data['autosync_fields']) ? $data['autosync_fields'] : [];
 
                         if(Company::find($data['company_id'])) {
                             foreach($fieldsSync as $fSync) {
-                                $data[$fSync] = Company::find($data['company_id'])->$fSync;
+                                $fsyncData = Company::find($data['company_id'])->$fSync;
+
+                                if($fsyncData) {
+                                    $data[$fSync] = $fsyncData;
+                                }
                             }
                         }
                     }
@@ -591,11 +582,15 @@ class IndexController extends Controller
 
                     // СИНХРОНИЗАЦИЯ ПОЛЕЙ
                     if(isset($data['company_id'])) {
-                        $fieldsSync = $data['autosync_fields'];
+                        $fieldsSync = isset($data['autosync_fields']) ? $data['autosync_fields'] : [];
 
                         if(Company::find($data['company_id'])) {
                             foreach($fieldsSync as $fSync) {
-                                $data[$fSync] = Company::find($data['company_id'])->$fSync;
+                                $fsyncData = Company::find($data['company_id'])->$fSync;
+
+                                if($fsyncData) {
+                                    $data[$fSync] = $fsyncData;
+                                }
                             }
                         }
                     }
@@ -782,6 +777,10 @@ class IndexController extends Controller
             return view('auth.login');
         }
 
+        if($user->hasRole('operator_pak', '==')) {
+            return redirect()->route('home', 'pak_queue');
+        }
+
         return redirect()->route('forms');
     }
 
@@ -863,7 +862,7 @@ class IndexController extends Controller
             $element['elements'] = $element['elements']->orderBy($orderKey, $orderBy);
 
             // Автоматическая загрузка справочников
-            $excludeElementTypes = ['Settings', 'Discount', 'DDates', 'Product', 'Instr', 'Town', 'Point', 'FieldHistory', 'Req'];
+            $excludeElementTypes = ['Settings', 'Discount', 'DDates', 'DDate', 'Product', 'Instr', 'Town', 'Point', 'FieldHistory', 'Req'];
 
             if($filter || in_array($type, $excludeElementTypes)) {
                 if($element['max']) {

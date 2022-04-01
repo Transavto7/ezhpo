@@ -359,6 +359,8 @@ class AnketsController extends Controller
                  * ОЧЕРЕДЬ ПАК
                  */
                 if($anketa['type_anketa'] == 'pak_queue') {
+                    $anketa['flag_pak'] = 'СДПО Р';
+
                     $notifyTo = new Notify();
                     $notifyTo->sendMsgToUsersFrom('role', '4', 'Новый осмотр в очереди СДПО');
                 }
@@ -456,7 +458,7 @@ class AnketsController extends Controller
                     && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38 && $tonometer[0] < 150) {
                     $anketa['admitted'] = 'Допущен';
                 } else {
-                    $anketa['admitted'] = 'Недопущен';
+                    $anketa['admitted'] = 'Не допущен';
                 }
 
                 /**
@@ -467,7 +469,7 @@ class AnketsController extends Controller
                     if($anketa['sleep_status'] === 'Да' && $anketa['people_status'] === 'Да' && $anketa['alcometer_result'] <= 0) {
                         $anketa['admitted'] = 'Допущен';
                     } else {
-                        $anketa['admitted'] = 'Недопущен';
+                        $anketa['admitted'] = 'Не допущен';
                     }
 
                 }
@@ -731,7 +733,7 @@ class AnketsController extends Controller
                 /**
                  * ОТПРАВКА SMS
                  */
-                if($anketa['admitted'] == 'Недопущен' && isset($Company)) {
+                if($anketa['admitted'] == 'Не допущен' && isset($Company)) {
                     $phone_to_call = Settings::setting('sms_text_phone');
 
                     if(isset($Driver)) {

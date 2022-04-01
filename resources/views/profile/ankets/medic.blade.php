@@ -51,7 +51,6 @@
 
     <div class="anketa-bordered">
 
-
         <div class="form-group row">
             <label class="form-control-label col-md-3">Тип осмотра:</label>
             <article class="col-md-9">

@@ -50,7 +50,7 @@
         <label class="btn btn-danger btn-sm">
             <i class="fa fa-close"></i>
             Отклонить
-            <input onchange="ANKETA_FORM.submit()" class="d-none" type="radio" value="Недопущен" name="admitted" />
+            <input onchange="ANKETA_FORM.submit()" class="d-none" type="radio" value="Не допущен" name="admitted" />
         </label>
     </div>
 @endsection

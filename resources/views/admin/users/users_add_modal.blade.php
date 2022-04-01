@@ -66,13 +66,15 @@
                     <div class="form-group">
                         <label>Роль</label>
                         <select name="role" required class="form-control">
-                            <option value="12">Клиент</option>
-                            <option value="4">Оператор СДПО</option>
-                            <option value="1">Контролёр ТС</option>
-                            <option selected value="2">Медицинский сотрудник</option>
-                            <option value="778">Терминал</option>
-                            <option value="11">Менеджер</option>
-                            <option value="777">Администратор</option>
+                            @if(!$is_pak)
+                                <option value="12">Клиент</option>
+                                <option value="4">Оператор СДПО</option>
+                                <option value="1">Контролёр ТС</option>
+                                <option selected value="2">Медицинский сотрудник</option>
+                                <option value="11">Менеджер</option>
+                                <option value="777">Администратор</option>
+                            @endif
+                            <option @if($is_pak) checked @endif value="778">Терминал</option>
                         </select>
                     </div>
 

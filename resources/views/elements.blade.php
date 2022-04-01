@@ -276,7 +276,7 @@
                                                 @php
                                                     $pre_month = (date('m')-1);
                                                     $date_from_company = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . '01';
-                                                    $date_to_company = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . cal_days_in_month(CAL_GREGORIAN, 2, date('Y'));
+                                                    $date_to_company = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . cal_days_in_month(CAL_GREGORIAN, $pre_month, date('Y'));
                                                 @endphp
 
                                                 <a class="btn btn-sm btn-outline-success"
@@ -400,5 +400,15 @@
         @endrole
     </div>
 </div>
+
+@if(count($elements) <= 0)
+    @section('custom-scripts')
+        <script>
+            setTimeout(function () {
+                $('[data-toggle-show*="-filters"]').trigger('click')
+            }, 500)
+        </script>
+    @endsection
+@endif
 
 @endsection

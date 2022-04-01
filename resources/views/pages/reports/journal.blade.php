@@ -246,11 +246,14 @@
                                 <th>Водитель</th>
                                 <th>Предрейсовые</th>
                                 <th>Послерейсовые</th>
+                                <th>БДД</th>
+                                <th>Отчёты с карт</th>
                             </thead>
 
                             <tbody>
                             @foreach($month['reports'] as $report)
                                 <tr>
+
                                     <td>{{ $report->driver_fio }}</td>
                                     <td>{{ \App\Anketa::where('type_view', 'Предрейсовый')
         ->where('type_anketa', 'medic')
@@ -264,6 +267,17 @@
         ->where('company_id', $company_id)
         ->where('driver_id', $report->driver_id)
         ->whereMonth('date', $month['month'])->count() }}</td>
+                                    <td>{{ \App\Anketa::where('type_anketa', 'bdd')
+        ->where('in_cart', 0)
+        ->where('company_id', $company_id)
+        ->where('driver_id', $report->driver_id)
+        ->whereMonth('date', $month['month'])->count() }}</td>
+                                    <td>{{ \App\Anketa::where('type_anketa', 'report_cart')
+        ->where('in_cart', 0)
+        ->where('company_id', $company_id)
+        ->where('driver_id', $report->driver_id)
+        ->whereMonth('date', $month['month'])->count() }}</td>
+
                                 </tr>
                             @endforeach
                             </tbody>
@@ -273,6 +287,8 @@
             @endforeach
             </tbody>
         </table>
+    @else
+        <p>Осмотры за другие месяцы не создавались</p>
     @endif
 @else
     <p>Осмотры за другие месяцы не создавались</p>

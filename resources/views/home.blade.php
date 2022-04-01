@@ -27,14 +27,12 @@
                             <div class="row bg-light p-2">
                                 <div class="col-md-6">
                                     <button type="button" data-toggle-show="#ankets-filters" class="btn btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
-                                    <a href="?trash=1" class="btn btn-warning">Корзина <i class="fa fa-trash"></i></a>
 
-                                    {{-- ОЧИСТКА ОЧЕРЕДИ СДПО --}}
-                                    @if($type_ankets === 'pak_queue')
-                                        @role(['admin'])
-                                            <a href="?clear=1&type_anketa={{ $type_ankets }}" class="btn btn-warning">Очистить очередь</a>
-                                        @endrole
-                                    @endif
+                                    @isset($_GET['trash'])
+                                        <a href="{{ route('home', $type_ankets) }}" class="btn btn-warning">Назад</a>
+                                    @else
+                                        <a href="?trash=1" class="btn btn-warning">Корзина <i class="fa fa-trash"></i></a>
+                                    @endisset
                                 </div>
 
 
@@ -90,6 +88,13 @@
                                 <img src="{{ asset('images/loader.gif') }}" width="30" class="mb-4" />
                             </div>
                         </form>
+                    @else
+                        {{-- ОЧИСТКА ОЧЕРЕДИ СДПО --}}
+                        @if($type_ankets === 'pak_queue')
+                            @role(['admin'])
+                                <a href="?clear=1&type_anketa={{ $type_ankets }}" class="btn btn-warning">Очистить очередь</a>
+                            @endrole
+                        @endif
                     @endif
 
                     @if(count($ankets) > 0)
@@ -155,7 +160,7 @@
                                                     @else
                                                         {{ $anketa[$anketaTDkey] }}
 
-                                                        @if($type_ankets === 'medic' && $anketaTDkey === 'admitted' && $anketa[$anketaTDkey] === 'Недопущен')
+                                                        @if($type_ankets === 'medic' && $anketaTDkey === 'admitted' && $anketa[$anketaTDkey] === 'Не допущен')
                                                             <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
                                                         @endif
                                                     @endif

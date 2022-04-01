@@ -101,7 +101,7 @@ export default {
                     nextDateCheck = new Date('2021-11-25 ' + (labels[index+1] ? labels[index+1] : labels[0]))
 
                 // Дата осмотра
-                if(date >= dateCheck && date <= nextDateCheck) {
+                if(date >= dateCheck && date < nextDateCheck) {
                     this.datacollection.datasets[0].data[index]++
                 }
             })
@@ -116,7 +116,7 @@ export default {
                     nextDateCheck = new Date('2021-11-25 ' + (labels[index+1] ? labels[index+1] : labels[0]))
 
                 // Дата создания
-                if(created_at >= dateCheck && created_at <= nextDateCheck) {
+                if(created_at >= dateCheck && created_at < nextDateCheck) {
                     this.datacollection.datasets[1].data[index]++
                 }
             })
