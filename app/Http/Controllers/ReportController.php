@@ -36,6 +36,7 @@ class ReportController extends Controller
         $pv_id = isset($data['pv_id']) ? $data['pv_id'] : [0];
 
         $dopData = [];
+        $hiddenMonths = 0;
 
         if(isset($data['filter'])) {
             $period_def = CarbonPeriod::create($date_from, $date_to)->month();
@@ -74,14 +75,14 @@ class ReportController extends Controller
                         ])
                         ->get();
 
-                    $reportsDate = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+                    /*$reportsDate = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
                         ->where('company_id', $data['company_id'])
                         ->where('in_cart', 0)
                         ->whereRaw("(date >= ? AND date <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])
-                        ->get();
+                        ->get();*/
 
                     if(true) {
                         $dates = $reports->sortByDesc('date');
@@ -111,6 +112,11 @@ class ReportController extends Controller
                                 })->unique('driver_id');
 
                                 $months[$monthKey]['hidden'] = $months[$monthKey]['hidden'] ? 1 : count($reps) <= 0;
+
+                                if($months[$monthKey]['hidden']) {
+                                    $hiddenMonths += 1;
+                                }
+
                                 $months[$monthKey]['reports'] = $reps;
                             }
 
@@ -144,6 +150,7 @@ class ReportController extends Controller
             'date_field' => $date_field,
             'company_id' => isset($data['company_id']) ? $data['company_id'] : 0,
             'pv_id' => isset($data['pv_id']) ? $data['pv_id'] : 0,
+            'hiddenMonths' => $hiddenMonths,
             'data' => $dopData
         ]);
     }

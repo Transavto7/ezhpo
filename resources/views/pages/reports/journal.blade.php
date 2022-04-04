@@ -224,7 +224,7 @@
 </table>
 
 @isset($data['months'])
-    @if(count($data['months']))
+    @if(count($data['months']) && (count($data['months']) !== $hiddenMonths))
         <table id="reports-table-4" class="table table-responsive">
             <thead>
             <tr>
