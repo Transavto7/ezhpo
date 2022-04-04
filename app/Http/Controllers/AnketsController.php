@@ -359,8 +359,6 @@ class AnketsController extends Controller
                  * ОЧЕРЕДЬ ПАК
                  */
                 if($anketa['type_anketa'] == 'pak_queue') {
-                    $anketa['flag_pak'] = 'СДПО Р';
-
                     $notifyTo = new Notify();
                     $notifyTo->sendMsgToUsersFrom('role', '4', 'Новый осмотр в очереди СДПО');
                 }
@@ -720,7 +718,7 @@ class AnketsController extends Controller
                  */
                 if(isset($anketa['is_pak'])) {
                     if($anketa['is_pak']) {
-                        $anketa['flag_pak'] = 'СДПО А';
+                        $anketa['flag_pak'] = 'СДПО Р';
                     }
                 }
 

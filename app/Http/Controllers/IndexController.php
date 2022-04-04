@@ -151,11 +151,12 @@ class IndexController extends Controller
                 'phone' => ['label' => 'Телефон', 'classes' => 'MASK_PHONE', 'type' => 'text', 'noRequired' => 1],
                 'gender' => ['label' => 'Пол', 'type' => 'select', 'values' => ['Мужской' => 'Мужской', 'Женский' => 'Женский'], 'defaultValue' => 'Мужской', 'noRequired' => 1],
                 'group_risk' => ['label' => 'Группа риска', 'type' => 'select', 'values' => [
+                    'Не указано' => 'Не указано',
                     'А\Д' => 'А\Д',
                     'Возраст' => 'Возраст',
                     'Алкоголь' => 'Алкоголь',
                     'Наркотики' => 'Наркотики'
-                ], 'defaultValue' => 'Возраст', 'noRequired' => 1],
+                ], 'defaultValue' => 'Не указано', 'noRequired' => 1],
                 'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
 
                 'products_id' => ['label' => 'Услуги', 'multiple' => 1, 'type' => 'select', 'values' => 'Product', 'noRequired' => 1],

@@ -16,6 +16,14 @@ Route::get('/api/pv-reset/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', 
 Route::get('/api/getField/{model}/{field}/{default_value?}', 'IndexController@GetFieldHTML');
 
 Route::prefix('snippet')->group(function () {
+    Route::get('/update-pak-fields/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', function () {
+        $ankets = \App\Anketa::where('is_pak', 1)
+            ->where('type_anketa', 'medic')
+            ->update(array( 'flag_pak' => 'СДПО А' ));
+
+        return response()->json($ankets);
+    });
+
     Route::get('/driver-to-user-all/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', function () {
         $drivers = DB::select('select * from drivers WHERE hash_id NOT IN (SELECT login FROM users)');
 

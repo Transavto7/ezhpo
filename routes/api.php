@@ -35,7 +35,7 @@ Route::middleware('auth:api')->get('/users/{role}', function (Request $request) 
     }
 });
 
-Route::middleware('auth:api')->post('/get-user-from-token/{token}', function (Request $request) {
+Route::middleware('auth:api')->get('/get-user-from-token/{token}', function (Request $request) {
     $user = $request->user();
 
     if($user->role >= 777) {
@@ -59,8 +59,14 @@ Route::middleware('auth:api')->post('/get-user/{user_id}', function (Request $re
 
 Route::middleware('auth:api')->group(function () {
     // Отображаем ПВ
-    Route::get('pvs', function () {
-        $points = Point::all();
+    Route::get('pvs/{id?}', function () {
+        $id = isset(request()->id) ? request()->id : null;
+
+        if($id) {
+            $points = Point::find($id);
+        } else {
+            $points = Point::all();
+        }
 
         return response()->json($points);
     });
