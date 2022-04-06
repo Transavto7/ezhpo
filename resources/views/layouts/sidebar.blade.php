@@ -99,7 +99,11 @@
                     <li><a href="{{ route('home', 'report_cart') }}"><i class="fa fa-book"></i>Журнал снятия отчетов с карт</a></li>
                     <li><a href="{{ route('home', 'pechat_pl') }}"><i class="fa fa-book"></i>Журнал печати ПЛ</a></li>
                     <li><a href="{{ route('home', 'vid_pl') }}"><i class="fa fa-book"></i>Реестр выданных ПЛ</a></li>
-                    <li><a href="{{ route('home', 'pak') }}"><i class="fa fa-close"></i>Реестр ошибок СДПО</a></li>
+
+                    @php
+                        $countErrorsPak = \App\Anketa::where('type_anketa', 'pak')->count();
+                    @endphp
+                    <li><a href="{{ route('home', 'pak') }}"><i class="fa fa-close"></i>Реестр ошибок СДПО <span class="badge bg-primary text-white">{{ $countErrorsPak < 99 ? $countErrorsPak : '99+' }}</a></li>
                 </ul>
             </li>
 

@@ -20,11 +20,6 @@
                             <div class="form-group">
                                 <p>{{ __('Логин') }}</p>
                                 <input id="login" type="text" placeholder="Login..." class="input-material @error('login') is-invalid @enderror" name="login" value="{{ old('login') }}" required autocomplete="login" autofocus>
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
                             </div>
 
                             <div class="form-group">
@@ -34,13 +29,15 @@
                                     <i class="fa fa-eye-slash"></i>
                                     <input data-toggle="password" id="password" type="password" placeholder="Пароль..." class="input-material @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
                                 </div>
-
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
                             </div>
+
+                            @if($errors->getMessages())
+                                @foreach($errors->getMessages() as $err)
+                                    @foreach($err as $errItem)
+                                        <span class="alert alert-danger">{{ $errItem }}</span>
+                                    @endforeach
+                                @endforeach
+                            @endif
 
                             <div class="form-group terms-conditions">
                                 <input id="remember" name="remember" type="checkbox" {{ old('remember') ? 'checked' : '' }} data-msg="Данное поле обязательно" class="checkbox-template">
