@@ -793,11 +793,33 @@ class IndexController extends Controller
         $user = Auth::user();
         $type = $request->type;
 
+        $queryString = '';
+        $oKey = 'orderKey';
+        $oBy = 'orderBy';
+
+        // ОПЕРАТОР ПАК & КОМПАНИИ
+        if($user->role === 4 && $type === 'Company') {
+            return back();
+        }
+
+        foreach($_GET as $getK => $getV) {
+            if($getK !== $oKey && $getK !== $oBy) {
+                if(is_array($getV)) {
+                    foreach($getV as $getVkey => $getVvalue) {
+                        $queryString .= '&' . $getK . "[$getVkey]" . '=' . $getVvalue;
+                    }
+                } else {
+                    $queryString .= '&' . $getK . '=' . $getV;
+                }
+
+            }
+        }
+
         /**
          * Сортировка
          */
-        $orderKey = $request->get('orderKey', 'created_at');
-        $orderBy = $request->get('orderBy', 'DESC');
+        $orderKey = $request->get($oKey, 'created_at');
+        $orderBy = $request->get($oBy, 'DESC');
         $filter = $request->get('filter', 0);
 
         $take = $request->get('take', 20);
@@ -865,7 +887,7 @@ class IndexController extends Controller
             // Автоматическая загрузка справочников
             $excludeElementTypes = ['Settings', 'Discount', 'DDates', 'DDate', 'Product', 'Instr', 'Town', 'Point', 'FieldHistory', 'Req'];
 
-            if($filter || in_array($type, $excludeElementTypes)) {
+            if($filter || in_array($type, $excludeElementTypes) || ($user->hasRole('client', '==') && ($type === 'Driver' || $type === 'Car'))) {
                 if($element['max']) {
                     $element['elements'] = $element['elements']->take($element['max'])->get();
                 } else {
@@ -884,6 +906,8 @@ class IndexController extends Controller
             } else {
                 $element['otherRoles'] = $roles;
             }
+
+            $element['queryString'] = $queryString;
 
             return view('elements', $element);
         } else {

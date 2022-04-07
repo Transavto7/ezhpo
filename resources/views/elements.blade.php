@@ -179,7 +179,7 @@
                 @if(!isset($notShowHashId))
                     <th title="Ключ: id" width="60">
                         ID
-                        <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=id">
+                        <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=id{{ $queryString }}">
                             <i class="fa fa-sort"></i>
                         </a>
                     </th>
@@ -190,7 +190,7 @@
                         <th title="Ключ: {{ $k }}" data-key="{{ $k }}">
                             {{ $v['label'] }}
 
-                            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $k }}">
+                            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $k . $queryString }}">
                                 <i class="fa fa-sort"></i>
                             </a>
                         </th>

@@ -16,6 +16,10 @@ class ReportController extends Controller
 
     public function GetReport (Request $request)
     {
+        if(auth()->user()->hasRole('medic', '==') || auth()->user()->hasRole('tech', '==')) {
+            return back();
+        }
+
         $data = $request->all();
         $reports = [];
         $reports2 = [];
