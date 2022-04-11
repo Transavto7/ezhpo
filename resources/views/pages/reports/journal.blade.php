@@ -54,7 +54,7 @@
 
             <tr>
                 <td>
-                    {{ $report->driver_fio }}
+                    {{ $report->driver_fio }} / {{ $report->driver_id }}
 
                     <div>
                         @if($syncFieldsDrivers)
@@ -155,7 +155,7 @@
 
             <tr>
                 <td>
-                    {{ $report->car_gos_number }}
+                    {{ $report->car_gos_number }} / {{ $report->car_id }}
 
                     <div>
                         @if($syncCarFields)
@@ -254,7 +254,7 @@
                             @foreach($month['reports'] as $report)
                                 <tr>
 
-                                    <td>{{ $report->driver_fio }}</td>
+                                    <td>{{ $report->driver_fio }} / {{ $report->driver_id }}</td>
                                     <td>{{ \App\Anketa::where('type_view', 'Предрейсовый')
         ->where('type_anketa', 'medic')
         ->where('in_cart', 0)
@@ -288,8 +288,80 @@
             </tbody>
         </table>
     @else
-        <p>Осмотры за другие месяцы не создавались</p>
+        <p>Осмотры за другие месяцы не создавались (МО)</p>
     @endif
 @else
-    <p>Осмотры за другие месяцы не создавались</p>
+    <p>Осмотры за другие месяцы не создавались (МО)</p>
+@endisset
+
+{{--ТЕХОСМОТРЫ--}}
+@isset($data['monthsTech'])
+    @if(count($data['monthsTech']) && (count($data['monthsTech']) !== $hiddenMonthsTech))
+        <table id="reports-table-4" class="table table-responsive">
+            <thead>
+            <tr>
+                @foreach($data['monthsTech'] as $month)
+                    @if(!$month['hidden'])
+                        <th style="border-left: 1px solid #e9e9e9;background: #e9e9e9;" class="text-center" colspan="3">
+                            {{ $month['name'] }} {{ $month['year'] }}
+                        </th>
+                    @endif
+                @endforeach
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($data['monthsTech'] as $month)
+                @if(!$month['hidden'])
+                    <td colspan="3" class="p-0">
+                        <table class="w-100 table">
+                            <thead>
+                                <th>Автомобиль</th>
+                                <th>Предрейсовые</th>
+                                <th>Послерейсовые</th>
+                                <th>БДД</th>
+                                <th>Отчёты с карт</th>
+                            </thead>
+
+                            <tbody>
+                            @foreach($month['reports'] as $report)
+                                <tr>
+
+                                    <td>{{ $report->car_gos_number }} / {{ $report->car_id }}</td>
+                                    <td>{{ \App\Anketa::where('type_view', 'Предрейсовый')
+        ->where('type_anketa', 'tech')
+        ->where('in_cart', 0)
+        ->where('company_id', $company_id)
+        ->where('car_id', $report->car_id)
+        ->whereMonth('date', $month['month'])->count() }}</td>
+                                    <td>{{ \App\Anketa::where('type_view', 'Послерейсовый')
+        ->where('type_anketa', 'tech')
+        ->where('in_cart', 0)
+        ->where('company_id', $company_id)
+        ->where('car_id', $report->car_id)
+        ->whereMonth('date', $month['month'])->count() }}</td>
+                                    <td>{{ \App\Anketa::where('type_anketa', 'bdd')
+        ->where('in_cart', 0)
+        ->where('company_id', $company_id)
+        ->where('car_id', $report->car_id)
+        ->whereMonth('date', $month['month'])->count() }}</td>
+                                    <td>{{ \App\Anketa::where('type_anketa', 'report_cart')
+        ->where('in_cart', 0)
+        ->where('company_id', $company_id)
+        ->where('car_id', $report->car_id)
+        ->whereMonth('date', $month['month'])->count() }}</td>
+
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </td>
+                @endif
+            @endforeach
+            </tbody>
+        </table>
+    @else
+        <p>Осмотры за другие месяцы не создавались (ТО)</p>
+    @endif
+@else
+    <p>Осмотры за другие месяцы не создавались (ТО)</p>
 @endisset

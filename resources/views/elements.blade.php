@@ -221,7 +221,7 @@
                                     @if($elK === 'products_id' || $elK === 'company_id' || $elK === 'req_id' || $elK === 'pv_id' || $elK === 'user_id' || $elK === 'town_id')
                                         @if($elK === 'company_id')
 
-                                            @if(($model === 'Driver' || $model === 'Car') && $el->$elK && auth()->user()->hasRole('client', '!='))
+                                            @if(($model === 'Driver' || $model === 'Car') && $el->$elK && auth()->user()->hasRole('client', '!=') && auth()->user()->hasRole('operator_pak', '!='))
                                                 <div>
                                                     <a href="{{ route('renderElements', ['model' => 'Company', 'filter' => 1, 'id' => $el->company_id ]) }}">{{ app('App\Company')->getName($el->company_id) }}</a>
 

@@ -662,11 +662,13 @@ class AnketsController extends Controller
 
                 $anketa['pv_id'] = Point::where('id', $pv_id)->first();
 
+                // Проверка ПВ
                 if($anketa['pv_id'])
                     $anketa['pv_id'] = $anketa['pv_id']->name;
                 else
                     $anketa['pv_id'] = '';
 
+                // Проверка АВТО
                 if($Car) {
                     $anketa['car_id'] = $Car->hash_id;
                     $anketa['car_mark_model'] = $Car->mark_model;
@@ -693,15 +695,6 @@ class AnketsController extends Controller
 
                     $Driver->save();
                 }
-
-                /**
-                 * Проверяем СРОК ДЕЙСТВИЯ ПЛ
-                 */
-                /*if(empty($anketa['date_number_list_road'])) {
-                    $dateListRoad = date('Y-m-d', strtotime($anketa['date'] . ' +1 day'));
-
-                    $anketa['date_number_list_road'] = $dateListRoad;
-                }*/
 
                 /**
                  * Проверка на "Дополнительный осмотр"

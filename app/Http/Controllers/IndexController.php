@@ -630,6 +630,8 @@ class IndexController extends Controller
                     $base64_image = Storage::disk('public')->put($path, $base64_image);
 
                     $data[$dataKey] = $path;
+                } else {
+                    $data[$dataKey] = $dataItem ? trim($dataItem) : $dataItem;
                 }
             }
 
@@ -681,6 +683,7 @@ class IndexController extends Controller
 
         if($model) {
             $data = $request->all();
+            $oldDataModel = [];
             $element = $model->find($id);
 
             unset($data['_token']);
@@ -698,6 +701,8 @@ class IndexController extends Controller
                 }
 
                 foreach($data as $k => $v) {
+                    $oldDataModel[$k] = $element[$k];
+
                     if(is_array($v)) {
                         $element[$k] = join(',', $v);
                     }
@@ -721,19 +726,21 @@ class IndexController extends Controller
                     }
                 }
 
-                /*
-                 * АВТО <- КОМПАНИЯ (СИНХРОНИЗАЦИЯ ПОЛЕЙ)
-                 * if($model_text === 'Driver' || $model_text === 'Car') {
+
+                //АВТО <- КОМПАНИЯ (СИНХРОНИЗАЦИЯ ПОЛЕЙ)
+                 if($model_text === 'Driver' || $model_text === 'Car') {
                     if(isset($element->company_id)) {
                         if($element->company_id) {
-                            $aSyncFields = explode(',', $element->autosync_fields);
+                            if($oldDataModel['company_id'] != $element->company_id) {
+                                $aSyncFields = explode(',', $element->autosync_fields);
 
-                            foreach($aSyncFields as $fSync) {
-                                $element->$fSync = Company::find($element->company_id)->$fSync;
+                                foreach($aSyncFields as $fSync) {
+                                    $element->$fSync = Company::find($element->company_id)->$fSync;
+                                }
                             }
                         }
                     }
-                } */
+                }
 
                 if ($model_text === 'Company') {
 
@@ -942,16 +949,14 @@ class IndexController extends Controller
 
         $anketa_key = $type;
 
-        // Если пользователь менеджер
-        //if($user->role === 11) return redirect(route('home'));
-
         // Отображаем данные
         $anketa = $this->ankets[$anketa_key];
         $point = Point::getPointText($user->pv_id);
         $points = Point::getAll();
 
+        // Конвертация текущего времени Юзера
         $time = time();
-        // $time += $user->timezone * 3600; (Вывод текущего времени пользователя)
+        $time += $user->timezone * 3600;
         $time = date('Y-m-d\TH:i', $time);
 
         // Дефолтные значения

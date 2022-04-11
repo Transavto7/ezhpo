@@ -12,7 +12,10 @@
                 <a href="{{ route('page.driver_bdd') }}" class="w-100 btn btn-default">Пройти инструктаж по безопасности дорожного движения</a>
             </div>
             <div class="col-md-12 mb-2">
-                <a href="" class="btn btn-lg btn-default w-100">Информация</a>
+                <a href="https://transavto7.ru/ostavit-otzyv" target="_blank" class="btn btn-lg btn-default w-100">Оставить отзыв или жалобу</a>
+            </div>
+            <div class="col-md-12 mb-2">
+                <a href="https://t.me/transavto7_bot" target="_blank" class="btn btn-lg btn-default w-100">Чат поддержки</a>
             </div>
             <div class="col-md-12 mb-2">
                 <a href="https://transavto7.ru/blog/instrukciya-dlya-voditelya-stavshego-uchastnikom-dtp" target="_blank" class="btn btn-lg btn-default w-100">Произошло ДТП?</a>

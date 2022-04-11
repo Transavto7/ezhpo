@@ -35,16 +35,18 @@ Route::middleware('auth:api')->get('/users/{role}', function (Request $request) 
     }
 });
 
-Route::middleware('auth:api')->get('/get-user-from-token/{token}', function (Request $request) {
+Route::middleware('auth:api')->post('/get-user-from-token', function (Request $request) {
     $user = $request->user();
 
     if($user->role >= 777) {
-        $token = $request->token;
+        $token = $request->all();
+        $token = isset($token['token']) ? $token['token'] : '';
         $user = User::where('api_token', $token)->first();
 
         return response()->json($user);
     }
 });
+
 
 Route::middleware('auth:api')->post('/get-user/{user_id}', function (Request $request) {
     $user = $request->user();

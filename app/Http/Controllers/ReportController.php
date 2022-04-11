@@ -41,6 +41,7 @@ class ReportController extends Controller
 
         $dopData = [];
         $hiddenMonths = 0;
+        $hiddenMonthsTech = 0;
 
         if(isset($data['filter'])) {
             $period_def = CarbonPeriod::create($date_from, $date_to)->month();
@@ -128,7 +129,6 @@ class ReportController extends Controller
                         }
                     }
 
-
                     $reports2 = Anketa::where('type_anketa', 'tech')
                         ->where('company_id', $data['company_id'])
                         ->where('in_cart', 0)
@@ -138,6 +138,46 @@ class ReportController extends Controller
                         ])
                         ->get()
                         ->unique('car_gos_number');
+
+                    if(true) {
+                        $datesTech = $reports2->sortByDesc('date');
+
+                        if(isset($datesTech->first()->date)) {
+                            $date_to_period = $datesTech->first()->date;
+                            $date_from_period = $datesTech->last()->date;
+
+                            $period = CarbonPeriod::create($date_from_period, $date_to_period);
+
+                            $monthsTech = collect($period)->map(function (Carbon $date) use ($months_def) {
+
+                                $dataMonth = [
+                                    'month' => $date->month,
+                                    'year' => $date->year,
+                                    'name' => $date->monthName,
+                                    'days' => $date->daysInMonth,
+                                    'hidden' => in_array($date->month, $months_def)
+                                ];
+
+                                return $dataMonth;
+                            })->unique('month')->toArray();
+
+                            foreach($monthsTech as $monthKey => $month) {
+                                $reps = $reports->filter(function ($rep) use ($month, $monthsTech, $monthKey) {
+                                    return \Carbon\Carbon::parse($rep->date)->month === $month['month'];
+                                })->unique('car_id');
+
+                                $monthsTech[$monthKey]['hidden'] = $monthsTech[$monthKey]['hidden'] ? 1 : count($reps) <= 0;
+
+                                if($monthsTech[$monthKey]['hidden']) {
+                                    $hiddenMonthsTech += 1;
+                                }
+
+                                $monthsTech[$monthKey]['reports'] = $reps;
+                            }
+
+                            $dopData['monthsTech'] = $monthsTech;
+                        }
+                    }
 
                     break;
             }
@@ -155,6 +195,7 @@ class ReportController extends Controller
             'company_id' => isset($data['company_id']) ? $data['company_id'] : 0,
             'pv_id' => isset($data['pv_id']) ? $data['pv_id'] : 0,
             'hiddenMonths' => $hiddenMonths,
+            'hiddenMonthsTech' => $hiddenMonthsTech,
             'data' => $dopData
         ]);
     }

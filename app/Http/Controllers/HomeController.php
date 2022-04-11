@@ -123,10 +123,6 @@ class HomeController extends Controller
         $is_export = isset($_GET['export']);
         $trash = $request->get('trash', 0);
 
-        if($is_export) {
-            $take = 10000;
-        }
-
         unset($filter_params['trash']);
         unset($filter_params['export']);
         unset($filter_params['exportPrikaz']);

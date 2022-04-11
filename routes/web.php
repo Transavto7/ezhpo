@@ -77,7 +77,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/add-client', 'IndexController@RenderAddClient')->name('pages.add_client');
 
     Route::get('driver-bdd', function () {
-        $instrs = \App\Instr::where('active', 1)->get();
+        $instrs = \App\Instr::where('active', 1)->orderBy('created_at', 'asc')->get();
         $pv_id = \App\Driver::where('hash_id', auth()->user()->id)->first();
 
         if($pv_id) {
