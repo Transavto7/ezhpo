@@ -1,6 +1,6 @@
 <template>
-    <div class="Notify">
-        <a v-if="messages.length" @click.prevent="clearMsgs" href="#">Очистить всё ({{ messages.length }})</a>
+    <div v-if="messages.length" class="Notify">
+        <a @click.prevent="clearMsgs" href="#">Очистить всё ({{ messages.length }})</a>
 
         <div v-for="msg in messages" class="Notify__message">
             <i class="fa fa-info-circle"></i> {{ msg.message }}
@@ -64,16 +64,19 @@
         border: 1px solid #e9e9e9;
         border-radius: 5px;
         margin-bottom: 10px;
+        max-width: 350px;
     }
 
     .Notify {
-        width: 300px;
-        max-height: 300px;
+        width: 100%;
+        height: 100%;
         overflow-y: auto;
+        background: rgba(0,0,0,.7);
         position: fixed;
         color: black;
-        top: 20px;
-        right: 20px;
+        top: 0;
+        left: 0;
+        padding: 25px;
         z-index: 111;
         text-align: left;
         font-size: 14px;

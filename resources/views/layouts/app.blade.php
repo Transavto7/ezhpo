@@ -93,7 +93,7 @@
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <p>ТРАНСАВТО-7 &copy; 2021 (release 0.9.7)</p>
+                                    <p>ТРАНСАВТО-7 &copy; 2021 (release <a href="{{ route('releases') }}"><b>0.9.8</b></a>)</p>
                                 </div>
                             </div>
                         </div>

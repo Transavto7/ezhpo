@@ -33,7 +33,7 @@ class ReportController extends Controller
         $pv_fields['getFieldKey'] = 'name';
         $pv_fields['multiple'] = 1;
 
-        $date_field = isset($data['date_field']) ? $data['date_field'] : 'created_at';
+        $date_field = 'date';
         $date_from = isset($data['date_from']) ? $data['date_from'] : '';
         $date_to = isset($data['date_to']) ? $data['date_to'] : date('Y-m-d');
 
@@ -50,6 +50,9 @@ class ReportController extends Controller
             })->toArray();
 
             switch($type_report) {
+                /**
+                 * ГРАФИК РАБОТЫ ПВ
+                 */
                 case 'graph_pv':
 
                     $reports = Anketa::whereIn('pv_id', $pv_id)
@@ -74,7 +77,7 @@ class ReportController extends Controller
                     $reports = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
                         ->where('company_id', $data['company_id'])
                         ->where('in_cart', 0)
-                        ->whereRaw("(created_at >= ? AND created_at <= ?)", [
+                        ->whereRaw("(date >= ? AND date <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])
@@ -92,9 +95,9 @@ class ReportController extends Controller
                     if(true) {
                         $dates = $reports->sortByDesc('date');
 
-                        if(isset($dates->first()->date)) {
-                            $date_to_period = $dates->first()->date;
-                            $date_from_period = $dates->last()->date;
+                        if(isset($dates->first()->created_at)) {
+                            $date_to_period = $dates->first()->created_at;
+                            $date_from_period = $dates->last()->created_at;
 
                             $period = CarbonPeriod::create($date_from_period, $date_to_period);
 
@@ -113,7 +116,7 @@ class ReportController extends Controller
 
                             foreach($months as $monthKey => $month) {
                                 $reps = $reports->filter(function ($rep) use ($month, $months, $monthKey) {
-                                    return \Carbon\Carbon::parse($rep->date)->month === $month['month'];
+                                    return \Carbon\Carbon::parse($rep->created_at)->month === $month['month'];
                                 })->unique('driver_id');
 
                                 $months[$monthKey]['hidden'] = $months[$monthKey]['hidden'] ? 1 : count($reps) <= 0;
@@ -132,7 +135,7 @@ class ReportController extends Controller
                     $reports2 = Anketa::where('type_anketa', 'tech')
                         ->where('company_id', $data['company_id'])
                         ->where('in_cart', 0)
-                        ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                        ->whereRaw("(date >= ? AND date <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])
@@ -142,9 +145,9 @@ class ReportController extends Controller
                     if(true) {
                         $datesTech = $reports2->sortByDesc('date');
 
-                        if(isset($datesTech->first()->date)) {
-                            $date_to_period = $datesTech->first()->date;
-                            $date_from_period = $datesTech->last()->date;
+                        if(isset($datesTech->first()->created_at)) {
+                            $date_to_period = $datesTech->first()->created_at;
+                            $date_from_period = $datesTech->last()->created_at;
 
                             $period = CarbonPeriod::create($date_from_period, $date_to_period);
 
@@ -163,7 +166,7 @@ class ReportController extends Controller
 
                             foreach($monthsTech as $monthKey => $month) {
                                 $reps = $reports->filter(function ($rep) use ($month, $monthsTech, $monthKey) {
-                                    return \Carbon\Carbon::parse($rep->date)->month === $month['month'];
+                                    return \Carbon\Carbon::parse($rep->created_at)->month === $month['month'];
                                 })->unique('car_id');
 
                                 $monthsTech[$monthKey]['hidden'] = $monthsTech[$monthKey]['hidden'] ? 1 : count($reps) <= 0;

@@ -6,6 +6,7 @@ use App\Http\Middleware\ {
 
 // Маршруты статичных и главных страниц
 Route::get('/', 'IndexController@RenderIndex')->name('index');
+Route::get('/releases', 'IndexController@RenderReleases')->name('releases');
 
 /**
  * API-маршруты

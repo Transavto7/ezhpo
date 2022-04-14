@@ -9,9 +9,10 @@ class Company extends Model
     public $fillable = [
         'hash_id', 'name',
         'note', 'user_id', 'req_id',
-        'pv_id', 'town_id', 'products_id', 'where_call', 'inn',
+        'pv_id', 'town_id', 'products_id', 'where_call', 'where_call_name', 'inn',
         'procedure_pv',
-        'dismissed'
+        'dismissed',
+        'has_actived_prev_month'
     ];
 
     public static function getAll () {

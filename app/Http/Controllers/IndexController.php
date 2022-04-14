@@ -12,6 +12,7 @@ use App\Imports\CompanyImport;
 use App\Imports\DriverImport;
 use App\Point;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -251,7 +252,8 @@ class IndexController extends Controller
                     ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель']
                 ]],
 
-                'where_call' => ['label' => 'Кому звонить при отстранении', 'classes' => 'MASK_PHONE', 'type' => 'text', 'noRequired' => 1],
+                'where_call' => ['label' => 'Кому звонить при отстранении (телефон)', 'classes' => 'MASK_PHONE', 'type' => 'text', 'noRequired' => 1],
+                'where_call_name' => ['label' => 'Кому звонить при отстранении (имя, должность)', 'type' => 'text', 'noRequired' => 1],
 
                 'inn' => ['label' => 'ИНН', 'type' => 'text', 'noRequired' => 1],
                 'procedure_pv' => ['label' => 'Порядок выпуска', 'type' => 'select', 'values' => [
@@ -264,7 +266,12 @@ class IndexController extends Controller
                 'dismissed' => ['label' => 'Черный список', 'type' => 'select', 'values' => [
                     'Нет' => 'Нет',
                     'Да' => 'Да'
-                ], 'defaultValue' => 'Нет']
+                ], 'defaultValue' => 'Нет'],
+
+                'has_actived_prev_month' => ['label' => 'Были ли активны в прошлом месяце', 'type' => 'select', 'values' => [
+                    'Да' => 'Да',
+                    'Нет' => 'Нет'
+                ],  'noRequired' => 1],
             ]
         ],
 
@@ -720,7 +727,7 @@ class IndexController extends Controller
                         $element->$k = $path;
                     }
                     else {
-                        if(isset($v) || $v === '') {
+                        if(isset($v)) {
                             $element[$k] = $v;
                         }
                     }
@@ -764,6 +771,15 @@ class IndexController extends Controller
 
                 }
 
+            }
+
+            /**
+             * Пустые поля обновляем
+             */
+            foreach($oldDataModel as $oldDataItemKey => $oldDataItemValue) {
+                if(!isset($data[$oldDataItemKey]) && $oldDataItemKey == 'note') {
+                    $element[$oldDataItemKey] = '';
+                }
             }
 
             if($element->save()) {
@@ -856,19 +872,25 @@ class IndexController extends Controller
                     if(!empty($aFv)) {
                         if(is_array($aFv)) {
 
-                            $element['elements'] = $element['elements']->where(function ($q) use ($aFv, $aFk) {
-                                $isId = strpos($aFk, '_id');
+                            if(count($aFv) > 0) {
+                                $element['elements'] = $element['elements']->where(function ($q) use ($aFv, $aFk) {
+                                    $isId = strpos($aFk, '_id');
 
-                                foreach($aFv as $aFvItemKey => $aFvItemValue) {
-                                    if($isId) {
-                                        $q = $q->orWhere($aFk, $aFvItemValue);
-                                    } else {
-                                        $q = $q->orWhere($aFk, 'LIKE', '%' . $aFvItemValue . '%');
+                                    foreach($aFv as $aFvItemKey => $aFvItemValue) {
+                                        if($isId) {
+                                            $q = $q->orWhere($aFk, $aFvItemValue);
+                                        } else {
+                                            if(strlen($aFvItemValue) === 0) {
+                                                $q = $q->orWhere($aFk, $aFvItemValue);
+                                            } else {
+                                                $q = $q->orWhere($aFk, 'LIKE', '%' . trim($aFvItemValue) . '%');
+                                            }
+                                        }
                                     }
-                                }
 
-                                return $q;
-                            });
+                                    return $q;
+                                });
+                            }
 
                         } else {
                             $element['elements'] = $element['elements']->where($aFk, 'LIKE', '%' . trim($aFv) . '%');
@@ -932,6 +954,11 @@ class IndexController extends Controller
         ]);
     }
 
+    public function RenderReleases ()
+    {
+        return view('releases');
+    }
+
     /**
      * Рендер анкет
      */
@@ -955,6 +982,8 @@ class IndexController extends Controller
         $points = Point::getAll();
 
         // Конвертация текущего времени Юзера
+        date_default_timezone_set('UTC');
+
         $time = time();
         $time += $user->timezone * 3600;
         $time = date('Y-m-d\TH:i', $time);
