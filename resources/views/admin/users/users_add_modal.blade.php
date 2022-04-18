@@ -9,7 +9,7 @@
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
             </div>
 
-            <form method="POST" enctype="multipart/form-data" action="{{ route('adminCreateUser') }}">
+            <form method="POST" autocomplete="off" enctype="multipart/form-data" action="{{ route('adminCreateUser') }}">
                 @csrf
 
                 <div class="modal-body">
@@ -35,18 +35,18 @@
                     </div>
 
                     <div class="form-group">
-                        <input type="text" required name="login" placeholder="Login" class="form-control">
+                        <input type="text" required name="login" placeholder="Login" class="form-control" autocomplete="off">
                         <i>(Пользователь авторизуется по введеному Вами логину)</i>
                     </div>
 
                     <div class="form-group">
-                        <input type="email" required name="email" placeholder="E-mail" class="form-control">
+                        <input type="email" required name="email" placeholder="E-mail" class="form-control" autocomplete="off">
                     </div>
 
                     <div class="form-group">
                         <div class="field field--password">
                             <i class="fa fa-eye-slash"></i>
-                            <input data-toggle="password" id="password" type="password" placeholder="Пароль..." class="form-control" name="password"  autocomplete="current-password">
+                            <input data-toggle="password" id="password" type="password" placeholder="Пароль..." class="form-control" name="password" autocomplete="off">
                         </div>
                     </div>
 

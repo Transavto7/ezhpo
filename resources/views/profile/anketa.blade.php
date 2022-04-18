@@ -58,9 +58,11 @@
                                                     <i>Дата проведения осмотра: <br/><b>{{ $anketa->date }}</b></i>
                                                 </div>
 
-                                                <div>
-                                                    <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $cId]) }}">Протокол отстранения</a>
-                                                </div>
+                                                @if($anketa->admitted === 'Не допущен')
+                                                    <div>
+                                                        <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $cId]) }}">Протокол отстранения</a>
+                                                    </div>
+                                                @endif
                                             @else
                                                 <b>"{{ $title }}" (ID: {{ $cId }}) успешно создан!</b>
 

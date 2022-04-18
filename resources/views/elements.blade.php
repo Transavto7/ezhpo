@@ -172,6 +172,12 @@
 @endif
 
 <div class="card">
+    @error('errors')
+        <div class="text-red">
+            <b>{{ $errors->first('errors') }}</b>
+        </div>
+    @enderror
+
     <table id="elements-table" class="table table-striped table-sm">
         <thead>
             <tr>

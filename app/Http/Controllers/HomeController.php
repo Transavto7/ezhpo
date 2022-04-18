@@ -92,7 +92,7 @@ class HomeController extends Controller
         $anketasModel = new Anketa();
         $anketas = $anketasModel;
 
-        $take = $request->get('take', 20);
+        $take = $request->get('take') ? $request->get('take') : 20;
         $orderKey = $request->get($oKey, 'date');
         $orderBy = $request->get($oBy, 'DESC');
 

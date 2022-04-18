@@ -40,7 +40,7 @@
                                     type="search"
                                     @endif
 
-                                    value="{{ request()->get($field) }}" name="{{ $field }}" class="form-control" />
+                                    value="{{ request()->get($field) ? request()->get($field) : ($field === 'date' || strpos($field, '_at')) ? date('Y-m-01') : '' }}" name="{{ $field }}" class="form-control" />
                             @endif
 
                         </div>
@@ -53,7 +53,7 @@
                                 <label><b>ДО</b></label>
                                 <input
                                     type="date"
-                                    value="{{ request()->get('TO_'.$field) }}"
+                                    value="{{ request()->get('TO_'.$field) ? request()->get('TO_'.$field) : date('Y-m-d') }}"
                                     name="TO_{{ $field }}" class="form-control" />
                             </div>
                         </div>

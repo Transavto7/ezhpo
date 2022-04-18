@@ -34,12 +34,23 @@
 </div>
 
 <div class="form-group row">
-    <label class="form-control-label col-md-3">Внесено в журнал осмотров:</label>
+    <label class="form-control-label col-md-3">Внесено в журнал ТО:</label>
     <article class="col-md-9">
         @include('profile.ankets.fields.added_to_dop', [
             'type_ankets' => $type_anketa,
             'field' => 'added_to_dop',
-            'field_default_value' => 'нет'
+            'field_default_value' => ''
+        ])
+    </article>
+</div>
+
+<div class="form-group row">
+    <label class="form-control-label col-md-3">Внесено в журнал МО:</label>
+    <article class="col-md-9">
+        @include('profile.ankets.fields.added_to_mo', [
+            'type_ankets' => $type_anketa,
+            'field' => 'added_to_mo',
+            'field_default_value' => ''
         ])
     </article>
 </div>

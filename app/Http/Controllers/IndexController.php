@@ -543,6 +543,22 @@ class IndexController extends Controller
             switch($model_type) {
                 case 'Company':
 
+                    /**
+                     * <Проврка на дубликат по НАЗВАНИЮ/НОМЕРУ>
+                     */
+                    if(isset($data['name'])) {
+                        $elDouble = Company::where('name', trim($data['name']))->count();
+
+                        if($elDouble > 0) {
+                            return back()->withErrors([
+                                'errors' => 'Найден дубликат по названию компании'
+                            ]);
+                        }
+                    }
+                    /**
+                     * </Проверка на дубликат по названию/номеру>
+                     */
+
                     $data['hash_id'] = mt_rand(1000,9999) . date('s');
 
                     break;
@@ -554,8 +570,24 @@ class IndexController extends Controller
                     if(isset($data['company_id'])) {
                         $fieldsSync = isset($data['autosync_fields']) ? $data['autosync_fields'] : [];
 
+                        /**
+                         * <Проврка на дубликат по НАЗВАНИЮ/НОМЕРУ>
+                         */
+                        if(isset($data['gos_number'])) {
+                            $elDouble = Car::where('company_id', $data['company_id'])->where('gos_number', trim($data['gos_number']))->count();
+
+                            if($elDouble > 0) {
+                                return back()->withErrors([
+                                    'errors' => 'Найден дубликат по гос.номеру Автомобиля'
+                                ]);
+                            }
+                        }
+                        /**
+                         * </Проверка на дубликат по названию/номеру>
+                         */
+
                         if(Company::find($data['company_id'])) {
-                            foreach($fieldsSync as $fSync) {
+                            foreach(['products_id'] as $fSync) {
                                 $fsyncData = Company::find($data['company_id'])->$fSync;
 
                                 if($fsyncData) {
@@ -571,6 +603,22 @@ class IndexController extends Controller
                     $data['hash_id'] = mt_rand(100000,499999);
 
                     $pv_id = isset($data['company_id']) ? Company::where('id', $data['company_id'])->first()->pv_id : 0;
+
+                    /**
+                     * <Проврка на дубликат по НАЗВАНИЮ/НОМЕРУ>
+                     */
+                    if(isset($data['company_id']) && isset($data['fio'])) {
+                        $elDouble = Driver::where('company_id', $data['company_id'])->where('fio', trim($data['fio']))->count();
+
+                        if($elDouble > 0) {
+                            return back()->withErrors([
+                                'errors' => 'Найден дубликат по ФИО Водителя'
+                            ]);
+                        }
+                    }
+                    /**
+                     * </Проверка на дубликат по названию/номеру>
+                     */
 
                     $userData = [
                         'hash_id' => $data['hash_id'],
@@ -593,7 +641,7 @@ class IndexController extends Controller
                         $fieldsSync = isset($data['autosync_fields']) ? $data['autosync_fields'] : [];
 
                         if(Company::find($data['company_id'])) {
-                            foreach($fieldsSync as $fSync) {
+                            foreach(['products_id'] as $fSync) {
                                 $fsyncData = Company::find($data['company_id'])->$fSync;
 
                                 if($fsyncData) {

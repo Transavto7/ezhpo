@@ -1,6 +1,11 @@
 <template>
     <div v-if="messages.length" class="Notify">
-        <a @click.prevent="clearMsgs" href="#">Очистить всё ({{ messages.length }})</a>
+        <div class="text-center">
+            <h2 class="text-white">У вас новые уведомления!</h2>
+            <br>
+            <a @click.prevent="clearMsgs" class="btn btn-success" href="#">Очистить всё ({{ messages.length }})</a>
+            <br><br>
+        </div>
 
         <div v-for="msg in messages" class="Notify__message">
             <i class="fa fa-info-circle"></i> {{ msg.message }}
@@ -65,6 +70,7 @@
         border-radius: 5px;
         margin-bottom: 10px;
         max-width: 350px;
+        margin: 0 auto;
     }
 
     .Notify {

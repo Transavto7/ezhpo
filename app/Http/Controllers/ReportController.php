@@ -73,6 +73,9 @@ class ReportController extends Controller
 
                     break;
 
+                /**
+                 * Отчет по услугам компании
+                 */
                 case 'journal':
                     $reports = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
                         ->where('company_id', $data['company_id'])
