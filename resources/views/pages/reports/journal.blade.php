@@ -8,6 +8,10 @@
         <th width="250">Водители</th>
         <th width="150">Предрейсовые</th>
         <th width="150">Послерейсовые</th>
+
+        <th width="150">Предсменные</th>
+        <th width="150">Послесменные</th>
+
         <th width="150">БДД</th>
         <th width="150">Отчёты с карт</th>
     </tr>
@@ -18,7 +22,7 @@
             @php $predr = \App\Anketa::where('type_view', 'Предрейсовый')
 ->where('company_id', $company_id)
 ->where('in_cart', 0)
-->whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+->where('type_anketa', 'medic')
 ->where('driver_id', $report->driver_id)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",
@@ -26,23 +30,45 @@
                         ])->count(); @endphp
 
             @php $posler = \App\Anketa::where('type_view', 'Послерейсовый')
-->where('company_id', $company_id)->where('in_cart', 0)
-->whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+->where('company_id', $company_id)
+->where('in_cart', 0)
+->where('type_anketa', 'medic')
 ->where('driver_id', $report->driver_id)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])->count(); @endphp
+
+            @php $predsmenniy = \App\Anketa::where('type_view', 'Предсменный')
+->where('in_cart', 0)
+->where('company_id', $company_id)
+->where('type_anketa', 'medic')
+->where('driver_id', $report->driver_id)
+->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                        $date_from." 00:00:00",
+                        $date_to." 23:59:59"
+                    ])->count(); @endphp
+
+            @php $poslesmenniy = \App\Anketa::where('type_view', 'Послесменный')
+->where('in_cart', 0)
+->where('company_id', $company_id)
+->where('type_anketa', 'medic')
+->where('driver_id', $report->driver_id)
+->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                        $date_from." 00:00:00",
+                        $date_to." 23:59:59"
+                    ])->count(); @endphp
 
             @php $bdd = \App\Anketa::where('type_anketa', 'bdd')
-->where('company_id', $company_id)->where('in_cart', 0)
+->where('company_id', $company_id)
+->where('in_cart', 0)
 ->where('driver_id', $report->driver_id)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])->count(); @endphp
 
-            @php $report_cart = \App\Anketa::whereIn('type_anketa', ['report_cart'])
+            @php $report_cart = \App\Anketa::where('type_anketa', 'report_cart')
 ->where('company_id', $company_id)
 ->where('driver_id', $report->driver_id)
 ->where('in_cart', 0)
@@ -86,6 +112,23 @@
                         {!! \App\Driver::calcServices($report->driver_id, 'medic', 'Послерейсовый', $posler) !!}
                     @endif
                 </td>
+
+                <td width="150">
+                    {{ $predsmenniy }}
+
+                    @if(request()->get('is_finance') && $predsmenniy > 0)
+                        {!! \App\Driver::calcServices($report->driver_id, 'medic', 'Предсменный', $predsmenniy) !!}
+                    @endif
+                </td>
+
+                <td width="150">
+                    {{ $poslesmenniy }}
+
+                    @if(request()->get('is_finance') && $poslesmenniy > 0)
+                        {!! \App\Driver::calcServices($report->driver_id, 'medic', 'Послесменный', $poslesmenniy) !!}
+                    @endif
+                </td>
+
                 <td width="150">
                     {{ $bdd }}
 
@@ -113,6 +156,10 @@
         <th width="250">Автомобили</th>
         <th width="150">Предрейсовые</th>
         <th width="150">Послерейсовые</th>
+
+        <th width="150">Предсменные</th>
+        <th width="150">Послесменные</th>
+
         <th width="150">БДД</th>
         <th width="150">Отчёты с карт</th>
     </tr>
@@ -129,8 +176,28 @@
                         $date_from." 00:00:00",
                         $date_to." 23:59:59"
                     ])->count(); @endphp
+
             @php $posler = \App\Anketa::where('type_view', 'Послерейсовый')
 ->where('in_cart', 0)->where('company_id', $company_id)
+->where('type_anketa', 'tech')
+->where('car_gos_number', $report->car_gos_number)
+->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                        $date_from." 00:00:00",
+                        $date_to." 23:59:59"
+                    ])->count(); @endphp
+
+            @php $predsmenniy = \App\Anketa::where('type_view', 'Предсменный')
+->where('in_cart', 0)->where('company_id', $company_id)
+->where('type_anketa', 'tech')
+->where('car_gos_number', $report->car_gos_number)
+->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                        $date_from." 00:00:00",
+                        $date_to." 23:59:59"
+                    ])->count(); @endphp
+
+            @php $poslesmenniy = \App\Anketa::where('type_view', 'Послесменный')
+->where('in_cart', 0)
+->where('company_id', $company_id)
 ->where('type_anketa', 'tech')
 ->where('car_gos_number', $report->car_gos_number)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
@@ -147,7 +214,7 @@
                             $date_to." 23:59:59"
                         ])->count(); @endphp
 
-            @php $report_cart = \App\Anketa::whereIn('type_anketa', ['report_cart'])
+            @php $report_cart = \App\Anketa::where('type_anketa', 'report_cart')
 ->where('company_id', $company_id)
 ->where('in_cart', 0)
 ->where('car_gos_number', $report->car_gos_number)
@@ -189,6 +256,22 @@
 
                     @if(request()->get('is_finance') && $posler > 0)
                         {!! \App\Car::calcServices($report->car_id, 'tech', 'Послерейсовый', $posler) !!}
+                    @endif
+                </td>
+
+                <td>
+                    {{ $predsmenniy }}
+
+                    @if(request()->get('is_finance') && $predsmenniy > 0)
+                        {!! \App\Car::calcServices($report->car_id, 'tech', 'Предсменный', $predsmenniy) !!}
+                    @endif
+                </td>
+
+                <td>
+                    {{ $poslesmenniy }}
+
+                    @if(request()->get('is_finance') && $poslesmenniy > 0)
+                        {!! \App\Car::calcServices($report->car_id, 'tech', 'Послесменный', $poslesmenniy) !!}
                     @endif
                 </td>
 
@@ -255,6 +338,10 @@
                                 <th>Водитель</th>
                                 <th>Предрейсовые</th>
                                 <th>Послерейсовые</th>
+
+                                <th>Предсменные</th>
+                                <th>Послесменные</th>
+
                                 <th>БДД</th>
                                 <th>Отчёты с карт</th>
                             </thead>
@@ -276,6 +363,20 @@
         ->where('company_id', $company_id)
         ->where('driver_id', $report->driver_id)
         ->whereMonth('created_at', $month['month'])->count() }}</td>
+
+                                    <td>{{ \App\Anketa::where('type_view', 'Предсменный')
+        ->where('type_anketa', 'medic')
+        ->where('in_cart', 0)
+        ->where('company_id', $company_id)
+        ->where('driver_id', $report->driver_id)
+        ->whereMonth('created_at', $month['month'])->count() }}</td>
+                                    <td>{{ \App\Anketa::where('type_view', 'Послесменный')
+        ->where('type_anketa', 'medic')
+        ->where('in_cart', 0)
+        ->where('company_id', $company_id)
+        ->where('driver_id', $report->driver_id)
+        ->whereMonth('created_at', $month['month'])->count() }}</td>
+
                                     <td>{{ \App\Anketa::where('type_anketa', 'bdd')
         ->where('in_cart', 0)
         ->where('company_id', $company_id)
@@ -327,6 +428,10 @@
                                 <th>Автомобиль</th>
                                 <th>Предрейсовые</th>
                                 <th>Послерейсовые</th>
+
+                                <th>Предсменные</th>
+                                <th>Послесменные</th>
+
                                 <th>БДД</th>
                                 <th>Отчёты с карт</th>
                             </thead>
@@ -348,6 +453,20 @@
         ->where('company_id', $company_id)
         ->where('car_id', $report->car_id)
         ->whereMonth('created_at', $month['month'])->count() }}</td>
+
+                                    <td>{{ \App\Anketa::where('type_view', 'Предсменный')
+        ->where('type_anketa', 'tech')
+        ->where('in_cart', 0)
+        ->where('company_id', $company_id)
+        ->where('car_id', $report->car_id)
+        ->whereMonth('created_at', $month['month'])->count() }}</td>
+                                    <td>{{ \App\Anketa::where('type_view', 'Послесменный')
+        ->where('type_anketa', 'tech')
+        ->where('in_cart', 0)
+        ->where('company_id', $company_id)
+        ->where('car_id', $report->car_id)
+        ->whereMonth('created_at', $month['month'])->count() }}</td>
+
                                     <td>{{ \App\Anketa::where('type_anketa', 'bdd')
         ->where('in_cart', 0)
         ->where('company_id', $company_id)

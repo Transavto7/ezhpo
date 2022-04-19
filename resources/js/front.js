@@ -718,8 +718,14 @@ $(document).ready(function () {
         requireds.each(function () {
             let val = $(this).val(), name = $(this).data('label')
 
-            if(!val)
-                errors.push(`Поле "${name}" не заполнено`)
+            if(typeof val === "object") {
+                if(val.length === 0) {
+                    errors.push(`Поле "${name}" не заполнено`)
+                }
+            } else {
+                if(!val)
+                    errors.push(`Поле "${name}" не заполнено`)
+            }
         })
 
         if(errors.length) {

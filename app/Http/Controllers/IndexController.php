@@ -205,7 +205,7 @@ class IndexController extends Controller
 
                 'products_id' => ['label' => 'Услуги', 'multiple' => 1, 'type' => 'select', 'values' => 'Product', 'noRequired' => 1],
 
-                'trailer' => ['label' => 'Прицеп', 'type' => 'select', 'values' => ['Нет' => 'Нет', 'Да' => 'Да'], 'defaultValue' => 'Нет', 'noRequired' => 1],
+                'trailer' => ['label' => 'Прицеп', 'type' => 'select', 'values' => ['Нет' => 'Нет', 'Да' => 'Да'], 'defaultValue' => 'Нет'],
                 'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
                 'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1],
                 'note' => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
@@ -252,7 +252,7 @@ class IndexController extends Controller
                     ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель']
                 ]],
 
-                'where_call' => ['label' => 'Кому звонить при отстранении (телефон)', 'classes' => 'MASK_PHONE', 'type' => 'text', 'noRequired' => 1],
+                'where_call' => ['label' => 'Кому отправлять СМС при отстранении', 'classes' => 'MASK_PHONE', 'type' => 'text', 'noRequired' => 1],
                 'where_call_name' => ['label' => 'Кому звонить при отстранении (имя, должность)', 'type' => 'text', 'noRequired' => 1],
 
                 'inn' => ['label' => 'ИНН', 'type' => 'text', 'noRequired' => 1],

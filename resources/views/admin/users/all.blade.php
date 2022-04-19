@@ -48,18 +48,18 @@
     </div>
 
     <div class="card">
+        @if($errors)
+            @foreach($errors as $error)
+                <p class="alert alert-danger"><b>{{ $error[0] }}</b></p>
+            @endforeach
+        @endif
+
         @include('admin.users.users_table')
 
         <div class="col-md-12">
             {{ $users->appends($_GET)->render() }}
 
             <p>Количество элементов: {{ count($users) }}</p>
-
-            @if($errors)
-                @foreach($errors as $error)
-                    <p class="text-red">{{ $error[0] }}</p>
-                @endforeach
-            @endif
         </div>
     </div>
 

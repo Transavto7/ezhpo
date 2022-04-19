@@ -28,9 +28,9 @@
 
         methods: {
             clearMsgs () {
-                API.clearNotifies().then(r => {
-                    this.messages = []
-                })
+                this.messages = []
+
+                API.clearNotifies()
             },
 
             playAudio () {

@@ -40,7 +40,7 @@
                                     type="search"
                                     @endif
 
-                                    value="{{ request()->get($field) ? request()->get($field) : ($field === 'date' || strpos($field, '_at')) ? date('Y-m-01') : '' }}" name="{{ $field }}" class="form-control" />
+                                    value="{{ request()->get($field) ? request()->get($field) : (($field === 'date' || strpos($field, '_at')) ? date('Y-m-01') : '') }}" name="{{ $field }}" class="form-control" />
                             @endif
 
                         </div>

@@ -77,6 +77,9 @@ class ReportController extends Controller
                  * Отчет по услугам компании
                  */
                 case 'journal':
+                    /**
+                     * Таблица МЕДОСМОТРОВ
+                     */
                     $reports = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
                         ->where('company_id', $data['company_id'])
                         ->where('in_cart', 0)
@@ -86,21 +89,24 @@ class ReportController extends Controller
                         ])
                         ->get();
 
-                    /*$reportsDate = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+                    /**
+                     * Нижняя таблица медосмотров
+                     */
+                    $reportsMedicCreatedAt = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
                         ->where('company_id', $data['company_id'])
                         ->where('in_cart', 0)
-                        ->whereRaw("(date >= ? AND date <= ?)", [
+                        ->whereRaw("(created_at >= ? AND created_at <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])
-                        ->get();*/
+                        ->get();
 
-                    if(true) {
-                        $dates = $reports->sortByDesc('date');
+                    if($reportsMedicCreatedAt) {
+                        $dates = $reportsMedicCreatedAt->sortByDesc('date');
 
-                        if(isset($dates->first()->created_at)) {
-                            $date_to_period = $dates->first()->created_at;
-                            $date_from_period = $dates->last()->created_at;
+                        if(isset($dates->first()->date)) {
+                            $date_to_period = $dates->first()->date;
+                            $date_from_period = $dates->last()->date;
 
                             $period = CarbonPeriod::create($date_from_period, $date_to_period);
 
@@ -118,8 +124,8 @@ class ReportController extends Controller
                             })->unique('month')->toArray();
 
                             foreach($months as $monthKey => $month) {
-                                $reps = $reports->filter(function ($rep) use ($month, $months, $monthKey) {
-                                    return \Carbon\Carbon::parse($rep->created_at)->month === $month['month'];
+                                $reps = $reportsMedicCreatedAt->filter(function ($rep) use ($month, $months, $monthKey) {
+                                    return \Carbon\Carbon::parse($rep->date)->month === $month['month'];
                                 })->unique('driver_id');
 
                                 $months[$monthKey]['hidden'] = $months[$monthKey]['hidden'] ? 1 : count($reps) <= 0;
@@ -135,7 +141,10 @@ class ReportController extends Controller
                         }
                     }
 
-                    $reports2 = Anketa::where('type_anketa', 'tech')
+                    /**
+                     * ТАБЛИЦА ТЕХОСМОТРОВ
+                     */
+                    $reports2 = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'report_cart'])
                         ->where('company_id', $data['company_id'])
                         ->where('in_cart', 0)
                         ->whereRaw("(date >= ? AND date <= ?)", [
@@ -145,12 +154,25 @@ class ReportController extends Controller
                         ->get()
                         ->unique('car_gos_number');
 
-                    if(true) {
-                        $datesTech = $reports2->sortByDesc('date');
+                    /**
+                     * Таблица ТЕХОСМОТРОВ - нижняя
+                     */
+                    $reports2TechCreatedAt = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'report_cart'])
+                        ->where('company_id', $data['company_id'])
+                        ->where('in_cart', 0)
+                        ->whereRaw("(created_at >= ? AND created_at <= ?)", [
+                            $date_from." 00:00:00",
+                            $date_to." 23:59:59"
+                        ])
+                        ->get()
+                        ->unique('car_gos_number');
 
-                        if(isset($datesTech->first()->created_at)) {
-                            $date_to_period = $datesTech->first()->created_at;
-                            $date_from_period = $datesTech->last()->created_at;
+                    if($reports2TechCreatedAt) {
+                        $datesTech = $reports2TechCreatedAt->sortByDesc('date');
+
+                        if(isset($datesTech->first()->date)) {
+                            $date_to_period = $datesTech->first()->date;
+                            $date_from_period = $datesTech->last()->date;
 
                             $period = CarbonPeriod::create($date_from_period, $date_to_period);
 
@@ -168,8 +190,8 @@ class ReportController extends Controller
                             })->unique('month')->toArray();
 
                             foreach($monthsTech as $monthKey => $month) {
-                                $reps = $reports->filter(function ($rep) use ($month, $monthsTech, $monthKey) {
-                                    return \Carbon\Carbon::parse($rep->created_at)->month === $month['month'];
+                                $reps = $reports2TechCreatedAt->filter(function ($rep) use ($month, $monthsTech, $monthKey) {
+                                    return \Carbon\Carbon::parse($rep->date)->month === $month['month'];
                                 })->unique('car_id');
 
                                 $monthsTech[$monthKey]['hidden'] = $monthsTech[$monthKey]['hidden'] ? 1 : count($reps) <= 0;

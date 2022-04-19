@@ -722,13 +722,16 @@ class AnketsController extends Controller
                 array_push($createdAnketas, $createdAnketa->id);
 
                 /**
-                 * Diff Date
+                 * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
                  */
                 if($createdAnketa->type_anketa === 'medic') {
                     $diffDateCheck = Carbon::parse($createdAnketa->date)->diff($createdAnketa->created_at)->format('%i');
 
                     if($diffDateCheck <= 10) {
                         $createdAnketa->realy = 'да';
+                        $createdAnketa->save();
+                    } else {
+                        $createdAnketa->realy = 'нет';
                         $createdAnketa->save();
                     }
                 }
