@@ -14,7 +14,7 @@ class AddFieldsRealyPlToAnketas extends Migration
     public function up()
     {
         Schema::table('anketas', function (Blueprint $table) {
-            $table->string('readly')->nullable();
+            $table->string('realy')->nullable();
             $table->string('added_to_mo')->nullable();
         });
     }

@@ -205,7 +205,7 @@ class IndexController extends Controller
 
                 'products_id' => ['label' => 'Услуги', 'multiple' => 1, 'type' => 'select', 'values' => 'Product', 'noRequired' => 1],
 
-                'trailer' => ['label' => 'Прицеп', 'type' => 'select', 'values' => ['Нет' => 'Нет', 'Да' => 'Да'], 'defaultValue' => ''],
+                'trailer' => ['label' => 'Прицеп', 'type' => 'select', 'values' => ['Нет' => 'Нет', 'Да' => 'Да'], 'defaultValue' => '', 'noRequired' => 1],
                 'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
                 'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1],
                 'note' => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],

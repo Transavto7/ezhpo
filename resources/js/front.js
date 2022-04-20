@@ -581,7 +581,7 @@ $(document).ready(function () {
 
         if(count_anketa+1 === 30) {
             swal.fire({
-                title: 'Нельзя добавлять более 9 осмотров',
+                title: 'Нельзя добавлять более 30 осмотров',
                 icon: 'warning'
             });
 
