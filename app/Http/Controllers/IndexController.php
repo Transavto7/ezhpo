@@ -205,7 +205,7 @@ class IndexController extends Controller
 
                 'products_id' => ['label' => 'Услуги', 'multiple' => 1, 'type' => 'select', 'values' => 'Product', 'noRequired' => 1],
 
-                'trailer' => ['label' => 'Прицеп', 'type' => 'select', 'values' => ['Нет' => 'Нет', 'Да' => 'Да'], 'defaultValue' => 'Нет'],
+                'trailer' => ['label' => 'Прицеп', 'type' => 'select', 'values' => ['Нет' => 'Нет', 'Да' => 'Да'], 'defaultValue' => ''],
                 'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
                 'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1],
                 'note' => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
@@ -748,9 +748,12 @@ class IndexController extends Controller
                 // Парсим файлы
                 foreach($request->allFiles() as $file_key => $file) {
                     if(isset($data[$file_key]) && !isset($data[$file_key . '_base64'])) {
+                        Storage::disk('public')->delete($element[$file_key]);
+
                         $file_path = Storage::disk('public')->putFile('elements', $file);
 
-                        Storage::disk('public')->delete($element[$file_key]);
+                        echo $file_path . ' IMAGE<br/>';
+
                         $element[$file_key] = $file_path;
                     }
                 }
@@ -760,9 +763,13 @@ class IndexController extends Controller
 
                     if(is_array($v)) {
                         $element[$k] = join(',', $v);
+
+                        echo $k . ' 1<br/>';
                     }
                     else if(preg_match('/^data:image\/(\w+);base64,/', $v)) {
                         $k = str_replace('_base64', '', $k);
+
+                        echo $k . ' 2<br/>';
 
                         $base64_image = substr($v, strpos($v, ',') + 1);
                         $base64_image = base64_decode($base64_image);
@@ -775,8 +782,10 @@ class IndexController extends Controller
                         $element->$k = $path;
                     }
                     else {
-                        if(isset($v)) {
+                        if(isset($v) && !$request->hasFile($k)) {
                             $element[$k] = $v;
+
+                            echo $k . ' 3<br/>';
                         }
                     }
                 }
@@ -851,6 +860,10 @@ class IndexController extends Controller
 
         if($user->hasRole('operator_pak', '==')) {
             return redirect()->route('home', 'pak_queue');
+        }
+
+        if($user->hasRole('manager', '==') || $user->role_manager) {
+            return redirect()->route('renderElements', 'Company');
         }
 
         return redirect()->route('forms');

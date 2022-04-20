@@ -608,7 +608,9 @@ class AnketsController extends Controller
                     }
                 }
 
-                if(($hourdiff < 1 && $hourdiff >= 0) && count($data_anketa) <= 1) {
+                if(($hourdiff < 1 && $hourdiff >= 0) && count($data_anketa) <= 1 &&
+                    (isset($anketa['is_pak']) || $anketa['type_anketa'] === 'pak_queue')
+                ) {
                     $errMsg = "Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])";
 
                     array_push($errorsAnketa, $errMsg);
@@ -726,14 +728,16 @@ class AnketsController extends Controller
                  */
                 if($createdAnketa->type_anketa === 'medic') {
                     $diffDateCheck = Carbon::parse($createdAnketa->date)->diff($createdAnketa->created_at)->format('%i');
+                    $anketaCreated = Anketa::find($createdAnketa->id);
 
                     if($diffDateCheck <= 10) {
-                        $createdAnketa->realy = 'да';
-                        $createdAnketa->save();
+                        $anketaCreated->realy = 'да';
+                        $anketaCreated->save();
                     } else {
-                        $createdAnketa->realy = 'нет';
-                        $createdAnketa->save();
+                        $anketaCreated->realy = 'нет';
+                        $anketaCreated->save();
                     }
+
                 }
 
                 /**

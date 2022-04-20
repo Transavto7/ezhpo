@@ -37,7 +37,7 @@ class Anketa extends Model
         'type_briefing',
 
         // ПАК
-        'pulse', 'alcometer_mode', 'alcometer_result', 'type_trip', 'questions', 'photos',
+        'pulse', 'alcometer_mode', 'alcometer_result', 'type_trip', 'questions', 'photos', 'videos',
 
         //системные поля
         'in_cart',
@@ -91,6 +91,7 @@ class Anketa extends Model
             'company_id' => 'ID компании',
             'driver_id' => 'ID водителя',
             'photos' => 'Фото',
+            'videos' => 'Видео',
             'pv_id' => 'Пункт выпуска',
             'flag_pak' => 'Флаг СДПО'
         ],
@@ -258,6 +259,7 @@ class Anketa extends Model
             'company_id' => 'ID компании',
             'driver_id' => 'ID водителя',
             'photos' => 'Фото',
+            'videos' => 'Видео',
             'pv_id' => 'Пункт выпуска',
             'flag_pak' => 'Флаг СДПО'
         ],

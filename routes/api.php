@@ -60,6 +60,12 @@ Route::middleware('auth:api')->post('/get-user/{user_id}', function (Request $re
 });
 
 Route::middleware('auth:api')->group(function () {
+    Route::get('anketa/{id}', function ($id) {
+        $anketa = \App\Anketa::find($id);
+
+        return response()->json($anketa);
+    });
+
     // Отображаем ПВ
     Route::get('pvs/{id?}', function () {
         $id = isset(request()->id) ? request()->id : null;

@@ -579,7 +579,7 @@ $(document).ready(function () {
     $('#ANKETA_CLONE_TRIGGER').click(e => {
         const CLONE_ID = 'cloning'
 
-        if(count_anketa+1 === 9) {
+        if(count_anketa+1 === 30) {
             swal.fire({
                 title: 'Нельзя добавлять более 9 осмотров',
                 icon: 'warning'

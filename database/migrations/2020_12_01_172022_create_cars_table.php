@@ -22,7 +22,7 @@ class CreateCarsTable extends Migration
             $table->string('mark_model')->default('-');
             $table->string('type_auto')->default('Не выбрано');
             $table->string('products_id')->nullable(); // ID товаров через запятую
-            $table->string('trailer')->default(0);
+            $table->string('trailer')->nullable();
             $table->date('date_osago')->nullable();
             $table->date('date_prto')->nullable(); // Дата ПРТО
             $table->date('date_techview')->nullable(); // Дата техосмотра
