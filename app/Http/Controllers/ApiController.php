@@ -33,7 +33,10 @@ class ApiController extends Controller
 
         foreach($users as $user) {
             $time = time();
-            $time += $user->timezone * 3600;
+
+            $timezone = $user->timezone ? $user->timezone : 3;
+
+            $time += $timezone * 3600;
             // [0] => Hours, [1] => Minutes
             $time = explode(':', date('H:i', $time));
 

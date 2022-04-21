@@ -69,6 +69,12 @@ class AdminController extends Controller
             }
         }
 
+        if(isset($data['timezone'])) {
+            if(empty($data['timezone'])) {
+                $data['timezone'] = 4;
+            }
+        }
+
         // Создаем Пользователя
         $registerController->create($data);
 

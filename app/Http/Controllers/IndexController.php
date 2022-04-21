@@ -1046,7 +1046,10 @@ class IndexController extends Controller
         date_default_timezone_set('UTC');
 
         $time = time();
-        $time += $user->timezone * 3600;
+
+        $timezone = $user->timezone ? $user->timezone : 3;
+
+        $time += $timezone * 3600;
         $time = date('Y-m-d\TH:i', $time);
 
         // Дефолтные значения
