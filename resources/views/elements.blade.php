@@ -302,9 +302,9 @@
 
                                         @isset($fields[$elK]['filterJournalLinkKey'])
                                             <div>
-                                                <a class="btn btn-sm btn-danger" href="{{ route('home', 'medic') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el[$elK] }}">МЕД</a>
-                                                <a class="btn btn-sm btn-info" href="{{ route('home', 'tech') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el[$elK] }}">ТЕХ</a>
-                                                <a class="btn btn-sm btn-dark" href="{{ route('home', 'Dop') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el[$elK] }}">ПЛ</a>
+                                                <a class="btn btn-sm btn-danger" href="{{ route('home', 'medic') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}">МЕД</a>
+                                                <a class="btn btn-sm btn-info" href="{{ route('home', 'tech') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}">ТЕХ</a>
+                                                <a class="btn btn-sm btn-dark" href="{{ route('home', 'Dop') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}">ПЛ</a>
                                             </div>
                                         @endisset
                                     @endif

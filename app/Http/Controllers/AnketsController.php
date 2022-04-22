@@ -329,8 +329,9 @@ class AnketsController extends Controller
                 // Тонометр
                 $tonometer = isset($anketa['tonometer']) ? $anketa['tonometer'] : $defaultDatas['tonometer'];
 
-                if(!isset($anketa['med_view']))
+                if(!isset($anketa['med_view'])) {
                     $anketa['med_view'] = 'В норме';
+                }
 
                 /**
                  * Парсим данные в анкете, удаляем главную анкету и ставим актуальную

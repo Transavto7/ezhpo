@@ -11,6 +11,9 @@
       <sshConfig authType="PASSWORD" host="62.113.107.51" id="667d468c-59f0-46c0-b2f8-45e737216e42" port="22" customName="VPS: CRM.TA-7.RU" nameFormat="CUSTOM" username="root">
         <option name="customName" value="VPS: CRM.TA-7.RU" />
       </sshConfig>
+      <sshConfig authType="PASSWORD" host="admint4n.beget.tech" id="4fa4042f-d425-4f54-b349-4ef252389d92" port="22" customName="ЭЖПО VDS" nameFormat="CUSTOM" username="admint4n">
+        <option name="customName" value="ЭЖПО VDS" />
+      </sshConfig>
     </configs>
   </component>
 </project>

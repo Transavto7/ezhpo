@@ -38,6 +38,40 @@
     </article>
 </div>
 
+@isset($photos)
+    @if(!empty($photos))
+        <div class="row">
+            <div class="col-md-12">
+                <p>Фотографии: </p>
+            </div>
+            @foreach(explode(',', $photos) as $photo)
+                @php $photo_path = Storage::disk('public')->exists($photo) ? Storage::url($photo) : $photo; @endphp
+
+                <a href="{{ $photo }}" data-fancybox class="col-md-3">
+                    <img width="100%" src="{{ $photo }}" alt="photo" />
+                </a>
+            @endforeach
+        </div>
+    @endif
+@endisset
+
+@isset($videos)
+    @if(!empty($videos))
+        <div class="row">
+            <div class="col-md-12">
+                <p>Видео: </p>
+            </div>
+            @foreach(explode(',', $videos) as $video)
+                <div class="col-md-4">
+                    <video controls="controls" src="{{ $video }}" width="100%" height="100"></video>
+                </div>
+            @endforeach
+        </div>
+    @endif
+@endisset
+
+<hr>
+
 @section('ankets_submit')
     <div class="text-center m-center">
         <label class="btn btn-success btn-sm">
