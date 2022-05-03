@@ -157,6 +157,23 @@
                                                             @endforeach
                                                         @endif
 
+                                                    @elseif($anketaTDkey === 'videos')
+
+                                                        @php $videos = explode(',', $anketa[$anketaTDkey]); @endphp
+
+                                                        @foreach($videos as $vK => $vV)
+                                                            @if($vK == 0)
+                                                                    <a data-type="iframe" href="{{ $vV }}" data-fancybox="video_{{ $anketa->id }}">
+                                                                        <i class="fa fa-video-camera"></i>
+
+                                                                        ({{ count($videos) }})
+                                                                    </a>
+                                                            @else
+                                                                <a data-type="iframe" href="{{ $vV }}" data-fancybox="video_{{ $anketa->id }}"></a>
+                                                            @endif
+
+                                                        @endforeach
+
                                                     @else
                                                         {{ $anketa[$anketaTDkey] }}
 

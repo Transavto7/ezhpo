@@ -165,7 +165,9 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
  * Панель администратора
  */
 Route::middleware(['auth', CheckAdmin::class])->group(function () {
+
     Route::prefix('admin')->group(function () {
+
         // Модернизация пользователей
         Route::get('/users', 'AdminController@ShowUsers')->name('adminUsers');
         Route::post('/users', 'AdminController@CreateUser')->name('adminCreateUser');
@@ -177,10 +179,9 @@ Route::middleware(['auth', CheckAdmin::class])->group(function () {
             Route::get('/', 'SettingsController@RenderSystemSettings')->name('systemSettings');
             Route::post('/', 'SettingsController@UpdateSystemSetting')->name('systemSettings.update');
         });
+
     });
-    /**
-     * SNIPPETS
-     */
+
 });
 
 // Маршруты авторизации

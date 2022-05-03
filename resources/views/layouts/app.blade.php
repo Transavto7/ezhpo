@@ -87,17 +87,6 @@
                             @yield('content')
                         </div>
                     </section>
-
-                    <!-- Подвал -->
-                    <footer class="main-footer">
-                        <div class="container-fluid">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <p>ТРАНСАВТО-7 &copy; 2021 (release <a href="{{ route('releases') }}"><b>0.9.10</b></a>)</p>
-                                </div>
-                            </div>
-                        </div>
-                    </footer>
                 </div>
             @endauth
         </main>

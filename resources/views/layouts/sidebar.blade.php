@@ -150,12 +150,13 @@
                                 'filter' => 1,
                                 'role' => 778
                             ]) }}">ПАК СДПО</a></li>
+
                         <li><a href="{{ route('renderElements', 'DDate') }}">Контроль дат</a></li>
                         <li><a href="{{ route('renderElements', 'FieldHistory') }}">История изменения полей</a></li>
                     @endadmin
 
                     <li><a href="{{ route('renderElements', 'Req') }}">Реквизиты нашей компании</a></li>
-
+                    <li><a href="{{ route('releases') }}">Релизы</a></li>
                 </ul>
             </li>
             @endmanager
