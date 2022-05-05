@@ -38,7 +38,7 @@ class IndexController extends Controller
             'model' => 'Point',
             'fields' => [
                 'name' => ['label' => 'Пункт выпуска', 'type' => 'text'],
-                'pv_id' => ['label' => 'Город', 'type' => 'select', 'values' => 'Town', 'noRequired' => 1],
+                'pv_id' => ['label' => 'Город', 'type' => 'select', 'values' => 'Town'],
                 'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company', 'noRequired' => 1]
             ]
         ],

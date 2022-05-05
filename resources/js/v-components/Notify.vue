@@ -3,7 +3,7 @@
         <div class="text-center">
             <h2 class="text-white">У вас новые уведомления!</h2>
             <br>
-            <a @click.prevent="clearMsgs" class="btn btn-success" href="#">Очистить всё ({{ messages.length }})</a>
+            <a @click.prevent="clearMsgs" class="btn btn-success btn-lg" href="#">Посмотреть очередь ({{ messages.length }})</a>
             <br><br>
         </div>
 

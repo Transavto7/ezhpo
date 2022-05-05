@@ -111,7 +111,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <input type="text" value="{{ $user->name }}" name="name" placeholder="Ваше имя" class="form-control">
+                                        <input type="text" value="{{ $user->name }}" name="name" placeholder="Ваше ФИО" class="form-control">
                                     </div>
 
                                     <div class="form-group">

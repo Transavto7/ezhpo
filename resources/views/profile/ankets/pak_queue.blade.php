@@ -34,41 +34,54 @@
 <div class="form-group row">
     <label class="col-md-3 form-control-label">Температура тела:</label>
     <article class="col-md-9">
-        <input type="number" value="{{ $t_people ?? '' }}" name="t_people" class="form-control">
+        <input type="number" step="0.1" value="{{ $t_people ?? '' }}" name="t_people" class="form-control">
     </article>
 </div>
 
-@isset($photos)
-    @if(!empty($photos))
-        <div class="row">
-            <div class="col-md-12">
-                <p>Фотографии: </p>
-            </div>
-            @foreach(explode(',', $photos) as $photo)
-                @php $photo_path = Storage::disk('public')->exists($photo) ? Storage::url($photo) : $photo; @endphp
+<div class="form-group row">
+    <label class="col-md-3 form-control-label">Проба на алкоголь:</label>
+    <article class="col-md-9">
+        <select name="proba_alko" required class="form-control">
+            @isset($proba_alko)
+                <option disabled selected value="{{ $proba_alko }}">{{ $proba_alko }}</option>
+            @endisset
 
-                <a href="{{ $photo }}" data-fancybox class="col-md-3">
-                    <img width="100%" src="{{ $photo }}" alt="photo" />
-                </a>
-            @endforeach
-        </div>
-    @endif
-@endisset
+            <option selected value="Отрицательно">Отрицательно</option>
+            <option value="Положительно">Положительно</option>
+        </select>
+    </article>
+</div>
 
-@isset($videos)
-    @if(!empty($videos))
-        <div class="row">
-            <div class="col-md-12">
-                <p>Видео: </p>
-            </div>
+<div class="row">
+    <div class="col-md-12">
+        @if(isset($photos) || isset($videos))
+            <p>Фотографии и видео:</p>
+        @endif
+    </div>
+    @isset($photos)
+        @if(!empty($photos))
+
+                @foreach(explode(',', $photos) as $photo)
+                    @php $isUri = strpos($photo, 'spdo.ta-7'); @endphp
+                    @php $photo_path = $isUri ? $photo : Storage::url($photo); @endphp
+
+                    <a href="{{ $photo_path }}" data-fancybox class="col-md-4">
+                        <img width="100%" src="{{ $photo_path }}" alt="photo" />
+                    </a>
+                @endforeach
+        @endif
+    @endisset
+
+    @isset($videos)
+        @if(!empty($videos))
             @foreach(explode(',', $videos) as $video)
                 <div class="col-md-4">
                     <video controls="controls" src="{{ $video }}" width="100%" height="100"></video>
                 </div>
             @endforeach
-        </div>
-    @endif
-@endisset
+        @endif
+    @endisset
+</div>
 
 <hr>
 

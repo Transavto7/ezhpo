@@ -8,6 +8,14 @@ use App\Http\Middleware\ {
 Route::get('/', 'IndexController@RenderIndex')->name('index');
 Route::get('/releases', 'IndexController@RenderReleases')->name('releases');
 
+Route::get('/show-video', function () {
+    $url = isset($_GET['url']) ? $_GET['url'] : '';
+
+    return view('showVideo', [
+        'video' => $url
+    ]);
+})->name('showVideo');
+
 /**
  * API-маршруты
  */

@@ -31,7 +31,7 @@
                     </div>
 
                     <div class="form-group">
-                        <input type="text" required name="name" placeholder="Ваше имя" class="form-control">
+                        <input type="text" required name="name" placeholder="Ваше ФИО" class="form-control">
                     </div>
 
                     <div class="form-group">

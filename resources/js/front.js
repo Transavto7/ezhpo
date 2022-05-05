@@ -907,6 +907,27 @@ $(document).ready(function () {
         }
     });
 
+    $('.header #toggle-btn').each(function () {
+        let localStatusSidebar = () => {
+                return localStorage.getItem('sidebar')
+            },
+            localStatusSet = status => {
+                localStorage.setItem('sidebar', status)
+            }
+
+        if(localStatusSidebar() === "0") {
+            $(this).trigger('click')
+        }
+
+        $(this).click(function () {
+            if($(this).hasClass('active')) {
+                localStatusSet(1)
+            } else {
+                localStatusSet(0)
+            }
+        })
+    })
+
     LIBS.initAll()
     $('.MASK_ID_ELEM').trigger('input')
 

@@ -149,10 +149,12 @@
                                                             @php $photos = explode(',', $anketa[$anketaTDkey]); @endphp
 
                                                             @foreach($photos as $phI => $ph)
+                                                                @php $isUri = strpos($ph, 'spdo.ta-7'); @endphp
+
                                                                 @if($phI == 0)
-                                                                    <a href="{{ Storage::url($ph) }}" data-fancybox="gallery_{{ $anketa->id }}"><i class="fa fa-camera"></i> ({{ count($photos) }})</a>
+                                                                    <a href="{{ $isUri ? $ph : Storage::url($ph) }}" data-fancybox="gallery_{{ $anketa->id }}"><i class="fa fa-camera"></i> ({{ count($photos) }})</a>
                                                                 @else
-                                                                    <a href="{{ Storage::url($ph) }}" data-fancybox="gallery_{{ $anketa->id }}"></a>
+                                                                    <a href="{{ $isUri ? $ph : Storage::url($ph) }}" data-fancybox="gallery_{{ $anketa->id }}"></a>
                                                                 @endif
                                                             @endforeach
                                                         @endif
@@ -163,11 +165,11 @@
 
                                                         @foreach($videos as $vK => $vV)
                                                             @if($vK == 0)
-                                                                    <a data-type="iframe" href="{{ $vV }}" data-fancybox="video_{{ $anketa->id }}">
-                                                                        <i class="fa fa-video-camera"></i>
+                                                                <a data-type="iframe" href="{{ route('showVideo', ['url' => $vV]) }}" data-fancybox="video_{{ $anketa->id }}">
+                                                                    <i class="fa fa-video-camera"></i>
 
-                                                                        ({{ count($videos) }})
-                                                                    </a>
+                                                                    ({{ count($videos) }})
+                                                                </a>
                                                             @else
                                                                 <a data-type="iframe" href="{{ $vV }}" data-fancybox="video_{{ $anketa->id }}"></a>
                                                             @endif

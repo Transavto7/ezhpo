@@ -113,7 +113,7 @@ class ReportController extends Controller
                             $months = collect($period)->map(function (Carbon $date) use ($months_def) {
 
                                 $dataMonth = [
-                                    'month' => $date->month,
+                                    'month' => $date->month+1,
                                     'year' => $date->year,
                                     'name' => $date->monthName,
                                     'days' => $date->daysInMonth,
@@ -179,7 +179,7 @@ class ReportController extends Controller
                             $monthsTech = collect($period)->map(function (Carbon $date) use ($months_def) {
 
                                 $dataMonth = [
-                                    'month' => $date->month,
+                                    'month' => $date->month+1,
                                     'year' => $date->year,
                                     'name' => $date->monthName,
                                     'days' => $date->daysInMonth,

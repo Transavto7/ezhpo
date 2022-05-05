@@ -96,7 +96,7 @@ class AnketsController extends Controller
                 switch($daK) {
                     case 'driver_id':
 
-                        if($type_anketa === 'medic') {
+                        if($daV) {
                             $driver = Driver::where('hash_id', $daV)->first();
 
                             if($driver) {
@@ -113,7 +113,7 @@ class AnketsController extends Controller
 
                     case 'car_id':
 
-                        if($type_anketa === 'tech' || $type_anketa === 'vid_pl') {
+                        if($daV) {
                             $car = Car::where('hash_id', $daV)->first();
 
                             if($car) {
@@ -659,7 +659,8 @@ class AnketsController extends Controller
                  */
                 $anketa['user_id'] = $user->id;
                 $anketa['user_name'] = $user->name;
-                $anketa['user_eds'] = $user->eds;
+
+                $anketa['user_eds'] = isset($anketa['user_eds']) ? $anketa['user_eds'] : $user->eds;
 
                 $anketa['pulse'] = isset($anketa['pulse']) ? $anketa['pulse'] : mt_rand(60,80);
 
@@ -699,6 +700,15 @@ class AnketsController extends Controller
                     $Driver->save();
                 }
 
+                // Конвертация текущего времени Юзера
+                date_default_timezone_set('UTC');
+                $time = time();
+                $timezone = $user->timezone ? $user->timezone : 3;
+                $time += $timezone * 3600;
+                $time = date('Y-m-d H:i:s', $time);
+
+                $anketa['created_at'] = isset($anketa['created_at']) ? $anketa['created_at'] : $time;
+
                 /**
                  * Проверка на "Дополнительный осмотр"
                  */
@@ -713,8 +723,10 @@ class AnketsController extends Controller
                  * Выставляем автоматический режим если осмотр пришел с ПАК
                  */
                 if(isset($anketa['is_pak'])) {
-                    if($anketa['is_pak']) {
+                    if($anketa['is_pak'] && $anketa['type_anketa'] === 'pak_queue') {
                         $anketa['flag_pak'] = 'СДПО Р';
+                    } else {
+                        $anketa['flag_pak'] = 'СДПО А';
                     }
                 }
 
