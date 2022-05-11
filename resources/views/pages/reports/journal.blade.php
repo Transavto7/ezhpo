@@ -311,6 +311,8 @@
                 $date_from." 00:00:00",
                 $date_to." 23:59:59"
             ])
+            ->get()
+            ->unique('driver_id')
             ->count() }}</td>
     </tbody>
 </table>

@@ -103,6 +103,12 @@
                                 <tr>
                                     <th width="60" class="not-export">ID</th>
 
+                                    @if($type_ankets === 'pak_queue')
+                                        <th class="not-export">
+                                            Таймер
+                                        </th>
+                                    @endif
+
                                     @foreach($anketsFields as $field)
                                         @isset($fieldsKeys[$field])
                                             <th @isset($blockedToExportFields[$field]) class="not-export" @endif data-field-key="{{ $field }}">
@@ -119,37 +125,47 @@
                                         <th class="not-export">ID автомобиля</th>
                                     @endaccessSetting
 
+                                    <!-- ОЧЕРЕДЬ ОСМОТРОВ -->
+                                    @if($type_ankets === 'pak_queue')
+                                        <th class="not-export">#</th>
+                                        <th class="not-export">#</th>
+                                    @endif
+                                    <!-- /ОЧЕРЕДЬ ОСМОТРОВ -->
+
                                     @role(['admin', 'manager', 'medic', 'tech', $currentRole])
                                         <th class="not-export">#</th>
                                     @endrole
 
-                                    @role(['admin', 'manager', 'medic', 'tech'])
-                                        <th class="not-export">#</th>
-                                    @endrole
+                                    @if($type_ankets !== 'pak_queue')
+                                        @role(['admin', 'manager', 'medic', 'tech'])
+                                            <th class="not-export">#</th>
+                                        @endrole
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($ankets as $anketaKey => $anketa)
                                     <tr data-field="{{ $anketaKey }}">
                                         <td class="not-export">{{ $anketa->id }}</td>
+
+                                        @if($type_ankets === 'pak_queue')
+                                            <td class="not-export">
+                                                <div class="App-Timer" data-date="{{ $anketa->created_at }}"></div>
+                                            </td>
+                                        @endif
+
                                         @foreach($anketsFields as $anketaTDkey)
                                             @if(isset($fieldsKeys[$anketaTDkey]))
                                                 <td @isset($blockedToExportFields[$anketaTDkey]) class="not-export" @endisset data-field-key="{{ $anketaTDkey }}">
                                                     @if($anketaTDkey === 'date' || strpos($anketaTDkey, '_at') > 0)
                                                         {{ date('d-m-Y H:i:s', strtotime($anketa[$anketaTDkey])) }}
-
-                                                        <!-- Очередь ПАК -->
-                                                        @if($type_ankets === 'pak_queue' && $anketaTDkey === 'created_at')
-                                                            <div class="App-Timer" data-date="{{ $anketa['created_at'] }}"></div>
-                                                        @endif
-
                                                     @elseif($anketaTDkey === 'photos')
 
                                                         @if($anketa[$anketaTDkey])
                                                             @php $photos = explode(',', $anketa[$anketaTDkey]); @endphp
 
                                                             @foreach($photos as $phI => $ph)
-                                                                @php $isUri = strpos($ph, 'spdo.ta-7'); @endphp
+                                                                @php $isUri = strpos($ph, 'sdpo.ta-7'); @endphp
 
                                                                 @if($phI == 0)
                                                                     <a href="{{ $isUri ? $ph : Storage::url($ph) }}" data-fancybox="gallery_{{ $anketa->id }}"><i class="fa fa-camera"></i> ({{ count($photos) }})</a>
@@ -161,20 +177,22 @@
 
                                                     @elseif($anketaTDkey === 'videos')
 
-                                                        @php $videos = explode(',', $anketa[$anketaTDkey]); @endphp
+                                                        @if($anketa[$anketaTDkey])
+                                                                @php $videos = explode(',', $anketa[$anketaTDkey]); @endphp
 
-                                                        @foreach($videos as $vK => $vV)
-                                                            @if($vK == 0)
-                                                                <a data-type="iframe" href="{{ route('showVideo', ['url' => $vV]) }}" data-fancybox="video_{{ $anketa->id }}">
-                                                                    <i class="fa fa-video-camera"></i>
+                                                                @foreach($videos as $vK => $vV)
+                                                                    @if($vK == 0)
+                                                                        <a data-type="iframe" href="{{ route('showVideo', ['url' => $vV]) }}" data-fancybox="video_{{ $anketa->id }}">
+                                                                            <i class="fa fa-video-camera"></i>
 
-                                                                    ({{ count($videos) }})
-                                                                </a>
-                                                            @else
-                                                                <a data-type="iframe" href="{{ $vV }}" data-fancybox="video_{{ $anketa->id }}"></a>
-                                                            @endif
+                                                                            ({{ count($videos) }})
+                                                                        </a>
+                                                                    @else
+                                                                        <a data-type="iframe" href="{{ $vV }}" data-fancybox="video_{{ $anketa->id }}"></a>
+                                                                    @endif
 
-                                                        @endforeach
+                                                                @endforeach
+                                                        @endif
 
                                                     @else
                                                         {{ $anketa[$anketaTDkey] }}
@@ -193,22 +211,35 @@
                                             </td>
                                         @endaccessSetting
 
+                                        <!-- ОЧЕРЕДЬ ОСМОТРОВ -->
+                                        @if($type_ankets === 'pak_queue')
+                                            <td class="td-option not-export">
+                                                <a href="{{ route('changePakQueue', ['admitted' => 'Допущен', 'id' => $anketa->id]) }}" class="btn btn-success"><i class="fa fa-check"></i></a>
+                                            </td>
+
+                                            <td class="td-option not-export">
+                                                <a href="{{ route('changePakQueue', ['admitted' => 'Не допущен', 'id' => $anketa->id]) }}" class="btn btn-danger"><i class="fa fa-close"></i></a>
+                                            </td>
+                                        @endif
+                                        <!-- /ОЧЕРЕДЬ ОСМОТРОВ -->
+
                                         @role(['admin', 'manager', 'medic', 'tech', $currentRole])
                                             <td class="td-option not-export">
-                                                <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info"><i class="fa fa-edit"></i></a>
+                                                <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info"><i class="fa fa-search"></i></a>
                                             </td>
                                         @endrole
 
-                                        <td class="td-option not-export">
-                                            @manager
+                                        @if($type_ankets !== 'pak_queue')
+                                            <td class="td-option not-export">
+                                                @manager
                                                 <form action="{{ route('forms.delete', $anketa->id) }}" onsubmit="if(!confirm('Хотите удалить?')) return false;" method="POST">
                                                     @csrf
                                                     {{ method_field('DELETE') }}
                                                     <button type="submit" class="btn btn-danger"><i class="fa fa-remove"></i></button>
                                                 </form>
-                                            @endmanager
+                                                @endmanager
 
-                                            @role(['admin', 'manager', 'medic', 'tech'])
+                                                @role(['admin', 'manager', 'medic', 'tech'])
                                                 <a href="{{ route('forms.trash', [
                                                     'id' => $anketa->id,
                                                     'action' => isset($_GET['trash']) ? 0 : 1
@@ -219,9 +250,10 @@
                                                         <i class="fa fa-trash"></i>
                                                     @endisset
                                                 </a>
-                                            @endrole
+                                                @endrole
 
-                                        </td>
+                                            </td>
+                                        @endif
 
                                     </tr>
                                 @endforeach

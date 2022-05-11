@@ -31,6 +31,8 @@
                 this.messages = []
 
                 API.clearNotifies()
+
+                location.href = '/home/pak_queue'
             },
 
             playAudio () {

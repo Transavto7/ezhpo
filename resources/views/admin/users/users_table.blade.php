@@ -95,24 +95,31 @@
                                 @csrf
 
                                 <div class="modal-body">
-                                    <div class="form-group">
-                                        <label>
-                                            Фотография
-                                            <input type="file" id="croppie-input{{ $user->id }}" name="photo">
 
-                                            <div style="display: none;" id="croppie-block{{ $user->id }}" class="croppie-block text-center">
-                                                <input type="hidden" name="photo_base64" id="croppie-result-base64{{ $user->id }}">
-                                                <div class="croppie-demo" data-croppie-id="{{ $user->id }}"></div>
-                                                <button type="button" data-croppie-id="{{ $user->id }}" class="btn croppie-save btn-sm btn-success">Сохранить обрезку</button>
-                                                <button type="button" data-croppie-id="{{ $user->id }}" class="btn croppie-delete btn-sm btn-danger">Удалить фото</button>
-                                            </div>
+                                    @if(!$is_pak)
+                                        <div class="form-group">
+                                            <label>
+                                                Фотография
+                                                <input type="file" id="croppie-input{{ $user->id }}" name="photo">
 
-                                        </label>
-                                    </div>
+                                                <div style="display: none;" id="croppie-block{{ $user->id }}" class="croppie-block text-center">
+                                                    <input type="hidden" name="photo_base64" id="croppie-result-base64{{ $user->id }}">
+                                                    <div class="croppie-demo" data-croppie-id="{{ $user->id }}"></div>
+                                                    <button type="button" data-croppie-id="{{ $user->id }}" class="btn croppie-save btn-sm btn-success">Сохранить обрезку</button>
+                                                    <button type="button" data-croppie-id="{{ $user->id }}" class="btn croppie-delete btn-sm btn-danger">Удалить фото</button>
+                                                </div>
 
-                                    <div class="form-group">
-                                        <input type="text" value="{{ $user->name }}" name="name" placeholder="Ваше ФИО" class="form-control">
-                                    </div>
+                                            </label>
+                                        </div>
+                                    @endif
+
+                                    @if(!$is_pak)
+                                        <div class="form-group">
+                                            <input type="text" value="{{ $user->name }}" name="name" placeholder="Ваше ФИО" class="form-control">
+                                        </div>
+                                    @else
+                                        <input type="hidden" name="name" value="{{ $user->name }}">
+                                    @endif
 
                                     <div class="form-group">
                                         <input type="text" value="{{ $user->login }}" name="login" placeholder="Login" class="form-control">
@@ -130,9 +137,11 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <input type="text" value="{{ $user->eds }}" name="eds" placeholder="ЭЦП" class="form-control">
-                                    </div>
+                                    @if(!$is_pak)
+                                        <div class="form-group">
+                                            <input type="text" value="{{ $user->eds }}" name="eds" placeholder="ЭЦП" class="form-control">
+                                        </div>
+                                    @endif
 
                                     <div class="form-group">
                                         <label>Часовой пояс <i>(UTC+3)</i></label>
@@ -145,35 +154,36 @@
                                         ])
                                     </div>
 
-                                    <div class="form-group">
-                                        <label>Роль</label>
-                                        <select name="role" required class="form-control">
-                                            <option disabled selected value="{{ $user->role }}">{{ \App\Http\Controllers\ProfileController::getUserRole(true, $user->id) }}</option>
-
-                                            @if(!$is_pak)
+                                    @if(!$is_pak)
+                                        <div class="form-group">
+                                            <label>Роль</label>
+                                            <select name="role" required class="form-control">
+                                                <option disabled selected value="{{ $user->role }}">{{ \App\Http\Controllers\ProfileController::getUserRole(true, $user->id) }}</option>
                                                 <option value="12">Клиент</option>
                                                 <option value="1">Контролёр ТС</option>
                                                 <option value="2">Медицинский сотрудник</option>
                                                 <option value="4">Оператор СДПО</option>
                                                 <option value="11">Менеджер</option>
                                                 <option value="777">Администратор</option>
-                                            @endif
+                                            </select>
+                                        </div>
+                                    @else
+                                        <input type="hidden" value="778" name="role">
+                                    @endif
 
-                                            <option value="778">Терминал</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Сделать менеджером</label>
-                                        <select name="role_manager">
-                                            <option
-                                                @if($user->role_manager === 1) selected @endif
+                                    @if(!$is_pak)
+                                        <div class="form-group">
+                                            <label>Сделать менеджером</label>
+                                            <select name="role_manager">
+                                                <option
+                                                    @if($user->role_manager === 1) selected @endif
                                                 value="1">Да</option>
-                                            <option
-                                                @if($user->role_manager === 0) selected @endif
-                                                 value="0">Нет</option>
-                                        </select>
-                                    </div>
+                                                <option
+                                                    @if($user->role_manager === 0) selected @endif
+                                                value="0">Нет</option>
+                                            </select>
+                                        </div>
+                                    @endif
 
                                     <div class="form-group">
                                         <label>Заблокирован</label>

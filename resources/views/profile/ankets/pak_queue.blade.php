@@ -62,7 +62,7 @@
         @if(!empty($photos))
 
                 @foreach(explode(',', $photos) as $photo)
-                    @php $isUri = strpos($photo, 'spdo.ta-7'); @endphp
+                    @php $isUri = strpos($photo, 'sdpo.ta-7'); @endphp
                     @php $photo_path = $isUri ? $photo : Storage::url($photo); @endphp
 
                     <a href="{{ $photo_path }}" data-fancybox class="col-md-4">

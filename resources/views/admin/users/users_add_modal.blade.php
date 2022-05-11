@@ -5,7 +5,7 @@
     <div role="document" class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Добавление сотрудника</h4>
+                <h4 class="modal-title">Добавление {{ $is_pak ? 'терминала' : 'сотрудника' }}</h4>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
             </div>
 
@@ -15,24 +15,30 @@
                 <div class="modal-body">
                     <p>Заполните форму внимательно и нажмите кнопку "Добавить"</p>
 
-                    <div class="form-group">
-                        <label>
-                            Фотография
-                            <input type="file" id="croppie-input{{ $photoInputId }}" name="photo">
+                    @if(!$is_pak)
+                        <div class="form-group">
+                            <label>
+                                Фотография
+                                <input type="file" id="croppie-input{{ $photoInputId }}" name="photo">
 
-                            <div style="display: none;" id="croppie-block{{ $photoInputId }}" class="croppie-block text-center">
-                                <input type="hidden" name="photo_base64" id="croppie-result-base64{{ $photoInputId }}">
-                                <div class="croppie-demo" data-croppie-id="{{ $photoInputId }}"></div>
-                                <button type="button" data-croppie-id="{{ $photoInputId }}" class="btn croppie-save btn-sm btn-success">Сохранить обрезку</button>
-                                <button type="button" data-croppie-id="{{ $photoInputId }}" class="btn croppie-delete btn-sm btn-danger">Удалить фото</button>
-                            </div>
+                                <div style="display: none;" id="croppie-block{{ $photoInputId }}" class="croppie-block text-center">
+                                    <input type="hidden" name="photo_base64" id="croppie-result-base64{{ $photoInputId }}">
+                                    <div class="croppie-demo" data-croppie-id="{{ $photoInputId }}"></div>
+                                    <button type="button" data-croppie-id="{{ $photoInputId }}" class="btn croppie-save btn-sm btn-success">Сохранить обрезку</button>
+                                    <button type="button" data-croppie-id="{{ $photoInputId }}" class="btn croppie-delete btn-sm btn-danger">Удалить фото</button>
+                                </div>
 
-                        </label>
-                    </div>
+                            </label>
+                        </div>
+                    @endif
 
-                    <div class="form-group">
-                        <input type="text" required name="name" placeholder="Ваше ФИО" class="form-control">
-                    </div>
+                    @if(!$is_pak)
+                        <div class="form-group">
+                            <input type="text" required name="name" placeholder="Ваше ФИО" class="form-control">
+                        </div>
+                    @else
+                        <input type="hidden" name="name" value="{{ random_int(5000,99999) }}">
+                    @endif
 
                     <div class="form-group">
                         <input type="text" required name="login" placeholder="Login" class="form-control" autocomplete="off">
@@ -50,9 +56,11 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <input type="text" name="eds" placeholder="ЭЦП" class="form-control">
-                    </div>
+                    @if(!$is_pak)
+                        <div class="form-group">
+                            <input type="text" name="eds" placeholder="ЭЦП" class="form-control">
+                        </div>
+                    @endif
 
                     <div class="form-group">
                         <label>Часовой пояс <i>(UTC+3)</i></label>
@@ -63,28 +71,31 @@
                         @include('admin.users.show_pvs')
                     </div>
 
-                    <div class="form-group">
-                        <label>Роль</label>
-                        <select name="role" required class="form-control">
-                            @if(!$is_pak)
+                    @if(!$is_pak)
+                        <div class="form-group">
+                            <label>Роль</label>
+                            <select name="role" required class="form-control">
                                 <option value="12">Клиент</option>
                                 <option value="4">Оператор СДПО</option>
                                 <option value="1">Контролёр ТС</option>
                                 <option selected value="2">Медицинский сотрудник</option>
                                 <option value="11">Менеджер</option>
                                 <option value="777">Администратор</option>
-                            @endif
-                            <option @if($is_pak) checked @endif value="778">Терминал</option>
-                        </select>
-                    </div>
+                            </select>
+                        </div>
+                    @else
+                        <input type="hidden" name="role" value="778">
+                    @endif
 
-                    <div class="form-group">
-                        <label>Сделать менеджером</label>
-                        <select name="role_manager">
-                            <option value="1">Да</option>
-                            <option selected value="0">Нет</option>
-                        </select>
-                    </div>
+                    @if(!$is_pak)
+                        <div class="form-group">
+                            <label>Сделать менеджером</label>
+                            <select name="role_manager">
+                                <option value="1">Да</option>
+                                <option selected value="0">Нет</option>
+                            </select>
+                        </div>
+                    @endif
 
                     <div class="form-group">
                         <label>Заблокирован</label>

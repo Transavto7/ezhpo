@@ -93,7 +93,7 @@ class HomeController extends Controller
         $anketas = $anketasModel;
 
         $take = $request->get('take') ? $request->get('take') : 20;
-        $orderKey = $request->get($oKey, 'date');
+        $orderKey = $request->get($oKey, 'created_at');
         $orderBy = $request->get($oBy, 'DESC');
 
         // Если пользователь менее менеджера - то показываем только свои анкеты, заполненные

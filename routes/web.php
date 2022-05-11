@@ -157,6 +157,8 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
         Route::delete('/{id}', 'AnketsController@Delete')->name('forms.delete');
         Route::post('/{id}', 'AnketsController@Update')->name('forms.update');
         Route::get('/{id}', 'AnketsController@Get')->name('forms.get');
+
+        Route::get('/change-pak-queue/{id}/{admitted}', 'AnketsController@ChangePakQueue')->name('changePakQueue');
     });
 
     Route::prefix('report')->group(function () {

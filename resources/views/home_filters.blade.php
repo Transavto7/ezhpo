@@ -18,6 +18,12 @@
                 </div>
             </div>
 
+            @php
+                $pre_month = (date('m')-1);
+                $date_from_filter = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . '01';
+                $date_to_filter = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . cal_days_in_month(CAL_GREGORIAN, $pre_month, date('Y'));
+            @endphp
+
             @foreach($anketsFields as $field)
                 @isset($fieldsGroupFirst[$field])
                     <div class="col-md-3">
@@ -40,7 +46,7 @@
                                     type="search"
                                     @endif
 
-                                    value="{{ request()->get($field) ? request()->get($field) : (($field === 'date' || strpos($field, '_at')) ? date('Y-m-01') : '') }}" name="{{ $field }}" class="form-control" />
+                                    value="{{ request()->get($field) ? request()->get($field) : (($field === 'date' || strpos($field, '_at')) ? $date_from_filter : '') }}" name="{{ $field }}" class="form-control" />
                             @endif
 
                         </div>
@@ -53,7 +59,7 @@
                                 <label><b>ДО</b></label>
                                 <input
                                     type="date"
-                                    value="{{ request()->get('TO_'.$field) ? request()->get('TO_'.$field) : date('Y-m-d') }}"
+                                    value="{{ request()->get('TO_'.$field) ? request()->get('TO_'.$field) : $date_to_filter }}"
                                     name="TO_{{ $field }}" class="form-control" />
                             </div>
                         </div>

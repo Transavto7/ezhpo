@@ -79,6 +79,20 @@ class AnketsController extends Controller
         return view('profile.anketa', $data);
     }
 
+    public function ChangePakQueue ($id, $admitted)
+    {
+        $anketa = Anketa::find($id);
+
+        if($anketa) {
+            $anketa->type_anketa = 'medic';
+            $anketa->flag_pak = 'СДПО Р';
+            $anketa->admitted = $admitted;
+            $anketa->save();
+        }
+
+        return back();
+    }
+
     public function Update (Request $request)
     {
         $id = $request->id;
@@ -100,6 +114,7 @@ class AnketsController extends Controller
                             $driver = Driver::where('hash_id', $daV)->first();
 
                             if($driver) {
+
                                 $data['driver_fio'] = $driver->fio;
                                 $data['driver_group_risk'] = $driver->group_risk;
                                 $data['driver_gender'] = $driver->gender;
@@ -151,32 +166,28 @@ class AnketsController extends Controller
             switch($dK) {
                 case 'driver_id':
 
-                    if($type_anketa === 'medic') {
-                        $driver = Driver::where('hash_id', $dV)->first();
+                    $driver = Driver::where('hash_id', $dV)->first();
 
-                        if($driver) {
-                            $anketa['driver_fio'] = $driver->fio;
-                            $anketa['driver_group_risk'] = $driver->group_risk;
-                            $anketa['driver_gender'] = $driver->gender;
-                            $anketa['driver_year_birthday'] = $driver->year_birthday;
+                    if($driver) {
+                        $anketa['driver_fio'] = $driver->fio;
+                        $anketa['driver_group_risk'] = $driver->group_risk;
+                        $anketa['driver_gender'] = $driver->gender;
+                        $anketa['driver_year_birthday'] = $driver->year_birthday;
 
-                            $company_id = $driver->company_id;
-                        }
+                        $company_id = $driver->company_id;
                     }
 
                     break;
 
                 case 'car_id':
 
-                    if($type_anketa === 'tech' || $type_anketa === 'vid_pl') {
-                        $car = Car::where('hash_id', $dV)->first();
+                    $car = Car::where('hash_id', $dV)->first();
 
-                        if($car) {
-                            $anketa['car_mark_model'] = $car->mark_model;
-                            $anketa['car_gos_number'] = $car->gos_number;
+                    if($car) {
+                        $anketa['car_mark_model'] = $car->mark_model;
+                        $anketa['car_gos_number'] = $car->gos_number;
 
-                            $company_id = $car->company_id;
-                        }
+                        $company_id = $car->company_id;
                     }
 
                     break;

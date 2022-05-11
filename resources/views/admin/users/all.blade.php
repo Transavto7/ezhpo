@@ -10,7 +10,7 @@
     <div class="col-md-12">
         <div class="row bg-light p-2">
             <div class="col-md-6">
-                <button type="button" data-toggle="modal" data-target="#users-modal-add" class="btn btn-success">Добавить сотрудника <i class="fa fa-plus"></i></button>
+                <button type="button" data-toggle="modal" data-target="#users-modal-add" class="btn btn-success">Добавить {{ $is_pak ? 'терминал' : 'сотрудника' }} <i class="fa fa-plus"></i></button>
             </div>
             <div class="col-md-6 text-right">
                 <button type="button" onclick="exportTable('elements-table', '{{ $title }}', '{{ $title }}.xls')" class="btn btn-dark">Экспорт <i class="fa fa-download"></i></button>

@@ -171,6 +171,10 @@ class AdminController extends Controller
             }
         }
 
+        if(!isset($_GET['role'])) {
+            $users = $users->where('role', '!=', 778);
+        }
+
         $users = $users->where('role', '!=', 3);
         $users = $users->orderBy($data['orderKey'], $data['orderBy'])->paginate(10);
         $points = Point::getAll();

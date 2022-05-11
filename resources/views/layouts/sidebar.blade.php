@@ -60,9 +60,9 @@
                     <a href="{{ route('forms', ['type' => 'pechat_pl']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести запись в Реестр печати ПЛ</a>
                 </li>
 
-                <li>
-                    <a href="{{ route('forms', ['type' => 'vid_pl']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести запись в Реестр выданных ПЛ</a>
-                </li>
+{{--                <li>--}}
+{{--                    <a href="{{ route('forms', ['type' => 'vid_pl']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести запись в Реестр выданных ПЛ</a>--}}
+{{--                </li>--}}
 
                 <li>
                     <a href="{{ route('forms', ['type' => 'Dop']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести запись в Журнал ПЛ</a>
@@ -98,7 +98,7 @@
                     <li><a href="{{ route('home', 'bdd') }}"><i class="fa fa-book"></i>Журнал инструктажей по БДД </a></li>
                     <li><a href="{{ route('home', 'report_cart') }}"><i class="fa fa-book"></i>Журнал снятия отчетов с карт</a></li>
                     <li><a href="{{ route('home', 'pechat_pl') }}"><i class="fa fa-book"></i>Журнал печати ПЛ</a></li>
-                    <li><a href="{{ route('home', 'vid_pl') }}"><i class="fa fa-book"></i>Реестр выданных ПЛ</a></li>
+{{--                    <li><a href="{{ route('home', 'vid_pl') }}"><i class="fa fa-book"></i>Реестр выданных ПЛ</a></li>--}}
 
                     @php
                         $countErrorsPak = \App\Anketa::where('type_anketa', 'pak')->count();
