@@ -62,17 +62,23 @@
                             @break
                         @endswitch
 
+                        @php
+                            $pre_month = (date('m')-1);
+                            $date_from_field = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . '01';
+                            $date_to_field = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . cal_days_in_month(CAL_GREGORIAN, $pre_month, date('Y'));
+                        @endphp
+
                         <div class="col-md-2">
                             <label>
                                 С:
-                                <input type="date" required value="{{ request()->get('date_from') }}" class="form-control" name="date_from">
+                                <input type="date" required value="{{ request()->get('date_from') ? request()->get('date_from') : $date_from_field }}" class="form-control" name="date_from">
                             </label>
                         </div>
 
                         <div class="col-md-2">
                             <label>
                                 ПО:
-                                <input type="date" required value="{{ request()->get('date_to') ? request()->get('date_to') : date('Y-m-d') }}" class="form-control" name="date_to">
+                                <input type="date" required value="{{ request()->get('date_to') ? request()->get('date_to') : $date_to_field }}" class="form-control" name="date_to">
                             </label>
                         </div>
 

@@ -60,15 +60,14 @@
     </div>
     @isset($photos)
         @if(!empty($photos))
+            @foreach(explode(',', $photos) as $photo)
+                @php $isUri = strpos($photo, 'sdpo.ta-7'); @endphp
+                @php $photo_path = $isUri ? $photo : Storage::url($photo); @endphp
 
-                @foreach(explode(',', $photos) as $photo)
-                    @php $isUri = strpos($photo, 'sdpo.ta-7'); @endphp
-                    @php $photo_path = $isUri ? $photo : Storage::url($photo); @endphp
-
-                    <a href="{{ $photo_path }}" data-fancybox class="col-md-4">
-                        <img width="100%" src="{{ $photo_path }}" alt="photo" />
-                    </a>
-                @endforeach
+                <a href="{{ $photo_path }}" data-fancybox class="col-md-4">
+                    <img width="100%" src="{{ $photo_path }}" alt="photo" />
+                </a>
+            @endforeach
         @endif
     @endisset
 

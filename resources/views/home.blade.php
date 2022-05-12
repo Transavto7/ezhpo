@@ -101,12 +101,12 @@
                         <table id="ankets-table" class="ankets-table table table-striped table-sm">
                             <thead>
                                 <tr>
-                                    <th width="60" class="not-export">ID</th>
-
                                     @if($type_ankets === 'pak_queue')
                                         <th class="not-export">
                                             Таймер
                                         </th>
+                                    @else
+                                        <th width="60" class="not-export">ID</th>
                                     @endif
 
                                     @foreach($anketsFields as $field)
@@ -146,12 +146,12 @@
                             <tbody>
                                 @foreach($ankets as $anketaKey => $anketa)
                                     <tr data-field="{{ $anketaKey }}">
-                                        <td class="not-export">{{ $anketa->id }}</td>
-
                                         @if($type_ankets === 'pak_queue')
                                             <td class="not-export">
                                                 <div class="App-Timer" data-date="{{ $anketa->created_at }}"></div>
                                             </td>
+                                        @else
+                                            <td class="not-export">{{ $anketa->id }}</td>
                                         @endif
 
                                         @foreach($anketsFields as $anketaTDkey)
@@ -178,20 +178,20 @@
                                                     @elseif($anketaTDkey === 'videos')
 
                                                         @if($anketa[$anketaTDkey])
-                                                                @php $videos = explode(',', $anketa[$anketaTDkey]); @endphp
+                                                            @php $videos = explode(',', $anketa[$anketaTDkey]); @endphp
 
-                                                                @foreach($videos as $vK => $vV)
-                                                                    @if($vK == 0)
-                                                                        <a data-type="iframe" href="{{ route('showVideo', ['url' => $vV]) }}" data-fancybox="video_{{ $anketa->id }}">
-                                                                            <i class="fa fa-video-camera"></i>
+                                                            @foreach($videos as $vK => $vV)
+                                                                @if($vK == 0)
+                                                                    <a data-type="iframe" href="{{ route('showVideo', ['url' => $vV]) }}" data-fancybox="video_{{ $anketa->id }}">
+                                                                        <i class="fa fa-video-camera"></i>
 
-                                                                            ({{ count($videos) }})
-                                                                        </a>
-                                                                    @else
-                                                                        <a data-type="iframe" href="{{ $vV }}" data-fancybox="video_{{ $anketa->id }}"></a>
-                                                                    @endif
+                                                                        ({{ count($videos) }})
+                                                                    </a>
+                                                                @else
+                                                                    <a data-type="iframe" href="{{ $vV }}" data-fancybox="video_{{ $anketa->id }}"></a>
+                                                                @endif
 
-                                                                @endforeach
+                                                            @endforeach
                                                         @endif
 
                                                     @else
