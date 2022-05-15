@@ -76,7 +76,6 @@ class Anketa extends Model
             'driver_fio' => 'Водитель',
             'pv_id' => 'Пункт выпуска',
             'car_mark_model' => 'Автомобиль',
-            'is_pak' => 'СДПО',
             'flag_pak' => 'Флаг СДПО'
         ],
 
@@ -110,8 +109,7 @@ class Anketa extends Model
             'driver_fio' => 'Водитель',
 
             // Доп поля
-            'pv_id' => 'Пункт выпуска',
-            'is_pak' => 'СДПО'
+            'pv_id' => 'Пункт выпуска'
         ],
 
         'bdd' => [
@@ -170,7 +168,8 @@ class Anketa extends Model
             'is_pak' => 'ПАК',
             'flag_pak' => 'Флаг СДПО',
             'company_name' => 'Место работы',
-            'realy' => 'Осмотр реальный?'
+            'realy' => 'Осмотр реальный?',
+            'videos' => 'Видео'
         ]
     ];
 
@@ -206,7 +205,6 @@ class Anketa extends Model
             //'car_id' => 'ID автомобиля',
             //'number_list_road' => 'Номер путевого листа',
             'type_view' => 'Тип осмотра',
-            //'is_pak' => 'ПАК',
             'flag_pak' => 'Флаг СДПО',
             'realy' => 'Осмотр реальный?'
         ],
@@ -309,8 +307,7 @@ class Anketa extends Model
             'pv_id' => 'Пункт выпуска',
             'user_name' => 'ФИО сотрудника',
             'user_eds' => 'ЭЦП контролера',
-            'created_at' => 'Дата создания',
-            'is_pak' => 'ПАК',
+            'created_at' => 'Дата создания'
         ],
 
         /**

@@ -100,6 +100,12 @@ class AnketsController extends Controller
 
         $data = $request->all();
 
+        $REFERER = isset($data['REFERER']) ? $data['REFERER'] : '';
+
+        if(isset($data['REFERER'])) {
+            unset($data['REFERER']);
+        }
+
         $data['pv_id'] = Point::where('id', $data['pv_id'])->first()->name;
         $type_anketa = $data['type_anketa'];
 
@@ -210,10 +216,14 @@ class AnketsController extends Controller
 
         $anketa->save();
 
-        return redirect(route('forms.get', [
-            'id' => $id,
-            'msg' => 'Осмотр успешно обновлён!'
-        ]));
+        if($REFERER) {
+            return redirect( $REFERER );
+        } else {
+            return redirect(route('forms.get', [
+                'id' => $id,
+                'msg' => 'Осмотр успешно обновлён!'
+            ]));
+        }
     }
 
     public static function ddateCheck ($dateAnketa, $dateModel, $id)

@@ -94,7 +94,9 @@ class HomeController extends Controller
 
         $take = $request->get('take') ? $request->get('take') : 20;
         $orderKey = $request->get($oKey, 'created_at');
-        $orderBy = $request->get($oBy, 'DESC');
+        $orderBy = $request->get($oBy,
+            ($typeAnkets === 'pak_queue' ? 'ASC' : 'DESC')
+        );
 
         // Если пользователь менее менеджера - то показываем только свои анкеты, заполненные
         if(isset(Anketa::$anketsKeys[$typeAnkets])) {

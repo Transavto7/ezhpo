@@ -127,6 +127,10 @@
                     >
                         @csrf
 
+                        @if(isset($anketa_route) && $id)
+                            <input type="hidden" name="REFERER" value="{{ $_SERVER['HTTP_REFERER'] }}">
+                        @endif
+
                         @include($anketa_view)
 
                         @if(!isset($anketa_route))
