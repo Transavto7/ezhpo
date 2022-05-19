@@ -132,6 +132,7 @@ class Anketa extends Model
 
         'pechat_pl' => [
             'date' => 'Дата распечатки ПЛ',
+            'driver_fio' => 'Водитель',
             'company_name' => 'Компания',
             'count_pl' => 'Количество распечатанных ПЛ',
             'user_name' => 'Ф.И.О сотрудника, который готовил ПЛ',
@@ -326,6 +327,7 @@ class Anketa extends Model
 
         'pechat_pl' => [
             'date' => 'Дата распечатки ПЛ',
+            'driver_fio' => 'Водитель',
             'company_name' => 'Компания',
             'count_pl' => 'Количество распечатанных ПЛ',
             'user_name' => 'Ф.И.О сотрудника, который готовил ПЛ',

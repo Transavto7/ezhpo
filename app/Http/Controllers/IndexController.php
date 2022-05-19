@@ -847,6 +847,19 @@ class IndexController extends Controller
         return abort(500);
     }
 
+    public function showEditModal ($model, $id) {
+        $page = $this->elements[$model];
+
+        $page['model'] = $model;
+        $page['id'] = $id;
+
+        $el = app("App\\$model")->find($id);
+
+        $page['el'] = $el;
+
+        return view('showEditElementModal', $page);
+    }
+
     /**
      * Рендеры страниц
      */
@@ -935,7 +948,7 @@ class IndexController extends Controller
 
                             if(count($aFv) > 0) {
                                 $element['elements'] = $element['elements']->where(function ($q) use ($aFv, $aFk) {
-                                    $isId = strpos($aFk, '_id');
+                                    $isId = strpos($aFk, '_id') && $aFk !== 'products_id';
 
                                     foreach($aFv as $aFvItemKey => $aFvItemValue) {
                                         if($isId) {

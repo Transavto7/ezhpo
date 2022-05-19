@@ -16,6 +16,8 @@ Route::get('/show-video', function () {
     ]);
 })->name('showVideo');
 
+Route::get('/show-edit-element-modal/{model}/{id}', 'IndexController@ShowEditModal')->name('showEditElementModal');
+
 /**
  * API-маршруты
  */

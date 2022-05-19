@@ -93,7 +93,7 @@ class HomeController extends Controller
         $anketas = $anketasModel;
 
         $take = $request->get('take') ? $request->get('take') : 20;
-        $orderKey = $request->get($oKey, 'created_at');
+        $orderKey = $request->get($oKey, 'date');
         $orderBy = $request->get($oBy,
             ($typeAnkets === 'pak_queue' ? 'ASC' : 'DESC')
         );
@@ -237,13 +237,11 @@ class HomeController extends Controller
         $anketasCountCompany = 0;
 
         if($filter_activated) {
-            $anketasCountCars = $anketas;
-            $anketasCountDrivers = $anketas;
-            $anketasCountCompany = $anketas;
+            $anketasCountTrigger = $anketas->get();
 
-            $anketasCountDrivers = $anketasCountDrivers->get()->groupBy('driver_id')->count();
-            $anketasCountCars = $anketasCountCars->get()->groupBy('car_id')->count();
-            $anketasCountCompany = $anketasCountCompany->get()->groupBy('company_id')->count();
+            $anketasCountDrivers = $anketasCountTrigger->groupBy('driver_id')->count();
+            $anketasCountCars = $anketasCountTrigger->groupBy('car_id')->count();
+            $anketasCountCompany = $anketasCountTrigger->groupBy('company_id')->count();
         }
 
         /**
@@ -260,17 +258,11 @@ class HomeController extends Controller
         $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$validTypeAnkets]) ? Anketa::$fieldsGroupFirst[$validTypeAnkets] : [];
 
         $anketsFields = array_keys($fieldsKeys);
-        $anketasArray = [];
 
         if(auth()->user()->hasRole('client', '==')) {
             unset($fieldsKeys['created_at']);
             unset($fieldsKeys['is_pak']);
         }
-
-        /**
-         * Если фильтр не активный - то возвращаем все анкеты
-         */
-        $anketasArray = $anketas;
 
         /**
          * Check Export
@@ -293,7 +285,7 @@ class HomeController extends Controller
         return view($_view, [
             'title' => Anketa::$anketsKeys[$validTypeAnkets],
             'name' => $user->name,
-            'ankets' => $anketasArray,
+            'ankets' => $anketas,
             'filter_activated' => $filter_activated,
             'type_ankets' => $validTypeAnkets,
             'anketsFields' => $anketsFields,
