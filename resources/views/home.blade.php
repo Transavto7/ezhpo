@@ -5,15 +5,28 @@
 @section('class-page', 'anketa-' . $type_ankets)
 
 @section('custom-scripts')
-    @if($isExport)
-        <script type="text/javascript">
-            window.onload = function () {
+    <script type="text/javascript">
+        window.onload = function () {
+            @if($isExport)
                 setTimeout(function () {
                     exportTable('ankets-table', {{ isset($_GET['exportPrikaz']) ? false : true }})
                 }, 1500)
-            };
-        </script>
-    @endif
+            @endif
+
+            @if($filter_activated)
+                $.get(location.href + '&getCounts=1').done(data => {
+                    if(data) {
+                        $('#COUNTS_ANKETAS').html(`
+                            <p class="text-success">Кол-во Автомобилей: <b>${data.anketasCountCars}</b></p>
+                            <p class="text-success">Кол-во Водителей: <b>${data.anketasCountDrivers}</b></p>
+                            <p class="text-success">Кол-во Компаний: <b>${data.anketasCountCompany}</b></p>
+                        `);
+                    }
+                })
+            @endif
+        };
+    </script>
+
 @endsection
 
 @section('content')
@@ -272,17 +285,9 @@
 
                 <p class="text-success">Найдено осмотров: <b>{{ $anketasCountResult }}</b></p>
 
-                @if($CountCompanies > 0 && $filter_activated)
-                    <p class="text-success">Кол-во компаний: <b>{{ $CountCompanies }}</b></p>
-                @endif
+                <div id="COUNTS_ANKETAS">
 
-                @if($CountDrivers > 0 && $filter_activated && $type_ankets !== 'tech')
-                    <p class="text-success">Кол-во Водителей: <b>{{ $CountDrivers }}</b></p>
-                @endif
-
-                @if($CountCars > 0 && $filter_activated && $type_ankets !== 'medic')
-                    <p class="text-success">Кол-во Автомобилей: <b>{{ $CountCars }}</b></p>
-                @endif
+                </div>
             </div>
 
         </div>

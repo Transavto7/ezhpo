@@ -124,7 +124,9 @@ class HomeController extends Controller
         $filter_params = $request->all(); // ИСПРАВИЛ: array_diff($request->all(), array(''))
         $is_export = isset($_GET['export']);
         $trash = $request->get('trash', 0);
+        $getCounts = isset($_GET['getCounts']);
 
+        unset($filter_params['getCounts']);
         unset($filter_params['trash']);
         unset($filter_params['export']);
         unset($filter_params['exportPrikaz']);
@@ -232,16 +234,22 @@ class HomeController extends Controller
         /**
          * <Измеряем количество Авто и Водителей (уникальные ID)>
          */
-        $anketasCountDrivers = 0;
-        $anketasCountCars = 0;
-        $anketasCountCompany = 0;
+        if($filter_activated && $getCounts) {
+            $anketasCountDrivers = 0;
+            $anketasCountCars = 0;
+            $anketasCountCompany = 0;
 
-        if($filter_activated) {
             $anketasCountTrigger = $anketas->get();
 
             $anketasCountDrivers = $anketasCountTrigger->groupBy('driver_id')->count();
             $anketasCountCars = $anketasCountTrigger->groupBy('car_id')->count();
             $anketasCountCompany = $anketasCountTrigger->groupBy('company_id')->count();
+
+            return response()->json([
+                'anketasCountDrivers' => $anketasCountDrivers,
+                'anketasCountCars' => $anketasCountCars,
+                'anketasCountCompany' => $anketasCountCompany
+            ]);
         }
 
         /**
@@ -294,9 +302,6 @@ class HomeController extends Controller
             'blockedToExportFields' => $blockedToExportFields,
 
             'anketasCountResult' => $anketasCountResult,
-            'CountCars' => $anketasCountCars,
-            'CountDrivers' => $anketasCountDrivers,
-            'CountCompanies' => $anketasCountCompany,
 
             'isExport' => $is_export,
 
