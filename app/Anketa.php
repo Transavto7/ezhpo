@@ -24,6 +24,7 @@ class Anketa extends Model
         // Новые поля
         'driver_gender', 'driver_year_birthday',
         'complaint', 'condition_visible_sliz', 'condition_koj_pokr',
+        'is_dop', 'result_dop',
 
         // Журнал печати ПЛ
         'date_pechat_pl',
@@ -54,7 +55,7 @@ class Anketa extends Model
         'bdd' => 'Журнал инструктажей по БДД',
         'report_cart' => 'Журнал снятия отчетов с карт',
         'pechat_pl' => 'Журнал печати путевых листов',
-        'vid_pl' => 'Реестр выданных путевых листов',
+        //'vid_pl' => 'Реестр выданных путевых листов',
         'pak' => 'Журнал СДПО',
         'pak_queue' => 'Очередь на утверждение',
     ];
@@ -67,7 +68,9 @@ class Anketa extends Model
             'pv_id' => 'Пункт выпуска',
             //'car_mark_model' => 'Автомобиль',
             'flag_pak' => 'Флаг СДПО',
-            'realy' => 'Осмотр реальный?'
+            'realy' => 'Осмотр реальный?',
+            'is_dop' => 'Режим ввода ПЛ',
+            'result_dop' => 'Решение ввода ПЛ'
         ],
 
         'pak' => [
@@ -139,7 +142,7 @@ class Anketa extends Model
             'pv_id' => 'Пункт выпуска',
         ],
 
-        'vid_pl' => [
+        /*'vid_pl' => [
             'date' => 'Дата выдачи ПЛ',
             'company_name' => 'Компания',
             'count_pl' => 'Количество выданных ПЛ',
@@ -149,7 +152,7 @@ class Anketa extends Model
             'added_to_mo' => 'Внесено в журнал МО',
             'period_pl' => 'Комментарий',
             'car_gos_number' => 'Госномер автомобиля'
-        ]
+        ]*/
     ];
 
     public static $blockedToExportFields = [
@@ -207,7 +210,9 @@ class Anketa extends Model
             //'number_list_road' => 'Номер путевого листа',
             'type_view' => 'Тип осмотра',
             'flag_pak' => 'Флаг СДПО',
-            'realy' => 'Осмотр реальный?'
+            'realy' => 'Осмотр реальный?',
+            'is_dop' => 'Режим ввода ПЛ',
+            'result_dop' => 'Решение ввода ПЛ'
         ],
 
         'pak' => [
@@ -335,7 +340,7 @@ class Anketa extends Model
             'pv_id' => 'Пункт выпуска'
         ],
 
-        'vid_pl' => [
+        /*'vid_pl' => [
             'date' => 'Дата выдачи ПЛ',
             'company_name' => 'Компания',
             'count_pl' => 'Количество выданных ПЛ',
@@ -349,7 +354,7 @@ class Anketa extends Model
             'added_to_dop' => 'Внесено в журнал ТО',
             'added_to_mo' => 'Внесено в журнал МО',
             'period_pl' => 'Комментарий'
-        ],
+        ],*/
 
         'bdd' => [
             'date' => 'Дата, время',

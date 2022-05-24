@@ -93,6 +93,18 @@ class AnketsController extends Controller
         return back();
     }
 
+    public function ChangeResultDop ($id, $result_dop)
+    {
+        $anketa = Anketa::find($id);
+
+        if($anketa) {
+            $anketa->result_dop = $result_dop;
+            $anketa->save();
+        }
+
+        return back();
+    }
+
     public function Update (Request $request)
     {
         $id = $request->id;

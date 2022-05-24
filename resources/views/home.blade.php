@@ -33,7 +33,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <div class="table-responsive">
+                <div>
 
                     @if($type_ankets !== 'pak_queue')
                         <div class="col-md-12">
@@ -238,7 +238,13 @@
 
                                         @role(['admin', 'manager', 'medic', 'tech', $currentRole])
                                             <td class="td-option not-export">
-                                                <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info"><i class="fa fa-search"></i></a>
+                                                @if($anketa->is_dop && !$anketa->result_dop)
+                                                    <a href="{{ route('changeResultDop', ['result_dop' => 'Утвержден', 'id' => $anketa->id]) }}" class="btn btn-sm btn-success"><i class="fa fa-check"></i></a>
+                                                    <a href="{{ route('changeResultDop', ['result_dop' => 'Отклонен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-danger"><i class="fa fa-stop-circle"></i></a>
+                                                    <a href="{{ route('changeResultDop', ['result_dop' => 'Не использовался', 'id' => $anketa->id]) }}" class="btn btn-sm btn-warning"><i class="fa fa-warning"></i></a>
+                                                @endif
+
+                                                <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm"><i class="fa fa-search"></i></a>
                                             </td>
                                         @endrole
 
@@ -248,7 +254,7 @@
                                                 <form action="{{ route('forms.delete', $anketa->id) }}" onsubmit="if(!confirm('Хотите удалить?')) return false;" method="POST">
                                                     @csrf
                                                     {{ method_field('DELETE') }}
-                                                    <button type="submit" class="btn btn-danger"><i class="fa fa-remove"></i></button>
+                                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-remove"></i></button>
                                                 </form>
                                                 @endmanager
 
@@ -256,7 +262,7 @@
                                                 <a href="{{ route('forms.trash', [
                                                     'id' => $anketa->id,
                                                     'action' => isset($_GET['trash']) ? 0 : 1
-                                                ]) }}" class="btn btn-warning">
+                                                ]) }}" class="btn btn-warning btn-sm">
                                                     @isset($_GET['trash'])
                                                         <i class="fa fa-undo"></i>
                                                     @else

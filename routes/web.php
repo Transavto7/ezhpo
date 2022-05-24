@@ -161,6 +161,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
         Route::get('/{id}', 'AnketsController@Get')->name('forms.get');
 
         Route::get('/change-pak-queue/{id}/{admitted}', 'AnketsController@ChangePakQueue')->name('changePakQueue');
+        Route::get('/change-resultdop-queue/{id}/{result_dop}', 'AnketsController@ChangeResultDop')->name('changeResultDop');
     });
 
     Route::prefix('report')->group(function () {

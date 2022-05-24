@@ -15,7 +15,7 @@
 @section('content')
     <div class="modal-content">
         <div class="modal-header">
-            <h4 class="modal-title">Редактирование {{ $model }}</h4>
+            <h4 class="modal-title">Редактирование элемента "{{ $title }}"</h4>
         </div>
 
         <form action="{{ route('updateElement', ['type' => $model, 'id' => $id ]) }}" enctype="multipart/form-data" method="POST">
@@ -56,7 +56,6 @@
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-success">Сохранить</button>
-                <button type="button" data-dismiss="modal" class="btn btn-secondary">Закрыть</button>
             </div>
         </form>
     </div>

@@ -4,6 +4,10 @@
 @section('sidebar', 1)
 @section('class-page', 'page-anketa anketa-' . $type_anketa)
 
+@php
+    $is_dop = isset($_GET['is_dop']) ? ($_GET['is_dop'] === "1") : 0;
+@endphp
+
 @section('content')
 
 <div class="row" data-anketa="{{ $anketa_view }}">

@@ -235,15 +235,16 @@ class HomeController extends Controller
          * <Измеряем количество Авто и Водителей (уникальные ID)>
          */
         if($filter_activated && $getCounts) {
+            //https://web-answers.ru/php/kak-podschitat-unikalnye-znachenija-stolbcov.html
             $anketasCountDrivers = 0;
             $anketasCountCars = 0;
             $anketasCountCompany = 0;
 
-            $anketasCountTrigger = $anketas->get();
+            $anketasTrigger = $anketas->distinct();
 
-            $anketasCountDrivers = $anketasCountTrigger->groupBy('driver_id')->count();
-            $anketasCountCars = $anketasCountTrigger->groupBy('car_id')->count();
-            $anketasCountCompany = $anketasCountTrigger->groupBy('company_id')->count();
+            $anketasCountDrivers = $anketasTrigger->count('driver_id');
+            $anketasCountCars = $anketasTrigger->count('car_id');
+            $anketasCountCompany = $anketasTrigger->count('company_id');
 
             return response()->json([
                 'anketasCountDrivers' => $anketasCountDrivers,

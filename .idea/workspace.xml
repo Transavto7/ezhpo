@@ -2,11 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f6a199b1-6d31-48a4-b894-b6045514cb71" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/resources/views/profile/ankets/components/is_dop.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Anketa.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Anketa.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/home.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/releases.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/releases.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/profile/anketa.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/anketa.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/medic.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/medic.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/showEditElementModal.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/showEditElementModal.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -323,7 +330,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="editor.config.ad.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
@@ -619,7 +626,10 @@
       <workItem from="1652613451816" duration="1145000" />
       <workItem from="1652708411755" duration="882000" />
       <workItem from="1652961158163" duration="5224000" />
-      <workItem from="1653309548687" duration="3548000" />
+      <workItem from="1653309548687" duration="3599000" />
+      <workItem from="1653318562713" duration="26000" />
+      <workItem from="1653401445819" duration="488000" />
+      <workItem from="1653407761738" duration="3385000" />
     </task>
     <servers />
   </component>
