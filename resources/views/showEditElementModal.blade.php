@@ -9,6 +9,10 @@
         section, .container, .page-container, .content-inner {
             padding: 0!important;
         }
+
+        .page {
+            background: #fff!important;
+        }
     </style>
 @endsection
 

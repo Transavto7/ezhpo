@@ -58,7 +58,8 @@ class AppServiceProvider extends ServiceProvider
 
         Blade::if('excludeRole', function ($dataRoles) {
             $roles = User::$userRolesValues;
-            $user_role = Auth::user()->role;
+            $user = Auth::user();
+            $user_role = $user->role;
 
             $excluded = true;
 
@@ -68,6 +69,10 @@ class AppServiceProvider extends ServiceProvider
                         $excluded = false;
                     }
                 }
+            }
+
+            if($user->role_manager) {
+                $excluded = true;
             }
 
             return $excluded;

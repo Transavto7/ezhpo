@@ -26,6 +26,10 @@
     }
 }
 
+.fancybox__content {
+    min-height: 80vh!important;
+}
+
 /** Anketa styles */
 .anketa {
     &__addnew {

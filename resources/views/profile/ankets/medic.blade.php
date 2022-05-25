@@ -26,28 +26,28 @@
             <label class="col-md-3 form-control-label">Дата выдачи ПЛ:</label>
             <article class="col-md-9">
                 <input min="1900-02-20T20:20"
-                       max="2999-02-20T20:20" type="datetime-local" required value="{{ $default_current_date }}" name="anketa[0][date]" class="form-control">
-            </article>
-        </div>
-
-        <div class="form-group row">
-            <label class="col-md-3 form-control-label">Количество выданных ПЛ:</label>
-            <article class="col-md-9">
-                <input type="number" max="30" value="{{ isset($count_pl) ? $count_pl : '' }}" required name="anketa[0][count_pl]" class="form-control">
+                       max="2999-02-20T20:20" type="datetime-local" value="{{ $default_current_date }}" name="anketa[0][date]" class="form-control">
             </article>
         </div>
 
         <div class="form-group row">
             <label class="col-md-3 form-control-label">Период выдачи ПЛ:</label>
             <article class="col-md-9">
-                <input type="text" value="{{ isset($period_pl) ? $period_pl : '' }}" required name="anketa[0][period_pl]" class="form-control">
+                <input type="month" value="{{ isset($period_pl) ? $period_pl : '' }}" name="anketa[0][period_pl]" class="form-control">
+            </article>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-md-3 form-control-label">Количество выданных ПЛ:</label>
+            <article class="col-md-9">
+                <input type="number" required max="30" value="{{ isset($count_pl) ? $count_pl : '' }}" name="anketa[0][count_pl]" class="form-control">
             </article>
         </div>
 
         <div class="form-group row">
             <label class="form-control-label col-md-3">Тип осмотра:</label>
             <article class="col-md-9">
-                <select name="anketa[0][type_view]" required class="form-control">
+                <select name="anketa[0][type_view]" class="form-control">
                     @isset($type_view)
                         <option disabled selected value="{{ $type_view }}">{{ $type_view }}</option>
                     @endisset

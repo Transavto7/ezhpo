@@ -314,6 +314,7 @@ class AnketsController extends Controller
 
         $test_narko = isset($data['test_narko']) ? $data['test_narko'] : 'Отрицательно';
         $proba_alko = isset($data['proba_alko']) ? $data['proba_alko'] : 'Отрицательно';
+        $is_dop = isset($data['is_dop']);
 
         // Выставляем оптимальные параметры
         unset($data['_token']);
@@ -819,6 +820,10 @@ class AnketsController extends Controller
 
             if(count($redDates) > 0) {
                 $responseData['redDates'] = $redDates;
+            }
+
+            if($is_dop) {
+                $responseData['is_dop'] = 1;
             }
 
             return redirect()->route('forms', $responseData);

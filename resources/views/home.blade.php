@@ -39,12 +39,12 @@
                         <div class="col-md-12">
                             <div class="row bg-light p-2">
                                 <div class="col-md-6">
-                                    <button type="button" data-toggle-show="#ankets-filters" class="btn btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
+                                    <button type="button" data-toggle-show="#ankets-filters" class="btn btn-sm btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
 
                                     @isset($_GET['trash'])
-                                        <a href="{{ route('home', $type_ankets) }}" class="btn btn-warning">Назад</a>
+                                        <a href="{{ route('home', $type_ankets) }}" class="btn btn-sm btn-warning">Назад</a>
                                     @else
-                                        <a href="?trash=1" class="btn btn-warning">Корзина <i class="fa fa-trash"></i></a>
+                                        <a href="?trash=1" class="btn btn-sm btn-warning">Корзина <i class="fa fa-trash"></i></a>
                                     @endisset
                                 </div>
 
@@ -53,8 +53,8 @@
                                     <div class="col-md-6 text-right">
     <!--                                    <button type="button" onclick="exportTable('ankets-table', true)" class="btn btn-default">Экспорт результатов <i class="fa fa-download"></i></button>-->
     <!--                                    <button type="button" onclick="exportTable('ankets-table')" class="btn btn-default">Экспорт результатов по приказу <i class="fa fa-download"></i></button>-->
-                                        <a href="?export=1{{ $queryString }}" class="btn btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
-                                        <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-default">Экспорт таблицы по приказу <i class="fa fa-download"></i></a>
+                                        <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
+                                        <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу <i class="fa fa-download"></i></a>
                                     </div>
                                 @endmanager
 
@@ -227,11 +227,11 @@
                                         <!-- ОЧЕРЕДЬ ОСМОТРОВ -->
                                         @if($type_ankets === 'pak_queue')
                                             <td class="td-option not-export">
-                                                <a href="{{ route('changePakQueue', ['admitted' => 'Допущен', 'id' => $anketa->id]) }}" class="btn btn-success"><i class="fa fa-check"></i></a>
+                                                <a href="{{ route('changePakQueue', ['admitted' => 'Допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-success"><i class="fa fa-check"></i></a>
                                             </td>
 
                                             <td class="td-option not-export">
-                                                <a href="{{ route('changePakQueue', ['admitted' => 'Не допущен', 'id' => $anketa->id]) }}" class="btn btn-danger"><i class="fa fa-close"></i></a>
+                                                <a href="{{ route('changePakQueue', ['admitted' => 'Не допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-danger"><i class="fa fa-close"></i></a>
                                             </td>
                                         @endif
                                         <!-- /ОЧЕРЕДЬ ОСМОТРОВ -->

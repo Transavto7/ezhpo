@@ -37,8 +37,8 @@
                     @endforeach
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Добавить</button>
-                    <button type="button" data-dismiss="modal" class="btn btn-secondary">Закрыть</button>
+                    <button type="submit" class="btn btn-sm btn-success">Добавить</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-sm btn-secondary">Закрыть</button>
                 </div>
             </form>
 
@@ -80,13 +80,13 @@
                 @if($model === 'Company' && (auth()->user()->hasRole('tech', '==') || auth()->user()->hasRole('medic', '==')))
                 @else
                     <div class="col-md-2">
-                        <button type="button" data-toggle="modal" data-target="#elements-modal-add" class="@isset($_GET['continue']) TRIGGER_CLICK @endisset btn btn-success">Добавить <i class="fa fa-plus"></i></button>
+                        <button type="button" data-toggle="modal" data-target="#elements-modal-add" class="@isset($_GET['continue']) TRIGGER_CLICK @endisset btn btn-sm btn-success">Добавить <i class="fa fa-plus"></i></button>
                     </div>
                 @endif
             @endrole
 
             <div class="col-md-5">
-                <button type="button" data-toggle-show="#elements-filters" class="btn btn-info"><i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры</button>
+                <button type="button" data-toggle-show="#elements-filters" class="btn btn-sm btn-info"><i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры</button>
             </div>
 
             {{--<div class="col-md-3 text-right">
@@ -161,8 +161,8 @@
                         @endforeach
 
                         <div class="col-md-2">
-                            <button type="submit" class="btn btn-info">Поиск</button>
-                            <a href="?" class="btn btn-danger">Сбросить</a>
+                            <button type="submit" class="btn btn-sm btn-info">Поиск</button>
+                            <a href="?" class="btn btn-sm btn-danger">Сбросить</a>
                         </div>
                     </div>
                 </form>
@@ -327,7 +327,7 @@
 
                         @role(['manager', 'admin'])
                             <td class="td-option">
-                                <a href="{{ route('removeElement', ['type' => $model, 'id' => $el->id ]) }}" class="ACTION_DELETE btn btn-danger"><i class="fa fa-trash"></i></a>
+                                <a href="{{ route('removeElement', ['type' => $model, 'id' => $el->id ]) }}" class="ACTION_DELETE btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>
                             </td>
                         @endrole
 
