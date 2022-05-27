@@ -18,7 +18,7 @@ class CheckManager
     {
         $user = Auth::user();
 
-        if($user->role >= 11 || $user->role_manager > 0) {
+        if($user->role >= 11 || $user->role_manager) {
             return $next($request);
         }
 

@@ -111,6 +111,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('profile')->group(function () {
         Route::post('/anketa', 'AnketsController@AddForm')->name('addAnket');
+
+        Route::get('/', 'ProfileController@RenderIndex')->name('profile');
+        Route::post('/', 'ProfileController@UpdateData')->name('updateProfile');
     });
 });
 
@@ -122,9 +125,6 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
 
     Route::prefix('profile')->group(function () {
         Route::get('/anketa', 'IndexController@RenderForms')->name('forms');
-
-        Route::get('/', 'ProfileController@RenderIndex')->name('profile');
-        Route::post('/', 'ProfileController@UpdateData')->name('updateProfile');
     });
 
     Route::prefix('docs')->group(function () {

@@ -43,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
         Blade::if('manager', function () {
             $user = Auth::user();
 
-            if($user->role == 11 || $user->role_manager >= 1 || $user->role >= 777) {
+            if($user->role == 11 || $user->role_manager || $user->role >= 777) {
                 return 1;
             }
 

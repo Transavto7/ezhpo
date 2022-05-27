@@ -774,7 +774,7 @@ class AnketsController extends Controller
                  * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
                  */
                 if($createdAnketa->type_anketa === 'medic') {
-                    $diffDateCheck = Carbon::parse($createdAnketa->date)->diff($createdAnketa->created_at)->format('%i');
+                    $diffDateCheck = Carbon::parse($createdAnketa->created_at)->diff($createdAnketa->date)->format('%i');
                     $anketaCreated = Anketa::find($createdAnketa->id);
 
                     if($diffDateCheck <= 10) {

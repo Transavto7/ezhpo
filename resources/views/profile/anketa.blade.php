@@ -15,9 +15,9 @@
     <div class="col-lg-2">
         <div class="card">
             <div class="card-body">
-                <p><b>Карточка компании</b></p>
+                <p><b>Карточка автомобиля</b></p>
 
-                <div id="CARD_COMPANY">
+                <div id="CARD_CAR">
                     Не найдено
                 </div>
             </div>
@@ -162,9 +162,9 @@
     <div class="col-lg-2">
         <div class="card">
             <div class="card-body">
-                <p><b>Карточка водителя</b></p>
+                <p><b>Карточка компании</b></p>
 
-                <div id="CARD_DRIVER">
+                <div id="CARD_COMPANY">
                     Не найдено
                 </div>
             </div>
@@ -174,9 +174,9 @@
     <div class="col-lg-2">
         <div class="card">
             <div class="card-body">
-                <p><b>Карточка автомобиля</b></p>
+                <p><b>Карточка водителя</b></p>
 
-                <div id="CARD_CAR">
+                <div id="CARD_DRIVER">
                     Не найдено
                 </div>
             </div>

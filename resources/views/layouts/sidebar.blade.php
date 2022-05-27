@@ -36,7 +36,7 @@
             </li>
 
             @if(($user_role < 11) || $user_role >= 777)
-                @role(['manager', 'medic', 'client', 'terminal'])
+                @role(['medic', 'client', 'terminal'])
                     <li>
                         <a href="{{ route('forms', ['type' => 'medic']) }}" class="bg-red text-white"><i class="icon-padnote"></i>Провести мед. осмотр</a>
                     </li>
@@ -60,15 +60,11 @@
                     <a href="{{ route('forms', ['type' => 'pechat_pl']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести запись в Реестр печати ПЛ</a>
                 </li>
 
-{{--                <li>--}}
-{{--                    <a href="{{ route('forms', ['type' => 'vid_pl']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести запись в Реестр выданных ПЛ</a>--}}
-{{--                </li>--}}
-
                 <li>
                     <a href="{{ route('forms', ['type' => 'Dop']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести запись в Журнал ПЛ</a>
                 </li>
 
-                @role(['manager', 'operator_pak', 'terminal'])
+                @role(['operator_pak', 'terminal'])
                     @php
                         $countPakQueue = \App\Anketa::where('type_anketa', 'pak_queue')->count();
                     @endphp
@@ -137,28 +133,28 @@
 
             {{-- Если пользователь Админ --}}
             @manager
-            <li>
-                <a href="#" data-btn-collapse="#spis-pol" role="button"><i class="fa fa-cog"></i> Настройки</a>
-                <ul id="spis-pol" class="collapse list-unstyle">
-                    @admin
-                        <li><a href="{{ route('renderElements', 'Settings') }}">Система</a></li>
-                        <li><a href="{{ route('systemSettings') }}">Системные настройки</a></li>
-                        <li><a href="{{ route('renderElements', 'Town') }}">Города</a></li>
-                        <li><a href="{{ route('renderElements', 'Point') }}">Пункты выпуска</a></li>
-                        <li><a href="{{ route('adminUsers') }}">Сотрудники</a></li>
-                        <li><a href="{{ route('adminUsers', [
-                                'filter' => 1,
-                                'role' => 778
-                            ]) }}">ПАК СДПО</a></li>
+                <li>
+                    <a href="#" data-btn-collapse="#spis-pol" role="button"><i class="fa fa-cog"></i> Настройки</a>
+                    <ul id="spis-pol" class="collapse list-unstyle">
+                        @admin
+                            <li><a href="{{ route('renderElements', 'Settings') }}">Система</a></li>
+                            <li><a href="{{ route('systemSettings') }}">Системные настройки</a></li>
+                            <li><a href="{{ route('renderElements', 'Town') }}">Города</a></li>
+                            <li><a href="{{ route('renderElements', 'Point') }}">Пункты выпуска</a></li>
+                            <li><a href="{{ route('adminUsers') }}">Сотрудники</a></li>
+                            <li><a href="{{ route('adminUsers', [
+                                    'filter' => 1,
+                                    'role' => 778
+                                ]) }}">ПАК СДПО</a></li>
 
-                        <li><a href="{{ route('renderElements', 'DDate') }}">Контроль дат</a></li>
-                        <li><a href="{{ route('renderElements', 'FieldHistory') }}">История изменения полей</a></li>
-                    @endadmin
+                            <li><a href="{{ route('renderElements', 'DDate') }}">Контроль дат</a></li>
+                            <li><a href="{{ route('renderElements', 'FieldHistory') }}">История изменения полей</a></li>
+                        @endadmin
 
-                    <li><a href="{{ route('renderElements', 'Req') }}">Реквизиты нашей компании</a></li>
-                    <li><a href="{{ route('releases') }}">Релизы</a></li>
-                </ul>
-            </li>
+                        <li><a href="{{ route('renderElements', 'Req') }}">Реквизиты нашей компании</a></li>
+                        <li><a href="{{ route('releases') }}">Релизы</a></li>
+                    </ul>
+                </li>
             @endmanager
 
         </ul>
