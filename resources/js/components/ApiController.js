@@ -3,6 +3,7 @@ import axios from 'axios'
 export class ApiController {
     constructor () {
         this.client = axios.create({
+            baseURL: (location.hostname === 'localhost' ? 'http://' : 'https://') + location.host,
             headers: {
                 Authorization: 'Bearer ' + API_TOKEN
             }

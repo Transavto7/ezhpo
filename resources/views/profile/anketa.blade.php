@@ -8,11 +8,19 @@
     $is_dop = isset($_GET['is_dop']) ? ($_GET['is_dop'] === "1") : 0;
 @endphp
 
+@section('custom-scripts')
+    <script type="text/javascript">
+        if(screen.width <= 700) {
+            ANKETA_FORM_VIEW.insertBefore(ANKETA_FORM_ROOT, ANKETA_FORM_VIEW_FIRST)
+        }
+    </script>
+@endsection
+
 @section('content')
 
-<div class="row" data-anketa="{{ $anketa_view }}">
+<div class="row" data-anketa="{{ $anketa_view }}" id="ANKETA_FORM_VIEW">
     <!-- Анкета -->
-    <div class="col-lg-2">
+    <div class="col-lg-2" id="ANKETA_FORM_VIEW_FIRST">
         <div class="card">
             <div class="card-body">
                 <p><b>Карточка автомобиля</b></p>
@@ -24,7 +32,7 @@
         </div>
     </div>
 
-    <div class="col-lg-6">
+    <div class="col-lg-6" id="ANKETA_FORM_ROOT">
         <div class="card">
             <div class="card-body">
 

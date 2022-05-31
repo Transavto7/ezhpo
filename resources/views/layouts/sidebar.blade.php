@@ -42,7 +42,7 @@
                     </li>
                 @endrole
 
-                @role(['manager', 'tech', 'client', 'terminal'])
+                @role(['tech', 'client', 'terminal'])
                     <li>
                         <a href="{{ route('forms', ['type' => 'tech']) }}" class="bg-blue text-white"><i class="icon-padnote"></i>Провести тех. осмотр</a>
                     </li>
