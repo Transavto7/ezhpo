@@ -26,6 +26,20 @@ export class ApiController {
         })
     }
 
+    getGraphReport ({ pv_id, date_from, date_to }) {
+        let pv_id_str = ''
+
+        pv_id.forEach((item, i) => {
+            pv_id_str += `pv_id[${i}]=${item}&`;
+        })
+
+        return this.client.get(`/api/report/graph_pv?filter=1&${pv_id_str}date_from=${date_from}&date_to=${date_to}&api=1`).then(response => {
+            const data = response.data
+
+            return data
+        })
+    }
+
     clearNotifies () {
         return this.client.post(`/api/notify/clear`);
     }

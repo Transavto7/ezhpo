@@ -314,7 +314,7 @@ class AnketsController extends Controller
 
         $test_narko = isset($data['test_narko']) ? $data['test_narko'] : 'Отрицательно';
         $proba_alko = isset($data['proba_alko']) ? $data['proba_alko'] : 'Отрицательно';
-        $is_dop = isset($data['is_dop']);
+        $is_dop = isset($data['is_dop']) ? ($data['is_dop'] === '1') : 0;
 
         // Выставляем оптимальные параметры
         unset($data['_token']);

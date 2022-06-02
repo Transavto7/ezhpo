@@ -6,6 +6,9 @@
 
 <script>
 import LineChart from './LineChart'
+import {ApiController} from "../components/ApiController";
+
+let API = new ApiController();
 
 let totalLabels = [
     '0:00:00',
@@ -64,11 +67,13 @@ export default {
     },
 
     props: [
-        'data', 'data2'
+        'pv_id', 'date_from', 'date_to'
     ],
 
     data () {
         return {
+            data: [],
+            data2: [],
             chartInit: false,
             datacollection: {
                 labels: totalLabels,
@@ -89,8 +94,14 @@ export default {
             }
         }
     },
-    mounted () {
+
+    async mounted () {
         let labels = this.datacollection.labels
+
+        let $reports = await API.getGraphReport({ pv_id: this.pv_id, date_from: this.date_from, date_to: this.date_to })
+
+        this.data = $reports.reports;
+        this.data2 = $reports.reports2;
 
         // ДАТА ОСМОТРА
         this.data.forEach((dataItem, dataIndex) => {

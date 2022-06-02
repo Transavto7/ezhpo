@@ -1,4 +1,5 @@
 <Chart
-    :data="{{ json_encode($reports) }}"
-    :data2="{{ json_encode($reports2) }}"
+    :pv_id="{{ json_encode(request()->get('pv_id')) }}"
+    :date_from="'{{ request()->get('date_from') }}'"
+    :date_to="'{{ request()->get('date_to') }}'"
 ></Chart>

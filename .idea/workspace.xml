@@ -3,17 +3,22 @@
   <component name="ChangeListManager">
     <list default="true" id="f6a199b1-6d31-48a4-b894-b6045514cb71" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/IndexController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/IndexController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ProfileController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ProfileController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/components/ApiController.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ApiController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/v-components/Chart.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/v-components/Chart.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/sass/custom.scss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/sass/custom.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/sass/main.scss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/sass/main.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layouts/header.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/header.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/layouts/sidebar.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/sidebar.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/pages/reports/graph_pv.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/pages/reports/graph_pv.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/pages/reports/journal.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/pages/reports/journal.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/anketa.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/anketa.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/components/is_dop.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/components/is_dop.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/medic.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/medic.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profile/ankets/tech.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/ankets/tech.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/profile/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -635,7 +640,9 @@
       <workItem from="1653652475701" duration="613000" />
       <workItem from="1653657226075" duration="3599000" />
       <workItem from="1654002334739" duration="821000" />
-      <workItem from="1654011668070" duration="5157000" />
+      <workItem from="1654011668070" duration="5282000" />
+      <workItem from="1654177659162" duration="56000" />
+      <workItem from="1654181979942" duration="3875000" />
     </task>
     <servers />
   </component>

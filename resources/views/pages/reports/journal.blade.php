@@ -18,7 +18,7 @@
     </thead>
     <tbody>
     @if(count($reports) > 0)
-        @foreach($reports->unique('driver_id') as $report)
+        @foreach($reports as $report)
             @php $predr = \App\Anketa::where('type_view', 'Предрейсовый')
 ->where('company_id', $company_id)
 ->where('in_cart', 0)
@@ -496,41 +496,3 @@
     <p>Осмотры за другие месяцы не создавались (ТО)</p>
 @endisset
 
-{{--РЕЖИМ ВВОДА ПЛ--}}
-@if(count($data['months_def']) && \App\Anketa::where('is_dop', 1)->count() > 0)
-    <hr>
-    <h3>Режим ввода ПЛ</h3>
-
-    <table id="reports-table-4" class="table table-responsive">
-        <thead>
-        <tr>
-            @foreach($data['months_def'] as $month)
-                <th style="border-left: 1px solid #e9e9e9;background: #e9e9e9;" class="text-center" colspan="3">
-                    {{ \Carbon\Carbon::create()->month($month)->monthName }}
-
-                    {{ $month['name'] }} {{ $month['year'] }}
-                </th>
-            @endforeach
-        </tr>
-        </thead>
-        <tbody>
-            @foreach($data['months_def'] as $month)
-                <td colspan="3" class="p-0">
-                    <table class="w-100 table">
-                        <tbody>
-                            <tr>
-                                <td>{{ \App\Anketa::whereIn('type_anketa', ['tech', 'medic'])
-                                    ->where('in_cart', 0)
-                                    ->where('is_dop', 1)
-                                    ->where('company_id', $company_id)
-                                    ->whereMonth('period_pl', $month)->count() }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </td>
-            @endforeach
-        </tbody>
-    </table>
-@else
-    <p>Осмотры за другие месяцы не создавались (ТО)</p>
-@endif

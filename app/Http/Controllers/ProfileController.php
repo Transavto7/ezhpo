@@ -102,6 +102,16 @@ class ProfileController extends Controller
             if($user[$k]) $user[$k] = $v;
         }
 
+        foreach($request->allFiles() as $file_key => $file) {
+            if($file_key === 'photo') {
+                Storage::disk('public')->delete($user->$file_key);
+
+                $file_path = Storage::disk('public')->putFile('avatars', $file);
+
+                $user[$file_key] = $file_path;
+            }
+        }
+
         // Если пользователь сохранился
         if($user->save()) {
             return redirect( route('profile') );

@@ -1,3 +1,5 @@
+@php $user_avatar = \App\Http\Controllers\ProfileController::getAvatar(); @endphp
+
 <!-- Main Navbar-->
 <header class="header no-print">
     <nav class="navbar">
@@ -26,7 +28,16 @@
                     @endif
                 @else
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('profile') }}"><span class="d-none d-sm-inline">{{ __(Auth::user()->name) }}</span> <i class="fa fa-user"></i></a>
+                        <a class="nav-link flex-center" href="{{ route('profile') }}">
+
+                            <span class="client">
+                                <span class="client-avatar">
+                                    <img src="{{ $user_avatar }}" width="50" alt="avatar">
+                                </span>
+                            </span>
+
+                            <span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp; {{ __(Auth::user()->name) }} <i class="fa fa-user"></i></span>
+                        </a>
                     </li>
                     <!-- Logout    -->
                     <li class="nav-item"><a href="{{ route('logout') }}" onclick="event.preventDefault();

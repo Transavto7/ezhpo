@@ -1,6 +1,5 @@
 @php $user_role_text = \App\Http\Controllers\ProfileController::getUserRole(); @endphp
 @php $user_role = \App\Http\Controllers\ProfileController::getUserRole(false); @endphp
-@php $user_avatar = \App\Http\Controllers\ProfileController::getAvatar(); @endphp
 
 @if($user_role != 3)
     <!-- Side Navbar -->
@@ -19,16 +18,6 @@
                 </article>
             </div>
         </div>
-        <!-- Sidebar Navidation Menus-->
-        @if(auth()->user()->hasRole('client', '!='))
-            <span class="heading">
-                <div class="client">
-                    <div class="client-avatar">
-                        <img src="{{ $user_avatar }}" width="100%" alt="avatar">
-                    </div>
-                </div>
-            </span>
-        @endif
 
         <ul class="list-unstyled">
             <li>

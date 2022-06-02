@@ -66,6 +66,8 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($anketa);
     });
 
+    Route::get('report/{type_report}', 'ReportController@ApiGetReport')->name('api.getReport');
+
     // Отображаем ПВ
     Route::get('pvs/{id?}', function () {
         $id = isset(request()->id) ? request()->id : null;

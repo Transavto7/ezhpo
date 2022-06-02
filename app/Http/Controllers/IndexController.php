@@ -752,8 +752,6 @@ class IndexController extends Controller
 
                         $file_path = Storage::disk('public')->putFile('elements', $file);
 
-                        echo $file_path . ' IMAGE<br/>';
-
                         $element[$file_key] = $file_path;
                     }
                 }
@@ -763,13 +761,9 @@ class IndexController extends Controller
 
                     if(is_array($v)) {
                         $element[$k] = join(',', $v);
-
-                        echo $k . ' 1<br/>';
                     }
                     else if(preg_match('/^data:image\/(\w+);base64,/', $v)) {
                         $k = str_replace('_base64', '', $k);
-
-                        echo $k . ' 2<br/>';
 
                         $base64_image = substr($v, strpos($v, ',') + 1);
                         $base64_image = base64_decode($base64_image);
@@ -784,8 +778,6 @@ class IndexController extends Controller
                     else {
                         if(isset($v) && !$request->hasFile($k)) {
                             $element[$k] = $v;
-
-                            echo $k . ' 3<br/>';
                         }
                     }
                 }

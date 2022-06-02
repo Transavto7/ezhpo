@@ -21,6 +21,7 @@ class ReportController extends Controller
         }
 
         $data = $request->all();
+        $isApi = isset($_GET['api']);
         $reports = [];
         $reports2 = [];
         $type_report = $request->type_report;
@@ -43,6 +44,9 @@ class ReportController extends Controller
         $hiddenMonths = 0;
         $hiddenMonthsTech = 0;
 
+        $reports = null;
+        $reports2 = null;
+
         if(isset($data['filter'])) {
             $period_def = CarbonPeriod::create($date_from, $date_to)->month();
             $months_def = collect($period_def)->map(function (Carbon $date) {
@@ -55,21 +59,29 @@ class ReportController extends Controller
                  */
                 case 'graph_pv':
 
-                    $reports = Anketa::whereIn('pv_id', $pv_id)
-                        ->where('type_anketa', 'medic')
-                        ->where('in_cart', 0)
-                        ->whereRaw("(date >= ? AND date <= ?)", [
-                            $date_from." 00:00:00",
-                            $date_to." 23:59:59"
-                        ])->get();
+                    if($isApi) {
 
-                    $reports2 = Anketa::whereIn('pv_id', $pv_id)
-                        ->where('type_anketa', 'medic')
-                        ->where('in_cart', 0)
-                        ->whereRaw("(created_at >= ? AND created_at <= ?)", [
-                            $date_from." 00:00:00",
-                            $date_to." 23:59:59"
-                        ])->get();
+                        $reports = Anketa::whereIn('pv_id', $pv_id)
+                            ->where('type_anketa', 'medic')
+                            ->where('in_cart', 0)
+                            ->whereRaw("(date >= ? AND date <= ?)", [
+                                $date_from." 00:00:00",
+                                $date_to." 23:59:59"
+                            ])->get();
+
+                        $reports2 = Anketa::whereIn('pv_id', $pv_id)
+                            ->where('type_anketa', 'medic')
+                            ->where('in_cart', 0)
+                            ->whereRaw("(created_at >= ? AND created_at <= ?)", [
+                                $date_from." 00:00:00",
+                                $date_to." 23:59:59"
+                            ])->get();
+
+                        return [
+                            'reports' => $reports,
+                            'reports2' => $reports2
+                        ];
+                    }
 
                     break;
 
@@ -87,7 +99,7 @@ class ReportController extends Controller
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])
-                        ->get();
+                        ->get()->unique('driver_id');
 
                     /**
                      * Нижняя таблица медосмотров
@@ -99,7 +111,7 @@ class ReportController extends Controller
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])
-                        ->get();
+                        ->get()->unique('driver_id');
 
                     if($reportsMedicCreatedAt) {
                         $dates = $reportsMedicCreatedAt->sortByDesc('date');
@@ -228,6 +240,13 @@ class ReportController extends Controller
             'hiddenMonthsTech' => $hiddenMonthsTech,
             'data' => $dopData
         ]);
+    }
+
+    public function ApiGetReport (Request $request)
+    {
+        $report = $this->GetReport($request);
+
+        return response()->json($report);
     }
 
 }
