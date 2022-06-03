@@ -38,13 +38,24 @@ class ProfileController extends Controller
         return $user->role;
     }
 
+    public function DeleteAvatar ()
+    {
+        $user = Auth::user();
+
+        if($user->photo) {
+            Storage::disk('public')->delete($user->photo);
+        }
+
+        return back();
+    }
+
     /**
      * Получение аватарки
      */
     public static function getAvatar ($user_id = 0) {
         $user = Auth::user();
-        $user_id = $user_id === 0 ? $user->id : $user_id;
-        $avatar = User::find($user_id)->photo;
+        $user_id = $user_id === 0 ? $user ? $user->id : $user_id : $user_id;
+        $avatar = $user ? $user->photo : '';
 
         if(Storage::disk('public')->exists($avatar)) {
             $avatar = Storage::url( $avatar );
@@ -99,10 +110,25 @@ class ProfileController extends Controller
 
         // Обновляем все данные что нашли, кроме пароля
         foreach ($data as $k => $v) {
-            if($user[$k]) $user[$k] = $v;
+
+            if(preg_match('/^data:image\/(\w+);base64,/', $v)) {
+                $k = str_replace('_base64', '', $k);
+
+                $base64_image = substr($v, strpos($v, ',') + 1);
+                $base64_image = base64_decode($base64_image);
+
+                $hash = sha1(time());
+                $path = "elements/$hash.png";
+
+                $base64_image = Storage::disk('public')->put($path, $base64_image);
+
+                $user->$k = $path;
+            } else {
+                if($user[$k]) $user[$k] = $v;
+            }
         }
 
-        foreach($request->allFiles() as $file_key => $file) {
+        /*foreach($request->allFiles() as $file_key => $file) {
             if($file_key === 'photo') {
                 Storage::disk('public')->delete($user->$file_key);
 
@@ -110,7 +136,7 @@ class ProfileController extends Controller
 
                 $user[$file_key] = $file_path;
             }
-        }
+        }*/
 
         // Если пользователь сохранился
         if($user->save()) {

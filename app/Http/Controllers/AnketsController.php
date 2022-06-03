@@ -769,13 +769,13 @@ class AnketsController extends Controller
                  */
                 $createdAnketa = Anketa::create($anketa);
                 array_push($createdAnketas, $createdAnketa->id);
+                $anketaCreated = Anketa::find($createdAnketa->id);
 
                 /**
                  * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
                  */
                 if($createdAnketa->type_anketa === 'medic') {
                     $diffDateCheck = Carbon::parse($createdAnketa->created_at)->diff($createdAnketa->date)->format('%i');
-                    $anketaCreated = Anketa::find($createdAnketa->id);
 
                     if($diffDateCheck <= 10) {
                         $anketaCreated->realy = 'да';
@@ -785,6 +785,14 @@ class AnketsController extends Controller
                         $anketaCreated->save();
                     }
 
+                }
+
+                /**
+                 * При режиме ввода ПЛ - осмотр НЕ реальный
+                 */
+                if($is_dop) {
+                    $anketaCreated->realy = 'нет';
+                    $anketaCreated->save();
                 }
 
                 /**

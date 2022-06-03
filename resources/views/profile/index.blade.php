@@ -18,7 +18,27 @@
                 <div class="form-group row">
                     <label class="col-sm-3 form-control-label">Фото:</label>
                     <div class="col-sm-9">
-                        <input type="file" name="photo">
+                        <input
+
+                            id="croppie-inputPHOTO"
+                            type="file"
+                            name="photo"
+                            data-label="photo"
+                            data-field="User_photo"
+                        />
+
+                        <div>
+                            <a href="{{ route('deleteAvatar') }}"><i class="fa fa-trash"></i> Удалить аватар</a>
+                        </div>
+
+                        <div style="display: none;" id="croppie-blockPHOTO" class="croppie-block text-center">
+                            <input type="hidden" name="photo_base64" id="croppie-result-base64PHOTO">
+                            <div class="croppie-demo" data-croppie-id="PHOTO"></div>
+                            <button type="button" data-croppie-id="PHOTO" class="btn croppie-save btn-sm btn-success">Сохранить обрезку</button>
+                            <button type="button" data-croppie-id="PHOTO" class="btn croppie-delete btn-sm btn-danger">Удалить фото</button>
+                        </div>
+
+
                     </div>
                 </div>
 

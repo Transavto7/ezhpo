@@ -112,6 +112,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('profile')->group(function () {
         Route::post('/anketa', 'AnketsController@AddForm')->name('addAnket');
 
+        Route::get('delete-avatar', 'ProfileController@DeleteAvatar')->name('deleteAvatar');
         Route::get('/', 'ProfileController@RenderIndex')->name('profile');
         Route::post('/', 'ProfileController@UpdateData')->name('updateProfile');
     });
