@@ -20,6 +20,14 @@ use App\Point;
 |
 */
 
+Route::post('/report-data/{model}/{id}', 'ReportController@GetApiReport');
+
+Route::get('/sync-fields/{model}/{id}', function ($model, $id) {
+    $data = app("App\\$model")->getAutoSyncFieldsFromHashId($id);
+
+    return $data;
+});
+
 Route::middleware('auth:api')->get('/users/{role}', function (Request $request) {
     $user = $request->user();
     $roleRequest = $request->role;

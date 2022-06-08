@@ -18,6 +18,18 @@ class Driver extends Model
         'autosync_fields'
     ];
 
+    public function getAutoSyncFieldsFromHashId ($hash_id) {
+        $element = self::where('hash_id', $hash_id)->first();
+
+        if($element) {
+            if($element->autosync_fields) {
+                return explode(',', $element->autosync_fields);
+            }
+        }
+
+        return [];
+    }
+
     public static function getAutoSyncFields ($hash_id) {
         $element = self::where('hash_id', $hash_id)->first();
 
