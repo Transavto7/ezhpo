@@ -51,9 +51,9 @@
         @include('layouts.header')
 
         @auth
-            @role(['operator_pak'])
+            @if(auth()->user()->role === 4)
                 <notify></notify>
-            @endrole
+            @endif
         @endauth
 
         <main class="page-content d-flex align-items-stretch">

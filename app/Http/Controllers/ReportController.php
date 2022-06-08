@@ -99,7 +99,8 @@ class ReportController extends Controller
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])
-                        ->get()->unique('driver_id');
+                        ->distinct('driver_id')
+                        ->pluck('driver_id', 'driver_fio');
 
                     /**
                      * Нижняя таблица медосмотров
@@ -111,7 +112,8 @@ class ReportController extends Controller
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])
-                        ->get()->unique('driver_id');
+                        ->distinct('driver_id')
+                        ->pluck('driver_id', 'driver_fio');
 
                     if($reportsMedicCreatedAt) {
                         $dates = $reportsMedicCreatedAt->sortByDesc('date');
@@ -163,8 +165,8 @@ class ReportController extends Controller
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])
-                        ->get()
-                        ->unique('car_gos_number');
+                        ->distinct('car_gos_number')
+                        ->pluck('car_id', 'car_gos_number');
 
                     /**
                      * Таблица ТЕХОСМОТРОВ - нижняя
@@ -176,8 +178,8 @@ class ReportController extends Controller
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])
-                        ->get()
-                        ->unique('car_gos_number');
+                        ->distinct('car_gos_number')
+                        ->pluck('car_id', 'car_gos_number');
 
                     if($reports2TechCreatedAt) {
                         $datesTech = $reports2TechCreatedAt->sortByDesc('date');
@@ -218,8 +220,6 @@ class ReportController extends Controller
                             $dopData['monthsTech'] = $monthsTech;
                         }
                     }
-
-                    $dopData['months_def'] = $months_def;
 
                     break;
             }

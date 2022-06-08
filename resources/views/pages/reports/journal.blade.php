@@ -18,12 +18,12 @@
     </thead>
     <tbody>
     @if(count($reports) > 0)
-        @foreach($reports as $report)
+        @foreach($reports as $driver_fio => $driver_id)
             @php $predr = \App\Anketa::where('type_view', 'Предрейсовый')
 ->where('company_id', $company_id)
 ->where('in_cart', 0)
 ->where('type_anketa', 'medic')
-->where('driver_id', $report->driver_id)
+->where('driver_id', $driver_id)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
@@ -33,7 +33,7 @@
 ->where('company_id', $company_id)
 ->where('in_cart', 0)
 ->where('type_anketa', 'medic')
-->where('driver_id', $report->driver_id)
+->where('driver_id', $driver_id)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
@@ -43,7 +43,7 @@
 ->where('in_cart', 0)
 ->where('company_id', $company_id)
 ->where('type_anketa', 'medic')
-->where('driver_id', $report->driver_id)
+->where('driver_id', $driver_id)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                         $date_from." 00:00:00",
                         $date_to." 23:59:59"
@@ -53,7 +53,7 @@
 ->where('in_cart', 0)
 ->where('company_id', $company_id)
 ->where('type_anketa', 'medic')
-->where('driver_id', $report->driver_id)
+->where('driver_id', $driver_id)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                         $date_from." 00:00:00",
                         $date_to." 23:59:59"
@@ -62,7 +62,7 @@
             @php $bdd = \App\Anketa::where('type_anketa', 'bdd')
 ->where('company_id', $company_id)
 ->where('in_cart', 0)
-->where('driver_id', $report->driver_id)
+->where('driver_id', $driver_id)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
@@ -70,21 +70,21 @@
 
             @php $report_cart = \App\Anketa::where('type_anketa', 'report_cart')
 ->where('company_id', $company_id)
-->where('driver_id', $report->driver_id)
+->where('driver_id', $driver_id)
 ->where('in_cart', 0)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])->count(); @endphp
 
-            @php $syncFieldsDrivers = \App\Driver::getAutoSyncFields($report->driver_id); @endphp
+            @php $syncFieldsDrivers = \App\Driver::getAutoSyncFields($driver_id); @endphp
 
             <tr>
                 <td width="100">
-                    {{ $report->driver_id }}
+                    {{ $driver_id }}
                 </td>
                 <td width="250">
-                    {{ $report->driver_fio }}
+                    {{ $driver_fio }}
 
                     <div>
                         @if($syncFieldsDrivers)
@@ -102,14 +102,14 @@
                     {{ $predr }}
 
                     @if(request()->get('is_finance') && $predr > 0)
-                        {!! \App\Driver::calcServices($report->driver_id, 'medic', 'Предрейсовый', $predr) !!}
+                        {!! \App\Driver::calcServices($driver_id, 'medic', 'Предрейсовый', $predr) !!}
                     @endif
                 </td>
                 <td width="150">
                     {{ $posler }}
 
                     @if(request()->get('is_finance') && $posler > 0)
-                        {!! \App\Driver::calcServices($report->driver_id, 'medic', 'Послерейсовый', $posler) !!}
+                        {!! \App\Driver::calcServices($driver_id, 'medic', 'Послерейсовый', $posler) !!}
                     @endif
                 </td>
 
@@ -117,7 +117,7 @@
                     {{ $predsmenniy }}
 
                     @if(request()->get('is_finance') && $predsmenniy > 0)
-                        {!! \App\Driver::calcServices($report->driver_id, 'medic', 'Предсменный', $predsmenniy) !!}
+                        {!! \App\Driver::calcServices($driver_id, 'medic', 'Предсменный', $predsmenniy) !!}
                     @endif
                 </td>
 
@@ -125,7 +125,7 @@
                     {{ $poslesmenniy }}
 
                     @if(request()->get('is_finance') && $poslesmenniy > 0)
-                        {!! \App\Driver::calcServices($report->driver_id, 'medic', 'Послесменный', $poslesmenniy) !!}
+                        {!! \App\Driver::calcServices($driver_id, 'medic', 'Послесменный', $poslesmenniy) !!}
                     @endif
                 </td>
 
@@ -133,14 +133,14 @@
                     {{ $bdd }}
 
                     @if(request()->get('is_finance') && $bdd > 0)
-                        {!! \App\Driver::calcServices($report->driver_id, 'bdd', 'БДД', $bdd) !!}
+                        {!! \App\Driver::calcServices($driver_id, 'bdd', 'БДД', $bdd) !!}
                     @endif
                 </td>
                 <td width="150">
                     {{ $report_cart }}
 
                     @if(request()->get('is_finance') && $report_cart > 0)
-                        {!! \App\Driver::calcServices($report->driver_id, 'report_cart', 'Отчеты с карт', $report_cart) !!}
+                        {!! \App\Driver::calcServices($driver_id, 'report_cart', 'Отчеты с карт', $report_cart) !!}
                     @endif
                 </td>
             </tr>
@@ -166,12 +166,12 @@
     </thead>
     <tbody>
     @if(count($reports2) > 0)
-        @foreach($reports2 as $report)
+        @foreach($reports2 as $car_gos_number => $car_id)
             @php $predr = \App\Anketa::where('type_view', 'Предрейсовый')
 ->where('in_cart', 0)
 ->where('company_id', $company_id)
 ->where('type_anketa', 'tech')
-->where('car_gos_number', $report->car_gos_number)
+->where('car_gos_number', $car_gos_number)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                         $date_from." 00:00:00",
                         $date_to." 23:59:59"
@@ -180,7 +180,7 @@
             @php $posler = \App\Anketa::where('type_view', 'Послерейсовый')
 ->where('in_cart', 0)->where('company_id', $company_id)
 ->where('type_anketa', 'tech')
-->where('car_gos_number', $report->car_gos_number)
+->where('car_gos_number', $car_gos_number)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                         $date_from." 00:00:00",
                         $date_to." 23:59:59"
@@ -189,7 +189,7 @@
             @php $predsmenniy = \App\Anketa::where('type_view', 'Предсменный')
 ->where('in_cart', 0)->where('company_id', $company_id)
 ->where('type_anketa', 'tech')
-->where('car_gos_number', $report->car_gos_number)
+->where('car_gos_number', $car_gos_number)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                         $date_from." 00:00:00",
                         $date_to." 23:59:59"
@@ -199,7 +199,7 @@
 ->where('in_cart', 0)
 ->where('company_id', $company_id)
 ->where('type_anketa', 'tech')
-->where('car_gos_number', $report->car_gos_number)
+->where('car_gos_number', $car_gos_number)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                         $date_from." 00:00:00",
                         $date_to." 23:59:59"
@@ -208,7 +208,7 @@
             @php $bdd = \App\Anketa::where('type_anketa', 'bdd')
 ->where('company_id', $company_id)
 ->where('in_cart', 0)
-->where('car_gos_number', $report->car_gos_number)
+->where('car_gos_number', $car_gos_number)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
@@ -217,20 +217,20 @@
             @php $report_cart = \App\Anketa::where('type_anketa', 'report_cart')
 ->where('company_id', $company_id)
 ->where('in_cart', 0)
-->where('car_gos_number', $report->car_gos_number)
+->where('car_gos_number', $car_gos_number)
 ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
                             $date_from." 00:00:00",
                             $date_to." 23:59:59"
                         ])->count(); @endphp
 
-            @php $syncCarFields = \App\Car::getAutoSyncFields($report->car_id); @endphp
+            @php $syncCarFields = \App\Car::getAutoSyncFields($car_id); @endphp
 
             <tr>
                 <td width="100">
-                    {{ $report->car_id }}
+                    {{ $car_id }}
                 </td>
                 <td width="250">
-                    {{ $report->car_gos_number }}
+                    {{ $car_gos_number }}
 
                     <div>
                         @if($syncCarFields)
@@ -248,14 +248,14 @@
                     {{ $predr }}
 
                     @if(request()->get('is_finance') && $predr > 0)
-                        {!! \App\Car::calcServices($report->car_id, 'tech', 'Предрейсовый', $predr) !!}
+                        {!! \App\Car::calcServices($car_id, 'tech', 'Предрейсовый', $predr) !!}
                     @endif
                 </td>
                 <td>
                     {{ $posler }}
 
                     @if(request()->get('is_finance') && $posler > 0)
-                        {!! \App\Car::calcServices($report->car_id, 'tech', 'Послерейсовый', $posler) !!}
+                        {!! \App\Car::calcServices($car_id, 'tech', 'Послерейсовый', $posler) !!}
                     @endif
                 </td>
 
@@ -263,7 +263,7 @@
                     {{ $predsmenniy }}
 
                     @if(request()->get('is_finance') && $predsmenniy > 0)
-                        {!! \App\Car::calcServices($report->car_id, 'tech', 'Предсменный', $predsmenniy) !!}
+                        {!! \App\Car::calcServices($car_id, 'tech', 'Предсменный', $predsmenniy) !!}
                     @endif
                 </td>
 
@@ -271,7 +271,7 @@
                     {{ $poslesmenniy }}
 
                     @if(request()->get('is_finance') && $poslesmenniy > 0)
-                        {!! \App\Car::calcServices($report->car_id, 'tech', 'Послесменный', $poslesmenniy) !!}
+                        {!! \App\Car::calcServices($car_id, 'tech', 'Послесменный', $poslesmenniy) !!}
                     @endif
                 </td>
 
@@ -279,7 +279,7 @@
                     {{ $bdd }}
 
                     @if(request()->get('is_finance') && $bdd > 0)
-                        {!! \App\Driver::calcServices($report->car_id, 'bdd', 'БДД', $bdd) !!}
+                        {!! \App\Driver::calcServices($car_id, 'bdd', 'БДД', $bdd) !!}
                     @endif
                 </td>
 
@@ -287,7 +287,7 @@
                     {{ $report_cart }}
 
                     @if(request()->get('is_finance') && $report_cart > 0)
-                        {!! \App\Driver::calcServices($report->car_id, 'report_cart', 'Отчеты с карт', $report_cart) !!}
+                        {!! \App\Driver::calcServices($car_id, 'report_cart', 'Отчеты с карт', $report_cart) !!}
                     @endif
                 </td>
 
@@ -311,8 +311,7 @@
                 $date_from." 00:00:00",
                 $date_to." 23:59:59"
             ])
-            ->get()
-            ->unique('driver_id')
+            ->distinct('driver_id')
             ->count() }}</td>
     </tbody>
 </table>
@@ -349,45 +348,45 @@
                             </thead>
 
                             <tbody>
-                            @foreach($month['reports'] as $report)
+                            @foreach($month['reports'] as $driver_fio => $driver_id)
                                 <tr>
 
-                                    <td>{{ $report->driver_fio }} / {{ $report->driver_id }}</td>
+                                    <td>{{ $driver_fio }} / {{ $driver_id }}</td>
                                     <td>{{ \App\Anketa::where('type_view', 'Предрейсовый')
         ->where('type_anketa', 'medic')
         ->where('in_cart', 0)
         ->where('company_id', $company_id)
-        ->where('driver_id', $report->driver_id)
+        ->where('driver_id', $driver_id)
         ->whereMonth('date', $month['month'])->count() }}</td>
                                     <td>{{ \App\Anketa::where('type_view', 'Послерейсовый')
         ->where('type_anketa', 'medic')
         ->where('in_cart', 0)
         ->where('company_id', $company_id)
-        ->where('driver_id', $report->driver_id)
+        ->where('driver_id', $driver_id)
         ->whereMonth('date', $month['month'])->count() }}</td>
 
                                     <td>{{ \App\Anketa::where('type_view', 'Предсменный')
         ->where('type_anketa', 'medic')
         ->where('in_cart', 0)
         ->where('company_id', $company_id)
-        ->where('driver_id', $report->driver_id)
+        ->where('driver_id', $driver_id)
         ->whereMonth('date', $month['month'])->count() }}</td>
                                     <td>{{ \App\Anketa::where('type_view', 'Послесменный')
         ->where('type_anketa', 'medic')
         ->where('in_cart', 0)
         ->where('company_id', $company_id)
-        ->where('driver_id', $report->driver_id)
+        ->where('driver_id', $driver_id)
         ->whereMonth('date', $month['month'])->count() }}</td>
 
                                     <td>{{ \App\Anketa::where('type_anketa', 'bdd')
         ->where('in_cart', 0)
         ->where('company_id', $company_id)
-        ->where('driver_id', $report->driver_id)
+        ->where('driver_id', $driver_id)
         ->whereMonth('date', $month['month'])->count() }}</td>
                                     <td>{{ \App\Anketa::where('type_anketa', 'report_cart')
         ->where('in_cart', 0)
         ->where('company_id', $company_id)
-        ->where('driver_id', $report->driver_id)
+        ->where('driver_id', $driver_id)
         ->whereMonth('date', $month['month'])->count() }}</td>
 
                                 </tr>
@@ -439,45 +438,45 @@
                             </thead>
 
                             <tbody>
-                            @foreach($month['reports'] as $report)
+                            @foreach($month['reports'] as $car_gos_number => $car_id)
                                 <tr>
 
-                                    <td>{{ $report->car_gos_number }} / {{ $report->car_id }}</td>
+                                    <td>{{ $car_gos_number }} / {{ $car_id }}</td>
                                     <td>{{ \App\Anketa::where('type_view', 'Предрейсовый')
         ->where('type_anketa', 'tech')
         ->where('in_cart', 0)
         ->where('company_id', $company_id)
-        ->where('car_id', $report->car_id)
+        ->where('car_id', $car_id)
         ->whereMonth('date', $month['month'])->count() }}</td>
                                     <td>{{ \App\Anketa::where('type_view', 'Послерейсовый')
         ->where('type_anketa', 'tech')
         ->where('in_cart', 0)
         ->where('company_id', $company_id)
-        ->where('car_id', $report->car_id)
+        ->where('car_id', $car_id)
         ->whereMonth('date', $month['month'])->count() }}</td>
 
                                     <td>{{ \App\Anketa::where('type_view', 'Предсменный')
         ->where('type_anketa', 'tech')
         ->where('in_cart', 0)
         ->where('company_id', $company_id)
-        ->where('car_id', $report->car_id)
+        ->where('car_id', $car_id)
         ->whereMonth('date', $month['month'])->count() }}</td>
                                     <td>{{ \App\Anketa::where('type_view', 'Послесменный')
         ->where('type_anketa', 'tech')
         ->where('in_cart', 0)
         ->where('company_id', $company_id)
-        ->where('car_id', $report->car_id)
+        ->where('car_id', $car_id)
         ->whereMonth('date', $month['month'])->count() }}</td>
 
                                     <td>{{ \App\Anketa::where('type_anketa', 'bdd')
         ->where('in_cart', 0)
         ->where('company_id', $company_id)
-        ->where('car_id', $report->car_id)
+        ->where('car_id', $car_id)
         ->whereMonth('created_at', $month['month'])->count() }}</td>
                                     <td>{{ \App\Anketa::where('type_anketa', 'report_cart')
         ->where('in_cart', 0)
         ->where('company_id', $company_id)
-        ->where('car_id', $report->car_id)
+        ->where('car_id', $car_id)
         ->whereMonth('date', $month['month'])->count() }}</td>
 
                                 </tr>

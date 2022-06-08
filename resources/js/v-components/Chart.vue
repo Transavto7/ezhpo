@@ -1,6 +1,7 @@
 <template>
     <div class="chart">
         <line-chart :options="{maintainAspectRatio:false}" v-if="chartInit" :chartData="datacollection"></line-chart>
+        <div v-else class="col-md-12">Ожидайте, график формируется...</div>
     </div>
 </template>
 
