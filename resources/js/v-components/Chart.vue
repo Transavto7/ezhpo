@@ -1,7 +1,7 @@
 <template>
     <div class="chart">
         <line-chart :options="{maintainAspectRatio:false}" v-if="chartInit" :chartData="datacollection"></line-chart>
-        <div v-else class="col-md-12">Ожидайте, график формируется...</div>
+        <div v-else class="col-md-12">Ожидайте, график формируется... (если данных много, загрузка может занять до 5 минут)</div>
     </div>
 </template>
 
@@ -12,26 +12,26 @@ import {ApiController} from "../components/ApiController";
 let API = new ApiController();
 
 let totalLabels = [
-    '0:00:00',
-    '0:30:00',
-    '1:00:00',
-    '1:30:00',
-    '2:00:00',
-    '2:30:00',
-    '3:00:00',
-    '3:30:00',
-    '4:00:00',
-    '4:30:00',
-    '5:00:00',
-    '5:30:00',
-    '6:00:00',
-    '6:30:00',
-    '7:00:00',
-    '7:30:00',
-    '8:00:00',
-    '8:30:00',
-    '9:00:00',
-    '9:30:00',
+    '00:00:00',
+    '00:30:00',
+    '01:00:00',
+    '01:30:00',
+    '02:00:00',
+    '02:30:00',
+    '03:00:00',
+    '03:30:00',
+    '04:00:00',
+    '04:30:00',
+    '05:00:00',
+    '05:30:00',
+    '06:00:00',
+    '06:30:00',
+    '07:00:00',
+    '07:30:00',
+    '08:00:00',
+    '08:30:00',
+    '09:00:00',
+    '09:30:00',
     '10:00:00',
     '10:30:00',
     '11:00:00',
@@ -99,7 +99,16 @@ export default {
     async mounted () {
         let labels = this.datacollection.labels
 
-        let $reports = await API.getGraphReport({ pv_id: this.pv_id, date_from: this.date_from, date_to: this.date_to })
+        let dataFromLoad = {
+            data: [],
+            data2: []
+        }
+
+        let $reports = await API.getGraphReport({
+            pv_id: this.pv_id,
+            date_from: this.date_from,
+            date_to: this.date_to
+        })
 
         this.data = $reports.reports;
         this.data2 = $reports.reports2;

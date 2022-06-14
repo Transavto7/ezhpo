@@ -2,15 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f6a199b1-6d31-48a4-b894-b6045514cb71" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/resources/js/v-components/ReportJournal.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Car.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Car.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Driver.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Driver.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/ApiController.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ApiController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/v-components/Chart.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/v-components/Chart.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/v-components/ReportJournal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/v-components/ReportJournal.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/pages/reports/journal.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/pages/reports/journal.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -639,7 +638,9 @@
       <workItem from="1654264921542" duration="1104000" />
       <workItem from="1654267094953" duration="74000" />
       <workItem from="1654306123725" duration="607000" />
-      <workItem from="1654699859061" duration="14172000" />
+      <workItem from="1654699859061" duration="15010000" />
+      <workItem from="1654774009816" duration="19000" />
+      <workItem from="1655190996684" duration="4833000" />
     </task>
     <servers />
   </component>

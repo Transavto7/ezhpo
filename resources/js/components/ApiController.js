@@ -26,14 +26,16 @@ export class ApiController {
         })
     }
 
-    getGraphReport ({ pv_id, date_from, date_to }) {
+    getGraphReport ({ pv_id, date_from, date_to, date_from_time, date_to_time }) {
         let pv_id_str = ''
 
         pv_id.forEach((item, i) => {
             pv_id_str += `pv_id[${i}]=${item}&`;
         })
 
-        return this.client.get(`/api/report/graph_pv?filter=1&${pv_id_str}date_from=${date_from}&date_to=${date_to}&api=1`).then(response => {
+        let dopParams = (date_to_time && date_from_time) ? `&date_from_time=${date_from_time}&date_to_time=${date_to_time}` : '';
+
+        return this.client.get(`/api/report/graph_pv?filter=1&${pv_id_str}date_from=${date_from}&date_to=${date_to}&api=1${dopParams}`).then(response => {
             const data = response.data
 
             return data

@@ -155,34 +155,83 @@
         <table v-if="medic.init && medic.dopData && medic.dopData.length != medic.hiddenMonths" id="reports-table-4" class="table table-responsive">
             <thead>
                 <tr>
-                    <th v-for="(month,i) in medic.dopData" v-if="!month.hidden" style="border-left: 1px solid #e9e9e9;background: #e9e9e9;" class="text-center" colspan="3">
+                    <th v-for="(month,i) in medic.dopData" v-if="!month.hidden" style="border-left: 1px solid #e9e9e9;background: #e9e9e9;" class="text-center" colspan="7">
                         {{ month.name }} {{ month.year }}
                     </th>
                 </tr>
             </thead>
             <tbody>
-                <td v-for="(month, i) in medic.dopData" colspan="3" class="p-0">
+                <td v-for="(month, i) in medic.dopData" colspan="7" class="p-0">
                     <table v-if="!month.hidden" class="w-100 table">
                         <thead>
-                        <th>Водитель</th>
-                        <th>Предрейсовые</th>
-                        <th>Послерейсовые</th>
+                            <th>Водитель</th>
+                            <th>Предрейсовые</th>
+                            <th>Послерейсовые</th>
 
-                        <th>Предсменные</th>
-                        <th>Послесменные</th>
+                            <th>Предсменные</th>
+                            <th>Послесменные</th>
 
-                        <th>БДД</th>
-                        <th>Отчёты с карт</th>
+                            <th>БДД</th>
+                            <th>Отчёты с карт</th>
                         </thead>
 
                         <tbody>
-                            <tr></tr>
+                            <tr v-for="(report, j) in month.reports">
+                                <td>{{ report.driver_fio }} / {{ report.driver_id }}</td>
+                                <td>{{ report.predr }}</td>
+                                <td>{{ report.posler }}</td>
+                                <td>{{ report.predsmenniy }}</td>
+                                <td>{{ report.poslesmenniy }}</td>
+                                <td>{{ report.bdd }}</td>
+                                <td>{{ report.report_cart }}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </td>
             </tbody>
         </table>
         <p v-else>Осмотры за другие месяцы не создавались (МО)</p>
+
+
+        <p v-if="tech.init"><b>Таблица "Техосмотры за другие периоды"</b></p>
+        <table v-if="tech.init && tech.dopData && tech.dopData.length != tech.hiddenMonths" id="reports-table-tech-months" class="table table-responsive">
+            <thead>
+            <tr>
+                <th v-for="(month,i) in tech.dopData" v-if="!month.hidden" style="border-left: 1px solid #e9e9e9;background: #e9e9e9;" class="text-center" colspan="7">
+                    {{ month.name }} {{ month.year }}
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <td v-for="(month, i) in tech.dopData" colspan="7" class="p-0">
+                <table v-if="!month.hidden" class="w-100 table">
+                    <thead>
+                        <th>Автомобиль</th>
+                        <th>Предрейсовые</th>
+                        <th>Послерейсовые</th>
+                        <th>Предсменные</th>
+                        <th>Послесменные</th>
+                        <th>БДД</th>
+                        <th>Отчёты с карт</th>
+                    </thead>
+
+                    <tbody>
+                        <tr v-for="(report, j) in month.reports">
+                            <td>{{ report.car_gos_number }} / {{ report.car_id }}</td>
+                            <td>{{ report.predr }}</td>
+                            <td>{{ report.posler }}</td>
+                            <td>{{ report.predsmenniy }}</td>
+                            <td>{{ report.poslesmenniy }}</td>
+                            <td>{{ report.bdd }}</td>
+                            <td>{{ report.report_cart }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+            </tbody>
+        </table>
+        <p v-else>Осмотры за другие месяцы не создавались (ТО)</p>
+
 
         <p v-if="dop.init"><b>Таблица "Режим ввода ПЛ"</b></p>
         <table v-if="dop.init && dop.dopData && dop.dopData.length != dop.hiddenMonths" id="reports-table-5" class="table table-responsive">
@@ -265,7 +314,6 @@
         methods: {
             async getReportsRows () {
                 await $.get(location.href + '&api=1').done(async data => {
-                    console.log(data)
 
                     let defaultFilterData = { date_from: this.date_from, date_to: this.date_to, company_id: this.company_id }
                     /**
@@ -288,6 +336,20 @@
                         await $.get(`/api/sync-fields/Driver/${driver.driver_id}`).done(responseData => {
                             this.medic.data[i].syncFields = responseData
                         })
+                    }
+
+                    for(let i in this.medic.dopData) {
+                        for(let j in this.medic.dopData[i].reports) {
+                            let report = this.medic.dopData[i].reports[j]
+                            let { month } = this.medic.dopData[i]
+
+                            let tempFilterData = defaultFilterData
+                            tempFilterData.month = this.medic.dopData[i].month
+
+                            await $.post(`/api/report-data/Driver_months/${month}`, tempFilterData).done(rData => {
+                                this.medic.dopData[i].reports[j] = {...report, ...rData}
+                            })
+                        }
                     }
 
                     this.medic.init = true
@@ -314,6 +376,20 @@
                         await $.get(`/api/sync-fields/Car/${car.car_id}`).done(responseData => {
                             this.tech.data[i].syncFields = responseData
                         })
+                    }
+
+                    for(let i in this.tech.dopData) {
+                        for(let j in this.tech.dopData[i].reports) {
+                            let report = this.tech.dopData[i].reports[j]
+                            let { month } = this.tech.dopData[i]
+
+                            let tempFilterData = defaultFilterData
+                            tempFilterData.month = this.tech.dopData[i].month
+
+                            await $.post(`/api/report-data/Car_months/${month}`, tempFilterData).done(rData => {
+                                this.tech.dopData[i].reports[j] = {...report, ...rData}
+                            })
+                        }
                     }
 
                     this.tech.init = true

@@ -399,6 +399,18 @@ class AnketsController extends Controller
                 }
 
                 /**
+                 * Компания
+                 */
+                if(isset($anketa['company_id'])) {
+                    $CompanyDop = Company::where('hash_id', $anketa['company_id'])->first();
+
+                    if($CompanyDop) {
+                        $anketa['company_id'] = $CompanyDop->hash_id;
+                        $anketa['company_name'] = $CompanyDop->name;
+                    }
+                }
+
+                /**
                  * Проверка водителя по: тесту наркотиков, возрасту
                  */
                 if($d_id || isset($Driver)) {

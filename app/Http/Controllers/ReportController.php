@@ -114,6 +114,94 @@ class ReportController extends Controller
 
                 break;
 
+            case 'Car_months':
+
+                $rData['predr'] = \App\Anketa::where('type_view', 'Предрейсовый')
+                    ->where('type_anketa', 'tech')
+                    ->where('in_cart', 0)
+                    ->where('company_id', $company_id)
+                    ->where('car_id', $car_id)
+                    ->whereMonth('date', $month)->count();
+
+                $rData['posler'] = \App\Anketa::where('type_view', 'Послерейсовый')
+                    ->where('type_anketa', 'tech')
+                    ->where('in_cart', 0)
+                    ->where('company_id', $company_id)
+                    ->where('car_id', $car_id)
+                    ->whereMonth('date', $month)->count();
+
+                $rData['predsmenniy'] = \App\Anketa::where('type_view', 'Предсменный')
+                    ->where('type_anketa', 'tech')
+                    ->where('in_cart', 0)
+                    ->where('company_id', $company_id)
+                    ->where('car_id', $car_id)
+                    ->whereMonth('date', $month)->count();
+
+                $rData['poslesmenniy'] = \App\Anketa::where('type_view', 'Послесменный')
+                    ->where('type_anketa', 'tech')
+                    ->where('in_cart', 0)
+                    ->where('company_id', $company_id)
+                    ->where('car_id', $car_id)
+                    ->whereMonth('date', $month)->count();
+
+                $rData['bdd'] = \App\Anketa::where('type_anketa', 'bdd')
+                    ->where('in_cart', 0)
+                    ->where('company_id', $company_id)
+                    ->where('car_id', $car_id)
+                    ->whereMonth('created_at', $month)->count();
+
+               $rData['report_cart'] = \App\Anketa::where('type_anketa', 'report_cart')
+                   ->where('in_cart', 0)
+                   ->where('company_id', $company_id)
+                   ->where('car_id', $car_id)
+                   ->whereMonth('date', $month)->count();
+
+                break;
+
+            case 'Driver_months':
+
+                $rData['predr'] = \App\Anketa::where('type_view', 'Предрейсовый')
+                ->where('type_anketa', 'medic')
+                ->where('in_cart', 0)
+                ->where('company_id', $company_id)
+                ->where('driver_id', $driver_id)
+                ->whereMonth('date', $month)->count();
+
+                $rData['posler'] = \App\Anketa::where('type_view', 'Послерейсовый')
+                ->where('type_anketa', 'medic')
+                ->where('in_cart', 0)
+                ->where('company_id', $company_id)
+                ->where('driver_id', $driver_id)
+                ->whereMonth('date', $month)->count();
+
+                $rData['predsmenniy'] = \App\Anketa::where('type_view', 'Предсменный')
+                ->where('type_anketa', 'medic')
+                ->where('in_cart', 0)
+                ->where('company_id', $company_id)
+                ->where('driver_id', $driver_id)
+                ->whereMonth('date', $month)->count();
+
+                $rData['poslesmenniy'] = \App\Anketa::where('type_view', 'Послесменный')
+                ->where('type_anketa', 'medic')
+                ->where('in_cart', 0)
+                ->where('company_id', $company_id)
+                ->where('driver_id', $driver_id)
+                ->whereMonth('date', $month)->count();
+
+                $rData['bdd'] = \App\Anketa::where('type_anketa', 'bdd')
+                ->where('in_cart', 0)
+                ->where('company_id', $company_id)
+                ->where('driver_id', $driver_id)
+                ->whereMonth('date', $month)->count();
+
+                $rData['report_cart'] = \App\Anketa::where('type_anketa', 'report_cart')
+                ->where('in_cart', 0)
+                ->where('company_id', $company_id)
+                ->where('driver_id', $driver_id)
+                ->whereMonth('date', $month)->count();
+
+                break;
+
             case 'Dop':
 
                 $rData['predr'] = \App\Anketa::where('type_view', 'Предрейсовый')
@@ -241,6 +329,8 @@ class ReportController extends Controller
         $date_field = 'date';
         $date_from = isset($data['date_from']) ? $data['date_from'] : '';
         $date_to = isset($data['date_to']) ? $data['date_to'] : date('Y-m-d');
+        $date_from_time = $request->get('date_from_time', '00:00:00');
+        $date_to_time = $request->get('date_from_time', '23:59:59');
 
         $pv_id = isset($data['pv_id']) ? $data['pv_id'] : [0];
 
@@ -270,17 +360,28 @@ class ReportController extends Controller
                             ->where('type_anketa', 'medic')
                             ->where('in_cart', 0)
                             ->whereRaw("(date >= ? AND date <= ?)", [
-                                $date_from." 00:00:00",
-                                $date_to." 23:59:59"
-                            ])->get();
+                                $date_from . " " . '00:00:00',
+                                $date_to . " " . '23:59:59'
+                            ]);
 
                         $reports2 = Anketa::whereIn('pv_id', $pv_id)
                             ->where('type_anketa', 'medic')
                             ->where('in_cart', 0)
                             ->whereRaw("(created_at >= ? AND created_at <= ?)", [
-                                $date_from." 00:00:00",
-                                $date_to." 23:59:59"
-                            ])->get();
+                                $date_from." ".'00:00:00',
+                                $date_to." ".'23:59:59'
+                            ]);
+
+                        if($date_from_time && $date_to_time) {
+                            $reports->whereTime('date', '>=', $date_from_time)
+                                ->whereTime('date', '<=', $date_to_time);
+
+                            $reports2->whereTime('created_at', '>=', $date_from_time)
+                                ->whereTime('created_at', '<=', $date_to_time);
+                        }
+
+                        $reports = $reports->get();
+                        $reports2 = $reports2->get();
 
                         return [
                             'reports' => $reports,
