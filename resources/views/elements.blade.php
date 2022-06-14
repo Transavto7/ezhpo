@@ -25,14 +25,18 @@
                         @php $default_value = isset($v['defaultValue']) ? $v['defaultValue'] : '' @endphp
 
                         @if($k !== 'id' && !isset($v['hidden']))
-                            <div class="form-group" data-field="{{ $k }}">
-                                <label>
-                                    @if($is_required) <b class="text-danger text-bold">*</b> @endif
+                            @if($model === 'Instr' && $k === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
+                                <!-- Сортировка инструктажей доступна админу или инженеру -->
+                            @else
+                                <div class="form-group" data-field="{{ $k }}">
+                                    <label>
+                                        @if($is_required) <b class="text-danger text-bold">*</b> @endif
 
-                                    {{ $v['label'] }}</label>
+                                        {{ $v['label'] }}</label>
 
-                                @include('templates.elements_field')
-                            </div>
+                                    @include('templates.elements_field')
+                                </div>
+                            @endif
                         @endif
                     @endforeach
                 </div>
@@ -146,6 +150,8 @@
                                                 'is_required' => '',
                                                 'default_value' => request()->get($fk)
                                             ])
+                                        @elseif($model === 'Instr' && $fk === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
+                                            <!-- Сортировка доступна только инженеру БДД и Админу -->
                                         @else
                                             @include('templates.elements_field', [
                                                 'v' => $fv,
@@ -193,13 +199,18 @@
 
                 @foreach ($fields as $k => $v)
                     @if(!isset($v['hidden']))
-                        <th title="Ключ: {{ $k }}" data-key="{{ $k }}">
-                            {{ $v['label'] }}
 
-                            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $k . $queryString }}">
-                                <i class="fa fa-sort"></i>
-                            </a>
-                        </th>
+                        @if($model === 'Instr' && $k === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
+                           <!-- Только админам -->
+                        @else
+                            <th title="Ключ: {{ $k }}" data-key="{{ $k }}">
+                                {{ $v['label'] }}
+
+                                <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $k . $queryString }}">
+                                    <i class="fa fa-sort"></i>
+                                </a>
+                            </th>
+                        @endif
                     @endif
                 @endforeach
 
@@ -270,6 +281,8 @@
                                                 @foreach(explode(',', $el[$elK]) as $aSyncData)
                                                     <div class="text-bold text-success"><i class="fa fa-refresh"></i> {{ __($aSyncData) }}</div>
                                                 @endforeach
+                                            @elseif($model === 'Instr' && $elK === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
+                                                <!-- Сортировка инструктажей доступна ролям БДД и Админу -->
                                             @else
                                                 @foreach(explode(',', htmlspecialchars($el[$elK])) as $keyElK => $valElK)
                                                     @if($keyElK !== 0), @endif

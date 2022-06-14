@@ -269,6 +269,11 @@
         </table>
         <p v-else>Осмотры за другие месяцы не создавались (Режим ввода ПЛ)</p>
 
+        <hr v-if="dop.init">
+        <div v-if="dop.init" class="alert alert-success">
+            Отчет успешно сформирован!
+        </div>
+
     </div>
 </template>
 
@@ -407,7 +412,6 @@
                      */
                     this.dop.hiddenMonths = data.hiddenMonthsDop;
                     this.dop.dopData = data.monthsDop;
-                    this.dop.init = true;
 
                     for(let i in this.dop.dopData) {
                         for(let j in this.dop.dopData[i].reports) {
@@ -422,6 +426,8 @@
                             })
                         }
                     }
+
+                    this.dop.init = true;
 
                 })
             }

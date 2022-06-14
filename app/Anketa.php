@@ -45,7 +45,8 @@ class Anketa extends Model
         'is_pak',
         'protokol_path',
         'comments',
-        'flag_pak'
+        'flag_pak',
+        'connected_hash'
     ];
 
     public static $anketsKeys = [

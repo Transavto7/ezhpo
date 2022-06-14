@@ -13,6 +13,7 @@ class Instr extends Model
         'descr',
         'type_briefing',
         'youtube',
-        'active'
+        'active',
+        'sort'
     ];
 }

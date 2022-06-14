@@ -352,6 +352,7 @@ class IndexController extends Controller
                     0 => 'Нет',
                     1 => 'Да'
                 ], 'defaultValue' => 'Да'],
+                'sort' => ['label' => 'Сортировка', 'type' => 'number', 'noRequired' => 1]
             ]
         ]
 

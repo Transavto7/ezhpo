@@ -45,6 +45,7 @@ class User extends Authenticatable
         'medic' => 2,
         'driver' => 3,
         'terminal' => 778,
+        'engineer_bdd' => 12,
         'manager' => 11,
         'admin' => 777,
         'operator_pak' => 4

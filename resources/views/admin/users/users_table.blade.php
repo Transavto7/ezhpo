@@ -164,6 +164,7 @@
                                                 <option value="2">Медицинский сотрудник</option>
                                                 <option value="4">Оператор СДПО</option>
                                                 <option value="11">Менеджер</option>
+                                                <option value="12">Инженер БДД</option>
                                                 <option value="777">Администратор</option>
                                             </select>
                                         </div>

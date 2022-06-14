@@ -228,6 +228,21 @@ class AnketsController extends Controller
 
         $anketa->save();
 
+        if($anketa->connected_hash) {
+            $anketaCopy = Anketa::where('connected_hash', $anketa->connected_hash)->where('type_anketa', '!=', $anketa->type_anketa)->first();
+
+            if($anketaCopy) {
+
+                foreach($anketa->fillable as $i => $key) {
+                    if($key !== 'type_anketa' && $key !== 'id' && $key !== 'created_at' && $key !== 'updated_at') {
+                        $anketaCopy->$key = $anketa[$key];
+                    }
+                }
+
+                $anketaCopy->save();
+            }
+        }
+
         if($REFERER) {
             return redirect( $REFERER );
         } else {
@@ -755,10 +770,13 @@ class AnketsController extends Controller
 
                 $anketa['created_at'] = isset($anketa['created_at']) ? $anketa['created_at'] : $time;
 
+                $connected_hash = sha1(time() . rand(99,9999));
+
                 /**
                  * Проверка на "Дополнительный осмотр"
                  */
                 if($is_tech_dop) {
+                    $anketa['connected_hash'] = $connected_hash;
                     $dopAnketa = $anketa;
                     $dopAnketa['type_anketa'] = 'Dop';
                     Anketa::create($dopAnketa);

@@ -38,10 +38,6 @@
                 @endrole
 
                 <li>
-                    <a href="{{ route('forms', ['type' => 'bdd']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести Инструктаж БДД</a>
-                </li>
-
-                <li>
                     <a href="{{ route('forms', ['type' => 'report_cart']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести Отчёт с карты</a>
                 </li>
 
@@ -52,14 +48,20 @@
                 <li>
                     <a href="{{ route('forms', ['type' => 'Dop']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести запись в Журнал ПЛ</a>
                 </li>
-
-                @role(['operator_pak', 'terminal'])
-                    @php
-                        $countPakQueue = \App\Anketa::where('type_anketa', 'pak_queue')->count();
-                    @endphp
-                    <li><a href="{{ route('home', 'pak_queue') }}"><i class="fa fa-users"></i>Очередь утверждения <span class="badge bg-primary text-white">{{ $countPakQueue < 99 ? $countPakQueue : '99+' }}</span></a></li>
-                @endrole
             @endif
+
+            @if($user_role != 11)
+                <li>
+                    <a href="{{ route('forms', ['type' => 'bdd']) }}" class="bg-yellow"><i class="icon-padnote"></i>Внести Инструктаж БДД</a>
+                </li>
+            @endif
+
+            @role(['operator_pak', 'terminal'])
+                @php
+                    $countPakQueue = \App\Anketa::where('type_anketa', 'pak_queue')->count();
+                @endphp
+                <li><a href="{{ route('home', 'pak_queue') }}"><i class="fa fa-users"></i>Очередь утверждения <span class="badge bg-primary text-white">{{ $countPakQueue < 99 ? $countPakQueue : '99+' }}</span></a></li>
+            @endrole
 
             @role(['admin', 'manager', 'terminal'])
                 <li>
