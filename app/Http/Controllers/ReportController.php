@@ -209,7 +209,8 @@ class ReportController extends Controller
                     ->where('in_cart', 0)
                     ->where('is_dop', 1)
                     ->whereIn('type_anketa', ['medic', 'tech'])
-                    ->whereMonth('date', $month)->count();
+                    ->whereMonth('date', $month)
+                    ->count();
 
                 $rData['posler'] = \App\Anketa::where('type_view', 'Послерейсовый')
                     ->where('company_id', $company_id)

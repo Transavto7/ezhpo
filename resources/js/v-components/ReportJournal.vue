@@ -151,61 +151,62 @@
             </tbody>
         </table>
 
-        <p v-if="medic.init"><b>Таблица "Медосмотры за другие периоды"</b></p>
-        <table v-if="medic.init && medic.dopData && medic.dopData.length != medic.hiddenMonths" id="reports-table-4" class="table table-responsive">
-            <thead>
+        <div v-if="medic.init && tech.init">
+            <p v-if="medic.init"><b>Таблица "Медосмотры за другие периоды"</b></p>
+            <table v-if="medic.init && medic.dopData && medic.dopData.length != medic.hiddenMonths" id="reports-table-4" class="table table-responsive">
+                <thead>
                 <tr>
                     <th v-for="(month,i) in medic.dopData" v-if="!month.hidden" style="border-left: 1px solid #e9e9e9;background: #e9e9e9;" class="text-center" colspan="7">
                         {{ month.name }} {{ month.year }}
                     </th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+                <tbody>
                 <td v-for="(month, i) in medic.dopData" colspan="7" class="p-0">
                     <table v-if="!month.hidden" class="w-100 table">
                         <thead>
-                            <th>Водитель</th>
-                            <th>Предрейсовые</th>
-                            <th>Послерейсовые</th>
+                        <th>Водитель</th>
+                        <th>Предрейсовые</th>
+                        <th>Послерейсовые</th>
 
-                            <th>Предсменные</th>
-                            <th>Послесменные</th>
+                        <th>Предсменные</th>
+                        <th>Послесменные</th>
 
-                            <th>БДД</th>
-                            <th>Отчёты с карт</th>
+                        <th>БДД</th>
+                        <th>Отчёты с карт</th>
                         </thead>
 
                         <tbody>
-                            <tr v-for="(report, j) in month.reports">
-                                <td>{{ report.driver_fio }} / {{ report.driver_id }}</td>
-                                <td>{{ report.predr }}</td>
-                                <td>{{ report.posler }}</td>
-                                <td>{{ report.predsmenniy }}</td>
-                                <td>{{ report.poslesmenniy }}</td>
-                                <td>{{ report.bdd }}</td>
-                                <td>{{ report.report_cart }}</td>
-                            </tr>
+                        <tr v-for="(report, j) in month.reports">
+                            <td>{{ report.driver_fio }} / {{ report.driver_id }}</td>
+                            <td>{{ report.predr }}</td>
+                            <td>{{ report.posler }}</td>
+                            <td>{{ report.predsmenniy }}</td>
+                            <td>{{ report.poslesmenniy }}</td>
+                            <td>{{ report.bdd }}</td>
+                            <td>{{ report.report_cart }}</td>
+                        </tr>
                         </tbody>
                     </table>
                 </td>
-            </tbody>
-        </table>
-        <p v-else>Осмотры за другие месяцы не создавались (МО)</p>
+                </tbody>
+            </table>
+            <p v-else>Осмотры за другие месяцы не создавались (МО)</p>
 
 
-        <p v-if="tech.init"><b>Таблица "Техосмотры за другие периоды"</b></p>
-        <table v-if="tech.init && tech.dopData && tech.dopData.length != tech.hiddenMonths" id="reports-table-tech-months" class="table table-responsive">
-            <thead>
-            <tr>
-                <th v-for="(month,i) in tech.dopData" v-if="!month.hidden" style="border-left: 1px solid #e9e9e9;background: #e9e9e9;" class="text-center" colspan="7">
-                    {{ month.name }} {{ month.year }}
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            <td v-for="(month, i) in tech.dopData" colspan="7" class="p-0">
-                <table v-if="!month.hidden" class="w-100 table">
-                    <thead>
+            <p v-if="tech.init"><b>Таблица "Техосмотры за другие периоды"</b></p>
+            <table v-if="tech.init && tech.dopData && tech.dopData.length != tech.hiddenMonths" id="reports-table-tech-months" class="table table-responsive">
+                <thead>
+                <tr>
+                    <th v-for="(month,i) in tech.dopData" v-if="!month.hidden" style="border-left: 1px solid #e9e9e9;background: #e9e9e9;" class="text-center" colspan="7">
+                        {{ month.name }} {{ month.year }}
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <td v-for="(month, i) in tech.dopData" colspan="7" class="p-0">
+                    <table v-if="!month.hidden" class="w-100 table">
+                        <thead>
                         <th>Автомобиль</th>
                         <th>Предрейсовые</th>
                         <th>Послерейсовые</th>
@@ -213,9 +214,9 @@
                         <th>Послесменные</th>
                         <th>БДД</th>
                         <th>Отчёты с карт</th>
-                    </thead>
+                        </thead>
 
-                    <tbody>
+                        <tbody>
                         <tr v-for="(report, j) in month.reports">
                             <td>{{ report.car_gos_number }} / {{ report.car_id }}</td>
                             <td>{{ report.predr }}</td>
@@ -225,53 +226,54 @@
                             <td>{{ report.bdd }}</td>
                             <td>{{ report.report_cart }}</td>
                         </tr>
-                    </tbody>
-                </table>
-            </td>
-            </tbody>
-        </table>
-        <p v-else>Осмотры за другие месяцы не создавались (ТО)</p>
-
-
-        <p v-if="dop.init"><b>Таблица "Режим ввода ПЛ"</b></p>
-        <table v-if="dop.init && dop.dopData && dop.dopData.length != dop.hiddenMonths" id="reports-table-5" class="table table-responsive">
-            <thead>
-            <tr>
-                <th v-for="(month,i) in dop.dopData" v-if="!month.hidden" style="border-left: 1px solid #e9e9e9;background: #e9e9e9;" class="text-center" colspan="5">
-                    {{ month.name }} {{ month.year }}
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-                <td v-for="(month, i) in dop.dopData" v-if="!month.hidden" colspan="5" class="p-0">
-                    <table class="w-100 table">
-                        <thead>
-                            <th>Автомобиль/Водитель</th>
-                            <th>Предрейсовые</th>
-                            <th>Послерейсовые</th>
-
-                            <th>Предсменные</th>
-                            <th>Послесменные</th>
-                        </thead>
-
-                        <tbody>
-                            <tr v-for="(report, j) in month.reports">
-                                <td>{{ report.driver_fio }} / {{ report.car_gos_number }}</td>
-                                <td>{{ report.predr }}</td>
-                                <td>{{ report.posler }}</td>
-                                <td>{{ report.predsmenniy }}</td>
-                                <td>{{ report.poslesmenniy }}</td>
-                            </tr>
                         </tbody>
                     </table>
                 </td>
-            </tbody>
-        </table>
-        <p v-else>Осмотры за другие месяцы не создавались (Режим ввода ПЛ)</p>
+                </tbody>
+            </table>
+            <p v-else>Осмотры за другие месяцы не создавались (ТО)</p>
 
-        <hr v-if="dop.init">
-        <div v-if="dop.init" class="alert alert-success">
-            Отчет успешно сформирован!
+
+            <p v-if="dop.init"><b>Таблица "Режим ввода ПЛ"</b></p>
+            <table v-if="dop.init && dop.dopData && dop.dopData.length != dop.hiddenMonths" id="reports-table-5" class="table table-responsive">
+                <thead>
+                <tr>
+                    <th v-for="(month,i) in dop.dopData" v-if="!month.hidden" style="border-left: 1px solid #e9e9e9;background: #e9e9e9;" class="text-center" colspan="5">
+                        {{ month.name }} {{ month.year }}
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <td v-for="(month, i) in dop.dopData" v-if="!month.hidden" colspan="5" class="p-0">
+                    <table class="w-100 table">
+                        <thead>
+                        <th>Автомобиль/Водитель</th>
+                        <th>Предрейсовые</th>
+                        <th>Послерейсовые</th>
+
+                        <th>Предсменные</th>
+                        <th>Послесменные</th>
+                        </thead>
+
+                        <tbody>
+                        <tr v-for="(report, j) in month.reports">
+                            <td>{{ report.driver_fio }} / {{ report.car_gos_number }}</td>
+                            <td>{{ report.predr }}</td>
+                            <td>{{ report.posler }}</td>
+                            <td>{{ report.predsmenniy }}</td>
+                            <td>{{ report.poslesmenniy }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                </tbody>
+            </table>
+            <p v-if>Осмотры за другие месяцы не создавались (Режим ввода ПЛ)</p>
+
+            <hr v-if="dop.init">
+            <div v-if="dop.init" class="alert alert-success">
+                Отчет успешно сформирован!
+            </div>
         </div>
 
     </div>
@@ -350,6 +352,7 @@
 
                             let tempFilterData = defaultFilterData
                             tempFilterData.month = this.medic.dopData[i].month
+                            tempFilterData.driver_id = report.driver_id
 
                             await $.post(`/api/report-data/Driver_months/${month}`, tempFilterData).done(rData => {
                                 this.medic.dopData[i].reports[j] = {...report, ...rData}

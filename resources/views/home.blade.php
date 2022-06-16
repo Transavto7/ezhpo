@@ -171,7 +171,9 @@
                                             @if(isset($fieldsKeys[$anketaTDkey]))
                                                 <td @isset($blockedToExportFields[$anketaTDkey]) class="not-export" @endisset data-field-key="{{ $anketaTDkey }}">
                                                     @if($anketaTDkey === 'date' || strpos($anketaTDkey, '_at') > 0)
-                                                        {{ date('d-m-Y H:i:s', strtotime($anketa[$anketaTDkey])) }}
+                                                        @if($anketa[$anketaTDkey])
+                                                            {{ date('d-m-Y H:i:s', strtotime($anketa[$anketaTDkey])) }}
+                                                        @endif
                                                     @elseif($anketaTDkey === 'photos')
 
                                                         @if($anketa[$anketaTDkey])

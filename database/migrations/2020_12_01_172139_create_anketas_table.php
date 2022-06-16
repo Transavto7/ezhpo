@@ -42,7 +42,7 @@ class CreateAnketasTable extends Migration
             $table->string('condition_visible_sliz')->default('Без особенностей');
             $table->string('condition_koj_pokr')->default('Без особенностей');
 
-            $table->timestamp('date')->useCurrent();
+            $table->timestamp('date')->nullable();
             $table->string('number_list_road')->nullable();
 
 

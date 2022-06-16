@@ -123,7 +123,7 @@ export default {
 
                 // Дата осмотра
                 if(date >= dateCheck && date < nextDateCheck) {
-                    this.datacollection.datasets[0].data[index]++
+                    this.datacollection.datasets[0].data[index+1]++
                 }
             })
         })
@@ -138,7 +138,7 @@ export default {
 
                 // Дата создания
                 if(created_at >= dateCheck && created_at < nextDateCheck) {
-                    this.datacollection.datasets[1].data[index]++
+                    this.datacollection.datasets[1].data[index+1]++
                 }
             })
         })

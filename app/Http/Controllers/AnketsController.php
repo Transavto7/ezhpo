@@ -390,7 +390,11 @@ class AnketsController extends Controller
                     $dv_item = $dv;
 
                     if(empty($dv_item) && isset($defaultDatas[$dk])) {
-                        $dv_item = $defaultDatas[$dk];
+                        if($dk === 'date' && $is_dop) {
+
+                        } else {
+                            $dv_item = $defaultDatas[$dk];
+                        }
                     }
 
                     $anketa[$dk] = $dv_item;
@@ -401,7 +405,11 @@ class AnketsController extends Controller
                  */
                 foreach($defaultDatas as $dfKey => $dfData) {
                     if(empty($anketa[$dfKey])) {
-                        $anketa[$dfKey] = $dfData;
+                        if($is_dop && $dfKey === 'date') {
+
+                        } else {
+                            $anketa[$dfKey] = $dfData;
+                        }
                     }
                 }
 
