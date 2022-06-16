@@ -3,15 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="f6a199b1-6d31-48a4-b894-b6045514cb71" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AnketsController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Kernel.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Kernel.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2020_12_01_172139_create_anketas_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_12_01_172139_create_anketas_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/v-components/Chart.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/v-components/Chart.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/v-components/ReportJournal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/v-components/ReportJournal.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/home.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -645,7 +639,7 @@
       <workItem from="1655190996684" duration="11432000" />
       <workItem from="1655379274073" duration="374000" />
       <workItem from="1655380012813" duration="2700000" />
-      <workItem from="1655384799286" duration="465000" />
+      <workItem from="1655384799286" duration="1510000" />
     </task>
     <servers />
   </component>

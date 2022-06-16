@@ -151,7 +151,7 @@
             </tbody>
         </table>
 
-        <div v-if="medic.init && tech.init">
+        <div v-if="medic.init && tech.init && pechat_pl.init">
             <p v-if="medic.init"><b>Таблица "Медосмотры за другие периоды"</b></p>
             <table v-if="medic.init && medic.dopData && medic.dopData.length != medic.hiddenMonths" id="reports-table-4" class="table table-responsive">
                 <thead>
@@ -345,6 +345,8 @@
                         })
                     }
 
+                    this.medic.init = true
+
                     for(let i in this.medic.dopData) {
                         for(let j in this.medic.dopData[i].reports) {
                             let report = this.medic.dopData[i].reports[j]
@@ -359,8 +361,6 @@
                             })
                         }
                     }
-
-                    this.medic.init = true
 
                     /**
                      * <ТО>
@@ -386,6 +386,8 @@
                         })
                     }
 
+                    this.tech.init = true
+
                     for(let i in this.tech.dopData) {
                         for(let j in this.tech.dopData[i].reports) {
                             let report = this.tech.dopData[i].reports[j]
@@ -399,8 +401,6 @@
                             })
                         }
                     }
-
-                    this.tech.init = true
 
                     /**
                      * Печать ПЛ

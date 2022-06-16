@@ -209,6 +209,10 @@ class ReportController extends Controller
                     ->where('in_cart', 0)
                     ->where('is_dop', 1)
                     ->whereIn('type_anketa', ['medic', 'tech'])
+                    ->where(function ($query) use ($month) {
+                        return $query->whereMonth('date', $month)
+                            ->orWhereMonth('period_pl', $month);
+                    })
                     ->whereMonth('date', $month)
                     ->count();
 
@@ -217,21 +221,33 @@ class ReportController extends Controller
                     ->where('in_cart', 0)
                     ->where('is_dop', 1)
                     ->whereIn('type_anketa', ['medic', 'tech'])
-                    ->whereMonth('date', $month)->count();
+                    ->where(function ($query) use ($month) {
+                        return $query->whereMonth('date', $month)
+                            ->orWhereMonth('period_pl', $month);
+                    })
+                    ->count();
 
                 $rData['predsmenniy'] = \App\Anketa::where('type_view', 'Предсменный')
                     ->where('in_cart', 0)
                     ->where('is_dop', 1)
                     ->where('company_id', $company_id)
                     ->whereIn('type_anketa', ['medic', 'tech'])
-                    ->whereMonth('date', $month)->count();
+                    ->where(function ($query) use ($month) {
+                        return $query->whereMonth('date', $month)
+                            ->orWhereMonth('period_pl', $month);
+                    })
+                    ->count();
 
                 $rData['poslesmenniy'] = \App\Anketa::where('type_view', 'Послесменный')
                     ->where('in_cart', 0)
                     ->where('is_dop', 1)
                     ->where('company_id', $company_id)
                     ->whereIn('type_anketa', ['medic', 'tech'])
-                    ->whereMonth('date', $month)->count();
+                    ->where(function ($query) use ($month) {
+                        return $query->whereMonth('date', $month)
+                            ->orWhereMonth('period_pl', $month);
+                    })
+                    ->count();
 
                 break;
 
