@@ -103,10 +103,26 @@ class HomeController extends Controller
             $validTypeAnkets = $typeAnkets;
         }
 
-        if(isset(Anketa::$blockedToExportFields[$typeAnkets])) {
-            $blockedToExportFields = Anketa::$blockedToExportFields[$typeAnkets];
+        /**
+         * Экспорт по приказу
+         */
+        $typePrikaz = $request->get('typePrikaz');
+
+        if(isset(Anketa::$blockedToExportFields[$validTypeAnkets])) {
+            $blockedToExportFields = Anketa::$blockedToExportFields[$validTypeAnkets];
         }
 
+        /**
+         * Выбор полей
+         */
+        $fieldsKeysTypeAnkets = $typePrikaz === 'Dop' ? 'Dop_prikaz' : $validTypeAnkets;
+        $fieldsKeys = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
+        $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets]) ? Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] : [];
+
+
+        /**
+         * Очистка корзины в очереди на утверждение от СДПО
+         */
         if(isset($_GET['clear']) && isset($_GET['type_anketa']) && $user->hasRole('admin', '==')) {
             $typeClearAnkets = trim($_GET['type_anketa']);
 
@@ -134,6 +150,7 @@ class HomeController extends Controller
         unset($filter_params['take']);
         unset($filter_params['orderBy']);
         unset($filter_params['orderKey']);
+        unset($filter_params['typePrikaz']);
         unset($filter_params['page']);
         unset($filter_params['getFormFilter']);
 
@@ -263,9 +280,6 @@ class HomeController extends Controller
         $anketasCountResult = ($filter_activated || $typeAnkets === 'pak_queue')
             ? $anketas->total() : 0;
 
-        $fieldsKeys = Anketa::$fieldsKeys[$validTypeAnkets];
-        $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$validTypeAnkets]) ? Anketa::$fieldsGroupFirst[$validTypeAnkets] : [];
-
         $anketsFields = array_keys($fieldsKeys);
 
         if(auth()->user()->hasRole('client', '==')) {
@@ -305,6 +319,7 @@ class HomeController extends Controller
             'anketasCountResult' => $anketasCountResult,
 
             'isExport' => $is_export,
+            'typePrikaz' => $typePrikaz,
 
             'currentRole' => $currentRole,
 

@@ -213,7 +213,7 @@ class ReportController extends Controller
                         return $query->whereMonth('date', $month)
                             ->orWhereMonth('period_pl', $month);
                     })
-                    ->whereMonth('date', $month)
+                    //->whereMonth('date', $month)
                     ->count();
 
                 $rData['posler'] = \App\Anketa::where('type_view', 'Послерейсовый')
