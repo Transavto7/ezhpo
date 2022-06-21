@@ -119,6 +119,9 @@ class HomeController extends Controller
         $fieldsKeys = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
         $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets]) ? Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] : [];
 
+        if($typePrikaz === 'Dop') {
+            $take = 10000;
+        }
 
         /**
          * Очистка корзины в очереди на утверждение от СДПО

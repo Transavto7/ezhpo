@@ -496,6 +496,13 @@ $(document).ready(function () {
         link.href = uri + base64(format(template, ctx))
         link.setAttribute('target', '_blank')
         link.click();
+
+        setTimeout(() => {
+            let findStrtypePrikaz = '&exportPrikaz=1&typePrikaz=Dop'
+            if(location.href.indexOf(findStrtypePrikaz) > -1) {
+                location.href = location.href.replace(findStrtypePrikaz, '')
+            }
+        }, 1500)
     };
 
     /*
