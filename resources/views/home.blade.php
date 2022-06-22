@@ -48,14 +48,13 @@
                                     @endisset
                                 </div>
 
-
                                 @manager
                                     @if($type_ankets === 'tech')
-                                    <div class="col-md-6 text-right">
-                                        <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
-                                        <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ТО <i class="fa fa-download"></i></a>
-                                        <a href="?export=1{{ $queryString }}&exportPrikaz=1&typePrikaz=Dop" class="btn btn-sm btn-default">Экспорт таблицы по приказу ПЛ <i class="fa fa-download"></i></a>
-                                    </div>
+                                        <div class="col-md-6 text-right">
+                                            <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
+                                            <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ТО <i class="fa fa-download"></i></a>
+                                            <a href="?export=1{{ str_replace('&page=' . request()->get('page'), '', $queryString) }}&exportPrikaz=1&typePrikaz=Dop" class="btn btn-sm btn-default">Экспорт таблицы по приказу ПЛ <i class="fa fa-download"></i></a>
+                                        </div>
                                     @else
                                         <div class="col-md-6 text-right">
                                             <!--                                    <button type="button" onclick="exportTable('ankets-table', true)" class="btn btn-default">Экспорт результатов <i class="fa fa-download"></i></button>-->
