@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Anketa;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
@@ -36,7 +35,7 @@ class ReportController extends Controller
         switch($model) {
 
             case 'pechat_pl':
-                return DB::table('anketas')->where('type_anketa', 'pechat_pl')
+                return \App\Anketa::where('type_anketa', 'pechat_pl')
                     ->where('in_cart', 0)
                     ->where('company_name', \App\Company::where('hash_id', $company_id)->first()->name)
                     ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
@@ -49,7 +48,7 @@ class ReportController extends Controller
 
             case 'Car':
 
-                $rData['predr'] = DB::table('anketas')->where('type_view', 'Предрейсовый')
+                $rData['predr'] = \App\Anketa::where('type_view', 'Предрейсовый')
                     ->where('company_id', $company_id)
                     ->where('in_cart', 0)
                     ->where('type_anketa', 'tech')
@@ -60,7 +59,7 @@ class ReportController extends Controller
                     ])->count();
                 $rData['predr_sum'] = \App\Car::calcServices($car_id, 'tech', 'Предрейсовый', $rData['predr']);
 
-                $rData['posler'] = DB::table('anketas')->where('type_view', 'Послерейсовый')
+                $rData['posler'] = \App\Anketa::where('type_view', 'Послерейсовый')
                     ->where('company_id', $company_id)
                     ->where('in_cart', 0)
                     ->where('type_anketa', 'tech')
@@ -71,7 +70,7 @@ class ReportController extends Controller
                     ])->count();
                 $rData['posler_sum'] = \App\Car::calcServices($car_id, 'tech', 'Послерейсовый', $rData['posler']);
 
-                $rData['predsmenniy'] = DB::table('anketas')->where('type_view', 'Предсменный')
+                $rData['predsmenniy'] = \App\Anketa::where('type_view', 'Предсменный')
                     ->where('in_cart', 0)
                     ->where('company_id', $company_id)
                     ->where('type_anketa', 'tech')
@@ -82,7 +81,7 @@ class ReportController extends Controller
                     ])->count();
                 $rData['predsmenniy_sum'] = \App\Car::calcServices($car_id, 'tech', 'Предсменный', $rData['predsmenniy']);
 
-                $rData['poslesmenniy'] = DB::table('anketas')->where('type_view', 'Послесменный')
+                $rData['poslesmenniy'] = \App\Anketa::where('type_view', 'Послесменный')
                     ->where('in_cart', 0)
                     ->where('company_id', $company_id)
                     ->where('type_anketa', 'tech')
@@ -93,7 +92,7 @@ class ReportController extends Controller
                     ])->count();
                 $rData['poslesmenniy_sum'] = \App\Car::calcServices($car_id, 'tech', 'Послесменный', $rData['poslesmenniy']);
 
-                $rData['bdd'] = DB::table('anketas')->where('type_anketa', 'bdd')
+                $rData['bdd'] = \App\Anketa::where('type_anketa', 'bdd')
                     ->where('company_id', $company_id)
                     ->where('in_cart', 0)
                     ->where('car_gos_number', $car_gos_number)
@@ -103,7 +102,7 @@ class ReportController extends Controller
                     ])->count();
                 $rData['bdd_sum'] = \App\Car::calcServices($car_id, 'bdd', 'БДД', $rData['bdd']);
 
-                $rData['report_cart'] = DB::table('anketas')->where('type_anketa', 'report_cart')
+                $rData['report_cart'] = \App\Anketa::where('type_anketa', 'report_cart')
                     ->where('company_id', $company_id)
                     ->where('car_gos_number', $car_gos_number)
                     ->where('in_cart', 0)
@@ -117,95 +116,95 @@ class ReportController extends Controller
 
             case 'Car_months':
 
-                $rData['predr'] = DB::table('anketas')->where('type_view', 'Предрейсовый')
+                $rData['predr'] = \App\Anketa::where('type_view', 'Предрейсовый')
                     ->where('type_anketa', 'tech')
                     ->where('in_cart', 0)
                     ->where('company_id', $company_id)
                     ->where('car_id', $car_id)
                     ->whereMonth('date', $month)->count();
 
-                $rData['posler'] = DB::table('anketas')->where('type_view', 'Послерейсовый')
+                $rData['posler'] = \App\Anketa::where('type_view', 'Послерейсовый')
                     ->where('type_anketa', 'tech')
                     ->where('in_cart', 0)
                     ->where('company_id', $company_id)
                     ->where('car_id', $car_id)
                     ->whereMonth('date', $month)->count();
 
-                $rData['predsmenniy'] = DB::table('anketas')->where('type_view', 'Предсменный')
+                $rData['predsmenniy'] = \App\Anketa::where('type_view', 'Предсменный')
                     ->where('type_anketa', 'tech')
                     ->where('in_cart', 0)
                     ->where('company_id', $company_id)
                     ->where('car_id', $car_id)
                     ->whereMonth('date', $month)->count();
 
-                $rData['poslesmenniy'] = DB::table('anketas')->where('type_view', 'Послесменный')
+                $rData['poslesmenniy'] = \App\Anketa::where('type_view', 'Послесменный')
                     ->where('type_anketa', 'tech')
                     ->where('in_cart', 0)
                     ->where('company_id', $company_id)
                     ->where('car_id', $car_id)
                     ->whereMonth('date', $month)->count();
 
-                $rData['bdd'] = DB::table('anketas')->where('type_anketa', 'bdd')
+                $rData['bdd'] = \App\Anketa::where('type_anketa', 'bdd')
                     ->where('in_cart', 0)
                     ->where('company_id', $company_id)
                     ->where('car_id', $car_id)
                     ->whereMonth('created_at', $month)->count();
 
-                $rData['report_cart'] = DB::table('anketas')->where('type_anketa', 'report_cart')
-                    ->where('in_cart', 0)
-                    ->where('company_id', $company_id)
-                    ->where('car_id', $car_id)
-                    ->whereMonth('date', $month)->count();
+               $rData['report_cart'] = \App\Anketa::where('type_anketa', 'report_cart')
+                   ->where('in_cart', 0)
+                   ->where('company_id', $company_id)
+                   ->where('car_id', $car_id)
+                   ->whereMonth('date', $month)->count();
 
                 break;
 
             case 'Driver_months':
 
-                $rData['predr'] = DB::table('anketas')->where('type_view', 'Предрейсовый')
-                    ->where('type_anketa', 'medic')
-                    ->where('in_cart', 0)
-                    ->where('company_id', $company_id)
-                    ->where('driver_id', $driver_id)
-                    ->whereMonth('date', $month)->count();
+                $rData['predr'] = \App\Anketa::where('type_view', 'Предрейсовый')
+                ->where('type_anketa', 'medic')
+                ->where('in_cart', 0)
+                ->where('company_id', $company_id)
+                ->where('driver_id', $driver_id)
+                ->whereMonth('date', $month)->count();
 
-                $rData['posler'] = DB::table('anketas')->where('type_view', 'Послерейсовый')
-                    ->where('type_anketa', 'medic')
-                    ->where('in_cart', 0)
-                    ->where('company_id', $company_id)
-                    ->where('driver_id', $driver_id)
-                    ->whereMonth('date', $month)->count();
+                $rData['posler'] = \App\Anketa::where('type_view', 'Послерейсовый')
+                ->where('type_anketa', 'medic')
+                ->where('in_cart', 0)
+                ->where('company_id', $company_id)
+                ->where('driver_id', $driver_id)
+                ->whereMonth('date', $month)->count();
 
-                $rData['predsmenniy'] = DB::table('anketas')->where('type_view', 'Предсменный')
-                    ->where('type_anketa', 'medic')
-                    ->where('in_cart', 0)
-                    ->where('company_id', $company_id)
-                    ->where('driver_id', $driver_id)
-                    ->whereMonth('date', $month)->count();
+                $rData['predsmenniy'] = \App\Anketa::where('type_view', 'Предсменный')
+                ->where('type_anketa', 'medic')
+                ->where('in_cart', 0)
+                ->where('company_id', $company_id)
+                ->where('driver_id', $driver_id)
+                ->whereMonth('date', $month)->count();
 
-                $rData['poslesmenniy'] = DB::table('anketas')->where('type_view', 'Послесменный')
-                    ->where('type_anketa', 'medic')
-                    ->where('in_cart', 0)
-                    ->where('company_id', $company_id)
-                    ->where('driver_id', $driver_id)
-                    ->whereMonth('date', $month)->count();
+                $rData['poslesmenniy'] = \App\Anketa::where('type_view', 'Послесменный')
+                ->where('type_anketa', 'medic')
+                ->where('in_cart', 0)
+                ->where('company_id', $company_id)
+                ->where('driver_id', $driver_id)
+                ->whereMonth('date', $month)->count();
 
-                $rData['bdd'] = DB::table('anketas')->where('type_anketa', 'bdd')
-                    ->where('in_cart', 0)
-                    ->where('company_id', $company_id)
-                    ->where('driver_id', $driver_id)
-                    ->whereMonth('date', $month)->count();
+                $rData['bdd'] = \App\Anketa::where('type_anketa', 'bdd')
+                ->where('in_cart', 0)
+                ->where('company_id', $company_id)
+                ->where('driver_id', $driver_id)
+                ->whereMonth('date', $month)->count();
 
-                $rData['report_cart'] = DB::table('anketas')->where('type_anketa', 'report_cart')
-                    ->where('in_cart', 0)
-                    ->where('company_id', $company_id)
-                    ->where('driver_id', $driver_id)
-                    ->whereMonth('date', $month)->count();
+                $rData['report_cart'] = \App\Anketa::where('type_anketa', 'report_cart')
+                ->where('in_cart', 0)
+                ->where('company_id', $company_id)
+                ->where('driver_id', $driver_id)
+                ->whereMonth('date', $month)->count();
 
                 break;
 
             case 'Dop':
 
-                $rData['predr'] = DB::table('anketas')->where('type_view', 'Предрейсовый')
+                $rData['predr'] = \App\Anketa::where('type_view', 'Предрейсовый')
                     ->where('company_id', $company_id)
                     ->where('in_cart', 0)
                     ->where('is_dop', 1)
@@ -217,7 +216,7 @@ class ReportController extends Controller
                     //->whereMonth('date', $month)
                     ->count();
 
-                $rData['posler'] = DB::table('anketas')->where('type_view', 'Послерейсовый')
+                $rData['posler'] = \App\Anketa::where('type_view', 'Послерейсовый')
                     ->where('company_id', $company_id)
                     ->where('in_cart', 0)
                     ->where('is_dop', 1)
@@ -228,7 +227,7 @@ class ReportController extends Controller
                     })
                     ->count();
 
-                $rData['predsmenniy'] = DB::table('anketas')->where('type_view', 'Предсменный')
+                $rData['predsmenniy'] = \App\Anketa::where('type_view', 'Предсменный')
                     ->where('in_cart', 0)
                     ->where('is_dop', 1)
                     ->where('company_id', $company_id)
@@ -239,7 +238,7 @@ class ReportController extends Controller
                     })
                     ->count();
 
-                $rData['poslesmenniy'] = DB::table('anketas')->where('type_view', 'Послесменный')
+                $rData['poslesmenniy'] = \App\Anketa::where('type_view', 'Послесменный')
                     ->where('in_cart', 0)
                     ->where('is_dop', 1)
                     ->where('company_id', $company_id)
@@ -254,68 +253,68 @@ class ReportController extends Controller
 
             case 'Driver':
 
-                $rData['predr'] = DB::table('anketas')->where('type_view', 'Предрейсовый')
-                    ->where('company_id', $company_id)
-                    ->where('in_cart', 0)
-                    ->where('type_anketa', 'medic')
-                    ->where('driver_id', $driver_id)
-                    ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
-                        $date_from." 00:00:00",
-                        $date_to." 23:59:59"
-                    ])->count();
+                $rData['predr'] = \App\Anketa::where('type_view', 'Предрейсовый')
+                ->where('company_id', $company_id)
+                ->where('in_cart', 0)
+                ->where('type_anketa', 'medic')
+                ->where('driver_id', $driver_id)
+                ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                    $date_from." 00:00:00",
+                    $date_to." 23:59:59"
+                ])->count();
                 $rData['predr_sum'] = \App\Driver::calcServices($driver_id, 'medic', 'Предрейсовый', $rData['predr']);
 
-                $rData['posler'] = DB::table('anketas')->where('type_view', 'Послерейсовый')
-                    ->where('company_id', $company_id)
-                    ->where('in_cart', 0)
-                    ->where('type_anketa', 'medic')
-                    ->where('driver_id', $driver_id)
-                    ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
-                        $date_from." 00:00:00",
-                        $date_to." 23:59:59"
-                    ])->count();
+                $rData['posler'] = \App\Anketa::where('type_view', 'Послерейсовый')
+                ->where('company_id', $company_id)
+                ->where('in_cart', 0)
+                ->where('type_anketa', 'medic')
+                ->where('driver_id', $driver_id)
+                ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                    $date_from." 00:00:00",
+                    $date_to." 23:59:59"
+                ])->count();
                 $rData['posler_sum'] = \App\Driver::calcServices($driver_id, 'medic', 'Послерейсовый', $rData['posler']);
 
-                $rData['predsmenniy'] = DB::table('anketas')->where('type_view', 'Предсменный')
-                    ->where('in_cart', 0)
-                    ->where('company_id', $company_id)
-                    ->where('type_anketa', 'medic')
-                    ->where('driver_id', $driver_id)
-                    ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
-                        $date_from." 00:00:00",
-                        $date_to." 23:59:59"
-                    ])->count();
+                $rData['predsmenniy'] = \App\Anketa::where('type_view', 'Предсменный')
+                ->where('in_cart', 0)
+                ->where('company_id', $company_id)
+                ->where('type_anketa', 'medic')
+                ->where('driver_id', $driver_id)
+                ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                    $date_from." 00:00:00",
+                    $date_to." 23:59:59"
+                ])->count();
                 $rData['predsmenniy_sum'] = \App\Driver::calcServices($driver_id, 'medic', 'Предсменный', $rData['predsmenniy']);
 
-                $rData['poslesmenniy'] = DB::table('anketas')->where('type_view', 'Послесменный')
-                    ->where('in_cart', 0)
-                    ->where('company_id', $company_id)
-                    ->where('type_anketa', 'medic')
-                    ->where('driver_id', $driver_id)
-                    ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
-                        $date_from." 00:00:00",
-                        $date_to." 23:59:59"
-                    ])->count();
+                $rData['poslesmenniy'] = \App\Anketa::where('type_view', 'Послесменный')
+                ->where('in_cart', 0)
+                ->where('company_id', $company_id)
+                ->where('type_anketa', 'medic')
+                ->where('driver_id', $driver_id)
+                ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                    $date_from." 00:00:00",
+                    $date_to." 23:59:59"
+                ])->count();
                 $rData['poslesmenniy_sum'] = \App\Driver::calcServices($driver_id, 'medic', 'Послесменный', $rData['poslesmenniy']);
 
-                $rData['bdd'] = DB::table('anketas')->where('type_anketa', 'bdd')
-                    ->where('company_id', $company_id)
-                    ->where('in_cart', 0)
-                    ->where('driver_id', $driver_id)
-                    ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
-                        $date_from." 00:00:00",
-                        $date_to." 23:59:59"
-                    ])->count();
+                $rData['bdd'] = \App\Anketa::where('type_anketa', 'bdd')
+                ->where('company_id', $company_id)
+                ->where('in_cart', 0)
+                ->where('driver_id', $driver_id)
+                ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                    $date_from." 00:00:00",
+                    $date_to." 23:59:59"
+                ])->count();
                 $rData['bdd_sum'] = \App\Driver::calcServices($driver_id, 'bdd', 'БДД', $rData['bdd']);
 
-                $rData['report_cart'] = DB::table('anketas')->where('type_anketa', 'report_cart')
-                    ->where('company_id', $company_id)
-                    ->where('driver_id', $driver_id)
-                    ->where('in_cart', 0)
-                    ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
-                        $date_from." 00:00:00",
-                        $date_to." 23:59:59"
-                    ])->count();
+                $rData['report_cart'] = \App\Anketa::where('type_anketa', 'report_cart')
+                ->where('company_id', $company_id)
+                ->where('driver_id', $driver_id)
+                ->where('in_cart', 0)
+                ->whereRaw("($date_field >= ? AND $date_field <= ?)", [
+                    $date_from." 00:00:00",
+                    $date_to." 23:59:59"
+                ])->count();
                 $rData['report_cart_sum'] = \App\Driver::calcServices($driver_id, 'report_cart', 'Отчеты с карт', $rData['report_cart']);
 
                 break;
@@ -418,19 +417,20 @@ class ReportController extends Controller
                         /**
                          * Таблица МЕДОСМОТРОВ
                          */
-                        $reports = DB::table('anketas')->whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+                        $reports = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
                             ->where('company_id', $data['company_id'])
                             ->where('in_cart', 0)
                             ->whereRaw("(date >= ? AND date <= ?)", [
                                 $date_from." 00:00:00",
                                 $date_to." 23:59:59"
                             ])
-                            ->get()->unique('driver_id');
+                            ->get()
+                            ->unique('driver_id');
 
                         /**
                          * Нижняя таблица медосмотров
                          */
-                        $reportsMedicCreatedAt = DB::table('anketas')->whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+                        $reportsMedicCreatedAt = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
                             ->where('company_id', $data['company_id'])
                             ->where('in_cart', 0)
                             ->whereRaw("(created_at >= ? AND created_at <= ?)", [
@@ -483,7 +483,7 @@ class ReportController extends Controller
                         /**
                          * ТАБЛИЦА ТЕХОСМОТРОВ
                          */
-                        $reports2 = DB::table('anketas')->whereIn('type_anketa', ['tech', 'bdd', 'report_cart'])
+                        $reports2 = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'report_cart'])
                             ->where('company_id', $data['company_id'])
                             ->where('in_cart', 0)
                             ->whereRaw("(date >= ? AND date <= ?)", [
@@ -496,7 +496,7 @@ class ReportController extends Controller
                         /**
                          * Таблица ТЕХОСМОТРОВ - нижняя
                          */
-                        $reports2TechCreatedAt = DB::table('anketas')->whereIn('type_anketa', ['tech', 'bdd', 'report_cart'])
+                        $reports2TechCreatedAt = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'report_cart'])
                             ->where('company_id', $data['company_id'])
                             ->where('in_cart', 0)
                             ->whereRaw("(created_at >= ? AND created_at <= ?)", [
@@ -549,7 +549,7 @@ class ReportController extends Controller
                         /**
                          * Нижняя таблица РЕЖИМА ВВОДА ПЛ
                          */
-                        $reportsDopCreatedAt = DB::table('anketas')->whereIn('type_anketa', ['medic', 'tech'])
+                        $reportsDopCreatedAt = Anketa::whereIn('type_anketa', ['medic', 'tech'])
                             ->where('company_id', $data['company_id'])
                             ->where('in_cart', 0)
                             ->where('is_dop', 1)

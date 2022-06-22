@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f6a199b1-6d31-48a4-b894-b6045514cb71" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/OldReportController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/HomeController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ReportController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/front.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/front.js" afterDir="false" />
@@ -323,7 +324,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="editor.config.ad.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/Http/Controllers" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
@@ -332,11 +333,11 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\OpenServer\domains\transauto\app\Http\Controllers" />
       <recent name="C:\OpenServer\domains\transauto\resources\views" />
       <recent name="C:\OpenServer\domains\transauto\resources\views\profile\ankets\fields" />
       <recent name="C:\OpenServer\domains\transauto\resources\views\profile\ankets" />
       <recent name="C:\OpenServer\domains\transauto\resources\views\pages" />
-      <recent name="F:\openserver\OSPanel\domains\transauto\resources\views\profile\ankets" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\OpenServer\domains\transauto\public" />
@@ -643,7 +644,8 @@
       <workItem from="1655384799286" duration="1672000" />
       <workItem from="1655386929772" duration="6000" />
       <workItem from="1655730775858" duration="4088000" />
-      <workItem from="1655812813046" duration="1645000" />
+      <workItem from="1655812813046" duration="1891000" />
+      <workItem from="1655899177708" duration="497000" />
     </task>
     <servers />
   </component>

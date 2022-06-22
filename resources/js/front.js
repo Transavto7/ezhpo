@@ -500,7 +500,10 @@ $(document).ready(function () {
         setTimeout(() => {
             let findStrtypePrikaz = '&exportPrikaz=1&typePrikaz=Dop'
             if(location.href.indexOf(findStrtypePrikaz) > -1) {
-                location.href = location.href.replace(findStrtypePrikaz, '')
+                let newLocation = location.href.replace(findStrtypePrikaz, '')
+                    newLocation = newLocation.replace(/(export\=1\&)|(\&export\=1)|(export\=1)/g, '')
+
+                location.href = newLocation
             }
         }, 1500)
     };
