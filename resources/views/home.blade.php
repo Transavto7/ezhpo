@@ -52,7 +52,7 @@
                                     @if($type_ankets === 'tech')
                                         <div class="col-md-6 text-right">
                                             <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
-                                            <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ТО <i class="fa fa-download"></i></a>
+                                            <a href="?export=1{{ str_replace('&page=' . request()->get('page'), '', $queryString) }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ТО <i class="fa fa-download"></i></a>
                                             <a href="?export=1{{ str_replace('&page=' . request()->get('page'), '', $queryString) }}&exportPrikaz=1&typePrikaz=Dop" class="btn btn-sm btn-default">Экспорт таблицы по приказу ПЛ <i class="fa fa-download"></i></a>
                                         </div>
                                     @else
@@ -60,7 +60,7 @@
                                             <!--                                    <button type="button" onclick="exportTable('ankets-table', true)" class="btn btn-default">Экспорт результатов <i class="fa fa-download"></i></button>-->
                                             <!--                                    <button type="button" onclick="exportTable('ankets-table')" class="btn btn-default">Экспорт результатов по приказу <i class="fa fa-download"></i></button>-->
                                             <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
-                                            <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу <i class="fa fa-download"></i></a>
+                                            <a href="?export=1{{ str_replace('&page=' . request()->get('page'), '', $queryString) }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу <i class="fa fa-download"></i></a>
                                         </div>
                                     @endif
                                 @endmanager
