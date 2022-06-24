@@ -8,6 +8,8 @@ use App\Company;
 use App\Driver;
 use App\Exports\AnketasExport;
 use App\User;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -107,6 +109,8 @@ class HomeController extends Controller
          * Экспорт по приказу
          */
         $typePrikaz = $request->get('typePrikaz');
+        $export = $request->get('export');
+
 
         if(isset(Anketa::$blockedToExportFields[$validTypeAnkets])) {
             $blockedToExportFields = Anketa::$blockedToExportFields[$validTypeAnkets];
@@ -115,10 +119,14 @@ class HomeController extends Controller
         /**
          * Выбор полей
          */
-        $fieldsKeysTypeAnkets = $typePrikaz === 'Dop' ? 'Dop_prikaz' : $validTypeAnkets;
+        $fieldsKeysTypeAnkets = $typePrikaz === 'Dop' || $request->get('exportPrikazPL') ? 'Dop_prikaz' : $validTypeAnkets;
         $fieldsKeys = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
         $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets]) ? Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] : [];
-
+//dd($exportPrikaz);
+//        dd($fieldsKeys, $fieldsGroupFirst);
+        if($typePrikaz === 'Dop' || $request->get('export')) {
+            $take = 10000;
+        }
 
         /**
          * Очистка корзины в очереди на утверждение от СДПО
@@ -145,6 +153,7 @@ class HomeController extends Controller
         unset($filter_params['getCounts']);
         unset($filter_params['trash']);
         unset($filter_params['export']);
+        unset($filter_params['exportPrikazPL']);
         unset($filter_params['exportPrikaz']);
         unset($filter_params['filter']);
         unset($filter_params['take']);
@@ -181,16 +190,24 @@ class HomeController extends Controller
                             $isFromEqualToValue = $fromFilterValue === $fv;
                             $fromToValues = [$filter_params[$is_filter_except], $fv];
 
+                            $fromToValues[0] = Carbon::create($fromToValues[0]);
+                            $fromToValues[1] = Carbon::create($fromToValues[1]);
                             /**
                              * Поправил дату
                              */
 
                             $anketas = $isFromEqualToValue ?
                                   $anketas->whereDate($is_filter_except, $fromFilterValue)
-                                : $anketas->whereRaw("($is_filter_except >= ? AND $is_filter_except <= ?)", [
-                                    $fromToValues[0]." 00:00:00",
-                                    $fromToValues[1]." 23:59:59"
-                                ]);
+                                : $anketas->whereBetween($is_filter_except, [
+                                    $fromToValues[0],
+                                    $fromToValues[1]
+                                ])
+//                              ->whereIn('period_pl', $targetMonthForPeriodPl)
+                              ->whereBetween('period_pl', [
+                                        $fromToValues[0],
+                                        $fromToValues[1]
+                                    ])
+                            ;
                         } else if ($fk !== 'date' && $fk !== 'created_at') {
                             $explodeData = is_array($fv) ? $fv : explode(',', $fv);
                             $explodeData = (count($explodeData) == 1) ? $explodeData[0] : $explodeData;
@@ -274,6 +291,13 @@ class HomeController extends Controller
          * </Измеряем количество Авто и Водителей (уникальные ID)>
          */
 
+        //todo на экспорт техосмотр по приказу ПЛ
+        if($request->get('exportPrikazPL')){
+            $collection = $anketas->orderBy($orderKey, $orderBy)->get(array_keys($fieldsKeys));
+            $collection->prepend(array_values($fieldsKeys));
+            return (new AnketasExport($collection))->download('export-anketas.xlsx');
+        }
+
         $anketas = ($filter_activated || $typeAnkets === 'pak_queue')
             ? $anketas->orderBy($orderKey, $orderBy)->paginate($take) : [];
 
@@ -286,7 +310,6 @@ class HomeController extends Controller
             unset($fieldsKeys['created_at']);
             unset($fieldsKeys['is_pak']);
         }
-
         /**
          * Check Export
          */

@@ -46,12 +46,12 @@
             </article>
         </div>
 
-        <div class="form-group row">
-            <label class="col-md-3 form-control-label">Количество выданных ПЛ:</label>
-            <article class="col-md-9">
-                <input type="number" required max="30" value="{{ isset($count_pl) ? $count_pl : '' }}" name="anketa[0][count_pl]" class="form-control">
-            </article>
-        </div>
+{{--        <div class="form-group row">--}}
+{{--            <label class="col-md-3 form-control-label">Количество выданных ПЛ:</label>--}}
+{{--            <article class="col-md-9">--}}
+{{--                <input type="number" required max="30" value="{{ isset($count_pl) ? $count_pl : '' }}" name="anketa[0][count_pl]" class="form-control">--}}
+{{--            </article>--}}
+{{--        </div>--}}
 
         <div class="form-group row">
             <label class="col-md-3 form-control-label">Номер путевого листа:</label>
