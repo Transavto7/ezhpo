@@ -162,7 +162,7 @@ class IndexController extends Controller
 
                 'products_id' => ['label' => 'Услуги', 'multiple' => 1, 'type' => 'select', 'values' => 'Product', 'noRequired' => 1],
 
-                'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1, 'saveToHistory' => 1],
+//                'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1, 'saveToHistory' => 1],
                 'note' => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
                 'procedure_pv' => ['label' => 'Порядок выпуска', 'type' => 'select', 'values' => [
                     'Наперед без дат' => 'Наперед без дат',
@@ -207,7 +207,7 @@ class IndexController extends Controller
 
                 'trailer' => ['label' => 'Прицеп', 'type' => 'select', 'values' => ['Нет' => 'Нет', 'Да' => 'Да'], 'defaultValue' => '', 'noRequired' => 1],
                 'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
-                'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1],
+//                'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1],
                 'note' => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
                 'procedure_pv' => ['label' => 'Порядок выпуска', 'type' => 'select', 'values' => [
                     'Наперед без дат' => 'Наперед без дат',
