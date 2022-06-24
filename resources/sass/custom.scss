@@ -155,6 +155,23 @@ label {
     align-items: center;
 }
 
+.form-date {
+    min-height: 40px;
+    font-size: 14px;
+}
+
+.multiselect, .multiselect__input, .multiselect__single {
+    font-size: 14px;
+}
+
+.multiselect__option, .multiselect__option span {
+    transition: ease-in-out 0.2s;
+}
+
+.multiselect__content-wrapper {
+    z-index: 1000;
+}
+
 /**
 PRINT
  */

@@ -13,4 +13,16 @@ class Discount extends Model
         'porog',
         'discount'
     ];
+
+
+    public function add($total, $price) {
+        $is_discount_valid = false;
+        eval('$is_discount_valid = ' . $total . $this->trigger . $this->porog . ';');
+
+        if($is_discount_valid) {
+            $disc = ($price * $this->discount) / 100;
+
+            return $price - $disc;
+        }
+    }
 }

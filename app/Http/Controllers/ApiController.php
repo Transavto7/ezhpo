@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Company;
 use App\User;
 use Illuminate\Http\Request;
 
@@ -22,6 +23,11 @@ class ApiController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function companiesList(Request $request) {
+        return Company::where('name', 'like', '%' . $request->search . '%')
+            ->select('hash_id', 'name')->limit(100)->get();
     }
 
     // Обновляем все пункты выпуска

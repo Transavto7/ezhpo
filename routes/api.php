@@ -20,7 +20,9 @@ use App\Point;
 |
 */
 
-Route::post('/report-data/{model}/{id}', 'ReportController@GetApiReport');
+Route::get('/companies/find', 'ApiController@companiesList');
+
+Route::get('reports/journal', 'ReportController@getJournalData')->name('api.reports.journal');
 
 Route::get('/sync-fields/{model}/{id}', function ($model, $id) {
     $data = app("App\\$model")->getAutoSyncFieldsFromHashId($id);
@@ -68,6 +70,7 @@ Route::middleware('auth:api')->post('/get-user/{user_id}', function (Request $re
 });
 
 Route::middleware('auth:api')->group(function () {
+
     Route::get('anketa/{id}', function ($id) {
         $anketa = \App\Anketa::find($id);
 
