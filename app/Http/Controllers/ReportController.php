@@ -268,7 +268,7 @@ class ReportController extends Controller
                 $date_from." 00:00:00",
                 $date_to." 23:59:59"
             ])
-            ->select('driver_id', 'driver_fio', 'date', 'type_anketa')
+            ->select('driver_id', 'type_view', 'driver_fio', 'date', 'type_anketa')
             ->get();
 
         $result = [];
@@ -332,7 +332,7 @@ class ReportController extends Controller
                 $date_from." 00:00:00",
                 $date_to." 23:59:59"
             ])
-            ->select('car_id', 'driver_id', 'car_gos_number', 'driver_fio',
+            ->select('car_id', 'driver_id', 'car_gos_number', 'driver_fio', 'type_anketa',
                 'date', 'type_view')
             ->get();
 
