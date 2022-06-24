@@ -4,14 +4,6 @@
           <h5 class="card-header">Выбор информации</h5>
           <div class="card-body">
               <div class="row">
-                  <div class="form-group col-lg-2">
-                      <label class="mb-1" for="date_from">Дата с:</label>
-                      <input type="date" required v-model="date_from" id="date_from" class="form-control form-date" name="date_from">
-                  </div>
-                  <div class="form-group col-lg-2">
-                      <label class="mb-1" for="date_to">Дата по:</label>
-                      <input type="date" required v-model="date_to" id="date_to" class="form-control form-date" name="date_to">
-                  </div>
                   <div class="form-group col-lg-3">
                       <label class="mb-1" for="company">Компании</label>
                       <multiselect
@@ -29,6 +21,14 @@
                           <span slot="noResult">Результатов не найдено</span>
                           <span slot="noOptions">Список пуст</span>
                       </multiselect>
+                  </div>
+                  <div class="form-group col-lg-2">
+                      <label class="mb-1" for="date_from">Дата с:</label>
+                      <input type="date" required v-model="date_from" id="date_from" class="form-control form-date" name="date_from">
+                  </div>
+                  <div class="form-group col-lg-2">
+                      <label class="mb-1" for="date_to">Дата по:</label>
+                      <input type="date" required v-model="date_to" id="date_to" class="form-control form-date" name="date_to">
                   </div>
               </div>
               <div class="row">
@@ -95,7 +95,15 @@ export default {
         this.searchCompany();
     },
     methods: {
+        reset() {
+            this.$refs.reportsMedic.hide();
+            this.$refs.reportsTech.hide();
+            this.$refs.reportsTechOther.hide();
+            this.$refs.reportsMedicOther.hide();
+            this.$refs.reportsPL.hide();
+        },
         report() {
+            this.reset();
             this.loading = true;
             axios.get('/api/reports/journal', {
                 params: {

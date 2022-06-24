@@ -201,13 +201,12 @@ class HomeController extends Controller
                                 : $anketas->whereBetween($is_filter_except, [
                                     $fromToValues[0],
                                     $fromToValues[1]
-                                ])
-//                              ->whereIn('period_pl', $targetMonthForPeriodPl)
-                              ->whereBetween('period_pl', [
-                                        $fromToValues[0],
-                                        $fromToValues[1]
-                                    ])
-                            ;
+                                ]);
+//                              ->whereBetween('period_pl', [
+//                                        $fromToValues[0]->format('Y-m'),
+//                                        $fromToValues[1]->format('Y-m')
+//                                    ]);
+
                         } else if ($fk !== 'date' && $fk !== 'created_at') {
                             $explodeData = is_array($fv) ? $fv : explode(',', $fv);
                             $explodeData = (count($explodeData) == 1) ? $explodeData[0] : $explodeData;
@@ -293,7 +292,7 @@ class HomeController extends Controller
 
         //todo на экспорт техосмотр по приказу ПЛ
         if($request->get('exportPrikazPL')){
-            $collection = $anketas->orderBy($orderKey, $orderBy)->get(array_keys($fieldsKeys));
+            $collection = $anketas->orderBy($orderKey, $orderBy)->limit(50000)->get(array_keys($fieldsKeys));
             $collection->prepend(array_values($fieldsKeys));
             return (new AnketasExport($collection))->download('export-anketas.xlsx');
         }

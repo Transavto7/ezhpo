@@ -64,6 +64,10 @@ export default {
 
             this.show = true;
         },
+        hide() {
+            this.data = false;
+            this.show = false;
+        },
         getTotal(item, name) {
             if (item.types && item.types[name] && item.types[name].total) {
                 return item.types[name].total;

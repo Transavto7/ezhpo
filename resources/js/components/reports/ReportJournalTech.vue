@@ -109,6 +109,10 @@ export default {
             }
             this.show = show;
         },
+        hide() {
+            this.reports = false;
+            this.show = false;
+        },
         getTotal(item, name) {
             if (item.types && item.types[name] && item.types[name].total) {
                 return item.types[name].total;

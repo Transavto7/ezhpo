@@ -431,7 +431,10 @@ $(document).ready(function () {
                 const PROP_HAS_EXISTS = data.data.exists
                 const DATA = data.data.message;
 
-                parent.closest('#ANKETA_FORM').find('input[name="company_id"]').val(DATA.company_id)
+                if (model === 'Driver') {
+                    parent.closest('#ANKETA_FORM').find('input[name="company_id"]').val(DATA.company_id)
+                }
+
                 showAnketsCardDBitemData(model, DATA, data.data.fieldsValues, data.data)
 
                 if(PARENT_ELEM.length) {
