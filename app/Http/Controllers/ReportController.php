@@ -210,11 +210,8 @@ class ReportController extends Controller
                     ->where('in_cart', 0)
                     ->where('is_dop', 1)
                     ->whereIn('type_anketa', ['medic', 'tech'])
-                    ->where(function ($query) use ($month) {
-                        return $query->whereMonth('date', $month)
-                            ->orWhereMonth('period_pl', $month);
-                    })
-                    //->whereMonth('date', $month)
+                    ->whereNull('date')
+                    ->whereMonth("period_pl", $month)
                     ->count();
 
                 $rData['posler'] = DB::table('anketas')->where('type_view', 'Послерейсовый')
@@ -222,10 +219,8 @@ class ReportController extends Controller
                     ->where('in_cart', 0)
                     ->where('is_dop', 1)
                     ->whereIn('type_anketa', ['medic', 'tech'])
-                    ->where(function ($query) use ($month) {
-                        return $query->whereMonth('date', $month)
-                            ->orWhereMonth('period_pl', $month);
-                    })
+                    ->whereNull('date')
+                    ->whereMonth("period_pl", $month)
                     ->count();
 
                 $rData['predsmenniy'] = DB::table('anketas')->where('type_view', 'Предсменный')
@@ -233,10 +228,8 @@ class ReportController extends Controller
                     ->where('is_dop', 1)
                     ->where('company_id', $company_id)
                     ->whereIn('type_anketa', ['medic', 'tech'])
-                    ->where(function ($query) use ($month) {
-                        return $query->whereMonth('date', $month)
-                            ->orWhereMonth('period_pl', $month);
-                    })
+                    ->whereNull('date')
+                    ->whereMonth("period_pl", $month)
                     ->count();
 
                 $rData['poslesmenniy'] = DB::table('anketas')->where('type_view', 'Послесменный')
@@ -244,10 +237,8 @@ class ReportController extends Controller
                     ->where('is_dop', 1)
                     ->where('company_id', $company_id)
                     ->whereIn('type_anketa', ['medic', 'tech'])
-                    ->where(function ($query) use ($month) {
-                        return $query->whereMonth('date', $month)
-                            ->orWhereMonth('period_pl', $month);
-                    })
+                    ->whereNull('date')
+                    ->whereMonth("period_pl", $month)
                     ->count();
 
                 break;
@@ -418,19 +409,20 @@ class ReportController extends Controller
                         /**
                          * Таблица МЕДОСМОТРОВ
                          */
-                        $reports = DB::table('anketas')->whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+                        $reports = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
                             ->where('company_id', $data['company_id'])
                             ->where('in_cart', 0)
                             ->whereRaw("(date >= ? AND date <= ?)", [
                                 $date_from." 00:00:00",
                                 $date_to." 23:59:59"
                             ])
-                            ->get()->unique('driver_id');
+                            ->get()
+                            ->unique('driver_id');
 
                         /**
                          * Нижняя таблица медосмотров
                          */
-                        $reportsMedicCreatedAt = DB::table('anketas')->whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+                        $reportsMedicCreatedAt = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
                             ->where('company_id', $data['company_id'])
                             ->where('in_cart', 0)
                             ->whereRaw("(created_at >= ? AND created_at <= ?)", [
@@ -483,7 +475,7 @@ class ReportController extends Controller
                         /**
                          * ТАБЛИЦА ТЕХОСМОТРОВ
                          */
-                        $reports2 = DB::table('anketas')->whereIn('type_anketa', ['tech', 'bdd', 'report_cart'])
+                        $reports2 = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'report_cart'])
                             ->where('company_id', $data['company_id'])
                             ->where('in_cart', 0)
                             ->whereRaw("(date >= ? AND date <= ?)", [
@@ -496,7 +488,7 @@ class ReportController extends Controller
                         /**
                          * Таблица ТЕХОСМОТРОВ - нижняя
                          */
-                        $reports2TechCreatedAt = DB::table('anketas')->whereIn('type_anketa', ['tech', 'bdd', 'report_cart'])
+                        $reports2TechCreatedAt = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'report_cart'])
                             ->where('company_id', $data['company_id'])
                             ->where('in_cart', 0)
                             ->whereRaw("(created_at >= ? AND created_at <= ?)", [
@@ -553,9 +545,10 @@ class ReportController extends Controller
                             ->where('company_id', $data['company_id'])
                             ->where('in_cart', 0)
                             ->where('is_dop', 1)
-                            ->whereRaw("(created_at >= ? AND created_at <= ?)", [
-                                $date_from." 00:00:00",
-                                $date_to." 23:59:59"
+                            ->whereNull('date')
+                            ->whereRaw("(period_pl >= ? AND period_pl <= ?)", [
+                                $date_from,
+                                $date_to
                             ])
                             ->get();
 
@@ -566,9 +559,7 @@ class ReportController extends Controller
                                 $date_to_period = $dates->first()->date;
                                 $date_from_period = $dates->last()->date;
 
-                                $period = CarbonPeriod::create($date_from_period, $date_to_period);
-
-                                $months = collect($period)->map(function (Carbon $date) use ($months_def) {
+                                $months = collect([Carbon::parse($date_to_period), Carbon::parse($date_from_period)])->map(function (Carbon $date) use ($months_def) {
 
                                     $dataMonth = [
                                         'month' => $date->month,
