@@ -11,6 +11,15 @@ class Product extends Model
         'type_anketa', 'type_view'
     ];
 
+    // Сущности
+    public static $essence = [
+        0 => 'Только компанию',
+        1 => 'Только водителей',
+        2 => 'Только автомобили',
+        3 => 'Автомобили или водителей',
+    ];
+
+    // многие ко многим ебать
     public function getName ($id)
     {
         $id = explode(',', $id);
@@ -31,7 +40,7 @@ class Product extends Model
 
         return $data;
     }
-
+    // это чё блять за хуйня блят ь
     public static function getAll () {
         return self::all();
     }

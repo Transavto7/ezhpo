@@ -6,6 +6,7 @@
 @section('content')
 
 <!-- Добавление элемента -->
+@if($model !== 'Product')
 <div id="elements-modal-add" tabindex="-1" role="dialog" aria-labelledby="elements-modal-label" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">
         <div class="modal-content">
@@ -49,6 +50,149 @@
         </div>
     </div>
 </div>
+@else
+{{--    @php--}}
+{{--        dd($fields)--}}
+
+{{--    @endphp--}}
+<div id="elements-modal-add" tabindex="-1" role="dialog" aria-labelledby="elements-modal-label"
+     class="modal fade text-left" style="display: none;" aria-modal="true">
+    <div role="document" class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Добавление Услуги __NEW</h4>
+                <button type="button" data-dismiss="modal" aria-label="Close" class="close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form action="{{ route('addElement', $model) }}" enctype="multipart/form-data" method="POST">
+                <input type="hidden" name="_token" value="ls0TWtuxN3lPRMLJL0lMzd0tac7ydl5mHK3KLe3V">
+                <div class="modal-body">
+                    <p>Заполните форму внимательно и нажмите кнопку "Добавить"</p>
+                    <div data-field="name" class="form-group">
+                        <label><b class="text-danger text-bold">*</b>Название</label>
+                        <input value="" type="text" required="required" name="name"
+                                                    data-label="Название" placeholder="Название"
+                                                    data-field="Product_name" class="form-control ">
+                    </div>
+                    <div data-field="type_product" class="form-group">
+                        <label><b class="text-danger text-bold">*</b>Тип</label>
+                        <select name="type_product"
+                                required="required"
+                                data-label="Тип"
+                                data-field="Product_type_product"
+                                class="js-chosen"
+                                style="display: none;"
+                        >
+                            <option value="">Не установлено</option>
+                            @foreach($fields['type_product']['values'] as $nameOfTypeProduct)
+                            <option selected="selected" value="{{ $nameOfTypeProduct }}" {{ ($fields['type_product']['values']['defaultValue'] ?? '' !== $nameOfTypeProduct) ? 'selected' : '' }}>
+                                {{ $nameOfTypeProduct }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div data-field="unit" class="form-group">
+                        <label><b class="text-danger text-bold">*</b>
+                            Ед.изм.</label>
+                        <input value="" type="text" required="required" name="unit"
+                                                   data-label="Ед.изм." placeholder="Ед.изм." data-field="Product_unit"
+                                                   class="form-control ">
+                    </div>
+                    <div data-field="price_unit" class="form-group">
+                        <label><b class="text-danger text-bold">*</b>
+                            Стоимость за единицу</label>
+                        <input value="" type="number" required="required"
+                                                                name="price_unit" data-label="Стоимость за единицу"
+                                                                placeholder="Стоимость за единицу"
+                                                                data-field="Product_price_unit" class="form-control ">
+                    </div>
+                    <div data-field="type_anketa" class="form-group">
+                        <label><b class="text-danger text-bold">*</b> Реестр</label>
+                        <select name="type_anketa" required="required" data-label="Реестр"
+                                                   data-field="Product_type_anketa" class="js-chosen"
+                                                   style="display: none;">
+                            <option value="">Не установлено</option>
+                            <option value="bdd">
+                                БДД
+                            </option>
+                            <option value="medic">
+                                Медицинский
+                            </option>
+                            <option value="tech">
+                                Технический
+                            </option>
+                            <option value="Dop">
+                                Учет ПЛ
+                            </option>
+                            <option value="pechat_pl">
+                                Печать ПЛ
+                            </option>
+                            <option value="report_cart">
+                                Отчеты с карт
+                            </option>
+                        </select>
+                    </div>
+                    <div data-field="type_view" class="form-group">
+                        <label><b class="text-danger text-bold">*</b>Тип осмотра</label>
+                        <select multiple="multiple" name="type_view[]" required="required"
+                                                        data-label="Тип осмотра" data-field="Product_type_view"
+                                                        class="js-chosen" style="display: none;">
+                            <option value="">Не установлено</option>
+                            <option value="Предрейсовый">
+                                Предрейсовый
+                            </option>
+                            <option value="Послерейсовый">
+                                Послерейсовый
+                            </option>
+                            <option value="Предсменный">
+                                Предсменный
+                            </option>
+                            <option value="Послесменный">
+                                Послесменный
+                            </option>
+                            <option value="БДД">
+                                БДД
+                            </option>
+                            <option value="Отчёты с карт">
+                                Отчёты с карт
+                            </option>
+                            <option value="Учет ПЛ">
+                                Учет ПЛ
+                            </option>
+                            <option value="Печать ПЛ">
+                                Печать ПЛ
+                            </option>
+                        </select>
+                    </div>
+
+                    <div data-field="essence" class="form-group" style="display: none">
+                        <label><b class="text-danger text-bold">*</b>Сущности</label>
+                        <select name="essence"
+                                required="required"
+                                data-label="Сущности"
+                                data-field="Product_type_view"
+                                class="js-chosen"
+                                style="display: none;"
+                        >
+                            <option value="">Не установлено</option>
+                            @foreach(\App\Product::$essence as $essenceKey => $essenceName)
+                            <option value="{{ $essenceKey }}">
+                                {{ $essenceName }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-sm btn-success">Добавить</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-sm btn-secondary">Закрыть</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
 
 {{--<div id="elements-modal-import" tabindex="-1" role="dialog" aria-labelledby="elements-modal-import" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">

@@ -948,4 +948,21 @@ $(document).ready(function () {
     LIBS.initAll()
     $('.MASK_ID_ELEM').trigger('input')
 
+    let field = $("*[data-field=Product_type_product]").chosen()
+    field.change(function(e, { selected }){
+        if(selected === 'Абонентская плата без реестров'){
+            field.closest('.modal-body').find('div[data-field=essence]').show()
+            field.closest('.modal-body').find('div[data-field=type_anketa]').hide()
+            field.closest('.modal-body').find('div[data-field=type_view]').hide()
+
+            field.closest('.modal-body').find('select[name=type_anketa]').prop('required',false) // тип осмотра
+            field.closest('.modal-body').find('select[name=type_view[]]').prop('required',false) // Реестр
+        }else{
+            field.closest('.modal-body').find('div[data-field=essence]').hide()
+            field.closest('.modal-body').find('div[data-field=essence]').show()
+            field.closest('.modal-body').find('div[data-field=essence]').show()
+        }
+    });
+
+    // let field = $('*[data-field="Product_type_product"]')
 });
