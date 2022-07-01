@@ -38,7 +38,7 @@
                     @if($type_ankets !== 'pak_queue')
                         <div class="col-md-12">
                             <div class="row bg-light p-2">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <button type="button" data-toggle-show="#ankets-filters" class="btn btn-sm btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
 
                                     @isset($_GET['trash'])
@@ -50,14 +50,14 @@
 
 
                                 @manager
-                                    @if($type_ankets === 'tech')
-                                    <div class="col-md-6 text-right">
-                                        <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
-                                        <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ТО <i class="fa fa-download"></i></a>
-                                        <a href="?export=1{{ $queryString }}&exportPrikazPL=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ПЛ <i class="fa fa-download"></i></a>
-                                    </div>
+                                    @if($type_ankets === 'tech' || $type_ankets === 'medic')
+                                        <div class="col-md-8 text-right">
+                                            <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
+                                            <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ТО <i class="fa fa-download"></i></a>
+                                            <a href="?export=1{{ $queryString }}&exportPrikazPL=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ПЛ <i class="fa fa-download"></i></a>
+                                        </div>
                                     @else
-                                        <div class="col-md-6 text-right">
+                                        <div class="col-md-8 text-right">
                                             <!--                                    <button type="button" onclick="exportTable('ankets-table', true)" class="btn btn-default">Экспорт результатов <i class="fa fa-download"></i></button>-->
                                             <!--                                    <button type="button" onclick="exportTable('ankets-table')" class="btn btn-default">Экспорт результатов по приказу <i class="fa fa-download"></i></button>-->
                                             <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>

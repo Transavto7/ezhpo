@@ -69,6 +69,7 @@ class HomeController extends Controller
         $oKey = 'orderKey';
         $oBy = 'orderBy';
 
+
         /**
          * All Query String Without Params
          */
@@ -94,7 +95,7 @@ class HomeController extends Controller
         $anketasModel = new Anketa();
         $anketas = $anketasModel;
 
-        $take = $request->get('take') ? $request->get('take') : 20;
+        $take = $request->get('take') ? $request->get('take') : 500;
         $orderKey = $request->get($oKey, 'date');
         $orderBy = $request->get($oBy,
             ($typeAnkets === 'pak_queue' ? 'ASC' : 'DESC')
@@ -119,7 +120,12 @@ class HomeController extends Controller
         /**
          * Выбор полей
          */
-        $fieldsKeysTypeAnkets = $typePrikaz === 'Dop' || $request->get('exportPrikazPL') ? 'Dop_prikaz' : $validTypeAnkets;
+        if ($typePrikaz === 'Dop' || (!isset($_GET['getFormFilter']) && $request->get('exportPrikazPL'))) {
+            $fieldsKeysTypeAnkets = 'Dop_prikaz';
+        } else {
+            $fieldsKeysTypeAnkets = 'Dop';
+        }
+
         $fieldsKeys = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
         $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets]) ? Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] : [];
 //dd($exportPrikaz);
@@ -145,6 +151,7 @@ class HomeController extends Controller
          * Фильтрация анкет
          */
         $filter_activated = !empty( $request->get('filter') );
+
         $filter_params = $request->all(); // ИСПРАВИЛ: array_diff($request->all(), array(''))
         $is_export = isset($_GET['export']);
         $trash = $request->get('trash', 0);
@@ -293,8 +300,9 @@ class HomeController extends Controller
          * </Измеряем количество Авто и Водителей (уникальные ID)>
          */
 
+
         //todo на экспорт техосмотр по приказу ПЛ
-        if($request->get('exportPrikazPL')){
+        if(count($filter_params) > 0 && $request->get('exportPrikazPL')) {
             $collection = $anketas->orderBy($orderKey, $orderBy)->limit(50000)->get(array_keys($fieldsKeys));
             $collection->prepend(array_values($fieldsKeys));
             return (new AnketasExport($collection))->download('export-anketas.xlsx');
@@ -329,6 +337,7 @@ class HomeController extends Controller
         if($typeAnkets === 'pak_queue' && $user->hasRole('operator_pak', '==')) {
             $currentRole = 'operator_pak';
         }
+
 
         return view($_view, [
             'title' => Anketa::$anketsKeys[$validTypeAnkets],

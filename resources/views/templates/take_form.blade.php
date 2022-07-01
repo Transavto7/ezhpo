@@ -4,7 +4,7 @@
     @include('templates.GET_INPUTS')
 
     <select onchange="FORM_COUNT_ELEMENTS.submit()" name="take">
-        @foreach([20, 50, 100, 250, 500] as $numb)
+        @foreach([500, 1500, 2000, 2500] as $numb)
             <option
                 @isset($take)
                 @if($take == $numb)
