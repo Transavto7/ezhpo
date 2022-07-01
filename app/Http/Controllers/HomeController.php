@@ -198,15 +198,17 @@ class HomeController extends Controller
 
                             $anketas = $isFromEqualToValue ?
                                   $anketas->whereDate($is_filter_except, $fromFilterValue)
-                                : $anketas
-                                    ->whereBetween($is_filter_except, [
-                                    $fromToValues[0],
-                                    $fromToValues[1]
-                                ])
-                              ->orWhereBetween('period_pl', [
-                                        $fromToValues[0]->format('Y-m'),
-                                        $fromToValues[1]->format('Y-m')
-                                    ]);
+                                : $anketas->where(function ($q) use ($is_filter_except, $fromToValues){
+                                    $q->whereBetween($is_filter_except, [
+                                        $fromToValues[0],
+                                        $fromToValues[1]
+                                    ])
+                                      ->orWhereBetween('period_pl', [
+                                          $fromToValues[0]->format('Y-m'),
+                                          $fromToValues[1]->format('Y-m')
+                                      ]);
+                                });
+
 
                         } else if ($fk !== 'date' && $fk !== 'created_at') {
                             $explodeData = is_array($fv) ? $fv : explode(',', $fv);
