@@ -123,7 +123,7 @@ class HomeController extends Controller
         if ($typePrikaz === 'Dop' || (!isset($_GET['getFormFilter']) && $request->get('exportPrikazPL'))) {
             $fieldsKeysTypeAnkets = 'Dop_prikaz';
         } else {
-            $fieldsKeysTypeAnkets = 'Dop';
+            $fieldsKeysTypeAnkets = $validTypeAnkets;
         }
 
         $fieldsKeys = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];

@@ -100,7 +100,8 @@ export default {
         this.date_from = now.getFullYear() + '-'+ months + '-' + '01';
 
         this.date_to = now.getFullYear() + '-' + months + '-' +
-            new Date(now.getFullYear(), months + 1, 0).getDate();
+            new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+
     },
     methods: {
         reset() {

@@ -217,7 +217,6 @@ class Anketa extends Model
             'flag_pak' => 'Флаг СДПО',
             'realy' => 'Осмотр реальный?',
             'is_dop' => 'Режим ввода ПЛ',
-            'result_dop' => 'Решение ввода ПЛ',
             'period_pl' => 'Период выдачи ПЛ'
         ],
 
@@ -296,7 +295,6 @@ class Anketa extends Model
             'user_eds' => 'Подпись лица, проводившего контроль',
             'pv_id' => 'Пункт выпуска',
             'is_dop' => 'Режим ввода ПЛ',
-            'result_dop' => 'Решение ввода ПЛ',
             'period_pl' => 'Период выдачи ПЛ'
         ],
 
