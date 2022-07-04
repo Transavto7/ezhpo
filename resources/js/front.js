@@ -431,7 +431,7 @@ $(document).ready(function () {
                 const PROP_HAS_EXISTS = data.data.exists
                 const DATA = data.data.message;
 
-                if (model === 'Driver') {
+                if ((model === 'Driver' || model === 'Car') && DATA.company_id) {
                     parent.closest('#ANKETA_FORM').find('input[name="company_id"]').val(DATA.company_id)
                 }
 
