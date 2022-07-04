@@ -50,7 +50,7 @@
 
 
                                 @manager
-                                    @if($type_ankets === 'tech' || $type_ankets === 'medic')
+                                    @if($type_ankets === 'tech')
                                         <div class="col-md-8 text-right">
                                             <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
                                             <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ТО <i class="fa fa-download"></i></a>

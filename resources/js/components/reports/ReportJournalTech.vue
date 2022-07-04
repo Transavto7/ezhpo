@@ -8,14 +8,14 @@
                     <tr>
                         <th width="100">ID</th>
                         <th width="250">Автомобили</th>
-                        <th width="150">Предрейсовые</th>
-                        <th width="150">Послерейсовые</th>
+                        <th class="text-center" width="150">Предрейсовые</th>
+                        <th class="text-center" width="150">Послерейсовые</th>
 
-                        <th width="150">Предсменные</th>
-                        <th width="150">Послесменные</th>
+                        <th class="text-center" width="150">Предсменные</th>
+                        <th class="text-center" width="150">Послесменные</th>
 
-                        <th width="150">БДД</th>
-                        <th width="150">Отчёты с карт</th>
+                        <th class="text-center" width="150">БДД</th>
+                        <th class="text-center" width="150">Отчёты с карт</th>
                     </tr>
                     </thead>
                     <tbody>
