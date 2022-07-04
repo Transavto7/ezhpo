@@ -20,9 +20,16 @@
             </div>
 
             @php
-                $pre_month = (date('m')-1);
-                $date_from_filter = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . '01';
-                $date_to_filter = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . cal_days_in_month(CAL_GREGORIAN, $pre_month, date('Y'));
+                // если есть дата в _GET запросе, но пустая, то оставляем пустую
+                if(array_key_exists('date', request()->all())){
+                    if(is_null(request()->get('date'))){
+                        $date_from_filter = '';
+                        $date_to_filter = '';
+                    }
+                }else{ // иначе берём начало и конец прошлого месяца
+                    $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
+                    $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
+                }
             @endphp
 
             @foreach($anketsFields as $field)
