@@ -9,17 +9,13 @@
                     <optgroup label="{{ $point['name'] }}">
                         @foreach($point['pvs'] as $child)
                             <option
-                                @if($default_pv_id)
-                                    {{ $default_pv_id === $child->name || $default_pv_id === $child->id ? 'selected' : '' }}
-                                @else
                                     @if(session()->has('anketa_pv_id'))
                                         @if($child->id == session('anketa_pv_id')['value'])
                                             selected
                                         @endif
-                                    @else
-                                @endif
-
-                                @endif
+                                    @elseif($default_pv_id)
+                                        {{ $default_pv_id === $child->name || $default_pv_id === $child->id ? 'selected' : '' }}
+                                    @endif
                                 value="{{ $child->id }}">
 
                                 — {{ $child->name }}</option>
