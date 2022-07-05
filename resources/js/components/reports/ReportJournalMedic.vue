@@ -7,7 +7,7 @@
                     <thead>
                     <tr>
                         <th width="100">ID</th>
-                        <th width="250">Водители</th>
+                        <th width="250">Водитель</th>
                         <th class="text-center" width="150">Предрейсовые</th>
                         <th class="text-center" width="150">Послерейсовые</th>
 

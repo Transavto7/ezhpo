@@ -205,22 +205,22 @@ class HomeController extends Controller
 
                             $anketas = $isFromEqualToValue ?
                                   $anketas->whereDate($is_filter_except, $fromFilterValue)
-                                : $anketas->where(function ($q) use ($is_filter_except, $fromToValues){
-                                    $q->where(function ($q) use ($is_filter_except, $fromToValues){
-                                        $q->whereBetween($is_filter_except, [
-                                            $fromToValues[0],
-                                            $fromToValues[1]
-                                        ])->where(function ($q){
-                                            $q->whereNull('is_dop')
-                                              ->orwhere('is_dop', 0);
+                                : $anketas
+                                    ->where(function ($q) use ($is_filter_except, $fromToValues) {
+                                        $q->where(function ($q) use ($is_filter_except, $fromToValues) {
+                                            $q->whereNotNull($is_filter_except)
+                                                ->whereBetween($is_filter_except, [
+                                                    $fromToValues[0],
+                                                    $fromToValues[1]
+                                                ]);
+                                        })
+                                        ->orWhere(function ($q) use ($is_filter_except, $fromToValues) {
+                                            $q->whereNull($is_filter_except)->whereBetween('period_pl', [
+                                                $fromToValues[0]->format('Y-m'),
+                                                $fromToValues[1]->format('Y-m')
+                                            ]);
                                         });
-                                    })->orWhere(function ($q) use ($is_filter_except, $fromToValues){
-                                        $q->whereBetween('period_pl', [
-                                            $fromToValues[0]->format('Y-m'),
-                                            $fromToValues[1]->format('Y-m')
-                                        ])->where('is_dop', 1);
                                     });
-                                });
 
 
 
@@ -268,7 +268,7 @@ class HomeController extends Controller
                         }
 
                     }
-                } else if (!empty($fv)) {
+                }else if (!empty($fv)) {
                     $anketas = $anketas->where($fk, 'LIKE', '%' . $fv . '%');
                 }
             }

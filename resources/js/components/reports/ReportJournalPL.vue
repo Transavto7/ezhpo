@@ -24,7 +24,7 @@
 
                             <tbody>
                             <tr v-for="(report, name, index) in item.reports">
-                                <td>{{ report.driver_fio }} / {{ report.car_gos_number }}</td>
+                                <td>{{ getStringMark(report) }}</td>
                                 <td>{{ getTotal(report, 'Предрейсовый') }}</td>
                                 <td>{{ getTotal(report, 'Послерейсовый') }}</td>
                                 <td>{{ getTotal(report, 'Предсменный') }}</td>
@@ -57,6 +57,26 @@ export default {
         }
     },
     methods: {
+        getStringMark(item) {
+            let str = '';
+            if (item.car_gos_number) {
+                str += item.car_gos_number + ' ';
+
+            }
+
+            if (item.car_mark_model) {
+                str +=  `(${item.car_mark_model})`;
+            }
+
+           if (item.driver_fio) {
+               if (str !== '') {
+                    str += ' / '
+               }
+            str += item.driver_fio;
+           }
+
+           return str;
+        },
         visible(data, show = true) {
             if (data.length === undefined || data.length > 0) {
                 this.data = data;

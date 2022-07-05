@@ -7,7 +7,7 @@
                     <thead>
                     <tr>
                         <th width="100">ID</th>
-                        <th width="250">Автомобили</th>
+                        <th width="250">Автомобиль</th>
                         <th class="text-center" width="150">Предрейсовые</th>
                         <th class="text-center" width="150">Послерейсовые</th>
 
@@ -25,7 +25,7 @@
                         </td>
 
                         <td width="250">
-                            {{ item.car_gos_number }}
+                            {{ getStringMark(item) }}
                         </td>
 
                         <td class="text-center" width="150">
@@ -103,6 +103,19 @@ export default {
         }
     },
     methods: {
+        getStringMark(item) {
+            let str = '';
+            if (item.car_gos_number) {
+                str += item.car_gos_number + ' ';
+
+            }
+
+            if (item.car_mark_model) {
+                str +=  `(${item.car_mark_model})`;
+            }
+
+            return str;
+        },
         visible(reports, show = true) {
             if (reports.length === undefined || reports.length > 0) {
                 this.reports = reports;
