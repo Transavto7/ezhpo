@@ -141,7 +141,7 @@ class ReportController extends Controller
 
     public function getJournalMedic($company, $date_from, $date_to, $products, $discounts) {
         // Get table info by filters
-        $medics = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+        $medics = Anketa::where('type_anketa', 'medic')
             ->join('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
             ->where('anketas.company_id', $company)
             ->where('anketas.in_cart', 0)
@@ -165,7 +165,7 @@ class ReportController extends Controller
             ->get();
 
 
-        $medicTypeCounts = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+        $medicTypeCounts = Anketa::where('type_anketa', 'medic')
             ->whereIn('driver_id', $medics->pluck('driver_id')->toArray())
             ->join('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
             ->where('anketas.company_id', $company)
@@ -222,7 +222,7 @@ class ReportController extends Controller
 
     public function getJournalTechs($company, $date_from, $date_to, $products, $discounts) {
         // Get table info by filters
-        $techs = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'report_cart'])
+        $techs = Anketa::where('type_anketa', 'tech')
             ->join('cars', 'anketas.car_id', '=', 'cars.hash_id')
             ->where('anketas.company_id', $company)
             ->whereNotNull('anketas.car_id')
@@ -246,7 +246,7 @@ class ReportController extends Controller
             ->groupBy(['car_id', 'type_view'])
             ->get();
 
-        $techsTypeCounts = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'report_cart'])
+        $techsTypeCounts = Anketa::where('type_anketa', 'tech')
             ->whereIn('car_id', $techs->pluck('car_id')->toArray())
             ->join('cars', 'anketas.car_id', '=', 'cars.hash_id')
             ->where('anketas.company_id', $company)
@@ -306,7 +306,7 @@ class ReportController extends Controller
     }
 
     public function getJournalMedicsOther($company, $date_from, $date_to) {
-        $reports = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+        $reports = Anketa::where('type_anketa', 'medic')
             ->where('company_id', $company)
             ->where('in_cart', 0)
             ->whereBetween('created_at', [
@@ -354,7 +354,7 @@ class ReportController extends Controller
     }
 
     public function getJournalTechsOther($company, $date_from, $date_to) {
-        $reports = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'report_cart'])
+        $reports = Anketa::where('type_anketa', 'tech')
             ->where('company_id', $company)
             ->whereNotNull('car_id')
             ->where('in_cart', 0)
