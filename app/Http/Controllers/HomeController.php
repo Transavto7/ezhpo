@@ -206,16 +206,19 @@ class HomeController extends Controller
                             $anketas = $isFromEqualToValue ?
                                   $anketas->whereDate($is_filter_except, $fromFilterValue)
                                 : $anketas->where(function ($q) use ($is_filter_except, $fromToValues){
-                                    $q->whereBetween($is_filter_except, [
-                                        $fromToValues[0],
-                                        $fromToValues[1]
-                                    ])->where('is_dop', 0);
-                                })->orWhere(function ($q) use ($is_filter_except, $fromToValues){
-                                    $q->whereBetween('period_pl', [
-                                        $fromToValues[0]->format('Y-m'),
-                                        $fromToValues[1]->format('Y-m')
-                                    ])->where('is_dop', 1);
+                                    $q->where(function ($q) use ($is_filter_except, $fromToValues){
+                                        $q->whereBetween($is_filter_except, [
+                                            $fromToValues[0],
+                                            $fromToValues[1]
+                                        ])->where('is_dop', 0);
+                                    })->orWhere(function ($q) use ($is_filter_except, $fromToValues){
+                                        $q->whereBetween('period_pl', [
+                                            $fromToValues[0]->format('Y-m'),
+                                            $fromToValues[1]->format('Y-m')
+                                        ])->where('is_dop', 1);
+                                    });
                                 });
+
 
 
                         } else if ($fk !== 'date' && $fk !== 'created_at') {
