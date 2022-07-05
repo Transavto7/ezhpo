@@ -210,7 +210,10 @@ class HomeController extends Controller
                                         $q->whereBetween($is_filter_except, [
                                             $fromToValues[0],
                                             $fromToValues[1]
-                                        ])->where('is_dop', 0);
+                                        ])->where(function ($q){
+                                            $q->whereNull('is_dop')
+                                              ->orwhere('is_dop', 0);
+                                        });
                                     })->orWhere(function ($q) use ($is_filter_except, $fromToValues){
                                         $q->whereBetween('period_pl', [
                                             $fromToValues[0]->format('Y-m'),
@@ -270,6 +273,8 @@ class HomeController extends Controller
                 }
             }
         }
+//        dump($fromToValues);
+//        dd($anketas->toSql());
 
         if(auth()->user()->hasRole('client', '==')) {
             $company_id_client = User::getUserCompanyId('hash_id');
