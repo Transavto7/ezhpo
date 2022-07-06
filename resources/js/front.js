@@ -22,6 +22,52 @@ $(document).ready(function () {
         }
     })
 
+    let loading = false
+
+    $(document).on('input', '.chosen-search-input', function(event) {
+        let search = event.target.value;
+        const select = $(event.target).parents('.form-group')?.children('.filled-select');
+        const model = select.attr('model');
+        const field = select.attr('field');
+
+        if (!model) {
+            return;
+        }
+
+        if (loading) {
+            return;
+        }
+
+        loading = true;
+        API_CONTROLLER.getFindModel({
+            model,
+            params: {
+                search,
+                field
+            }
+        }).then(({ data }) => {
+            data.forEach((element => {
+                const value = element[field];
+                const exist = select.children('option[value="' + value + '"]');
+                if (exist.length > 0) {
+                    return;
+                }
+
+                select.append($('<option>', {
+                    value: value,
+                    text: value
+                }));
+            }));
+            search = event.target.value;
+            select.trigger("chosen:updated");
+            event.target.value = search;
+            console.log(select.children('option').length);
+        });
+        setTimeout(() => {
+            loading = false;
+        }, 600);
+    })
+
     const API_CONTROLLER = new ApiController(),
         API = API_CONTROLLER.client
 
@@ -121,6 +167,7 @@ $(document).ready(function () {
                 no_results_text: 'Совпадений не найдено',
                 placeholder_text_single: 'Выберите значение',
                 placeholder_text_multiple: 'Выберите значения',
+                reset_search_field_on_update: false,
             });
         },
 
