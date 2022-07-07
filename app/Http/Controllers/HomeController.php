@@ -197,32 +197,41 @@ class HomeController extends Controller
                             $isFromEqualToValue = $fromFilterValue === $fv;
                             $fromToValues = [$filter_params[$is_filter_except], $fv];
 
-                            $fromToValues[0] = Carbon::create($fromToValues[0])->startOfDay();
-                            $fromToValues[1] = Carbon::create($fromToValues[1])->endOfDay();
+                            $fromToValues[0] = Carbon::create($fromToValues[0]);
+                            $fromToValues[1] = Carbon::create($fromToValues[1]);
+
                             /**
                              * Поправил дату
                              */
 
-                            $anketas = $isFromEqualToValue ?
-                                  $anketas->whereDate($is_filter_except, $fromFilterValue)
-                                : $anketas
-                                    ->where(function ($q) use ($is_filter_except, $fromToValues) {
-                                        $q->where(function ($q) use ($is_filter_except, $fromToValues) {
-                                            $q->whereNotNull($is_filter_except)
-                                                ->whereBetween($is_filter_except, [
-                                                    $fromToValues[0],
-                                                    $fromToValues[1]
-                                                ]);
-                                        })
-                                        ->orWhere(function ($q) use ($is_filter_except, $fromToValues) {
-                                            $q->whereNull($is_filter_except)->whereBetween('period_pl', [
-                                                $fromToValues[0]->format('Y-m'),
-                                                $fromToValues[1]->format('Y-m')
-                                            ]);
+                            if ($is_filter_except === 'date') {
+                                $anketas = $isFromEqualToValue ?
+                                    $anketas->whereDate($is_filter_except, $fromFilterValue)
+                                    : $anketas
+                                        ->where(function ($q) use ($is_filter_except, $fromToValues) {
+                                            $q->where(function ($q) use ($is_filter_except, $fromToValues) {
+                                                $q->whereNotNull($is_filter_except)
+                                                    ->whereBetween($is_filter_except, [
+                                                        $fromToValues[0],
+                                                        $fromToValues[1]
+                                                    ]);
+                                            })
+                                                ->orWhere(function ($q) use ($is_filter_except, $fromToValues) {
+                                                    $q->whereNull($is_filter_except)->whereBetween('period_pl', [
+                                                        $fromToValues[0]->format('Y-m'),
+                                                        $fromToValues[1]->format('Y-m')
+                                                    ]);
+                                                });
                                         });
-                                    });
+                            } else {
+                                $anketas = $isFromEqualToValue ?
+                                    $anketas->whereDate($is_filter_except, $fromFilterValue)
+                                    : $anketas->whereBetween($is_filter_except, [
+                                            $fromToValues[0],
+                                            $fromToValues[1]
+                                        ]);
 
-
+                            }
 
                         } else if ($fk !== 'date' && $fk !== 'created_at') {
                             $explodeData = is_array($fv) ? $fv : explode(',', $fv);
@@ -257,21 +266,14 @@ class HomeController extends Controller
                                     $anketas = $anketas->where($fk, null);
                                 }
                             }
-                        } else if($fk !== 'date') {
-                            // Если даты \\ не ебу чё он тут писал, бля мне это мешало
-                            if( $fk === 'created_at' ) {
-//                                dump($fk, '>=', $fv);
-                                $anketas = $anketas->where($fk, '>=', $fv);
-                            } else {
-                                $anketas = $anketas->where($fk, $fv);
-                            }
                         }
-
                     }
                 }else if (!empty($fv)) {
                     $anketas = $anketas->where($fk, 'LIKE', '%' . $fv . '%');
                 }
             }
+
+//            dd($anketas->get(), $anketas->dd());
         }
 //        dump($fromToValues);
 //        dd($anketas->toSql());
