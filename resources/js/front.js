@@ -24,6 +24,24 @@ $(document).ready(function () {
 
     let loading = false
 
+    $(document).on('click', '.reload-filters', function(event) {
+        const btn = $(event.target);
+        if(location.pathname.indexOf('home') > -1) {
+            btn.disabled = true;
+            console.log(btn.children('span.spinner'));
+            btn.children('span.spinner').removeClass('d-none');
+            $('#filter-group-2-tab').removeClass('active');
+            $('#filter-group-1-tab').addClass('active');
+
+            $.get(location.origin + location.pathname + '/filters').done(response => {
+                if(response) {
+                    $('#filter-groupsContent').html(response)
+                    LIBS.initChosen()
+                }
+            });
+        }
+    });
+
     $(document).on('input', '.chosen-search-input', function(event) {
         let search = event.target.value;
         const select = $(event.target).parents('.form-group')?.children('.filled-select');
@@ -51,9 +69,11 @@ $(document).ready(function () {
             data.forEach((element => {
                 const value = element[key];
                 const text = element[field];
-                const exist = select.children('option[value="' + value + '"]');
-                if (exist.length > 0) {
-                    return;
+                const exist = select.children('option');
+                for(let i = 0; i < exist.length; i++) {
+                    if (exist[i].value == value) {
+                        return;
+                    }
                 }
 
                 select.append($('<option>', {
@@ -64,7 +84,6 @@ $(document).ready(function () {
             search = event.target.value;
             select.trigger("chosen:updated");
             event.target.value = search;
-            console.log(select.children('option').length);
         });
         setTimeout(() => {
             loading = false;

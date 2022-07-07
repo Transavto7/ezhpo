@@ -131,4 +131,7 @@
 
 
 <button type="submit" class="btn btn-info">Поиск</button>
-<a href="{{ route('home', $type_ankets) }}" class="btn btn-danger">Сбросить</a>
+<button type="button" class="btn btn-danger reload-filters">
+    <span class="spinner spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+    Сбросить
+</button>
