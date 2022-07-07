@@ -45,6 +45,7 @@
     @php
         $default_value = is_array($default_value) ? $default_value : explode(',', $default_value);
         $key = isset($v['getFieldKey']) ? $v['getFieldKey'] : 'id';
+        $value = isset($v['getField']) ? $v['getField'] : 'name';
     @endphp
 
     <select
@@ -54,7 +55,8 @@
 
         @if(!is_array($v['values']))
             model="{{ $v['values'] }}"
-            field="{{ $key }}"
+            field-key="{{ $key }}"
+            field="{{ $value }}"
         @endif
 
         @isset($v['multiple'])
@@ -81,16 +83,14 @@
                 </option>
             @endforeach
         @else
-            @foreach($default_value as $value)
-                @if($value != 'Не установлено')
-                    <option selected value="{{ $value }}">
-                        {{ $value }}
-                    </option>
-                @endif
+            @foreach(app("App\\" . $v['values'])::whereIn($key, $default_value)->get() as $option)
+                <option selected value="{{ $option[$key] }}">
+                    {{ $option[$value] }}
+                </option>
             @endforeach
             @foreach(app("App\\" . $v['values'])::whereNotIn($key, $default_value)->limit(100)->get() as $option)
                 <option value="{{ $option[$key] }}">
-                    {{ $option[$key] }}
+                    {{ $option[$value] }}
                 </option>
             @endforeach
         @endif

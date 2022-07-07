@@ -12,15 +12,20 @@ class ApiController extends Controller
 {
 
     public function modelList(Request $request, $model) {
-        $field = 'id';
+        $field = 'name';
+        $key = 'id';
 
-        if ($request->has('field')) {
+        if ($request->get('field')) {
             $field = $request->field;
+        }
+
+        if ($request->get('key')) {
+            $key = $request->key;
         }
 
         return app("App\\" . $model)::where(DB::raw("LOWER($field)"),
             'like', '%' . strtolower($request->search) . '%')
-            ->select($field, 'id')->limit(100)->get();
+            ->select($field, $key)->limit(100)->get();
     }
 
     // Response

@@ -29,6 +29,7 @@ $(document).ready(function () {
         const select = $(event.target).parents('.form-group')?.children('.filled-select');
         const model = select.attr('model');
         const field = select.attr('field');
+        const key = select.attr('field-key');
 
         if (!model) {
             return;
@@ -43,19 +44,21 @@ $(document).ready(function () {
             model,
             params: {
                 search,
-                field
+                field,
+                key
             }
         }).then(({ data }) => {
             data.forEach((element => {
-                const value = element[field];
+                const value = element[key];
+                const text = element[field];
                 const exist = select.children('option[value="' + value + '"]');
                 if (exist.length > 0) {
                     return;
                 }
 
                 select.append($('<option>', {
-                    value: value,
-                    text: value
+                    value,
+                    text
                 }));
             }));
             search = event.target.value;
