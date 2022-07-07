@@ -373,4 +373,40 @@ class HomeController extends Controller
             'queryString' => $queryString
         ]);
     }
+
+    public function getFilters(Request $request) {
+
+        $typePrikaz = $request->get('typePrikaz');
+        $typeAnkets = $request->type_ankets;
+
+        $validTypeAnkets = User::$userRolesKeys[auth()->user()->role];
+        if(isset(Anketa::$anketsKeys[$typeAnkets])) {
+            $validTypeAnkets = $typeAnkets;
+        }
+
+        /**
+         * Выбор полей
+         */
+        if ($typePrikaz === 'Dop' || (!isset($_GET['getFormFilter']) && $request->get('exportPrikazPL'))) {
+            $fieldsKeysTypeAnkets = 'Dop_prikaz';
+        } else {
+            $fieldsKeysTypeAnkets = $validTypeAnkets;
+        }
+
+        $fieldsKeys = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
+        $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets]) ? Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] : [];
+        $anketsFields = array_keys($fieldsKeys);
+
+        if(auth()->user()->hasRole('client', '==')) {
+            unset($fieldsKeys['created_at']);
+            unset($fieldsKeys['is_pak']);
+        }
+
+        return view('home_filters', [
+            'anketsFields' => $anketsFields,
+            'type_ankets' => $validTypeAnkets,
+            'fieldsKeys' => $fieldsKeys,
+            'fieldsGroupFirst' => $fieldsGroupFirst,
+        ]);
+    }
 }

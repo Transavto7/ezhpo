@@ -314,7 +314,7 @@ $(document).ready(function () {
 
     // Подгрузка в полей в Журналах: CHOSEN
     if(location.pathname.indexOf('home') > -1) {
-        $.get(location.search ? location.href+'&getFormFilter=1' : '?getFormFilter=1').done(response => {
+        $.get(location.origin + location.pathname + '/filters' + location.search).done(response => {
             if(response) {
                 $('#filter-groupsContent').html(response)
                 LIBS.initChosen()
