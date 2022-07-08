@@ -152,3 +152,10 @@
         </select>
     </div>
 @endif
+
+<div class="form-group">
+    <label class="form-control-label">Подпись водителя:</label>
+    <article>
+        <input type="text" min="0" minlength="0" max="50" maxlength="50" name="signature" value="{{ $tonometer ?? 'Подписано простой ЭЦП' }}" class="form-control">
+    </article>
+</div>

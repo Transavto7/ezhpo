@@ -18,7 +18,7 @@ class Anketa extends Model
         'company_id', 'company_name',
 
         'pv_id', 'date', 'created_at', 'number_list_road', //'date_number_list_road',
-        'type_view', 'tonometer', 't_people', 'proba_alko', 'test_narko', 'med_view', 'odometer', 'point_reys_control',
+        'type_view', 'tonometer','signature', 't_people', 'proba_alko', 'test_narko', 'med_view', 'odometer', 'point_reys_control',
         'admitted',
 
         // Новые поля
@@ -69,7 +69,8 @@ class Anketa extends Model
             'pv_id' => 'Пункт выпуска',
             //'car_mark_model' => 'Автомобиль',
             'flag_pak' => 'Флаг СДПО',
-            'realy' => 'Осмотр реальный?'
+            'realy' => 'Осмотр реальный?',
+            'signature' => 'ЭЛ подпись',
         ],
 
         'pak' => [
@@ -91,7 +92,9 @@ class Anketa extends Model
             'complaint' => 'Жалобы',
             'admitted' => 'Заключение о результатах осмотра',
             'photos' => 'Фото',
-            'videos' => 'Видео'
+            'videos' => 'Видео',
+            'signature' => 'Электронная подпись',
+
         ],
 
         'tech' => [
@@ -175,7 +178,8 @@ class Anketa extends Model
             'videos' => 'Видео',
             'is_dop' => 'Режим ввода ПЛ',
             'result_dop' => 'Результат ввода ПЛ',
-            'period_pl' => 'Период ПЛ'
+            'period_pl' => 'Период ПЛ',
+            'signature' => 'ЭЛ подпись',
         ],
         'tech' => [
 
@@ -217,7 +221,8 @@ class Anketa extends Model
             'flag_pak' => 'Флаг СДПО',
             'realy' => 'Осмотр реальный?',
             'is_dop' => 'Режим ввода ПЛ',
-            'period_pl' => 'Период выдачи ПЛ'
+            'period_pl' => 'Период выдачи ПЛ',
+            'signature' => 'ЭЛ подпись',
         ],
 
         'pak' => [
@@ -235,6 +240,7 @@ class Anketa extends Model
             'proba_alko' => 'Признаки опьянения', // Проба на алкоголь
             'admitted' => 'Заключение о результатах осмотра',
             'user_eds' => 'ЭЦП медицинского работника',
+            'signature' => 'Электронная подпись',
 
             // Поля не в выгрузку
             'created_at' => 'Дата создания',
@@ -265,6 +271,7 @@ class Anketa extends Model
             'complaint' => 'Жалобы',
             'admitted' => 'Заключение о результатах осмотра',
             'photos' => 'Фото',
+            'signature' => 'Электронная подпись',
             'videos' => 'Видео'
         ],
 
@@ -295,7 +302,8 @@ class Anketa extends Model
             'user_eds' => 'Подпись лица, проводившего контроль',
             'pv_id' => 'Пункт выпуска',
             'is_dop' => 'Режим ввода ПЛ',
-            'period_pl' => 'Период выдачи ПЛ'
+            'period_pl' => 'Период выдачи ПЛ',
+            'signature' => 'ЭЛ подпись',
         ],
 
         /**
