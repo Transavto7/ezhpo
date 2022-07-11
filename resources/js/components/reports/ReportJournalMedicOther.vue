@@ -74,15 +74,35 @@ export default {
             this.show = false;
         },
         getTotal(item, name) {
-            if (item.types && item.types[name] && item.types[name].total) {
-                return item.types[name].total;
+            let total = 0;
+
+            if (item.types) {
+                for (let key in item.types) {
+                    if (key.split('/')[0].trim() === name) {
+                        total += parseInt(item.types[key]?.total);
+                    }
+                }
+            }
+
+            if (total > 0) {
+                return total;
             }
 
             return 'отсутствует';
         },
         getSum(item, name) {
-            if (item.types && item.types[name] && item.types[name].sum) {
-                return item.types[name].sum;
+            let sum = 0;
+
+            if (item.types) {
+                for (let key in item.types) {
+                    if (key.split('/')[0].trim() === name) {
+                        sum += parseInt(item.types[key]?.sum);
+                    }
+                }
+            }
+
+            if (sum > 0) {
+                return sum;
             }
 
             return null

@@ -122,6 +122,7 @@ Route::middleware(['auth'])->group(function () {
  * Профиль, анкета, авторзация
  */
 Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(function () {
+    Route::get('/home/filters', 'HomeController@getFilters');
     Route::get('/home/{type_ankets?}/filters', 'HomeController@getFilters')->name('home.filters');
     Route::get('/home/{type_ankets?}', 'HomeController@index')->name('home');
 

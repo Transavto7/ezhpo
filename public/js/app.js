@@ -2624,15 +2624,39 @@ __webpack_require__.r(__webpack_exports__);
       this.show = false;
     },
     getTotal: function getTotal(item, name) {
-      if (item.types && item.types[name] && item.types[name].total) {
-        return item.types[name].total;
+      var total = 0;
+
+      if (item.types) {
+        for (var key in item.types) {
+          if (key.split('/')[0].trim() === name) {
+            var _item$types$key;
+
+            total += parseInt((_item$types$key = item.types[key]) === null || _item$types$key === void 0 ? void 0 : _item$types$key.total);
+          }
+        }
+      }
+
+      if (total > 0) {
+        return total;
       }
 
       return 'отсутствует';
     },
     getSum: function getSum(item, name) {
-      if (item.types && item.types[name] && item.types[name].sum) {
-        return item.types[name].sum;
+      var sum = 0;
+
+      if (item.types) {
+        for (var key in item.types) {
+          if (key.split('/')[0].trim() === name) {
+            var _item$types$key2;
+
+            sum += parseInt((_item$types$key2 = item.types[key]) === null || _item$types$key2 === void 0 ? void 0 : _item$types$key2.sum);
+          }
+        }
+      }
+
+      if (sum > 0) {
+        return sum;
       }
 
       return null;
@@ -2731,15 +2755,39 @@ __webpack_require__.r(__webpack_exports__);
       this.show = false;
     },
     getTotal: function getTotal(item, name) {
-      if (item.types && item.types[name] && item.types[name].total) {
-        return item.types[name].total;
+      var total = 0;
+
+      if (item.types) {
+        for (var key in item.types) {
+          if (key.split('/')[0].trim() === name) {
+            var _item$types$key;
+
+            total += parseInt((_item$types$key = item.types[key]) === null || _item$types$key === void 0 ? void 0 : _item$types$key.total);
+          }
+        }
+      }
+
+      if (total > 0) {
+        return total;
       }
 
       return 'отсутствует';
     },
     getSum: function getSum(item, name) {
-      if (item.types && item.types[name] && item.types[name].sum) {
-        return item.types[name].sum;
+      var sum = 0;
+
+      if (item.types) {
+        for (var key in item.types) {
+          if (key.split('/')[0].trim() === name) {
+            var _item$types$key2;
+
+            sum += parseInt((_item$types$key2 = item.types[key]) === null || _item$types$key2 === void 0 ? void 0 : _item$types$key2.sum);
+          }
+        }
+      }
+
+      if (sum > 0) {
+        return sum;
       }
 
       return null;
@@ -3022,15 +3070,39 @@ __webpack_require__.r(__webpack_exports__);
       this.show = false;
     },
     getTotal: function getTotal(item, name) {
-      if (item.types && item.types[name] && item.types[name].total) {
-        return item.types[name].total;
+      var total = 0;
+
+      if (item.types) {
+        for (var key in item.types) {
+          if (key.split('/')[0].trim() === name) {
+            var _item$types$key;
+
+            total += parseInt((_item$types$key = item.types[key]) === null || _item$types$key === void 0 ? void 0 : _item$types$key.total);
+          }
+        }
+      }
+
+      if (total > 0) {
+        return total;
       }
 
       return 'отсутствует';
     },
     getSum: function getSum(item, name) {
-      if (item.types && item.types[name] && item.types[name].sum) {
-        return item.types[name].sum;
+      var sum = 0;
+
+      if (item.types) {
+        for (var key in item.types) {
+          if (key.split('/')[0].trim() === name) {
+            var _item$types$key2;
+
+            sum += parseInt((_item$types$key2 = item.types[key]) === null || _item$types$key2 === void 0 ? void 0 : _item$types$key2.sum);
+          }
+        }
+      }
+
+      if (sum > 0) {
+        return sum;
       }
 
       return null;
@@ -3182,15 +3254,39 @@ __webpack_require__.r(__webpack_exports__);
       this.show = false;
     },
     getTotal: function getTotal(item, name) {
-      if (item.types && item.types[name] && item.types[name].total) {
-        return item.types[name].total;
+      var total = 0;
+
+      if (item.types) {
+        for (var key in item.types) {
+          if (key.split('/')[0].trim() === name) {
+            var _item$types$key;
+
+            total += parseInt((_item$types$key = item.types[key]) === null || _item$types$key === void 0 ? void 0 : _item$types$key.total);
+          }
+        }
+      }
+
+      if (total > 0) {
+        return total;
       }
 
       return 'отсутствует';
     },
     getSum: function getSum(item, name) {
-      if (item.types && item.types[name] && item.types[name].sum) {
-        return item.types[name].sum;
+      var sum = 0;
+
+      if (item.types) {
+        for (var key in item.types) {
+          if (key.split('/')[0].trim() === name) {
+            var _item$types$key2;
+
+            sum += parseInt((_item$types$key2 = item.types[key]) === null || _item$types$key2 === void 0 ? void 0 : _item$types$key2.sum);
+          }
+        }
+      }
+
+      if (sum > 0) {
+        return sum;
       }
 
       return null;
@@ -3288,15 +3384,39 @@ __webpack_require__.r(__webpack_exports__);
       this.show = false;
     },
     getTotal: function getTotal(item, name) {
-      if (item.types && item.types[name] && item.types[name].total) {
-        return item.types[name].total;
+      var total = 0;
+
+      if (item.types) {
+        for (var key in item.types) {
+          if (key.split('/')[0].trim() === name) {
+            var _item$types$key;
+
+            total += parseInt((_item$types$key = item.types[key]) === null || _item$types$key === void 0 ? void 0 : _item$types$key.total);
+          }
+        }
+      }
+
+      if (total > 0) {
+        return total;
       }
 
       return 'отсутствует';
     },
     getSum: function getSum(item, name) {
-      if (item.types && item.types[name] && item.types[name].sum) {
-        return item.types[name].sum;
+      var sum = 0;
+
+      if (item.types) {
+        for (var key in item.types) {
+          if (key.split('/')[0].trim() === name) {
+            var _item$types$key2;
+
+            sum += parseInt((_item$types$key2 = item.types[key]) === null || _item$types$key2 === void 0 ? void 0 : _item$types$key2.sum);
+          }
+        }
+      }
+
+      if (sum > 0) {
+        return sum;
       }
 
       return null;
@@ -3810,6 +3930,23 @@ $(document).ready(function () {
     }
   });
   var loading = false;
+  $(document).on('click', '.reload-filters', function (event) {
+    var btn = $(event.target);
+
+    if (location.pathname.indexOf('home') > -1) {
+      btn.disabled = true;
+      console.log(btn.children('span.spinner'));
+      btn.children('span.spinner').removeClass('d-none');
+      $('#filter-group-2-tab').removeClass('active');
+      $('#filter-group-1-tab').addClass('active');
+      $.get(location.origin + location.pathname + '/filters').done(function (response) {
+        if (response) {
+          $('#filter-groupsContent').html(response);
+          LIBS.initChosen();
+        }
+      });
+    }
+  });
   $(document).on('input', '.chosen-search-input', function (event) {
     var _$$parents;
 
@@ -3817,6 +3954,7 @@ $(document).ready(function () {
     var select = (_$$parents = $(event.target).parents('.form-group')) === null || _$$parents === void 0 ? void 0 : _$$parents.children('.filled-select');
     var model = select.attr('model');
     var field = select.attr('field');
+    var key = select.attr('field-key');
 
     if (!model) {
       return;
@@ -3831,27 +3969,30 @@ $(document).ready(function () {
       model: model,
       params: {
         search: search,
-        field: field
+        field: field,
+        key: key
       }
     }).then(function (_ref) {
       var data = _ref.data;
       data.forEach(function (element) {
-        var value = element[field];
-        var exist = select.children('option[value="' + value + '"]');
+        var value = element[key];
+        var text = element[field];
+        var exist = select.children('option');
 
-        if (exist.length > 0) {
-          return;
+        for (var i = 0; i < exist.length; i++) {
+          if (exist[i].value == value) {
+            return;
+          }
         }
 
         select.append($('<option>', {
           value: value,
-          text: value
+          text: text
         }));
       });
       search = event.target.value;
       select.trigger("chosen:updated");
       event.target.value = search;
-      console.log(select.children('option').length);
     });
     setTimeout(function () {
       loading = false;
