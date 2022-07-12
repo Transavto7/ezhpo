@@ -177,12 +177,6 @@
     </article>
 </div>
 
-<div class="form-group row">
-    <label class="col-md-3 form-control-label">Подпись водителя:</label>
-    <article class="col-md-9">
-        <input type="text" min="0" minlength="0" max="50" maxlength="50" name="signature" value="{{ $tonometer ?? 'Подписано простой ЭЦП' }}" class="form-control">
-    </article>
-</div>
 
 <div class="row">
     <div class="col-md-12">
