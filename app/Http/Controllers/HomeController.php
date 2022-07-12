@@ -197,8 +197,8 @@ class HomeController extends Controller
                             $isFromEqualToValue = $fromFilterValue === $fv;
                             $fromToValues = [$filter_params[$is_filter_except], $fv];
 
-                            $fromToValues[0] = Carbon::create($fromToValues[0]);
-                            $fromToValues[1] = Carbon::create($fromToValues[1]);
+                            $fromToValues[0] = Carbon::create($fromToValues[0])->startOfDay();
+                            $fromToValues[1] = Carbon::create($fromToValues[1])->endOfDay();
 
                             /**
                              * Поправил дату

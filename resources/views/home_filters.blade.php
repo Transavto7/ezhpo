@@ -27,8 +27,8 @@
                         $date_to_filter = '';
                     }
                 }else{ // иначе берём начало и конец прошлого месяца
-                    $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d H:i');;
-                    $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d H:i');
+                    $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');;
+                    $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
                 }
             @endphp
 
@@ -99,7 +99,7 @@
                                 {{--ИЗНАЧАЛЬНОЕ ПОЛЕ ФИЛЬТР--}}
                                 <input
                                     @if($field === 'date' || strpos($field, '_at') > 0)
-                                    type="datetime-local"
+                                    type="date"
                                     @else
                                     type="search"
                                     @endif
@@ -116,7 +116,7 @@
                             <div class="form-group">
                                 <label><b>ДО</b></label>
                                 <input
-                                    type="datetime-local"
+                                    type="date"
                                     value="{{ request()->get('TO_'.$field) }}"
                                     name="TO_{{ $field }}" class="form-control" />
                             </div>
