@@ -70,7 +70,6 @@ class Anketa extends Model
             //'car_mark_model' => 'Автомобиль',
             'flag_pak' => 'Флаг СДПО',
             'realy' => 'Осмотр реальный?',
-            'signature' => 'ЭЛ подпись',
         ],
 
         'pak' => [
@@ -93,7 +92,6 @@ class Anketa extends Model
             'admitted' => 'Заключение о результатах осмотра',
             'photos' => 'Фото',
             'videos' => 'Видео',
-            'signature' => 'Электронная подпись',
 
         ],
 
@@ -125,6 +123,7 @@ class Anketa extends Model
             'driver_fio' => 'Ф.И.О водителя, прошедшего инструктаж',
             'user_name' => 'Ф.И.О (при наличии) лица, проводившего инструктаж',
             'pv_id' => 'Пункт выпуска',
+            'signature' => 'ЭЛ подпись',
         ],
 
         'report_cart' => [
@@ -222,7 +221,6 @@ class Anketa extends Model
             'realy' => 'Осмотр реальный?',
             'is_dop' => 'Режим ввода ПЛ',
             'period_pl' => 'Период выдачи ПЛ',
-            'signature' => 'ЭЛ подпись',
         ],
 
         'pak' => [
@@ -240,7 +238,6 @@ class Anketa extends Model
             'proba_alko' => 'Признаки опьянения', // Проба на алкоголь
             'admitted' => 'Заключение о результатах осмотра',
             'user_eds' => 'ЭЦП медицинского работника',
-            'signature' => 'Электронная подпись',
 
             // Поля не в выгрузку
             'created_at' => 'Дата создания',
@@ -271,7 +268,6 @@ class Anketa extends Model
             'complaint' => 'Жалобы',
             'admitted' => 'Заключение о результатах осмотра',
             'photos' => 'Фото',
-            'signature' => 'Электронная подпись',
             'videos' => 'Видео'
         ],
 
@@ -303,7 +299,6 @@ class Anketa extends Model
             'pv_id' => 'Пункт выпуска',
             'is_dop' => 'Режим ввода ПЛ',
             'period_pl' => 'Период выдачи ПЛ',
-            'signature' => 'ЭЛ подпись',
         ],
 
         /**
@@ -353,6 +348,7 @@ class Anketa extends Model
             'pv_id' => 'Пункт выпуска',
             'company_id' => 'ID компании',
             'driver_id' => 'ID водителя',
+            'signature' => 'ЭЛ подпись',
         ],
 
         'pechat_pl' => [
@@ -392,6 +388,7 @@ class Anketa extends Model
             'user_eds' => 'Подпись лица, проводившего инструктаж',
             'company_id' => 'ID компании',
             'driver_id' => 'ID водителя',
+            'signature' => 'ЭЛ подпись',
         ]
 
     ];

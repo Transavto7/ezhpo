@@ -71,7 +71,6 @@ class IndexController extends Controller
                 'banks' => ['label' => 'Банки', 'type' => 'text', 'noRequired' => 1],
                 'director' => ['label' => 'Должность руководителя', 'type' => 'text', 'noRequired' => 1],
                 'director_fio' => ['label' => 'ФИО Руководителя', 'type' => 'text', 'noRequired' => 1],
-                'signature' => ['label' => 'Подпись', 'type' => 'file', 'noRequired' => 1],
                 'seal' => ['label' => 'Печать', 'type' => 'file', 'noRequired' => 1]
             ]
         ],
@@ -352,7 +351,8 @@ class IndexController extends Controller
                     0 => 'Нет',
                     1 => 'Да'
                 ], 'defaultValue' => 'Да'],
-                'sort' => ['label' => 'Сортировка', 'type' => 'number', 'noRequired' => 1]
+                'sort' => ['label' => 'Сортировка', 'type' => 'number', 'noRequired' => 1],
+                'signature' => ['label' => 'ЭЛ подпись водителя', 'type' => 'number', 'noRequired' => 1]
             ]
         ]
 
