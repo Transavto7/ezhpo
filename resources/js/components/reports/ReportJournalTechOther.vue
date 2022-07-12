@@ -17,8 +17,8 @@
                         <table class="w-100 table">
                             <thead>
                             <th class="text-center">Автомобиль</th>
-                            <th class="text-center">Предрейсовые</th>
-                            <th class="text-center">Послерейсовые</th>
+                            <th class="text-center">Предрейсовые/Предсменный</th>
+                            <th class="text-center">Послерейсовые/Послесменный</th>
                             <th class="text-center">режим ПЛ</th>
                             <th class="text-center">БДД</th>
                             <th class="text-center">Отчёты с карт</th>

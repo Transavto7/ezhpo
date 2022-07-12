@@ -8,8 +8,8 @@
                     <tr>
                         <th width="100">ID</th>
                         <th width="250">Автомобиль</th>
-                        <th class="text-center" width="150">Предрейсовые</th>
-                        <th class="text-center" width="150">Послерейсовые</th>
+                        <th class="text-center" width="150">Предрейсовые/Предсменный</th>
+                        <th class="text-center" width="150">Послерейсовые/Послесменный</th>
                         <th class="text-center">режим ПЛ</th>
 
                         <th class="text-center" width="150">БДД</th>
