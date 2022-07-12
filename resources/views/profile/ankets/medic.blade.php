@@ -107,8 +107,6 @@
 
                         <option selected value="Предрейсовый">Предрейсовый</option>
                         <option value="Послерейсовый">Послерейсовый</option>
-                        <option value="Предсменный">Предсменный</option>
-                        <option value="Послесменный">Послесменный</option>
                     </select>
                 </article>
             </div>

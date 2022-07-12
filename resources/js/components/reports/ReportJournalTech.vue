@@ -11,9 +11,6 @@
                         <th class="text-center" width="150">Предрейсовые</th>
                         <th class="text-center" width="150">Послерейсовые</th>
 
-                        <th class="text-center" width="150">Предсменные</th>
-                        <th class="text-center" width="150">Послесменные</th>
-
                         <th class="text-center" width="150">БДД</th>
                         <th class="text-center" width="150">Отчёты с карт</th>
                     </tr>
@@ -29,39 +26,21 @@
                         </td>
 
                         <td class="text-center" width="150">
-                            {{ getTotal(item, 'Предрейсовый') }}
+                            {{ getTotal(item, 'Предрейсовый', 'Предсменный') }}
 
-                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Предрейсовый') == null">
+                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Предрейсовый', 'Предсменный') == null">
                                 Услуги не указаны
                             </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Предрейсовый') }}₽ </div>
+                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Предрейсовый', 'Предсменный') }}₽ </div>
                         </td>
 
                         <td class="text-center" width="150">
-                            {{ getTotal(item, 'Послерейсовый') }}
+                            {{ getTotal(item, 'Послерейсовый', 'Послесменный') }}
 
-                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Послерейсовый') == null">
+                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Послерейсовый', 'Послесменный') == null">
                                 Услуги не указаны
                             </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Послерейсовый') }}₽ </div>
-                        </td>
-
-                        <td class="text-center" width="150">
-                            {{ getTotal(item, 'Предсменный') }}
-
-                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Предсменный') == null">
-                                Услуги не указаны
-                            </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Предсменный') }}₽ </div>
-                        </td>
-
-                        <td class="text-center" width="150">
-                            {{ getTotal(item, 'Послесменный') }}
-
-                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Послесменный') == null">
-                                Услуги не указаны
-                            </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Послесменный') }}₽ </div>
+                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Послерейсовый', 'Послесменный') }}₽ </div>
                         </td>
 
                         <td class="text-center" width="150">
@@ -110,8 +89,8 @@ export default {
 
             }
 
-            if (item.car_mark_model) {
-                str +=  `(${item.car_mark_model})`;
+            if (item.type_auto) {
+                str +=  `(${item.type_auto})`;
             }
 
             return str;
@@ -126,14 +105,16 @@ export default {
             this.reports = false;
             this.show = false;
         },
-        getTotal(item, name) {
+        getTotal(item, ...names) {
             let total = 0;
 
             if (item.types) {
                 for (let key in item.types) {
-                    if (key.split('/')[0].trim() === name) {
-                        total += parseInt(item.types[key]?.total);
-                    }
+                    names.forEach(name => {
+                        if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+                            total += parseInt(item.types[key]?.total);
+                        }
+                    });
                 }
             }
 
@@ -143,14 +124,16 @@ export default {
 
             return 'отсутствует';
         },
-        getSum(item, name) {
+        getSum(item, ...names) {
             let sum = 0;
 
             if (item.types) {
                 for (let key in item.types) {
-                    if (key.split('/')[0].trim() === name) {
-                        sum += parseInt(item.types[key]?.sum);
-                    }
+                    names.forEach(name => {
+                        if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+                            sum += parseInt(item.types[key]?.sum);
+                        }
+                    });
                 }
             }
 
