@@ -49,14 +49,11 @@ $(document).ready(function () {
         if (select.length < 1) {
            const id = $(event.target).attr('aria-controls');
            select = $(`.select2-selection[aria-owns="${id}"]`).parents('.select2')?.parent()?.children('.filled-select2');
-           console.log(id);
         }
 
         const model = select.attr('model');
         const field = select.attr('field');
         const key = select.attr('field-key');
-
-        console.log(select, model, key, field)
 
         if (!model) {
             return;
