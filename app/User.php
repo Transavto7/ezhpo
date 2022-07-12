@@ -58,6 +58,7 @@ class User extends Authenticatable
         '4' => 'pak_queue',
         '12' => 'medic',
         '11' => 'medic',
+        '13' => 'bdd',
         '777' => 'medic',
         '778' => 'medic'
     ];
