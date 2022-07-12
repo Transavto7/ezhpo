@@ -18,6 +18,7 @@
                             <th class="text-center">Водитель</th>
                             <th class="text-center">Предрейсовые</th>
                             <th class="text-center">Послерейсовые</th>
+                            <th class="text-center">режим ПЛ</th>
 
                             <th class="text-center">БДД</th>
                             <th class="text-center">Отчёты с карт</th>
@@ -28,6 +29,7 @@
                                 <td class="text-center">{{ report.driver_fio }} / {{ name }}</td>
                                 <td class="text-center">{{ getTotal(report, 'Предрейсовый', 'Предсменный') }}</td>
                                 <td class="text-center">{{ getTotal(report, 'Послерейсовый', 'Послесменный') }}</td>
+                                <td class="text-center">{{ getTotal(report, 'is_dop') }}</td>
                                 <td class="text-center">{{ getTotal(report, 'bdd')}} </td>
                                 <td class="text-center">{{ getTotal(report, 'report_cart') }}</td>
                             </tr>

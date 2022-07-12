@@ -2590,17 +2590,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "ReportJournalMedic",
   data: function data() {
@@ -2623,16 +2612,26 @@ __webpack_require__.r(__webpack_exports__);
       this.reports = false;
       this.show = false;
     },
-    getTotal: function getTotal(item, name) {
+    getTotal: function getTotal(item) {
       var total = 0;
 
       if (item.types) {
-        for (var key in item.types) {
-          if (key.split('/')[0].trim() === name) {
-            var _item$types$key;
+        for (var _len = arguments.length, names = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          names[_key - 1] = arguments[_key];
+        }
 
-            total += parseInt((_item$types$key = item.types[key]) === null || _item$types$key === void 0 ? void 0 : _item$types$key.total);
-          }
+        var _loop = function _loop(key) {
+          names.forEach(function (name) {
+            if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+              var _item$types$key;
+
+              total += parseInt((_item$types$key = item.types[key]) === null || _item$types$key === void 0 ? void 0 : _item$types$key.total);
+            }
+          });
+        };
+
+        for (var key in item.types) {
+          _loop(key);
         }
       }
 
@@ -2642,16 +2641,26 @@ __webpack_require__.r(__webpack_exports__);
 
       return 'отсутствует';
     },
-    getSum: function getSum(item, name) {
+    getSum: function getSum(item) {
       var sum = 0;
 
       if (item.types) {
-        for (var key in item.types) {
-          if (key.split('/')[0].trim() === name) {
-            var _item$types$key2;
+        for (var _len2 = arguments.length, names = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+          names[_key2 - 1] = arguments[_key2];
+        }
 
-            sum += parseInt((_item$types$key2 = item.types[key]) === null || _item$types$key2 === void 0 ? void 0 : _item$types$key2.sum);
-          }
+        var _loop2 = function _loop2(key) {
+          names.forEach(function (name) {
+            if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+              var _item$types$key2;
+
+              sum += parseInt((_item$types$key2 = item.types[key]) === null || _item$types$key2 === void 0 ? void 0 : _item$types$key2.sum);
+            }
+          });
+        };
+
+        for (var key in item.types) {
+          _loop2(key);
         }
       }
 
@@ -2727,9 +2736,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "ReportJournalMedicOther",
@@ -2754,16 +2760,26 @@ __webpack_require__.r(__webpack_exports__);
       this.data = false;
       this.show = false;
     },
-    getTotal: function getTotal(item, name) {
+    getTotal: function getTotal(item) {
       var total = 0;
 
       if (item.types) {
-        for (var key in item.types) {
-          if (key.split('/')[0].trim() === name) {
-            var _item$types$key;
+        for (var _len = arguments.length, names = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          names[_key - 1] = arguments[_key];
+        }
 
-            total += parseInt((_item$types$key = item.types[key]) === null || _item$types$key === void 0 ? void 0 : _item$types$key.total);
-          }
+        var _loop = function _loop(key) {
+          names.forEach(function (name) {
+            if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+              var _item$types$key;
+
+              total += parseInt((_item$types$key = item.types[key]) === null || _item$types$key === void 0 ? void 0 : _item$types$key.total);
+            }
+          });
+        };
+
+        for (var key in item.types) {
+          _loop(key);
         }
       }
 
@@ -2772,25 +2788,6 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       return 'отсутствует';
-    },
-    getSum: function getSum(item, name) {
-      var sum = 0;
-
-      if (item.types) {
-        for (var key in item.types) {
-          if (key.split('/')[0].trim() === name) {
-            var _item$types$key2;
-
-            sum += parseInt((_item$types$key2 = item.types[key]) === null || _item$types$key2 === void 0 ? void 0 : _item$types$key2.sum);
-          }
-        }
-      }
-
-      if (sum > 0) {
-        return sum;
-      }
-
-      return null;
     }
   }
 });
@@ -3020,10 +3017,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "ReportJournalPL",
@@ -3042,8 +3035,8 @@ __webpack_require__.r(__webpack_exports__);
         str += item.car_gos_number + ' ';
       }
 
-      if (item.car_mark_model) {
-        str += "(".concat(item.car_mark_model, ")");
+      if (item.type_auto) {
+        str += "(".concat(item.type_auto, ")");
       }
 
       if (item.driver_fio) {
@@ -3069,16 +3062,26 @@ __webpack_require__.r(__webpack_exports__);
       this.data = false;
       this.show = false;
     },
-    getTotal: function getTotal(item, name) {
+    getTotal: function getTotal(item) {
       var total = 0;
 
       if (item.types) {
-        for (var key in item.types) {
-          if (key.split('/')[0].trim() === name) {
-            var _item$types$key;
+        for (var _len = arguments.length, names = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          names[_key - 1] = arguments[_key];
+        }
 
-            total += parseInt((_item$types$key = item.types[key]) === null || _item$types$key === void 0 ? void 0 : _item$types$key.total);
-          }
+        var _loop = function _loop(key) {
+          names.forEach(function (name) {
+            if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+              var _item$types$key;
+
+              total += parseInt((_item$types$key = item.types[key]) === null || _item$types$key === void 0 ? void 0 : _item$types$key.total);
+            }
+          });
+        };
+
+        for (var key in item.types) {
+          _loop(key);
         }
       }
 
@@ -3087,25 +3090,6 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       return 'отсутствует';
-    },
-    getSum: function getSum(item, name) {
-      var sum = 0;
-
-      if (item.types) {
-        for (var key in item.types) {
-          if (key.split('/')[0].trim() === name) {
-            var _item$types$key2;
-
-            sum += parseInt((_item$types$key2 = item.types[key]) === null || _item$types$key2 === void 0 ? void 0 : _item$types$key2.sum);
-          }
-        }
-      }
-
-      if (sum > 0) {
-        return sum;
-      }
-
-      return null;
     }
   }
 });
@@ -3207,17 +3191,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "ReportJournalTech",
   data: function data() {
@@ -3234,8 +3207,8 @@ __webpack_require__.r(__webpack_exports__);
         str += item.car_gos_number + ' ';
       }
 
-      if (item.car_mark_model) {
-        str += "(".concat(item.car_mark_model, ")");
+      if (item.type_auto) {
+        str += "(".concat(item.type_auto, ")");
       }
 
       return str;
@@ -3253,16 +3226,26 @@ __webpack_require__.r(__webpack_exports__);
       this.reports = false;
       this.show = false;
     },
-    getTotal: function getTotal(item, name) {
+    getTotal: function getTotal(item) {
       var total = 0;
 
       if (item.types) {
-        for (var key in item.types) {
-          if (key.split('/')[0].trim() === name) {
-            var _item$types$key;
+        for (var _len = arguments.length, names = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          names[_key - 1] = arguments[_key];
+        }
 
-            total += parseInt((_item$types$key = item.types[key]) === null || _item$types$key === void 0 ? void 0 : _item$types$key.total);
-          }
+        var _loop = function _loop(key) {
+          names.forEach(function (name) {
+            if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+              var _item$types$key;
+
+              total += parseInt((_item$types$key = item.types[key]) === null || _item$types$key === void 0 ? void 0 : _item$types$key.total);
+            }
+          });
+        };
+
+        for (var key in item.types) {
+          _loop(key);
         }
       }
 
@@ -3272,16 +3255,26 @@ __webpack_require__.r(__webpack_exports__);
 
       return 'отсутствует';
     },
-    getSum: function getSum(item, name) {
+    getSum: function getSum(item) {
       var sum = 0;
 
       if (item.types) {
-        for (var key in item.types) {
-          if (key.split('/')[0].trim() === name) {
-            var _item$types$key2;
+        for (var _len2 = arguments.length, names = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+          names[_key2 - 1] = arguments[_key2];
+        }
 
-            sum += parseInt((_item$types$key2 = item.types[key]) === null || _item$types$key2 === void 0 ? void 0 : _item$types$key2.sum);
-          }
+        var _loop2 = function _loop2(key) {
+          names.forEach(function (name) {
+            if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+              var _item$types$key2;
+
+              sum += parseInt((_item$types$key2 = item.types[key]) === null || _item$types$key2 === void 0 ? void 0 : _item$types$key2.sum);
+            }
+          });
+        };
+
+        for (var key in item.types) {
+          _loop2(key);
         }
       }
 
@@ -3370,6 +3363,19 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
+    getStringMark: function getStringMark(item) {
+      var str = '';
+
+      if (item.car_gos_number) {
+        str += item.car_gos_number + ' ';
+      }
+
+      if (item.type_auto) {
+        str += "(".concat(item.type_auto, ")");
+      }
+
+      return str;
+    },
     visible: function visible(data) {
       var show = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
@@ -3383,16 +3389,26 @@ __webpack_require__.r(__webpack_exports__);
       this.data = false;
       this.show = false;
     },
-    getTotal: function getTotal(item, name) {
+    getTotal: function getTotal(item) {
       var total = 0;
 
       if (item.types) {
-        for (var key in item.types) {
-          if (key.split('/')[0].trim() === name) {
-            var _item$types$key;
+        for (var _len = arguments.length, names = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          names[_key - 1] = arguments[_key];
+        }
 
-            total += parseInt((_item$types$key = item.types[key]) === null || _item$types$key === void 0 ? void 0 : _item$types$key.total);
-          }
+        var _loop = function _loop(key) {
+          names.forEach(function (name) {
+            if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+              var _item$types$key;
+
+              total += parseInt((_item$types$key = item.types[key]) === null || _item$types$key === void 0 ? void 0 : _item$types$key.total);
+            }
+          });
+        };
+
+        for (var key in item.types) {
+          _loop(key);
         }
       }
 
@@ -3401,25 +3417,6 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       return 'отсутствует';
-    },
-    getSum: function getSum(item, name) {
-      var sum = 0;
-
-      if (item.types) {
-        for (var key in item.types) {
-          if (key.split('/')[0].trim() === name) {
-            var _item$types$key2;
-
-            sum += parseInt((_item$types$key2 = item.types[key]) === null || _item$types$key2 === void 0 ? void 0 : _item$types$key2.sum);
-          }
-        }
-      }
-
-      if (sum > 0) {
-        return sum;
-      }
-
-      return null;
     }
   }
 });
@@ -3958,13 +3955,11 @@ $(document).ready(function () {
 
       var id = $(event.target).attr('aria-controls');
       select = (_$$parents2 = $(".select2-selection[aria-owns=\"".concat(id, "\"]")).parents('.select2')) === null || _$$parents2 === void 0 ? void 0 : (_$$parents2$parent = _$$parents2.parent()) === null || _$$parents2$parent === void 0 ? void 0 : _$$parents2$parent.children('.filled-select2');
-      console.log(id);
     }
 
     var model = select.attr('model');
     var field = select.attr('field');
     var key = select.attr('field-key');
-    console.log(select, model, key, field);
 
     if (!model) {
       return;
@@ -100515,10 +100510,17 @@ var render = function () {
                         [
                           _vm._v(
                             "\n                        " +
-                              _vm._s(_vm.getTotal(item, "Предрейсовый")) +
+                              _vm._s(
+                                _vm.getTotal(
+                                  item,
+                                  "Предрейсовый",
+                                  "Предсменный"
+                                )
+                              ) +
                               "\n\n                        "
                           ),
-                          _vm.getSum(item, "Предрейсовый") == null
+                          _vm.getSum(item, "Предрейсовый", "Предсменный") ==
+                          null
                             ? _c(
                                 "div",
                                 { staticClass: "text-red font-weight-bold" },
@@ -100531,7 +100533,13 @@ var render = function () {
                             : _c("div", { staticClass: "font-weight-bold" }, [
                                 _vm._v(
                                   " " +
-                                    _vm._s(_vm.getSum(item, "Предрейсовый")) +
+                                    _vm._s(
+                                      _vm.getSum(
+                                        item,
+                                        "Предрейсовый",
+                                        "Предсменный"
+                                      )
+                                    ) +
                                     "₽ "
                                 ),
                               ]),
@@ -100544,10 +100552,17 @@ var render = function () {
                         [
                           _vm._v(
                             "\n                        " +
-                              _vm._s(_vm.getTotal(item, "Послерейсовый")) +
+                              _vm._s(
+                                _vm.getTotal(
+                                  item,
+                                  "Послерейсовый",
+                                  "Послесменный"
+                                )
+                              ) +
                               "\n\n                        "
                           ),
-                          _vm.getSum(item, "Послерейсовый") == null
+                          _vm.getSum(item, "Послерейсовый", "Послесменный") ==
+                          null
                             ? _c(
                                 "div",
                                 { staticClass: "text-red font-weight-bold" },
@@ -100560,7 +100575,13 @@ var render = function () {
                             : _c("div", { staticClass: "font-weight-bold" }, [
                                 _vm._v(
                                   " " +
-                                    _vm._s(_vm.getSum(item, "Послерейсовый")) +
+                                    _vm._s(
+                                      _vm.getSum(
+                                        item,
+                                        "Послерейсовый",
+                                        "Послесменный"
+                                      )
+                                    ) +
                                     "₽ "
                                 ),
                               ]),
@@ -100573,10 +100594,10 @@ var render = function () {
                         [
                           _vm._v(
                             "\n                        " +
-                              _vm._s(_vm.getTotal(item, "Предсменный")) +
+                              _vm._s(_vm.getTotal(item, "is_dop")) +
                               "\n\n                        "
                           ),
-                          _vm.getSum(item, "Предсменный") == null
+                          _vm.getSum(item, "is_dop") == null
                             ? _c(
                                 "div",
                                 { staticClass: "text-red font-weight-bold" },
@@ -100589,36 +100610,7 @@ var render = function () {
                             : _c("div", { staticClass: "font-weight-bold" }, [
                                 _vm._v(
                                   " " +
-                                    _vm._s(_vm.getSum(item, "Предсменный")) +
-                                    "₽ "
-                                ),
-                              ]),
-                        ]
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "td",
-                        { staticClass: "text-center", attrs: { width: "150" } },
-                        [
-                          _vm._v(
-                            "\n                        " +
-                              _vm._s(_vm.getTotal(item, "Послесменный")) +
-                              "\n\n                        "
-                          ),
-                          _vm.getSum(item, "Послесменный") == null
-                            ? _c(
-                                "div",
-                                { staticClass: "text-red font-weight-bold" },
-                                [
-                                  _vm._v(
-                                    "\n                            Услуги не указаны\n                        "
-                                  ),
-                                ]
-                              )
-                            : _c("div", { staticClass: "font-weight-bold" }, [
-                                _vm._v(
-                                  " " +
-                                    _vm._s(_vm.getSum(item, "Послесменный")) +
+                                    _vm._s(_vm.getSum(item, "is_dop")) +
                                     "₽ "
                                 ),
                               ]),
@@ -100717,11 +100709,7 @@ var staticRenderFns = [
         ]),
         _vm._v(" "),
         _c("th", { staticClass: "text-center", attrs: { width: "150" } }, [
-          _vm._v("Предсменные"),
-        ]),
-        _vm._v(" "),
-        _c("th", { staticClass: "text-center", attrs: { width: "150" } }, [
-          _vm._v("Послесменные"),
+          _vm._v("режим ПЛ"),
         ]),
         _vm._v(" "),
         _c("th", { staticClass: "text-center", attrs: { width: "150" } }, [
@@ -100818,7 +100806,7 @@ var render = function () {
                               item.reports,
                               function (report, name, index) {
                                 return _c("tr", [
-                                  _c("td", [
+                                  _c("td", { staticClass: "text-center" }, [
                                     _vm._v(
                                       _vm._s(report.driver_fio) +
                                         " / " +
@@ -100826,45 +100814,43 @@ var render = function () {
                                     ),
                                   ]),
                                   _vm._v(" "),
-                                  _c("td", [
+                                  _c("td", { staticClass: "text-center" }, [
                                     _vm._v(
                                       _vm._s(
-                                        _vm.getTotal(report, "Предрейсовый")
+                                        _vm.getTotal(
+                                          report,
+                                          "Предрейсовый",
+                                          "Предсменный"
+                                        )
                                       )
                                     ),
                                   ]),
                                   _vm._v(" "),
-                                  _c("td", [
+                                  _c("td", { staticClass: "text-center" }, [
                                     _vm._v(
                                       _vm._s(
-                                        _vm.getTotal(report, "Послерейсовый")
+                                        _vm.getTotal(
+                                          report,
+                                          "Послерейсовый",
+                                          "Послесменный"
+                                        )
                                       )
                                     ),
                                   ]),
                                   _vm._v(" "),
-                                  _c("td", [
+                                  _c("td", { staticClass: "text-center" }, [
                                     _vm._v(
-                                      _vm._s(
-                                        _vm.getTotal(report, "Предсменный")
-                                      )
+                                      _vm._s(_vm.getTotal(report, "is_dop"))
                                     ),
                                   ]),
                                   _vm._v(" "),
-                                  _c("td", [
-                                    _vm._v(
-                                      _vm._s(
-                                        _vm.getTotal(report, "Послесменный")
-                                      )
-                                    ),
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("td", [
+                                  _c("td", { staticClass: "text-center" }, [
                                     _vm._v(
                                       _vm._s(_vm.getTotal(report, "bdd")) + " "
                                     ),
                                   ]),
                                   _vm._v(" "),
-                                  _c("td", [
+                                  _c("td", { staticClass: "text-center" }, [
                                     _vm._v(
                                       _vm._s(
                                         _vm.getTotal(report, "report_cart")
@@ -100901,19 +100887,17 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("thead", [
-      _c("th", [_vm._v("Водитель")]),
+      _c("th", { staticClass: "text-center" }, [_vm._v("Водитель")]),
       _vm._v(" "),
-      _c("th", [_vm._v("Предрейсовые")]),
+      _c("th", { staticClass: "text-center" }, [_vm._v("Предрейсовые")]),
       _vm._v(" "),
-      _c("th", [_vm._v("Послерейсовые")]),
+      _c("th", { staticClass: "text-center" }, [_vm._v("Послерейсовые")]),
       _vm._v(" "),
-      _c("th", [_vm._v("Предсменные")]),
+      _c("th", { staticClass: "text-center" }, [_vm._v("режим ПЛ")]),
       _vm._v(" "),
-      _c("th", [_vm._v("Послесменные")]),
+      _c("th", { staticClass: "text-center" }, [_vm._v("БДД")]),
       _vm._v(" "),
-      _c("th", [_vm._v("БДД")]),
-      _vm._v(" "),
-      _c("th", [_vm._v("Отчёты с карт")]),
+      _c("th", { staticClass: "text-center" }, [_vm._v("Отчёты с карт")]),
     ])
   },
 ]
@@ -101206,38 +101190,30 @@ var render = function () {
                               item.reports,
                               function (report, name, index) {
                                 return _c("tr", [
-                                  _c("td", [
+                                  _c("td", { staticClass: "text-center" }, [
                                     _vm._v(_vm._s(_vm.getStringMark(report))),
                                   ]),
                                   _vm._v(" "),
-                                  _c("td", [
+                                  _c("td", { staticClass: "text-center" }, [
                                     _vm._v(
                                       _vm._s(
-                                        _vm.getTotal(report, "Предрейсовый")
+                                        _vm.getTotal(
+                                          report,
+                                          "Предрейсовый",
+                                          "Предсменный"
+                                        )
                                       )
                                     ),
                                   ]),
                                   _vm._v(" "),
-                                  _c("td", [
+                                  _c("td", { staticClass: "text-center" }, [
                                     _vm._v(
                                       _vm._s(
-                                        _vm.getTotal(report, "Послерейсовый")
-                                      )
-                                    ),
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("td", [
-                                    _vm._v(
-                                      _vm._s(
-                                        _vm.getTotal(report, "Предсменный")
-                                      )
-                                    ),
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("td", [
-                                    _vm._v(
-                                      _vm._s(
-                                        _vm.getTotal(report, "Послесменный")
+                                        _vm.getTotal(
+                                          report,
+                                          "Послерейсовый",
+                                          "Послесменный"
+                                        )
                                       )
                                     ),
                                   ]),
@@ -101271,15 +101247,11 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("thead", [
-      _c("th", [_vm._v("Автомобиль/Водитель")]),
+      _c("th", { staticClass: "text-center" }, [_vm._v("Автомобиль/Водитель")]),
       _vm._v(" "),
-      _c("th", [_vm._v("Предрейсовые")]),
+      _c("th", { staticClass: "text-center" }, [_vm._v("Предрейсовые")]),
       _vm._v(" "),
-      _c("th", [_vm._v("Послерейсовые")]),
-      _vm._v(" "),
-      _c("th", [_vm._v("Предсменные")]),
-      _vm._v(" "),
-      _c("th", [_vm._v("Послесменные")]),
+      _c("th", { staticClass: "text-center" }, [_vm._v("Послерейсовые")]),
     ])
   },
 ]
@@ -101348,10 +101320,17 @@ var render = function () {
                         [
                           _vm._v(
                             "\n                        " +
-                              _vm._s(_vm.getTotal(item, "Предрейсовый")) +
+                              _vm._s(
+                                _vm.getTotal(
+                                  item,
+                                  "Предрейсовый",
+                                  "Предсменный"
+                                )
+                              ) +
                               "\n\n                        "
                           ),
-                          _vm.getSum(item, "Предрейсовый") == null
+                          _vm.getSum(item, "Предрейсовый", "Предсменный") ==
+                          null
                             ? _c(
                                 "div",
                                 { staticClass: "text-red font-weight-bold" },
@@ -101364,7 +101343,13 @@ var render = function () {
                             : _c("div", { staticClass: "font-weight-bold" }, [
                                 _vm._v(
                                   " " +
-                                    _vm._s(_vm.getSum(item, "Предрейсовый")) +
+                                    _vm._s(
+                                      _vm.getSum(
+                                        item,
+                                        "Предрейсовый",
+                                        "Предсменный"
+                                      )
+                                    ) +
                                     "₽ "
                                 ),
                               ]),
@@ -101377,10 +101362,17 @@ var render = function () {
                         [
                           _vm._v(
                             "\n                        " +
-                              _vm._s(_vm.getTotal(item, "Послерейсовый")) +
+                              _vm._s(
+                                _vm.getTotal(
+                                  item,
+                                  "Послерейсовый",
+                                  "Послесменный"
+                                )
+                              ) +
                               "\n\n                        "
                           ),
-                          _vm.getSum(item, "Послерейсовый") == null
+                          _vm.getSum(item, "Послерейсовый", "Послесменный") ==
+                          null
                             ? _c(
                                 "div",
                                 { staticClass: "text-red font-weight-bold" },
@@ -101393,7 +101385,13 @@ var render = function () {
                             : _c("div", { staticClass: "font-weight-bold" }, [
                                 _vm._v(
                                   " " +
-                                    _vm._s(_vm.getSum(item, "Послерейсовый")) +
+                                    _vm._s(
+                                      _vm.getSum(
+                                        item,
+                                        "Послерейсовый",
+                                        "Послесменный"
+                                      )
+                                    ) +
                                     "₽ "
                                 ),
                               ]),
@@ -101406,10 +101404,10 @@ var render = function () {
                         [
                           _vm._v(
                             "\n                        " +
-                              _vm._s(_vm.getTotal(item, "Предсменный")) +
+                              _vm._s(_vm.getTotal(item, "is_dop")) +
                               "\n\n                        "
                           ),
-                          _vm.getSum(item, "Предсменный") == null
+                          _vm.getSum(item, "is_dop") == null
                             ? _c(
                                 "div",
                                 { staticClass: "text-red font-weight-bold" },
@@ -101422,36 +101420,7 @@ var render = function () {
                             : _c("div", { staticClass: "font-weight-bold" }, [
                                 _vm._v(
                                   " " +
-                                    _vm._s(_vm.getSum(item, "Предсменный")) +
-                                    "₽ "
-                                ),
-                              ]),
-                        ]
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "td",
-                        { staticClass: "text-center", attrs: { width: "150" } },
-                        [
-                          _vm._v(
-                            "\n                        " +
-                              _vm._s(_vm.getTotal(item, "Послесменный")) +
-                              "\n\n                        "
-                          ),
-                          _vm.getSum(item, "Послесменный") == null
-                            ? _c(
-                                "div",
-                                { staticClass: "text-red font-weight-bold" },
-                                [
-                                  _vm._v(
-                                    "\n                            Услуги не указаны\n                        "
-                                  ),
-                                ]
-                              )
-                            : _c("div", { staticClass: "font-weight-bold" }, [
-                                _vm._v(
-                                  " " +
-                                    _vm._s(_vm.getSum(item, "Послесменный")) +
+                                    _vm._s(_vm.getSum(item, "is_dop")) +
                                     "₽ "
                                 ),
                               ]),
@@ -101549,13 +101518,7 @@ var staticRenderFns = [
           _vm._v("Послерейсовые"),
         ]),
         _vm._v(" "),
-        _c("th", { staticClass: "text-center", attrs: { width: "150" } }, [
-          _vm._v("Предсменные"),
-        ]),
-        _vm._v(" "),
-        _c("th", { staticClass: "text-center", attrs: { width: "150" } }, [
-          _vm._v("Послесменные"),
-        ]),
+        _c("th", { staticClass: "text-center" }, [_vm._v("режим ПЛ")]),
         _vm._v(" "),
         _c("th", { staticClass: "text-center", attrs: { width: "150" } }, [
           _vm._v("БДД"),
@@ -101651,53 +101614,51 @@ var render = function () {
                               item.reports,
                               function (report, name, index) {
                                 return _c("tr", [
-                                  _c("td", [
+                                  _c("td", { staticClass: "text-center" }, [
                                     _vm._v(
-                                      _vm._s(report.car_gos_number) +
-                                        " / " +
-                                        _vm._s(name)
+                                      "\n                                " +
+                                        _vm._s(_vm.getStringMark(report)) +
+                                        "\n                            "
                                     ),
                                   ]),
                                   _vm._v(" "),
-                                  _c("td", [
+                                  _c("td", { staticClass: "text-center" }, [
                                     _vm._v(
                                       _vm._s(
-                                        _vm.getTotal(report, "Предрейсовый")
+                                        _vm.getTotal(
+                                          report,
+                                          "Предрейсовый",
+                                          "Предсменный"
+                                        )
                                       )
                                     ),
                                   ]),
                                   _vm._v(" "),
-                                  _c("td", [
+                                  _c("td", { staticClass: "text-center" }, [
                                     _vm._v(
                                       _vm._s(
-                                        _vm.getTotal(report, "Послерейсовый")
+                                        _vm.getTotal(
+                                          report,
+                                          "Послерейсовый",
+                                          "Послесменный"
+                                        )
                                       )
                                     ),
                                   ]),
                                   _vm._v(" "),
-                                  _c("td", [
+                                  _c("td", { staticClass: "text-center" }, [
                                     _vm._v(
-                                      _vm._s(
-                                        _vm.getTotal(report, "Предсменный")
-                                      )
+                                      _vm._s(_vm.getTotal(report, "is_dop"))
                                     ),
                                   ]),
                                   _vm._v(" "),
-                                  _c("td", [
-                                    _vm._v(
-                                      _vm._s(
-                                        _vm.getTotal(report, "Послесменный")
-                                      )
-                                    ),
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("td", [
+                                  _c("td", { staticClass: "text-center" }, [
                                     _vm._v(
                                       _vm._s(_vm.getTotal(report, "bdd")) + " "
                                     ),
                                   ]),
                                   _vm._v(" "),
-                                  _c("td", [
+                                  _c("td", { staticClass: "text-center" }, [
                                     _vm._v(
                                       _vm._s(
                                         _vm.getTotal(report, "report_cart")
@@ -101734,19 +101695,17 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("thead", [
-      _c("th", [_vm._v("Автомобиль")]),
+      _c("th", { staticClass: "text-center" }, [_vm._v("Автомобиль")]),
       _vm._v(" "),
-      _c("th", [_vm._v("Предрейсовые")]),
+      _c("th", { staticClass: "text-center" }, [_vm._v("Предрейсовые")]),
       _vm._v(" "),
-      _c("th", [_vm._v("Послерейсовые")]),
+      _c("th", { staticClass: "text-center" }, [_vm._v("Послерейсовые")]),
       _vm._v(" "),
-      _c("th", [_vm._v("Предсменные")]),
+      _c("th", { staticClass: "text-center" }, [_vm._v("режим ПЛ")]),
       _vm._v(" "),
-      _c("th", [_vm._v("Послесменные")]),
+      _c("th", { staticClass: "text-center" }, [_vm._v("БДД")]),
       _vm._v(" "),
-      _c("th", [_vm._v("БДД")]),
-      _vm._v(" "),
-      _c("th", [_vm._v("Отчёты с карт")]),
+      _c("th", { staticClass: "text-center" }, [_vm._v("Отчёты с карт")]),
     ])
   },
 ]

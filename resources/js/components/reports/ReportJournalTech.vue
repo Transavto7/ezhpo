@@ -10,6 +10,7 @@
                         <th width="250">Автомобиль</th>
                         <th class="text-center" width="150">Предрейсовые</th>
                         <th class="text-center" width="150">Послерейсовые</th>
+                        <th class="text-center">режим ПЛ</th>
 
                         <th class="text-center" width="150">БДД</th>
                         <th class="text-center" width="150">Отчёты с карт</th>
@@ -41,6 +42,15 @@
                                 Услуги не указаны
                             </div>
                             <div class="font-weight-bold" v-else> {{ getSum(item, 'Послерейсовый', 'Послесменный') }}₽ </div>
+                        </td>
+
+                        <td class="text-center" width="150">
+                            {{ getTotal(item, 'is_dop') }}
+
+                            <div class="text-red font-weight-bold" v-if="getSum(item, 'is_dop') == null">
+                                Услуги не указаны
+                            </div>
+                            <div class="font-weight-bold" v-else> {{ getSum(item, 'is_dop') }}₽ </div>
                         </td>
 
                         <td class="text-center" width="150">

@@ -141,7 +141,7 @@ class ReportController extends Controller
 
     public function getJournalMedic($company, $date_from, $date_to, $products, $discounts) {
         // Get table info by filters
-        $medics = Anketa::where('type_anketa', 'medic')
+        $medics = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
             ->join('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
             ->where('anketas.company_id', $company)
             ->where('anketas.in_cart', 0)
@@ -160,61 +160,65 @@ class ReportController extends Controller
                         ]);
                     });
             })
-            ->select('driver_fio', 'driver_id', 'type_anketa', 'type_view', 'drivers.products_id', DB::raw('count(*) as total'))
-            ->groupBy(['type_view', 'driver_id'])
-            ->get();
-
-
-        $medicTypeCounts = Anketa::where('type_anketa', 'medic')
-            ->whereIn('driver_id', $medics->pluck('driver_id')->toArray())
-            ->join('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
-            ->where('anketas.company_id', $company)
-            ->where('anketas.in_cart', 0)
-            ->where(function ($q) use ($date_from, $date_to) {
-                $q->where(function ($q) use ($date_from, $date_to) {
-                    $q->whereNotNull('anketas.date')
-                        ->whereBetween('anketas.date', [
-                            Carbon::parse($date_from)->startOfDay(),
-                            Carbon::parse($date_to)->endOfDay(),
-                        ]);
-                })
-                    ->orWhere(function ($q) use ($date_from, $date_to) {
-                        $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
-                            Carbon::parse($date_from)->format('Y-m'),
-                            Carbon::parse($date_to)->format('Y-m'),
-                        ]);
-                    });
-            })
-            ->select('driver_id', 'type_anketa', 'drivers.products_id', DB::raw('count(*) as total'))
-            ->groupBy(['type_anketa', 'driver_id'])
+            ->select('driver_fio', 'driver_id', 'type_anketa', 'type_view', 'result_dop',
+                'is_dop', 'drivers.products_id')
             ->get();
 
         $result = [];
-        foreach ($medicTypeCounts as $row) {
-            $result[$row->driver_id]['types'][$row->type_anketa]['total'] = $row->total;
-        }
 
-        foreach ($medics as $row) {
-            $result[$row->driver_id]['driver_fio'] = $row->driver_fio;
-            $result[$row->driver_id]['types'][$row->type_view]['total'] = $row->total;
+        foreach ($medics->groupBy('driver_id') as $driver) {
+            $id = $driver->first()->driver_id;
+            $result[$id]['driver_fio'] = $driver->first()->driver_fio;
 
-            $services = explode(',', $row->products_id);
-            $prods = $products->whereIn('id', $services);
+            foreach ($driver->where('type_anketa', 'medic')->groupBy('type_view') as $rows) {
+                $type = $rows->first()->type_view;
+                $total = $rows->count();
+                $result[$id]['types'][$type]['total'] = $total;
 
-            if ($prods->count() > 0) {
-                foreach ($prods as $service) {
-                    $discounts = $discounts->where('products_id', $service->id);
+                $services = explode(',', $driver->first()->products_id);
+                $prods = $products->whereIn('id', $services);
 
-                    if($discounts->count()) {
-                        foreach($discounts as $discount) {
-                            $service->price_unit = $discount->add($row->total, $service->price_unit);
+                if ($prods->count() > 0) {
+                    foreach ($prods as $service) {
+                        $discounts = $discounts->where('products_id', $service->id);
+
+                        if($discounts->count()) {
+                            foreach($discounts as $discount) {
+                                $service->price_unit = $discount->add($total, $service->price_unit);
+                            }
                         }
                     }
-                }
 
-                $result[$row->driver_id]['types'][$row->type_view]['sum'] = $prods->sum('price_unit');
+                    $result[$id]['types'][$type]['sum'] = $prods->sum('price_unit');
+                }
             }
 
+            foreach ($driver->groupBy('type_anketa') as $rows) {
+                $type = $rows->first()->type_anketa;
+                $total = $rows->count();
+                $result[$id]['types'][$type]['total'] = $total;
+
+                $services = explode(',', $driver->first()->products_id);
+                $prods = $products->whereIn('id', $services);
+
+                if ($prods->count() > 0) {
+                    foreach ($prods as $service) {
+                        $discounts = $discounts->where('products_id', $service->id);
+
+                        if($discounts->count()) {
+                            foreach($discounts as $discount) {
+                                $service->price_unit = $discount->add($total, $service->price_unit);
+                            }
+                        }
+                    }
+
+                    $result[$id]['types'][$type]['sum'] = $prods->sum('price_unit');
+                }
+            }
+
+
+            $result[$id]['types']['is_dop']['total'] = $driver->where('type_anketa', 'medic')
+                ->where('result_dop', null)->where('is_dop', 1)->count();
         }
 
         return $result;
@@ -222,7 +226,7 @@ class ReportController extends Controller
 
     public function getJournalTechs($company, $date_from, $date_to, $products, $discounts) {
         // Get table info by filters
-        $techs = Anketa::where('type_anketa', 'tech')
+        $techs = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'report_cart'])
             ->join('cars', 'anketas.car_id', '=', 'cars.hash_id')
             ->where('anketas.company_id', $company)
             ->whereNotNull('anketas.car_id')
@@ -242,71 +246,73 @@ class ReportController extends Controller
                         ]);
                     });
             })
-            ->select('car_gos_number', 'car_id', 'type_auto', 'type_anketa', 'type_view', 'cars.products_id', DB::raw('count(*) as total'))
-            ->groupBy(['car_id', 'type_view'])
-            ->get();
-
-        $techsTypeCounts = Anketa::where('type_anketa', 'tech')
-            ->whereIn('car_id', $techs->pluck('car_id')->toArray())
-            ->join('cars', 'anketas.car_id', '=', 'cars.hash_id')
-            ->where('anketas.company_id', $company)
-            ->whereNotNull('anketas.car_id')
-            ->where('anketas.in_cart', 0)
-            ->where(function ($q) use ($date_from, $date_to) {
-                $q->where(function ($q) use ($date_from, $date_to) {
-                    $q->whereNotNull('anketas.date')
-                        ->whereBetween('anketas.date', [
-                            Carbon::parse($date_from)->startOfDay(),
-                            Carbon::parse($date_to)->endOfDay(),
-                        ]);
-                })
-                    ->orWhere(function ($q) use ($date_from, $date_to) {
-                        $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
-                            Carbon::parse($date_from)->format('Y-m'),
-                            Carbon::parse($date_to)->format('Y-m'),
-                        ]);
-                    });
-            })
-            ->select('car_id', 'type_anketa', 'cars.products_id', DB::raw('count(*) as total'))
-            ->groupBy(['type_anketa', 'driver_id'])
+            ->select('car_gos_number', 'car_id', 'type_auto', 'type_anketa', 'is_dop', 'result_dop',
+                'type_view', 'cars.products_id')
             ->get();
 
         $result = [];
 
-        foreach ($techsTypeCounts as $row) {
-            $result[$row->car_id]['types'][$row->type_anketa]['total'] = $row->total;
-        }
+        foreach ($techs->groupBy('car_id') as $car) {
+            $id = $car->first()->car_id;
+            $result[$id]['car_gos_number'] = $car->first()->car_gos_number;
+            $result[$id]['type_auto'] = $car->first()->type_auto;
 
-        foreach ($techs as $row) {
-            $result[$row->car_id]['car_gos_number'] = $row->car_gos_number;
-            $result[$row->car_id]['type_auto'] = $row->type_auto;
-            $result[$row->car_id]['types'][$row->type_view]['total'] = $row->total;
+            foreach ($car->where('type_anketa', 'tech')->groupBy('type_view') as $rows) {
+                $type = $rows->first()->type_view;
+                $total = $rows->count();
+                $result[$id]['types'][$type]['total'] = $total;
 
-            $services = explode(',', $row->products_id);
-            $prods = $products->whereIn('id', $services);
+                $services = explode(',', $car->first()->products_id);
+                $prods = $products->whereIn('id', $services);
 
-            if ($prods->count() > 0) {
-                foreach ($prods as $service) {
-                    $discounts = $discounts->where('products_id', $service->id);
+                if ($prods->count() > 0) {
+                    foreach ($prods as $service) {
+                        $discounts = $discounts->where('products_id', $service->id);
 
-                    if($discounts->count()) {
-                        foreach($discounts as $discount) {
-                            $service->price_unit = $discount->add($row->total, $service->price_unit);
+                        if($discounts->count()) {
+                            foreach($discounts as $discount) {
+                                $service->price_unit = $discount->add($total, $service->price_unit);
+                            }
                         }
                     }
+
+                    $result[$id]['types'][$type]['sum'] = $prods->sum('price_unit');
                 }
-
-                $result[$row->car_id]['types'][$row->type_view]['sum'] = $prods->sum('price_unit');
-
             }
 
+            foreach ($car->groupBy('type_anketa') as $rows) {
+                $type = $rows->first()->type_anketa;
+                $total = $rows->count();
+                $result[$id]['types'][$type]['total'] = $total;
+
+                $services = explode(',', $car->first()->products_id);
+                $prods = $products->whereIn('id', $services);
+
+                if ($prods->count() > 0) {
+                    foreach ($prods as $service) {
+                        $discounts = $discounts->where('products_id', $service->id);
+
+                        if($discounts->count()) {
+                            foreach($discounts as $discount) {
+                                $service->price_unit = $discount->add($total, $service->price_unit);
+                            }
+                        }
+                    }
+
+                    $result[$id]['types'][$type]['sum'] = $prods->sum('price_unit');
+                }
+            }
+
+
+            $result[$id]['types']['is_dop']['total'] = $car->where('type_anketa', 'tech')
+                ->where('result_dop', null)->where('is_dop', 1)->count();
         }
 
         return $result;
     }
 
     public function getJournalMedicsOther($company, $date_from, $date_to) {
-        $reports = Anketa::where('type_anketa', 'medic')
+        $reports = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
             ->where('company_id', $company)
             ->where('in_cart', 0)
             ->whereBetween('created_at', [
@@ -328,7 +334,7 @@ class ReportController extends Controller
                         ]);
                     });
             })
-            ->select('driver_id', 'period_pl', 'type_view', 'driver_fio', 'date', 'type_anketa')
+            ->select('driver_id', 'period_pl', 'type_view', 'driver_fio', 'date', 'is_dop', 'result_dop', 'type_anketa')
             ->get();
 
         $result = [];
@@ -345,16 +351,20 @@ class ReportController extends Controller
             $result[$key]['month'] = $date->month;
             $result[$key]['reports'][$report->driver_id]['driver_fio'] = $report->driver_fio;
             $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['total']
-                = $reports->where('driver_id', $report->driver_id)->where('type_view', $report->type_view)->count();
+                = $reports->where('driver_id', $report->driver_id)
+                ->where('type_anketa', 'medic')->where('type_view', $report->type_view)->count();
             $result[$key]['reports'][$report->driver_id]['types'][$report->type_anketa]['total']
                 = $reports->where('driver_id', $report->driver_id)->where('type_anketa', $report->type_anketa)->count();
+            $result[$key]['reports'][$report->driver_id]['types']['is_dop']['total']
+                = $reports->where('driver_id', $report->driver_id)->where('type_anketa', 'medic')
+                    ->where('result_dop', null)->where('is_dop', 1)->count();
         }
 
         return array_reverse($result);
     }
 
     public function getJournalTechsOther($company, $date_from, $date_to) {
-        $reports = Anketa::where('type_anketa', 'tech')
+        $reports = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'type_anketa'])
             ->join('cars', 'anketas.car_id', '=', 'cars.hash_id')
             ->where('anketas.company_id', $company)
             ->whereNotNull('car_id')
@@ -378,7 +388,7 @@ class ReportController extends Controller
                         ]);
                     });
             })
-            ->select('anketas.car_gos_number', 'type_auto', 'period_pl', 'car_id', 'date', 'type_anketa', 'type_view')
+            ->select('anketas.car_gos_number', 'type_auto', 'period_pl', 'car_id', 'date', 'result_dop', 'type_anketa', 'type_view')
             ->get();
 
         $result = [];
@@ -396,9 +406,14 @@ class ReportController extends Controller
             $result[$key]['reports'][$report->car_id]['car_gos_number'] = $report->car_gos_number;
             $result[$key]['reports'][$report->car_id]['type_auto'] = $report->type_auto;
             $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['total']
-                = $reports->where('car_id', $report->car_id)->where('type_view', $report->type_view)->count();
+                = $reports->where('car_id', $report->car_id)
+                    ->where('type_anketa', 'tech')->where('type_view', $report->type_view)->count();
             $result[$key]['reports'][$report->car_id]['types'][$report->type_anketa]['total']
                 = $reports->where('car_id', $report->car_id)->where('type_anketa', $report->type_anketa)->count();
+            $result[$key]['reports'][$report->car_id]['types']['is_dop']['total']
+                = $reports->where('car_id', $report->car_id)->where('type_anketa', 'tech')
+                    ->where('result_dop', null)->where('is_dop', 1)->count();
+
         }
 
         return array_reverse($result);
@@ -410,11 +425,28 @@ class ReportController extends Controller
             ->where('in_cart', 0)
             ->where('is_dop', 1)
             ->whereNull('result_dop')
-            ->whereBetween('created_at', [
-                $date_from." 00:00:00",
-                $date_to." 23:59:59"
-            ])
-            ->select('type_auto', 'car_id', 'driver_id', 'car_gos_number', 'driver_fio', 'type_anketa',
+            ->where(function($q) use ($date_from, $date_to) {
+                $q->where(function ($q) use ($date_from, $date_to) {
+                    $q->where(function ($q) use ($date_from, $date_to) {
+                        $q->whereNotNull('anketas.date')
+                            ->whereBetween('anketas.date', [
+                                Carbon::parse($date_from)->startOfDay(),
+                                Carbon::parse($date_to)->endOfDay(),
+                            ]);
+                    })
+                        ->orWhere(function ($q) use ($date_from, $date_to) {
+                            $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
+                                Carbon::parse($date_from)->format('Y-m'),
+                                Carbon::parse($date_to)->format('Y-m'),
+                            ]);
+                        });
+                })->orWhereBetween('created_at', [
+                    $date_from." 00:00:00",
+                    $date_to." 23:59:59"
+                ]);
+            })
+
+            ->select('car_id', 'driver_id', 'car_gos_number', 'driver_fio', 'type_anketa',
                 'period_pl', 'type_view')
             ->get();
 
@@ -431,7 +463,6 @@ class ReportController extends Controller
             $result[$key]['year'] = $date->year;
             $result[$key]['month'] = $date->month;
             $result[$key]['reports'][$report->driver_id]['car_gos_number'] = $report->car_gos_number;
-            $result[$key]['reports'][$report->driver_id]['type_auto'] = $report->type_auto;
             $result[$key]['reports'][$report->driver_id]['driver_fio'] = $report->driver_fio;
 
             $rps = $result[$key]['reports'][$report->driver_id];

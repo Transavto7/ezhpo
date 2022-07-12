@@ -83,7 +83,7 @@
 
 
                 <!-- Редактирование элемента -->
-                <div id="users-modal-edit-{{ $user->id }}" tabindex="-1" role="dialog" aria-hidden="true" class="modal fade text-left">
+                <div id="users-modal-edit-{{ $user->id }}" role="dialog" aria-hidden="true" class="modal fade text-left">
                     <div role="document" class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
