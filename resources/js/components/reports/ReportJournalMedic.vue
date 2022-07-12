@@ -8,11 +8,11 @@
                     <tr>
                         <th width="100">ID</th>
                         <th width="250">Водитель</th>
-                        <th class="text-center" width="150">Предрейсовые</th>
-                        <th class="text-center" width="150">Послерейсовые</th>
+                        <th class="text-center" width="150">Предрейсовый/Предсменный</th>
+                        <th class="text-center" width="150">Послерейсовые/Послесменные</th>
 
-                        <th class="text-center" width="150">Предсменные</th>
-                        <th class="text-center" width="150">Послесменные</th>
+<!--                        <th class="text-center" width="150">Предсменные</th>-->
+<!--                        <th class="text-center" width="150">Послесменные</th>-->
 
                         <th class="text-center" width="150">БДД</th>
                         <th class="text-center" width="150">Отчёты с карт</th>
@@ -46,23 +46,23 @@
                             <div class="font-weight-bold" v-else> {{ getSum(item, 'Послерейсовый') }}₽ </div>
                         </td>
 
-                        <td class="text-center" width="150">
-                            {{ getTotal(item, 'Предсменный') }}
+<!--                        <td class="text-center" width="150">-->
+<!--                            {{ getTotal(item, 'Предсменный') }}-->
 
-                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Предсменный') == null">
-                                Услуги не указаны
-                            </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Предсменный') }}₽ </div>
-                        </td>
+<!--                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Предсменный') == null">-->
+<!--                                Услуги не указаны-->
+<!--                            </div>-->
+<!--                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Предсменный') }}₽ </div>-->
+<!--                        </td>-->
 
-                        <td class="text-center" width="150">
-                            {{ getTotal(item, 'Послесменный') }}
+<!--                        <td class="text-center" width="150">-->
+<!--                            {{ getTotal(item, 'Послесменный') }}-->
 
-                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Послесменный') == null">
-                                Услуги не указаны
-                            </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Послесменный') }}₽ </div>
-                        </td>
+<!--                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Послесменный') == null">-->
+<!--                                Услуги не указаны-->
+<!--                            </div>-->
+<!--                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Послесменный') }}₽ </div>-->
+<!--                        </td>-->
 
                         <td class="text-center" width="150">
                             {{ getTotal(item, 'bdd') }}
