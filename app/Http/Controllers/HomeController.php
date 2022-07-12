@@ -332,12 +332,42 @@ class HomeController extends Controller
          * </Измеряем количество Авто и Водителей (уникальные ID)>
          */
 
-        // Экспорт из техосмотров
+        // Экспорт из техосмотров и БДД
         if($request->get('export') && ($typeAnkets == 'tech' || $typeAnkets == 'bdd')) {
             $request->request->remove('exportPrikazPL');
             $request->request->remove('exportPrikaz');
             $request->request->remove('export');
-            $collection = $anketas->orderBy($orderKey, $orderBy)->limit(50000)->get(array_keys($fieldsKeys));
+//            dd($anketas->get()->toArray());
+
+            if($typeAnkets == 'bdd' && $fieldsKeysTypeAnkets == 'bdd_export_prikaz'){
+                // Тут надо получать должность
+                $collection = $anketas->orderBy($orderKey, $orderBy)
+                                      ->limit(50000)
+                                      ->leftJoin('users', 'anketas.user_eds', '=', 'users.eds')
+                                      ->get(array_keys($fieldsKeys))
+                                      ->map(function ($q){
+                                          // todo вынести
+                                          $role = null;
+                                          switch($q->role) {
+                                              case 12: $role = 'Клиент'; break;
+                                              case 4: $role = 'Оператор СДПО'; break;
+                                              case 1: $role = 'Контролёр ТС'; break;
+                                              case 2: $role = 'Медицинский сотрудник'; break;
+                                              case 3: $role = 'Водитель'; break;
+                                              case 11: $role = 'Менеджер'; break;
+                                              case 13: $role = 'Инженер БДД'; break;
+                                              case 777: $role = 'Администратор'; break;
+                                              case 778: $role = 'Терминал'; break;
+                                          }
+                                          $q->role = $role;
+                                          return $q;
+                                      });
+            }else{
+                $collection = $anketas->orderBy($orderKey, $orderBy)
+                                      ->limit(50000)
+                                      ->get(array_keys($fieldsKeys));
+            }
+
             $collection->prepend(array_values($fieldsKeys));
             return (new AnketasExport($collection))->download('export-anketas.xlsx');
         }
