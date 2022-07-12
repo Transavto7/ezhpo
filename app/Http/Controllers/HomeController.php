@@ -126,10 +126,30 @@ class HomeController extends Controller
             $fieldsKeysTypeAnkets = $validTypeAnkets;
         }
 
+        // Экспорты новые писать тут всё
+        if($request->get('export')){
+            if($typeAnkets == 'tech'){
+                if($request->get('exportPrikaz')){
+                    $fieldsKeysTypeAnkets = 'tech_export_to'; // экспорт по приказу ТО
+                }elseif ($request->get('exportPrikazPL')){
+                    $fieldsKeysTypeAnkets= 'tech_export_pl';// экспорт по приказу ПЛ
+                }else{
+                    $fieldsKeysTypeAnkets= 'tech';// экспорт просто
+                }
+            }elseif ($typeAnkets == 'bdd'){
+                if($request->get('exportPrikaz')){
+                    $fieldsKeysTypeAnkets= 'bdd_export_prikaz';// экспорт по приказу
+
+                }else{
+                    $fieldsKeysTypeAnkets= 'bdd';// экспорт просто
+                }
+            }
+        }
+
+//        dd($fieldsKeysTypeAnkets);
         $fieldsKeys = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
         $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets]) ? Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] : [];
-//dd($exportPrikaz);
-//        dd($fieldsKeys, $fieldsGroupFirst);
+
         if($typePrikaz === 'Dop' || $request->get('export')) {
             $take = 10000;
         }
@@ -312,9 +332,11 @@ class HomeController extends Controller
          * </Измеряем количество Авто и Водителей (уникальные ID)>
          */
 
-
-        //todo на экспорт техосмотр по приказу ПЛ
-        if(count($filter_params) > 0 && $request->get('exportPrikazPL')) {
+        // Экспорт из техосмотров
+        if($request->get('export') && ($typeAnkets == 'tech' || $typeAnkets == 'bdd')) {
+            $request->request->remove('exportPrikazPL');
+            $request->request->remove('exportPrikaz');
+            $request->request->remove('export');
             $collection = $anketas->orderBy($orderKey, $orderBy)->limit(50000)->get(array_keys($fieldsKeys));
             $collection->prepend(array_values($fieldsKeys));
             return (new AnketasExport($collection))->download('export-anketas.xlsx');

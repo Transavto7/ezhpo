@@ -16,11 +16,11 @@
                         <table class="w-100 table">
                             <thead>
                             <th>Водитель</th>
-                            <th>Предрейсовые</th>
-                            <th>Послерейсовые</th>
+                            <th>Предрейсовый/Предсменный</th>
+                            <th>Послерейсовые/Послесменные</th>
 
-                            <th>Предсменные</th>
-                            <th>Послесменные</th>
+<!--                            <th>Предсменные</th>-->
+<!--                            <th>Послесменные</th>-->
 
                             <th>БДД</th>
                             <th>Отчёты с карт</th>
@@ -31,8 +31,8 @@
                                 <td>{{ report.driver_fio }} / {{ name }}</td>
                                 <td>{{ getTotal(report, 'Предрейсовый') }}</td>
                                 <td>{{ getTotal(report, 'Послерейсовый') }}</td>
-                                <td>{{ getTotal(report, 'Предсменный') }}</td>
-                                <td>{{ getTotal(report, 'Послесменный') }}</td>
+<!--                                <td>{{ getTotal(report, 'Предсменный') }}</td>-->
+<!--                                <td>{{ getTotal(report, 'Послесменный') }}</td>-->
                                 <td>{{ getTotal(report, 'bdd')}} </td>
                                 <td>{{ getTotal(report, 'report_cart') }}</td>
                             </tr>

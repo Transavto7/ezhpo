@@ -16,10 +16,10 @@
                         <table class="w-100 table">
                             <thead>
                             <th>Автомобиль/Водитель</th>
-                            <th>Предрейсовые</th>
-                            <th>Послерейсовые</th>
-                            <th>Предсменные</th>
-                            <th>Послесменные</th>
+                            <th>Предрейсовый/Предсменный</th>
+                            <th>Послерейсовые/Послесменные</th>
+<!--                            <th>Предсменные</th>-->
+<!--                            <th>Послесменные</th>-->
                             </thead>
 
                             <tbody>
@@ -27,8 +27,8 @@
                                 <td>{{ getStringMark(report) }}</td>
                                 <td>{{ getTotal(report, 'Предрейсовый') }}</td>
                                 <td>{{ getTotal(report, 'Послерейсовый') }}</td>
-                                <td>{{ getTotal(report, 'Предсменный') }}</td>
-                                <td>{{ getTotal(report, 'Послесменный') }}</td>
+<!--                                <td>{{ getTotal(report, 'Предсменный') }}</td>-->
+<!--                                <td>{{ getTotal(report, 'Послесменный') }}</td>-->
                             </tr>
                             </tbody>
                         </table>
