@@ -17499,6 +17499,56 @@ body {
   display: block;
 }
 
+.filled-select2 {
+  max-width: 100%;
+}
+
+.select2-container .select2-search--inline .select2-search__field,
+.select2-container .select2-selection__placeholder,
+.select2-container .select2-selection__rendered {
+  font-size: 0.8rem;
+}
+
+.select2 .select2-selection__rendered {
+  margin-top: 5px;
+}
+
+.select2-container .select2-search__field {
+  font-size: 0.8rem;
+}
+
+.select2, .select2 .selection {
+  min-width: 100% !important;
+  max-width: 100% !important;
+}
+
+.select2-selection__rendered {
+  line-height: 16px !important;
+}
+
+.select2 .selection .select2-selection {
+  border: 1px solid #dee2e6 !important;
+  min-height: calc(1.8rem + 2px) !important;
+  border-radius: 0;
+}
+
+.select2-container .select2-dropdown {
+  border: 1px solid #dee2e6 !important;
+}
+
+.select2-selection__choice, .select2-results__option {
+  font-size: 13px;
+  font-weight: normal;
+}
+
+.select2-selection__choice__remove {
+  margin-right: 0;
+}
+
+.select2-selection__choice {
+  white-space: normal !important;
+}
+
 @page {
   margin-left: 1.18in;
   margin-right: 0.59in;

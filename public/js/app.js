@@ -3947,14 +3947,24 @@ $(document).ready(function () {
       });
     }
   });
-  $(document).on('input', '.chosen-search-input', function (event) {
-    var _$$parents;
+  $(document).on('input', '.select2-search__field', function (event) {
+    var _$$parents, _$$parents$parent;
 
     var search = event.target.value;
-    var select = (_$$parents = $(event.target).parents('.form-group')) === null || _$$parents === void 0 ? void 0 : _$$parents.children('.filled-select');
+    var select = (_$$parents = $(event.target).parents('.select2')) === null || _$$parents === void 0 ? void 0 : (_$$parents$parent = _$$parents.parent()) === null || _$$parents$parent === void 0 ? void 0 : _$$parents$parent.children('.filled-select2');
+
+    if (select.length < 1) {
+      var _$$parents2, _$$parents2$parent;
+
+      var id = $(event.target).attr('aria-controls');
+      select = (_$$parents2 = $(".select2-selection[aria-owns=\"".concat(id, "\"]")).parents('.select2')) === null || _$$parents2 === void 0 ? void 0 : (_$$parents2$parent = _$$parents2.parent()) === null || _$$parents2$parent === void 0 ? void 0 : _$$parents2$parent.children('.filled-select2');
+      console.log(id);
+    }
+
     var model = select.attr('model');
     var field = select.attr('field');
     var key = select.attr('field-key');
+    console.log(select, model, key, field);
 
     if (!model) {
       return;
@@ -3990,13 +4000,10 @@ $(document).ready(function () {
           text: text
         }));
       });
-      search = event.target.value;
-      select.trigger("chosen:updated");
-      event.target.value = search;
     });
     setTimeout(function () {
       loading = false;
-    }, 600);
+    }, 300);
   });
   var API_CONTROLLER = new _components_ApiController__WEBPACK_IMPORTED_MODULE_3__.ApiController(),
       API = API_CONTROLLER.client;
@@ -4017,6 +4024,14 @@ $(document).ready(function () {
       'примечания': ['особых отметок нет.', 'водителю протокол контроля трезвости был зачитан вслух, от подписи отказался']
     },
     initChosen: function initChosen() {
+      $('.filled-select2').select2({
+        placeholder: 'Выберите значение',
+        language: {
+          noResults: function noResults(params) {
+            return "Совпадений не найдено";
+          }
+        }
+      });
       $('.js-chosen').chosen({
         width: '100%',
         search_contains: true,

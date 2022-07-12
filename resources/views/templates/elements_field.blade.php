@@ -47,7 +47,6 @@
         $key = isset($v['getFieldKey']) ? $v['getFieldKey'] : 'id';
         $value = isset($v['getField']) ? $v['getField'] : 'name';
     @endphp
-
     <select
         @isset($v['saveToHistory'])
             onchange="addFieldToHistory(event.target.value, '{{ $v['label'] }}');"
@@ -69,7 +68,7 @@
         {{ $is_required }}
         data-label="{{ isset($v['label']) ? $v['label'] : $k }}"
         data-field="{{ $model }}_{{ $k }}"
-        class="js-chosen filled-select"
+        class="filled-select2 filled-select"
     >
         {{-- disabled selected --}}
         <option value="">Не установлено</option>

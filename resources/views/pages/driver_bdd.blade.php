@@ -48,6 +48,7 @@
                                             <input value="{{ auth()->user()->login }}" type="hidden" name="driver_id">
                                             <input value="{{ $instr->type_briefing }}" type="hidden" name="anketa[0][type_briefing]">
                                             <input type="hidden"  value="{{ date('Y-m-d\TH:i', time()) }}" name="anketa[0][date]">
+                                            <input type="hidden"  value="Подписано простой ЭЦП" name="anketa[0][signature]">
 
                                             <button type="submit" class="btn btn-success">Да</button>
                                         </form>
