@@ -42,12 +42,21 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('input', '.chosen-search-input', function(event) {
+    $(document).on('input', '.select2-search__field', function(event) {
         let search = event.target.value;
-        const select = $(event.target).parents('.form-group')?.children('.filled-select');
+        let select = $(event.target).parents('.select2')?.parent()?.children('.filled-select2');
+
+        if (select.length < 1) {
+           const id = $(event.target).attr('aria-controls');
+           select = $(`.select2-selection[aria-owns="${id}"]`).parents('.select2')?.parent()?.children('.filled-select2');
+           console.log(id);
+        }
+
         const model = select.attr('model');
         const field = select.attr('field');
         const key = select.attr('field-key');
+
+        console.log(select, model, key, field)
 
         if (!model) {
             return;
@@ -81,13 +90,10 @@ $(document).ready(function () {
                     text
                 }));
             }));
-            search = event.target.value;
-            select.trigger("chosen:updated");
-            event.target.value = search;
         });
         setTimeout(() => {
             loading = false;
-        }, 600);
+        }, 300);
     })
 
     const API_CONTROLLER = new ApiController(),
@@ -183,6 +189,15 @@ $(document).ready(function () {
         },
 
         initChosen () {
+            $('.filled-select2').select2({
+                placeholder: 'Выберите значение',
+                language: {
+                    noResults: function (params) {
+                        return "Совпадений не найдено";
+                    }
+                },
+            });
+
             $('.js-chosen').chosen({
                 width: '100%',
                 search_contains: true,
