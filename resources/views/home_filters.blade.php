@@ -49,7 +49,7 @@
                                 {{--ИЗНАЧАЛЬНОЕ ПОЛЕ ФИЛЬТР--}}
                                 <input
                                     @if($field === 'date' || strpos($field, '_at') > 0)
-                                    type="datetime-local"
+                                    type="date"
                                     @else
                                     type="search"
                                     @endif
@@ -66,7 +66,7 @@
                             <div class="form-group">
                                 <label><b>ДО</b></label>
                                 <input
-                                    type="datetime-local"
+                                    type="date"
                                     value="{{ request()->get('TO_'.$field) ? request()->get('TO_'.$field) : $date_to_filter }}"
                                     name="TO_{{ $field }}" class="form-control" />
                             </div>
