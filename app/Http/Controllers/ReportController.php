@@ -242,7 +242,7 @@ class ReportController extends Controller
                         ]);
                     });
             })
-            ->select('car_gos_number', 'car_id', 'car_mark_model', 'type_anketa', 'type_view', 'cars.products_id', DB::raw('count(*) as total'))
+            ->select('car_gos_number', 'car_id', 'type_auto', 'type_anketa', 'type_view', 'cars.products_id', DB::raw('count(*) as total'))
             ->groupBy(['car_id', 'type_view'])
             ->get();
 
@@ -279,7 +279,7 @@ class ReportController extends Controller
 
         foreach ($techs as $row) {
             $result[$row->car_id]['car_gos_number'] = $row->car_gos_number;
-            $result[$row->car_id]['car_mark_model'] = $row->car_mark_model;
+            $result[$row->car_id]['type_auto'] = $row->type_auto;
             $result[$row->car_id]['types'][$row->type_view]['total'] = $row->total;
 
             $services = explode(',', $row->products_id);
@@ -355,10 +355,11 @@ class ReportController extends Controller
 
     public function getJournalTechsOther($company, $date_from, $date_to) {
         $reports = Anketa::where('type_anketa', 'tech')
-            ->where('company_id', $company)
+            ->join('cars', 'anketas.car_id', '=', 'cars.hash_id')
+            ->where('anketas.company_id', $company)
             ->whereNotNull('car_id')
             ->where('in_cart', 0)
-            ->whereBetween('created_at', [
+            ->whereBetween('anketas.created_at', [
                 $date_from." 00:00:00",
                 $date_to." 23:59:59"
             ])
@@ -377,7 +378,7 @@ class ReportController extends Controller
                         ]);
                     });
             })
-            ->select('car_gos_number', 'period_pl', 'car_id', 'date', 'type_anketa', 'type_view')
+            ->select('anketas.car_gos_number', 'type_auto', 'period_pl', 'car_id', 'date', 'type_anketa', 'type_view')
             ->get();
 
         $result = [];
@@ -393,6 +394,7 @@ class ReportController extends Controller
             $result[$key]['year'] = $date->year;
             $result[$key]['month'] = $date->month;
             $result[$key]['reports'][$report->car_id]['car_gos_number'] = $report->car_gos_number;
+            $result[$key]['reports'][$report->car_id]['type_auto'] = $report->type_auto;
             $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['total']
                 = $reports->where('car_id', $report->car_id)->where('type_view', $report->type_view)->count();
             $result[$key]['reports'][$report->car_id]['types'][$report->type_anketa]['total']
@@ -412,7 +414,7 @@ class ReportController extends Controller
                 $date_from." 00:00:00",
                 $date_to." 23:59:59"
             ])
-            ->select('car_mark_model', 'car_id', 'driver_id', 'car_gos_number', 'driver_fio', 'type_anketa',
+            ->select('type_auto', 'car_id', 'driver_id', 'car_gos_number', 'driver_fio', 'type_anketa',
                 'period_pl', 'type_view')
             ->get();
 
@@ -429,7 +431,7 @@ class ReportController extends Controller
             $result[$key]['year'] = $date->year;
             $result[$key]['month'] = $date->month;
             $result[$key]['reports'][$report->driver_id]['car_gos_number'] = $report->car_gos_number;
-            $result[$key]['reports'][$report->driver_id]['car_mark_model'] = $report->car_mark_model;
+            $result[$key]['reports'][$report->driver_id]['type_auto'] = $report->type_auto;
             $result[$key]['reports'][$report->driver_id]['driver_fio'] = $report->driver_fio;
 
             $rps = $result[$key]['reports'][$report->driver_id];

@@ -15,20 +15,16 @@
                     <td v-for="(item, name, index) in data" colspan="7" class="p-0">
                         <table class="w-100 table">
                             <thead>
-                            <th>Автомобиль/Водитель</th>
-                            <th>Предрейсовый/Предсменный</th>
-                            <th>Послерейсовые/Послесменные</th>
-<!--                            <th>Предсменные</th>-->
-<!--                            <th>Послесменные</th>-->
+                            <th class="text-center">Автомобиль/Водитель</th>
+                            <th class="text-center">Предрейсовые</th>
+                            <th class="text-center">Послерейсовые</th>
                             </thead>
 
                             <tbody>
                             <tr v-for="(report, name, index) in item.reports">
-                                <td>{{ getStringMark(report) }}</td>
-                                <td>{{ getTotal(report, 'Предрейсовый') }}</td>
-                                <td>{{ getTotal(report, 'Послерейсовый') }}</td>
-<!--                                <td>{{ getTotal(report, 'Предсменный') }}</td>-->
-<!--                                <td>{{ getTotal(report, 'Послесменный') }}</td>-->
+                                <td class="text-center">{{ getStringMark(report) }}</td>
+                                <td class="text-center">{{ getTotal(report, 'Предрейсовый', 'Предсменный') }}</td>
+                                <td class="text-center">{{ getTotal(report, 'Послерейсовый', 'Послесменный') }}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -64,8 +60,8 @@ export default {
 
             }
 
-            if (item.car_mark_model) {
-                str +=  `(${item.car_mark_model})`;
+            if (item.type_auto) {
+                str +=  `(${item.type_auto})`;
             }
 
            if (item.driver_fio) {
@@ -88,14 +84,16 @@ export default {
             this.data = false;
             this.show = false;
         },
-        getTotal(item, name) {
+        getTotal(item, ...names) {
             let total = 0;
 
             if (item.types) {
                 for (let key in item.types) {
-                    if (key.split('/')[0].trim() === name) {
-                        total += parseInt(item.types[key]?.total);
-                    }
+                    names.forEach(name => {
+                        if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+                            total += parseInt(item.types[key]?.total);
+                        }
+                    });
                 }
             }
 
@@ -104,23 +102,6 @@ export default {
             }
 
             return 'отсутствует';
-        },
-        getSum(item, name) {
-            let sum = 0;
-
-            if (item.types) {
-                for (let key in item.types) {
-                    if (key.split('/')[0].trim() === name) {
-                        sum += parseInt(item.types[key]?.sum);
-                    }
-                }
-            }
-
-            if (sum > 0) {
-                return sum;
-            }
-
-            return null
         },
     }
 }

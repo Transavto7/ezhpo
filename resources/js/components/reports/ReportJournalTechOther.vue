@@ -16,24 +16,22 @@
                     <td v-for="(item, name, index) in data" colspan="7" class="p-0">
                         <table class="w-100 table">
                             <thead>
-                            <th>Автомобиль</th>
-                            <th>Предрейсовый/Предсменный</th>
-                            <th>Послерейсовые/Послесменные</th>
-<!--                            <th>Предсменные</th>-->
-<!--                            <th>Послесменные</th>-->
-                            <th>БДД</th>
-                            <th>Отчёты с карт</th>
+                            <th class="text-center">Автомобиль</th>
+                            <th class="text-center">Предрейсовые</th>
+                            <th class="text-center">Послерейсовые</th>
+                            <th class="text-center">БДД</th>
+                            <th class="text-center">Отчёты с карт</th>
                             </thead>
 
                             <tbody>
                             <tr v-for="(report, name, index) in item.reports">
-                                <td>{{ report.car_gos_number }} / {{ name }}</td>
-                                <td>{{ getTotal(report, 'Предрейсовый') }}</td>
-                                <td>{{ getTotal(report, 'Послерейсовый') }}</td>
-<!--                                <td>{{ getTotal(report, 'Предсменный') }}</td>-->
-<!--                                <td>{{ getTotal(report, 'Послесменный') }}</td>-->
-                                <td>{{ getTotal(report, 'bdd')}} </td>
-                                <td>{{ getTotal(report, 'report_cart') }}</td>
+                                <td class="text-center">
+                                    {{ getStringMark(report) }}
+                                </td>
+                                <td class="text-center">{{ getTotal(report, 'Предрейсовый', 'Предсменный') }}</td>
+                                <td class="text-center">{{ getTotal(report, 'Послерейсовый', 'Послесменный') }}</td>
+                                <td class="text-center">{{ getTotal(report, 'bdd')}} </td>
+                                <td class="text-center">{{ getTotal(report, 'report_cart') }}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -62,6 +60,19 @@ export default {
         }
     },
     methods: {
+        getStringMark(item) {
+            let str = '';
+            if (item.car_gos_number) {
+                str += item.car_gos_number + ' ';
+
+            }
+
+            if (item.type_auto) {
+                str +=  `(${item.type_auto})`;
+            }
+
+            return str;
+        },
         visible(data, show = true) {
             if (data.length === undefined || data.length > 0) {
                 this.data = data;
@@ -73,14 +84,16 @@ export default {
             this.data = false;
             this.show = false;
         },
-        getTotal(item, name) {
+        getTotal(item, ...names) {
             let total = 0;
 
             if (item.types) {
                 for (let key in item.types) {
-                    if (key.split('/')[0].trim() === name) {
-                        total += parseInt(item.types[key]?.total);
-                    }
+                    names.forEach(name => {
+                        if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+                            total += parseInt(item.types[key]?.total);
+                        }
+                    });
                 }
             }
 
@@ -89,23 +102,6 @@ export default {
             }
 
             return 'отсутствует';
-        },
-        getSum(item, name) {
-            let sum = 0;
-
-            if (item.types) {
-                for (let key in item.types) {
-                    if (key.split('/')[0].trim() === name) {
-                        sum += parseInt(item.types[key]?.sum);
-                    }
-                }
-            }
-
-            if (sum > 0) {
-                return sum;
-            }
-
-            return null
         },
     }
 }
