@@ -80,7 +80,7 @@
                                 <option value="1">Контролёр ТС</option>
                                 <option selected value="2">Медицинский сотрудник</option>
                                 <option value="11">Менеджер</option>
-                                <option value="12">Инженер БДД</option>
+                                <option value="13">Инженер БДД</option>
                                 <option value="777">Администратор</option>
                             </select>
                         </div>

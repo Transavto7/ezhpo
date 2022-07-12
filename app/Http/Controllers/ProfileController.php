@@ -27,7 +27,7 @@ class ProfileController extends Controller
             case 2: $role = 'Медицинский сотрудник'; break;
             case 3: $role = 'Водитель'; break;
             case 11: $role = 'Менеджер'; break;
-            case 12: $role = 'Инженер БДД'; break;
+            case 13: $role = 'Инженер БДД'; break;
             case 777: $role = 'Администратор'; break;
             case 778: $role = 'Терминал'; break;
         }
