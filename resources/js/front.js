@@ -1036,6 +1036,7 @@ $(document).ready(function () {
 
         axios.get(route).then(({ data }) => {
             modalContent.text('').append(data);
+            LIBS.initAll()
         })
 
     })
