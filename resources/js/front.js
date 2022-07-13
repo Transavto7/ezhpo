@@ -28,12 +28,18 @@ $(document).ready(function () {
         const btn = $(event.target);
         if(location.pathname.indexOf('home') > -1) {
             btn.disabled = true;
-            console.log(btn.children('span.spinner'));
             btn.children('span.spinner').removeClass('d-none');
             $('#filter-group-2-tab').removeClass('active');
             $('#filter-group-1-tab').addClass('active');
 
-            $.get(location.origin + location.pathname + '/filters').done(response => {
+            let path = location.origin + location.pathname;
+
+            if (!path.endsWith('/')) {
+                path += '/';
+            }
+
+            path += 'filters';
+            $.get(path).done(response => {
                 if(response) {
                     $('#filter-groupsContent').html(response)
                     LIBS.initChosen()
@@ -348,7 +354,15 @@ $(document).ready(function () {
 
     // Подгрузка в полей в Журналах: CHOSEN
     if(location.pathname.indexOf('home') > -1) {
-        $.get(location.origin + location.pathname + '/filters' + location.search).done(response => {
+        let path = location.origin + location.pathname;
+
+        if (!path.endsWith('/')) {
+            path += '/';
+        }
+
+        path += 'filters' + location.search;
+        console.log(path);
+        $.get(path).done(response => {
             if(response) {
                 $('#filter-groupsContent').html(response)
                 LIBS.initChosen()

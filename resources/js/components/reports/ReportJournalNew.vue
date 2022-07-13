@@ -75,6 +75,7 @@ import ReportJournalPL from "./ReportJournalPL";
 
 export default {
     name: "ReportJournalNew",
+    props: ['default_company'],
     components: {
         ReportJournalMedic,
         ReportJournalTech,
@@ -94,6 +95,13 @@ export default {
     },
     mounted() {
         this.searchCompany();
+
+        if (this.default_company) {
+            this.companies.push(this.default_company);
+            this.company = this.default_company;
+            this.company_id = this.default_company.id;
+        }
+
         const now = new Date();
         const days = now.getDate() > 9 ? now.getDate() : '0' + now.getDate();
         const months = now.getMonth() > 9 ? now.getMonth() : '0' + now.getMonth();

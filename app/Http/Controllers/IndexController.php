@@ -236,7 +236,7 @@ class IndexController extends Controller
 
             'model' => 'Company',
             'fields' => [
-                'name' => ['label' => 'Название компании клиента', 'type' => 'text', 'filterJournalLinkKey' => 'company_id'],
+                'name' => ['label' => 'Название компании клиента', 'type' => 'text', 'filterJournalLinkKey' => 'company_name'],
                 'note' => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
                 'user_id' => ['label' => 'Ответственный', 'type' => 'select', 'values' => 'User', 'noRequired' => 1],
                 'req_id' => ['label' => 'Реквизиты нашей компании', 'type' => 'select', 'values' => 'Req'],

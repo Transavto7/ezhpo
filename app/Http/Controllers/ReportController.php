@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Anketa;
+use App\Company;
 use App\Discount;
 use App\Product;
 use App\Req;
@@ -115,8 +116,15 @@ class ReportController extends Controller
         ]);
     }
 
-    public function showJournal() {
-        return view('reports.journal');
+    public function showJournal(Request $request) {
+        $company = null;
+        if ($request->has('company_id')) {
+            $company = Company::where('hash_id', $request->company_id)->select('id', 'name')->first();
+        }
+
+        return view('reports.journal', [
+            'company' => $company
+        ]);
     }
 
     public function getJournalData(Request $request) {
