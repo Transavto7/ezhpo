@@ -1029,4 +1029,14 @@ $(document).ready(function () {
     LIBS.initAll()
     $('.MASK_ID_ELEM').trigger('input')
 
+
+    $('#modalEditor').on('shown.bs.modal', function (event) {
+        let route = $(event.relatedTarget).data('route')
+        let modalContent = $("#modalEditor .modal-content")
+
+        axios.get(route).then(({ data }) => {
+            modalContent.text('').append(data);
+        })
+
+    })
 });

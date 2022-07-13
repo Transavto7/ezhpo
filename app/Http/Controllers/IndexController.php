@@ -848,7 +848,7 @@ class IndexController extends Controller
 
         $page['el'] = $el;
 
-        return view('showEditElementModal', $page);
+        echo view('showEditElementModal', $page);
     }
 
     /**

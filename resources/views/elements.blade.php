@@ -5,6 +5,14 @@
 
 @section('content')
 
+<!-- Модалка для редактирования см front.js  -->
+<div class="modal fade editor-modal" id="modalEditor" tabindex="1" role="dialog"  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
 <!-- Добавление элемента -->
 <div id="elements-modal-add" role="dialog" aria-labelledby="elements-modal-label" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">
@@ -230,9 +238,9 @@
                                 <td class="td-option">
                                     @if($elK === $editOnField)
                                         @role($otherRoles)
-                                           <a data-type="iframe" data-fancybox href="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}">
-                                            {{--<a href="" data-toggle="modal" data-target="#elements-modal-{{ $el->id }}-add" class="text-info">--}}
-
+{{--                                           <a data-type="iframe" data-fancybox href="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}">--}}
+                                               <a href="#" class="showEditModal" data-route="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}" data-toggle="modal" data-target="#modalEditor">
+{{--                                            <a href="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}" data-toggle="modal" data-target="#elements-modal-{{ $el->id }}-add" class="text-info">--}}
 
                                         @endrole
                                     @endif
