@@ -11,33 +11,24 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     public $fillable = [
         'hash_id', 'req_id', 'photo', 'name', 'email', 'password', 'eds', 'pv_id', 'timezone', 'role', 'role_manager', 'blocked', 'pv_id_default', 'api_token',
         'login', 'user_post'
     ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
     protected $hidden = [
         'password'
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // sorry for name
+    public function anketas()
+    {
+        return $this->hasMany(Anketa::class, 'user_id', 'id');
+    }
 
     public static $userRolesValues = [
         'client' => 12,

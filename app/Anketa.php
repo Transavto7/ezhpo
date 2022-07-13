@@ -6,6 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Anketa extends Model
 {
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id', 'hash_id');
+    }
+
+    public function driver()
+    {
+        return $this->belongsTo(User::class, 'driver_id', 'hash_id');
+    }
+
+
+
     public $fillable
         = [
             'id',
@@ -459,10 +476,6 @@ class Anketa extends Model
 
         ];
 
-    public function user()
-    {
-        return $this->hasOne(User::class, 'id', 'user_id');
-    }
 
     public static function getAll()
     {

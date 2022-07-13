@@ -15,6 +15,11 @@ class Company extends Model
         'has_actived_prev_month'
     ];
 
+    public function cars()
+    {
+        return $this->hasMany(Car::class, 'company_id', 'id');
+    }
+
     public static function getAll () {
         $user = auth()->user();
 
