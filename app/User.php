@@ -58,10 +58,22 @@ class User extends Authenticatable
         '4' => 'pak_queue',
         '12' => 'medic',
         '11' => 'medic',
-        '13' => 'bdd',
         '777' => 'medic',
         '778' => 'medic'
     ];
+
+    public static $userRolesText
+        = [
+            1   => 'Контролёр ТС',
+            2   => 'Медицинский сотрудник',
+            3   => 'Медицинский сотрудник',
+            4   => 'Оператор СДПО',
+            11  => 'Менеджер',
+            12  => 'Клиент',
+            13  => 'Инженер БДД',
+            777 => 'Администратор',
+            778 => 'Терминал',
+        ];
 
     public static function getUserCompanyId ($field = 'id')
     {

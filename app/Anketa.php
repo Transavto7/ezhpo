@@ -246,7 +246,7 @@ class Anketa extends Model
                 'driver_fio'    => 'ФИО водителя',
                 'company_name'  => 'Компания',
                 'user_name'     => 'ФИО лица, проводившего инструктаж',
-                'role'          => 'Должность лица, проводившего инструктаж',    // Ну этой хуйни в таблице нет
+                'user_id'       => 'Должность лица, проводившего инструктаж',    // Ну этой хуйни в таблице нет
                 'signature'     => 'Подпись водителя, прошедшего инструктаж',
                 'user_eds'      => 'Подпись лица, проводившего инструктаж (ЭЦП)',
             ],
@@ -458,6 +458,11 @@ class Anketa extends Model
             ],
 
         ];
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
 
     public static function getAll()
     {

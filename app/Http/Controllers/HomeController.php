@@ -337,32 +337,27 @@ class HomeController extends Controller
             $request->request->remove('exportPrikazPL');
             $request->request->remove('exportPrikaz');
             $request->request->remove('export');
-//            dd($anketas->get()->toArray());
 
             if($typeAnkets == 'bdd' && $fieldsKeysTypeAnkets == 'bdd_export_prikaz'){
                 // Тут надо получать должность
                 $collection = $anketas->orderBy($orderKey, $orderBy)
                                       ->limit(50000)
-                                      ->leftJoin('users', 'anketas.user_eds', '=', 'users.eds')
-                                      ->get(array_keys($fieldsKeys))
-                                      ->map(function ($q){
-                                          // todo вынести
-                                          $role = null;
-                                          switch($q->role) {
-                                              case 12: $role = 'Клиент'; break;
-                                              case 4: $role = 'Оператор СДПО'; break;
-                                              case 1: $role = 'Контролёр ТС'; break;
-                                              case 2: $role = 'Медицинский сотрудник'; break;
-                                              case 3: $role = 'Водитель'; break;
-                                              case 11: $role = 'Менеджер'; break;
-                                              case 13: $role = 'Инженер БДД'; break;
-                                              case 777: $role = 'Администратор'; break;
-                                              case 778: $role = 'Терминал'; break;
-                                          }
-                                          $q->role = $role;
+                                      ->with([
+                                          'user' => function ($q) {
+                                              $q->select('id', 'role');
+                                          },
+                                      ])
+                                      ->select(array_keys($fieldsKeys))
+                                      ->get()
+                                      ->map(function ($q) {
+                                          $q->user_id = User::$userRolesText[$q->user['role']] ?? null;
+                                          unset($q->user);
+
                                           return $q;
                                       });
-            }else{
+
+
+            } else {
                 $collection = $anketas->orderBy($orderKey, $orderBy)
                                       ->limit(50000)
                                       ->get(array_keys($fieldsKeys));
