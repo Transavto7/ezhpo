@@ -321,7 +321,6 @@ class AnketsController extends Controller
 
         // Проверяем дефолтные значения
         $defaultDatas = [
-            'termometr' => '36,3 - 36,9',
             'tonometer' => rand(118,129) .'/'. rand(70,90),
             't_people' => mt_rand_float(35.9,36.7),
             'date' => date('Y-m-d H:i:s')
@@ -363,6 +362,30 @@ class AnketsController extends Controller
             $createdAnketasDataResponseApi = [];
             $data_anketa = $data['anketa'];
             $errorsAnketa = array();
+            $dopAnketas = [];
+            $Driver = Driver::where('hash_id', $d_id)->first();
+            $cars = [];
+            $cars[] = $data['car_id'] ?? 0;
+
+            foreach ($data_anketa as $anketa) {
+                $c_id = isset($anketa['car_id']) ? $anketa['car_id'] :
+                    (isset($data['car_id']) ? $data['car_id'] : 0);
+                $cars[] = $c_id;
+            }
+
+            if ($data['type_anketa'] === 'medic' || $data['type_anketa'] === 'pak') {
+                $anketasMedic = Anketa::where('driver_id', $d_id)
+                    ->where('type_anketa', 'medic')
+                    ->where('in_cart', 0)
+                    ->orderBy('date', 'desc')
+                    ->get();
+            } else if ($data['type_anketa'] === 'tech' || $data['type_anketa'] === 'vid_pl') {
+                $anketasTech = Anketa::whereIn('car_id', $cars)
+                    ->whereIn('type_anketa', ['tech', 'dop'])
+                    ->where('in_cart', 0)
+                    ->orderBy('date', 'desc')
+                    ->get();
+            }
 
             foreach($data_anketa as $anketa) {
                 // Выделение красных дат
@@ -373,7 +396,6 @@ class AnketsController extends Controller
                     (isset($data['car_id']) ? $data['car_id'] : 0);
 
                 $Car = Car::where('hash_id', $c_id)->first();
-                $Driver = Driver::where('hash_id', $d_id)->first();
 
                 // Тонометр
                 $tonometer = isset($anketa['tonometer']) ? $anketa['tonometer'] : $defaultDatas['tonometer'];
@@ -416,6 +438,7 @@ class AnketsController extends Controller
                 /**
                  * ОЧЕРЕДЬ ПАК
                  */
+
                 if($anketa['type_anketa'] == 'pak_queue') {
                     $notifyTo = new Notify();
                     $notifyTo->sendMsgToUsersFrom('role', '4', 'Новый осмотр в очереди СДПО');
@@ -598,33 +621,23 @@ class AnketsController extends Controller
                     'date' => ''
                 ];
 
-                if ($anketa['type_anketa'] === 'medic' || $anketa['type_anketa'] === 'pak') {
-                    $anketaMedic = Anketa::where('driver_id', $d_id)
-                        ->where('type_anketa', 'medic')
-                        ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '')
-                        ->where('in_cart', 0)
-                        ->orderBy('date', 'desc')
-                        ->get();
+                if(isset($anketasMedic)) {
+                    $anketaMedic = $anketasMedic
+                        ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '');
 
-                    if($anketaMedic) {
-                        foreach($anketaMedic as $aM) {
-                            $hourdiff_check = round((strtotime($anketa['date']) - strtotime($aM->date))/3600, 1);
+                    foreach($anketaMedic as $aM) {
+                        $hourdiff_check = round((strtotime($anketa['date']) - strtotime($aM->date))/3600, 1);
 
-                            if($hourdiff_check < 1 && $hourdiff_check >= 0) {
-                                $anketaDublicate['id'] = $aM->id;
-                                $anketaDublicate['date'] = $aM->date;
-                                $hourdiff = $hourdiff_check;
-                            }
+                        if($hourdiff_check < 1 && $hourdiff_check >= 0) {
+                            $anketaDublicate['id'] = $aM->id;
+                            $anketaDublicate['date'] = $aM->date;
+                            $hourdiff = $hourdiff_check;
                         }
                     }
-                } else if ($anketa['type_anketa'] === 'tech' || $anketa['type_anketa'] === 'vid_pl') {
-                    $anketaTech = Anketa::where('car_id', $c_id)
+                } else if (isset($anketasTech)) {
+                    $anketaTech = $anketasTech
                         ->where('type_anketa', 'tech')
-                        ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '')
-                        ->where('in_cart', 0)
-                        ->orderBy('date', 'desc')
-                        ->get();
-
+                        ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '');
 
                     /**
                      * Уволенный АВТО
@@ -703,11 +716,8 @@ class AnketsController extends Controller
 
                     // Проверка записи в Журнале ПЛ, если у нас ТО
                     if($anketa['type_anketa'] === 'tech') {
-                        $anketaPL = Anketa::where('car_id', $c_id)
-                            ->where('type_anketa', 'Dop')
-                            ->where('in_cart', 0)
-                            ->orderBy('date', 'desc')
-                            ->get();
+                        $anketaPL = $anketasTech
+                            ->where('type_anketa', 'Dop');
 
                         if($anketaPL) {
                             foreach($anketaPL as $aPL) {
@@ -787,7 +797,7 @@ class AnketsController extends Controller
                     $anketa['connected_hash'] = $connected_hash;
                     $dopAnketa = $anketa;
                     $dopAnketa['type_anketa'] = 'Dop';
-                    Anketa::create($dopAnketa);
+                    $dopAnketas[] = $dopAnketa;
                 }
 
                 /**
@@ -805,22 +815,19 @@ class AnketsController extends Controller
                 /**
                  * Создаем анкету
                  */
-                $createdAnketa = Anketa::create($anketa);
-                array_push($createdAnketas, $createdAnketa->id);
-                $anketaCreated = Anketa::find($createdAnketa->id);
+//                $createdAnketa = Anketa::create($anketa);
+//                array_push($createdAnketas, $createdAnketa->id);
+//                $anketaCreated = Anketa::find($createdAnketa->id);
 
                 /**
                  * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
                  */
-                if($createdAnketa->type_anketa === 'medic') {
-                    $diffDateCheck = Carbon::parse($createdAnketa->created_at)->diff($createdAnketa->date)->format('%i');
-
+                if($anketa['type_anketa'] === 'medic') {
+                    $diffDateCheck = Carbon::now()->diff($anketa['date'])->format('%i');
                     if($diffDateCheck <= 10) {
-                        $anketaCreated->realy = 'да';
-                        $anketaCreated->save();
+                        $anketa['realy'] = 'да';
                     } else {
-                        $anketaCreated->realy = 'нет';
-                        $anketaCreated->save();
+                        $anketa['realy'] = 'нет';
                     }
 
                 }
@@ -829,8 +836,7 @@ class AnketsController extends Controller
                  * При режиме ввода ПЛ - осмотр НЕ реальный
                  */
                 if($is_dop) {
-                    $anketaCreated->realy = 'нет';
-                    $anketaCreated->save();
+                    $anketa['realy'] = 'нет';
                 }
 
                 /**
@@ -844,23 +850,28 @@ class AnketsController extends Controller
                     } else if (isset($Car)) {
                         $sms->sms($Company->where_call, Settings::setting('sms_text_car') . " $Car->gos_number. $phone_to_call");
                     } else {
-                        $sms->sms($Company->where_call, Settings::setting('sms_text_default') . " $createdAnketa. $phone_to_call");
+                        $sms->sms($Company->where_call, Settings::setting('sms_text_default') . ' ' . new Anketa($anketa) . '.' . ' ' . $phone_to_call);
                     }
                 }
 
-                if($isApiRoute) {
-                    array_push($createdAnketasDataResponseApi, $createdAnketa);
-                }
+                array_push($createdAnketas, $anketa);
             }
 
+            if (count($dopAnketas) > 0) {
+                Anketa::insert($dopAnketas);
+            }
+
+            Anketa::insert($createdAnketas);
+            $createdAnketas = Anketa::orderBy('created_at', 'desc')->limit(count($createdAnketas))->get();
+
             $responseData = [
-                'createdId' => $createdAnketas,
+                'createdId' => $createdAnketas->pluck('id')->toArray(),
                 'errors' => $errorsAnketa,
                 'type' => $data['type_anketa']
             ];
 
             if($isApiRoute) {
-                $responseData['ankets'] = $createdAnketasDataResponseApi;
+                $responseData['ankets'] = $createdAnketas;
                 return response()->json($responseData);
             }
 
