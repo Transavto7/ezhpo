@@ -8,8 +8,8 @@
                     <tr>
                         <th width="100">ID</th>
                         <th width="250">Водитель</th>
-                        <th class="text-center" width="150">Предрейсовые/Предсменный</th>
-                        <th class="text-center" width="150">Послерейсовые/Послесменный</th>
+                        <th class="text-center" width="150">Предрейсовый/Предсменный</th>
+                        <th class="text-center" width="150">Послерейсовый/Послесменный</th>
                         <th class="text-center" width="150">режим ПЛ</th>
 
                         <th class="text-center" width="150">БДД</th>
@@ -63,7 +63,7 @@
                         </td>
 
                         <td class="text-center" width="150">
-                            {{ getTotal(item, 'Отчёт') }}
+                            {{ getTotal(item, 'report_cart') }}
 
                             <div class="text-red font-weight-bold" v-if="getSum(item, 'report_cart') == null">
                                 Услуги не указаны
@@ -71,6 +71,50 @@
                             <div class="font-weight-bold" v-else> {{ getSum(item, 'report_cart') }}₽ </div>
                         </td>
 
+                    </tr>
+
+                    <tr v-if="reports">
+                        <td width="100">
+                        </td>
+
+                        <td width="250">
+                            <b>Всего</b>
+                        </td>
+
+                        <td class="text-center" width="150">
+                            {{ getTotalAll('Предрейсовый', 'Предсменный') }}
+
+                            <div class="font-weight-bold" v-if="getSumAll('Предрейсовый', 'Предсменный') != null">
+                                {{ getSumAll('Предрейсовый', 'Предсменный') }}₽
+                            </div>
+                        </td>
+
+                        <td class="text-center" width="150">
+                            {{ getTotalAll('Послерейсовый', 'Послесменный') }}
+
+
+                            <div class="font-weight-bold" v-if="getSumAll('Послерейсовый', 'Послесменный') != null">
+                                {{ getSumAll('Послерейсовый', 'Послесменный') }}₽
+                            </div>
+                        </td>
+
+                        <td class="text-center" width="150">
+                            {{ getTotalAll('is_dop') }}
+
+                            <div class="font-weight-bold" v-if="getSumAll('is_dop') != null"> {{ getSumAll('is_dop') }}₽ </div>
+                        </td>
+
+                        <td class="text-center" width="150">
+                            {{ getTotalAll('bdd') }}
+
+                            <div class="font-weight-bold" v-if="getSumAll('bdd') != null"> {{ getSumAll('bdd') }}₽ </div>
+                        </td>
+
+                        <td class="text-center" width="150">
+                            {{ getTotalAll('report_cart') }}
+
+                            <div class="font-weight-bold" v-if="getSumAll('report_cart') != null"> {{ getSumAll('report_cart') }}₽ </div>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -102,6 +146,38 @@ export default {
         hide() {
           this.reports = false;
           this.show = false;
+        },
+        getTotalAll(...names) {
+            let total = 0;
+            for (let key in this.reports) {
+                const totalDriver = this.getTotal(this.reports[key], ...names);
+
+                if (typeof totalDriver === 'number') {
+                    total += totalDriver;
+                }
+            }
+
+            if (total > 0) {
+                return total;
+            }
+
+            return 'отсутствует';
+        },
+        getSumAll(...names) {
+            let sum = 0;
+            for (let key in this.reports) {
+                const totalDriver = this.getSum(this.reports[key], ...names);
+
+                if (typeof totalDriver === 'number') {
+                    sum += totalDriver;
+                }
+            }
+
+            if (sum > 0) {
+                return sum;
+            }
+
+            return null;
         },
         getTotal(item, ...names) {
             let total = 0;
