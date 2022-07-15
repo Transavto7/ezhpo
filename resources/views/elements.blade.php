@@ -6,7 +6,7 @@
 @section('content')
 
 <!-- Модалка для редактирования см front.js  -->
-<div class="modal fade editor-modal" id="modalEditor" tabindex="1" role="dialog"  aria-hidden="true">
+<div class="modal fade editor-modal" id="modalEditor" role="dialog"  aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
         </div>
