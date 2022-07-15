@@ -62,6 +62,36 @@ class HomeController extends Controller
         return redirect( $_SERVER['HTTP_REFERER'] );
     }
 
+    public static function setSessionForField(){
+        session(["fields_medic" => [
+            'date' => 'on',
+            'created_at' => 'on',
+            'driver_fio' => 'on',
+            'company_id' => 'on',
+            'pv_id' => 'on',
+            'driver_id' => 'on',
+        ]]);
+        session(["fields_tech" => [
+            'date' => 'on',
+            'created_at' => 'on',
+            'driver_fio' => 'on',
+            'company_id' => 'on',
+            'pv_id' => 'on',
+            'car_gos_number' => 'on',
+//            'car_id' => 'on',
+            'odometer' => 'on',
+//            'car_id' => 'on',
+//            'car_id' => 'on',
+        ]]);
+//        session(["fields_medic" => [
+//
+//        ]]);
+//        session(["fields_medic" => [
+//
+//        ]]);
+
+    }
+
     public function index(Request $request)
     {
         $queryString = '';
@@ -205,11 +235,11 @@ class HomeController extends Controller
             foreach($filter_params as $fk => $fv) {
                 $is_filter_except = isset($filterExcept[$fk]) ? $filterExcept[$fk] : null;
 
-                if($fk == 'hour_from' ){
+                if($fk == 'hour_from' && $fv){
                     $anketas->whereTime('date','>=',  $fv . ':00');
                     continue;
                 }
-                if($fk == 'hour_to'){
+                if($fk == 'hour_to' && $fv){
                     $anketas->whereTime('date', '<=',  $fv . ':00');
                     continue;
                 }
@@ -305,7 +335,7 @@ class HomeController extends Controller
 //            dd($anketas->get(), $anketas->dd());
         }
 //        dump($fromToValues);
-//        dd($anketas->toSql());
+//        dd($anketas->limit(20)->get());
 
         if(auth()->user()->hasRole('client', '==')) {
             $company_id_client = User::getUserCompanyId('hash_id');
