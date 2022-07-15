@@ -100,6 +100,8 @@
                                 <input
                                     @if($field === 'date' || strpos($field, '_at') > 0)
                                     type="date"
+                                    @elseif($field === 'hour_from' || $field === 'hour_to')
+                                    type="time"
                                     @else
                                     type="search"
                                     @endif

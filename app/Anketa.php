@@ -22,7 +22,6 @@ class Anketa extends Model
     }
 
 
-
     public $fillable
         = [
             'id',
@@ -272,6 +271,8 @@ class Anketa extends Model
             'medic' => [
                 'date'                   => 'Дата и время осмотра',
                 'driver_fio'             => 'ФИО работника',
+                'hour_from'              => 'Время проведения осмотра с:',
+                'hour_to'                => 'Время проведения осмотра до',
                 'driver_gender'          => 'Пол',
                 'driver_year_birthday'   => 'Дата рождения',
                 'company_name'           => 'Место работы',
@@ -359,6 +360,8 @@ class Anketa extends Model
              */
             'tech'      => [
                 'date'           => 'Дата, время проведения контроля',
+                'hour_from'      => 'Время проведения осмотра с:',
+                'hour_to'        => 'Время проведения осмотра до',
                 'created_at'     => 'Дата создания',
                 'car_mark_model' => 'Наименование марки, модели транспортного средства',
                 'car_gos_number' => 'Государственный регистрационный номер транспортного средства',
