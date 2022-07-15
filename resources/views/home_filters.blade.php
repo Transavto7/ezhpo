@@ -142,7 +142,7 @@
                         <label><b>Время проведения осмотра до:</b></label>
                         <input
                             type="time"
-                            value="{{ request()->get('hour_from') }}"
+                            value="{{ request()->get('hour_to') }}"
                             name="hour_to" class="form-control" />
                     </div>
                 </div>
