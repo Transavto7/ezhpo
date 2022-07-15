@@ -205,6 +205,15 @@ class HomeController extends Controller
             foreach($filter_params as $fk => $fv) {
                 $is_filter_except = isset($filterExcept[$fk]) ? $filterExcept[$fk] : null;
 
+                if($fk == 'hour_from' ){
+                    $anketas->whereTime('date','>=',  $fv . ':00');
+                    continue;
+                }
+                if($fk == 'hour_to'){
+                    $anketas->whereTime('date', '<=',  $fv . ':00');
+                    continue;
+                }
+
                 if((in_array($fk, $anketasModel->fillable) || $is_filter_except)) {
                     // Поиск по дефолтным полям в таблице Anketas
 
