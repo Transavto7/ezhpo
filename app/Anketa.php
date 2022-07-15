@@ -171,7 +171,7 @@ class Anketa extends Model
                 'driver_fio'    => 'Ф.И.О водителя, прошедшего инструктаж',
                 'user_name'     => 'Ф.И.О (при наличии) лица, проводившего инструктаж',
                 'pv_id'         => 'Пункт выпуска',
-                'signature'     => 'ЭЛ подпись',
+                'signature'     => 'ЭЛ подпись водителя',
             ],
 
             'report_cart' => [
@@ -227,7 +227,7 @@ class Anketa extends Model
                 'is_dop'            => 'Режим ввода ПЛ',
                 'result_dop'        => 'Результат ввода ПЛ',
                 'period_pl'         => 'Период ПЛ',
-                'signature'         => 'ЭЛ подпись',
+                'signature'         => 'ЭЛ подпись водителя',
             ],
             'tech'  => [
 
@@ -430,7 +430,7 @@ class Anketa extends Model
                 'pv_id'        => 'Пункт выпуска',
                 'company_id'   => 'ID компании',
                 'driver_id'    => 'ID водителя',
-                'signature'    => 'ЭЛ подпись',
+                'signature'    => 'ЭЛ подпись водителя',
             ],
 
             'pechat_pl' => [
@@ -470,7 +470,7 @@ class Anketa extends Model
                 'user_eds'      => 'Подпись лица, проводившего инструктаж',
                 'company_id'    => 'ID компании',
                 'driver_id'     => 'ID водителя',
-                'signature'     => 'ЭЛ подпись',
+                'signature'     => 'ЭЛ подпись водителя',
             ],
 
         ];
