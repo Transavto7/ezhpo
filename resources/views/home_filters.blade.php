@@ -143,7 +143,7 @@
                         <input
                             type="time"
                             value="{{ request()->get('hour_from') }}"
-                            name="hour_from" class="form-control" />
+                            name="hour_to" class="form-control" />
                     </div>
                 </div>
         @endif
