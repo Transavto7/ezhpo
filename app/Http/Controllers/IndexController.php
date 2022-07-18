@@ -874,7 +874,7 @@ class IndexController extends Controller
     }
 
     /**
-     * Рендер элементов для редактирования, добавления и удаления
+     * Рендер просмотра вкладок CRM
      */
     public function RenderElements (Request $request)
     {

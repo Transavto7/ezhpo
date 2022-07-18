@@ -60,7 +60,7 @@
             <p>а) на алкоголь</p>
             <p>- выдыхаемый воздух (алкометр)</p>
             <textarea name="алкометр" rows="1" class="doc-input doc-input--row">DRIVESAFE II</textarea>
-            <p>время проведения контроля трезвости: <textarea name="данные_ли_время" rows="1" class="doc-input doc-input--row">{{ date('H:i', time($date)) }}</textarea></p>
+            <p>время проведения контроля трезвости: <textarea name="данные_ли_время" rows="1" class="doc-input doc-input--row">{{ \Carbon\Carbon::parse($date)->format('H:i') }}</textarea></p>
             <p>результат: <textarea name="данные_ли_результат" rows="1" class="doc-input doc-input--row">0,00 мг/л</textarea></p>
 
             <p>б) на наркотические средства</p>
