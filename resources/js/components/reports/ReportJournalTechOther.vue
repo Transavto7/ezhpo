@@ -19,7 +19,7 @@
                             <th class="text-center">Автомобиль</th>
                             <th class="text-center">Предрейсовый/Предсменный</th>
                             <th class="text-center">Послерейсовый/Послесменный</th>
-                            <th class="text-center">режим ПЛ</th>
+                            <th class="text-center">Несогласованные ПЛ</th>
                             <th class="text-center">БДД</th>
                             <th class="text-center">Отчёты с карт</th>
                             </thead>

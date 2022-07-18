@@ -10,7 +10,7 @@
                         <th width="250">Водитель</th>
                         <th class="text-center" width="150">Предрейсовый/Предсменный</th>
                         <th class="text-center" width="150">Послерейсовый/Послесменный</th>
-                        <th class="text-center" width="150">режим ПЛ</th>
+                        <th class="text-center" width="150">Несогласованные ПЛ</th>
 
                         <th class="text-center" width="150">БДД</th>
                         <th class="text-center" width="150">Отчёты с карт</th>
