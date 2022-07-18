@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="data" class="card">
-            <h5 class="card-header">Режим ввода ПЛ</h5>
+            <h5 class="card-header">Несогласованные ПЛ</h5>
             <div class="card-body">
                 <table id="reports-table-4" class="table table-responsive">
                     <thead>

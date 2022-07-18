@@ -910,7 +910,7 @@ class IndexController extends Controller
         $orderBy = $request->get($oBy, 'DESC');
         $filter = $request->get('filter', 0);
 
-        $take = $request->get('take', 20);
+        $take = $request->get('take', 500);
 
         if(isset($this->elements[$type])) {
             $element = $this->elements[$type];
