@@ -107,7 +107,7 @@ $(document).ready(function () {
         });
         setTimeout(() => {
             loading = false;
-        }, 300);
+        }, 100);
     })
 
     const API_CONTROLLER = new ApiController(),
