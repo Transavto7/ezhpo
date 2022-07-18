@@ -62,12 +62,43 @@ class HomeController extends Controller
         return redirect( $_SERVER['HTTP_REFERER'] );
     }
 
+    public static function setSessionForField(){
+        session(["fields_medic" => [
+            'date' => 'on',
+            'created_at' => 'on',
+            'driver_fio' => 'on',
+            'company_id' => 'on',
+            'pv_id' => 'on',
+            'driver_id' => 'on',
+        ]]);
+        session(["fields_tech" => [
+            'date' => 'on',
+            'created_at' => 'on',
+            'driver_fio' => 'on',
+            'company_id' => 'on',
+            'pv_id' => 'on',
+            'car_gos_number' => 'on',
+//            'car_id' => 'on',
+            'odometer' => 'on',
+//            'car_id' => 'on',
+//            'car_id' => 'on',
+        ]]);
+//        session(["fields_medic" => [
+//
+//        ]]);
+//        session(["fields_medic" => [
+//
+//        ]]);
+
+    }
+
     public function index(Request $request)
     {
         $queryString = '';
 
         $oKey = 'orderKey';
         $oBy = 'orderBy';
+
 
         /**
          * All Query String Without Params
@@ -94,7 +125,7 @@ class HomeController extends Controller
         $anketasModel = new Anketa();
         $anketas = $anketasModel;
 
-        $take = $request->get('take') ? $request->get('take') : 20;
+        $take = $request->get('take') ? $request->get('take') : 500;
         $orderKey = $request->get($oKey, 'date');
         $orderBy = $request->get($oBy,
             ($typeAnkets === 'pak_queue' ? 'ASC' : 'DESC')
@@ -119,11 +150,36 @@ class HomeController extends Controller
         /**
          * Выбор полей
          */
-        $fieldsKeysTypeAnkets = $typePrikaz === 'Dop' || $request->get('exportPrikazPL') ? 'Dop_prikaz' : $validTypeAnkets;
+        if ($typePrikaz === 'Dop' || (!isset($_GET['getFormFilter']) && $request->get('exportPrikazPL'))) {
+            $fieldsKeysTypeAnkets = 'Dop_prikaz';
+        } else {
+            $fieldsKeysTypeAnkets = $validTypeAnkets;
+        }
+
+        // Экспорты новые писать тут всё
+        if($request->get('export')){
+            if($typeAnkets == 'tech'){
+                if($request->get('exportPrikaz')){
+                    $fieldsKeysTypeAnkets = 'tech_export_to'; // экспорт по приказу ТО
+                }elseif ($request->get('exportPrikazPL')){
+                    $fieldsKeysTypeAnkets= 'tech_export_pl';// экспорт по приказу ПЛ
+                }else{
+                    $fieldsKeysTypeAnkets= 'tech';// экспорт просто
+                }
+            }elseif ($typeAnkets == 'bdd'){
+                if($request->get('exportPrikaz')){
+                    $fieldsKeysTypeAnkets= 'bdd_export_prikaz';// экспорт по приказу
+
+                }else{
+                    $fieldsKeysTypeAnkets= 'bdd';// экспорт просто
+                }
+            }
+        }
+
+//        dd($fieldsKeysTypeAnkets);
         $fieldsKeys = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
         $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets]) ? Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] : [];
-//dd($exportPrikaz);
-//        dd($fieldsKeys, $fieldsGroupFirst);
+
         if($typePrikaz === 'Dop' || $request->get('export')) {
             $take = 10000;
         }
@@ -145,6 +201,7 @@ class HomeController extends Controller
          * Фильтрация анкет
          */
         $filter_activated = !empty( $request->get('filter') );
+
         $filter_params = $request->all(); // ИСПРАВИЛ: array_diff($request->all(), array(''))
         $is_export = isset($_GET['export']);
         $trash = $request->get('trash', 0);
@@ -164,50 +221,63 @@ class HomeController extends Controller
         unset($filter_params['getFormFilter']);
 
         // Уникальные и независимые поля
-        $filterExcept = [
-            'TO_created_at' => 'created_at',
-            'TO_date' => 'date'
-        ];
-
-        $dataExcept = [
-            'pv_id' => 1
-        ];
+        // dolboeb ebanii
+//        $filterExcept = [
+//            'TO_created_at' => 'created_at',
+//            'TO_date' => 'date'
+//        ];
 
         // Фильтр
         if(count($filter_params) > 0 && $filter_activated) {
             foreach($filter_params as $fk => $fv) {
-                $is_filter_except = isset($filterExcept[$fk]) ? $filterExcept[$fk] : null;
 
-                if((in_array($fk, $anketasModel->fillable) || $is_filter_except)) {
+                if($fk == 'hour_from' && $fv){
+                    $anketas->whereTime('date','>=',  $fv . ':00');
+                    continue;
+                }
+                if($fk == 'hour_to' && $fv){
+                    $anketas->whereTime('date', '<=',  $fv . ':00');
+                    continue;
+                }
+                // В любом случае все ключи передаются
+                if($fk == 'TO_date'){
+                    continue;
+                }
+                // если ключ date, и date или TO_date не пустые
+                if($fk == 'date' && ($filter_params['date'] || $filter_params['TO_date'])){
+                    $date_from = Carbon::parse($fv)->startOfDay() ?? Carbon::now()->subYears(2);
+                    $date_to = Carbon::parse($filter_params['TO_date'])->endOfDay() ?? Carbon::now();
+
+                    $anketas = $anketas->where(function ($q) use ($date_from, $date_to) {
+                            $q->where(function ($q) use ($date_from, $date_to) {
+                                $q->where('is_dop','<>', 1)
+                                  ->whereBetween('date',  [$date_from, $date_to]);
+                            })->orWhere(function ($q) use ($date_from, $date_to) {
+                                $q->where('is_dop', 1)
+                                  ->whereBetween('period_pl', [$date_from, $date_to]);
+                            });
+                        });
+
+                    unset($date_from);
+                    unset($date_to);
+                    continue;
+                }
+                if($fk == 'created_at' && $fv){
+                    $anketas = $anketas->where('created_at', '>=', Carbon::parse($fv)->startOfDay());
+                    continue;
+                }
+                if($fk == 'TO_created_at' && $fv){
+                    $anketas = $anketas->where('created_at', '<=', Carbon::parse($fv)->endOfDay());
+                    continue;
+                }
+
+                if((in_array($fk, $anketasModel->fillable))) {
                     // Поиск по дефолтным полям в таблице Anketas
 
                     // Проверяем пустые поля
                     if(!empty($fv)) {
 
-                        if($is_filter_except) {
-                            // Проверка, одинаковые ли данные
-                            $fromFilterValue = $filter_params[$is_filter_except];
-                            $isFromEqualToValue = $fromFilterValue === $fv;
-                            $fromToValues = [$filter_params[$is_filter_except], $fv];
-
-                            $fromToValues[0] = Carbon::create($fromToValues[0]);
-                            $fromToValues[1] = Carbon::create($fromToValues[1]);
-                            /**
-                             * Поправил дату
-                             */
-
-                            $anketas = $isFromEqualToValue ?
-                                  $anketas->whereDate($is_filter_except, $fromFilterValue)
-                                : $anketas->whereBetween($is_filter_except, [
-                                    $fromToValues[0],
-                                    $fromToValues[1]
-                                ]);
-//                              ->whereBetween('period_pl', [
-//                                        $fromToValues[0]->format('Y-m'),
-//                                        $fromToValues[1]->format('Y-m')
-//                                    ]);
-
-                        } else if ($fk !== 'date' && $fk !== 'created_at') {
+                        if ($fk !== 'date' && $fk !== 'created_at') {
                             $explodeData = is_array($fv) ? $fv : explode(',', $fv);
                             $explodeData = (count($explodeData) == 1) ? $explodeData[0] : $explodeData;
 
@@ -240,21 +310,22 @@ class HomeController extends Controller
                                     $anketas = $anketas->where($fk, null);
                                 }
                             }
-                        } else {
-                            // Если даты
-                            if($fk === 'date' || $fk === 'created_at') {
-                                $anketas = $anketas->where($fk, '>=', $fv);
-                            } else {
-                                $anketas = $anketas->where($fk, $fv);
-                            }
                         }
-
+//                        elseif(){
+//
+//                        }
                     }
-                } else if (!empty($fv)) {
+                }else if (!empty($fv)) {
                     $anketas = $anketas->where($fk, 'LIKE', '%' . $fv . '%');
                 }
             }
+
+//            dd($anketas->get(), $anketas->dd());
         }
+//        dump($fromToValues);
+//        dd($anketas->toSql());
+//        dd($anketas->limit(20)->get()->toArray());
+//        $anketas->limit(20);
 
         if(auth()->user()->hasRole('client', '==')) {
             $company_id_client = User::getUserCompanyId('hash_id');
@@ -290,9 +361,37 @@ class HomeController extends Controller
          * </Измеряем количество Авто и Водителей (уникальные ID)>
          */
 
-        //todo на экспорт техосмотр по приказу ПЛ
-        if($request->get('exportPrikazPL')){
-            $collection = $anketas->orderBy($orderKey, $orderBy)->limit(50000)->get(array_keys($fieldsKeys));
+        // Экспорт из техосмотров и БДД
+        if($request->get('export') && ($typeAnkets == 'tech' || $typeAnkets == 'bdd')) {
+            $request->request->remove('exportPrikazPL');
+            $request->request->remove('exportPrikaz');
+            $request->request->remove('export');
+
+            if($typeAnkets == 'bdd' && $fieldsKeysTypeAnkets == 'bdd_export_prikaz'){
+                // Тут надо получать должность
+                $collection = $anketas->orderBy($orderKey, $orderBy)
+                                      ->limit(50000)
+                                      ->with([
+                                          'user' => function ($q) {
+                                              $q->select('id', 'role');
+                                          },
+                                      ])
+                                      ->select(array_keys($fieldsKeys))
+                                      ->get()
+                                      ->map(function ($q) {
+                                          $q->user_id = User::$userRolesText[$q->user['role']] ?? null;
+                                          unset($q->user);
+
+                                          return $q;
+                                      });
+
+
+            } else {
+                $collection = $anketas->orderBy($orderKey, $orderBy)
+                                      ->limit(50000)
+                                      ->get(array_keys($fieldsKeys));
+            }
+
             $collection->prepend(array_values($fieldsKeys));
             return (new AnketasExport($collection))->download('export-anketas.xlsx');
         }
@@ -327,6 +426,7 @@ class HomeController extends Controller
             $currentRole = 'operator_pak';
         }
 
+
         return view($_view, [
             'title' => Anketa::$anketsKeys[$validTypeAnkets],
             'name' => $user->name,
@@ -349,6 +449,42 @@ class HomeController extends Controller
             'orderBy' => $orderBy,
             'orderKey' => $orderKey,
             'queryString' => $queryString
+        ]);
+    }
+
+    public function getFilters(Request $request) {
+
+        $typePrikaz = $request->get('typePrikaz');
+        $typeAnkets = $request->type_ankets;
+
+        $validTypeAnkets = User::$userRolesKeys[auth()->user()->role];
+        if(isset(Anketa::$anketsKeys[$typeAnkets])) {
+            $validTypeAnkets = $typeAnkets;
+        }
+
+        /**
+         * Выбор полей
+         */
+        if ($typePrikaz === 'Dop' || (!isset($_GET['getFormFilter']) && $request->get('exportPrikazPL'))) {
+            $fieldsKeysTypeAnkets = 'Dop_prikaz';
+        } else {
+            $fieldsKeysTypeAnkets = $validTypeAnkets;
+        }
+
+        $fieldsKeys = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
+        $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets]) ? Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] : [];
+        $anketsFields = array_keys($fieldsKeys);
+
+        if(auth()->user()->hasRole('client', '==')) {
+            unset($fieldsKeys['created_at']);
+            unset($fieldsKeys['is_pak']);
+        }
+
+        return view('home_filters', [
+            'anketsFields' => $anketsFields,
+            'type_ankets' => $validTypeAnkets,
+            'fieldsKeys' => $fieldsKeys,
+            'fieldsGroupFirst' => $fieldsGroupFirst,
         ]);
     }
 }

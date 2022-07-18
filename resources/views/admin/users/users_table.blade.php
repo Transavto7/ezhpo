@@ -83,7 +83,7 @@
 
 
                 <!-- Редактирование элемента -->
-                <div id="users-modal-edit-{{ $user->id }}" tabindex="-1" role="dialog" aria-hidden="true" class="modal fade text-left">
+                <div id="users-modal-edit-{{ $user->id }}" role="dialog" aria-hidden="true" class="modal fade text-left">
                     <div role="document" class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -164,7 +164,7 @@
                                                 <option value="2">Медицинский сотрудник</option>
                                                 <option value="4">Оператор СДПО</option>
                                                 <option value="11">Менеджер</option>
-                                                <option value="12">Инженер БДД</option>
+                                                <option value="13">Инженер БДД</option>
                                                 <option value="777">Администратор</option>
                                             </select>
                                         </div>

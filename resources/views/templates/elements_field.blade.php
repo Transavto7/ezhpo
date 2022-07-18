@@ -42,12 +42,21 @@
     @endif
 
 @elseif ($v['type'] === 'select')
-    @php $default_value = is_array($default_value) ? $default_value : explode(',', $default_value) @endphp
-
+    @php
+        $default_value = is_array($default_value) ? $default_value : explode(',', $default_value);
+        $key = isset($v['getFieldKey']) ? $v['getFieldKey'] : 'id';
+        $value = isset($v['getField']) ? $v['getField'] : 'name';
+    @endphp
     <select
         @isset($v['saveToHistory'])
             onchange="addFieldToHistory(event.target.value, '{{ $v['label'] }}');"
         @endisset
+
+        @if(!is_array($v['values']))
+            model="{{ $v['values'] }}"
+            field-key="{{ $key }}"
+            field="{{ $value }}"
+        @endif
 
         @isset($v['multiple'])
             multiple="multiple"
@@ -59,7 +68,7 @@
         {{ $is_required }}
         data-label="{{ isset($v['label']) ? $v['label'] : $k }}"
         data-field="{{ $model }}_{{ $k }}"
-        class="js-chosen"
+        class="filled-select2 filled-select"
     >
         {{-- disabled selected --}}
         <option value="">Не установлено</option>
@@ -73,25 +82,14 @@
                 </option>
             @endforeach
         @else
-            @foreach(app("App\\" . $v['values'])::getAll(true) as $option)
-                <option
-                    @isset($v['getFieldKey'])
-
-                        @if(in_array($option[$v['getFieldKey']], $default_value)) selected @endif
-                        value="{{ $option[$v['getFieldKey']] }}"
-
-                    @else
-
-                    @if(in_array($option->id, $default_value)) selected @endif
-                        value="{{ $option->id }}"
-
-                    @endisset
-                >
-                    @isset($v['getField'])
-                        {{ $option[$v['getField']] }}
-                    @else
-                        {{ $option->name }}
-                    @endisset
+            @foreach(app("App\\" . $v['values'])::whereIn($key, $default_value)->get() as $option)
+                <option selected value="{{ $option[$key] }}">
+                    {{ $option[$value] }}
+                </option>
+            @endforeach
+            @foreach(app("App\\" . $v['values'])::whereNotIn($key, $default_value)->limit(100)->get() as $option)
+                <option value="{{ $option[$key] }}">
+                    {{ $option[$value] }}
                 </option>
             @endforeach
         @endif

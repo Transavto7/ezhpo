@@ -71,7 +71,6 @@ class IndexController extends Controller
                 'banks' => ['label' => 'Банки', 'type' => 'text', 'noRequired' => 1],
                 'director' => ['label' => 'Должность руководителя', 'type' => 'text', 'noRequired' => 1],
                 'director_fio' => ['label' => 'ФИО Руководителя', 'type' => 'text', 'noRequired' => 1],
-                'signature' => ['label' => 'Подпись', 'type' => 'file', 'noRequired' => 1],
                 'seal' => ['label' => 'Печать', 'type' => 'file', 'noRequired' => 1]
             ]
         ],
@@ -237,7 +236,7 @@ class IndexController extends Controller
 
             'model' => 'Company',
             'fields' => [
-                'name' => ['label' => 'Название компании клиента', 'type' => 'text', 'filterJournalLinkKey' => 'company_id'],
+                'name' => ['label' => 'Название компании клиента', 'type' => 'text', 'filterJournalLinkKey' => 'company_name'],
                 'note' => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
                 'user_id' => ['label' => 'Ответственный', 'type' => 'select', 'values' => 'User', 'noRequired' => 1],
                 'req_id' => ['label' => 'Реквизиты нашей компании', 'type' => 'select', 'values' => 'Req'],
@@ -319,9 +318,7 @@ class IndexController extends Controller
                 ], 'defaultValue' => 'Не установлено'],
                 'type_view' => ['label' => 'Тип осмотра', 'type' => 'select', 'values' => [
                     'Предрейсовый' => 'Предрейсовый',
-                    'Послерейсовый' => 'Послерейсовый',
                     'Предсменный' => 'Предсменный',
-                    'Послесменный' => 'Послесменный',
                     'БДД' => 'БДД',
                     'Отчёты с карт' => 'Отчёты с карт',
                     'Учет ПЛ' => 'Учет ПЛ',
@@ -353,7 +350,8 @@ class IndexController extends Controller
                     0 => 'Нет',
                     1 => 'Да'
                 ], 'defaultValue' => 'Да'],
-                'sort' => ['label' => 'Сортировка', 'type' => 'number', 'noRequired' => 1]
+                'sort' => ['label' => 'Сортировка', 'type' => 'number', 'noRequired' => 1],
+                'signature' => ['label' => 'ЭЛ подпись водителя', 'type' => 'number', 'noRequired' => 1]
             ]
         ]
 
@@ -851,7 +849,7 @@ class IndexController extends Controller
 
         $page['el'] = $el;
 
-        return view('showEditElementModal', $page);
+        echo view('showEditElementModal', $page);
     }
 
     /**
@@ -877,7 +875,7 @@ class IndexController extends Controller
     }
 
     /**
-     * Рендер элементов для редактирования, добавления и удаления
+     * Рендер просмотра вкладок CRM
      */
     public function RenderElements (Request $request)
     {
@@ -913,7 +911,7 @@ class IndexController extends Controller
         $orderBy = $request->get($oBy, 'DESC');
         $filter = $request->get('filter', 0);
 
-        $take = $request->get('take', 20);
+        $take = $request->get('take', 500);
 
         if(isset($this->elements[$type])) {
             $element = $this->elements[$type];

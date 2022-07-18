@@ -21,6 +21,7 @@ use App\Point;
 */
 
 Route::get('/companies/find', 'ApiController@companiesList');
+Route::get('/find/{model}', 'ApiController@modelList');
 
 Route::get('reports/journal', 'ReportController@getJournalData')->name('api.reports.journal');
 

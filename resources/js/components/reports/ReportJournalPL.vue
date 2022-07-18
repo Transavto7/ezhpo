@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="data" class="card">
-            <h5 class="card-header">Режим ввода ПЛ</h5>
+            <h5 class="card-header">Несогласованные ПЛ</h5>
             <div class="card-body">
                 <table id="reports-table-4" class="table table-responsive">
                     <thead>
@@ -15,20 +15,23 @@
                     <td v-for="(item, name, index) in data" colspan="7" class="p-0">
                         <table class="w-100 table">
                             <thead>
-                            <th>Автомобиль/Водитель</th>
-                            <th>Предрейсовые</th>
-                            <th>Послерейсовые</th>
-                            <th>Предсменные</th>
-                            <th>Послесменные</th>
+                            <th class="text-center">Автомобиль/Водитель</th>
+                            <th class="text-center">Предрейсовый/Предсменный</th>
+                            <th class="text-center">Послерейсовый/Послесменный</th>
                             </thead>
 
                             <tbody>
                             <tr v-for="(report, name, index) in item.reports">
-                                <td>{{ report.driver_fio }} / {{ report.car_gos_number }}</td>
-                                <td>{{ getTotal(report, 'Предрейсовый') }}</td>
-                                <td>{{ getTotal(report, 'Послерейсовый') }}</td>
-                                <td>{{ getTotal(report, 'Предсменный') }}</td>
-                                <td>{{ getTotal(report, 'Послесменный') }}</td>
+                                <td class="text-center">{{ getStringMark(report) }}</td>
+                                <td class="text-center">{{ getTotal(report, 'Предрейсовый', 'Предсменный') }}</td>
+                                <td class="text-center">{{ getTotal(report, 'Послерейсовый', 'Послесменный') }}</td>
+                            </tr>
+                            <tr v-if="item.reports">
+                                <td class="text-center">
+                                    <b>Всего</b>
+                                </td>
+                                <td class="text-center">{{ getTotalAll(item.reports, 'Предрейсовый', 'Предсменный') }}</td>
+                                <td class="text-center">{{ getTotalAll(item.reports, 'Послерейсовый', 'Послесменный') }}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -57,6 +60,26 @@ export default {
         }
     },
     methods: {
+        getStringMark(item) {
+            let str = '';
+            if (item.car_gos_number) {
+                str += item.car_gos_number + ' ';
+
+            }
+
+            if (item.type_auto) {
+                str +=  `(${item.type_auto})`;
+            }
+
+           if (item.driver_fio) {
+               if (str !== '') {
+                    str += ' / '
+               }
+            str += item.driver_fio;
+           }
+
+           return str;
+        },
         visible(data, show = true) {
             if (data.length === undefined || data.length > 0) {
                 this.data = data;
@@ -68,19 +91,40 @@ export default {
             this.data = false;
             this.show = false;
         },
-        getTotal(item, name) {
-            if (item.types && item.types[name] && item.types[name].total) {
-                return item.types[name].total;
+        getTotalAll(reports, ...names) {
+            let total = 0;
+            for (let key in reports) {
+                const totalDriver = this.getTotal(reports[key], ...names);
+
+                if (typeof totalDriver === 'number') {
+                    total += totalDriver;
+                }
+            }
+
+            if (total > 0) {
+                return total;
             }
 
             return 'отсутствует';
         },
-        getSum(item, name) {
-            if (item.types && item.types[name] && item.types[name].sum) {
-                return item.types[name].sum;
+        getTotal(item, ...names) {
+            let total = 0;
+
+            if (item.types) {
+                for (let key in item.types) {
+                    names.forEach(name => {
+                        if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+                            total += parseInt(item.types[key]?.total);
+                        }
+                    });
+                }
             }
 
-            return null
+            if (total > 0) {
+                return total;
+            }
+
+            return 'отсутствует';
         },
     }
 }

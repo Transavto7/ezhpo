@@ -11,33 +11,24 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     public $fillable = [
         'hash_id', 'req_id', 'photo', 'name', 'email', 'password', 'eds', 'pv_id', 'timezone', 'role', 'role_manager', 'blocked', 'pv_id_default', 'api_token',
         'login', 'user_post'
     ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
     protected $hidden = [
         'password'
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // sorry for name
+    public function anketas()
+    {
+        return $this->hasMany(Anketa::class, 'user_id', 'id');
+    }
 
     public static $userRolesValues = [
         'client' => 12,
@@ -61,6 +52,19 @@ class User extends Authenticatable
         '777' => 'medic',
         '778' => 'medic'
     ];
+
+    public static $userRolesText
+        = [
+            1   => 'Контролёр ТС',
+            2   => 'Медицинский сотрудник',
+            3   => 'Медицинский сотрудник',
+            4   => 'Оператор СДПО',
+            11  => 'Менеджер',
+            12  => 'Клиент',
+            13  => 'Инженер БДД',
+            777 => 'Администратор',
+            778 => 'Терминал',
+        ];
 
     public static function getUserCompanyId ($field = 'id')
     {

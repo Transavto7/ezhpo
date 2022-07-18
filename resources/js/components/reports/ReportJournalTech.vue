@@ -7,15 +7,13 @@
                     <thead>
                     <tr>
                         <th width="100">ID</th>
-                        <th width="250">Автомобили</th>
-                        <th width="150">Предрейсовые</th>
-                        <th width="150">Послерейсовые</th>
+                        <th width="250">Автомобиль</th>
+                        <th class="text-center" width="150">Предрейсовый/Предсменный</th>
+                        <th class="text-center" width="150">Послерейсовый/Послесменный</th>
+                        <th class="text-center">Несогласованные ПЛ</th>
 
-                        <th width="150">Предсменные</th>
-                        <th width="150">Послесменные</th>
-
-                        <th width="150">БДД</th>
-                        <th width="150">Отчёты с карт</th>
+                        <th class="text-center" width="150">БДД</th>
+                        <th class="text-center" width="150">Отчёты с карт</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -25,43 +23,34 @@
                         </td>
 
                         <td width="250">
-                            {{ item.car_gos_number }}
+                            {{ getStringMark(item) }}
                         </td>
 
                         <td class="text-center" width="150">
-                            {{ getTotal(item, 'Предрейсовый') }}
+                            {{ getTotal(item, 'Предрейсовый', 'Предсменный') }}
 
-                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Предрейсовый') == null">
+                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Предрейсовый', 'Предсменный') == null">
                                 Услуги не указаны
                             </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Предрейсовый') }}₽ </div>
+                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Предрейсовый', 'Предсменный') }}₽ </div>
                         </td>
 
                         <td class="text-center" width="150">
-                            {{ getTotal(item, 'Послерейсовый') }}
+                            {{ getTotal(item, 'Послерейсовый', 'Послесменный') }}
 
-                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Послерейсовый') == null">
+                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Послерейсовый', 'Послесменный') == null">
                                 Услуги не указаны
                             </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Послерейсовый') }}₽ </div>
+                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Послерейсовый', 'Послесменный') }}₽ </div>
                         </td>
 
                         <td class="text-center" width="150">
-                            {{ getTotal(item, 'Предсменный') }}
+                            {{ getTotal(item, 'is_dop') }}
 
-                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Предсменный') == null">
+                            <div class="text-red font-weight-bold" v-if="getSum(item, 'is_dop') == null">
                                 Услуги не указаны
                             </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Предсменный') }}₽ </div>
-                        </td>
-
-                        <td class="text-center" width="150">
-                            {{ getTotal(item, 'Послесменный') }}
-
-                            <div class="text-red font-weight-bold" v-if="getSum(item, 'Послесменный') == null">
-                                Услуги не указаны
-                            </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Послесменный') }}₽ </div>
+                            <div class="font-weight-bold" v-else> {{ getSum(item, 'is_dop') }}₽ </div>
                         </td>
 
                         <td class="text-center" width="150">
@@ -80,6 +69,50 @@
                                 Услуги не указаны
                             </div>
                             <div class="font-weight-bold" v-else> {{ getSum(item, 'report_cart') }}₽ </div>
+                        </td>
+                    </tr>
+
+                    <tr v-if="reports">
+                        <td width="100">
+                        </td>
+
+                        <td width="250">
+                            <b>Всего</b>
+                        </td>
+
+                        <td class="text-center" width="150">
+                            {{ getTotalAll('Предрейсовый', 'Предсменный') }}
+
+                            <div class="font-weight-bold" v-if="getSumAll('Предрейсовый', 'Предсменный') != null">
+                                {{ getSumAll('Предрейсовый', 'Предсменный') }}₽
+                            </div>
+                        </td>
+
+                        <td class="text-center" width="150">
+                            {{ getTotalAll('Послерейсовый', 'Послесменный') }}
+
+
+                            <div class="font-weight-bold" v-if="getSumAll('Послерейсовый', 'Послесменный') != null">
+                                {{ getSumAll('Послерейсовый', 'Послесменный') }}₽
+                            </div>
+                        </td>
+
+                        <td class="text-center" width="150">
+                            {{ getTotalAll('is_dop') }}
+
+                            <div class="font-weight-bold" v-if="getSumAll('is_dop') != null"> {{ getSumAll('is_dop') }}₽ </div>
+                        </td>
+
+                        <td class="text-center" width="150">
+                            {{ getTotalAll('bdd') }}
+
+                            <div class="font-weight-bold" v-if="getSumAll('bdd') != null"> {{ getSumAll('bdd') }}₽ </div>
+                        </td>
+
+                        <td class="text-center" width="150">
+                            {{ getTotalAll('report_cart') }}
+
+                            <div class="font-weight-bold" v-if="getSumAll('report_cart') != null"> {{ getSumAll('report_cart') }}₽ </div>
                         </td>
                     </tr>
                     </tbody>
@@ -103,6 +136,19 @@ export default {
         }
     },
     methods: {
+        getStringMark(item) {
+            let str = '';
+            if (item.car_gos_number) {
+                str += item.car_gos_number + ' ';
+
+            }
+
+            if (item.type_auto) {
+                str +=  `(${item.type_auto})`;
+            }
+
+            return str;
+        },
         visible(reports, show = true) {
             if (reports.length === undefined || reports.length > 0) {
                 this.reports = reports;
@@ -113,16 +159,72 @@ export default {
             this.reports = false;
             this.show = false;
         },
-        getTotal(item, name) {
-            if (item.types && item.types[name] && item.types[name].total) {
-                return item.types[name].total;
+        getTotalAll(...names) {
+            let total = 0;
+            for (let key in this.reports) {
+                const totalDriver = this.getTotal(this.reports[key], ...names);
+
+                if (typeof totalDriver === 'number') {
+                    total += totalDriver;
+                }
+            }
+
+            if (total > 0) {
+                return total;
             }
 
             return 'отсутствует';
         },
-        getSum(item, name) {
-            if (item.types && item.types[name] && item.types[name].sum) {
-                return item.types[name].sum;
+        getSumAll(...names) {
+            let sum = 0;
+            for (let key in this.reports) {
+                const totalDriver = this.getSum(this.reports[key], ...names);
+
+                if (typeof totalDriver === 'number') {
+                    sum += totalDriver;
+                }
+            }
+
+            if (sum > 0) {
+                return sum;
+            }
+
+            return null;
+        },
+        getTotal(item, ...names) {
+            let total = 0;
+
+            if (item.types) {
+                for (let key in item.types) {
+                    names.forEach(name => {
+                        if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+                            total += parseInt(item.types[key]?.total);
+                        }
+                    });
+                }
+            }
+
+            if (total > 0) {
+                return total;
+            }
+
+            return 'отсутствует';
+        },
+        getSum(item, ...names) {
+            let sum = 0;
+
+            if (item.types) {
+                for (let key in item.types) {
+                    names.forEach(name => {
+                        if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+                            sum += parseInt(item.types[key]?.sum);
+                        }
+                    });
+                }
+            }
+
+            if (sum > 0) {
+                return sum;
             }
 
             return null

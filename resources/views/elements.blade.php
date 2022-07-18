@@ -5,9 +5,17 @@
 
 @section('content')
 
+<!-- Модалка для редактирования см front.js  -->
+<div class="modal fade editor-modal" id="modalEditor" role="dialog"  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
 <!-- Добавление элемента -->
 @if($model !== 'Product')
-<div id="elements-modal-add" tabindex="-1" role="dialog" aria-labelledby="elements-modal-label" aria-hidden="true" class="modal fade text-left">
+<div id="elements-modal-add" role="dialog" aria-labelledby="elements-modal-label" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -371,12 +379,18 @@
                     <tr>
                         @foreach ($el->fillable as $elIndex => $elK)
                             @if(!(isset($notShowHashId) && $elK === 'hash_id') && $elK !== 'autosync_fields')
+                                @php
+                                    if (!isset($fields[$elK]) && $elK !== 'hash_id') {
+                                        continue;
+                                    }
+                                @endphp
+
                                 <td class="td-option">
                                     @if($elK === $editOnField)
                                         @role($otherRoles)
-                                           <a data-type="iframe" data-fancybox href="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}">
-                                            {{--<a href="" data-toggle="modal" data-target="#elements-modal-{{ $el->id }}-add" class="text-info">--}}
-
+{{--                                           <a data-type="iframe" data-fancybox href="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}">--}}
+                                               <a href="#" class="showEditModal" data-route="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}" data-toggle="modal" data-target="#modalEditor">
+{{--                                            <a href="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}" data-toggle="modal" data-target="#elements-modal-{{ $el->id }}-add" class="text-info">--}}
 
                                         @endrole
                                     @endif
@@ -438,14 +452,9 @@
                                         @if($model === 'Company' && $elK === 'name')
 
                                             <p>
-                                                @php
-                                                    $pre_month = (date('m')-1);
-                                                    $date_from_company = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . '01';
-                                                    $date_to_company = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . cal_days_in_month(CAL_GREGORIAN, $pre_month, date('Y'));
-                                                @endphp
 
                                                 <a class="btn btn-sm btn-outline-success"
-                                                   href="{{ route('report.get', ['type' => 'journal', 'date_field' => 'date', 'filter' => 1, 'is_finance' => 1, 'company_id' => $el->hash_id, 'date_from' => $date_from_company, 'date_to' => $date_to_company]) }}">
+                                                   href="{{ route('report.get', ['type' => 'journal', 'company_id' => $el->hash_id]) }}">
                                                     ₽
                                                 </a>
                                                 <a class="btn btn-sm btn-default"
@@ -461,9 +470,9 @@
 
                                         @isset($fields[$elK]['filterJournalLinkKey'])
                                             <div>
-                                                <a class="btn btn-sm btn-danger" href="{{ route('home', 'medic') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}">МЕД</a>
-                                                <a class="btn btn-sm btn-info" href="{{ route('home', 'tech') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}">ТЕХ</a>
-                                                <a class="btn btn-sm btn-dark" href="{{ route('home', 'Dop') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}">ПЛ</a>
+                                                <a class="btn btn-sm btn-danger" href="{{ route('home', 'medic') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['name'] }}">МЕД</a>
+                                                <a class="btn btn-sm btn-info" href="{{ route('home', 'tech') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['name'] }}">ТЕХ</a>
+                                                <a class="btn btn-sm btn-dark" href="{{ route('home', 'Dop') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['name'] }}">ПЛ</a>
                                             </div>
                                         @endisset
                                     @endif

@@ -3,7 +3,7 @@ import axios from 'axios'
 export class ApiController {
     constructor () {
         this.client = axios.create({
-            baseURL: (location.hostname === 'localhost' ? 'http://' : 'https://') + location.host,
+            baseURL: location.origin,
             headers: {
                 Authorization: 'Bearer ' + API_TOKEN
             }
@@ -48,5 +48,11 @@ export class ApiController {
 
     getFieldHTML ({ field, model, default_value }) {
         return this.client.get(`/api/getField/${model}/${field}/${default_value}`);
+    }
+
+    getFindModel ({ model, params }) {
+        return this.client.get(`/api/find/${model}`, {
+            params
+        });
     }
 }

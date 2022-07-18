@@ -8,8 +8,19 @@ require('./init-plugins')
 require('chosen-js')
 require('croppie')
 require('suggestions-jquery')
+$.fn.select2.amd.require(['select2/selection/search'], function (Search) {
+    Search.prototype.searchRemoveChoice = function (decorated, item) {
+        this.trigger('unselect', {
+            data: item
+        });
+
+        this.$search.val('');
+        this.handleSearch();
+    };
+});
 
 $(document).ready(function () {
+
     const Toast = swal.mixin({
         toast: true,
         position: 'top-end',
@@ -20,6 +31,83 @@ $(document).ready(function () {
             toast.addEventListener('mouseenter', swal.stopTimer)
             toast.addEventListener('mouseleave', swal.resumeTimer)
         }
+    })
+
+    let loading = false
+
+    $(document).on('click', '.reload-filters', function(event) {
+        const btn = $(event.target);
+        if(location.pathname.indexOf('home') > -1) {
+            btn.disabled = true;
+            btn.children('span.spinner').removeClass('d-none');
+            $('#filter-group-2-tab').removeClass('active');
+            $('#filter-group-1-tab').addClass('active');
+
+            let path = location.origin + location.pathname;
+
+            if (!path.endsWith('/')) {
+                path += '/';
+            }
+
+            path += 'filters';
+            $.get(path).done(response => {
+                if(response) {
+                    $('#filter-groupsContent').html(response)
+                    LIBS.initChosen()
+                }
+            });
+        }
+    });
+
+    $(document).on('input', '.select2-search__field', function(event) {
+        let search = event.target.value;
+        let select = $(event.target).parents('.select2')?.parent()?.children('.filled-select2');
+
+        if (select.length < 1) {
+           const id = $(event.target).attr('aria-controls');
+           select = $(`.select2-selection[aria-owns="${id}"]`).parents('.select2')?.parent()?.children('.filled-select2');
+        }
+
+        const model = select.attr('model');
+        const field = select.attr('field');
+        const key = select.attr('field-key');
+
+        if (!model) {
+            return;
+        }
+
+        if (loading) {
+            return;
+        }
+
+        loading = true;
+        API_CONTROLLER.getFindModel({
+            model,
+            params: {
+                search,
+                field,
+                key
+            }
+        }).then(({ data }) => {
+            data.forEach((element => {
+                const value = element[key];
+                const text = element[field];
+                const exist = select.children('option');
+                for(let i = 0; i < exist.length; i++) {
+                    if (exist[i].value == value) {
+                        return;
+                    }
+                }
+
+                select.append($('<option>', {
+                    value,
+                    text
+                }));
+            }));
+        });
+        setTimeout(() => {
+            loading = false;
+        }, 300);
     })
 
     const API_CONTROLLER = new ApiController(),
@@ -115,12 +203,23 @@ $(document).ready(function () {
         },
 
         initChosen () {
+            $('.filled-select2').select2({
+                placeholder: 'Выберите значение',
+                language: {
+                    noResults: function (params) {
+                        return "Совпадений не найдено";
+                    }
+                },
+                allowClear: false
+            });
+
             $('.js-chosen').chosen({
                 width: '100%',
                 search_contains: true,
                 no_results_text: 'Совпадений не найдено',
                 placeholder_text_single: 'Выберите значение',
                 placeholder_text_multiple: 'Выберите значения',
+                reset_search_field_on_update: false,
             });
         },
 
@@ -267,7 +366,15 @@ $(document).ready(function () {
 
     // Подгрузка в полей в Журналах: CHOSEN
     if(location.pathname.indexOf('home') > -1) {
-        $.get(location.search ? location.href+'&getFormFilter=1' : '?getFormFilter=1').done(response => {
+        let path = location.origin + location.pathname;
+
+        if (!path.endsWith('/')) {
+            path += '/';
+        }
+
+        path += 'filters' + location.search;
+        console.log(path);
+        $.get(path).done(response => {
             if(response) {
                 $('#filter-groupsContent').html(response)
                 LIBS.initChosen()
@@ -431,7 +538,7 @@ $(document).ready(function () {
                 const PROP_HAS_EXISTS = data.data.exists
                 const DATA = data.data.message;
 
-                if (model === 'Driver') {
+                if ((model === 'Driver' || model === 'Car') && DATA.company_id) {
                     parent.closest('#ANKETA_FORM').find('input[name="company_id"]').val(DATA.company_id)
                 }
 
@@ -911,18 +1018,18 @@ $(document).ready(function () {
         triggerField()
     })
 
-    $('*[data-field="Company_name"]').suggestions({
-        token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
-        type: "PARTY",
-        /* Вызывается, когда пользователь выбирает одну из подсказок */
-        onSelect: function(suggestion) {
-            if(suggestion.data) {
-                const { inn } = suggestion.data
-
-                $('#elements-modal-add input[name="inn"]').val(inn)
-            }
-        }
-    });
+    // $('*[data-field="Company_name"]').suggestions({
+    //     token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
+    //     type: "PARTY",
+    //     /* Вызывается, когда пользователь выбирает одну из подсказок */
+    //     onSelect: function(suggestion) {
+    //         if(suggestion.data) {
+    //             const { inn } = suggestion.data
+    //
+    //             $('#elements-modal-add input[name="inn"]').val(inn)
+    //         }
+    //     }
+    // });
 
     $('.header #toggle-btn').each(function () {
         let localStatusSidebar = () => {
@@ -948,6 +1055,17 @@ $(document).ready(function () {
     LIBS.initAll()
     $('.MASK_ID_ELEM').trigger('input')
 
+
+    $('#modalEditor').on('shown.bs.modal', function (event) {
+        let route = $(event.relatedTarget).data('route')
+        let modalContent = $("#modalEditor .modal-content")
+
+        axios.get(route).then(({ data }) => {
+            modalContent.text('').append(data);
+            LIBS.initAll()
+        })
+
+    })
     let field = $("*[data-field=Product_type_product]").chosen()
     field.change(function(e, { selected }){
         if(selected === 'Абонентская плата без реестров'){

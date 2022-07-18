@@ -16,6 +16,13 @@ class Car extends Model
         'autosync_fields'
     ];
 
+    // sorry for name
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id', 'id');
+    }
+
+
     public function getAutoSyncFieldsFromHashId ($hash_id) {
         $element = self::where('hash_id', $hash_id)->first();
 

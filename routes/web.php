@@ -68,16 +68,16 @@ Route::prefix('snippet')->group(function () {
         }
     });
 
-    Route::get('/register-user-admin/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', function () {
-        $reg = new \App\Http\Controllers\Auth\RegisterController();
-        return response()->json($reg->create([
-            'name' => 'ADMIN',
-            'email' => 'webmazaretto@gmail.com',
-            'role' => 777,
-            'password' => 'webmazaretto@gmail.com',
-            'login' => 'webmazaretto@gmail.com'
-        ]));
-    });
+//    Route::get('/register-user-admin/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', function () {
+//        $reg = new \App\Http\Controllers\Auth\RegisterController();
+//        return response()->json($reg->create([
+//            'name' => 'ADMIN',
+//            'email' => 'webmazaretto@gmail.com',
+//            'role' => 777,
+//            'password' => 'webmazaretto@gmail.com',
+//            'login' => 'webmazaretto@gmail.com'
+//        ]));
+//    });
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -122,6 +122,8 @@ Route::middleware(['auth'])->group(function () {
  * Профиль, анкета, авторзация
  */
 Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(function () {
+    Route::get('/home/filters', 'HomeController@getFilters');
+    Route::get('/home/{type_ankets?}/filters', 'HomeController@getFilters')->name('home.filters');
     Route::get('/home/{type_ankets?}', 'HomeController@index')->name('home');
 
     Route::prefix('profile')->group(function () {

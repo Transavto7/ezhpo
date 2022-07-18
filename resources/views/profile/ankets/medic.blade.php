@@ -45,10 +45,8 @@
                         <option disabled selected value="{{ $type_view }}">{{ $type_view }}</option>
                     @endisset
 
-                    <option selected value="Предрейсовый">Предрейсовый</option>
-                    <option value="Послерейсовый">Послерейсовый</option>
-                    <option value="Предсменный">Предсменный</option>
-                    <option value="Послесменный">Послесменный</option>
+                    <option selected value="Предрейсовый/Предсменный">Предрейсовый/Предсменный</option>
+                    <option value="Послерейсовый/Послесменный">Послерейсовый/Послесменный</option>
                 </select>
             </article>
         </div>
@@ -105,10 +103,8 @@
                             <option disabled selected value="{{ $type_view }}">{{ $type_view }}</option>
                         @endisset
 
-                        <option selected value="Предрейсовый">Предрейсовый</option>
-                        <option value="Послерейсовый">Послерейсовый</option>
-                        <option value="Предсменный">Предсменный</option>
-                        <option value="Послесменный">Послесменный</option>
+                        <option selected value="Предрейсовый/Предсменный">Предрейсовый/Предсменный</option>
+                        <option value="Послерейсовый/Послесменный">Послерейсовый/Послесменный</option>
                     </select>
                 </article>
             </div>
@@ -129,12 +125,12 @@
         <label class="col-md-3 form-control-label">Проба на алкоголь:</label>
         <article class="col-md-9">
             <select name="proba_alko" required class="form-control">
-                @isset($proba_alko)
+                @if($proba_alko ?? false)
                     <option disabled selected value="{{ $proba_alko }}">{{ $proba_alko }}</option>
-                @endisset
-
-                <option selected value="Отрицательно">Отрицательно</option>
-                <option value="Положительно">Положительно</option>
+                @else
+                    <option selected value="Отрицательно">Отрицательно</option>
+                    <option value="Положительно">Положительно</option>
+                @endif
             </select>
         </article>
     </div>
@@ -143,13 +139,14 @@
         <label class="col-md-3 form-control-label">Тест на наркотики:</label>
         <article class="col-md-9">
             <select name="test_narko" required class="form-control">
-                @isset($test_narko)
-                    <option disabled selected value="{{ $test_narko }}">{{ $test_narko }}</option>
-                @endisset
 
-                <option selected value="Не проводился">Не проводился</option>
-                <option value="Отрицательно">Отрицательно</option>
-                <option value="Положительно">Положительно</option>
+                @if($test_narko ?? false)
+                    <option disabled selected value="{{ $test_narko }}">{{ $test_narko }}</option>
+                @else
+                    <option selected value="Не проводился">Не проводился</option>
+                    <option value="Отрицательно">Отрицательно</option>
+                    <option value="Положительно">Положительно</option>
+                @endif
             </select>
         </article>
     </div>
@@ -158,12 +155,12 @@
         <label class="col-md-3 form-control-label">Мед показания:</label>
         <article class="col-md-9">
             <select name="med_view" required class="form-control">
-                @isset($med_view)
+                @if($med_view ?? false)
                     <option disabled selected value="{{ $med_view }}">{{ $med_view }}</option>
-                @endisset
-
-                <option selected value="В норме">В норме</option>
-                <option value="Отстранение">Отстранение</option>
+                @else
+                    <option selected value="В норме">В норме</option>
+                    <option value="Отстранение">Отстранение</option>
+                @endif
             </select>
         </article>
     </div>
@@ -176,6 +173,7 @@
         <small>Недопустимо верхнее давление < 50 или > 220 , нижнее < 40 или > 160</small>
     </article>
 </div>
+
 
 <div class="row">
     <div class="col-md-12">

@@ -3,11 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Company;
+use App\Req;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ApiController extends Controller
 {
+
+    public function modelList(Request $request, $model) {
+        $field = 'name';
+        $key = 'id';
+
+        if ($request->get('field')) {
+            $field = $request->field;
+        }
+
+        if ($request->get('key')) {
+            $key = $request->key;
+        }
+
+        return app("App\\" . $model)::where(DB::raw("LOWER($field)"),
+            'like', '%' . strtolower($request->search) . '%')
+            ->select($field, $key)->limit(100)->get();
+    }
+
     // Response
     public static function r($data = [], $action = 1) {
         $response = [];

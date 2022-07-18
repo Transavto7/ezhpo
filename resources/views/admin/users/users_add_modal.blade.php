@@ -1,7 +1,7 @@
 @php $photoInputId = sha1(time()); @endphp
 
 <!-- Добавление элемента -->
-<div id="users-modal-add" tabindex="-1" role="dialog" aria-hidden="true" class="modal fade text-left">
+<div id="users-modal-add" role="dialog" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -80,7 +80,7 @@
                                 <option value="1">Контролёр ТС</option>
                                 <option selected value="2">Медицинский сотрудник</option>
                                 <option value="11">Менеджер</option>
-                                <option value="12">Инженер БДД</option>
+                                <option value="13">Инженер БДД</option>
                                 <option value="777">Администратор</option>
                             </select>
                         </div>

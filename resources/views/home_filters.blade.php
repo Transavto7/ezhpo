@@ -8,6 +8,7 @@
 
 <div class="tab-pane fade show active" id="filter-group-1" role="tabpanel" aria-labelledby="filter-group-1">
     {{--ОТКРЫТЫЕ ПО УМОЛЧАНИЮ ГРУППЫ ПОЛЕЙ--}}
+
     @if($fieldsGroupFirst)
         <div class="row">
             <div class="col-md-3">
@@ -19,9 +20,16 @@
             </div>
 
             @php
-                $pre_month = (date('m')-1);
-                $date_from_filter = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . '01';
-                $date_to_filter = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . cal_days_in_month(CAL_GREGORIAN, $pre_month, date('Y'));
+                // если есть дата в _GET запросе, но пустая, то оставляем пустую
+                if(array_key_exists('date', request()->all())){
+                    if(is_null(request()->get('date'))){
+                        $date_from_filter = '';
+                        $date_to_filter = '';
+                    }
+                }else{ // иначе берём начало и конец прошлого месяца
+                    $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');;
+                    $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
+                }
             @endphp
 
             @foreach($anketsFields as $field)
@@ -118,9 +126,33 @@
                 @endisset
             @endif
         @endforeach
+
+        @if($type_ankets == 'tech' || $type_ankets == 'medic')
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label><b>Время проведения осмотра с:</b></label>
+                        <input
+                            type="time"
+                            value="{{ request()->get('hour_from') }}"
+                            name="hour_from" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label><b>Время проведения осмотра до:</b></label>
+                        <input
+                            type="time"
+                            value="{{ request()->get('hour_to') }}"
+                            name="hour_to" class="form-control" />
+                    </div>
+                </div>
+        @endif
     </div>
 </div>
 
 
 <button type="submit" class="btn btn-info">Поиск</button>
-<a href="{{ route('home', $type_ankets) }}" class="btn btn-danger">Сбросить</a>
+<button type="button" class="btn btn-danger reload-filters">
+    <span class="spinner spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+    Сбросить
+</button>

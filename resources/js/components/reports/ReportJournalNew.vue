@@ -24,7 +24,8 @@
                   </div>
                   <div class="form-group col-lg-2">
                       <label class="mb-1" for="date_from">Дата с:</label>
-                      <input type="date" required v-model="date_from" id="date_from" class="form-control form-date" name="date_from">
+                      <input type="date" required ref="date_from" v-model="date_from"
+                             id="date_from" class="form-control form-date" name="date_from">
                   </div>
                   <div class="form-group col-lg-2">
                       <label class="mb-1" for="date_to">Дата по:</label>
@@ -74,6 +75,7 @@ import ReportJournalPL from "./ReportJournalPL";
 
 export default {
     name: "ReportJournalNew",
+    props: ['default_company'],
     components: {
         ReportJournalMedic,
         ReportJournalTech,
@@ -93,6 +95,21 @@ export default {
     },
     mounted() {
         this.searchCompany();
+
+        if (this.default_company) {
+            this.companies.push(this.default_company);
+            this.company = this.default_company;
+            this.company_id = this.default_company.id;
+        }
+
+        const now = new Date();
+        const days = now.getDate() > 9 ? now.getDate() : '0' + now.getDate();
+        const months = now.getMonth() > 9 ? now.getMonth() : '0' + now.getMonth();
+        this.date_from = now.getFullYear() + '-'+ months + '-' + '01';
+
+        this.date_to = now.getFullYear() + '-' + months + '-' +
+            new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+
     },
     methods: {
         reset() {

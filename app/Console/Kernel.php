@@ -2,6 +2,9 @@
 
 namespace App\Console;
 
+use App\Anketa;
+use App\Company;
+use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -12,20 +15,45 @@ class Kernel extends ConsoleKernel
      *
      * @var array
      */
-    protected $commands = [
-        //
-    ];
+    protected $commands
+        = [
+            //
+        ];
 
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param \Illuminate\Console\Scheduling\Schedule $schedule
+     *
      * @return void
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        //todo перенести логику куда нибудь
+        $schedule->call(function () {
+            // получаем все компании
+            $companies = Company::get();
+
+            // смотрим, в каких компаниях были осмотры за прошлый месяц
+            $companiesWithInspection = Anketa::whereBetween('created_at', [
+                Carbon::now()->subMonth()->startOfMonth(),
+                Carbon::now()->subMonth()->endOfMonth(),
+            ])
+                                             ->whereNotNull('company_id')
+                                             ->get(['company_id'])
+                                             ->pluck('company_id')->unique()
+                                             ->toArray();
+            // сохраняем
+            foreach ($companies as $company) {
+                if(in_array($company->hash_id, $companiesWithInspection)){
+                    $company->has_actived_prev_month = 'Да';
+                }else{
+                    $company->has_actived_prev_month = 'Нет';
+                }
+                $company->save();
+            }
+
+        })->monthlyOn(1, '6:00');
     }
 
     /**

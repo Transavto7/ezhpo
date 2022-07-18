@@ -68,10 +68,8 @@
                         <option disabled selected value="{{ $type_view }}">{{ $type_view }}</option>
                     @endisset
 
-                    <option selected value="Предрейсовый">Предрейсовый</option>
-                    <option value="Послерейсовый">Послерейсовый</option>
-                    <option value="Предсменный">Предсменный</option>
-                    <option value="Послесменный">Послесменный</option>
+                    <option selected value="Предрейсовый/Предсменный">Предрейсовый/Предсменный</option>
+                    <option value="Предрейсовый/Предсменный">Послерейсовый/Послесменный</option>
                 </select>
             </article>
         </div>
@@ -119,10 +117,8 @@
                         <option disabled selected value="{{ $type_view }}">{{ $type_view }}</option>
                     @endisset
 
-                    <option selected value="Предрейсовый">Предрейсовый</option>
-                    <option value="Послерейсовый">Послерейсовый</option>
-                    <option value="Предсменный">Предсменный</option>
-                    <option value="Послесменный">Послесменный</option>
+                    <option selected value="Предрейсовый/Предсменный">Предрейсовый/Предсменный</option>
+                    <option value="Предрейсовый/Предсменный">Послерейсовый/Послесменный</option>
                 </select>
             </article>
         </div>
@@ -152,3 +148,4 @@
         </select>
     </div>
 @endif
+
