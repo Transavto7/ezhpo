@@ -8,8 +8,19 @@ require('./init-plugins')
 require('chosen-js')
 require('croppie')
 require('suggestions-jquery')
+$.fn.select2.amd.require(['select2/selection/search'], function (Search) {
+    Search.prototype.searchRemoveChoice = function (decorated, item) {
+        this.trigger('unselect', {
+            data: item
+        });
+
+        this.$search.val('');
+        this.handleSearch();
+    };
+});
 
 $(document).ready(function () {
+
     const Toast = swal.mixin({
         toast: true,
         position: 'top-end',
@@ -199,6 +210,7 @@ $(document).ready(function () {
                         return "Совпадений не найдено";
                     }
                 },
+                allowClear: false
             });
 
             $('.js-chosen').chosen({
