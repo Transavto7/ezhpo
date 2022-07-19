@@ -22,7 +22,6 @@ class Anketa extends Model
     }
 
 
-
     public $fillable
         = [
             'id',
@@ -113,7 +112,7 @@ class Anketa extends Model
         = [ // Группа 1 (показываем сразу в HOME)
             'medic' => [
                 'date'         => 'Дата и время осмотра',
-                'company_name' => 'Место работы',
+                'company_id'   => 'Место работы',
                 'driver_fio'   => 'Водитель',
                 'pv_id'        => 'Пункт выпуска',
                 //'car_mark_model' => 'Автомобиль',
@@ -123,7 +122,7 @@ class Anketa extends Model
 
             'pak' => [
                 'date'           => 'Дата и время осмотра',
-                'company_name'   => 'Место работы',
+                'company_id'   => 'Место работы',
                 'driver_fio'     => 'Водитель',
                 'pv_id'          => 'Пункт выпуска',
                 'car_mark_model' => 'Автомобиль',
@@ -147,7 +146,7 @@ class Anketa extends Model
             'tech' => [
                 'date'           => 'Дата, время проведения контроля',
                 'car_gos_number' => 'Государственный регистрационный номер транспортного средства',
-                'company_name'   => 'Компания',
+                'company_id'   => 'Компания',
                 'driver_fio'     => 'Водитель',
 
                 // Доп поля
@@ -157,7 +156,7 @@ class Anketa extends Model
             'Dop' => [
                 'date'           => 'Дата, время проведения осмотра',
                 'car_mark_model' => 'Автомобиль',
-                'company_name'   => 'Компания',
+                'company_id'   => 'Компания',
                 'driver_fio'     => 'Водитель',
 
                 // Доп поля
@@ -167,18 +166,18 @@ class Anketa extends Model
             'bdd' => [
                 'date'          => 'Дата, время',
                 'created_at'    => 'Дата внесения в журнал',
-                'company_name'  => 'Компания',
+                'company_id'  => 'Компания',
                 'type_briefing' => 'Вид инструктажа',
                 'driver_fio'    => 'Ф.И.О водителя, прошедшего инструктаж',
                 'user_name'     => 'Ф.И.О (при наличии) лица, проводившего инструктаж',
                 'pv_id'         => 'Пункт выпуска',
-                'signature'     => 'ЭЛ подпись',
+                'signature'     => 'ЭЛ подпись водителя',
             ],
 
             'report_cart' => [
                 'date'         => 'Дата снятия отчета',
                 'driver_fio'   => 'Ф.И.О водителя',
-                'company_name' => 'Компания',
+                'company_id' => 'Компания',
                 'user_name'    => 'Ф.И.О (при наличии) лица, проводившего снятие',
                 'pv_id'        => 'Пункт выпуска',
             ],
@@ -186,7 +185,7 @@ class Anketa extends Model
             'pechat_pl' => [
                 'date'         => 'Дата распечатки ПЛ',
                 'driver_fio'   => 'ФИО водителя',
-                'company_name' => 'Компания',
+                'company_id' => 'Компания',
                 'count_pl'     => 'Количество распечатанных ПЛ',
                 'user_name'    => 'Ф.И.О сотрудника, который готовил ПЛ',
                 'pv_id'        => 'Пункт выпуска',
@@ -228,7 +227,7 @@ class Anketa extends Model
                 'is_dop'            => 'Режим ввода ПЛ',
                 'result_dop'        => 'Результат ввода ПЛ',
                 'period_pl'         => 'Период ПЛ',
-                'signature'         => 'ЭЛ подпись',
+                'signature'         => 'ЭЛ подпись водителя',
             ],
             'tech'  => [
 
@@ -261,7 +260,6 @@ class Anketa extends Model
                 'date'          => 'Дата инструктажа',
                 'type_briefing' => 'Вид инструктажа',
                 'driver_fio'    => 'ФИО водителя',
-                'company_name'  => 'Компания',
                 'user_name'     => 'ФИО лица, проводившего инструктаж',
                 'user_id'       => 'Должность лица, проводившего инструктаж',    // Ну этой хуйни в таблице нет
                 'signature'     => 'Подпись водителя, прошедшего инструктаж',
@@ -274,7 +272,6 @@ class Anketa extends Model
                 'driver_fio'             => 'ФИО работника',
                 'driver_gender'          => 'Пол',
                 'driver_year_birthday'   => 'Дата рождения',
-                'company_name'           => 'Место работы',
                 'complaint'              => 'Жалобы',
                 'condition_visible_sliz' => 'Состояние видимых слизистых',
                 'condition_koj_pokr'     => 'Состояние кожных покровов',
@@ -311,7 +308,6 @@ class Anketa extends Model
                 'user_name'              => 'ФИО работника',
                 'driver_gender'          => 'Пол',
                 'driver_year_birthday'   => 'Дата рождения',
-                'company_name'           => 'Место работы',
                 'complaint'              => 'Жалобы',
                 'condition_visible_sliz' => 'Состояние видимых слизистых',
                 'condition_koj_pokr'     => 'Состояние кожных покровов',
@@ -362,7 +358,6 @@ class Anketa extends Model
                 'created_at'     => 'Дата создания',
                 'car_mark_model' => 'Наименование марки, модели транспортного средства',
                 'car_gos_number' => 'Государственный регистрационный номер транспортного средства',
-                'company_name'   => 'Компания',
                 'driver_fio'     => 'ФИО Водителя',
 
                 // ID'шники
@@ -431,7 +426,7 @@ class Anketa extends Model
                 'pv_id'        => 'Пункт выпуска',
                 'company_id'   => 'ID компании',
                 'driver_id'    => 'ID водителя',
-                'signature'    => 'ЭЛ подпись',
+                'signature'    => 'ЭЛ подпись водителя',
             ],
 
             'pechat_pl' => [
@@ -471,7 +466,7 @@ class Anketa extends Model
                 'user_eds'      => 'Подпись лица, проводившего инструктаж',
                 'company_id'    => 'ID компании',
                 'driver_id'     => 'ID водителя',
-                'signature'     => 'ЭЛ подпись',
+                'signature'     => 'ЭЛ подпись водителя',
             ],
 
         ];

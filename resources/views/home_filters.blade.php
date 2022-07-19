@@ -126,6 +126,27 @@
                 @endisset
             @endif
         @endforeach
+
+        @if($type_ankets == 'tech' || $type_ankets == 'medic')
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label><b>Время проведения осмотра с:</b></label>
+                        <input
+                            type="time"
+                            value="{{ request()->get('hour_from') }}"
+                            name="hour_from" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label><b>Время проведения осмотра до:</b></label>
+                        <input
+                            type="time"
+                            value="{{ request()->get('hour_to') }}"
+                            name="hour_to" class="form-control" />
+                    </div>
+                </div>
+        @endif
     </div>
 </div>
 

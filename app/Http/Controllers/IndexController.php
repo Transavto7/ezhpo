@@ -304,6 +304,7 @@ class IndexController extends Controller
                 'type_product' => ['label' => 'Тип', 'type' => 'select', 'values' => [
                     'Абонентская оплата' => 'Абонентская оплата',
                     'Разовые осмотры' => 'Разовые осмотры',
+                    'Абонентская плата без реестров' => 'Абонентская плата без реестров',
                 ], 'defaultValue' => 'Абонентская оплата'],
                 'unit' => ['label' => 'Ед.изм.', 'type' => 'text'],
                 'price_unit' => ['label' => 'Стоимость за единицу', 'type' => 'number'],
@@ -323,6 +324,7 @@ class IndexController extends Controller
                     'Учет ПЛ' => 'Учет ПЛ',
                     'Печать ПЛ' => 'Печать ПЛ'
                 ], 'defaultValue' => 'Не установлено', 'multiple' => 1],
+                'essence' => ['label' => 'Сущности', 'type' => 'text', 'noRequired' => 1],
             ]
         ],
 
@@ -874,7 +876,7 @@ class IndexController extends Controller
     }
 
     /**
-     * Рендер элементов для редактирования, добавления и удаления
+     * Рендер просмотра вкладок CRM
      */
     public function RenderElements (Request $request)
     {
@@ -910,7 +912,7 @@ class IndexController extends Controller
         $orderBy = $request->get($oBy, 'DESC');
         $filter = $request->get('filter', 0);
 
-        $take = $request->get('take', 20);
+        $take = $request->get('take', 500);
 
         if(isset($this->elements[$type])) {
             $element = $this->elements[$type];
@@ -1002,7 +1004,8 @@ class IndexController extends Controller
             }
 
             $element['queryString'] = $queryString;
-
+//dd($element);
+//dd(view('elements', $element));
             return view('elements', $element);
         } else {
             return redirect( route('home') );

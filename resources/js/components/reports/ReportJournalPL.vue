@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="data" class="card">
-            <h5 class="card-header">Режим ввода ПЛ</h5>
+            <h5 class="card-header">Несогласованные ПЛ</h5>
             <div class="card-body">
                 <table id="reports-table-4" class="table table-responsive">
                     <thead>
@@ -16,8 +16,8 @@
                         <table class="w-100 table">
                             <thead>
                             <th class="text-center">Автомобиль/Водитель</th>
-                            <th class="text-center">Предрейсовые/Предсменный</th>
-                            <th class="text-center">Послерейсовые/Послесменный</th>
+                            <th class="text-center">Предрейсовый/Предсменный</th>
+                            <th class="text-center">Послерейсовый/Послесменный</th>
                             </thead>
 
                             <tbody>
@@ -25,6 +25,13 @@
                                 <td class="text-center">{{ getStringMark(report) }}</td>
                                 <td class="text-center">{{ getTotal(report, 'Предрейсовый', 'Предсменный') }}</td>
                                 <td class="text-center">{{ getTotal(report, 'Послерейсовый', 'Послесменный') }}</td>
+                            </tr>
+                            <tr v-if="item.reports">
+                                <td class="text-center">
+                                    <b>Всего</b>
+                                </td>
+                                <td class="text-center">{{ getTotalAll(item.reports, 'Предрейсовый', 'Предсменный') }}</td>
+                                <td class="text-center">{{ getTotalAll(item.reports, 'Послерейсовый', 'Послесменный') }}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -83,6 +90,22 @@ export default {
         hide() {
             this.data = false;
             this.show = false;
+        },
+        getTotalAll(reports, ...names) {
+            let total = 0;
+            for (let key in reports) {
+                const totalDriver = this.getTotal(reports[key], ...names);
+
+                if (typeof totalDriver === 'number') {
+                    total += totalDriver;
+                }
+            }
+
+            if (total > 0) {
+                return total;
+            }
+
+            return 'отсутствует';
         },
         getTotal(item, ...names) {
             let total = 0;

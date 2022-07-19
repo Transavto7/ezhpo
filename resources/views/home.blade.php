@@ -131,6 +131,9 @@
                                     @endif
 
                                     @foreach($anketsFields as $field)
+                                        @if($field == 'hour_from' || $field == 'hour_to')
+                                            @continue
+                                        @endif
                                         @isset($fieldsKeys[$field])
                                             <th @isset($blockedToExportFields[$field]) class="not-export" @endif data-field-key="{{ $field }}">
                                                 {{ (isset($fieldsKeys[$field]['name'])) ? $fieldsKeys[$field]['name'] : $fieldsKeys[$field] }}
