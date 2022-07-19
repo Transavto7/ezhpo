@@ -52,6 +52,11 @@
             onchange="addFieldToHistory(event.target.value, '{{ $v['label'] }}');"
         @endisset
 
+        @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' ))
+            @php
+                $is_required = '';
+            @endphp
+        @endif
         @if(!is_array($v['values']))
             model="{{ $v['values'] }}"
             field-key="{{ $key }}"

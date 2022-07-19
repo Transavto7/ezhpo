@@ -8,7 +8,7 @@ class Product extends Model
 {
     public $fillable = [
         'hash_id', 'name', 'type_product', 'unit', 'price_unit',
-        'type_anketa', 'type_view'
+        'type_anketa', 'type_view', 'essence'
     ];
 
     // Сущности

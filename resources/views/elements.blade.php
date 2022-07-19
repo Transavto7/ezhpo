@@ -74,7 +74,7 @@
                 </button>
             </div>
             <form action="{{ route('addElement', $model) }}" enctype="multipart/form-data" method="POST">
-                <input type="hidden" name="_token" value="ls0TWtuxN3lPRMLJL0lMzd0tac7ydl5mHK3KLe3V">
+                @csrf
                 <div class="modal-body">
                     <p>Заполните форму внимательно и нажмите кнопку "Добавить"</p>
                     <div data-field="name" class="form-group">
@@ -92,9 +92,9 @@
                                 class="js-chosen"
                                 style="display: none;"
                         >
-                            <option value="">Не установлено</option>
+                            <option value="" selected>Не установлено</option>
                             @foreach($fields['type_product']['values'] as $nameOfTypeProduct)
-                            <option selected="selected" value="{{ $nameOfTypeProduct }}" {{ ($fields['type_product']['values']['defaultValue'] ?? '' !== $nameOfTypeProduct) ? 'selected' : '' }}>
+                            <option value="{{ $nameOfTypeProduct }}">
                                 {{ $nameOfTypeProduct }}
                             </option>
                             @endforeach
@@ -395,7 +395,7 @@
                                         @endrole
                                     @endif
 
-                                    @if($elK === 'products_id' || $elK === 'company_id' || $elK === 'req_id' || $elK === 'pv_id' || $elK === 'user_id' || $elK === 'town_id')
+                                    @if($elK === 'products_id' || $elK === 'company_id' || $elK === 'req_id' || $elK === 'pv_id' || $elK === 'user_id' || $elK === 'town_id' || $elK === 'essence')
                                         @if($elK === 'company_id')
 
                                             @if(($model === 'Driver' || $model === 'Car') && $el->$elK && auth()->user()->hasRole('client', '!=') && auth()->user()->hasRole('operator_pak', '!='))
@@ -423,6 +423,8 @@
                                             {{ app('App\Town')->getName($el->pv_id) }}
                                         @elseif ($elK == 'products_id')
                                             {{ app('App\Product')->getName($el->$elK) }}
+                                        @elseif ($elK == 'essence')
+                                            {{ \App\Product::$essence[$el->$elK] ?? ''  }}
                                         @endif
                                     @else
                                         @if(Storage::disk('public')->exists($el[$elK]) && $el[$elK] !== '<' && $el[$elK] !== '>')

@@ -324,6 +324,7 @@ class IndexController extends Controller
                     'Учет ПЛ' => 'Учет ПЛ',
                     'Печать ПЛ' => 'Печать ПЛ'
                 ], 'defaultValue' => 'Не установлено', 'multiple' => 1],
+                'essence' => ['label' => 'Сущности', 'type' => 'text', 'noRequired' => 1],
             ]
         ],
 
