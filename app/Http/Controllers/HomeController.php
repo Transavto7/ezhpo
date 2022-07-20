@@ -263,7 +263,10 @@ class HomeController extends Controller
                               ->whereBetween('date', [$date_from, $date_to]);
                         })->orWhere(function ($q) use ($date_from, $date_to) {
                             $q->where('is_dop', 1)
-                              ->whereBetween('period_pl', [$date_from, $date_to]);
+                              ->whereBetween('period_pl', [
+                                  $date_from->format('Y-m'),
+                                  $date_to->format('Y-m')
+                              ]);
                         });
                     });
 
