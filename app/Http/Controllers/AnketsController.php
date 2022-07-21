@@ -12,6 +12,7 @@ use App\Point;
 use App\Settings;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -797,7 +798,9 @@ class AnketsController extends Controller
                     $anketa['connected_hash'] = $connected_hash;
                     $dopAnketa = $anketa;
                     $dopAnketa['type_anketa'] = 'Dop';
-                    $dopAnketas[] = $dopAnketa;
+
+                    $ank = new Anketa();
+                    $dopAnketas[] = Arr::only($dopAnketa, $ank->getFillable());
                 }
 
                 /**
@@ -854,7 +857,8 @@ class AnketsController extends Controller
                     }
                 }
 
-                array_push($createdAnketas, $anketa);
+                $ank = new Anketa();
+                $createdAnketas[] = Arr::only($anketa, $ank->getFillable());
             }
 
             if (count($dopAnketas) > 0) {
