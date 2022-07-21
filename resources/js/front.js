@@ -373,7 +373,7 @@ $(document).ready(function () {
         }
 
         path += 'filters' + location.search;
-        console.log(path);
+
         $.get(path).done(response => {
             if(response) {
                 $('#filter-groupsContent').html(response)
@@ -388,9 +388,10 @@ $(document).ready(function () {
         {
             const showTableData = el => {
                 if(el) {
-                    let index = Number(el.attr('data-value')) + 1, prop_checked = el.prop('checked');
+                    const id = el.attr('name');
+                    const prop_checked = el.prop('checked');
 
-                    let anketsTable = $(`.ankets-table thead th:nth-child(${index}), .ankets-table tbody tr td:nth-child(${index})`),
+                    let anketsTable = $(`.ankets-table thead th[data-field-key="${id}"], .ankets-table tbody tr td[data-field-key="${id}"]`),
                         displayProp = (!prop_checked ? 'none' : 'table-cell')
 
                     anketsTable.attr('hidden', !prop_checked).css({'display': displayProp })
@@ -539,7 +540,25 @@ $(document).ready(function () {
                 const DATA = data.data.message;
 
                 if ((model === 'Driver' || model === 'Car') && DATA.company_id) {
-                    parent.closest('#ANKETA_FORM').find('input[name="company_id"]').val(DATA.company_id)
+                    const form =  parent.closest('#ANKETA_FORM');
+                    form.find('input[name="company_id"]').val(DATA.company_id);
+
+                    const select = form.find('select[name="company_name"]');
+
+                    if (select) {
+                        const exist = select.children('option').filter((id, element) => {
+                            return element.value === DATA.company_name;
+                        });
+
+                        if (exist.length < 1) {
+                            select.append($('<option>', {
+                                value: DATA.company_name,
+                                text: DATA.company_name
+                            }));
+                        }
+
+                        select.select2().val(DATA.company_name).trigger("change");
+                    }
                 }
 
                 showAnketsCardDBitemData(model, DATA, data.data.fieldsValues, data.data)
@@ -1088,8 +1107,6 @@ $(document).ready(function () {
     $(document).on('change', '.filled-select2.filled-select', function(event) {
         const field = $(event.target);
         let selected = field.val()
-        console.log(field)
-        console.log(selected)
 
         if(selected === 'Абонентская плата без реестров'){
             field.closest('.modal-body').find('div[data-field=essence]').show()

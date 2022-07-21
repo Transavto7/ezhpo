@@ -14,6 +14,7 @@
 
                         <th class="text-center" width="150">БДД</th>
                         <th class="text-center" width="150">Отчёты с карт</th>
+                        <th class="text-center" width="150">Печать ПЛ</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -71,6 +72,14 @@
                             <div class="font-weight-bold" v-else> {{ getSum(item, 'report_cart') }}₽ </div>
                         </td>
 
+                        <td class="text-center" width="150">
+                            {{ getTotal(item, 'pechat_pl') }}
+
+                            <div class="text-red font-weight-bold" v-if="getSum(item, 'pechat_pl') == null">
+                                Услуги не указаны
+                            </div>
+                            <div class="font-weight-bold" v-else> {{ getSum(item, 'pechat_pl') }}₽ </div>
+                        </td>
                     </tr>
 
                     <tr v-if="reports">
@@ -82,38 +91,44 @@
                         </td>
 
                         <td class="text-center" width="150">
-                            {{ getTotalAll('Предрейсовый', 'Предсменный') }}
+                            {{ getTotalAll(reports, 'Предрейсовый', 'Предсменный') }}
 
-                            <div class="font-weight-bold" v-if="getSumAll('Предрейсовый', 'Предсменный') != null">
-                                {{ getSumAll('Предрейсовый', 'Предсменный') }}₽
+                            <div class="font-weight-bold" v-if="getSumAll(reports, 'Предрейсовый', 'Предсменный') != null">
+                                {{ getSumAll(reports, 'Предрейсовый', 'Предсменный') }}₽
                             </div>
                         </td>
 
                         <td class="text-center" width="150">
-                            {{ getTotalAll('Послерейсовый', 'Послесменный') }}
+                            {{ getTotalAll(reports, 'Послерейсовый', 'Послесменный') }}
 
 
-                            <div class="font-weight-bold" v-if="getSumAll('Послерейсовый', 'Послесменный') != null">
-                                {{ getSumAll('Послерейсовый', 'Послесменный') }}₽
+                            <div class="font-weight-bold" v-if="getSumAll(reports, 'Послерейсовый', 'Послесменный') != null">
+                                {{ getSumAll(reports, 'Послерейсовый', 'Послесменный') }}₽
                             </div>
                         </td>
 
                         <td class="text-center" width="150">
-                            {{ getTotalAll('is_dop') }}
+                            {{ getTotalAll(reports, 'is_dop') }}
 
-                            <div class="font-weight-bold" v-if="getSumAll('is_dop') != null"> {{ getSumAll('is_dop') }}₽ </div>
+                            <div class="font-weight-bold" v-if="getSumAll(reports, 'is_dop') != null"> {{ getSumAll(reports, 'is_dop') }}₽ </div>
                         </td>
 
                         <td class="text-center" width="150">
-                            {{ getTotalAll('bdd') }}
+                            {{ getTotalAll(reports, 'bdd') }}
 
-                            <div class="font-weight-bold" v-if="getSumAll('bdd') != null"> {{ getSumAll('bdd') }}₽ </div>
+                            <div class="font-weight-bold" v-if="getSumAll(reports, 'bdd') != null"> {{ getSumAll(reports, 'bdd') }}₽ </div>
                         </td>
 
                         <td class="text-center" width="150">
-                            {{ getTotalAll('report_cart') }}
+                            {{ getTotalAll(reports, 'report_cart') }}
 
-                            <div class="font-weight-bold" v-if="getSumAll('report_cart') != null"> {{ getSumAll('report_cart') }}₽ </div>
+                            <div class="font-weight-bold" v-if="getSumAll(reports, 'report_cart') != null"> {{ getSumAll(reports, 'report_cart') }}₽ </div>
+                        </td>
+
+                        <td class="text-center" width="150">
+                            {{ getTotalAll(reports, 'pechat_pl') }}
+
+                            <div class="font-weight-bold" v-if="getSumAll(reports, 'pechat_pl') != null"> {{ getSumAll(reports, 'pechat_pl') }}₽ </div>
                         </td>
                     </tr>
                     </tbody>
@@ -128,6 +143,8 @@
 </template>
 
 <script>
+import { getTotalAll, getTotal, getSum, getSumAll } from "../const/reportsAmount";
+
 export default {
     name: "ReportJournalMedic",
     data() {
@@ -147,76 +164,10 @@ export default {
           this.reports = false;
           this.show = false;
         },
-        getTotalAll(...names) {
-            let total = 0;
-            for (let key in this.reports) {
-                const totalDriver = this.getTotal(this.reports[key], ...names);
-
-                if (typeof totalDriver === 'number') {
-                    total += totalDriver;
-                }
-            }
-
-            if (total > 0) {
-                return total;
-            }
-
-            return 'отсутствует';
-        },
-        getSumAll(...names) {
-            let sum = 0;
-            for (let key in this.reports) {
-                const totalDriver = this.getSum(this.reports[key], ...names);
-
-                if (typeof totalDriver === 'number') {
-                    sum += totalDriver;
-                }
-            }
-
-            if (sum > 0) {
-                return sum;
-            }
-
-            return null;
-        },
-        getTotal(item, ...names) {
-            let total = 0;
-
-            if (item.types) {
-                for (let key in item.types) {
-                    names.forEach(name => {
-                        if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
-                            total += parseInt(item.types[key]?.total);
-                        }
-                    });
-                }
-            }
-
-            if (total > 0) {
-                return total;
-            }
-
-            return 'отсутствует';
-        },
-        getSum(item, ...names) {
-            let sum = 0;
-
-            if (item.types) {
-                for (let key in item.types) {
-                    names.forEach(name => {
-                        if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
-                            sum += parseInt(item.types[key]?.sum);
-                        }
-                    });
-                }
-            }
-
-            if (sum > 0) {
-                return sum;
-            }
-
-            return null
-        },
+        getTotalAll,
+        getTotal,
+        getSumAll,
+        getSum
     }
 }
 </script>

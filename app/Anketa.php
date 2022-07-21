@@ -179,7 +179,7 @@ class Anketa extends Model
             'pechat_pl' => [
                 'date'         => 'Дата выдачи',
                 'driver_fio'   => 'ФИО водителя',
-                'company_id' => 'Компания',
+                'company_name' => 'Компания',
             ],
 
             /*'vid_pl' => [
@@ -421,7 +421,7 @@ class Anketa extends Model
             ],
 
             'pechat_pl' => [
-                'company_id' => 'Компания',
+                'company_name' => 'Компания',
                 'date'         => 'Дата выдачи',
                 'driver_fio'   => 'ФИО водителя',
                 'count_pl'     => 'Количество распечатанных ПЛ',

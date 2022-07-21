@@ -179,16 +179,26 @@
                                         @endif
 
                                         @foreach($anketsFields as $anketaTDkey)
-                                            @if(isset($fieldsKeys[$anketaTDkey]))
-                                                <td @isset($blockedToExportFields[$anketaTDkey]) class="not-export" @endisset data-field-key="{{ $anketaTDkey }}">
-                                                    @if($anketaTDkey === 'date' || strpos($anketaTDkey, '_at') > 0)
-                                                        @if($anketa[$anketaTDkey])
-                                                            {{ date('d-m-Y H:i:s', strtotime($anketa[$anketaTDkey])) }}
-                                                        @endif
-                                                    @elseif($anketaTDkey === 'photos')
+                                            @php
 
-                                                        @if($anketa[$anketaTDkey])
-                                                            @php $photos = explode(',', $anketa[$anketaTDkey]); @endphp
+                                                if($anketaTDkey == 'company_id') {
+                                                    $akey = 'company_name';
+                                                } else {
+                                                    $akey = $anketaTDkey;
+                                                }
+
+                                            @endphp
+
+                                            @if(isset($fieldsKeys[$anketaTDkey]))
+                                                <td @isset($blockedToExportFields[$akey]) class="not-export" @endisset data-field-key="{{ $anketaTDkey }}">
+                                                    @if($akey === 'date' || strpos($akey, '_at') > 0)
+                                                        @if($anketa[$akey])
+                                                            {{ date('d-m-Y H:i:s', strtotime($anketa[$akey])) }}
+                                                        @endif
+                                                    @elseif($akey === 'photos')
+
+                                                        @if($anketa[$akey])
+                                                            @php $photos = explode(',', $anketa[$akey]); @endphp
 
                                                             @foreach($photos as $phI => $ph)
                                                                 @php $isUri = strpos($ph, 'sdpo.ta-7'); @endphp
@@ -201,10 +211,10 @@
                                                             @endforeach
                                                         @endif
 
-                                                    @elseif($anketaTDkey === 'videos')
+                                                    @elseif($akey === 'videos')
 
-                                                        @if($anketa[$anketaTDkey])
-                                                            @php $videos = explode(',', $anketa[$anketaTDkey]); @endphp
+                                                        @if($anketa[$akey])
+                                                            @php $videos = explode(',', $anketa[$akey]); @endphp
 
                                                             @foreach($videos as $vK => $vV)
                                                                 @if($vK == 0)
@@ -221,9 +231,9 @@
                                                         @endif
 
                                                     @else
-                                                        {{ $anketa[$anketaTDkey] }}
+                                                        {{ $anketa[$akey] }}
 
-                                                        @if($type_ankets === 'medic' && $anketaTDkey === 'admitted' && $anketa[$anketaTDkey] === 'Не допущен')
+                                                        @if($type_ankets === 'medic' && $akey === 'admitted' && $anketa[$akey] === 'Не допущен')
                                                             <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
                                                         @endif
                                                     @endif
