@@ -74,7 +74,7 @@ import ReportJournalMedicOther from "./ReportJournalMedicOther";
 import ReportJournalPL from "./ReportJournalPL";
 
 export default {
-    name: "ReportJournalNew",
+    name: "ReportJournalIndex",
     props: ['default_company'],
     components: {
         ReportJournalMedic,

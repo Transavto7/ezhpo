@@ -14,7 +14,7 @@
                     </thead>
                     <tbody>
                     <td v-for="(item, name, index) in data" colspan="7" class="p-0">
-                        <table class="w-100 table">
+                        <table class="w-100 table mr-2">
                             <thead>
                             <th class="text-center">Автомобиль</th>
                             <th class="text-center">Предрейсовый/Предсменный</th>
@@ -22,6 +22,7 @@
                             <th class="text-center">Несогласованные ПЛ</th>
                             <th class="text-center">БДД</th>
                             <th class="text-center">Отчёты с карт</th>
+                            <th class="text-center">Печать ПЛ</th>
                             </thead>
 
                             <tbody>
@@ -34,6 +35,7 @@
                                 <td class="text-center">{{ getTotal(report, 'is_dop') }}</td>
                                 <td class="text-center">{{ getTotal(report, 'bdd')}} </td>
                                 <td class="text-center">{{ getTotal(report, 'report_cart') }}</td>
+                                <td class="text-center">{{ getTotal(report, 'pechat_pl') }}</td>
                             </tr>
                             <tr v-if="item.reports">
                                 <td class="text-center">
@@ -44,6 +46,7 @@
                                 <td class="text-center">{{ getTotalAll(item.reports, 'is_dop') }}</td>
                                 <td class="text-center">{{ getTotalAll(item.reports, 'bdd')}} </td>
                                 <td class="text-center">{{ getTotalAll(item.reports, 'report_cart') }}</td>
+                                <td class="text-center">{{ getTotalAll(item.reports, 'pechat_pl') }}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -61,6 +64,7 @@
 
 <script>
 import { months } from '../const/local';
+import { getTotalAll, getTotal } from "../const/reportsAmount";
 
 export default {
     name: "ReportJournalTechOther",
@@ -96,41 +100,8 @@ export default {
             this.data = false;
             this.show = false;
         },
-        getTotalAll(reports, ...names) {
-            let total = 0;
-            for (let key in reports) {
-                const totalDriver = this.getTotal(reports[key], ...names);
-
-                if (typeof totalDriver === 'number') {
-                    total += totalDriver;
-                }
-            }
-
-            if (total > 0) {
-                return total;
-            }
-
-            return 'отсутствует';
-        },
-        getTotal(item, ...names) {
-            let total = 0;
-
-            if (item.types) {
-                for (let key in item.types) {
-                    names.forEach(name => {
-                        if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
-                            total += parseInt(item.types[key]?.total);
-                        }
-                    });
-                }
-            }
-
-            if (total > 0) {
-                return total;
-            }
-
-            return 'отсутствует';
-        },
+        getTotalAll,
+        getTotal,
     }
 }
 </script>
