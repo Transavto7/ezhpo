@@ -73,18 +73,18 @@
                 <a href="#" data-btn-collapse="#views" role="button"> <i class="icon-grid"></i>Журналы осмотров</a>
                 <ul id="views" class="collapse list-unstyle">
                     @if($user_role === 2 || @manager)
-                        <li><a href="{{ route('home', 'medic') }}"><i class="fa fa-plus"></i>Медосмотры</a></li>
+                        <li><a href="{{ route('home', 'medic') }}"><i class="fa fa-plus"></i>Журнал МО</a></li>
                     @endif
 
                     @if($user_role === 1 || @manager)
-                        <li><a href="{{ route('home', 'tech') }}"><i class="fa fa-wrench"></i>Техосмотры</a></li>
+                        <li><a href="{{ route('home', 'tech') }}"><i class="fa fa-wrench"></i>Журнал ТО</a></li>
                     @endif
 
-                    <li><a href="{{ route('home', 'Dop') }}"><i class="fa fa-book"></i>Журнал учета ПЛ</a></li>
 
                     <li><a href="{{ route('home', 'bdd') }}"><i class="fa fa-book"></i>Журнал инструктажей по БДД </a></li>
-                    <li><a href="{{ route('home', 'report_cart') }}"><i class="fa fa-book"></i>Журнал снятия отчетов с карт</a></li>
-                    <li><a href="{{ route('home', 'pechat_pl') }}"><i class="fa fa-book"></i>Журнал печати ПЛ</a></li>
+                        <li><a href="{{ route('home', 'pechat_pl') }}"><i class="fa fa-book"></i>Журнал печати ПЛ</a></li>
+                    <li><a href="{{ route('home', 'report_cart') }}"><i class="fa fa-book"></i>Реестр снятия отчетов с карт</a></li>
+                        <li><a href="{{ route('home', 'Dop') }}"><i class="fa fa-book"></i>Журнал учета ПЛ</a></li>
 {{--                    <li><a href="{{ route('home', 'vid_pl') }}"><i class="fa fa-book"></i>Реестр выданных ПЛ</a></li>--}}
 
                     @php

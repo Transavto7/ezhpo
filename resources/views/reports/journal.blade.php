@@ -4,9 +4,9 @@
 @section('sidebar', 1)
 
 @section('content')
-    <report-journal-new
+    <report-journal-index
         @if ($company)
             :default_company="{{ json_encode($company) }}"
         @endif
-    ></report-journal-new>
+    ></report-journal-index>
 @endsection

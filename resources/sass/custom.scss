@@ -132,6 +132,10 @@
     }
 }
 
+nav.side-navbar ul li li a {
+    padding-left: 25px !important;
+}
+
 /*
 Snippets
  */
@@ -232,6 +236,11 @@ PRINT
 
 .select2-selection__choice {
     white-space: normal !important;
+}
+
+.form-group input[type="month"] {
+    width: 100%;
+    border: 1px solid #dee2e6;
 }
 
 @page { margin-left: 1.18in; margin-right: 0.59in; margin-top: 0.59in; margin-bottom: 0.37in }

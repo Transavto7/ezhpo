@@ -11,13 +11,15 @@
 
     @if($fieldsGroupFirst)
         <div class="row">
+        @isset ($fieldsGroupFirst['id'])
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>ID</label>
+                    <label>{{ $fieldsGroupFirst['id'] }}</label>
 
                     <input type="number" name="id" class="form-control" value="{{ request()->get('id') ? request()->get('id') : '' }}">
                 </div>
             </div>
+        @endisset
 
             @php
                 // если есть дата в _GET запросе, но пустая, то оставляем пустую
@@ -36,7 +38,11 @@
                 @isset($fieldsGroupFirst[$field])
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label>{{ (isset($fieldsGroupFirst[$field]['name'])) ? $fieldsGroupFirst[$field]['name'] : $fieldsGroupFirst[$field] }}</label>
+                            @if($field === 'date' || strpos($field, '_at') > 0)
+                                <label>{{ (isset($fieldsGroupFirst[$field]['name'])) ? $fieldsGroupFirst[$field]['name'] : $fieldsGroupFirst[$field] }} от</label>
+                            @else
+                                <label>{{ (isset($fieldsGroupFirst[$field]['name'])) ? $fieldsGroupFirst[$field]['name'] : $fieldsGroupFirst[$field] }}</label>
+                            @endif
 
                             @php $field_view_key = join('_', explode('.', $field)); @endphp
                             @php $field_view = 'profile.ankets.fields.' . $field_view_key; @endphp
@@ -64,7 +70,7 @@
                     @if($field === 'date' || strpos($field, '_at') > 0)
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label><b>ДО</b></label>
+                                <label>{{ (isset($fieldsGroupFirst[$field]['name'])) ? $fieldsGroupFirst[$field]['name'] : $fieldsGroupFirst[$field] }} до</label>
                                 <input
                                     type="date"
                                     value="{{ request()->get('TO_'.$field) ? request()->get('TO_'.$field) : $date_to_filter }}"
@@ -81,12 +87,26 @@
 <div class="tab-pane fade" id="filter-group-2" role="tabpanel" aria-labelledby="filter-group-2">
     <!-- filter-group-2 -->
     <div class="row">
+        @if (!isset($fieldsGroupFirst['id']))
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>{{ $fieldsKeys['id'] ?? 'ID' }}</label>
+
+                    <input type="number" name="id" class="form-control" value="{{ request()->get('id') ? request()->get('id') : '' }}">
+                </div>
+            </div>
+        @endif
+
         @foreach($anketsFields as $field)
             @if(!isset($fieldsGroupFirst[$field]))
                 @isset($fieldsKeys[$field])
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label>{{ (isset($fieldsKeys[$field]['name'])) ? $fieldsKeys[$field]['name'] : $fieldsKeys[$field] }}</label>
+                            @if($field === 'date' || strpos($field, '_at') > 0)
+                                <label>{{ (isset($fieldsKeys[$field]['name'])) ? $fieldsKeys[$field]['name'] : $fieldsKeys[$field] }} от</label>
+                            @else
+                                <label>{{ (isset($fieldsKeys[$field]['name'])) ? $fieldsKeys[$field]['name'] : $fieldsKeys[$field] }}</label>
+                            @endif
 
                             @php $field_view_key = join('_', explode('.', $field)); @endphp
                             @php $field_view = 'profile.ankets.fields.' . $field_view_key; @endphp
@@ -114,7 +134,7 @@
                     @if($field === 'date' || strpos($field, '_at') > 0)
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label><b>ДО</b></label>
+                                <label>{{ (isset($fieldsKeys[$field]['name'])) ? $fieldsKeys[$field]['name'] : $fieldsKeys[$field] }} до</label>
                                 <input
                                     type="date"
                                     value="{{ request()->get('TO_'.$field) }}"

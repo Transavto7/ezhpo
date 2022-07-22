@@ -136,6 +136,7 @@ class ReportController extends Controller
             return response(null, 404);
         }
 
+        $company = Company::select('id', 'hash_id', 'name')->where('hash_id', $company)->first();
         $products = Product::all();
         $discounts = Discount::all();
         return [
@@ -149,9 +150,12 @@ class ReportController extends Controller
 
     public function getJournalMedic($company, $date_from, $date_to, $products, $discounts) {
         // Get table info by filters
-        $medics = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
+        $medics = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart', 'pechat_pl'])
             ->join('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
-            ->where('anketas.company_id', $company)
+            ->where(function ($query) use ($company) {
+                $query->where('anketas.company_id', $company->hash_id)
+                    ->orWhere('anketas.company_name', $company->name);
+            })
             ->where('anketas.in_cart', 0)
             ->where(function ($q) use ($date_from, $date_to) {
                 $q->where(function ($q) use ($date_from, $date_to) {
@@ -234,9 +238,12 @@ class ReportController extends Controller
 
     public function getJournalTechs($company, $date_from, $date_to, $products, $discounts) {
         // Get table info by filters
-        $techs = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'report_cart'])
+        $techs = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'report_cart', 'pechat_pl'])
             ->join('cars', 'anketas.car_id', '=', 'cars.hash_id')
-            ->where('anketas.company_id', $company)
+            ->where(function ($query) use ($company) {
+                $query->where('anketas.company_id', $company->hash_id)
+                    ->orWhere('anketas.company_name', $company->name);
+            })
             ->whereNotNull('anketas.car_id')
             ->where('anketas.in_cart', 0)
             ->where(function ($q) use ($date_from, $date_to) {
@@ -320,8 +327,11 @@ class ReportController extends Controller
     }
 
     public function getJournalMedicsOther($company, $date_from, $date_to) {
-        $reports = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart'])
-            ->where('company_id', $company)
+        $reports = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart', 'pechat_pl'])
+            ->where(function ($query) use ($company) {
+                $query->where('anketas.company_id', $company->hash_id)
+                    ->orWhere('anketas.company_name', $company->name);
+            })
             ->where('in_cart', 0)
             ->whereBetween('created_at', [
                 $date_from." 00:00:00",
@@ -372,9 +382,12 @@ class ReportController extends Controller
     }
 
     public function getJournalTechsOther($company, $date_from, $date_to) {
-        $reports = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'type_anketa'])
+        $reports = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'type_anketa', 'pechat_pl'])
             ->join('cars', 'anketas.car_id', '=', 'cars.hash_id')
-            ->where('anketas.company_id', $company)
+            ->where(function ($query) use ($company) {
+                $query->where('anketas.company_id', $company->hash_id)
+                    ->orWhere('anketas.company_name', $company->name);
+            })
             ->whereNotNull('car_id')
             ->where('in_cart', 0)
             ->whereBetween('anketas.created_at', [
@@ -429,7 +442,10 @@ class ReportController extends Controller
 
     public function getJournalPl($company, $date_from, $date_to) {
         $reports = Anketa::whereIn('type_anketa', ['medic', 'tech'])
-            ->where('company_id', $company)
+            ->where(function ($query) use ($company) {
+                $query->where('anketas.company_id', $company->hash_id)
+                    ->orWhere('anketas.company_name', $company->name);
+            })
             ->where('in_cart', 0)
             ->where('is_dop', 1)
             ->whereNull('result_dop')
