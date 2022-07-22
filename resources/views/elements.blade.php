@@ -362,6 +362,14 @@
                                     <i class="fa fa-sort"></i>
                                 </a>
                             </th>
+                            @if($model === 'Company')
+                                <th>
+                                    Реестры
+                                </th>
+                                <th>
+                                    Справочники
+                                </th>
+                            @endif
                         @endif
                     @endif
                 @endforeach
@@ -452,8 +460,9 @@
                                         @endif
 
                                         @if($model === 'Company' && $elK === 'name')
-
-                                            <p>
+                                            </td>
+                                            <td class="td-option">
+                                            <nobr>
 
                                                 <a class="btn btn-sm btn-outline-success"
                                                    href="{{ route('report.get', ['type' => 'journal', 'company_id' => $el->hash_id]) }}">
@@ -467,15 +476,17 @@
                                                    href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'company_id' => $el->id ]) }}">
                                                     <i class="fa fa-user"></i>
                                                 </a>
-                                            </p>
+                                            </nobr>
                                         @endif
 
                                         @isset($fields[$elK]['filterJournalLinkKey'])
-                                            <div>
+                                            </td>
+                                            <td class="td-option">
+                                            <nobr>
                                                 <a class="btn btn-sm btn-danger" href="{{ route('home', 'medic') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['name'] }}">МЕД</a>
                                                 <a class="btn btn-sm btn-info" href="{{ route('home', 'tech') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['name'] }}">ТЕХ</a>
                                                 <a class="btn btn-sm btn-dark" href="{{ route('home', 'Dop') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['name'] }}">ПЛ</a>
-                                            </div>
+                                            </nobr>
                                         @endisset
                                     @endif
 
