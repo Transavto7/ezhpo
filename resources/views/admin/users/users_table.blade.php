@@ -34,8 +34,8 @@
                 <i class="fa fa-sort"></i>
             </a>
         </th>
-        <th>Город
-            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=city_id">
+        <th>Компания
+            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=company_id">
                 <i class="fa fa-sort"></i>
             </a>
         </th>
@@ -80,7 +80,7 @@
             <td>{{ $user->login }}</td>
             <td>{{ $user->email }}</td>
             <td>{{ \App\Point::getPointText($user->pv_id) }}</td>
-            <td>{{ $user->city['name'] }}</td>
+            <td>{{ $user->company['name'] }}</td>
             <td>{{ $user->timezone }}</td>
             <td>{{ $user->blocked ? 'Да' : 'Нет' }}</td>
             <td>{{ \App\Http\Controllers\ProfileController::getUserRole(true, $user->id) }}</td>
@@ -160,14 +160,23 @@
                                         ])
                                     </div>
 
-                                    <div class="form-group users_show_city" @if( $user->role != 12 ) style="display: none" @endif>
-                                        <label>Город</label>
-                                        <select name="city_id" required class="form-control">
-                                            <option value="0">--none--</option>
-                                            @foreach(\App\Town::get() as $cityInfo)
-                                                <option value="{{$cityInfo->id}}" @if($cityInfo->id == $user->city['id']) selected @endif>{{$cityInfo->name}}</option>
-                                            @endforeach
-                                        </select>
+
+                                    <div class="form-group users_show_company"  @if( $user->role != 12 ) style="display: none" @endif>
+                                        <label>Компания</label>
+                                        @php
+                                            $iController = new \App\Http\Controllers\IndexController();
+
+                                            $company_fields = $iController->elements['Driver']['fields']['company_id'];
+                                            $company_fields['getFieldKey'] = 'id';
+                                            //dd($company_fields)
+                                        @endphp
+                                        @include('templates.elements_field', [
+                                            'v' => $company_fields,
+                                            'k' => 'company_id',
+                                            'is_required' => '',
+                                            'model' => 'Company',
+                                            'default_value' => $user->company['id']
+                                        ])
                                     </div>
 
                                     @if(!$is_pak)
@@ -235,14 +244,14 @@
                 let selected = field.val()
 
                 if(selected == 12){
-                    field.closest('.modal-body').find('.users_show_city').show()
+                    field.closest('.modal-body').find('.users_show_company').show()
                     field.closest('.modal-body').find('.users_show_pvs').hide()
                     field.closest('.modal-body').find('select[name="pv_id"]').val(0)
 
                 }else{
                     field.closest('.modal-body').find('.users_show_pvs').show()
-                    field.closest('.modal-body').find('.users_show_city').hide()
-                    field.closest('.modal-body').find('select[name="city_id"]').val(0)
+                    field.closest('.modal-body').find('.users_show_company').hide()
+                    field.closest('.modal-body').find('select[name="company_id"]').val(0)
                 }
             });
         })

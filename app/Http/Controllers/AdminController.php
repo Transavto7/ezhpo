@@ -152,7 +152,6 @@ class AdminController extends Controller
     public function ShowUsers (Request $request, $errors = [])
     {
         $data = [];
-
         /**
          * Сортировка
          */
@@ -163,7 +162,7 @@ class AdminController extends Controller
         $users = app('App\\User');
         $fieldsModel = $users->fillable;
 
-        $users = $users->with(['city']);
+        $users = $users->with(['company']);
 
         if(isset($_GET['filter'])) {
             foreach($_GET as $fk => $fv) {

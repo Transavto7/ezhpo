@@ -82,14 +82,19 @@
                         @include('admin.users.show_pvs')
                     </div>
 
-                    <div class="form-group users_show_city" style="display: none">
-                        <label>Город</label>
-                        <select name="city_id" required class="form-control">
-                            <option value="0">--none--</option>
-                            @foreach(\App\Town::get() as $cityInfo)
-                                <option value="{{$cityInfo->id}}">{{$cityInfo->name}}</option>
-                            @endforeach
-                        </select>
+                    <div class="form-group users_show_company"  style="display: none">
+                        <label>Компания</label>
+                        @php
+                            $iController = new \App\Http\Controllers\IndexController();
+                            $company_fields = $iController->elements['Driver']['fields']['company_id'];
+                            $company_fields['getFieldKey'] = 'id';
+                        @endphp
+                        @include('templates.elements_field', [
+                            'v' => $company_fields,
+                            'k' => 'company_id',
+                            'is_required' => '',
+                            'model' => 'Company'
+                        ])
                     </div>
 
                     @if(!$is_pak)
@@ -142,13 +147,13 @@
                 let selected = field.val()
 
                 if(selected == 12){
-                    field.closest('.modal-body').find('.users_show_city').show()
+                    field.closest('.modal-body').find('.users_show_company').show()
                     field.closest('.modal-body').find('.users_show_pvs').hide()
                     field.closest('.modal-body').find('select[name="pv_id"]').val(0)
 
                 }else{
                     field.closest('.modal-body').find('.users_show_pvs').show()
-                    field.closest('.modal-body').find('.users_show_city').hide()
+                    field.closest('.modal-body').find('.users_show_company').hide()
                     field.closest('.modal-body').find('select[name="city_id"]').val(0)
                 }
             });

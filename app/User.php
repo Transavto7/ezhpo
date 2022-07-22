@@ -13,7 +13,7 @@ class User extends Authenticatable
 
     public $fillable = [
         'hash_id', 'req_id', 'photo', 'name', 'email', 'password', 'eds', 'pv_id', 'timezone', 'role', 'role_manager', 'blocked', 'pv_id_default', 'api_token',
-        'login', 'user_post', 'city_id'
+        'login', 'user_post', 'company_id'
     ];
 
     protected $hidden = [
@@ -30,9 +30,9 @@ class User extends Authenticatable
         return $this->hasMany(Anketa::class, 'user_id', 'id');
     }
     // sorry for name
-    public function city()
+    public function company()
     {
-        return $this->belongsTo(Town::class, 'city_id', 'id');
+        return $this->belongsTo(Company::class, 'company_id', 'id');
     }
 
     public static $userRolesValues = [
