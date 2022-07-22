@@ -13,7 +13,7 @@ class User extends Authenticatable
 
     public $fillable = [
         'hash_id', 'req_id', 'photo', 'name', 'email', 'password', 'eds', 'pv_id', 'timezone', 'role', 'role_manager', 'blocked', 'pv_id_default', 'api_token',
-        'login', 'user_post'
+        'login', 'user_post', 'company_id'
     ];
 
     protected $hidden = [
@@ -28,6 +28,11 @@ class User extends Authenticatable
     public function anketas()
     {
         return $this->hasMany(Anketa::class, 'user_id', 'id');
+    }
+    // sorry for name
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id', 'id');
     }
 
     public static $userRolesValues = [
@@ -57,7 +62,7 @@ class User extends Authenticatable
         = [
             1   => 'Контролёр ТС',
             2   => 'Медицинский сотрудник',
-            3   => 'Медицинский сотрудник',
+            3   => 'Водитель',
             4   => 'Оператор СДПО',
             11  => 'Менеджер',
             12  => 'Клиент',

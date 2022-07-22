@@ -33,7 +33,14 @@
                             <div class="text-red font-weight-bold" v-if="getSum(item, 'Предрейсовый', 'Предсменный') == null">
                                 Услуги не указаны
                             </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Предрейсовый', 'Предсменный') }}₽ </div>
+                            <div class="font-weight-bold" v-else>
+                                {{ getSum(item, 'Предрейсовый', 'Предсменный') }}₽
+                                <span class="text-red" v-if="getDiscount(item, 'Предрейсовый', 'Предсменный')">
+                                    ({{ getDiscount(item, 'Предрейсовый', 'Предсменный') }}%)
+                                </span>
+                                <i v-if="isSync(item, 'Предрейсовый', 'Предсменный')" class="fa fa-refresh text-success"></i>
+                                <i v-else class="fa fa-refresh text-red"></i>
+                            </div>
                         </td>
 
                         <td class="text-center" width="150">
@@ -42,16 +49,19 @@
                             <div class="text-red font-weight-bold" v-if="getSum(item, 'Послерейсовый', 'Послесменный') == null">
                                 Услуги не указаны
                             </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'Послерейсовый', 'Послесменный') }}₽ </div>
+                            <div class="font-weight-bold" v-else>
+                                {{ getSum(item, 'Послерейсовый', 'Послесменный') }}₽
+                                <span class="text-red" v-if="getDiscount(item, 'Послерейсовый', 'Послесменный')">
+                                    ({{ getDiscount(item, 'Послерейсовый', 'Послесменный') }}%)
+                                </span>
+                                <i v-if="isSync(item, 'Послерейсовый', 'Послесменный')" class="fa fa-refresh text-success"></i>
+                                <i v-else class="fa fa-refresh text-red"></i>
+                            </div>
+
                         </td>
 
                         <td class="text-center" width="150">
                             {{ getTotal(item, 'is_dop') }}
-
-                            <div class="text-red font-weight-bold" v-if="getSum(item, 'is_dop') == null">
-                                Услуги не указаны
-                            </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'is_dop') }}₽ </div>
                         </td>
 
                         <td class="text-center" width="150">
@@ -60,7 +70,14 @@
                             <div class="text-red font-weight-bold" v-if="getSum(item, 'bdd') == null">
                                 Услуги не указаны
                             </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'bdd') }}₽ </div>
+                            <div class="font-weight-bold" v-else>
+                                {{ getSum(item, 'bdd') }}₽
+                                <span class="text-red" v-if="getDiscount(item, 'bdd')">
+                                    ({{ getDiscount(item, 'bdd') }}%)
+                                </span>
+                                <i v-if="isSync(item, 'bdd')" class="fa fa-refresh text-success"></i>
+                                <i v-else class="fa fa-refresh text-red"></i>
+                            </div>
                         </td>
 
                         <td class="text-center" width="150">
@@ -69,7 +86,14 @@
                             <div class="text-red font-weight-bold" v-if="getSum(item, 'report_cart') == null">
                                 Услуги не указаны
                             </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'report_cart') }}₽ </div>
+                            <div class="font-weight-bold" v-else>
+                                {{ getSum(item, 'report_cart') }}₽
+                                <span class="text-red" v-if="getDiscount(item, 'report_cart')">
+                                    ({{ getDiscount(item, 'report_cart') }}%)
+                                </span>
+                                <i v-if="isSync(item, 'report_cart')" class="fa fa-refresh text-success"></i>
+                                <i v-else class="fa fa-refresh text-red"></i>
+                            </div>
                         </td>
 
                         <td class="text-center" width="150">
@@ -78,7 +102,14 @@
                             <div class="text-red font-weight-bold" v-if="getSum(item, 'pechat_pl') == null">
                                 Услуги не указаны
                             </div>
-                            <div class="font-weight-bold" v-else> {{ getSum(item, 'pechat_pl') }}₽ </div>
+                            <div class="font-weight-bold" v-else>
+                                {{ getSum(item, 'pechat_pl') }}₽
+                                <span class="text-red" v-if="getDiscount(item, 'pechat_pl')">
+                                    ({{ getDiscount(item, 'pechat_pl') }}%)
+                                </span>
+                                <i v-if="isSync(item, 'pechat_pl')" class="fa fa-refresh text-success"></i>
+                                <i v-else class="fa fa-refresh text-red"></i>
+                            </div>
                         </td>
                     </tr>
 
@@ -109,8 +140,6 @@
 
                         <td class="text-center" width="150">
                             {{ getTotalAll('is_dop') }}
-
-                            <div class="font-weight-bold" v-if="getSumAll(reports, 'is_dop') != null"> {{ getSumAll(reports, 'is_dop') }}₽ </div>
                         </td>
 
                         <td class="text-center" width="150">
@@ -143,7 +172,7 @@
 </template>
 
 <script>
-import { getTotalAll, getTotal, getSum, getSumAll } from "../const/reportsAmount";
+import { getTotalAll, getTotal, getSum, getSumAll, getDiscount } from "../const/reportsAmount";
 
 export default {
     name: "ReportJournalTech",
@@ -180,7 +209,8 @@ export default {
         getTotalAll,
         getTotal,
         getSumAll,
-        getSum
+        getSum,
+        getDiscount
     }
 }
 </script>

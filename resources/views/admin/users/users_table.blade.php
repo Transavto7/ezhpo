@@ -34,6 +34,11 @@
                 <i class="fa fa-sort"></i>
             </a>
         </th>
+        <th>Компания
+            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=company_id">
+                <i class="fa fa-sort"></i>
+            </a>
+        </th>
         <th>GMT
             <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=timezone">
                 <i class="fa fa-sort"></i>
@@ -75,6 +80,7 @@
             <td>{{ $user->login }}</td>
             <td>{{ $user->email }}</td>
             <td>{{ \App\Point::getPointText($user->pv_id) }}</td>
+            <td>{{ $user->company['name'] }}</td>
             <td>{{ $user->timezone }}</td>
             <td>{{ $user->blocked ? 'Да' : 'Нет' }}</td>
             <td>{{ \App\Http\Controllers\ProfileController::getUserRole(true, $user->id) }}</td>
@@ -148,9 +154,28 @@
                                         <input type="number" value="{{ $user->timezone }}" name="timezone" placeholder="Часовой пояс" class="form-control">
                                     </div>
 
-                                    <div class="form-group">
+                                    <div class="form-group users_show_pvs"  @if( $user->role == 12 ) style="display: none" @endif>
                                         @include('admin.users.show_pvs', [
                                             'pv_id' => $user->pv_id
+                                        ])
+                                    </div>
+
+
+                                    <div class="form-group users_show_company"  @if( $user->role != 12 ) style="display: none" @endif>
+                                        <label>Компания</label>
+                                        @php
+                                            $iController = new \App\Http\Controllers\IndexController();
+
+                                            $company_fields = $iController->elements['Driver']['fields']['company_id'];
+                                            $company_fields['getFieldKey'] = 'id';
+                                            //dd($company_fields)
+                                        @endphp
+                                        @include('templates.elements_field', [
+                                            'v' => $company_fields,
+                                            'k' => 'company_id',
+                                            'is_required' => '',
+                                            'model' => 'Company',
+                                            'default_value' => $user->company['id']
                                         ])
                                     </div>
 
@@ -158,14 +183,9 @@
                                         <div class="form-group">
                                             <label>Роль</label>
                                             <select name="role" required class="form-control">
-                                                <option disabled selected value="{{ $user->role }}">{{ \App\Http\Controllers\ProfileController::getUserRole(true, $user->id) }}</option>
-                                                <option value="12">Клиент</option>
-                                                <option value="1">Контролёр ТС</option>
-                                                <option value="2">Медицинский сотрудник</option>
-                                                <option value="4">Оператор СДПО</option>
-                                                <option value="11">Менеджер</option>
-                                                <option value="13">Инженер БДД</option>
-                                                <option value="777">Администратор</option>
+                                                @foreach(\App\User::$userRolesText as $roleKey =>  $roleName)
+                                                    <option value="{{$roleKey}}" @if($roleKey == $user->role) selected @endif>{{$roleName}}</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     @else
@@ -215,3 +235,25 @@
     @endforeach
     </tbody>
 </table>
+
+@section('custom-scripts')
+    <script>
+        $(document).ready(function () {
+            $(document).on('change', 'select[name="role"]', function(event) {
+                const field = $(event.target);
+                let selected = field.val()
+
+                if(selected == 12){
+                    field.closest('.modal-body').find('.users_show_company').show()
+                    field.closest('.modal-body').find('.users_show_pvs').hide()
+                    field.closest('.modal-body').find('select[name="pv_id"]').val(0)
+
+                }else{
+                    field.closest('.modal-body').find('.users_show_pvs').show()
+                    field.closest('.modal-body').find('.users_show_company').hide()
+                    field.closest('.modal-body').find('select[name="company_id"]').val(0)
+                }
+            });
+        })
+    </script>
+@endsection
