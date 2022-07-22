@@ -362,14 +362,16 @@
                                     <i class="fa fa-sort"></i>
                                 </a>
                             </th>
-                            @if($model === 'Company')
+                            @if($model === 'Company' && $k == 'name')
                                 <th>
                                     Реестры
                                 </th>
+                            @endif
+                            @isset($fields[$k]['filterJournalLinkKey'])
                                 <th>
                                     Справочники
                                 </th>
-                            @endif
+                            @endisset
                         @endif
                     @endif
                 @endforeach
