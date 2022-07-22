@@ -136,7 +136,7 @@ class ReportController extends Controller
             return response(null, 404);
         }
 
-        $company = Company::select('id', 'hash_id', 'name')->where('hash_id', $company)->first();
+        $company = Company::select('id', 'hash_id', 'name', 'products_id')->where('hash_id', $company)->first();
         $products = Product::all();
         $discounts = Discount::all();
         return [
@@ -188,22 +188,41 @@ class ReportController extends Controller
                 $result[$id]['types'][$type]['total'] = $total;
 
                 $services = explode(',', $driver->first()->products_id);
-                $prods = $products->whereIn('id', $services);
+                $types = explode('/', $type);
+                $prods = $products->whereIn('id', $services)->where('type_anketa', 'medic');
 
                 if ($prods->count() > 0) {
                     foreach ($prods as $service) {
                         $discounts = $discounts->where('products_id', $service->id);
 
-                        if($discounts->count()) {
-                            foreach($discounts as $discount) {
-                                $service->price_unit = $discount->add($total, $service->price_unit);
+                        if ($discounts->count()) {
+                            foreach ($discounts as $discount) {
+                                $disSum = $discount->getDiscount($total);
+                                if ($disSum) {
+                                    $service->price_unit = $service->price_unit - ($service->price_unit * $disSum / 100);
+                                    $result[$id]['types'][$type]['discount'] = 1 * $disSum;
+                                }
+                            }
+                        }
+
+                        $vt = $service->type_view;
+
+                        foreach ($types as $type_view) {
+                            if (strpos($vt, $type_view) !== false) {
+                                $result[$id]['types'][$type]['sync'] =
+                                    in_array($service->id, explode(',', $company->products_id));
+
+                                if ($service->type_product === 'Разовые осмотры') {
+                                    $result[$id]['types'][$type]['sum'] = $service->price_unit * $total;
+                                } else {
+                                    $result[$id]['types'][$type]['sum'] = $service->price_unit;
+                                }
                             }
                         }
                     }
-
-                    $result[$id]['types'][$type]['sum'] = $prods->sum('price_unit');
                 }
             }
+
 
             foreach ($driver->groupBy('type_anketa') as $rows) {
                 $type = $rows->first()->type_anketa;
@@ -211,20 +230,31 @@ class ReportController extends Controller
                 $result[$id]['types'][$type]['total'] = $total;
 
                 $services = explode(',', $driver->first()->products_id);
-                $prods = $products->whereIn('id', $services);
+                $prods = $products->whereIn('id', $services)->where('type_anketa', $type);
 
                 if ($prods->count() > 0) {
                     foreach ($prods as $service) {
                         $discounts = $discounts->where('products_id', $service->id);
 
-                        if($discounts->count()) {
-                            foreach($discounts as $discount) {
-                                $service->price_unit = $discount->add($total, $service->price_unit);
+                        if ($discounts->count()) {
+                            foreach ($discounts as $discount) {
+                                $disSum = $discount->getDiscount($total);
+                                if ($disSum) {
+                                    $service->price_unit = $service->price_unit - ($service->price_unit * $disSum / 100);
+                                    $result[$id]['types'][$type]['discount'] = 1 * $disSum;
+                                }
                             }
                         }
-                    }
 
-                    $result[$id]['types'][$type]['sum'] = $prods->sum('price_unit');
+                        $result[$id]['types'][$type]['sync'] =
+                            in_array($service->id, explode(',', $company->products_id));
+
+                        if ($service->type_product === 'Разовые осмотры') {
+                            $result[$id]['types'][$type]['sum'] = $service->price_unit * $total;
+                        } else {
+                            $result[$id]['types'][$type]['sum'] = $service->price_unit;
+                        }
+                    }
                 }
             }
 
@@ -278,20 +308,38 @@ class ReportController extends Controller
                 $result[$id]['types'][$type]['total'] = $total;
 
                 $services = explode(',', $car->first()->products_id);
-                $prods = $products->whereIn('id', $services);
+                $types = explode('/', $type);
+                $prods = $products->whereIn('id', $services)->where('type_anketa', 'tech');
 
                 if ($prods->count() > 0) {
                     foreach ($prods as $service) {
                         $discounts = $discounts->where('products_id', $service->id);
 
-                        if($discounts->count()) {
-                            foreach($discounts as $discount) {
-                                $service->price_unit = $discount->add($total, $service->price_unit);
+                        if ($discounts->count()) {
+                            foreach ($discounts as $discount) {
+                                $disSum = $discount->getDiscount($total);
+                                if ($disSum) {
+                                    $service->price_unit = $service->price_unit - ($service->price_unit * $disSum / 100);
+                                    $result[$id]['types'][$type]['discount'] = 1 * $disSum;
+                                }
+                            }
+                        }
+
+                        $vt = $service->type_view;
+
+                        foreach ($types as $type_view) {
+                            if (strpos($vt, $type_view) !== false) {
+                                $result[$id]['types'][$type]['sync'] =
+                                    in_array($service->id, explode(',', $company->products_id));
+
+                                if ($service->type_product === 'Разовые осмотры') {
+                                    $result[$id]['types'][$type]['sum'] = $service->price_unit * $total;
+                                } else {
+                                    $result[$id]['types'][$type]['sum'] = $service->price_unit;
+                                }
                             }
                         }
                     }
-
-                    $result[$id]['types'][$type]['sum'] = $prods->sum('price_unit');
                 }
             }
 
@@ -301,20 +349,31 @@ class ReportController extends Controller
                 $result[$id]['types'][$type]['total'] = $total;
 
                 $services = explode(',', $car->first()->products_id);
-                $prods = $products->whereIn('id', $services);
+                $prods = $products->whereIn('id', $services)->where('type_anketa', $type);
 
                 if ($prods->count() > 0) {
                     foreach ($prods as $service) {
                         $discounts = $discounts->where('products_id', $service->id);
 
-                        if($discounts->count()) {
-                            foreach($discounts as $discount) {
-                                $service->price_unit = $discount->add($total, $service->price_unit);
+                        if ($discounts->count()) {
+                            foreach ($discounts as $discount) {
+                                $disSum = $discount->getDiscount($total);
+                                if ($disSum) {
+                                    $service->price_unit = $service->price_unit - ($service->price_unit * $disSum / 100);
+                                    $result[$id]['types'][$type]['discount'] = 1 * $disSum;
+                                }
                             }
                         }
-                    }
 
-                    $result[$id]['types'][$type]['sum'] = $prods->sum('price_unit');
+                        $result[$id]['types'][$type]['sync'] =
+                            in_array($service->id, explode(',', $company->products_id));
+
+                        if ($service->type_product === 'Разовые осмотры') {
+                            $result[$id]['types'][$type]['sum'] = $service->price_unit * $total;
+                        } else {
+                            $result[$id]['types'][$type]['sum'] = $service->price_unit;
+                        }
+                    }
                 }
             }
 

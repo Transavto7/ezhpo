@@ -71,3 +71,39 @@ export function getSum(item, ...names) {
 
     return null
 }
+
+export function getDiscount(item, ...names) {
+    let disc = 0;
+
+    if (item.types) {
+        for (let key in item.types) {
+            names.forEach(name => {
+                if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+                    disc = parseInt(item.types[key]?.discount);
+                }
+            });
+        }
+    }
+
+    if (disc > 0) {
+        return disc;
+    }
+
+    return null
+}
+
+export function isSync(item, ...names) {
+    let result = false;
+
+    if (item.types) {
+        for (let key in item.types) {
+            names.forEach(name => {
+                if (key.split('/')[0].trim().toLowerCase() === name.toLowerCase()) {
+                    result = item.types[key]?.sync;
+                }
+            });
+        }
+    }
+
+    return result;
+}
