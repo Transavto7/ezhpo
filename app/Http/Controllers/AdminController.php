@@ -163,8 +163,15 @@ class AdminController extends Controller
         $users = app('App\\User');
         $fieldsModel = $users->fillable;
 
+        $users = $users->with(['city']);
+
         if(isset($_GET['filter'])) {
             foreach($_GET as $fk => $fv) {
+                if($fk == 'city_id'){
+                    $users = $users->whereHas('city', function ($q) use ($fv){
+                        $q->where('id', $fv);
+                    });
+                }
                 if(in_array($fk, $fieldsModel) && !empty($fv)) {
                     $users = $users->where($fk, 'LIKE', '%'. trim($_GET[$fk]) .'%');
                 }
@@ -186,4 +193,5 @@ class AdminController extends Controller
 
         return view('admin.users.all', $data);
     }
+
 }

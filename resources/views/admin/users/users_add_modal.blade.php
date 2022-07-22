@@ -6,10 +6,12 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Добавление {{ $is_pak ? 'терминала' : 'сотрудника' }}</h4>
-                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
+                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span
+                        aria-hidden="true">×</span></button>
             </div>
 
-            <form method="POST" autocomplete="off" enctype="multipart/form-data" action="{{ route('adminCreateUser') }}">
+            <form method="POST" autocomplete="off" enctype="multipart/form-data"
+                  action="{{ route('adminCreateUser') }}">
                 @csrf
 
                 <div class="modal-body">
@@ -21,11 +23,17 @@
                                 Фотография
                                 <input type="file" id="croppie-input{{ $photoInputId }}" name="photo">
 
-                                <div style="display: none;" id="croppie-block{{ $photoInputId }}" class="croppie-block text-center">
-                                    <input type="hidden" name="photo_base64" id="croppie-result-base64{{ $photoInputId }}">
+                                <div style="display: none;" id="croppie-block{{ $photoInputId }}"
+                                     class="croppie-block text-center">
+                                    <input type="hidden" name="photo_base64"
+                                           id="croppie-result-base64{{ $photoInputId }}">
                                     <div class="croppie-demo" data-croppie-id="{{ $photoInputId }}"></div>
-                                    <button type="button" data-croppie-id="{{ $photoInputId }}" class="btn croppie-save btn-sm btn-success">Сохранить обрезку</button>
-                                    <button type="button" data-croppie-id="{{ $photoInputId }}" class="btn croppie-delete btn-sm btn-danger">Удалить фото</button>
+                                    <button type="button" data-croppie-id="{{ $photoInputId }}"
+                                            class="btn croppie-save btn-sm btn-success">Сохранить обрезку
+                                    </button>
+                                    <button type="button" data-croppie-id="{{ $photoInputId }}"
+                                            class="btn croppie-delete btn-sm btn-danger">Удалить фото
+                                    </button>
                                 </div>
 
                             </label>
@@ -41,18 +49,21 @@
                     @endif
 
                     <div class="form-group">
-                        <input type="text" required name="login" placeholder="Login" class="form-control" autocomplete="off">
+                        <input type="text" required name="login" placeholder="Login" class="form-control"
+                               autocomplete="off">
                         <i>(Пользователь авторизуется по введеному Вами логину)</i>
                     </div>
 
                     <div class="form-group">
-                        <input type="email" required name="email" placeholder="E-mail" class="form-control" autocomplete="off">
+                        <input type="email" required name="email" placeholder="E-mail" class="form-control"
+                               autocomplete="off">
                     </div>
 
                     <div class="form-group">
                         <div class="field field--password">
                             <i class="fa fa-eye-slash"></i>
-                            <input data-toggle="password" id="password" type="password" placeholder="Пароль..." class="form-control" name="password" autocomplete="off">
+                            <input data-toggle="password" id="password" type="password" placeholder="Пароль..."
+                                   class="form-control" name="password" autocomplete="off">
                         </div>
                     </div>
 
@@ -62,26 +73,32 @@
                         </div>
                     @endif
 
-                    <div class="form-group">
+                    <div class="form-group ">
                         <label>Часовой пояс <i>(UTC+3)</i></label>
                         <input type="number" name="timezone" value="3" placeholder="Часовой пояс" class="form-control">
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group users_show_pvs">
                         @include('admin.users.show_pvs')
+                    </div>
+
+                    <div class="form-group users_show_city" style="display: none">
+                        <label>Город</label>
+                        <select name="city_id" required class="form-control">
+                            <option value="0">--none--</option>
+                            @foreach(\App\Town::get() as $cityInfo)
+                                <option value="{{$cityInfo->id}}">{{$cityInfo->name}}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     @if(!$is_pak)
                         <div class="form-group">
                             <label>Роль</label>
                             <select name="role" required class="form-control">
-                                <option value="12">Клиент</option>
-                                <option value="4">Оператор СДПО</option>
-                                <option value="1">Контролёр ТС</option>
-                                <option selected value="2">Медицинский сотрудник</option>
-                                <option value="11">Менеджер</option>
-                                <option value="13">Инженер БДД</option>
-                                <option value="777">Администратор</option>
+                                @foreach(\App\User::$userRolesText as $roleKey =>  $roleName)
+                                    <option value="{{$roleKey}}">{{$roleName}}</option>
+                                @endforeach
                             </select>
                         </div>
                     @else
@@ -116,3 +133,25 @@
         </div>
     </div>
 </div>
+
+@section('custom-scripts')
+    <script>
+        $(document).ready(function () {
+            $(document).on('change', 'select[name="role"]', function(event) {
+                const field = $(event.target);
+                let selected = field.val()
+
+                if(selected == 12){
+                    field.closest('.modal-body').find('.users_show_city').show()
+                    field.closest('.modal-body').find('.users_show_pvs').hide()
+                    field.closest('.modal-body').find('select[name="pv_id"]').val(0)
+
+                }else{
+                    field.closest('.modal-body').find('.users_show_pvs').show()
+                    field.closest('.modal-body').find('.users_show_city').hide()
+                    field.closest('.modal-body').find('select[name="city_id"]').val(0)
+                }
+            });
+        })
+    </script>
+@endsection
