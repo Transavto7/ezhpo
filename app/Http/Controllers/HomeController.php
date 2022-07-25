@@ -280,13 +280,10 @@ class HomeController extends Controller
 
                     $anketas = $anketas->where(function ($q) use ($date_from, $date_to) {
                         $q->where(function ($q) use ($date_from, $date_to) {
-                            $q->where(function ($q) {
-                                $q->where('is_dop', '!=', 1)
-                                  ->orWhereNull('is_dop');
-                            })
+                            $q->whereNotNull('anketas.date')
                               ->whereBetween('date', [$date_from, $date_to]);
                         })->orWhere(function ($q) use ($date_from, $date_to) {
-                            $q->where('is_dop', 1)
+                            $q->whereNull('anketas.date')
                               ->whereBetween('period_pl', [
                                   $date_from->format('Y-m'),
                                   $date_to->format('Y-m')
@@ -436,6 +433,8 @@ class HomeController extends Controller
 
             return (new AnketasExport($collection))->download('export-anketas.xlsx');
         }
+
+//        dd($anketas->toSql(), $anketas->getBindings());
 
         $anketas = ($filter_activated || $typeAnkets === 'pak_queue')
             ? $anketas->orderBy($orderKey, $orderBy)->paginate($take) : [];

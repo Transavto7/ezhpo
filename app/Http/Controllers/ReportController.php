@@ -193,13 +193,14 @@ class ReportController extends Controller
 
                 if ($prods->count() > 0) {
                     foreach ($prods as $service) {
-                        $discounts = $discounts->where('products_id', $service->id);
+                        $disc = $discounts->where('products_id', $service->id);
+                        $service->price = $service->price_unit;
 
-                        if ($discounts->count()) {
-                            foreach ($discounts as $discount) {
+                        if ($disc->count()) {
+                            foreach ($disc as $discount) {
                                 $disSum = $discount->getDiscount($total);
                                 if ($disSum) {
-                                    $service->price_unit = $service->price_unit - ($service->price_unit * $disSum / 100);
+                                    $service->price = $service->price_unit - ($service->price_unit * $disSum / 100);
                                     $result[$id]['types'][$type]['discount'] = 1 * $disSum;
                                 }
                             }
@@ -212,10 +213,13 @@ class ReportController extends Controller
                                 $result[$id]['types'][$type]['sync'] =
                                     in_array($service->id, explode(',', $company->products_id));
 
+                                $result[$id]['types'][$type]['name'] = $service->name;
                                 if ($service->type_product === 'Разовые осмотры') {
-                                    $result[$id]['types'][$type]['sum'] = $service->price_unit * $total;
+                                    $result[$id]['types'][$type]['sum'] = $service->price * $total;
+                                    $result[$id]['types'][$type]['tp'] = 'Разовые осмотры';
                                 } else {
-                                    $result[$id]['types'][$type]['sum'] = $service->price_unit;
+                                    $result[$id]['types'][$type]['sum'] = $service->price;
+                                    $result[$id]['types'][$type]['tp'] = 'абонентские осмотры';
                                 }
                             }
                         }
@@ -234,13 +238,14 @@ class ReportController extends Controller
 
                 if ($prods->count() > 0) {
                     foreach ($prods as $service) {
-                        $discounts = $discounts->where('products_id', $service->id);
+                        $disc = $discounts->where('products_id', $service->id);
+                        $service->price = $service->price_unit;
 
-                        if ($discounts->count()) {
-                            foreach ($discounts as $discount) {
+                        if ($disc->count()) {
+                            foreach ($disc as $discount) {
                                 $disSum = $discount->getDiscount($total);
                                 if ($disSum) {
-                                    $service->price_unit = $service->price_unit - ($service->price_unit * $disSum / 100);
+                                    $service->price = $service->price_unit - ($service->price_unit * $disSum / 100);
                                     $result[$id]['types'][$type]['discount'] = 1 * $disSum;
                                 }
                             }
@@ -250,9 +255,9 @@ class ReportController extends Controller
                             in_array($service->id, explode(',', $company->products_id));
 
                         if ($service->type_product === 'Разовые осмотры') {
-                            $result[$id]['types'][$type]['sum'] = $service->price_unit * $total;
+                            $result[$id]['types'][$type]['sum'] = $service->price * $total;
                         } else {
-                            $result[$id]['types'][$type]['sum'] = $service->price_unit;
+                            $result[$id]['types'][$type]['sum'] = $service->price;
                         }
                     }
                 }

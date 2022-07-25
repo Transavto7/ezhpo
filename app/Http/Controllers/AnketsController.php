@@ -866,7 +866,8 @@ class AnketsController extends Controller
             }
 
             Anketa::insert($createdAnketas);
-            $createdAnketas = Anketa::orderBy('created_at', 'desc')->limit(count($createdAnketas))->get();
+            $createdAnketas = Anketa::where('type_anketa', $data['type_anketa'])
+                ->limit(count($createdAnketas))->orderBy('created_at', 'desc')->get();
 
             $responseData = [
                 'createdId' => $createdAnketas->pluck('id')->toArray(),

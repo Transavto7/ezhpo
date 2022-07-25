@@ -23,11 +23,9 @@
 
             @php
                 // если есть дата в _GET запросе, но пустая, то оставляем пустую
-                if(array_key_exists('date', request()->all())){
-                    if(is_null(request()->get('date'))){
-                        $date_from_filter = '';
-                        $date_to_filter = '';
-                    }
+                if(array_key_exists('date', request()->all())) {
+                    $date_from_filter = '';
+                    $date_to_filter = '';
                 }else{ // иначе берём начало и конец прошлого месяца
                     $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');;
                     $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
