@@ -172,7 +172,7 @@
 </template>
 
 <script>
-import { getTotalAll, getTotal, getSum, getSumAll, getDiscount } from "../const/reportsAmount";
+import { getTotalAll, getTotal, getSum, getSumAll, getDiscount, isSync } from "../const/reportsAmount";
 
 export default {
     name: "ReportJournalTech",
@@ -210,7 +210,8 @@ export default {
         getTotal,
         getSumAll,
         getSum,
-        getDiscount
+        getDiscount,
+        isSync
     }
 }
 </script>

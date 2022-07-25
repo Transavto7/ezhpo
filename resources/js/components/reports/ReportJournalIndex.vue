@@ -38,6 +38,10 @@
                           <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                           Сформировать отчет
                       </button>
+                      <button type="submit" @click="exportData" class="btn btn-info" :disabled="loadingExport">
+                          <span v-if="loadingExport" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                          Экспортировать
+                      </button>
                       <a href="?" class="btn btn-danger">Сбросить</a>
                   </div>
               </div>
@@ -86,6 +90,7 @@ export default {
     data() {
         return {
             loading: false,
+            loadingExport: false,
             company: null,
             companies: [],
             date_to: null,
@@ -136,6 +141,26 @@ export default {
                 this.$refs.reportsPL.visible(data.other_pl);
             }).finally(() => {
                 this.loading = false;
+            });
+        },
+        exportData() {
+            this.loadingExport = true;
+            axios.get('/api/reports/journal/export', {
+                params: {
+                    company_id: this.company_id,
+                    date_to: this.date_to,
+                    date_from: this.date_from,
+                },
+                responseType: 'blob'
+            }).then(({ data }) => {
+                const url = window.URL.createObjectURL(new Blob([data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'export.xlsx'); //or any other extension
+                document.body.appendChild(link);
+                link.click();
+            }).finally(() => {
+                this.loadingExport = false;
             });
         },
         searchCompany(query = '') {
