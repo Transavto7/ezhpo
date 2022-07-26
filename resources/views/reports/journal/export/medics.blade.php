@@ -1,4 +1,3 @@
-<html>
 <table>
     <thead>
     <tr>
@@ -11,7 +10,7 @@
         ><b>Водитель</b></th>
 
         <th
-            height="30" width="30" valign="center" align="center" style="background-color: #e6826a;"
+            height="30" width="35" valign="center" align="center" style="background-color: #e6826a;"
         ><b>Предрейсовый/Предсменный</b></th>
 
         <th
@@ -19,15 +18,15 @@
         ><b>Послерейсовый/Послесменный</b></th>
 
         <th
-            height="30" width="20" valign="center" align="center" style="background-color: #e6826a;"
+            height="30" width="25" valign="center" align="center" style="background-color: #e6826a;"
         ><b>Несогласованные ПЛ</b></th>
 
         <th
-            height="30" width="20" valign="center" align="center" style="background-color: #e6826a;"
+            height="30" width="25" valign="center" align="center" style="background-color: #e6826a;"
         ><b>БДД</b></th>
 
         <th
-            height="30" width="40" valign="center" align="center" style="background-color: #e6826a;"
+            height="30" width="25" valign="center" align="center" style="background-color: #e6826a;"
         ><b>Отчёты с карт</b></th>
 
         <th
@@ -41,7 +40,7 @@
         $total_start = $total_end = $total_dop = $total_bdd = $total_cart = $total_pl = 0;
         $sum_start = $sum_end = $sum_dop = $sum_bdd = $sum_cart = $sum_pl = 0;
     @endphp
-    @foreach($data['medics'] as $id => $item)
+    @foreach($medics as $id => $item)
         <tr>
             <td align="left">{{ $id }}</td>
             <td>{{ $item['driver_fio'] }}</td>
@@ -161,4 +160,3 @@
         <td align="center"> {{ $sum_pl }} </td>
     </tbody>
 </table>
-</html>

@@ -21,7 +21,7 @@ class ReportJournalExport implements FromView, WithEvents
 
     public function view(): View
     {
-        return view('reports.journal.export', [
+        return view('reports.journal.export.index', [
             'data' => $this->data
         ]);
     }
