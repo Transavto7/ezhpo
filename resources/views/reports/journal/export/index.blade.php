@@ -24,4 +24,8 @@
     @isset($data['other_pl'])
         @include('reports.journal.export.pl', ['months' => $months, 'data' => $data['other_pl']])
     @endisset
+
+    @isset($data['other'])
+        @include('reports.journal.export.other', ['other' => $data['other']]);
+    @endisset
 </html>

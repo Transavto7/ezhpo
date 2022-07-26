@@ -67,6 +67,10 @@
       <ReportJournalPL
         ref="reportsPL"
       />
+
+      <ReportJournalOther
+          ref="reportsOther"
+      />
   </div>
 </template>
 
@@ -75,6 +79,7 @@ import ReportJournalMedic from "./ReportJournalMedic";
 import ReportJournalTech from "./ReportJournalTech";
 import ReportJournalTechOther from "./ReportJournalTechOther";
 import ReportJournalMedicOther from "./ReportJournalMedicOther";
+import ReportJournalOther from "./ReportJournalOther";
 import ReportJournalPL from "./ReportJournalPL";
 
 export default {
@@ -85,7 +90,8 @@ export default {
         ReportJournalTech,
         ReportJournalTechOther,
         ReportJournalMedicOther,
-        ReportJournalPL
+        ReportJournalPL,
+        ReportJournalOther
     },
     data() {
         return {
@@ -123,6 +129,7 @@ export default {
             this.$refs.reportsTechOther.hide();
             this.$refs.reportsMedicOther.hide();
             this.$refs.reportsPL.hide();
+            this.$refs.reportsOther.hide();
         },
         report() {
             this.reset();
@@ -139,6 +146,7 @@ export default {
                 this.$refs.reportsTechOther.visible(data.techs_other);
                 this.$refs.reportsMedicOther.visible(data.medics_other);
                 this.$refs.reportsPL.visible(data.other_pl);
+                this.$refs.reportsOther.visible(data.other);
             }).finally(() => {
                 this.loading = false;
             });

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Anketa;
+use App\Car;
 use App\Company;
 use App\Discount;
+use App\Driver;
 use App\Exports\ReportJournalExport;
 use App\Product;
 use App\Req;
@@ -150,6 +152,7 @@ class ReportController extends Controller
             'medics_other' => $this->getJournalMedicsOther($company, $date_from, $date_to),
             'techs_other' => $this->getJournalTechsOther($company, $date_from, $date_to),
             'other_pl' => $this->getJournalPl($company, $date_from, $date_to),
+            'other' => $this->getJournalOther($company, $products),
         ];
     }
 
@@ -580,6 +583,43 @@ class ReportController extends Controller
         }
 
         return array_reverse($result);
+    }
+
+    public function getJournalOther($company, $products) {
+        $result = [];
+        $companyProdsID = explode(',', $company->products_id);
+        $prods = $products->where('type_product', 'Абонентская плата без реестров');
+        $drivers = Driver::where('company_id', $company->id)->get();
+        $cars = Car::where('company_id', $company->id)->get();
+
+        foreach ($prods->whereIn('id', $companyProdsID)->where('essence', 0) as $product) {
+            $result['company'][$product->name] = $product->price_unit;
+        }
+
+        foreach ($drivers as $driver) {
+            $driverProdsID = explode(',', $driver->products_id);
+            foreach ($prods->whereIn('id', $driverProdsID)->whereIn('essence', [1, 3]) as $product) {
+                $result['drivers'][] = [
+                    'driver_fio' => $driver->fio,
+                    'name' => $product->name,
+                    'sum' => 1 * $product->price_unit
+                ];
+            }
+        }
+
+        foreach ($cars as $car) {
+            $carProdsID = explode(',', $car->products_id);
+            foreach ($prods->whereIn('id', $carProdsID)->whereIn('essence', [2, 3]) as $product) {
+                $result['cars'][] = [
+                    'gos_number' => $car->gos_number,
+                    'type_auto' => $car->type_auto,
+                    'name' => $product->name,
+                    'sum' => 1 * $product->price_unit
+                ];
+            }
+        }
+
+        return $result;
     }
 
     public function ApiGetReport(Request $request)
