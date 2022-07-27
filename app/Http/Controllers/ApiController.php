@@ -165,7 +165,9 @@ class ApiController extends Controller
             }
 
             if (isset($data['company_id'])) {
-                $data['company_name'] = Company::select('name')->find($data['company_id'])->name;
+                $company = Company::select('name', 'hash_id')->find($data['company_id']);
+                $data['company_name'] = $company->name;
+                $data['company_hash_id'] = $company->hash_id;
             }
 
             return ApiController::r(['exists' => $data_exists, 'model' => $model, 'blockedFields' => $blockedFields, 'message' => $data, 'fieldsValues' => $fieldsValues, 'redDates' => $redDates], 1);

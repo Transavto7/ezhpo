@@ -539,10 +539,13 @@ $(document).ready(function () {
                 const PROP_HAS_EXISTS = data.data.exists
                 const DATA = data.data.message;
 
-                if ((model === 'Driver' || model === 'Car') && DATA.company_id) {
+                if ((model === 'Driver' || model === 'Car') && DATA.company_hash_id) {
                     const form =  parent.closest('#ANKETA_FORM');
-                    form.find('input[name="company_id"]').val(DATA.company_id);
+                    form.find('input[name="company_id"]').val(DATA.company_hash_id);
+                }
 
+                if ((model === 'Driver' || model === 'Car') && DATA.company_name) {
+                    const form =  parent.closest('#ANKETA_FORM');
                     const select = form.find('select[name="company_name"]');
 
                     if (select) {

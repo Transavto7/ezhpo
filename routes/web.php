@@ -8,6 +8,21 @@ use App\Http\Middleware\ {
 Route::get('/', 'IndexController@RenderIndex')->name('index');
 Route::get('/releases', 'IndexController@RenderReleases')->name('releases');
 
+Route::get('/fix', function() {
+    \App\Anketa::whereIn('type_view', ['Предрейсовый', 'Предсменный', 'предрейсовый/Предсменный', 'Предрейсовый/предсменный',
+        'предрейсовый/предсменный'])->update(
+        [
+            'type_view' => 'Предрейсовый/Предсменный'
+        ]
+    );
+    \App\Anketa::whereIn('type_view', ['Послерейсовый', 'Послесменный', 'послерейсовый/Послесменный', 'Послерейсовый/послесменный',
+        'послерейсовый/послесменный'])->update(
+        [
+            'type_view' => 'Послерейсовый/Послесменный'
+        ]
+    );
+});
+
 Route::get('/show-video', function () {
     $url = isset($_GET['url']) ? $_GET['url'] : '';
 
