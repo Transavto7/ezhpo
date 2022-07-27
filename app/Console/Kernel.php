@@ -31,9 +31,6 @@ class Kernel extends ConsoleKernel
     {
         //todo перенести логику куда нибудь
         $schedule->call(function () {
-            // получаем все компании
-            $companies = Company::get();
-
             // смотрим, в каких компаниях были осмотры за прошлый месяц
             $companiesWithInspection = Anketa::whereBetween('created_at', [
                 Carbon::now()->subMonth()->startOfMonth(),
@@ -41,17 +38,14 @@ class Kernel extends ConsoleKernel
             ])
                                              ->whereNotNull('company_id')
                                              ->get(['company_id'])
-                                             ->pluck('company_id')->unique()
-                                             ->toArray();
-            // сохраняем
-            foreach ($companies as $company) {
-                if(in_array($company->hash_id, $companiesWithInspection)){
-                    $company->has_actived_prev_month = 'Да';
-                }else{
-                    $company->has_actived_prev_month = 'Нет';
-                }
-                $company->save();
-            }
+                                             ->pluck('company_id')
+                                             ->unique();
+
+            Company::whereIn('hash_id', $companiesWithInspection)
+                   ->update(['has_actived_prev_month' => 'Да']);
+
+            Company::whereNotIn('hash_id', $companiesWithInspection)
+                   ->update(['has_actived_prev_month' => 'Нет']);
 
         })->monthlyOn(1, '6:00');
     }
