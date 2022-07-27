@@ -15,7 +15,11 @@ class Driver extends Model
         'date_report_driver',
         'time_card_driver',
         'town_id', 'dismissed',
-        'autosync_fields'
+        'autosync_fields', 'date_of_employment'
+    ];
+
+    protected $casts = [
+        'date_of_employment' => 'datetime'
     ];
 
     public function getAutoSyncFieldsFromHashId ($hash_id) {
