@@ -23,7 +23,7 @@
                         >
                             <option value="">Не установлено</option>
                             @foreach(\App\Product::$essence as $essenceKey => $essenceName)
-                                <option value="{{ $essenceKey }}">
+                                <option value="{{ $essenceKey }}" @if ($el->essence == $essenceKey) selected @endif>
                                     {{ $essenceName }}
                                 </option>
                             @endforeach
