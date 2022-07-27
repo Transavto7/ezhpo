@@ -21,6 +21,11 @@ class Point extends Model
         return $point;
     }
 
+    public function town()
+    {
+        return $this->belongsTo(Town::class, 'pv_id');
+    }
+
     // Получение всех пунктов
     public static function getAll ($basic = false) {
         $towns = Town::all();

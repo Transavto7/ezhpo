@@ -243,6 +243,38 @@ PRINT
     border: 1px solid #dee2e6;
 }
 
+table.protokol {
+    width: 100%;
+    font-size: 18px;
+    color: #000;
+
+    th {
+        font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+        padding: 10px 5px;
+    }
+
+    td, th {
+        padding: 5px;
+        border: solid black 1px;
+
+        textarea.doc-input {
+            vertical-align: bottom;
+            font-weight: normal;
+            border: none;
+            &.center {
+                text-align: center;
+            }
+        }
+
+        &.head {
+            background: #e1e1e1;
+            font-weight: bold;
+        }
+    }
+}
+
 @page { margin-left: 1.18in; margin-right: 0.59in; margin-top: 0.59in; margin-bottom: 0.37in }
 P { margin-bottom: 0.08in; direction: ltr; widows: 2; orphans: 2 }
 

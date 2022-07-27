@@ -27,7 +27,10 @@ class DocsController extends Controller
             'user_post' => '',
             'user_fio' => '',
             'user_company' => '',
-            'date' => ''
+            'date' => '',
+            'town' => '',
+            'drugs' => false,
+            'alko' => false
         ];
 
         $a = \App\Anketa::find($anketa_id);
@@ -42,6 +45,14 @@ class DocsController extends Controller
                 $data[$field] = $a[$field];
             }
 
+            if ($a->test_narko === 'Положительно') {
+                $data['drugs'] = true;
+            }
+
+            if ($a->proba_alko === 'Положительно') {
+                $data['alko'] = true;
+            }
+
             if($a->company_id) {
                 $c = Company::where('hash_id', $a->company_id)->first();
 
@@ -52,6 +63,11 @@ class DocsController extends Controller
                         $data['driver_pv'] = $c->name;
                     }
                 }
+            }
+
+            if ($a->pv_id) {
+                $point = Point::where('name', $a->pv_id)->with('town')->first();
+                $data['town'] = $point->town->name;
             }
         }
 

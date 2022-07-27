@@ -234,7 +234,11 @@
                                                         {{ $anketa[$akey] }}
 
                                                         @if($type_ankets === 'medic' && $akey === 'admitted' && $anketa[$akey] === 'Не допущен')
-                                                            <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
+                                                            @if ($anketa->proba_alko === 'Положительно')
+                                                                <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
+                                                            @else
+                                                                <a href="{{ route('docs.get', ['type' => 'other', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
+                                                            @endif
                                                         @endif
                                                     @endif
                                                 </td>

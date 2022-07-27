@@ -71,9 +71,11 @@
                                                 </div>
 
                                                 @if($anketa->admitted === 'Не допущен')
-                                                    <div>
+                                                    @if ($anketa->proba_alko === 'Положительно')
                                                         <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $cId]) }}">Протокол отстранения</a>
-                                                    </div>
+                                                    @else
+                                                        <a href="{{ route('docs.get', ['type' => 'other', 'anketa_id' => $cId]) }}">Протокол отстранения</a>
+                                                    @endif
                                                 @endif
                                             @else
                                                 <b>"{{ $title }}" (ID: {{ $cId }}) успешно создан!</b>
