@@ -30,24 +30,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         //todo перенести логику куда нибудь
-        $schedule->call(function () {
-            // смотрим, в каких компаниях были осмотры за прошлый месяц
-            $companiesWithInspection = Anketa::whereBetween('created_at', [
-                Carbon::now()->subMonth()->startOfMonth(),
-                Carbon::now()->subMonth()->endOfMonth(),
-            ])
-                                             ->whereNotNull('company_id')
-                                             ->get(['company_id'])
-                                             ->pluck('company_id')
-                                             ->unique();
-
-            Company::whereIn('hash_id', $companiesWithInspection)
-                   ->update(['has_actived_prev_month' => 'Да']);
-
-            Company::whereNotIn('hash_id', $companiesWithInspection)
-                   ->update(['has_actived_prev_month' => 'Нет']);
-
-        })->monthlyOn(1, '6:00');
+        $schedule->command('companies:inspect')->monthlyOn(1, '6:00');
     }
 
     /**
