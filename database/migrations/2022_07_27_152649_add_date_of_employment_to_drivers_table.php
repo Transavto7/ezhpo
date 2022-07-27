@@ -14,7 +14,7 @@ class AddDateOfEmploymentToDriversTable extends Migration
     public function up()
     {
         Schema::table('drivers', function (Blueprint $table) {
-            $table->date('date_of_employment')->nullable(); //Дата снятия отчета с карты водителя
+            $table->date('date_of_employment')->nullable(); // Дата трудоустройства
         });
     }
 
