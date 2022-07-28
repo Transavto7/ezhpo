@@ -98,6 +98,10 @@
         @foreach($anketsFields as $field)
             @if(!isset($fieldsGroupFirst[$field]))
                 @isset($fieldsKeys[$field])
+                    @php
+                        if ($field === 'company_name') continue;
+                    @endphp
+
                     <div class="col-md-3">
                         <div class="form-group">
                             @if($field === 'date' || strpos($field, '_at') > 0)

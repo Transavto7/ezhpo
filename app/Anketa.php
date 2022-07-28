@@ -259,7 +259,8 @@ class Anketa extends Model
 
 
             'medic' => [
-                'company_id'             => 'Компания',
+                'company_name'             => 'Компания',
+                'company_id'             => 'ID Компании',
                 'date'                   => 'Дата осмотра',
                 'period_pl'              => 'Период выдачи ПЛ',
                 'driver_fio'             => 'Водитель',

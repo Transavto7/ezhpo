@@ -66,6 +66,7 @@ class HomeController extends Controller
     {
         session([
             "fields_medic" => [
+                'company_id' => 'on',
                 'date'       => 'on',
                 'driver_fio' => 'on',
                 'period_pl' => 'on',
