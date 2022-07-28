@@ -376,6 +376,13 @@
                     @endif
                 @endforeach
 
+                @if($model === 'Company')
+                    @role(['admin'])
+                    {{--УДАЛЕНИЕ--}}
+                    <th width="60">#</th>
+                    @endrole
+                @endif
+
                 @role(['manager', 'admin'])
                 {{--УДАЛЕНИЕ--}}
                     <th width="60">#</th>
@@ -505,6 +512,14 @@
                                 </td>
                             @endif
                         @endforeach
+
+                        @if($model === 'Company')
+                            @role(['admin'])
+                                <td class="td-option" title="При синхронизации все услуги компании будут присвоены водителям и автомобилям компании.">
+                                    <a href="{{ route('syncElement', ['type' => $model, 'id' => $el->id ]) }}" class="btn btn-sm btn-success"><i class="fa fa-refresh"></i></a>
+                                </td>
+                            @endrole
+                        @endif
 
                         @role(['manager', 'admin'])
                             <td class="td-option">

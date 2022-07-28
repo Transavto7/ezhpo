@@ -165,6 +165,8 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
         Route::post('/{type}', 'IndexController@AddElement')->name('addElement');
         // Обновление элемента (водитель, компания и т.д.)
         Route::post('/{type}/{id}', 'IndexController@updateElement')->name('updateElement');
+        // Синхронизация для компаний
+        Route::get('/{type}/sync/{id}', 'IndexController@syncElement')->name('syncElement');
 
         // Удаление файла
         Route::get('/delete-file/{model}/{id}/{field}', 'IndexController@DeleteFileElement')->name('deleteFileElement');

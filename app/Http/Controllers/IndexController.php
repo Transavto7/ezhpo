@@ -11,6 +11,7 @@ use App\Imports\CarImport;
 use App\Imports\CompanyImport;
 use App\Imports\DriverImport;
 use App\Point;
+use App\Product;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -710,6 +711,41 @@ class IndexController extends Controller
                 return redirect( $_SERVER['HTTP_REFERER'] );
             }
         }
+    }
+
+    // Для компаний синхронизация
+    // Ставит услуги машинам и водителям такие же, как и у компании
+    public function syncElement(Request $request)
+    {
+        if ($request->type !== 'Company') {
+            return redirect($_SERVER['HTTP_REFERER']);
+        }
+        $id      = $request->id;
+        $company = Company::find($id);
+
+        $productsForCar    = Product::whereIn('id', explode(',', $company->products_id))
+                                    ->where(function ($q) {
+                                        $q->whereNull('essence')
+                                          ->orWhere('essence', Product::ESSENCE_CAR)
+                                          ->orWhere('essence', Product::ESSENCE_CAR_DRIVER);
+                                    })
+                                    ->get(['id'])
+                                    ->pluck('id');
+
+        $productsForDriver = Product::whereIn('id', explode(',', $company->products_id))
+                                    ->where(function ($q) {
+                                        $q->whereNull('essence')
+                                          ->orWhere('essence', Product::ESSENCE_DRIVER)
+                                          ->orWhere('essence', Product::ESSENCE_CAR_DRIVER);
+                                    })
+                                    ->get(['id'])
+                                    ->pluck('id');
+
+        Car::where('company_id', $productsForCar)->update(['products_id' => $productsForCar->implode('. ')]);
+        Driver::where('company_id', $productsForDriver)->update(['products_id' => $productsForDriver->implode('. ')]);
+
+
+        return redirect($_SERVER['HTTP_REFERER']);
     }
 
     public function DeleteFileElement (Request $request)

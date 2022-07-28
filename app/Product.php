@@ -19,6 +19,11 @@ class Product extends Model
         3 => 'Автомобили или водителей',
     ];
 
+    const ESSENCE_COMPANY    = 0;
+    const ESSENCE_DRIVER     = 1;
+    const ESSENCE_CAR        = 2;
+    const ESSENCE_CAR_DRIVER = 3;
+
     // многие ко многим ебать
     public function getName ($id)
     {
