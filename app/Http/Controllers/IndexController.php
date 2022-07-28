@@ -723,6 +723,9 @@ class IndexController extends Controller
         $id      = $request->id;
         $company = Company::find($id);
 
+        if(!$company->products_id){
+            return redirect($_SERVER['HTTP_REFERER']);
+        }
         $productsForCar    = Product::whereIn('id', explode(',', $company->products_id))
                                     ->where(function ($q) {
                                         $q->whereNull('essence')
