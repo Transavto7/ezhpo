@@ -37,7 +37,7 @@
                 @foreach($item['reports'] as $report)
                     <tr>
                         <td>
-                            {{ $months[$item['month']] }} {{ $item['year'] }}
+                            {{ $months[$item['month']-1] }} {{ $item['year'] }}
                         </td>
                         <td>
                             {{ $report['driver_fio'] }}
