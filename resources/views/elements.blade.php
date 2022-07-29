@@ -68,7 +68,7 @@
     <div role="document" class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Добавление Услуги __NEW</h4>
+                <h4 class="modal-title">Добавление Услуги</h4>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close">
                     <span aria-hidden="true">×</span>
                 </button>
