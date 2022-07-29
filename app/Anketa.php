@@ -486,8 +486,8 @@ class Anketa extends Model
                 'date'           => 'Дата и время выдачи пл',
                 'company_name'   => 'Компания',
                 'driver_fio'     => 'ФИО водителя',
-                'car_mark_model' => 'Автомобиль',
-                'car_gos_number' => 'Госномер',
+                'car_mark_model' => 'Марка автомобиля',
+                'car_gos_number' => 'Государственный регистрационный номер транспортного средства',
 
                 // ID'шники
                 'company_id'     => 'ID компании',
@@ -522,7 +522,7 @@ class Anketa extends Model
                 'company_name'   => 'Компания',
                 'date'         => 'Дата снятия отчета',
                 'driver_fio'   => 'Ф.И.О водителя',
-                'user_name'    => 'Ф.И.О (при наличии) лица, проводившего снятие',
+                'user_name'    => 'ФИО ответственного',
                 'user_eds'     => 'Подпись лица, проводившего снятие',
                 'pv_id'        => 'Пункт выпуска',
                 'driver_id'    => 'ID водителя',
@@ -532,6 +532,7 @@ class Anketa extends Model
 
             'pechat_pl' => [
                 'company_name' => 'Компания',
+                'company_id' => 'ID Компания',
                 'date'         => 'Дата/Время создания записи',
                 'driver_fio'   => 'ФИО водителя',
                 'count_pl'     => 'Количество распечатанных ПЛ',
@@ -557,8 +558,9 @@ class Anketa extends Model
             ],*/
 
             'bdd' => [
-                'company_id'    => 'Компания',
-                'date'          => 'Дата снятия отчета',
+                'company_name'    => 'Компания',
+                'company_id'    => 'ID Компании',
+                'date'          => 'Дата, время проведения инструктажа',
                 'created_at'    => 'Дата/Время создания записи',
                 'type_briefing' => 'Вид инструктажа',
                 'driver_fio'    => 'ФИО водителя',

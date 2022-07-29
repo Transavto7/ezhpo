@@ -99,8 +99,6 @@ class HomeController extends Controller
                 'driver_fio' => 'on',
                 'company_id' => 'on',
                 'pv_id' => 'on',
-                'type_briefing' => 'on',
-                'user_eds' => 'on',
                 'user_name' => 'on',
             ],
         ]);
