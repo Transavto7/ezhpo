@@ -126,10 +126,10 @@
                                             Таймер
                                         </th>
                                     @else
-                                        <th width="60" class="not-export">ID</th>
+                                        <th width="60" class="not-export">ID записи</th>
                                     @endif
 
-                                    @foreach($anketsFields as $field)
+                                    @foreach($anketsFieldsTable as $field)
                                         @if($field == 'hour_from' || $field == 'hour_to')
                                             @continue
                                         @endif
@@ -177,7 +177,8 @@
                                             <td class="not-export">{{ $anketa->id }}</td>
                                         @endif
 
-                                        @foreach($anketsFields as $anketaKey)
+
+                                        @foreach($anketsFieldsTable as $anketaKey)
                                             @if(isset($fieldsKeys[$anketaKey]))
                                                 <td @isset($blockedToExportFields[$anketaKey]) class="not-export" @endisset data-field-key="{{ $anketaKey }}">
                                                     @if($anketaKey === 'date' || strpos($anketaKey, '_at') > 0)

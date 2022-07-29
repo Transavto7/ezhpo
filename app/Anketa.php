@@ -225,6 +225,112 @@ class Anketa extends Model
             ],
         ];
 
+    public static $fieldsKeysTable = [
+        'medic' => [
+            'date',
+            'created_at',
+            'driver_fio',
+            'company_name',
+            'company_id',
+            'pv_id',
+            'driver_id',
+            'period_pl',
+            'realy',
+            'user_name',
+            'type_view',
+            'proba_alko', // Проба на алкоголь
+            'test_narko',
+            'driver_group_risk',
+            'driver_gender',
+            'driver_year_birthday',
+            'complaint',
+            'condition_visible_sliz',
+            'condition_koj_pokr',
+            't_people',
+            'tonometer',
+            'pulse',
+            'test_narko',
+            'admitted',
+            'user_eds',
+            'photos',
+            'videos',
+            'med_view',
+            'flag_pak',
+            'is_dop',
+        ],
+        'tech' => [
+            'date',
+            'created_at',
+            'driver_fio',
+            'company_name',
+            'company_id',
+            'pv_id',
+            'car_id',
+            'car_gos_number',
+            'car_mark_model',
+            'odometer',
+            'period_pl',
+            'realy',
+            'type_view',
+            'driver_id',
+            'number_list_road',
+            'point_reys_control',
+            'user_eds',
+            'is_dop',
+            'user_name',
+        ],
+        'Dop' => [
+            'date',
+            'created_at',
+            'driver_fio',
+            'company_name',
+            'company_id',
+            'pv_id',
+            'number_list_road',
+            'car_gos_number',
+            'car_mark_model',
+            'driver_id',
+            'car_id',
+            'user_eds',
+            'user_name',
+        ],
+        'bdd' => [
+            'date',
+            'created_at',
+            'driver_fio',
+            'company_id',
+            'pv_id',
+            'type_briefing',
+            'user_eds',
+            'driver_id',
+            'signature',
+            'user_name',
+        ],
+        'report_cart' => [
+            'date',
+            'created_at',
+            'driver_fio',
+            'company_name',
+            'company_id',
+            'pv_id',
+            'user_eds',
+            'driver_id',
+            'signature',
+            'user_name',
+        ],
+        'pechat_pl' => [
+            'date',
+            'created_at',
+            'driver_fio',
+            'company_name',
+            'company_id',
+            'pv_id',
+            'count_pl',
+            'user_eds',
+            'user_name',
+        ]
+    ];
+
     public static $fieldsKeys
         = [ // Группа 2 (скрыты по умолчанию)
             'tech_export_to' => [
@@ -261,9 +367,9 @@ class Anketa extends Model
             'medic' => [
                 'company_name'             => 'Компания',
                 'company_id'             => 'ID Компании',
-                'date'                   => 'Дата осмотра',
+                'date'                   => 'Дата и время осмотра',
                 'period_pl'              => 'Период выдачи ПЛ',
-                'driver_fio'             => 'Водитель',
+                'driver_fio'             => 'ФИО Водителя',
                 'realy'                  => 'Осмотр реальный?',
                 'type_view'              => 'Тип осмотра',
                 'proba_alko'             => 'Признаки опьянения', // Проба на алкоголь
@@ -279,11 +385,11 @@ class Anketa extends Model
                 'pulse'                  => 'Пульс',
                 'test_narko'             => 'Тест на наркотики',
                 'admitted'               => 'Заключение о результатах осмотра',
-                'user_name'              => 'ФИО медицинского работника',
+                'user_name'              => 'ФИО ответственного',
                 'user_eds'               => 'ЭЦП медицинского работника',
 
                 // Поля не в выгрузку
-                'created_at'             => 'Дата создания',
+                'created_at'             => 'Дата/Время создания записи',
                 'driver_id'              => 'ID водителя',
                 'photos'                 => 'Фото',
                 'videos'                 => 'Видео',
@@ -346,13 +452,14 @@ class Anketa extends Model
              * Технический осмотр (параметры полей)
              */
             'tech'      => [
-                'company_id'     => 'Компании',
-                'date'           => 'Дата осмотра',
+                'company_id'     => 'ID Компании',
+                'company_name'     => 'Компания',
+                'date'           => 'Дата, время проведения контроля',
                 'period_pl'      => 'Период выдачи ПЛ',
-                'created_at'     => 'Дата создания',
-                'car_gos_number' => 'Гос. регистрационный номер ТС',
+                'created_at'     => 'Дата/Время создания записи',
+                'car_gos_number' => 'Государственный регистрационный номер транспортного средства',
                 'realy'        => 'Осмотр реальный?',
-                'car_mark_model' => 'Категория ТС',
+                'car_mark_model' => 'Марка автомобиля',
                 'type_view'          => 'Тип осмотра',
                 'driver_fio'     => 'ФИО Водителя',
 
@@ -364,9 +471,9 @@ class Anketa extends Model
 
                 'number_list_road'   => 'Номер ПЛ',
                 //'date_number_list_road' => 'Срок действия путевого листа',
-                'odometer'           => 'Показания одометра (полные километры пробега) при проведении контроля',
+                'odometer'           => 'показания одометра',
                 'point_reys_control' => 'Отметка о прохождении контроля',
-                'user_name'          => 'Фамилия, имя, отчество (при наличии) лица, проводившего контроль',
+                'user_name'          => 'ФИО ответственного',
                 'user_eds'           => 'Подпись лица, проводившего контроль',
                 'pv_id'              => 'Пункт выпуска',
                 'is_dop'             => 'Режим ввода ПЛ',
@@ -376,9 +483,9 @@ class Anketa extends Model
              * Дополнительные осмотр (параметры полей)
              */
             'Dop'       => [
-                'date'           => 'Дата и время осмотра',
+                'date'           => 'Дата и время выдачи пл',
                 'company_name'   => 'Компания',
-                'driver_fio'     => 'Водитель',
+                'driver_fio'     => 'ФИО водителя',
                 'car_mark_model' => 'Автомобиль',
                 'car_gos_number' => 'Госномер',
 
@@ -392,9 +499,9 @@ class Anketa extends Model
                 'number_list_road' => 'Номер путевого листа',
                 //'date_number_list_road' => 'Срок действия путевого листа',
                 'pv_id'            => 'Пункт выпуска',
-                'user_name'        => 'ФИО сотрудника',
+                'user_name'        => 'ФИО ответственного',
                 'user_eds'         => 'ЭЦП контролера',
-                'created_at'       => 'Дата создания',
+                'created_at'       => 'Дата/Время создания записи',
             ],
 
             'Dop_prikaz'  => [
@@ -411,7 +518,8 @@ class Anketa extends Model
              * ЖУРНАЛЫ
              */
             'report_cart' => [
-                'company_id'   => 'Компания',
+                'company_id'   => 'ID Компании',
+                'company_name'   => 'Компания',
                 'date'         => 'Дата снятия отчета',
                 'driver_fio'   => 'Ф.И.О водителя',
                 'user_name'    => 'Ф.И.О (при наличии) лица, проводившего снятие',
@@ -419,14 +527,15 @@ class Anketa extends Model
                 'pv_id'        => 'Пункт выпуска',
                 'driver_id'    => 'ID водителя',
                 'signature'    => 'ЭЛ подпись водителя',
+                'created_at' => 'Дата/Время создания записи',
             ],
 
             'pechat_pl' => [
                 'company_name' => 'Компания',
-                'date'         => 'Дата выдачи',
+                'date'         => 'Дата/Время создания записи',
                 'driver_fio'   => 'ФИО водителя',
                 'count_pl'     => 'Количество распечатанных ПЛ',
-                'user_name'    => 'Ф.И.О сотрудника, который готовил ПЛ',
+                'user_name'    => 'ФИО ответственного',
                 'user_eds'     => 'ЭЦП сотрудника',
                 'pv_id'        => 'Пункт выпуска',
             ],
@@ -449,11 +558,11 @@ class Anketa extends Model
 
             'bdd' => [
                 'company_id'    => 'Компания',
-                'date'          => 'Дата, время',
-                'created_at'    => 'Дата внесения в журнал',
+                'date'          => 'Дата снятия отчета',
+                'created_at'    => 'Дата/Время создания записи',
                 'type_briefing' => 'Вид инструктажа',
-                'driver_fio'    => 'Ф.И.О водителя, прошедшего инструктаж',
-                'user_name'     => 'Ф.И.О (при наличии) лица, проводившего инструктаж',
+                'driver_fio'    => 'ФИО водителя',
+                'user_name'     => 'ФИО ответственного',
                 'pv_id'         => 'Пункт выпуска',
                 'user_eds'      => 'Подпись лица, проводившего инструктаж',
                 'driver_id'     => 'ID водителя',

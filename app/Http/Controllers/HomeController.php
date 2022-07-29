@@ -66,59 +66,83 @@ class HomeController extends Controller
     {
         session([
             "fields_medic" => [
-                'company_id' => 'on',
-                'date'       => 'on',
-                'driver_fio' => 'on',
-                'period_pl' => 'on',
+                'date'  => 'on',
                 'created_at' => 'on',
-                'driver_group_risk' => 'on',
-                'type_view' => 'on',
-                'realy' => 'on',
-                'proba_alko' => 'on',
-                'test_narko' => 'on'
+                'driver_fio' => 'on',
+                'company_name' => 'on',
+                'company_id' => 'on',
+                'pv_id' => 'on',
+                'driver_id' => 'on',
+                'user_name' => 'on',
             ],
         ]);
         session([
             "fields_tech" => [
-                'date'           => 'on',
+                'date' => 'on',
+                'created_at' => 'on',
+                'driver_fio' => 'on',
+                'company_name' => 'on',
+                'company_id' => 'on',
+                'pv_id' => 'on',
+                'car_id' => 'on',
                 'car_gos_number' => 'on',
-                'period_pl' => 'on',
-                'created_at'     => 'on',
                 'car_mark_model' => 'on',
-                'type_view' => 'on',
-                'realy' => 'on',
+                'odometer' => 'on',
+                'user_name' => 'on',
             ],
         ]);
 
         session([
             "fields_bdd" => [
-                'date'           => 'on',
-                'driver_fio'     => 'on',
+                'date' => 'on',
+                'created_at' => 'on',
+                'driver_fio' => 'on',
+                'company_id' => 'on',
+                'pv_id' => 'on',
                 'type_briefing' => 'on',
-                'company_id'    => 'on',
-                'created_at'    => 'on',
-                'user_name'     => 'on',
+                'user_eds' => 'on',
+                'user_name' => 'on',
             ],
         ]);
 
         session([
             "fields_pechat_pl" => [
-                'date'           => 'on',
-                'driver_fio'     => 'on',
+                'date' => 'on',
+                'created_at' => 'on',
+                'driver_fio' => 'on',
+                'company_name' => 'on',
+                'company_id' => 'on',
+                'pv_id' => 'on',
                 'count_pl' => 'on',
-                'company_id'    => 'on',
-                'user_name'     => 'on',
-                'pv_id'    => 'on',
+                'user_name' => 'on',
             ],
         ]);
 
         session([
             "fields_report_cart" => [
-                'date'           => 'on',
-                'driver_fio'     => 'on',
-                'company_id'    => 'on',
-                'user_name'     => 'on',
+                'date' => 'on',
+                'created_at' => 'on',
+                'driver_fio' => 'on',
+                'company_name' => 'on',
+                'company_id' => 'on',
+                'pv_id' => 'on',
+                'user_name' => 'on',
             ],
+        ]);
+
+        session([
+            "fields_Dop" => [
+                'date'     => 'on',
+                'created_at'     => 'on',
+                'driver_fio'     => 'on',
+                'company_name'     => 'on',
+                'company_id'     => 'on',
+                'pv_id'     => 'on',
+                'number_list_road'     => 'on',
+                'car_gos_number'     => 'on',
+                'car_mark_model'     => 'on',
+                'user_name'     => 'on',
+            ]
         ]);
     }
 
@@ -444,6 +468,11 @@ class HomeController extends Controller
             ? $anketas->total() : 0;
 
         $anketsFields = array_keys($fieldsKeys);
+        if (isset(Anketa::$fieldsKeysTable[$fieldsKeysTypeAnkets])) {
+            $anketsFieldsTable = Anketa::$fieldsKeysTable[$fieldsKeysTypeAnkets];
+        } else {
+            $anketsFieldsTable = $anketsFields;
+        }
 
         if (auth()->user()->hasRole('client', '==')) {
             unset($fieldsKeys['created_at']);
@@ -475,6 +504,7 @@ class HomeController extends Controller
             'filter_activated'      => $filter_activated,
             'type_ankets'           => $validTypeAnkets,
             'anketsFields'          => $anketsFields,
+            'anketsFieldsTable'     => $anketsFieldsTable,
             'fieldsKeys'            => $fieldsKeys,
             'fieldsGroupFirst'      => $fieldsGroupFirst,
             'blockedToExportFields' => $blockedToExportFields,
