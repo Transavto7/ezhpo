@@ -122,7 +122,7 @@ class ReportController extends Controller
     public function showJournal(Request $request) {
         $company = null;
         if ($request->has('company_id')) {
-            $company = Company::where('hash_id', $request->company_id)->select('id', 'name')->first();
+            $company = Company::where('hash_id', $request->company_id)->select('id', 'hash_id', 'name')->first();
         }
 
         return view('reports.journal.index', [

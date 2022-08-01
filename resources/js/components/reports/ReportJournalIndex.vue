@@ -110,7 +110,7 @@ export default {
         if (this.default_company) {
             this.companies.push(this.default_company);
             this.company = this.default_company;
-            this.company_id = this.default_company.id;
+            this.company_id = this.default_company.hash_id;
         }
 
         const now = new Date();
