@@ -448,7 +448,6 @@ class HomeController extends Controller
             if ($typeAnkets == 'bdd') {
                 if ($request->get('exportPrikaz')) {
                     $bdd = $anketas->where('type_anketa', 'bdd')
-                              ->limit(50000)
                               ->with([
                                   'user' => function ($q) {
                                       $q->select('id', 'role');
