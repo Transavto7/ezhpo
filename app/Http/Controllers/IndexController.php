@@ -179,7 +179,7 @@ class IndexController extends Controller
                     'Нет' => 'Нет',
                     'Да' => 'Да'
                 ], 'defaultValue' => 'Нет'],
-//                'date_of_employment' => ['label' => 'Дата устройства на работу', 'type' => 'date',  'noRequired' => 1],
+                'date_of_employment' => ['label' => 'Дата устройства на работу', 'type' => 'date',  'noRequired' => 1],
                 'autosync_fields' => ['label' => 'Автоматическая синхронизация Полей с компанией (по умолч.)', 'type' => 'select', 'values' => [
                     'products_id' => 'Услуги'
                 ], 'defaultValue' => 'products_id', 'multiple' => 1, 'hidden' => 1]
