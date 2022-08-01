@@ -3,23 +3,25 @@
 namespace App\Exports;
 
 use App\Anketa;
-use Maatwebsite\Excel\Concerns\Exportable;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Concerns\FromView;
 
-class AnketasExport implements FromCollection
+class AnketasExport implements FromView
 {
-    use Exportable;
+    private $anketas;
+    private $fields;
 
-    public function __construct($data)
+    public function __construct($anketas, $fields)
     {
-        $this->data = $data;
+        $this->anketas = $anketas;
+        $this->fields = $fields;
     }
 
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-    public function collection()
+    public function view(): View
     {
-        return $this->data;
+        return view('home-export', [
+            'data' => $this->anketas,
+            'fields' => $this->fields,
+        ]);
     }
 }

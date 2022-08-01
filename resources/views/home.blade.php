@@ -7,12 +7,6 @@
 @section('custom-scripts')
     <script type="text/javascript">
         window.onload = function () {
-            @if($isExport)
-                setTimeout(function () {
-                    exportTable('ankets-table', {{ isset($_GET['exportPrikaz']) ? false : true }})
-                }, 1500)
-            @endif
-
             @if($filter_activated)
                 $.get(location.href + '&getCounts=1').done(data => {
                     if(data) {

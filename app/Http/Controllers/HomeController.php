@@ -7,6 +7,7 @@ use App\Car;
 use App\Company;
 use App\Driver;
 use App\Exports\AnketasExport;
+use App\Exports\TechAnketasExport;
 use App\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -209,26 +210,25 @@ class HomeController extends Controller
         }
 
         // Экспорты новые писать тут всё
-        if ($request->get('export')) {
-            if ($typeAnkets == 'tech') {
-                if ($request->get('exportPrikaz')) {
-                    $fieldsKeysTypeAnkets = 'tech_export_to'; // экспорт по приказу ТО
-                } elseif ($request->get('exportPrikazPL')) {
-                    $fieldsKeysTypeAnkets = 'tech_export_pl';// экспорт по приказу ПЛ
-                } else {
-                    $fieldsKeysTypeAnkets = 'tech';// экспорт просто
-                }
-            } elseif ($typeAnkets == 'bdd') {
-                if ($request->get('exportPrikaz')) {
-                    $fieldsKeysTypeAnkets = 'bdd_export_prikaz';// экспорт по приказу
+//        if ($request->get('export')) {
+//            if ($typeAnkets == 'tech') {
+//                if ($request->get('exportPrikaz')) {
+//                    $fieldsKeysTypeAnkets = 'tech_export_to'; // экспорт по приказу ТО
+//                } elseif ($request->get('exportPrikazPL')) {
+//                    $fieldsKeysTypeAnkets = 'tech_export_pl';// экспорт по приказу ПЛ
+//                } else {
+//                    $fieldsKeysTypeAnkets = 'tech';// экспорт просто
+//                }
+//            } elseif ($typeAnkets == 'bdd') {
+//                if ($request->get('exportPrikaz')) {
+//                    $fieldsKeysTypeAnkets = 'bdd_export_prikaz';// экспорт по приказу
+//
+//                } else {
+//                    $fieldsKeysTypeAnkets = 'bdd';// экспорт просто
+//                }
+//            }
+//        }
 
-                } else {
-                    $fieldsKeysTypeAnkets = 'bdd';// экспорт просто
-                }
-            }
-        }
-
-//        dd($fieldsKeysTypeAnkets);
         $fieldsKeys       = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
         $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets])
             ? Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] : [];
@@ -369,9 +369,6 @@ class HomeController extends Controller
                                 }
                             }
                         }
-//                        elseif(){
-//
-//                        }
                     }
                 } else {
                     if ( !empty($fv)) {
@@ -380,12 +377,7 @@ class HomeController extends Controller
                 }
             }
 
-//            dd($anketas->get(), $anketas->dd());
         }
-//        dump($fromToValues);
-//        dd($anketas->toSql());
-//        dd($anketas->limit(20)->get()->toArray());
-//        $anketas->limit(20);
 
         if (auth()->user()->hasRole('client', '==')) {
             $company_id_client = User::getUserCompanyId('hash_id');
@@ -422,42 +414,74 @@ class HomeController extends Controller
          */
 
         // Экспорт из техосмотров и БДД
-        if ($request->get('export') && ($typeAnkets == 'tech' || $typeAnkets == 'bdd')) {
-            $request->request->remove('exportPrikazPL');
-            $request->request->remove('exportPrikaz');
-            $request->request->remove('export');
+        if ($is_export && $filter_activated) {
+            if ($typeAnkets == 'tech') {
 
-            if ($typeAnkets == 'bdd' && $fieldsKeysTypeAnkets == 'bdd_export_prikaz') {
-                // Тут надо получать должность
-                $collection = $anketas->orderBy($orderKey, $orderBy)
-                                      ->limit(50000)
-                                      ->with([
-                                          'user' => function ($q) {
-                                              $q->select('id', 'role');
-                                          },
-                                      ])
-                                      ->select(array_keys($fieldsKeys))
-                                      ->get()
-                                      ->map(function ($q) {
-                                          $q->user_id = User::$userRolesText[$q->user['role']] ?? null;
-                                          unset($q->user);
+                if ($request->get('exportPrikaz')) {
+                    $techs = $anketas->where('type_anketa', 'tech')
+                        ->limit(50000)
+                        ->get();
 
-                                          return $q;
-                                      });
+                    return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_to']),
+                        'export.xlsx');
+                }
 
+                if ($request->get('tech_export_pl')) {
+                    $techs = $anketas->where('type_anketa', 'tech')
+                        ->limit(50000)
+                        ->get();
 
-            } else {
-                $collection = $anketas->orderBy($orderKey, $orderBy)
-                                      ->limit(50000)
-                                      ->get(array_keys($fieldsKeys));
+                    return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_to']),
+                        'export.xlsx');
+                }
             }
 
-            $collection->prepend(array_values($fieldsKeys));
+            if ($typeAnkets == 'medic') {
+                if ($request->get('exportPrikaz')) {
+                    $medic = $anketas->where('type_anketa', 'medic')
+                        ->limit(50000)
+                        ->get();
 
-            return (new AnketasExport($collection))->download('export-anketas.xlsx');
+                    return Excel::download(new AnketasExport($medic, Anketa::$fieldsKeys['medic_export_pl']),
+                        'export.xlsx');
+                }
+            }
+
+            if ($typeAnkets == 'bdd') {
+                if ($request->get('exportPrikaz')) {
+                    $bdd = $anketas->where('type_anketa', 'bdd')
+                              ->limit(50000)
+                              ->with([
+                                  'user' => function ($q) {
+                                      $q->select('id', 'role');
+                                  },
+                              ])
+                              ->get()
+                              ->map(function ($q) {
+                                  $q->user_id = User::$userRolesText[$q->user['role']] ?? null;
+                                  unset($q->user);
+
+                                  return $q;
+                              });
+                }
+            }
+
+            if ($typeAnkets == 'Dop') {
+                if ($request->get('exportPrikaz')) {
+                    return Excel::download(new AnketasExport($anketas->where('type_anketa', 'Dop')
+                        ->limit(50000)
+                        ->get(), Anketa::$fieldsKeys['dop_export_pl']),
+                        'export.xlsx');
+
+                }
+            }
+
+            return Excel::download(new AnketasExport($anketas->where('type_anketa', $typeAnkets)
+                ->limit(50000)
+                ->get(), Anketa::$fieldsKeys[$typeAnkets]),
+                'export.xlsx');
         }
 
-//        dd($anketas->toSql(), $anketas->getBindings());
 
         $anketas = ($filter_activated || $typeAnkets === 'pak_queue')
             ? $anketas->orderBy($orderKey, $orderBy)->paginate($take) : [];
@@ -476,12 +500,6 @@ class HomeController extends Controller
             unset($fieldsKeys['created_at']);
             unset($fieldsKeys['is_pak']);
         }
-        /**
-         * Check Export
-         */
-        /*if($is_export) {
-            return (new AnketasExport($anketasArray))->download('export-anketas.xlsx');
-        }*/
 
         /**
          * Check VIEW
@@ -509,7 +527,6 @@ class HomeController extends Controller
 
             'anketasCountResult' => $anketasCountResult,
 
-            'isExport'   => $is_export,
             'typePrikaz' => $typePrikaz,
 
             'currentRole' => $currentRole,
