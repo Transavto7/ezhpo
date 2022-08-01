@@ -415,11 +415,11 @@ class HomeController extends Controller
 
         // Экспорт из техосмотров и БДД
         if ($is_export && $filter_activated) {
+
             if ($typeAnkets == 'tech') {
 
                 if ($request->get('exportPrikaz')) {
                     $techs = $anketas->where('type_anketa', 'tech')
-                        ->limit(50000)
                         ->get();
 
                     return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_to']),
@@ -428,7 +428,6 @@ class HomeController extends Controller
 
                 if ($request->get('tech_export_pl')) {
                     $techs = $anketas->where('type_anketa', 'tech')
-                        ->limit(50000)
                         ->get();
 
                     return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_to']),
@@ -439,7 +438,6 @@ class HomeController extends Controller
             if ($typeAnkets == 'medic') {
                 if ($request->get('exportPrikaz')) {
                     $medic = $anketas->where('type_anketa', 'medic')
-                        ->limit(50000)
                         ->get();
 
                     return Excel::download(new AnketasExport($medic, Anketa::$fieldsKeys['medic_export_pl']),
@@ -469,7 +467,6 @@ class HomeController extends Controller
             if ($typeAnkets == 'Dop') {
                 if ($request->get('exportPrikaz')) {
                     return Excel::download(new AnketasExport($anketas->where('type_anketa', 'Dop')
-                        ->limit(50000)
                         ->get(), Anketa::$fieldsKeys['dop_export_pl']),
                         'export.xlsx');
 
@@ -477,7 +474,6 @@ class HomeController extends Controller
             }
 
             return Excel::download(new AnketasExport($anketas->where('type_anketa', $typeAnkets)
-                ->limit(50000)
                 ->get(), Anketa::$fieldsKeys[$typeAnkets]),
                 'export.xlsx');
         }
