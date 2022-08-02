@@ -40,10 +40,21 @@ class CompaniesInspection extends Command
      */
     public function handle()
     {
-        $companiesWithInspection = Anketa::whereBetween('created_at', [
-            Carbon::now()->subMonth()->startOfMonth(),
-            Carbon::now()->subMonth()->endOfMonth(),
-        ])
+        $companiesWithInspection = Anketa::where(function ($q) {
+                $q->where(function ($q) {
+                    $q->whereNotNull('anketas.date')
+                        ->whereBetween('anketas.date', [
+                            Carbon::now()->subMonth()->startOfDay(),
+                            Carbon::now()->subMonth()->endOfDay(),
+                        ]);
+                })
+                    ->orWhere(function ($q) {
+                        $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
+                            Carbon::now()->subMonth()->format('Y-m'),
+                            Carbon::now()->subMonth()->format('Y-m'),
+                        ]);
+                    });
+            })
             ->whereNotNull('company_id')
             ->get(['company_id'])
             ->pluck('company_id')
