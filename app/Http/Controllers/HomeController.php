@@ -67,39 +67,36 @@ class HomeController extends Controller
     {
         session([
             "fields_medic" => [
-                'date'  => 'on',
-                'created_at' => 'on',
+                'date' => 'on',
                 'driver_fio' => 'on',
-                'company_name' => 'on',
-                'company_id' => 'on',
-                'pv_id' => 'on',
-                'driver_id' => 'on',
-                'user_name' => 'on',
+                'period_pl' => 'on',
+                'created_at' => 'on',
+                'driver_group_risk' => 'on',
+                'type_view' => 'on',
+                'realy' => 'on',
+                'proba_alko' => 'on', // Проба на алкоголь
+                'test_narko' => 'on',
             ],
         ]);
         session([
             "fields_tech" => [
                 'date' => 'on',
-                'created_at' => 'on',
-                'driver_fio' => 'on',
-                'company_name' => 'on',
-                'company_id' => 'on',
-                'pv_id' => 'on',
-                'car_id' => 'on',
                 'car_gos_number' => 'on',
+                'period_pl' => 'on',
+                'created_at' => 'on',
                 'car_mark_model' => 'on',
-                'odometer' => 'on',
-                'user_name' => 'on',
+                'type_view' => 'on',
+                'realy' => 'on',
             ],
         ]);
 
         session([
             "fields_bdd" => [
                 'date' => 'on',
-                'created_at' => 'on',
                 'driver_fio' => 'on',
-                'company_id' => 'on',
-                'pv_id' => 'on',
+                'type_briefing' => 'on',
+                'company_name' => 'on',
+                'created_at' => 'on',
                 'user_name' => 'on',
             ],
         ]);
@@ -107,24 +104,19 @@ class HomeController extends Controller
         session([
             "fields_pechat_pl" => [
                 'date' => 'on',
-                'created_at' => 'on',
                 'driver_fio' => 'on',
-                'company_name' => 'on',
-                'company_id' => 'on',
-                'pv_id' => 'on',
                 'count_pl' => 'on',
+                'company_name' => 'on',
                 'user_name' => 'on',
+                'pv_id' => 'on',
             ],
         ]);
 
         session([
             "fields_report_cart" => [
                 'date' => 'on',
-                'created_at' => 'on',
                 'driver_fio' => 'on',
                 'company_name' => 'on',
-                'company_id' => 'on',
-                'pv_id' => 'on',
                 'user_name' => 'on',
             ],
         ]);
