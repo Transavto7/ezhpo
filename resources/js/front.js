@@ -33,6 +33,7 @@ $(document).ready(function () {
         }
     })
 
+    let loading = false
 
     $(document).on('click', '.reload-filters', function(event) {
         const btn = $(event.target);
@@ -58,7 +59,7 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('input', '.select2-search__field', function(event) {
+    $(document).on('input', '.select2-search__field', async function(event) {
         let search = event.target.value;
         let select = $(event.target).parents('.select2')?.parent()?.children('.filled-select2');
 
@@ -75,7 +76,13 @@ $(document).ready(function () {
             return;
         }
 
-        API_CONTROLLER.getFindModel({
+        if (loading) {
+            loading = false;
+            return;
+        }
+
+        loading = true;
+        await API_CONTROLLER.getFindModel({
             model,
             params: {
                 search,
@@ -99,6 +106,8 @@ $(document).ready(function () {
                 }));
             }));
         });
+
+        $(event.target).trigger('input');
     })
 
     const API_CONTROLLER = new ApiController(),
