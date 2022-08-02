@@ -33,7 +33,6 @@ $(document).ready(function () {
         }
     })
 
-    let loading = false
 
     $(document).on('click', '.reload-filters', function(event) {
         const btn = $(event.target);
@@ -76,11 +75,6 @@ $(document).ready(function () {
             return;
         }
 
-        if (loading) {
-            return;
-        }
-
-        loading = true;
         API_CONTROLLER.getFindModel({
             model,
             params: {
@@ -105,9 +99,6 @@ $(document).ready(function () {
                 }));
             }));
         });
-        setTimeout(() => {
-            loading = false;
-        }, 100);
     })
 
     const API_CONTROLLER = new ApiController(),
