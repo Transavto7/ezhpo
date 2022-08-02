@@ -397,7 +397,7 @@
                         @foreach ($el->fillable as $elIndex => $elK)
                             @if(!(isset($notShowHashId) && $elK === 'hash_id') && $elK !== 'autosync_fields')
                                 @php
-                                    if (!isset($fields[$elK]) && $elK !== 'hash_id') {
+                                    if (!isset($fields[$elK]) && $elK !== 'hash_id' && $elK !== 'id') {
                                         continue;
                                     }
                                 @endphp

@@ -66,9 +66,16 @@
                                                         <br /> <b>Водитель: {{ \App\Driver::where('hash_id', $anketa->driver_id)->first()->fio }}</b>
                                                     @endisset
                                                 @endisset
-                                                <div>
-                                                    <i>Дата проведения осмотра: <br/><b>{{ $anketa->date }}</b></i>
-                                                </div>
+
+                                                @if($anketa->date)
+                                                    <div>
+                                                        <i>Дата проведения осмотра: <br/><b>{{ $anketa->date }}</b></i>
+                                                    </div>
+                                                @elseif($anketa->period_pl)
+                                                    <div>
+                                                        <i>Период проведения осмотра: <br/><b>{{ $anketa->period_pl }}</b></i>
+                                                    </div>
+                                                @endif
 
                                                 @if($anketa->admitted === 'Не допущен')
                                                     @if ($anketa->proba_alko === 'Положительно')
