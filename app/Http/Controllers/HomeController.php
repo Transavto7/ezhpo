@@ -370,7 +370,7 @@ class HomeController extends Controller
                 } else {
                     if ( !empty($fv)) {
                         if ($fk === 'car_type_auto') {
-                            $anketas = $anketas->whereIn('car_type_auto', $fv);
+                            $anketas = $anketas->whereIn('cars.type_auto', $fv);
                         } else {
                             $anketas = $anketas->where('anketas.' . $fk, 'LIKE', '%'.$fv.'%');
                         }
