@@ -84,7 +84,7 @@ class HomeController extends Controller
                 'car_gos_number' => 'on',
                 'period_pl' => 'on',
                 'created_at' => 'on',
-                'car_mark_model' => 'on',
+                'car_type_auto' => 'on',
                 'type_view' => 'on',
                 'realy' => 'on',
             ],
@@ -190,6 +190,11 @@ class HomeController extends Controller
 
         if (isset(Anketa::$blockedToExportFields[$validTypeAnkets])) {
             $blockedToExportFields = Anketa::$blockedToExportFields[$validTypeAnkets];
+        }
+
+        if ($typeAnkets == 'tech') {
+            $anketas = $anketas->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')->select('anketas.*',
+                'cars.type_auto as car_type_auto');
         }
 
         /**
@@ -311,11 +316,11 @@ class HomeController extends Controller
                     continue;
                 }
                 if ($fk == 'created_at' && $fv) {
-                    $anketas = $anketas->where('created_at', '>=', Carbon::parse($fv)->startOfDay());
+                    $anketas = $anketas->where('anketas.created_at', '>=', Carbon::parse($fv)->startOfDay());
                     continue;
                 }
                 if ($fk == 'TO_created_at' && $fv) {
-                    $anketas = $anketas->where('created_at', '<=', Carbon::parse($fv)->endOfDay());
+                    $anketas = $anketas->where('anketas.created_at', '<=', Carbon::parse($fv)->endOfDay());
                     continue;
                 }
 
@@ -334,7 +339,7 @@ class HomeController extends Controller
                                 $anketas = $anketas->where(function ($q) use ($explodeData, $fk) {
 
                                     foreach ($explodeData as $fvItemKey => $fvItemValue) {
-                                        $q = $q->orWhere($fk, $fvItemValue); // TODO: поправили Like
+                                        $q = $q->orWhere('anketas.' . $fk, $fvItemValue); // TODO: поправили Like
                                     }
 
                                     return $q;
@@ -349,14 +354,14 @@ class HomeController extends Controller
                                     // Для строгих значений
                                     if (in_array($fk, ['company_name', 'driver_fio']) || strpos($fk, '_id')
                                         || $fk === 'id') {
-                                        $anketas = $anketas->where($fk, $explodeData);
+                                        $anketas = $anketas->where('anketas.' . $fk, $explodeData);
                                     } // Для динамичных значений
                                     else {
-                                        $anketas = $anketas->where($fk, 'LIKE', '%'.$explodeData.'%');
+                                        $anketas = $anketas->where('anketas.' . $fk, 'LIKE', '%'.$explodeData.'%');
                                     }
                                 } else {
                                     if ($explodeData === null) {
-                                        $anketas = $anketas->where($fk, null);
+                                        $anketas = $anketas->where('anketas.' . $fk, null);
                                     }
                                 }
                             }
@@ -364,7 +369,11 @@ class HomeController extends Controller
                     }
                 } else {
                     if ( !empty($fv)) {
-                        $anketas = $anketas->where($fk, 'LIKE', '%'.$fv.'%');
+                        if ($fk === 'car_type_auto') {
+                            $anketas = $anketas->whereIn('car_type_auto', $fv);
+                        } else {
+                            $anketas = $anketas->where('anketas.' . $fk, 'LIKE', '%'.$fv.'%');
+                        }
                     }
                 }
             }
@@ -374,7 +383,7 @@ class HomeController extends Controller
         if (auth()->user()->hasRole('client', '==')) {
             $company_id_client = User::getUserCompanyId('hash_id');
 
-            $anketas = $anketas->where('company_id', $company_id_client);
+            $anketas = $anketas->where('anketas.company_id', $company_id_client);
         }
 
         $anketas = $anketas->where('type_anketa', $validTypeAnkets)->where('in_cart', $trash);
@@ -471,7 +480,7 @@ class HomeController extends Controller
 
 
         $anketas = ($filter_activated || $typeAnkets === 'pak_queue')
-            ? $anketas->orderBy($orderKey, $orderBy)->paginate($take) : [];
+            ? $anketas->orderBy('anketas.' . $orderKey, $orderBy)->paginate($take) : [];
 
         $anketasCountResult = ($filter_activated || $typeAnkets === 'pak_queue')
             ? $anketas->total() : 0;
