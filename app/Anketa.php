@@ -115,8 +115,8 @@ class Anketa extends Model
                 'company_id'   => 'Компания',
                 'period_pl'    => 'Период выдачи ПЛ',
                 'driver_fio'   => 'Водитель',
-                'pv_id'        => 'Пункт выпуска',
                 'realy'        => 'Осмотр реальный?',
+                'driver_group_risk'      => 'Группа риска',
                 'type_view'    => 'Тип осмотра',
                 'proba_alko'   => 'Признаки опьянения', // Проба на алкоголь
                 'test_narko'   => 'Тест на наркотики',
@@ -147,6 +147,7 @@ class Anketa extends Model
 
             'tech' => [
                 'date'           => 'Дата осмотра',
+                'period_pl'    => 'Период выдачи ПЛ',
                 'car_gos_number' => 'Гос. регистрационный номер ТС',
                 'realy'        => 'Осмотр реальный?',
                 'car_type_auto' => 'Категория ТС',
@@ -399,10 +400,10 @@ class Anketa extends Model
                 'period_pl'              => 'Период выдачи ПЛ',
                 'driver_fio'             => 'ФИО работника',
                 'realy'                  => 'Осмотр реальный?',
+                'driver_group_risk'      => 'Группа риска',
                 'type_view'              => 'Тип осмотра',
                 'proba_alko'             => 'Признаки опьянения', // Проба на алкоголь
                 'test_narko'             => 'Тест на наркотики',
-                'driver_group_risk'      => 'Группа риска',
                 'driver_gender'          => 'Пол',
                 'driver_year_birthday'   => 'Дата рождения',
                 'complaint'              => 'Жалобы',
