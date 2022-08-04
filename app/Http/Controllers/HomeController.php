@@ -460,6 +460,9 @@ class HomeController extends Controller
 
                                   return $q;
                               });
+
+                    return Excel::download(new AnketasExport($bdd, Anketa::$fieldsKeys['bdd_export_prikaz']),
+                        'export.xlsx');
                 }
             }
 
