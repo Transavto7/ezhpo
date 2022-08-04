@@ -192,11 +192,6 @@ class HomeController extends Controller
             $blockedToExportFields = Anketa::$blockedToExportFields[$validTypeAnkets];
         }
 
-        if ($typeAnkets == 'tech') {
-            $anketas = $anketas->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')->select('anketas.*',
-                'cars.type_auto as car_type_auto');
-        }
-
         /**
          * Выбор полей
          */
@@ -410,6 +405,10 @@ class HomeController extends Controller
             ]);
         }
 
+        if ($typeAnkets == 'tech') {
+            $anketas = $anketas->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')->select('anketas.*',
+                'cars.type_auto as car_type_auto');
+        }
         /**
          * </Измеряем количество Авто и Водителей (уникальные ID)>
          */
