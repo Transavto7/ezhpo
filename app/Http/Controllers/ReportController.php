@@ -136,8 +136,14 @@ class ReportController extends Controller
 
     public function getJournalData(Request $request) {
         $company = $request->company_id;
-        $date_to = $request->date_to;
-        $date_from = $request->date_from;
+
+        if ($request->has('month')) {
+            $date_to = Carbon::parse($request->month)->startOfMonth();
+            $date_from = Carbon::parse($request->month)->endOfMonth();
+        } else {
+            $date_to = $request->date_to;
+            $date_from = $request->date_from;
+        }
 
         if (!$company || !$date_to || !$date_from) {
             return response(null, 404);

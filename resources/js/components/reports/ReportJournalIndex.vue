@@ -23,13 +23,9 @@
                       </multiselect>
                   </div>
                   <div class="form-group col-lg-2">
-                      <label class="mb-1" for="date_from">Дата с:</label>
-                      <input type="date" required ref="date_from" v-model="date_from"
-                             id="date_from" class="form-control form-date" name="date_from">
-                  </div>
-                  <div class="form-group col-lg-2">
-                      <label class="mb-1" for="date_to">Дата по:</label>
-                      <input type="date" required v-model="date_to" id="date_to" class="form-control form-date" name="date_to">
+                      <label class="mb-1" for="date_from">Период:</label>
+                      <input type="month" required ref="month" v-model="month"
+                             id="month" class="form-control form-date" name="month">
                   </div>
               </div>
               <div class="row">
@@ -93,8 +89,7 @@ export default {
             loadingExport: false,
             company: null,
             companies: [],
-            date_to: null,
-            date_from: null,
+            month: null,
             company_id: 0,
         }
     },
@@ -108,12 +103,8 @@ export default {
         }
 
         const now = new Date();
-        const days = now.getDate() > 9 ? now.getDate() : '0' + now.getDate();
         const months = now.getMonth() > 9 ? now.getMonth() : '0' + now.getMonth();
-        this.date_from = now.getFullYear() + '-'+ months + '-' + '01';
-
-        this.date_to = now.getFullYear() + '-' + months + '-' +
-            new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+        this.month = now.getFullYear() + '-'+ months;
 
     },
     methods: {
@@ -130,8 +121,7 @@ export default {
             axios.get('/api/reports/journal', {
                 params: {
                     company_id: this.company_id,
-                    date_to: this.date_to,
-                    date_from: this.date_from
+                    month: this.month
                 }
             }).then(({ data }) => {
                 this.$refs.reportsMedic.visible(data.medics);
