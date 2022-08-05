@@ -11,6 +11,18 @@
             id="croppie-input{{ $uniqueInputId }}"
         @endif
 
+{{--        @if ($default_value === 'current_date')--}}
+{{--            @php--}}
+{{--                $default_value = \Carbon\Carbon::now()->format('Y-m-d');--}}
+{{--            @endphp--}}
+{{--        @endif--}}
+
+        @if ($k === 'date_of_employment')
+            @php
+                $default_value = \Carbon\Carbon::parse($default_value)->format('Y-m-d');
+            @endphp
+        @endif
+
         value="{{ $default_value }}"
         type="{{ $v['type'] }}" {{ $is_required }}
         name="{{ $k }}"

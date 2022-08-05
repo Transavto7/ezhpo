@@ -443,6 +443,7 @@
                                         @elseif ($elK == 'essence')
                                             {{ \App\Product::$essence[$el->$elK] ?? ''  }}
                                         @endif
+
                                     @else
                                         @if(Storage::disk('public')->exists($el[$elK]) && $el[$elK] !== '<' && $el[$elK] !== '>')
                                             <a href="{{ Storage::url($el[$elK]) }}" data-fancybox="gallery_{{ $el->id }}">
@@ -458,6 +459,8 @@
                                                 @foreach(explode(',', $el[$elK]) as $aSyncData)
                                                     <div class="text-bold text-success"><i class="fa fa-refresh"></i> {{ __($aSyncData) }}</div>
                                                 @endforeach
+                                            @elseif ($elK === 'date_of_employment')
+                                                {{ $el[$elK] ? \Carbon\Carbon::parse($el[$elK])->format('d.m.Y') : '' }}
                                             @elseif($model === 'Instr' && $elK === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
                                                 <!-- Сортировка инструктажей доступна ролям БДД и Админу -->
                                             @else
