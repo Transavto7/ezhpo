@@ -138,8 +138,7 @@ export default {
             axios.get('/api/reports/journal/export', {
                 params: {
                     company_id: this.company_id,
-                    date_to: this.date_to,
-                    date_from: this.date_from,
+                    month: this.month
                 },
                 responseType: 'blob'
             }).then(({ data }) => {
