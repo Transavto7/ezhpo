@@ -13,6 +13,7 @@ use App\Req;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
@@ -138,11 +139,11 @@ class ReportController extends Controller
         $company = $request->company_id;
 
         if ($request->has('month')) {
-            $date_to = Carbon::parse($request->month)->startOfMonth();
-            $date_from = Carbon::parse($request->month)->endOfMonth();
+            $date_from = Carbon::parse($request->month)->startOfMonth();
+            $date_to = Carbon::parse($request->month)->endOfMonth();
         } else {
-            $date_to = $request->date_to;
-            $date_from = $request->date_from;
+            $date_from = Carbon::parse($request->date_from)->startOfDay();
+            $date_to = Carbon::parse($request->date_to)->endOfDay();
         }
 
         if (!$company || !$date_to || !$date_from) {
@@ -152,6 +153,7 @@ class ReportController extends Controller
         $company = Company::select('id', 'hash_id', 'name', 'products_id')->where('hash_id', $company)->first();
         $products = Product::all();
         $discounts = Discount::all();
+
         return [
             'medics' => $this->getJournalMedic($company, $date_from, $date_to, $products, $discounts),
             'techs' => $this->getJournalTechs($company, $date_from, $date_to, $products, $discounts),
@@ -174,16 +176,16 @@ class ReportController extends Controller
                 $q->where(function ($q) use ($date_from, $date_to) {
                     $q->whereNotNull('anketas.date')
                         ->whereBetween('anketas.date', [
-                            Carbon::parse($date_from)->startOfDay(),
-                            Carbon::parse($date_to)->endOfDay(),
+                            $date_from,
+                            $date_to,
                         ]);
                 })
-                    ->orWhere(function ($q) use ($date_from, $date_to) {
-                        $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
-                            Carbon::parse($date_from)->format('Y-m'),
-                            Carbon::parse($date_to)->format('Y-m'),
-                        ]);
-                    });
+                ->orWhere(function ($q) use ($date_from, $date_to) {
+                    $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
+                        $date_from->format('Y-m'),
+                        $date_to->format('Y-m'),
+                    ]);
+                });
             })
             ->select('driver_fio', 'driver_id', 'type_anketa', 'type_view', 'result_dop',
                 'is_dop', 'drivers.products_id')
@@ -296,14 +298,14 @@ class ReportController extends Controller
                 $q->where(function ($q) use ($date_from, $date_to) {
                     $q->whereNotNull('anketas.date')
                         ->whereBetween('anketas.date', [
-                            Carbon::parse($date_from)->startOfDay(),
-                            Carbon::parse($date_to)->endOfDay(),
+                            $date_from,
+                            $date_to,
                         ]);
                 })
                     ->orWhere(function ($q) use ($date_from, $date_to) {
                         $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
-                            Carbon::parse($date_from)->format('Y-m'),
-                            Carbon::parse($date_to)->format('Y-m'),
+                            $date_from->format('Y-m'),
+                            $date_to->format('Y-m'),
                         ]);
                     });
             })
@@ -411,21 +413,21 @@ class ReportController extends Controller
             })
             ->where('in_cart', 0)
             ->whereBetween('created_at', [
-                $date_from." 00:00:00",
-                $date_to." 23:59:59"
+                $date_from,
+                $date_to
             ])
             ->where(function ($q) use ($date_from, $date_to) {
                 $q->where(function ($q) use ($date_from, $date_to) {
                     $q->whereNotNull('anketas.date')
                         ->whereNotBetween('anketas.date', [
-                            Carbon::parse($date_from)->startOfDay(),
-                            Carbon::parse($date_to)->endOfDay(),
+                            $date_from,
+                            $date_to,
                         ]);
                 })
                     ->orWhere(function ($q) use ($date_from, $date_to) {
                         $q->whereNull('anketas.date')->whereNotBetween('anketas.period_pl', [
-                            Carbon::parse($date_from)->format('Y-m'),
-                            Carbon::parse($date_to)->format('Y-m'),
+                            $date_from->format('Y-m'),
+                            $date_to->format('Y-m'),
                         ]);
                     });
             })
@@ -468,21 +470,21 @@ class ReportController extends Controller
             ->whereNotNull('car_id')
             ->where('in_cart', 0)
             ->whereBetween('anketas.created_at', [
-                $date_from." 00:00:00",
-                $date_to." 23:59:59"
+                $date_from,
+                $date_to
             ])
             ->where(function ($q) use ($date_from, $date_to) {
                 $q->where(function ($q) use ($date_from, $date_to) {
                     $q->whereNotNull('anketas.date')
                         ->whereNotBetween('anketas.date', [
-                            Carbon::parse($date_from)->startOfDay(),
-                            Carbon::parse($date_to)->endOfDay(),
+                            $date_from,
+                            $date_to,
                         ]);
                 })
                     ->orWhere(function ($q) use ($date_from, $date_to) {
                         $q->whereNull('anketas.date')->whereNotBetween('anketas.period_pl', [
-                            Carbon::parse($date_from)->format('Y-m'),
-                            Carbon::parse($date_to)->format('Y-m'),
+                            $date_from->format('Y-m'),
+                            $date_to->format('Y-m'),
                         ]);
                     });
             })
