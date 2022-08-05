@@ -423,15 +423,15 @@ class HomeController extends Controller
                         ->get();
 
                     return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_to']),
-                        'export.xlsx');
+                        'ЭЖ ПРТО.xlsx');
                 }
 
-                if ($request->get('tech_export_pl')) {
+                if ($request->get('exportPrikazPL')) {
                     $techs = $anketas->where('type_anketa', 'tech')
                         ->get();
 
-                    return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_to']),
-                        'export.xlsx');
+                    return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_pl']),
+                        'ЭЖ учета ПЛ.xlsx');
                 }
             }
 
@@ -441,7 +441,7 @@ class HomeController extends Controller
                         ->get();
 
                     return Excel::download(new AnketasExport($medic, Anketa::$fieldsKeys['medic_export_pl']),
-                        'export.xlsx');
+                        'ЭЖ ПРМО.xlsx');
                 }
             }
 
@@ -462,7 +462,7 @@ class HomeController extends Controller
                               });
 
                     return Excel::download(new AnketasExport($bdd, Anketa::$fieldsKeys['bdd_export_prikaz']),
-                        'export.xlsx');
+                        'ЭЖ инструктажей БДД.xlsx');
                 }
             }
 
@@ -470,14 +470,14 @@ class HomeController extends Controller
                 if ($request->get('exportPrikaz')) {
                     return Excel::download(new AnketasExport($anketas->where('type_anketa', 'Dop')
                         ->get(), Anketa::$fieldsKeys['dop_export_pl']),
-                        'export.xlsx');
+                        'ЭЖ.xlsx');
 
                 }
             }
 
             return Excel::download(new AnketasExport($anketas->where('type_anketa', $typeAnkets)
                 ->get(), Anketa::$fieldsKeys[$typeAnkets]),
-                'export.xlsx');
+                'ЭЖ.xlsx');
         }
 
 
