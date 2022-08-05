@@ -21,10 +21,6 @@
         @include('reports.journal.export.techs-other', ['months' => $months, 'data' => $data['techs_other']])
     @endisset
 
-    @isset($data['other_pl'])
-        @include('reports.journal.export.pl', ['months' => $months, 'data' => $data['other_pl']])
-    @endisset
-
     @isset($data['other'])
         @include('reports.journal.export.other', ['other' => $data['other']]);
     @endisset

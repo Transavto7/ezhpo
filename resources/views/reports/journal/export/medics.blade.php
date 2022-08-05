@@ -1,38 +1,43 @@
 <table>
     <thead>
-    <tr>
-        <th
-            height="30" width="10" valign="center" align="center" style="background-color: #e6826a;"
-        ><b>ID</b></th>
+        <tr>
+            <th height="18" width="10" valign="center" align="center" colspan="8">
+                <b>Медосмотры за период</b>
+            </th>
+        </tr>
+        <tr>
+            <th
+                height="30" width="10" valign="center" align="center" style="background-color: #e6826a;"
+            ><b>ID</b></th>
 
-        <th
-            height="30" width="35" valign="center" align="center" style="background-color: #e6826a;"
-        ><b>Водитель</b></th>
+            <th
+                height="30" width="35" valign="center" align="center" style="background-color: #e6826a;"
+            ><b>Водитель</b></th>
 
-        <th
-            height="30" width="35" valign="center" align="center" style="background-color: #e6826a;"
-        ><b>Предрейсовый/Предсменный</b></th>
+            <th
+                height="30" width="35" valign="center" align="center" style="background-color: #e6826a;"
+            ><b>Предрейсовый/Предсменный</b></th>
 
-        <th
-            height="30" width="35" valign="center" align="center" style="background-color: #e6826a;"
-        ><b>Послерейсовый/Послесменный</b></th>
+            <th
+                height="30" width="35" valign="center" align="center" style="background-color: #e6826a;"
+            ><b>Послерейсовый/Послесменный</b></th>
 
-        <th
-            height="30" width="25" valign="center" align="center" style="background-color: #e6826a;"
-        ><b>Несогласованные ПЛ</b></th>
+            <th
+                height="30" width="25" valign="center" align="center" style="background-color: #e6826a;"
+            ><b>Несогласованные ПЛ</b></th>
 
-        <th
-            height="30" width="25" valign="center" align="center" style="background-color: #e6826a;"
-        ><b>БДД</b></th>
+            <th
+                height="30" width="25" valign="center" align="center" style="background-color: #e6826a;"
+            ><b>БДД</b></th>
 
-        <th
-            height="30" width="25" valign="center" align="center" style="background-color: #e6826a;"
-        ><b>Отчёты с карт</b></th>
+            <th
+                height="30" width="25" valign="center" align="center" style="background-color: #e6826a;"
+            ><b>Отчёты с карт</b></th>
 
-        <th
-            height="30" width="25" valign="center" align="center" style="background-color: #e6826a;"
-        ><b>Печать ПЛ</b></th>
-    </tr>
+            <th
+                height="30" width="25" valign="center" align="center" style="background-color: #e6826a;"
+            ><b>Печать ПЛ</b></th>
+        </tr>
     </thead>
 
     <tbody>

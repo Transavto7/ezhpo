@@ -64,10 +64,6 @@
         ref="reportsTechOther"
       />
 
-      <ReportJournalPL
-        ref="reportsPL"
-      />
-
       <ReportJournalOther
           ref="reportsOther"
       />
@@ -80,7 +76,6 @@ import ReportJournalTech from "./ReportJournalTech";
 import ReportJournalTechOther from "./ReportJournalTechOther";
 import ReportJournalMedicOther from "./ReportJournalMedicOther";
 import ReportJournalOther from "./ReportJournalOther";
-import ReportJournalPL from "./ReportJournalPL";
 
 export default {
     name: "ReportJournalIndex",
@@ -90,7 +85,6 @@ export default {
         ReportJournalTech,
         ReportJournalTechOther,
         ReportJournalMedicOther,
-        ReportJournalPL,
         ReportJournalOther
     },
     data() {
@@ -128,7 +122,6 @@ export default {
             this.$refs.reportsTech.hide();
             this.$refs.reportsTechOther.hide();
             this.$refs.reportsMedicOther.hide();
-            this.$refs.reportsPL.hide();
             this.$refs.reportsOther.hide();
         },
         report() {
@@ -145,7 +138,6 @@ export default {
                 this.$refs.reportsTech.visible(data.techs);
                 this.$refs.reportsTechOther.visible(data.techs_other);
                 this.$refs.reportsMedicOther.visible(data.medics_other);
-                this.$refs.reportsPL.visible(data.other_pl);
                 this.$refs.reportsOther.visible(data.other);
             }).finally(() => {
                 this.loading = false;

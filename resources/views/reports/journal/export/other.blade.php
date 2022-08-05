@@ -1,15 +1,20 @@
 @isset($other['company'])
     <table>
         <thead>
-        <tr>
-            <th></th>
-            <th
-                height="30" valign="center" align="center" style="background-color: #e6826a;"
-            >Услуга</th>
-            <th
-                height="30" valign="center" align="center" style="background-color: #e6826a;"
-            >Сумма</th>
-        </tr>
+            <tr>
+                <th height="18" width="10" valign="center" align="center" colspan="2">
+                    <b>Услуги без реестров</b>
+                </th>
+            </tr>
+            <tr>
+                <th></th>
+                <th
+                    height="30" valign="center" align="center" style="background-color: #e6826a;"
+                >Услуга</th>
+                <th
+                    height="30" valign="center" align="center" style="background-color: #e6826a;"
+                >Сумма</th>
+            </tr>
         </thead>
 
         <tbody>

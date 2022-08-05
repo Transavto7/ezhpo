@@ -2,6 +2,11 @@
         @foreach($data as $key => $item)
             <thead>
                 <tr>
+                    <th height="18" width="10" valign="center" align="center" colspan="8">
+                        <b>Медосмотры за другие периоды</b>
+                    </th>
+                </tr>
+                <tr>
                     <th height="30" valign="center" align="center" style="background-color: #e6826a;">
                         Месяц
                     </th>

@@ -1,33 +1,38 @@
 <table>
     @foreach($data as $key => $item)
         <thead>
-        <tr>
-            <th height="30" valign="center" align="center" style="background-color: #e6826a;">
-                Месяц
-            </th>
-            <th height="30" valign="center" align="center" style="background-color: #e6826a;">
-                Автомобиль
-            </th>
-            <th height="30" valign="center" align="center" style="background-color: #e6826a;">
-                Предрейсовый/Предсменный
-            </th>
-            <th height="30" valign="center" align="center" style="background-color: #e6826a;">
-                Послерейсовый/Послесменный
-            </th>
-            <th height="30" valign="center" align="center" style="background-color: #e6826a;">
-                Несогласованные ПЛ
-            </th>
+            <tr>
+                <th height="18" width="10" valign="center" align="center" colspan="8">
+                    <b>Техосмотры за другие периоды</b>
+                </th>
+            </tr>
+            <tr>
+                <th height="30" valign="center" align="center" style="background-color: #e6826a;">
+                    Месяц
+                </th>
+                <th height="30" valign="center" align="center" style="background-color: #e6826a;">
+                    Автомобиль
+                </th>
+                <th height="30" valign="center" align="center" style="background-color: #e6826a;">
+                    Предрейсовый/Предсменный
+                </th>
+                <th height="30" valign="center" align="center" style="background-color: #e6826a;">
+                    Послерейсовый/Послесменный
+                </th>
+                <th height="30" valign="center" align="center" style="background-color: #e6826a;">
+                    Несогласованные ПЛ
+                </th>
 
-            <th height="30" valign="center" align="center" style="background-color: #e6826a;">
-                БДД
-            </th>
-            <th height="30" valign="center" align="center" style="background-color: #e6826a;">
-                Отчёты с карт
-            </th>
-            <th height="30" valign="center" align="center" style="background-color: #e6826a;">
-                Печать ПЛ
-            </th>
-        </tr>
+                <th height="30" valign="center" align="center" style="background-color: #e6826a;">
+                    БДД
+                </th>
+                <th height="30" valign="center" align="center" style="background-color: #e6826a;">
+                    Отчёты с карт
+                </th>
+                <th height="30" valign="center" align="center" style="background-color: #e6826a;">
+                    Печать ПЛ
+                </th>
+            </tr>
         </thead>
         @php
             $total_start = $total_end = $total_dop = $total_bdd = $total_cart = $total_pl = 0;

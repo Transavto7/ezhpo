@@ -151,7 +151,6 @@ class ReportController extends Controller
             'techs' => $this->getJournalTechs($company, $date_from, $date_to, $products, $discounts),
             'medics_other' => $this->getJournalMedicsOther($company, $date_from, $date_to),
             'techs_other' => $this->getJournalTechsOther($company, $date_from, $date_to),
-            'other_pl' => $this->getJournalPl($company, $date_from, $date_to),
             'other' => $this->getJournalOther($company, $products),
         ];
     }
@@ -507,79 +506,6 @@ class ReportController extends Controller
                 = $reports->where('car_id', $report->car_id)->where('type_anketa', 'tech')
                     ->where('result_dop', null)->where('is_dop', 1)->count();
 
-        }
-
-        return array_reverse($result);
-    }
-
-    public function getJournalPl($company, $date_from, $date_to) {
-        $reports = Anketa::whereIn('type_anketa', ['medic', 'tech'])
-            ->where(function ($query) use ($company) {
-                $query->where('anketas.company_id', $company->hash_id)
-                    ->orWhere('anketas.company_name', $company->name);
-            })
-            ->where('in_cart', 0)
-            ->where('is_dop', 1)
-            ->whereNull('result_dop')
-            ->where(function($q) use ($date_from, $date_to) {
-                $q->where(function ($q) use ($date_from, $date_to) {
-                    $q->where(function ($q) use ($date_from, $date_to) {
-                        $q->whereNotNull('anketas.date')
-                            ->whereBetween('anketas.date', [
-                                Carbon::parse($date_from)->startOfDay(),
-                                Carbon::parse($date_to)->endOfDay(),
-                            ]);
-                    })
-                        ->orWhere(function ($q) use ($date_from, $date_to) {
-                            $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
-                                Carbon::parse($date_from)->format('Y-m'),
-                                Carbon::parse($date_to)->format('Y-m'),
-                            ]);
-                        });
-                })->orWhereBetween('created_at', [
-                    $date_from." 00:00:00",
-                    $date_to." 23:59:59"
-                ]);
-            })
-
-            ->select('car_id', 'driver_id', 'car_gos_number', 'driver_fio', 'type_anketa',
-                'period_pl', 'type_view')
-            ->get();
-
-        $result = [];
-
-        foreach ($reports as $report) {
-            if (!$report->car_gos_number && !$report->driver_fio) {
-                continue;
-            }
-
-            $date = Carbon::parse($report->period_pl);
-            $key = $date->year . '-' . $date->month; // key by date
-
-            $result[$key]['year'] = $date->year;
-            $result[$key]['month'] = $date->month;
-            $result[$key]['reports'][$report->driver_id]['car_gos_number'] = $report->car_gos_number;
-            $result[$key]['reports'][$report->driver_id]['driver_fio'] = $report->driver_fio;
-
-            $rps = $result[$key]['reports'][$report->driver_id];
-            $view_count = 0;
-            $anketa_count = 0;
-
-            if (key_exists('types', $rps)) {
-                if (key_exists($report->type_view, $rps['types'])
-                    && key_exists('total', $rps['types'][$report->type_view])) {
-                    $view_count = $rps['types'][$report->type_view]['total'];
-                }
-
-                if (key_exists($report->type_anketa, $rps['types'])
-                    && key_exists('total', $rps['types'][$report->type_anketa])) {
-                    $anketa_count = $rps['types'][$report->type_anketa]['total'];
-                }
-            }
-
-            $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['total'] = $view_count + 1;
-
-            $result[$key]['reports'][$report->driver_id]['types'][$report->type_anketa]['total'] = $anketa_count + 1;
         }
 
         return array_reverse($result);

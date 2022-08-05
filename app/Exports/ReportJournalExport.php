@@ -9,7 +9,7 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 
-class ReportJournalExport implements FromView, WithEvents
+class ReportJournalExport implements FromView
 {
 
     protected $data;
@@ -24,14 +24,5 @@ class ReportJournalExport implements FromView, WithEvents
         return view('reports.journal.export.index', [
             'data' => $this->data
         ]);
-    }
-
-    public function registerEvents(): array
-    {
-        return [
-            AfterSheet::class => function(AfterSheet $event) {
-                $event->sheet->getDelegate()->setAutoFilter('A1:'.$event->sheet->getDelegate()->getHighestColumn().'1');
-            }
-        ];
     }
 }
