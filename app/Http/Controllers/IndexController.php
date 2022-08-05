@@ -726,26 +726,9 @@ class IndexController extends Controller
         if(!$company->products_id){
             return redirect($_SERVER['HTTP_REFERER']);
         }
-        $productsForCar    = Product::whereIn('id', explode(',', $company->products_id))
-                                    ->where(function ($q) {
-                                        $q->whereNull('essence')
-                                          ->orWhere('essence', Product::ESSENCE_CAR)
-                                          ->orWhere('essence', Product::ESSENCE_CAR_DRIVER);
-                                    })
-                                    ->get(['id'])
-                                    ->pluck('id');
 
-        $productsForDriver = Product::whereIn('id', explode(',', $company->products_id))
-                                    ->where(function ($q) {
-                                        $q->whereNull('essence')
-                                          ->orWhere('essence', Product::ESSENCE_DRIVER)
-                                          ->orWhere('essence', Product::ESSENCE_CAR_DRIVER);
-                                    })
-                                    ->get(['id'])
-                                    ->pluck('id');
-
-        Car::where('company_id', $productsForCar)->update(['products_id' => $productsForCar->implode('. ')]);
-        Driver::where('company_id', $productsForDriver)->update(['products_id' => $productsForDriver->implode('. ')]);
+        Car::where('company_id', $id)->update(['products_id' => $company->products_id]);
+        Driver::where('company_id', $id)->update(['products_id' => $company->products_id]);
 
 
         return redirect($_SERVER['HTTP_REFERER']);

@@ -80,7 +80,7 @@
             <td>{{ $user->login }}</td>
             <td>{{ $user->email }}</td>
             <td>{{ \App\Point::getPointText($user->pv_id) }}</td>
-            <td>{{ $user->company['name'] }}</td>
+            <td>{{ $user->company['name'] ?? '' }}</td>
             <td>{{ $user->timezone }}</td>
             <td>{{ $user->blocked ? 'Да' : 'Нет' }}</td>
             <td>{{ \App\Http\Controllers\ProfileController::getUserRole(true, $user->id) }}</td>
@@ -175,7 +175,7 @@
                                             'k' => 'company_id',
                                             'is_required' => '',
                                             'model' => 'Company',
-                                            'default_value' => $user->company['id']
+                                            'default_value' => $user->company['id'] ?? null
                                         ])
                                     </div>
 

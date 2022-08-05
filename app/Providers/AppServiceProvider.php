@@ -6,6 +6,7 @@ use App\SystemSetting;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
@@ -83,12 +84,15 @@ class AppServiceProvider extends ServiceProvider
             $user_role = Auth::user()->role;
             $is_role_manager = Auth::user()->role_manager;
 
+
+
+
             $validRoles = [];
 
             foreach($dataRoles as $role) {
                 if(isset($roles[$role])) {
-                    if(($user_role === $roles[$role] || ($is_role_manager && $role === 'manager')) || $user_role === 777) {
-                        array_push($validRoles, 1);
+                    if(($user_role == $roles[$role] || ($is_role_manager && $role === 'manager')) || $user_role === 777) {
+                        $validRoles[] = 1;
                     }
                 }
             }
