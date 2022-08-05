@@ -179,7 +179,7 @@ class IndexController extends Controller
                     'Нет' => 'Нет',
                     'Да' => 'Да'
                 ], 'defaultValue' => 'Нет'],
-                'date_of_employment' => ['label' => 'Дата устройства на работу', 'type' => 'date'],
+                'date_of_employment' => ['label' => 'Дата устройства на работу', 'type' => 'date', 'defaultValue' => 'current_date'],
                 'autosync_fields' => ['label' => 'Автоматическая синхронизация Полей с компанией (по умолч.)', 'type' => 'select', 'values' => [
                     'products_id' => 'Услуги'
                 ], 'defaultValue' => 'products_id', 'multiple' => 1, 'hidden' => 1]
@@ -983,7 +983,15 @@ class IndexController extends Controller
                             }
 
                         } else {
-                            $element['elements'] = $element['elements']->where($aFk, 'LIKE', '%' . trim($aFv) . '%');
+                            if ($aFk == 'date_of_employment') {
+                                $element['elements'] = $element['elements']->whereBetween($aFk, [
+                                        Carbon::parse($aFv)->startOfDay(),
+                                        Carbon::parse($aFv)->endOfDay()
+                                        ]
+                                );
+                            } else {
+                                $element['elements'] = $element['elements']->where($aFk, 'LIKE', '%' . trim($aFv) . '%');
+                            }
                         }
                     }
                 }

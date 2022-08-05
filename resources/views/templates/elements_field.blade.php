@@ -19,7 +19,12 @@
 
         @if ($k === 'date_of_employment')
             @php
-                $default_value = \Carbon\Carbon::parse($default_value)->format('Y-m-d');
+                if ($default_value == 'current_date') {
+                    $default_value = \Carbon\Carbon::now()->format('Y-m-d');
+                } else if ($default_value != null) {
+                    $default_value = \Carbon\Carbon::parse($default_value)->format('Y-m-d');
+                }
+
             @endphp
         @endif
 
