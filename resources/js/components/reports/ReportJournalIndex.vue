@@ -95,17 +95,17 @@ export default {
     },
     mounted() {
         this.searchCompany();
+        const now = new Date();
+        const months = now.getMonth() > 9 ? now.getMonth() : '0' + now.getMonth();
+        this.month = now.getFullYear() + '-'+ months;
 
         if (this.default_company) {
             this.companies.push(this.default_company);
             this.company = this.default_company;
             this.company_id = this.default_company.hash_id;
+
+            this.report();
         }
-
-        const now = new Date();
-        const months = now.getMonth() > 9 ? now.getMonth() : '0' + now.getMonth();
-        this.month = now.getFullYear() + '-'+ months;
-
     },
     methods: {
         reset() {
