@@ -40,7 +40,7 @@
                             </thead>
                             <tbody>
                             <tr v-for="(info, name, index) in data.drivers" :key="index">
-                                <td> {{ info.driver_fio }} </td>
+                                <td> {{ info.driver_fio || 'Неизвестный водитель' }} </td>
                                 <td> {{ info.name }} </td>
                                 <td class="text-center"> {{ info.sum }}₽ </td>
                             </tr>
@@ -60,14 +60,14 @@
                         <table id="reports-table-1" class="table table-striped table-sm">
                             <thead>
                             <tr>
-                                <th width="200">Водитель</th>
+                                <th width="200">Автомобиль</th>
                                 <th width="200">Услуга</th>
                                 <th class="text-center" width="100">Сумма</th>
                             </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="(info, name, index) in data.cars" :key="index">
-                                    <td> {{ info.gos_number }} ({{ info.type_auto }}) </td>
+                                    <td> {{ info.gos_number || 'Неизвестный автомобиль' }} ({{ info.type_auto }}) </td>
                                     <td> {{ info.name }} </td>
                                     <td class="text-center"> {{ info.sum }}₽ </td>
                                 </tr>

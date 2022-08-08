@@ -250,13 +250,10 @@
 
                                         @role(['admin', 'manager', 'medic', 'tech', $currentRole])
                                             <td class="td-option not-export">
-                                                @if($anketa->is_dop && !$anketa->result_dop)
-                                                    <a href="{{ route('changeResultDop', ['result_dop' => 'Утвержден', 'id' => $anketa->id]) }}" class="btn btn-sm btn-success"><i class="fa fa-check"></i></a>
-                                                    <a href="{{ route('changeResultDop', ['result_dop' => 'Отклонен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-danger"><i class="fa fa-stop-circle"></i></a>
-                                                    <a href="{{ route('changeResultDop', ['result_dop' => 'Не использовался', 'id' => $anketa->id]) }}" class="btn btn-sm btn-warning"><i class="fa fa-warning"></i></a>
-                                                @endif
-
                                                 <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm"><i class="fa fa-search"></i></a>
+                                                @if($anketa->is_dop && !$anketa->result_dop)
+                                                    <button disabled class="btn btn-sm btn-success"><i class="fa fa-check"></i></button>
+                                                @endif
                                             </td>
                                         @endrole
 

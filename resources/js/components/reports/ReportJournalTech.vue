@@ -187,7 +187,8 @@ export default {
             let str = '';
             if (item.car_gos_number) {
                 str += item.car_gos_number + ' ';
-
+            } else {
+                str += 'неизвестный автомобиль ';
             }
 
             if (item.type_auto) {

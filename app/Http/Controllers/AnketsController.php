@@ -69,7 +69,13 @@ class AnketsController extends Controller
 
         // Дефолтные значения
         $data['title'] = 'Редактирование осмотра';
-        $data['default_current_date'] = date('Y-m-d\TH:i', strtotime($anketa->date)); // date('Y-m-d\TH:i')
+
+        if ($anketa->date) {
+            $data['default_current_date'] = date('Y-m-d\TH:i', strtotime($anketa->date)); // date('Y-m-d\TH:i')
+        } else {
+            $data['default_current_date'] = Carbon::now()->format('Y-m-d\TH:i');
+        }
+
         $data['default_point'] = $point;
         $data['points'] = $points;
         $data['anketa_view'] = 'profile.ankets.' . $anketa->type_anketa;

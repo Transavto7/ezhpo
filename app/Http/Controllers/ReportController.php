@@ -166,7 +166,7 @@ class ReportController extends Controller
     public function getJournalMedic($company, $date_from, $date_to, $products, $discounts) {
         // Get table info by filters
         $medics = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart', 'pechat_pl'])
-            ->join('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
+            ->leftjoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
             ->where(function ($query) use ($company) {
                 $query->where('anketas.company_id', $company->hash_id)
                     ->orWhere('anketas.company_name', $company->name);
