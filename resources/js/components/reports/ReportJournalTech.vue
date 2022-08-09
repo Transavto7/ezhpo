@@ -115,10 +115,11 @@
 
                     <tr v-if="reports">
                         <td width="100">
+                            <b>Всего</b>
                         </td>
 
-                        <td width="250">
-                            <b>Всего</b>
+                        <td>
+                            {{ Object.keys(reports).length }}
                         </td>
 
                         <td class="text-center" width="150">
