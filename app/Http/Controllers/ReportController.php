@@ -166,7 +166,7 @@ class ReportController extends Controller
     public function getJournalMedic($company, $date_from, $date_to, $products, $discounts) {
         // Get table info by filters
         $medics = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart', 'pechat_pl'])
-            ->leftjoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
+            ->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
             ->where(function ($query) use ($company) {
                 $query->where('anketas.company_id', $company->hash_id)
                     ->orWhere('anketas.company_name', $company->name);
@@ -188,7 +188,7 @@ class ReportController extends Controller
                 });
             })
             ->select('driver_fio', 'driver_id', 'type_anketa', 'type_view', 'result_dop',
-                'is_dop', 'drivers.products_id')
+                'is_dop')
             ->get();
 
         $result = [];
@@ -287,7 +287,7 @@ class ReportController extends Controller
     public function getJournalTechs($company, $date_from, $date_to, $products, $discounts) {
         // Get table info by filters
         $techs = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'report_cart', 'pechat_pl'])
-            ->join('cars', 'anketas.car_id', '=', 'cars.hash_id')
+            ->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')
             ->where(function ($query) use ($company) {
                 $query->where('anketas.company_id', $company->hash_id)
                     ->orWhere('anketas.company_name', $company->name);
@@ -462,7 +462,7 @@ class ReportController extends Controller
 
     public function getJournalTechsOther($company, $date_from, $date_to) {
         $reports = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'type_anketa', 'pechat_pl'])
-            ->join('cars', 'anketas.car_id', '=', 'cars.hash_id')
+            ->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')
             ->where(function ($query) use ($company) {
                 $query->where('anketas.company_id', $company->hash_id)
                     ->orWhere('anketas.company_name', $company->name);

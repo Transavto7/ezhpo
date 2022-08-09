@@ -8,7 +8,9 @@
     <div class="form-group row">
         <label class="form-control-label col-md-3">ID компании:</label>
         <article class="col-md-9">
-            <input value="{{ $company_id ?? '' }}" required type="number" oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Company', event.target.value, 'name', $(event.target).parent())" min="5" name="company_id" class="MASK_ID_ELEM form-control">
+            <input value="{{ $company_id ?? '' }}" required type="number"
+                   oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Company', event.target.value, 'name', $(event.target).parent())"
+                   min="5" name="company_id" class="MASK_ID_ELEM form-control">
             <p class="app-checker-prop"></p>
         </article>
     </div>

@@ -572,7 +572,7 @@ $(document).ready(function () {
                     if(PROP_HAS_EXISTS){
                         APP_CHECKER_PARENT.removeClass('text-danger').addClass('text-success').text(DATA[label])
                     } else {
-                        PARENT_ELEM.find('input, textarea, select').val('');
+                        // PARENT_ELEM.find('input, textarea, select').val('');
                         APP_CHECKER_PARENT.removeClass('text-success').addClass('text-danger').text(`Не найдено`)
                     }
                 }
@@ -583,7 +583,7 @@ $(document).ready(function () {
                     }
                 }
 
-                return
+                return;
             }
         });
     }

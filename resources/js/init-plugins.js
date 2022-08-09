@@ -6,7 +6,7 @@ require('select2')
  */
 const INIT_MASKS = () => {
     const MASKS = {
-        '.MASK_ID_ELEM': '000000',
+        '.MASK_ID_ELEM': '000000000',
         '.MASK_DATETIME': '00.00.0000 00:00',
         '.MASK_UTC': 'UTC-#',
         '.MASK_TONOM': '900/00',
