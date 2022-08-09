@@ -119,7 +119,7 @@
     <div class="form-group row">
         <label class="col-md-3 form-control-label">Температура тела:</label>
         <article class="col-md-9">
-            <input type="number" step="0.1" value="{{ $t_people ?? '' }}" name="t_people" class="form-control">
+            <input type="number" step="0.1" value="{{ $t_people ?? '' }}" min="30" max="46" name="t_people" class="form-control">
         </article>
     </div>
 
