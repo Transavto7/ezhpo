@@ -202,7 +202,12 @@ class ReportController extends Controller
                 $total = $rows->count();
                 $result[$id]['types'][$type]['total'] = $total;
 
-                $services = explode(',', $driver->first()->products_id);
+                if ($id == null) {
+                    $services = explode(',', $company->products_id);
+                } else {
+                    $services = explode(',', $driver->first()->products_id);
+                }
+
                 $types = explode('/', $type);
                 $prods = $products->whereIn('id', $services)->where('type_anketa', 'medic');
 
