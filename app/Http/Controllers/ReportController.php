@@ -187,7 +187,7 @@ class ReportController extends Controller
                     ]);
                 });
             })
-            ->select('driver_fio', 'driver_id', 'type_anketa', 'type_view', 'result_dop',
+            ->select('driver_fio', 'driver_id', 'type_anketa', 'type_view', 'result_dop', 'products_id',
                 'is_dop')
             ->get();
 
@@ -205,6 +205,7 @@ class ReportController extends Controller
                 $services = explode(',', $driver->first()->products_id);
                 $types = explode('/', $type);
                 $prods = $products->whereIn('id', $services)->where('type_anketa', 'medic');
+
 
                 if ($prods->count() > 0) {
                     foreach ($prods as $service) {
@@ -310,7 +311,7 @@ class ReportController extends Controller
                     });
             })
             ->select('car_gos_number', 'car_id', 'type_auto', 'type_anketa', 'is_dop', 'result_dop',
-                'type_view', 'cars.products_id')
+                'type_view', 'products_id')
             ->get();
 
         $result = [];

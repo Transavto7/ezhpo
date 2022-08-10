@@ -633,12 +633,11 @@ class AnketsController extends Controller
                         ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '');
 
                     foreach($anketaMedic as $aM) {
-                        $hourdiff_check = round((strtotime($anketa['date']) - strtotime($aM->date))/60, 1);
-
+                        $hourdiff_check = round((Carbon::now()->timestamp - $aM->created_at->timestamp)/60, 1);
 
                         if($hourdiff_check < 1 && $hourdiff_check >= 0) {
                             $anketaDublicate['id'] = $aM->id;
-                            $anketaDublicate['date'] = $aM->date;
+                            $anketaDublicate['date'] = $aM->created_at;
                             $hourdiff = $hourdiff_check;
                         }
                     }
@@ -688,18 +687,18 @@ class AnketsController extends Controller
 
                     if($anketaTech) {
                         foreach($anketaTech as $aT) {
-                            $hourdiff_check = round((strtotime($anketa['date']) - strtotime($aT->date))/60, 1);
+                            $hourdiff_check = round((Carbon::now()->timestamp - $aT->created_at->timestamp)/60, 1);
 
                             if($hourdiff_check < 1 && $hourdiff_check >= 0) {
                                 $anketaDublicate['id'] = $aT->id;
-                                $anketaDublicate['date'] = $aT->date;
+                                $anketaDublicate['date'] = $aT->created_at;
                                 $hourdiff = $hourdiff_check;
                             }
                         }
                     }
                 }
 
-                if(($hourdiff < 1 && $hourdiff >= 0)) {
+                if(($hourdiff < 1 && $hourdiff >= 0) && count($data_anketa) <= 1) {
                     $errMsg = "Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])";
 
                     array_push($errorsAnketa, $errMsg);
@@ -1217,11 +1216,11 @@ class AnketsController extends Controller
 
                     if($anketaMedic) {
                         foreach($anketaMedic as $aM) {
-                            $hourdiff_check = round((strtotime($anketa['date']) - strtotime($aM->date))/60, 1);
+                            $hourdiff_check = round((Carbon::now()->timestamp - $aM->created_at->timestamp)/60, 1);
 
                             if($hourdiff_check < 1 && $hourdiff_check >= 0) {
                                 $anketaDublicate['id'] = $aM->id;
-                                $anketaDublicate['date'] = $aM->date;
+                                $anketaDublicate['date'] = $aM->created_at;
                                 $hourdiff = $hourdiff_check;
                             }
                         }
@@ -1276,11 +1275,11 @@ class AnketsController extends Controller
 
                     if($anketaTech) {
                         foreach($anketaTech as $aT) {
-                            $hourdiff_check = round((strtotime($anketa['date']) - strtotime($aT->date))/60, 1);
+                            $hourdiff_check = round((Carbon::now()->timestamp - $aT->created_at->timestamp)/60, 1);
 
                             if($hourdiff_check < 1 && $hourdiff_check >= 0) {
                                 $anketaDublicate['id'] = $aT->id;
-                                $anketaDublicate['date'] = $aT->date;
+                                $anketaDublicate['date'] = $aT->created_at;
                                 $hourdiff = $hourdiff_check;
                             }
                         }
