@@ -293,7 +293,6 @@ class ReportController extends Controller
                 $query->where('anketas.company_id', $company->hash_id)
                     ->orWhere('anketas.company_name', $company->name);
             })
-            ->whereNotNull('anketas.car_id')
             ->where('anketas.in_cart', 0)
             ->where(function ($q) use ($date_from, $date_to) {
                 $q->where(function ($q) use ($date_from, $date_to) {
@@ -326,7 +325,12 @@ class ReportController extends Controller
                 $total = $rows->count();
                 $result[$id]['types'][$type]['total'] = $total;
 
-                $services = explode(',', $car->first()->products_id);
+                if ($id == null) {
+                    $services = explode(',', $company->products_id);
+                } else {
+                    $services = explode(',', $car->first()->products_id);
+                }
+
                 $types = explode('/', $type);
                 $prods = $products->whereIn('id', $services)->where('type_anketa', 'tech');
 
