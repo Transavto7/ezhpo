@@ -633,7 +633,8 @@ class AnketsController extends Controller
                         ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '');
 
                     foreach($anketaMedic as $aM) {
-                        $hourdiff_check = round((strtotime($anketa['date']) - strtotime($aM->date))/3600, 1);
+                        $hourdiff_check = round((strtotime($anketa['date']) - strtotime($aM->date))/60, 1);
+
 
                         if($hourdiff_check < 1 && $hourdiff_check >= 0) {
                             $anketaDublicate['id'] = $aM->id;
@@ -687,7 +688,7 @@ class AnketsController extends Controller
 
                     if($anketaTech) {
                         foreach($anketaTech as $aT) {
-                            $hourdiff_check = round((strtotime($anketa['date']) - strtotime($aT->date))/3600, 1);
+                            $hourdiff_check = round((strtotime($anketa['date']) - strtotime($aT->date))/60, 1);
 
                             if($hourdiff_check < 1 && $hourdiff_check >= 0) {
                                 $anketaDublicate['id'] = $aT->id;
@@ -698,15 +699,10 @@ class AnketsController extends Controller
                     }
                 }
 
-                if(($hourdiff < 1 && $hourdiff >= 0) && count($data_anketa) <= 1 &&
-                    (isset($anketa['is_pak']) || $anketa['type_anketa'] === 'pak_queue')
-                ) {
+                if(($hourdiff < 1 && $hourdiff >= 0)) {
                     $errMsg = "Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])";
 
                     array_push($errorsAnketa, $errMsg);
-
-                    // Убрали добавление в журнал СДПО
-
                     continue;
                 }
 
@@ -1221,7 +1217,7 @@ class AnketsController extends Controller
 
                     if($anketaMedic) {
                         foreach($anketaMedic as $aM) {
-                            $hourdiff_check = round((strtotime($anketa['date']) - strtotime($aM->date))/3600, 1);
+                            $hourdiff_check = round((strtotime($anketa['date']) - strtotime($aM->date))/60, 1);
 
                             if($hourdiff_check < 1 && $hourdiff_check >= 0) {
                                 $anketaDublicate['id'] = $aM->id;
@@ -1280,7 +1276,7 @@ class AnketsController extends Controller
 
                     if($anketaTech) {
                         foreach($anketaTech as $aT) {
-                            $hourdiff_check = round((strtotime($anketa['date']) - strtotime($aT->date))/3600, 1);
+                            $hourdiff_check = round((strtotime($anketa['date']) - strtotime($aT->date))/60, 1);
 
                             if($hourdiff_check < 1 && $hourdiff_check >= 0) {
                                 $anketaDublicate['id'] = $aT->id;
@@ -1291,15 +1287,10 @@ class AnketsController extends Controller
                     }
                 }
 
-                if(($hourdiff < 1 && $hourdiff >= 0) && count($data_anketa) <= 1 &&
-                    (isset($anketa['is_pak']) || $anketa['type_anketa'] === 'pak_queue')
-                ) {
+                if(($hourdiff < 1 && $hourdiff >= 0)) {
                     $errMsg = "Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])";
 
                     array_push($errorsAnketa, $errMsg);
-
-                    // Убрали добавление в журнал СДПО
-
                     continue;
                 }
 
