@@ -11,26 +11,27 @@
         <div class="modal-body">
             @foreach ($fields as $k => $v)
                 @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
+                @php if ($model === 'Instr' && $k === 'signature') continue; @endphp
 
-            @if($k == 'essence')
-                    <div data-field="essence" class="form-group" @if(($el->type_product ?? '') != 'Абонентская плата без реестров')  style="display: none" @endif>
-                        <label>Сущности</label>
-                        <select name="essence"
-                                data-label="Сущности"
-                                data-field="Product_type_view"
-                                class="js-chosen"
-                                style="display: none;"
-                        >
-                            <option value="">Не установлено</option>
-                            @foreach(\App\Product::$essence as $essenceKey => $essenceName)
-                                <option value="{{ $essenceKey }}" @if ($el->essence == $essenceKey) selected @endif>
-                                    {{ $essenceName }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                @continue
-            @endif
+                @if($k == 'essence')
+                        <div data-field="essence" class="form-group" @if(($el->type_product ?? '') != 'Абонентская плата без реестров')  style="display: none" @endif>
+                            <label>Сущности</label>
+                            <select name="essence"
+                                    data-label="Сущности"
+                                    data-field="Product_type_view"
+                                    class="js-chosen"
+                                    style="display: none;"
+                            >
+                                <option value="">Не установлено</option>
+                                @foreach(\App\Product::$essence as $essenceKey => $essenceName)
+                                    <option value="{{ $essenceKey }}" @if ($el->essence == $essenceKey) selected @endif>
+                                        {{ $essenceName }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @continue
+                @endif
 
                 @if($k !== 'id' && !isset($v['hidden']))
                     <div class="form-group" data-field="{{ $k }}" @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' ))  style="display: none" @endif>

@@ -76,7 +76,7 @@ class IndexController extends Controller
             ]
         ],
 
-        'DDate' => [
+        'DDates' => [
             'title' => 'Даты контроля',
             'role' => 777,
             'popupTitle' => 'Даты контроля',

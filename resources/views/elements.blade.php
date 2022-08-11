@@ -36,6 +36,7 @@
                         @if($k !== 'id' && !isset($v['hidden']))
                             @if($model === 'Instr' && $k === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
                                 <!-- Сортировка инструктажей доступна админу или инженеру -->
+                            @elseif($model === 'Instr' && $k === 'signature')
                             @else
                                 <div class="form-group" data-field="{{ $k }}">
                                     <label>
@@ -354,6 +355,7 @@
 
                         @if($model === 'Instr' && $k === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
                            <!-- Только админам -->
+                        @elseif($model === 'Instr' && $k === 'signature')
                         @else
                             <th title="Ключ: {{ $k }}" data-key="{{ $k }}">
                                 {{ $v['label'] }}

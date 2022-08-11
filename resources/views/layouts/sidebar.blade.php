@@ -138,7 +138,7 @@
                                     'role' => 778
                                 ]) }}">ПАК СДПО</a></li>
 
-                            <li><a href="{{ route('renderElements', 'DDate') }}">Контроль дат</a></li>
+                            <li><a href="{{ route('renderElements', 'DDates') }}">Контроль дат</a></li>
                             <li><a href="{{ route('renderElements', 'FieldHistory') }}">История изменения полей</a></li>
                         @endadmin
 
