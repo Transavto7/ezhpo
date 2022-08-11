@@ -22,7 +22,7 @@
                                     class="js-chosen"
                                     style="display: none;"
                             >
-                                <option value="">Не установлено</option>
+                                <option value="null">Не установлено</option>
                                 @foreach(\App\Product::$essence as $essenceKey => $essenceName)
                                     <option value="{{ $essenceKey }}" @if ($el->essence == $essenceKey) selected @endif>
                                         {{ $essenceName }}

@@ -655,7 +655,16 @@ class IndexController extends Controller
                     }
 
                     break;
+                case 'Product':
+                    $data['hash_id'] = mt_rand(100000,499999);
+                    if ($data['type_product'] === 'Абонентская плата без реестров') {
+                        $data['type_anketa'] = null;
+                        $data['type_view'] = null;
+                    } else {
+                        $data['essence'] = null;
+                    }
 
+                    break;
                 default:
                     $data['hash_id'] = mt_rand(1000,9999) . date('s');
                     break;
@@ -821,6 +830,15 @@ class IndexController extends Controller
                         }
                     }
                 }
+
+                 if ($model_text === 'Product') {
+                    if ($element->type_product === 'Абонентская плата без реестров') {
+                        $element->type_anketa = null;
+                        $element->type_view = null;
+                    } else {
+                        $element->essence = null;
+                    }
+                 }
 
                 if ($model_text === 'Company') {
 
