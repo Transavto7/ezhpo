@@ -72,23 +72,6 @@ class User extends Authenticatable
             778 => 'Терминал',
         ];
 
-    public static function getUserCompanyId ($field = 'id')
-    {
-        $point = auth()->user()->pv_id;
-        $point = Point::find($point);
-
-        if($point) {
-            $company = $point->company_id ? Company::find($point->company_id) : 0;
-
-            if($company) {
-                return $company->$field;
-            } else {
-                return -1;
-            }
-        }
-
-        return -1;
-    }
 
     public function hasRole ($role, $prefix = '>=')
     {

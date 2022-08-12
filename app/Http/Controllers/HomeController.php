@@ -376,8 +376,7 @@ class HomeController extends Controller
         }
 
         if (auth()->user()->hasRole('client', '==')) {
-            $company_id_client = User::getUserCompanyId('hash_id');
-
+            $company_id_client = auth()->user()->company->hash_id;
             $anketas = $anketas->where('anketas.company_id', $company_id_client);
         }
 
