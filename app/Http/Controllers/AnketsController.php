@@ -463,6 +463,15 @@ class AnketsController extends Controller
                     }
                 }
 
+                if (isset($anketa['driver_id'])) {
+                    $DriverDop = Driver::where('hash_id', $anketa['driver_id'])->first();
+
+                    if ($DriverDop) {
+                        $anketa['driver_id'] = $DriverDop->hash_id;
+                        $anketa['driver_fio'] = $DriverDop->fio;
+                    }
+                }
+
                 /**
                  * Проверка водителя по: тесту наркотиков, возрасту
                  */
@@ -1038,6 +1047,15 @@ class AnketsController extends Controller
                     if($CompanyDop) {
                         $anketa['company_id'] = $CompanyDop->hash_id;
                         $anketa['company_name'] = $CompanyDop->name;
+                    }
+                }
+
+                if (isset($anketa['driver_id'])) {
+                    $DriverDop = Driver::where('hash_id', $anketa['driver_id'])->first();
+
+                    if ($DriverDop) {
+                        $anketa['driver_id'] = $DriverDop->hash_id;
+                        $anketa['driver_fio'] = $DriverDop->fio;
                     }
                 }
 

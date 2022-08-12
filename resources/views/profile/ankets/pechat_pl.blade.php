@@ -5,12 +5,13 @@
 <div class="form-group row">
     <label class="col-md-3 form-control-label">Название компании:</label>
     <article class="col-md-9">
+        @php $company_fields['getFieldKey'] = 'id'; @endphp
         @include('templates.elements_field', [
             'v' => $company_fields,
-            'k' => 'company_name',
+            'k' => 'company_id',
             'is_required' => 'required',
             'model' => 'Company',
-            'default_value' => request()->get('company_name')
+            'default_value' => request()->get('company_id')
         ])
 
         <div class="app-checker-prop"></div>

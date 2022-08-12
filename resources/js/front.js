@@ -544,11 +544,11 @@ $(document).ready(function () {
                     form.find('input[name="company_id"]').val(DATA.company_hash_id);
                 }
 
-                if ((model === 'Driver' || model === 'Car') && DATA.company_name) {
+                if ((model === 'Driver' || model === 'Car') && DATA.company_name && DATA.company_id) {
                     const form =  parent.closest('#ANKETA_FORM');
-                    const select = form.find('select[name="company_name"]');
+                    let select = form.find('select[name="company_name"]');
 
-                    if (select) {
+                    if (select.length > 0) {
                         const exist = select.children('option').filter((id, element) => {
                             return element.value === DATA.company_name;
                         });
@@ -561,6 +561,21 @@ $(document).ready(function () {
                         }
 
                         select.select2().val(DATA.company_name).trigger("change");
+                    } else {
+                        select = form.find('select[name="company_id"]');
+
+                        const exist = select.children('option').filter((id, element) => {
+                            return element.value === DATA.company_id;
+                        });
+
+                        if (exist.length < 1) {
+                            select.append($('<option>', {
+                                value: DATA.company_id,
+                                text: DATA.company_name
+                            }));
+                        }
+
+                        select.select2().val(DATA.company_id).trigger("change");
                     }
                 }
 
