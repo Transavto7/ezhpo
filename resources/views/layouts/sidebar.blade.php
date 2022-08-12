@@ -99,7 +99,9 @@
                     <a href="#" data-btn-collapse="#reports" role="button"><i class="fa fa-area-chart"></i> Отчеты</a>
                     <ul id="reports" class="collapse list-unstyle">
                         <li><a href="{{ route('report.get', 'journal') }}"><i class="fa fa-book"></i>Отчет по услугам компании</a></li>
+                        @excludeRole(['client'])
                         <li><a href="{{ route('report.get', 'graph_pv') }}"><i class="fa fa-book"></i>График работы пунктов выпуска</a></li>
+                        @endexcludeRole
                     </ul>
                 </li>
             @endexcludeRole
@@ -115,8 +117,12 @@
                     @endrole
 
                     @manager
-                        <li><a href="{{ route('renderElements', 'Product') }}">Услуги</a></li>
-                        <li><a href="{{ route('renderElements', 'Discount') }}">Скидки</a></li>
+
+                        @excludeRole(['client'])
+                            <li><a href="{{ route('renderElements', 'Product') }}">Услуги</a></li>
+                            <li><a href="{{ route('renderElements', 'Discount') }}">Скидки</a></li>
+                        @endexcludeRole
+
                         <li><a href="{{ route('renderElements', 'Instr') }}">Инструктажи</a></li>
                     @endmanager
                 </ul>

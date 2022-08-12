@@ -1020,7 +1020,7 @@ class IndexController extends Controller
             }
 
             if(auth()->user()->hasRole('client', '==') && auth()->user()->company) {
-                $company_user_id = auth()->user()->company->hash_id;
+                $company_user_id = auth()->user()->company->id;
 
                 if($model == 'Driver' || $model == 'Car') {
                     $element['elements'] = $element['elements']->where('company_id', $company_user_id);

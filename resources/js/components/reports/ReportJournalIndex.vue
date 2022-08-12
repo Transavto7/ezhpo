@@ -7,6 +7,7 @@
                   <div class="form-group col-lg-3">
                       <label class="mb-1" for="company">Компании</label>
                       <multiselect
+                          :disabled="client"
                           v-model="company"
                           @search-change="searchCompany"
                           @select="(company) => company_id = company.hash_id"
@@ -75,7 +76,7 @@ import ReportJournalOther from "./ReportJournalOther";
 
 export default {
     name: "ReportJournalIndex",
-    props: ['default_company'],
+    props: ['default_company', 'client_company'],
     components: {
         ReportJournalMedic,
         ReportJournalTech,
@@ -88,6 +89,7 @@ export default {
             loading: false,
             loadingExport: false,
             company: null,
+            client: false,
             companies: [],
             month: null,
             company_id: 0,
@@ -99,7 +101,12 @@ export default {
         const months = now.getMonth() > 9 ? now.getMonth() : '0' + now.getMonth();
         this.month = now.getFullYear() + '-'+ months;
 
-        if (this.default_company) {
+        if (this.client_company) {
+            this.companies.push(this.client_company);
+            this.company = this.client_company;
+            this.company_id = this.client_company.hash_id;
+            this.client = true;
+        } else if (this.default_company) {
             this.companies.push(this.default_company);
             this.company = this.default_company;
             this.company_id = this.default_company.hash_id;
