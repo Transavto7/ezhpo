@@ -637,14 +637,14 @@ class AnketsController extends Controller
                     'date' => ''
                 ];
 
-                if(isset($anketasMedic)) {
+                if(isset($anketasMedic) && $anketa['is_dop'] != 1) {
                     $anketaMedic = $anketasMedic
                         ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '');
 
                     foreach($anketaMedic as $aM) {
                         $hourdiff_check = round((Carbon::parse($anketa['date'])->timestamp - Carbon::parse($aM->date)->timestamp)/60, 1);
 
-                        if($hourdiff_check < 1 && $hourdiff_check >= 0) {
+                        if($hourdiff_check < 1 && $hourdiff_check >= 0 && $aM->is_dop != 1) {
                             $anketaDublicate['id'] = $aM->id;
                             $anketaDublicate['date'] = $aM->date;
                             $hourdiff = $hourdiff_check;
@@ -694,11 +694,11 @@ class AnketsController extends Controller
                         }
                     }
 
-                    if($anketaTech) {
+                    if($anketaTech && $anketa['is_dop'] != 1) {
                         foreach($anketaTech as $aT) {
                             $hourdiff_check = round((Carbon::parse($anketa['date'])->timestamp - Carbon::parse($aT->date)->timestamp)/60, 1);
 
-                            if($hourdiff_check < 1 && $hourdiff_check >= 0) {
+                            if($hourdiff_check < 1 && $hourdiff_check >= 0 && $aT->is_dop != 1) {
                                 $anketaDublicate['id'] = $aT->id;
                                 $anketaDublicate['date'] = $aT->date;
                                 $hourdiff = $hourdiff_check;
@@ -1232,11 +1232,11 @@ class AnketsController extends Controller
                         ->orderBy('date', 'desc')
                         ->get();
 
-                    if($anketaMedic) {
+                    if($anketaMedic && $anketa['is_dop'] != 1) {
                         foreach($anketaMedic as $aM) {
                             $hourdiff_check = round((Carbon::parse($anketa['date']) - Carbon::parse($aM->date)->timestamp)/60, 1);
 
-                            if($hourdiff_check < 1 && $hourdiff_check >= 0) {
+                            if($hourdiff_check < 1 && $hourdiff_check >= 0 && $aM->is_dop != 1) {
                                 $anketaDublicate['id'] = $aM->id;
                                 $anketaDublicate['date'] = $aM->date;
                                 $hourdiff = $hourdiff_check;
@@ -1291,11 +1291,11 @@ class AnketsController extends Controller
                         }
                     }
 
-                    if($anketaTech) {
+                    if($anketaTech && $anketa['is_dop'] != 1) {
                         foreach($anketaTech as $aT) {
                             $hourdiff_check = round((Carbon::parse($anketa['date'])->timestamp - Carbon::parse($aT->date)->timestamp)/60, 1);
 
-                            if($hourdiff_check < 1 && $hourdiff_check >= 0) {
+                            if($hourdiff_check < 1 && $hourdiff_check >= 0 && $aT->is_dop != 1) {
                                 $anketaDublicate['id'] = $aT->id;
                                 $anketaDublicate['date'] = $aT->date;
                                 $hourdiff = $hourdiff_check;
