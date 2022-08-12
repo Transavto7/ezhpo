@@ -542,11 +542,28 @@ $(document).ready(function () {
                 if ((model === 'Driver' || model === 'Car') && DATA.company_hash_id) {
                     const form =  parent.closest('#ANKETA_FORM');
                     form.find('input[name="company_id"]').val(DATA.company_hash_id);
+                    const select = form.find('select[name="company_id"]');
+
+                    if (select.length > 0) {
+                        const exist = select.children('option').filter((id, element) => {
+                            return element.value === DATA.company_hash_id;
+                        });
+
+                        console.log(DATA);
+                        if (exist.length < 1) {
+                            select.append($('<option>', {
+                                value: DATA.company_hash_id,
+                                text: DATA.company_name
+                            }));
+                        }
+
+                        select.select2().val(DATA.company_hash_id).trigger("change");
+                    }
                 }
 
-                if ((model === 'Driver' || model === 'Car') && DATA.company_name && DATA.company_id) {
+                if ((model === 'Driver' || model === 'Car') && DATA.company_name) {
                     const form =  parent.closest('#ANKETA_FORM');
-                    let select = form.find('select[name="company_name"]');
+                    const select = form.find('select[name="company_name"]');
 
                     if (select.length > 0) {
                         const exist = select.children('option').filter((id, element) => {
@@ -561,21 +578,6 @@ $(document).ready(function () {
                         }
 
                         select.select2().val(DATA.company_name).trigger("change");
-                    } else {
-                        select = form.find('select[name="company_id"]');
-
-                        const exist = select.children('option').filter((id, element) => {
-                            return element.value === DATA.company_id;
-                        });
-
-                        if (exist.length < 1) {
-                            select.append($('<option>', {
-                                value: DATA.company_id,
-                                text: DATA.company_name
-                            }));
-                        }
-
-                        select.select2().val(DATA.company_id).trigger("change");
                     }
                 }
 
