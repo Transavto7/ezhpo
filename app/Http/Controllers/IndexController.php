@@ -774,6 +774,10 @@ class IndexController extends Controller
             $oldDataModel = [];
             $element = $model->find($id);
 
+            if (auth()->user()->role == User::$userRolesValues['client']) {
+                $oldDataModel['company_id'] = auth()->user()->company->hash_id;
+            }
+
             unset($data['_token']);
 
             // Обновляем данные
