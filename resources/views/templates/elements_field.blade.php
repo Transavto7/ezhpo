@@ -57,6 +57,21 @@
             <button type="button" data-croppie-id="{{ $uniqueInputId }}" class="btn croppie-delete btn-sm btn-danger">Удалить фото</button>
         </div>
     @endif
+@elseif ($v['type'] === 'select' && auth()->user()->role == 12 && $k === 'company_id')
+    @php
+        $default_value = is_array($default_value) ? $default_value : explode(',', $default_value);
+        $key = isset($v['getFieldKey']) ? $v['getFieldKey'] : 'id';
+        $value = isset($v['getField']) ? $v['getField'] : 'name';
+    @endphp
+    <select
+        disabled
+        name="company_id"
+        class="filled-select2 filled-select"
+    >
+        <option selected value="{{ auth()->user()->company->hash_id }}">
+            {{ auth()->user()->company->name }}
+        </option>
+    </select>
 
 @elseif ($v['type'] === 'select')
     @php
