@@ -121,37 +121,39 @@
                         @excludeRole(['client'])
                             <li><a href="{{ route('renderElements', 'Product') }}">Услуги</a></li>
                             <li><a href="{{ route('renderElements', 'Discount') }}">Скидки</a></li>
+                        <li><a href="{{ route('renderElements', 'Instr') }}">Инструктажи</a></li>
                         @endexcludeRole
 
-                        <li><a href="{{ route('renderElements', 'Instr') }}">Инструктажи</a></li>
                     @endmanager
                 </ul>
             </li>
 
             {{-- Если пользователь Админ --}}
             @manager
-                <li>
-                    <a href="#" data-btn-collapse="#spis-pol" role="button"><i class="fa fa-cog"></i> Настройки</a>
-                    <ul id="spis-pol" class="collapse list-unstyle">
-                        @admin
-                            <li><a href="{{ route('renderElements', 'Settings') }}">Система</a></li>
-                            <li><a href="{{ route('systemSettings') }}">Системные настройки</a></li>
-                            <li><a href="{{ route('renderElements', 'Town') }}">Города</a></li>
-                            <li><a href="{{ route('renderElements', 'Point') }}">Пункты выпуска</a></li>
-                            <li><a href="{{ route('adminUsers') }}">Сотрудники</a></li>
-                            <li><a href="{{ route('adminUsers', [
-                                    'filter' => 1,
-                                    'role' => 778
-                                ]) }}">ПАК СДПО</a></li>
+                @excludeRole(['client'])
+                    <li>
+                        <a href="#" data-btn-collapse="#spis-pol" role="button"><i class="fa fa-cog"></i> Настройки</a>
+                        <ul id="spis-pol" class="collapse list-unstyle">
+                            @admin
+                                <li><a href="{{ route('renderElements', 'Settings') }}">Система</a></li>
+                                <li><a href="{{ route('systemSettings') }}">Системные настройки</a></li>
+                                <li><a href="{{ route('renderElements', 'Town') }}">Города</a></li>
+                                <li><a href="{{ route('renderElements', 'Point') }}">Пункты выпуска</a></li>
+                                <li><a href="{{ route('adminUsers') }}">Сотрудники</a></li>
+                                <li><a href="{{ route('adminUsers', [
+                                        'filter' => 1,
+                                        'role' => 778
+                                    ]) }}">ПАК СДПО</a></li>
 
-                            <li><a href="{{ route('renderElements', 'DDates') }}">Контроль дат</a></li>
-                            <li><a href="{{ route('renderElements', 'FieldHistory') }}">История изменения полей</a></li>
-                        @endadmin
+                                <li><a href="{{ route('renderElements', 'DDates') }}">Контроль дат</a></li>
+                                <li><a href="{{ route('renderElements', 'FieldHistory') }}">История изменения полей</a></li>
+                            @endadmin
 
-                        <li><a href="{{ route('renderElements', 'Req') }}">Реквизиты нашей компании</a></li>
-                        <li><a href="{{ route('releases') }}">Релизы</a></li>
-                    </ul>
-                </li>
+                            <li><a href="{{ route('renderElements', 'Req') }}">Реквизиты нашей компании</a></li>
+                            <li><a href="{{ route('releases') }}">Релизы</a></li>
+                        </ul>
+                    </li>
+                @endexcludeRole
             @endmanager
 
         </ul>
