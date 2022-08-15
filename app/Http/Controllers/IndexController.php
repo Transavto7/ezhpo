@@ -286,8 +286,8 @@ class IndexController extends Controller
             'fields' => [
                 'products_id' => ['label' => 'Услуга', 'type' => 'select', 'values' => 'Product'],
                 'trigger' => ['label' => 'Триггер (больше/меньше)', 'type' => 'select', 'values' => [
-                    '>' => '>',
-                    '<' => '<'
+                    '>' => 'больше',
+                    '<' => 'меньше'
                 ], 'defaultValue' => '>'],
                 'porog' => ['label' => 'Пороговое значение', 'type' => 'number'],
                 'discount' => ['label' => 'Скидка (%)', 'type' => 'porog']

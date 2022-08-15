@@ -463,6 +463,8 @@
                                                 @endforeach
                                             @elseif ($elK === 'date_of_employment')
                                                 {{ $el[$elK] ? \Carbon\Carbon::parse($el[$elK])->format('d.m.Y') : '' }}
+                                            @elseif ($elK === 'trigger')
+                                                {{ $el[$elK] === '<' ? 'меньше' : 'больше'  }}
                                             @elseif($model === 'Instr' && $elK === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
                                                 <!-- Сортировка инструктажей доступна ролям БДД и Админу -->
                                             @else

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="reports" class="card">
-            <h5 class="card-header">Медосмотры за период</h5>
+            <h5 class="card-header">Медосмотры и другие услуги для водителей за выбранный период</h5>
             <div class="card-body">
                 <table id="reports-table-1" class="table table-striped table-sm">
                     <thead>
@@ -10,7 +10,7 @@
                         <th width="250">Водитель</th>
                         <th class="text-center" width="150">Предрейсовый/Предсменный</th>
                         <th class="text-center" width="150">Послерейсовый/Послесменный</th>
-                        <th class="text-center" width="150">Несогласованные ПЛ</th>
+                        <th class="text-center" width="150">Несогласованные осмотры</th>
 
                         <th class="text-center" width="150">БДД</th>
                         <th class="text-center" width="150">Отчёты с карт</th>

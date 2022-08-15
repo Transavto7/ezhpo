@@ -298,7 +298,7 @@
 
                 @include('templates.take_form')
 
-                <p class="text-success">Найдено осмотров: <b>{{ $anketasCountResult }}</b></p>
+                <p class="text-success">Найдено записей: <b>{{ $anketasCountResult }}</b></p>
 
                 <div id="COUNTS_ANKETAS">
 

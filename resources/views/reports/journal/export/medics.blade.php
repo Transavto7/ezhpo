@@ -2,7 +2,7 @@
     <thead>
         <tr>
             <th height="18" width="10" valign="center" align="center" colspan="8">
-                <b>Медосмотры за период</b>
+                <b>Медосмотры и другие услуги для водителей за выбранный период</b>
             </th>
         </tr>
         <tr>
