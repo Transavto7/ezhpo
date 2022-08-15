@@ -637,14 +637,14 @@ class AnketsController extends Controller
                     'date' => ''
                 ];
 
-                if(isset($anketasMedic) && $anketa['is_dop'] != 1) {
+                if(isset($anketasMedic)) {
                     $anketaMedic = $anketasMedic
                         ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '');
 
                     foreach($anketaMedic as $aM) {
                         $hourdiff_check = round((Carbon::parse($anketa['date'])->timestamp - Carbon::parse($aM->date)->timestamp)/60, 1);
 
-                        if($hourdiff_check < 1 && $hourdiff_check >= 0 && $aM->is_dop != 1) {
+                        if($hourdiff_check < 1 && $hourdiff_check >= 0) {
                             $anketaDublicate['id'] = $aM->id;
                             $anketaDublicate['date'] = $aM->date;
                             $hourdiff = $hourdiff_check;
@@ -694,11 +694,11 @@ class AnketsController extends Controller
                         }
                     }
 
-                    if($anketaTech && $anketa['is_dop'] != 1) {
+                    if($anketaTech) {
                         foreach($anketaTech as $aT) {
                             $hourdiff_check = round((Carbon::parse($anketa['date'])->timestamp - Carbon::parse($aT->date)->timestamp)/60, 1);
 
-                            if($hourdiff_check < 1 && $hourdiff_check >= 0 && $aT->is_dop != 1) {
+                            if($hourdiff_check < 1 && $hourdiff_check >= 0) {
                                 $anketaDublicate['id'] = $aT->id;
                                 $anketaDublicate['date'] = $aT->date;
                                 $hourdiff = $hourdiff_check;
@@ -844,13 +844,6 @@ class AnketsController extends Controller
                         $anketa['realy'] = 'нет';
                     }
 
-                }
-
-                /**
-                 * При режиме ввода ПЛ - осмотр НЕ реальный
-                 */
-                if($is_dop) {
-                    $anketa['realy'] = 'нет';
                 }
 
                 /**
@@ -1233,11 +1226,11 @@ class AnketsController extends Controller
                         ->orderBy('date', 'desc')
                         ->get();
 
-                    if($anketaMedic && $anketa['is_dop'] != 1) {
+                    if($anketaMedic) {
                         foreach($anketaMedic as $aM) {
                             $hourdiff_check = round((Carbon::parse($anketa['date']) - Carbon::parse($aM->date)->timestamp)/60, 1);
 
-                            if($hourdiff_check < 1 && $hourdiff_check >= 0 && $aM->is_dop != 1) {
+                            if($hourdiff_check < 1 && $hourdiff_check >= 0) {
                                 $anketaDublicate['id'] = $aM->id;
                                 $anketaDublicate['date'] = $aM->date;
                                 $hourdiff = $hourdiff_check;
@@ -1292,11 +1285,11 @@ class AnketsController extends Controller
                         }
                     }
 
-                    if($anketaTech && $anketa['is_dop'] != 1) {
+                    if($anketaTech) {
                         foreach($anketaTech as $aT) {
                             $hourdiff_check = round((Carbon::parse($anketa['date'])->timestamp - Carbon::parse($aT->date)->timestamp)/60, 1);
 
-                            if($hourdiff_check < 1 && $hourdiff_check >= 0 && $aT->is_dop != 1) {
+                            if($hourdiff_check < 1 && $hourdiff_check >= 0) {
                                 $anketaDublicate['id'] = $aT->id;
                                 $anketaDublicate['date'] = $aT->date;
                                 $hourdiff = $hourdiff_check;
@@ -1446,14 +1439,6 @@ class AnketsController extends Controller
                         $anketaCreated->save();
                     }
 
-                }
-
-                /**
-                 * При режиме ввода ПЛ - осмотр НЕ реальный
-                 */
-                if($is_dop) {
-                    $anketaCreated->realy = 'нет';
-                    $anketaCreated->save();
                 }
 
                 /**
