@@ -10,11 +10,7 @@
                         <th width="250">Автомобиль</th>
                         <th class="text-center" width="150">Предрейсовый/Предсменный</th>
                         <th class="text-center" width="150">Послерейсовый/Послесменный</th>
-                        <th class="text-center">Несогласованные ПЛ</th>
-
-                        <th class="text-center" width="150">БДД</th>
-                        <th class="text-center" width="150">Отчёты с карт</th>
-                        <th class="text-center" width="150">Печать ПЛ</th>
+                        <th class="text-center">Несогласованные осмотры</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -63,54 +59,6 @@
                         <td class="text-center" width="150">
                             {{ getTotal(item, 'is_dop') }}
                         </td>
-
-                        <td class="text-center" width="150">
-                            {{ getTotal(item, 'bdd') }}
-
-                            <div class="text-red font-weight-bold" v-if="getSum(item, 'bdd') == null">
-                                Услуги не указаны
-                            </div>
-                            <div class="font-weight-bold" v-else>
-                                {{ getSum(item, 'bdd') }}₽
-                                <span class="text-red" v-if="getDiscount(item, 'bdd')">
-                                    ({{ getDiscount(item, 'bdd') }}%)
-                                </span>
-                                <i v-if="isSync(item, 'bdd')" class="fa fa-refresh text-success"></i>
-                                <i v-else class="fa fa-refresh text-red"></i>
-                            </div>
-                        </td>
-
-                        <td class="text-center" width="150">
-                            {{ getTotal(item, 'report_cart') }}
-
-                            <div class="text-red font-weight-bold" v-if="getSum(item, 'report_cart') == null">
-                                Услуги не указаны
-                            </div>
-                            <div class="font-weight-bold" v-else>
-                                {{ getSum(item, 'report_cart') }}₽
-                                <span class="text-red" v-if="getDiscount(item, 'report_cart')">
-                                    ({{ getDiscount(item, 'report_cart') }}%)
-                                </span>
-                                <i v-if="isSync(item, 'report_cart')" class="fa fa-refresh text-success"></i>
-                                <i v-else class="fa fa-refresh text-red"></i>
-                            </div>
-                        </td>
-
-                        <td class="text-center" width="150">
-                            {{ getTotal(item, 'pechat_pl') }}
-
-                            <div class="text-red font-weight-bold" v-if="getSum(item, 'pechat_pl') == null">
-                                Услуги не указаны
-                            </div>
-                            <div class="font-weight-bold" v-else>
-                                {{ getSum(item, 'pechat_pl') }}₽
-                                <span class="text-red" v-if="getDiscount(item, 'pechat_pl')">
-                                    ({{ getDiscount(item, 'pechat_pl') }}%)
-                                </span>
-                                <i v-if="isSync(item, 'pechat_pl')" class="fa fa-refresh text-success"></i>
-                                <i v-else class="fa fa-refresh text-red"></i>
-                            </div>
-                        </td>
                     </tr>
 
                     <tr v-if="reports">
@@ -141,24 +89,6 @@
 
                         <td class="text-center" width="150">
                             {{ getTotalAll('is_dop') }}
-                        </td>
-
-                        <td class="text-center" width="150">
-                            {{ getTotalAll('bdd') }}
-
-                            <div class="font-weight-bold" v-if="getSumAll(reports, 'bdd') != null"> {{ getSumAll(reports, 'bdd') }}₽ </div>
-                        </td>
-
-                        <td class="text-center" width="150">
-                            {{ getTotalAll('report_cart') }}
-
-                            <div class="font-weight-bold" v-if="getSumAll(reports, 'report_cart') != null"> {{ getSumAll(reports, 'report_cart') }}₽ </div>
-                        </td>
-
-                        <td class="text-center" width="150">
-                            {{ getTotalAll('pechat_pl') }}
-
-                            <div class="font-weight-bold" v-if="getSumAll(reports, 'pechat_pl') != null"> {{ getSumAll(reports, 'pechat_pl') }}₽ </div>
                         </td>
                     </tr>
                     </tbody>

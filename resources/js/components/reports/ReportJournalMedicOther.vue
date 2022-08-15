@@ -18,7 +18,7 @@
                             <th class="text-center">Водитель</th>
                             <th class="text-center">Предрейсовый/Предсменный</th>
                             <th class="text-center">Послерейсовый/Послесменный</th>
-                            <th class="text-center">Несогласованные ПЛ</th>
+                            <th class="text-center">Несогласованные осмотры</th>
 
                             <th class="text-center">БДД</th>
                             <th class="text-center">Отчёты с карт</th>

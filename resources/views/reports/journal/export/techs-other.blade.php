@@ -22,20 +22,10 @@
                 <th height="30" valign="center" align="center" style="background-color: #e6826a;">
                     Несогласованные ПЛ
                 </th>
-
-                <th height="30" valign="center" align="center" style="background-color: #e6826a;">
-                    БДД
-                </th>
-                <th height="30" valign="center" align="center" style="background-color: #e6826a;">
-                    Отчёты с карт
-                </th>
-                <th height="30" valign="center" align="center" style="background-color: #e6826a;">
-                    Печать ПЛ
-                </th>
             </tr>
         </thead>
         @php
-            $total_start = $total_end = $total_dop = $total_bdd = $total_cart = $total_pl = 0;
+            $total_start = $total_end = $total_dop  = 0;
         @endphp
 
         <tbody>
@@ -70,24 +60,6 @@
                             {{ $report['types']['is_dop']['total'] }}
                         @endisset
                     </td>
-                    <td align="center">
-                        @isset($report['types']['bdd']['total'])
-                            @php $total_bdd += $report['types']['bdd']['total'] @endphp
-                            {{ $report['types']['bdd']['total'] }}
-                        @endisset
-                    </td>
-                    <td align="center">
-                        @isset($report['types']['report_cart']['total'])
-                            @php $total_cart += $report['types']['report_cart']['total'] @endphp
-                            {{ $report['types']['report_cart']['total'] }}
-                        @endisset
-                    </td>
-                    <td align="center">
-                        @isset($report['types']['pechat_pl']['total'])
-                            @php $total_pl += $report['types']['pechat_pl']['total'] @endphp
-                            {{ $report['types']['pechat_pl']['total'] }}
-                        @endisset
-                    </td>
                 </tr>
             @endforeach
         <tr>
@@ -98,9 +70,6 @@
             <td align="center">{{ $total_start }}</td>
             <td align="center">{{ $total_end }}</td>
             <td align="center">{{ $total_dop }}</td>
-            <td align="center">{{ $total_bdd }} </td>
-            <td align="center">{{ $total_cart }}</td>
-            <td align="center">{{ $total_pl }}</td>
         </tr>
         </tbody>
     @endforeach

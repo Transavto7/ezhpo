@@ -168,13 +168,15 @@
     </div>
 @endif
 
-<div class="form-group row">
-    <label class="col-md-3 form-control-label">Показания тонометра:</label>
-    <article class="col-md-9">
-        <input type="text" min="4" minlength="4" max="7" maxlength="7" placeholder="90/120 или 120/80 (пример)" name="anketa[0][tonometer]" value="{{ $tonometer ?? '' }}" class="form-control">
-        <small>Недопустимо верхнее давление < 50 или > 220 , нижнее < 40 или > 160</small>
-    </article>
-</div>
+@if(!$is_dop)
+    <div class="form-group row">
+        <label class="col-md-3 form-control-label">Показания тонометра:</label>
+        <article class="col-md-9">
+            <input type="text" min="4" minlength="4" max="7" maxlength="7" placeholder="90/120 или 120/80 (пример)" name="anketa[0][tonometer]" value="{{ $tonometer ?? '' }}" class="form-control">
+            <small>Недопустимо верхнее давление < 50 или > 220 , нижнее < 40 или > 160</small>
+        </article>
+    </div>
+@endif
 
 
 <div class="row">

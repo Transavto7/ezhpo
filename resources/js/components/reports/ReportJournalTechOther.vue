@@ -19,10 +19,7 @@
                             <th class="text-center">Автомобиль</th>
                             <th class="text-center">Предрейсовый/Предсменный</th>
                             <th class="text-center">Послерейсовый/Послесменный</th>
-                            <th class="text-center">Несогласованные ПЛ</th>
-                            <th class="text-center">БДД</th>
-                            <th class="text-center">Отчёты с карт</th>
-                            <th class="text-center">Печать ПЛ</th>
+                            <th class="text-center">Несогласованные осмотры</th>
                             </thead>
 
                             <tbody>
@@ -33,9 +30,6 @@
                                 <td class="text-center">{{ getTotal(report, 'Предрейсовый', 'Предсменный') }}</td>
                                 <td class="text-center">{{ getTotal(report, 'Послерейсовый', 'Послесменный') }}</td>
                                 <td class="text-center">{{ getTotal(report, 'is_dop') }}</td>
-                                <td class="text-center">{{ getTotal(report, 'bdd')}} </td>
-                                <td class="text-center">{{ getTotal(report, 'report_cart') }}</td>
-                                <td class="text-center">{{ getTotal(report, 'pechat_pl') }}</td>
                             </tr>
                             <tr v-if="item.reports">
                                 <td class="text-center">
@@ -44,9 +38,6 @@
                                 <td class="text-center">{{ getTotalAll(item.reports, 'Предрейсовый', 'Предсменный') }}</td>
                                 <td class="text-center">{{ getTotalAll(item.reports, 'Послерейсовый', 'Послесменный') }}</td>
                                 <td class="text-center">{{ getTotalAll(item.reports, 'is_dop') }}</td>
-                                <td class="text-center">{{ getTotalAll(item.reports, 'bdd')}} </td>
-                                <td class="text-center">{{ getTotalAll(item.reports, 'report_cart') }}</td>
-                                <td class="text-center">{{ getTotalAll(item.reports, 'pechat_pl') }}</td>
                             </tr>
                             </tbody>
                         </table>
