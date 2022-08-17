@@ -28,8 +28,7 @@
                             <tbody>
                             <tr v-for="(report, name, index) in item.reports">
                                 <td class="text-center">
-                                    {{ report.driver_fio || 'Неизвестный водитель' }} / {{ name }} <br>
-                                    {{ report.pv_id || '' }}
+                                    {{ report.driver_fio || 'Неизвестный водитель' }} / {{ name }}
                                 </td>
                                 <td class="text-center">{{ getTotal(report, 'Предрейсовый', 'Предсменный') }}</td>
                                 <td class="text-center">{{ getTotal(report, 'Послерейсовый', 'Послесменный') }}</td>

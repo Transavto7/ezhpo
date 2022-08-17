@@ -196,7 +196,7 @@ class ReportController extends Controller
         foreach ($medics->groupBy('driver_id') as $driver) {
             $id = $driver->first()->driver_id;
             $result[$id]['driver_fio'] = $driver->first()->driver_fio;
-            $result[$id]['pv_id'] = $driver->first()->pv_id;
+            $result[$id]['pv_id'] = implode('; ', array_unique($driver->pluck('pv_id')->toArray()));
 
             foreach ($driver->where('type_anketa', 'medic')->groupBy('type_view') as $rows) {
                 $type = $rows->first()->type_view;
@@ -325,7 +325,7 @@ class ReportController extends Controller
             $id = $car->first()->car_id;
             $result[$id]['car_gos_number'] = $car->first()->car_gos_number;
             $result[$id]['type_auto'] = $car->first()->type_auto;
-            $result[$id]['pv_id'] = $car->first()->pv_id;
+            $result[$id]['pv_id'] = implode('; ', array_unique($car->pluck('pv_id')->toArray()));
 
             foreach ($car->where('type_anketa', 'tech')->groupBy('type_view') as $rows) {
                 $type = $rows->first()->type_view;
@@ -443,7 +443,7 @@ class ReportController extends Controller
                         ]);
                     });
             })
-            ->select('driver_id', 'period_pl', 'type_view', 'driver_fio', 'date', 'is_dop', 'result_dop', 'type_anketa', 'pv_id')
+            ->select('driver_id', 'period_pl', 'type_view', 'driver_fio', 'date', 'is_dop', 'result_dop', 'type_anketa')
             ->get();
 
         $result = [];
@@ -459,7 +459,6 @@ class ReportController extends Controller
             $result[$key]['year'] = $date->year;
             $result[$key]['month'] = $date->month;
             $result[$key]['reports'][$report->driver_id]['driver_fio'] = $report->driver_fio;
-            $result[$key]['reports'][$report->driver_id]['pv_id'] = $report->pv_id;
             $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['total']
                 = $reports->where('driver_id', $report->driver_id)
                 ->where('type_anketa', 'medic')->where('type_view', $report->type_view)->count();
@@ -501,8 +500,7 @@ class ReportController extends Controller
                         ]);
                     });
             })
-            ->select('anketas.car_gos_number', 'type_auto', 'period_pl', 'car_id', 'date', 'result_dop', 'type_anketa',
-                'pv_id', 'type_view')
+            ->select('anketas.car_gos_number', 'type_auto', 'period_pl', 'car_id', 'date', 'result_dop', 'type_anketa', 'type_view')
             ->get();
 
         $result = [];
@@ -518,7 +516,6 @@ class ReportController extends Controller
             $result[$key]['year'] = $date->year;
             $result[$key]['month'] = $date->month;
             $result[$key]['reports'][$report->car_id]['car_gos_number'] = $report->car_gos_number;
-            $result[$key]['reports'][$report->car_id]['pv_id'] = $report->pv_id;
             $result[$key]['reports'][$report->car_id]['type_auto'] = $report->type_auto;
             $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['total']
                 = $reports->where('car_id', $report->car_id)
