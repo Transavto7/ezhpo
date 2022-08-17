@@ -24,7 +24,8 @@
                         </td>
 
                         <td width="250">
-                            {{ item.driver_fio || 'Неизвестный водитель' }}
+                            {{ item.driver_fio || 'Неизвестный водитель' }} <br>
+                            {{ item.pv_id || ''}}
                         </td>
 
                         <td class="text-center" width="150">

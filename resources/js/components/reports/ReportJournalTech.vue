@@ -20,7 +20,8 @@
                         </td>
 
                         <td width="250">
-                            {{ getStringMark(item) }}
+                            {{ getStringMark(item) }} <br>
+                            {{ item.pv_id || '' }}
                         </td>
 
                         <td class="text-center" width="150">
