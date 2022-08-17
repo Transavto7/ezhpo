@@ -14,7 +14,7 @@
 
                 <div class="row">
                     <div class="col-md-4 nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                        @foreach($instrs as $k => $instr)
+                        @foreach($instrs->sortByDesc('id') as $k => $instr)
                             <a class="nav-link" id="instr-{{ $instr->id }}" data-toggle="pill" href="#instr-{{ $instr->id }}-tab" role="tab" aria-controls="instr-{{ $instr->id }}" aria-selected="false">{{ $instr->name }} [{{ $instr->type_briefing }}]</a>
                         @endforeach
                     </div>
