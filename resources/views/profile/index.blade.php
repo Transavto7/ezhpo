@@ -14,12 +14,12 @@
                 @csrf
 
                 <p class="text"><strong>#{{ $user->id }}</strong><br/></p>
+                <p class="text"><strong>hash_id:{{ $user->hash_id }}</strong><br/></p>
 
                 <div class="form-group row">
                     <label class="col-sm-3 form-control-label">Фото:</label>
                     <div class="col-sm-9">
                         <input
-
                             id="croppie-inputPHOTO"
                             type="file"
                             name="photo"
