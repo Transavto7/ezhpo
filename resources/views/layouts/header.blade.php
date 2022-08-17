@@ -37,6 +37,9 @@
                             </span>
 
                             <span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp; {{ __(Auth::user()->name) }} <i class="fa fa-user"></i></span>
+                            @if(Auth::user()->role == 3)
+                            <span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp; {{Auth::user()->hash_id}} </span>
+                            @endif
                         </a>
                     </li>
                     <!-- Logout    -->
