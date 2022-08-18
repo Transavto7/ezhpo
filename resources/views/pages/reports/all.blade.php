@@ -81,6 +81,15 @@
                                 <input type="date" required value="{{ request()->get('date_to') ? request()->get('date_to') : $date_to_field }}" class="form-control" name="date_to">
                             </label>
                         </div>
+                        <div class="col-md-2">
+                            <label>
+                                Тип осмотра:
+                                <select name="type_anketa"  class="form-control" >
+                                    <option value="medic" @if(request()->get('type_anketa') == 'medic') selected @endif>Медицинский</option>
+                                    <option value="tech" @if(request()->get('type_anketa') == 'tech') selected @endif>Техничекий</option>
+                                </select>
+                            </label>
+                        </div>
 
                         <div class="col-md-4">
                             <button type="submit" class="btn btn-info">Сформировать отчет</button>

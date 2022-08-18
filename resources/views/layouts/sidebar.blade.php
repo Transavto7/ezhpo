@@ -81,7 +81,7 @@
                     @endif
 
 
-                    <li><a href="{{ route('home', 'bdd') }}"><i class="fa fa-book"></i>Журнал инструктажей по БДД </a></li>
+                        <li><a href="{{ route('home', 'bdd') }}"><i class="fa fa-book"></i>Журнал инструктажей по БДД </a></li>
                         <li><a href="{{ route('home', 'pechat_pl') }}"><i class="fa fa-book"></i>Журнал печати ПЛ</a></li>
                     <li><a href="{{ route('home', 'report_cart') }}"><i class="fa fa-book"></i>Реестр снятия отчетов с карт</a></li>
                         <li><a href="{{ route('home', 'Dop') }}"><i class="fa fa-book"></i>Журнал учета ПЛ</a></li>
@@ -121,10 +121,13 @@
                         @excludeRole(['client'])
                             <li><a href="{{ route('renderElements', 'Product') }}">Услуги</a></li>
                             <li><a href="{{ route('renderElements', 'Discount') }}">Скидки</a></li>
-                        <li><a href="{{ route('renderElements', 'Instr') }}">Инструктажи</a></li>
+
                         @endexcludeRole
 
                     @endmanager
+                    @if(auth()->user()->role === 777 || auth()->user()->role == 12)
+                        <li><a href="{{ route('renderElements', 'Instr') }}">Инструктажи</a></li>
+                    @endif
                 </ul>
             </li>
 

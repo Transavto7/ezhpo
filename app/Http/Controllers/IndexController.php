@@ -273,6 +273,8 @@ class IndexController extends Controller
                     'Да' => 'Да',
                     'Нет' => 'Нет'
                 ],  'noRequired' => 1],
+
+                'document_bdd' => ['label' => 'Ссылка на таблицу с документами по бдд', 'type' => 'text', 'noRequired' => 1],
             ]
         ],
 
@@ -714,6 +716,7 @@ class IndexController extends Controller
         $model = $request->type;
         $id = $request->id;
         $model = app("App\\$model");
+//        dd($model, $id, $model);
 
         if($model) {
             if($model::find($id)->delete()) {

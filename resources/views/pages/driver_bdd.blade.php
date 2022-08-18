@@ -1,7 +1,22 @@
 @extends('layouts.app')
 
 @section('title', 'ЛК Водителя')
+@php
+$instrs = $instrs->sortBy('id')
+            ->sort(function ($a, $b) {
+        if (is_null($a->sort)) {
+            return is_null($b->sort) ? 0 : 1;
+        }
+        if (is_null($b->sort)) {
+            return -1;
+        }
+        if ($a->sort == $b->sort) {
+            return 0;
+        }
 
+        return $a->sort < $b->sort ? -1 : 1;
+});
+@endphp
 @section('content')
     <div class="container text-center">
         <h1>БДД</h1>
@@ -14,7 +29,7 @@
 
                 <div class="row">
                     <div class="col-md-4 nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                        @foreach($instrs as $k => $instr)
+                        @foreach($instrs->sortBy('sort') as $k => $instr)
                             <a class="nav-link" id="instr-{{ $instr->id }}" data-toggle="pill" href="#instr-{{ $instr->id }}-tab" role="tab" aria-controls="instr-{{ $instr->id }}" aria-selected="false">{{ $instr->name }} [{{ $instr->type_briefing }}]</a>
                         @endforeach
                     </div>

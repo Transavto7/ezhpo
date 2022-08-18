@@ -19,7 +19,6 @@
                     <label class="col-sm-3 form-control-label">Фото:</label>
                     <div class="col-sm-9">
                         <input
-
                             id="croppie-inputPHOTO"
                             type="file"
                             name="photo"

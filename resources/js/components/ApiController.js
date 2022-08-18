@@ -26,7 +26,7 @@ export class ApiController {
         })
     }
 
-    getGraphReport ({ pv_id, date_from, date_to, date_from_time, date_to_time }) {
+    getGraphReport ({ pv_id, date_from, date_to, date_from_time, date_to_time, type_anketa }) {
         let pv_id_str = ''
 
         pv_id.forEach((item, i) => {
@@ -35,7 +35,8 @@ export class ApiController {
 
         let dopParams = (date_to_time && date_from_time) ? `&date_from_time=${date_from_time}&date_to_time=${date_to_time}` : '';
 
-        return this.client.get(`/api/report/graph_pv?filter=1&${pv_id_str}date_from=${date_from}&date_to=${date_to}&api=1${dopParams}`).then(response => {
+        // Ты чё еблан нахуй?
+        return this.client.get(`/api/report/graph_pv?filter=1&${pv_id_str}date_from=${date_from}&date_to=${date_to}&api=1${dopParams}&type_anketa=${type_anketa}`).then(response => {
             const data = response.data
 
             return data

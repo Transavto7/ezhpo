@@ -6,13 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
 {
+    use \Illuminate\Database\Eloquent\SoftDeletes;
+
     public $fillable = [
         'hash_id', 'name',
         'note', 'user_id', 'req_id',
         'pv_id', 'town_id', 'products_id', 'where_call', 'where_call_name', 'inn',
         'procedure_pv',
         'dismissed',
-        'has_actived_prev_month'
+        'has_actived_prev_month',
+        'document_bdd'
     ];
 
     public function cars()
