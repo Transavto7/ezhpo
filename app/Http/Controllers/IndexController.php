@@ -273,6 +273,8 @@ class IndexController extends Controller
                     'Да' => 'Да',
                     'Нет' => 'Нет'
                 ],  'noRequired' => 1],
+
+                'document_bdd' => ['label' => 'Ссылка на таблицу с документами по бдд', 'type' => 'text', 'noRequired' => 1],
             ]
         ],
 
