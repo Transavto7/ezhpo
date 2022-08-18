@@ -30,23 +30,115 @@
                                 <td class="text-center">
                                     {{ report.driver_fio || 'Неизвестный водитель' }} / {{ name }}
                                 </td>
-                                <td class="text-center">{{ getTotal(report, 'Предрейсовый', 'Предсменный') }}</td>
-                                <td class="text-center">{{ getTotal(report, 'Послерейсовый', 'Послесменный') }}</td>
-                                <td class="text-center">{{ getTotal(report, 'is_dop') }}</td>
-                                <td class="text-center">{{ getTotal(report, 'bdd')}} </td>
-                                <td class="text-center">{{ getTotal(report, 'report_cart') }}</td>
-                                <td class="text-center">{{ getTotal(report, 'pechat_pl') }}</td>
+                                <td class="text-center">
+                                    {{ getTotal(report, 'Предрейсовый', 'Предсменный') }}
+
+                                    <div class="font-weight-bold" v-if="getSum(report, 'Предрейсовый', 'Предсменный')">
+                                        {{ getSum(report, 'Предрейсовый', 'Предсменный') }}₽
+                                        <span class="text-red" v-if="getDiscount(report, 'Предрейсовый', 'Предсменный')">
+                                            ({{ getDiscount(report, 'Предрейсовый', 'Предсменный') }}%)
+                                        </span>
+                                        <i v-if="isSync(report, 'Предрейсовый', 'Предсменный')" class="fa fa-refresh text-success"></i>
+                                        <i v-else class="fa fa-refresh text-red"></i>
+                                    </div>
+
+                                </td>
+                                <td class="text-center">
+                                    {{ getTotal(report, 'Послерейсовый', 'Послесменный') }}
+
+                                    <div class="font-weight-bold" v-if="getSum(item, 'Послерейсовый', 'Послесменный')">
+                                        {{ getSum(report, 'Послерейсовый', 'Послесменный') }}₽
+                                        <span class="text-red" v-if="getDiscount(report, 'Послерейсовый', 'Послесменный')">
+                                            ({{ getDiscount(report, 'Послерейсовый', 'Послесменный') }}%)
+                                        </span>
+                                        <i v-if="isSync(report, 'Послерейсовый', 'Послесменный')" class="fa fa-refresh text-success"></i>
+                                        <i v-else class="fa fa-refresh text-red"></i>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    {{ getTotal(report, 'is_dop') }}
+                                </td>
+
+                                <td class="text-center">
+                                    {{ getTotal(report, 'bdd') }}
+
+                                    <div class="font-weight-bold" v-if="getSum(report, 'bdd')">
+                                        {{ getSum(report, 'bdd') }}₽
+                                        <span class="text-red" v-if="getDiscount(report, 'bdd')">
+                                            ({{ getDiscount(report, 'bdd') }}%)
+                                        </span>
+                                        <i v-if="isSync(report, 'bdd')" class="fa fa-refresh text-success"></i>
+                                        <i v-else class="fa fa-refresh text-red"></i>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    {{ getTotal(report, 'report_cart') }}
+
+                                    <div class="font-weight-bold" v-if="getSum(report, 'report_cart')">
+                                        {{ getSum(report, 'report_cart') }}₽
+                                        <span class="text-red" v-if="getDiscount(report, 'report_cart')">
+                                            ({{ getDiscount(report, 'report_cart') }}%)
+                                        </span>
+                                        <i v-if="isSync(report, 'report_cart')" class="fa fa-refresh text-success"></i>
+                                        <i v-else class="fa fa-refresh text-red"></i>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    {{ getTotal(report, 'pechat_pl') }}
+
+                                    <div class="font-weight-bold" v-if="getSum(item, 'pechat_pl')">
+                                    {{ getSum(report, 'pechat_pl') }}₽
+                                    <span class="text-red" v-if="getDiscount(report, 'pechat_pl')">
+                                        ({{ getDiscount(report, 'pechat_pl') }}%)
+                                    </span>
+                                    <i v-if="isSync(report, 'pechat_pl')" class="fa fa-refresh text-success"></i>
+                                    <i v-else class="fa fa-refresh text-red"></i>
+                                </div>
+                                </td>
                             </tr>
                             <tr v-if="item.reports">
                                 <td class="text-center">
                                     <b>Всего</b>
                                 </td>
-                                <td class="text-center">{{ getTotalAll(item.reports, 'Предрейсовый', 'Предсменный') }}</td>
-                                <td class="text-center">{{ getTotalAll(item.reports, 'Послерейсовый', 'Послесменный') }}</td>
-                                <td class="text-center">{{ getTotalAll(item.reports, 'is_dop') }}</td>
-                                <td class="text-center">{{ getTotalAll(item.reports, 'bdd')}} </td>
-                                <td class="text-center">{{ getTotalAll(item.reports, 'report_cart') }}</td>
-                                <td class="text-center">{{ getTotalAll(item.reports, 'pechat_pl') }}</td>
+                                <td class="text-center">
+                                    {{ getTotalAll(item.reports, 'Предрейсовый', 'Предсменный') }}
+
+                                    <div class="font-weight-bold" v-if="getSumAll(item.reports, 'Предрейсовый', 'Предсменный') != null">
+                                        {{ getSumAll(item.reports, 'Предрейсовый', 'Предсменный') }}₽
+                                    </div>
+                                </td>
+
+                                <td class="text-center">
+                                    {{ getTotalAll(item.reports, 'Послерейсовый', 'Послесменный') }}
+
+                                    <div class="font-weight-bold" v-if="getSumAll(reports, 'Послерейсовый', 'Послесменный') != null">
+                                        {{ getSumAll(item.reports, 'Послерейсовый', 'Послесменный') }}₽
+                                    </div>
+                                </td>
+
+                                <td class="text-center">
+                                    {{ getTotalAll(item.reports, 'is_dop') }}
+                                </td>
+
+                                <td class="text-center">
+                                    {{ getTotalAll(item.reports, 'bdd')}}
+                                    <div class="font-weight-bold" v-if="getSumAll(item.reports, 'bdd') != null">
+                                        {{ getSumAll(item.reports, 'bdd') }}₽
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    {{ getTotalAll(item.reports, 'report_cart') }}
+                                    <div class="font-weight-bold" v-if="getSumAll(item.reports, 'report_cart') != null">
+                                        {{ getSumAll(item.reports, 'report_cart') }}₽
+                                    </div>
+                                </td>
+
+                                <td class="text-center">
+                                    {{ getTotalAll(item.reports, 'pechat_pl') }}
+                                    <div class="font-weight-bold" v-if="getSumAll(item.reports, 'pechat_pl') != null">
+                                        {{ getSumAll(item.reports, 'pechat_pl') }}₽
+                                    </div>
+                                </td>
                             </tr>
                             </tbody>
                         </table>
@@ -64,7 +156,7 @@
 
 <script>
 import { months } from '../const/local';
-import { getTotalAll, getTotal } from "../const/reportsAmount";
+import {getTotalAll, getTotal, getSum, getSumAll, getDiscount, isSync} from "../const/reportsAmount";
 
 export default {
     name: "ReportJournalMedicOther",
@@ -88,6 +180,10 @@ export default {
         },
         getTotalAll,
         getTotal,
+        getSumAll,
+        getSum,
+        getDiscount,
+        isSync
     }
 }
 </script>
