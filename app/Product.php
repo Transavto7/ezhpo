@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
+    use \Illuminate\Database\Eloquent\SoftDeletes;
+
     public $fillable = [
         'hash_id', 'name', 'type_product', 'unit', 'price_unit',
         'type_anketa', 'type_view', 'essence'

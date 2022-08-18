@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
 {
+    use \Illuminate\Database\Eloquent\SoftDeletes;
+
     public $fillable = [
         'hash_id', 'name',
         'note', 'user_id', 'req_id',
