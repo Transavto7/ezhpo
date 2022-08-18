@@ -333,9 +333,9 @@ class AnketsController extends Controller
             'date' => date('Y-m-d H:i:s')
         ];
 
-        $test_narko = isset($data['test_narko']) ? $data['test_narko'] : 'Отрицательно';
-        $proba_alko = isset($data['proba_alko']) ? $data['proba_alko'] : 'Отрицательно';
-        $is_dop = isset($data['is_dop']) ? ($data['is_dop'] === '1') : 0;
+        $test_narko = $data['test_narko'] ?? 'Отрицательно';
+        $proba_alko = $data['proba_alko'] ?? 'Отрицательно';
+        $is_dop = $data['is_dop'] ?? 0;
 
         // Выставляем оптимальные параметры
         unset($data['_token']);
@@ -374,9 +374,117 @@ class AnketsController extends Controller
             $cars = [];
             $cars[] = $data['car_id'] ?? 0;
 
+            //================== VALIDATE company/driver/car ===================//
+            // tech
+            if($data['type_anketa'] === 'tech'){
+                if($data['is_dop'] == 1){
+                    if(!Company::where('hash_id', $data['company_id'])->count()){
+                        $errorsAnketa[] = 'Не найдена компания.';
+                    }
+                }
+                if(!Car::where('hash_id', $data['anketa'][0]['car_id'])->count()){
+                    $errorsAnketa[] = 'Не найдена машина.';
+                }
+                if(!Driver::where('hash_id', $data['driver_id'])->count()){
+                    $errorsAnketa[] = 'Не найден водитель.';
+                }
+                if(count($errorsAnketa)){
+                    return redirect()->route('forms', [
+                        'errors' => $errorsAnketa,
+                        'type' => $data['type_anketa'],
+                        'is_dop' => $data['is_dop'],
+                    ]);
+                }
+            }
+
+            // medic
+            if($data['type_anketa'] === 'medic'){
+                if($data['is_dop'] == 1){
+                    if(!Company::where('hash_id', $data['company_id'])->count()){
+                        $errorsAnketa[] = 'Не найдена компания.';
+                    }
+                }
+                if(!Driver::where('hash_id', $data['driver_id'])->count()){
+                    $errorsAnketa[] = 'Не найден водитель.';
+                }
+                if(count($errorsAnketa)){
+                    return redirect()->route('forms', [
+                        'errors' => $errorsAnketa,
+                        'type' => $data['type_anketa'],
+                        'is_dop' => $data['is_dop'],
+                    ]);
+                }
+            }
+
+            // Журнал снятия отчетов с карт
+            if($data['type_anketa'] === 'report_cart'){
+                if(!Driver::where('hash_id', $data['driver_id'])->count()){
+                    $errorsAnketa[] = 'Не найден водитель.';
+                }
+                if(count($errorsAnketa)){
+                    return redirect()->route('forms', [
+                        'errors' => $errorsAnketa,
+                        'type' => $data['type_anketa']
+                    ]);
+                }
+            }
+
+            // Журнал печати путевых листов
+            if($data['type_anketa'] === 'pechat_pl'){
+                if(!Driver::where('hash_id', $data['anketa'][0]['driver_id'])->count()){
+                    $errorsAnketa[] = 'Не найден водитель.';
+                }
+                if(count($errorsAnketa)){
+                    return redirect()->route('forms', [
+                        'errors' => $errorsAnketa,
+                        'type' => $data['type_anketa']
+                    ]);
+                }
+            }
+
+            // Журнал ПЛ
+            if($data['type_anketa'] === 'Dop'){
+                if($data['driver_id']){
+                    if(!Driver::where('hash_id', $data['driver_id'])->count()){
+                        $errorsAnketa[] = 'Не найден водитель.';
+                    }
+                }else{
+                    $errorsAnketa[] = 'Не указана машина.';
+                }
+                if($data['car_id']){
+                    if(!Car::where('hash_id', $data['car_id'])->count()){
+                        $errorsAnketa[] = 'Не найдена машина.';
+                    }
+                }else{
+                    $errorsAnketa[] = 'Не указана машина.';
+                }
+                if(count($errorsAnketa)){
+                    return redirect()->route('forms', [
+                        'errors' => $errorsAnketa,
+                        'type' => $data['type_anketa']
+                    ]);
+                }
+            }
+
+            // Журнал инструктажей по БДД
+            if($data['type_anketa'] === 'bdd'){
+                if($data['driver_id']){
+                    if(!Driver::where('hash_id', $data['driver_id'])->count()){
+                        $errorsAnketa[] = 'Не найден водитель.';
+                    }
+                }else{
+                    $errorsAnketa[] = 'Не указана машина.';
+                }
+                if(count($errorsAnketa)){
+                    return redirect()->route('forms', [
+                        'errors' => $errorsAnketa,
+                        'type' => $data['type_anketa']
+                    ]);
+                }
+            }
+
             foreach ($data_anketa as $anketa) {
-                $c_id = isset($anketa['car_id']) ? $anketa['car_id'] :
-                    (isset($data['car_id']) ? $data['car_id'] : 0);
+                $c_id = $data['car_id'] ?? 0;
                 $cars[] = $c_id;
             }
 
@@ -384,11 +492,14 @@ class AnketsController extends Controller
                 $anketasMedic = Anketa::where('driver_id', $d_id)
                     ->where('type_anketa', 'medic')
                     ->where('in_cart', 0)
+                    ->where('type_view', $anketa['type_view'] ?? '')
                     ->orderBy('date', 'desc')
-                    ->get();
+                    ->get(['ID']);
             } else if ($data['type_anketa'] === 'tech' || $data['type_anketa'] === 'vid_pl') {
                 $anketasTech = Anketa::whereIn('car_id', $cars)
                     ->whereIn('type_anketa', ['tech', 'dop'])
+                    ->where('type_anketa', 'tech')
+                    ->where('type_view', $anketa['type_view'] ?? '')
                     ->where('in_cart', 0)
                     ->orderBy('date', 'desc')
                     ->get();
@@ -399,13 +510,12 @@ class AnketsController extends Controller
                 $redDates = [];
 
                 // ID автомобиля
-                $c_id = isset($anketa['car_id']) ? $anketa['car_id'] :
-                    (isset($data['car_id']) ? $data['car_id'] : 0);
+                $c_id = $data['car_id'] ?? 0;
 
                 $Car = Car::where('hash_id', $c_id)->first();
 
                 // Тонометр
-                $tonometer = isset($anketa['tonometer']) ? $anketa['tonometer'] : $defaultDatas['tonometer'];
+                $tonometer = $anketa['tonometer'] ?? $defaultDatas['tonometer'];
 
                 if(!isset($anketa['med_view'])) {
                     $anketa['med_view'] = 'В норме';
@@ -450,6 +560,7 @@ class AnketsController extends Controller
                     $notifyTo = new Notify();
                     $notifyTo->sendMsgToUsersFrom('role', '4', 'Новый осмотр в очереди СДПО');
                 }
+
 
                 /**
                  * Компания
@@ -638,8 +749,7 @@ class AnketsController extends Controller
                 ];
 
                 if(isset($anketasMedic)) {
-                    $anketaMedic = $anketasMedic
-                        ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '');
+                    $anketaMedic = $anketasMedic;
 
                     foreach($anketaMedic as $aM) {
                         if (!$aM->date) {
@@ -656,9 +766,7 @@ class AnketsController extends Controller
                         }
                     }
                 } else if (isset($anketasTech)) {
-                    $anketaTech = $anketasTech
-                        ->where('type_anketa', 'tech')
-                        ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '');
+                    $anketaTech = $anketasTech;
 
                     /**
                      * Уволенный АВТО
