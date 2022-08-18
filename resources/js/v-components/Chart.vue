@@ -68,7 +68,7 @@ export default {
     },
 
     props: [
-        'pv_id', 'date_from', 'date_to'
+        'pv_id', 'date_from', 'date_to', 'type_anketa'
     ],
 
     data () {
@@ -107,7 +107,8 @@ export default {
         let $reports = await API.getGraphReport({
             pv_id: this.pv_id,
             date_from: this.date_from,
-            date_to: this.date_to
+            date_to: this.date_to,
+            type_anketa: this.type_anketa
         })
 
         this.data = $reports.reports;
