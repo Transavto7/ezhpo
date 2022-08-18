@@ -14,7 +14,8 @@ class Company extends Model
         'pv_id', 'town_id', 'products_id', 'where_call', 'where_call_name', 'inn',
         'procedure_pv',
         'dismissed',
-        'has_actived_prev_month'
+        'has_actived_prev_month',
+        'document_bdd'
     ];
 
     public function cars()
