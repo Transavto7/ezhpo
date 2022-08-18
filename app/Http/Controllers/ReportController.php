@@ -66,30 +66,32 @@ class ReportController extends Controller
                  */
                 case 'graph_pv':
 
-                    if($isApi) {
+                    if ($isApi) {
 
                         $reports = Anketa::whereIn('pv_id', $pv_id)
-                            ->where('type_anketa', 'medic')
-                            ->where('in_cart', 0)
-                            ->whereRaw("(date >= ? AND date <= ?)", [
-                                $date_from . " " . '00:00:00',
-                                $date_to . " " . '23:59:59'
-                            ]);
+//                            ->where('type_anketa', 'medic')
+                                         ->where('type_anketa', $request->get('type_anketa'))
+                                         ->where('in_cart', 0)
+                                         ->whereRaw("(date >= ? AND date <= ?)", [
+                                             $date_from." ".'00:00:00',
+                                             $date_to." ".'23:59:59',
+                                         ]);
 
                         $reports2 = Anketa::whereIn('pv_id', $pv_id)
-                            ->where('type_anketa', 'medic')
-                            ->where('in_cart', 0)
-                            ->whereRaw("(created_at >= ? AND created_at <= ?)", [
-                                $date_from." ".'00:00:00',
-                                $date_to." ".'23:59:59'
-                            ]);
+//                            ->where('type_anketa', 'medic')
+                                          ->where('type_anketa', $request->get('type_anketa'))
+                                          ->where('in_cart', 0)
+                                          ->whereRaw("(created_at >= ? AND created_at <= ?)", [
+                                              $date_from." ".'00:00:00',
+                                              $date_to." ".'23:59:59',
+                                          ]);
 
-                        if($date_from_time && $date_to_time) {
+                        if ($date_from_time && $date_to_time) {
                             $reports->whereTime('date', '>=', $date_from_time)
-                                ->whereTime('date', '<=', $date_to_time);
+                                    ->whereTime('date', '<=', $date_to_time);
 
                             $reports2->whereTime('created_at', '>=', $date_from_time)
-                                ->whereTime('created_at', '<=', $date_to_time);
+                                     ->whereTime('created_at', '<=', $date_to_time);
                         }
 
                         $reports = $reports->get();
