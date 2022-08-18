@@ -714,6 +714,7 @@ class IndexController extends Controller
         $model = $request->type;
         $id = $request->id;
         $model = app("App\\$model");
+//        dd($model, $id, $model);
 
         if($model) {
             if($model::find($id)->delete()) {

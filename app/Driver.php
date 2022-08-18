@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Driver extends Model
 {
+    use \Illuminate\Database\Eloquent\SoftDeletes;
+
     public $fillable = [
         'hash_id',
         //'old_id',
