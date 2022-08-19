@@ -28,7 +28,6 @@
         <div class="card">
             <div class="card-body">
                 <div>
-
                     @if($type_ankets !== 'pak_queue')
                         <div class="col-md-12">
                             <div class="row bg-light p-2">
@@ -109,6 +108,10 @@
                                 <a href="?clear=1&type_anketa={{ $type_ankets }}" class="btn btn-warning">Очистить очередь</a>
                             @endrole
                         @endif
+                    @endif
+
+                    @if (session()->has('error'))
+                        <div class="alert alert-danger" role="alert">{{ session()->get('error') }}</div>
                     @endif
 
                     @if(count($ankets) > 0)
@@ -252,7 +255,19 @@
                                             <td class="td-option not-export">
                                                 <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm"><i class="fa fa-search"></i></a>
                                                 @if($anketa->is_dop && !$anketa->result_dop)
-                                                    <button disabled class="btn btn-sm btn-success"><i class="fa fa-check"></i></button>
+                                                    @if ($anketa->date)
+                                                        <a
+                                                            href="{{ route('changeResultDop', ['result_dop' => 'Утвержден', 'id' => $anketa->id]) }}"
+                                                            class="btn btn-sm btn-success">
+                                                            <i class="fa fa-check"></i>
+                                                        </a>
+                                                    @else
+
+                                                        <button disabled
+                                                            class="btn btn-sm btn-success">
+                                                            <i class="fa fa-check"></i>
+                                                        </button>
+                                                    @endif
                                                 @endif
                                             </td>
                                         @endrole

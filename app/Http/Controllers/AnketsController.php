@@ -78,6 +78,7 @@ class AnketsController extends Controller
 
         $data['default_point'] = $point;
         $data['points'] = $points;
+        $data['is_dop'] = $anketa->is_dop;
         $data['anketa_view'] = 'profile.ankets.' . $anketa->type_anketa;
         $data['default_pv_id'] = $anketa->pv_id;
         $data['anketa_route'] = 'forms.update';
@@ -103,6 +104,60 @@ class AnketsController extends Controller
     public function ChangeResultDop ($id, $result_dop)
     {
         $anketa = Anketa::find($id);
+        $hourdiff = 1;
+        $anketaDublicate = [
+            'id' => 0,
+            'date' => ''
+        ];
+
+        if($anketa->type_anketa === 'medic') {
+            $anketaMedic = Anketa::where('driver_id', $anketa->driver_id)
+                ->where('type_anketa', 'medic')
+                ->where('type_view', $anketa->type_view)
+                ->where('in_cart', 0)
+                ->orderBy('date', 'desc')
+                ->get();
+
+            foreach($anketaMedic as $aM) {
+                if (!$aM->date || $aM->id === $anketa->id) {
+                    continue;
+                }
+
+                $hourdiff_check = round((Carbon::parse($anketa->date)->timestamp - Carbon::parse($aM->date)->timestamp)/60, 1);
+
+                if($hourdiff_check < 1 && $hourdiff_check >= 0) {
+                    $anketaDublicate['id'] = $aM->id;
+                    $anketaDublicate['date'] = $aM->date;
+                    $hourdiff = $hourdiff_check;
+                }
+            }
+        } else if($anketa->type_anketa === 'tech') {
+            $anketasTech = Anketa::where('car_id', $anketa->car_id)
+                ->whereIn('type_anketa', ['tech', 'dop'])
+                ->where('type_anketa', 'tech')
+                ->where('type_view', $anketa->type_view ?? '')
+                ->where('in_cart', 0)
+                ->orderBy('date', 'desc')
+                ->get();
+
+            foreach($anketasTech as $aT) {
+                if (!$aT->date || $aT->id === $anketa->id) {
+                    continue;
+                }
+
+                $hourdiff_check = round((Carbon::parse($anketa->date)->timestamp - Carbon::parse($aT->date)->timestamp)/60, 1);
+
+                if($hourdiff_check < 1 && $hourdiff_check >= 0) {
+                    $anketaDublicate['id'] = $aT->id;
+                    $anketaDublicate['date'] = $aT->date;
+                    $hourdiff = $hourdiff_check;
+                }
+            }
+        }
+
+        if($hourdiff < 1 && $hourdiff >= 0) {
+            return back()->with('error', "Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])");
+        }
 
         if($anketa) {
             $anketa->result_dop = $result_dop;
@@ -118,7 +173,6 @@ class AnketsController extends Controller
         $anketa = Anketa::find($id);
 
         $data = $request->all();
-
         $REFERER = isset($data['REFERER']) ? $data['REFERER'] : '';
 
         if(isset($data['REFERER'])) {
@@ -372,7 +426,6 @@ class AnketsController extends Controller
             $dopAnketas = [];
             $Driver = Driver::where('hash_id', $d_id)->first();
             $cars = [];
-            $cars[] = $data['car_id'] ?? 0;
 
             //================== VALIDATE company/driver/car ===================//
             // tech
@@ -483,9 +536,12 @@ class AnketsController extends Controller
                 }
             }
 
+            if (isset($data['car_id'])) {
+                $cars[] = $data['car_id'];
+            }
+
             foreach ($data_anketa as $anketa) {
-                $c_id = $data['car_id'] ?? 0;
-                $cars[] = $c_id;
+                $cars[] = $anketa['car_id'] ?? 0;
             }
 
             if ($data['type_anketa'] === 'medic' || $data['type_anketa'] === 'pak') {
@@ -510,9 +566,9 @@ class AnketsController extends Controller
                 $redDates = [];
 
                 // ID автомобиля
-                $c_id = $data['car_id'] ?? 0;
+                $c_id = $anketa['car_id'] ?? 0;
 
-                $Car = Car::where('hash_id', $c_id)->first();
+                $Car = $anketasTech->where('hash_id', $c_id)->first();
 
                 // Тонометр
                 $tonometer = $anketa['tonometer'] ?? $defaultDatas['tonometer'];
