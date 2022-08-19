@@ -80,7 +80,7 @@
             <label class="form-control-label col-md-3">ID автомобиля:</label>
             <article class="col-md-9">
                 <input value="{{ $car_id ?? '' }}"
-                       type="number"
+                       type="number" required
                        oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent())"
                        min="6"
                        name="anketa[0][car_id]"
