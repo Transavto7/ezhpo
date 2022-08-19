@@ -550,7 +550,7 @@ class AnketsController extends Controller
                     ->where('in_cart', 0)
                     ->where('type_view', $anketa['type_view'] ?? '')
                     ->orderBy('date', 'desc')
-                    ->get(['ID']);
+                    ->get();
             } else if ($data['type_anketa'] === 'tech' || $data['type_anketa'] === 'vid_pl') {
                 $anketasTech = Anketa::whereIn('car_id', $cars)
                     ->whereIn('type_anketa', ['tech', 'dop'])
