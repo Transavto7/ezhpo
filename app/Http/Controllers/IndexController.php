@@ -787,7 +787,7 @@ class IndexController extends Controller
             if($element) {
                 // Парсим файлы
                 foreach($request->allFiles() as $file_key => $file) {
-                    if(isset($data[$file_key]) && !isset($data[$file_key . '_base64'])) {
+                    if((isset($data[$file_key]) || is_null($data[$file_key])) && !isset($data[$file_key . '_base64'])) {
                         Storage::disk('public')->delete($element[$file_key]);
 
                         $file_path = Storage::disk('public')->putFile('elements', $file);
