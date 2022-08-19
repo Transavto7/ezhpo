@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="data" class="card">
-            <h5 class="card-header">Медосмотры за другие периоды</h5>
+            <h5 class="card-header">Медосмотры и другие услуги для водителей за другие периоды</h5>
             <div class="card-body">
                 <table id="reports-table-4" class="table table-responsive">
                     <thead>
