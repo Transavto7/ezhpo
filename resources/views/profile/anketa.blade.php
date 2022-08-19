@@ -169,7 +169,7 @@
                             @hasSection('ankets_submit')
                                 @yield('ankets_submit')
                             @else
-                                <button disabled type="submit" class="m-center btn btn-success">{{ __('ankets.submit') }}</button>
+                                <button type="submit" class="m-center btn btn-success">{{ __('ankets.submit') }}</button>
                             @endif
                         </div>
                     </form>
