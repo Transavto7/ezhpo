@@ -90,6 +90,16 @@
                     </div>
                 @endmanager
 
+                @if($user->role == 12)
+                <div class="line"></div>
+                <div class="form-group row">
+                    <label class="col-sm-3 form-control-label">Ссылка на таблицу с документами БДД</label>
+                    <div class="col-sm-9">
+                        <input type="text" disabled value="{{ $user->company->document_bdd }}" class="form-control">
+                    </div>
+                </div>
+                @endif
+
                 <div class="line"></div>
                 <div class="form-group row">
                     <div class="col-sm-4 offset-sm-3">

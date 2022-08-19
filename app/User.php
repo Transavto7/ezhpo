@@ -30,10 +30,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Anketa::class, 'user_id', 'id');
     }
+
     // sorry for name
     public function company()
     {
-        return $this->belongsTo(Company::class, 'company_id', 'id');
+        return $this->belongsTo(Company::class, 'company_id', 'id')
+                    ->withDefault();
     }
 
     public static $userRolesValues = [
