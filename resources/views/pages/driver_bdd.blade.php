@@ -2,20 +2,12 @@
 
 @section('title', 'ЛК Водителя')
 @php
-$instrs = $instrs->sortBy('id')
-            ->sort(function ($a, $b) {
-        if (is_null($a->sort)) {
-            return is_null($b->sort) ? 0 : 1;
-        }
-        if (is_null($b->sort)) {
-            return -1;
-        }
-        if ($a->sort == $b->sort) {
-            return 0;
-        }
 
-        return $a->sort < $b->sort ? -1 : 1;
-});
+$nullable = $instrs->where('sort','===', null);
+$full = $instrs->where('sort','!==' ,null)->sortBy('sort');
+$instrs = collect();
+$instrs = $instrs->merge($full);
+$instrs = $instrs->merge($nullable);
 @endphp
 @section('content')
     <div class="container text-center">
