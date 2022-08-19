@@ -72,11 +72,12 @@ class ProfileController extends Controller
      */
     public function RenderIndex ()
     {
-        $user = Auth::user();
+//        $user = Auth::user();
+        $user = User::with(['company'])->find(Auth::user()->id);
 
-        if($user->hasRole('client', '==')) {
-            return redirect( route('home') );
-        }
+//        if($user->hasRole('client', '==')) {
+//            return redirect( route('home') );
+//        }
 
         // Получение пункта выпуска
         $point = Point::getPointText($user->pv_id);
