@@ -529,9 +529,40 @@ $(document).ready(function () {
     }
 
     // Проверка свойства по модели на бэкенда
-    window.checkInputProp = (prop = '0', model = '0', val = '0', label, parent) => {
-        const PARENT_ELEM = parent;
+    window.checkInputProp = async (prop = '0', model = '0', val = '0', label, parent) => {
 
+        let PARENT_ELEM = $(event.target).parent();
+
+        if(parent){
+            PARENT_ELEM = parent;
+        }
+
+        console.log(PARENT_ELEM)
+        console.log(prop)
+        console.log(model)
+        console.log(val)
+        //check-prop-one
+        let answer = await $.ajax({
+            url: `/api/check-prop-one/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
+            headers: {'Authorization': 'Bearer ' + API_TOKEN},
+            success:  (data) => {
+                let element = PARENT_ELEM.find('.app-checker-prop')
+                if(data.status){
+                    element.removeClass('text-danger').addClass('text-success').text(data.name);
+                    PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', false);
+                }else{
+                    element.removeClass('text-success').addClass('text-danger').text(`Не найдено`);
+                    PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', true);
+                }
+            }
+        })
+        console.log(123)
+        console.log(answer)
+        if(!answer.status){
+            return;
+        }
+
+        console.log(prop, model, val)
         $.ajax({
             url: `/api/check-prop/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
             headers: {'Authorization': 'Bearer ' + API_TOKEN},
@@ -596,7 +627,8 @@ $(document).ready(function () {
 
                 if(DATA) {
                     if(!!DATA.company_id) {
-                        checkInputProp('id', 'Company', DATA.company_id, 'name', [])
+                        $('#ANKETA_FORM').find('input[name="company_id"]').parent().find('.app-checker-prop').removeClass('text-danger').addClass('text-success').text(DATA.company_name);
+                        PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', false);
                     }
                 }
 
