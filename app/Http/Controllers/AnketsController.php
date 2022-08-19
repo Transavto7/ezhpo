@@ -119,7 +119,7 @@ class AnketsController extends Controller
                 ->get();
 
             foreach($anketaMedic as $aM) {
-                if (!$aM->date || $aM->id === $anketa->id) {
+                if (!$aM->date || $aM->id === $anketa->id || $aT->result_dop == null) {
                     continue;
                 }
 
@@ -141,7 +141,7 @@ class AnketsController extends Controller
                 ->get();
 
             foreach($anketasTech as $aT) {
-                if (!$aT->date || $aT->id === $anketa->id) {
+                if (!$aT->date || $aT->id === $anketa->id || $aT->result_dop == null) {
                     continue;
                 }
 
