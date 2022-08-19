@@ -69,13 +69,22 @@ class ReportController extends Controller
                     if ($isApi) {
 
                         $reports = Anketa::whereIn('pv_id', $pv_id)
-//                            ->where('type_anketa', 'medic')
-                                         ->where('type_anketa', $request->get('type_anketa'))
-                                         ->where('in_cart', 0)
-                                         ->whereRaw("(date >= ? AND date <= ?)", [
-                                             $date_from." ".'00:00:00',
-                                             $date_to." ".'23:59:59',
+                             ->where('type_anketa', $request->get('type_anketa'))
+                             ->where('in_cart', 0)
+                             ->where(function ($q) use ($date_from, $date_to) {
+                                 $q->where(function ($q) use ($date_from, $date_to) {
+                                     $q->whereNotNull('date')
+                                         ->whereBetween('date', [
+                                             $date_from.' '.'00:00:00',
+                                             $date_to.' '.'23:59:59',
                                          ]);
+                                 })->orWhere(function ($q) use ($date_from, $date_to) {
+                                     $q->whereNull('date')->whereBetween('period_pl', [
+                                         Carbon::parse($date_from)->format('Y-m'),
+                                         Carbon::parse($date_to)->format('Y-m'),
+                                     ]);
+                                 });
+                            });
 
                         $reports2 = Anketa::whereIn('pv_id', $pv_id)
 //                            ->where('type_anketa', 'medic')
