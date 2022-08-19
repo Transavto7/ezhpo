@@ -28,7 +28,7 @@
             <label class="col-md-3 form-control-label">Дата осмотра ПЛ:</label>
             <article class="col-md-9">
                 <input min="1900-02-20T20:20"
-                       max="2999-02-20T20:20" type="datetime-local" name="anketa[0][date]" class="form-control">
+                       max="2999-02-20T20:20" type="datetime-local" value="{{ $default_current_date ?? '' }}" name="anketa[0][date]" class="form-control">
             </article>
         </div>
 
