@@ -5,7 +5,10 @@
 @section('class-page', 'page-anketa anketa-' . $type_anketa)
 
 @php
-    $is_dop = isset($_GET['is_dop']) ? ($_GET['is_dop'] === "1") : 0;
+    if (!isset($is_dop)) {
+        $is_dop = isset($_GET['is_dop']) ? ($_GET['is_dop'] === "1") : 0;
+    }
+
 @endphp
 
 @section('custom-scripts')
