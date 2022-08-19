@@ -537,10 +537,6 @@ $(document).ready(function () {
             PARENT_ELEM = parent;
         }
 
-        console.log(PARENT_ELEM)
-        console.log(prop)
-        console.log(model)
-        console.log(val)
         //check-prop-one
         let answer = await $.ajax({
             url: `/api/check-prop-one/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
@@ -556,8 +552,7 @@ $(document).ready(function () {
                 }
             }
         })
-        console.log(123)
-        console.log(answer)
+
         if(!answer.status){
             return;
         }
@@ -629,6 +624,7 @@ $(document).ready(function () {
                     if(!!DATA.company_id) {
                         $('#ANKETA_FORM').find('input[name="company_id"]').parent().find('.app-checker-prop').removeClass('text-danger').addClass('text-success').text(DATA.company_name);
                         PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', false);
+                        checkInputProp('id', 'Company', DATA.company_id, 'name', $('#ANKETA_FORM').find('input[name="company_id"]').parent())
                     }
                 }
 
