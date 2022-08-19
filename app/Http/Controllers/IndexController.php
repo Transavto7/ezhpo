@@ -787,7 +787,7 @@ class IndexController extends Controller
             if($element) {
                 // Парсим файлы
                 foreach($request->allFiles() as $file_key => $file) {
-                    if((isset($data[$file_key]) || is_null($data[$file_key])) && !isset($data[$file_key . '_base64'])) {
+                    if((isset($data[$file_key])) && !isset($data[$file_key . '_base64'])) {
                         Storage::disk('public')->delete($element[$file_key]);
 
                         $file_path = Storage::disk('public')->putFile('elements', $file);
@@ -801,8 +801,7 @@ class IndexController extends Controller
 
                     if(is_array($v)) {
                         $element[$k] = join(',', $v);
-                    }
-                    else if(preg_match('/^data:image\/(\w+);base64,/', $v)) {
+                    } else if(preg_match('/^data:image\/(\w+);base64,/', $v)) {
                         $k = str_replace('_base64', '', $k);
 
                         $base64_image = substr($v, strpos($v, ',') + 1);
@@ -816,7 +815,7 @@ class IndexController extends Controller
                         $element->$k = $path;
                     }
                     else {
-                        if(isset($v) && !$request->hasFile($k)) {
+                        if((isset($v) || (is_null($v))) && !$request->hasFile($k)) {
                             $element[$k] = $v;
                         }
                     }
@@ -874,12 +873,12 @@ class IndexController extends Controller
                 }
 
             }
-
+//dd($element->toArray()); //  || is_null($data[$file_key])
             /**
              * Пустые поля обновляем
              */
             foreach($oldDataModel as $oldDataItemKey => $oldDataItemValue) {
-                if(!isset($data[$oldDataItemKey]) && $oldDataItemKey == 'note') {
+                if(!isset($data[$oldDataItemKey])  && $oldDataItemKey == 'note') {
                     $element[$oldDataItemKey] = '';
                 }
             }
