@@ -119,6 +119,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::post('/anketa', 'AnketsController@ApiAddForm')->name('api.addform');
+    Route::get('/check-prop-one/{prop}/{model}/{val}', 'ApiController@OneCheckProperty');
     Route::get('/check-prop/{prop}/{model}/{val}', 'ApiController@CheckProperty');
 
     Route::post('/field-history', 'FieldHistoryController@save');
