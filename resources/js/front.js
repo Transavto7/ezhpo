@@ -529,7 +529,7 @@ $(document).ready(function () {
     }
 
     // Проверка свойства по модели на бэкенда
-    window.checkInputProp = async (prop = '0', model = '0', val = '0', label, parent) => {
+    window.checkInputProp = async (prop = '0', model = '0', val = '0', label, parent, is_dop) => {
 
         let PARENT_ELEM = $(event.target).parent();
 
@@ -537,25 +537,29 @@ $(document).ready(function () {
             PARENT_ELEM = parent;
         }
 
+        console.log(is_dop)
         //check-prop-one
-        let answer = await $.ajax({
-            url: `/api/check-prop-one/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
-            headers: {'Authorization': 'Bearer ' + API_TOKEN},
-            success:  (data) => {
-                let element = PARENT_ELEM.find('.app-checker-prop')
-                if(data.status){
-                    element.removeClass('text-danger').addClass('text-success').text(data.name);
-                    PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', false);
-                }else{
-                    element.removeClass('text-success').addClass('text-danger').text(`Не найдено`);
-                    PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', true);
+        if(!is_dop){
+            let answer = await $.ajax({
+                url: `/api/check-prop-one/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
+                headers: {'Authorization': 'Bearer ' + API_TOKEN},
+                success:  (data) => {
+                    let element = PARENT_ELEM.find('.app-checker-prop')
+                    if(data.status){
+                        element.removeClass('text-danger').addClass('text-success').text(data.name);
+                        PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', false);
+                    }else{
+                        element.removeClass('text-success').addClass('text-danger').text(`Не найдено`);
+                        PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', true);
+                    }
                 }
-            }
-        })
+            })
 
-        if(!answer.status){
-            return;
+            if(!answer.status){
+                return;
+            }
         }
+
 
         console.log(prop, model, val)
         $.ajax({
