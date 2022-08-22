@@ -72,10 +72,9 @@ class AnketsController extends Controller
 
         if ($anketa->date) {
             $data['default_current_date'] = date('Y-m-d\TH:i', strtotime($anketa->date)); // date('Y-m-d\TH:i')
-        } else {
-            $data['default_current_date'] = Carbon::now()->format('Y-m-d\TH:i');
         }
 
+        $data['date'] = $anketa->date;
         $data['default_point'] = $point;
         $data['points'] = $points;
         $data['is_dop'] = $anketa->is_dop;
@@ -119,7 +118,7 @@ class AnketsController extends Controller
                 ->get();
 
             foreach($anketaMedic as $aM) {
-                if (!$aM->date || $aM->id === $anketa->id || $aM->result_dop == null) {
+                if (!$aM->date || $aM->id === $anketa->id || ($aM->is_dop && $aM->result_dop == null)) {
                     continue;
                 }
 
@@ -141,7 +140,7 @@ class AnketsController extends Controller
                 ->get();
 
             foreach($anketasTech as $aT) {
-                if (!$aT->date || $aT->id === $anketa->id || $aT->result_dop == null) {
+                if (!$aT->date || $aT->id === $anketa->id || ($aT->is_dop && $aT->result_dop == null)) {
                     continue;
                 }
 
@@ -777,11 +776,26 @@ class AnketsController extends Controller
                     'date' => ''
                 ];
 
-                if(isset($anketasMedic)) {
+                if(isset($anketasMedic) && !$anketa['is_dop']) {
                     $anketaMedic = $anketasMedic;
 
+                    $count = 0;
+
+                    foreach ($data_anketa as $aM) {
+                        $hourdiff_check = round((Carbon::parse($anketa['date'])->timestamp - Carbon::parse($aM['date'])->timestamp)/60, 1);
+
+                        if($hourdiff_check < 1 && $hourdiff_check >= 0) {
+                            $count++;
+                        }
+                    }
+
+                    if ($count > 1) {
+                        $hourdiff = $hourdiff_check;
+                        $anketaDublicate['date'] = $aM['date'];
+                    }
+
                     foreach($anketaMedic as $aM) {
-                        if (!$aM->date) {
+                        if (!$aM->date || ($aM->is_dop && $aM->result_dop == null)) {
                             continue;
                         }
 
@@ -836,9 +850,28 @@ class AnketsController extends Controller
                         }
                     }
 
-                    if($anketaTech) {
+                    if($anketaTech && !$anketa['is_dop']) {
+                        $count = 0;
+
+                        foreach ($data_anketa as $aT) {
+                            if ($aT['car_id'] != $anketa['car_id']) {
+                                continue;
+                            }
+
+                            $hourdiff_check = round((Carbon::parse($anketa['date'])->timestamp - Carbon::parse($aT['date'])->timestamp)/60, 1);
+
+                            if($hourdiff_check < 1 && $hourdiff_check >= 0) {
+                                $count++;
+                            }
+                        }
+
+                        if ($count > 1) {
+                            $hourdiff = $hourdiff_check;
+                            $anketaDublicate['date'] = $aT['date'];
+                        }
+
                         foreach($anketaTech as $aT) {
-                            if (!$aT->date) {
+                            if (!$aT->date || ($aT->is_dop && $aT->result_dop == null)) {
                                 continue;
                             }
 
@@ -853,8 +886,12 @@ class AnketsController extends Controller
                     }
                 }
 
-                if(($hourdiff < 1 && $hourdiff >= 0) && count($data_anketa) <= 1) {
-                    $errMsg = "Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])";
+                if(($hourdiff < 1 && $hourdiff >= 0)) {
+                    if ($anketaDublicate['id'] != 0) {
+                        $errMsg = "Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])";
+                    } else {
+                        $errMsg = "Найден дубликат осмотра при добавлении (Дата: $anketaDublicate[date])";
+                    }
 
                     array_push($errorsAnketa, $errMsg);
                     continue;
@@ -1021,7 +1058,7 @@ class AnketsController extends Controller
 
             $responseData = [
                 'createdId' => $createdAnketas->pluck('id')->toArray(),
-                'errors' => $errorsAnketa,
+                'errors' => array_unique($errorsAnketa),
                 'type' => $data['type_anketa']
             ];
 
@@ -1372,9 +1409,9 @@ class AnketsController extends Controller
                         ->orderBy('date', 'desc')
                         ->get();
 
-                    if($anketaMedic) {
+                    if($anketaMedic && !$anketa['is_dop']) {
                         foreach($anketaMedic as $aM) {
-                            if (!$aM->date) {
+                            if (!$aM->date || ($aM->is_dop && $aM->result_dop == null)) {
                                 continue;
                             }
 
@@ -1435,11 +1472,15 @@ class AnketsController extends Controller
                         }
                     }
 
-                    if($anketaTech) {
+                    if($anketaTech && !$anketa['is_dop']) {
                         foreach($anketaTech as $aT) {
+                            if (!$aT->date || ($aT->is_dop && $aT->result_dop == null)) {
+                                continue;
+                            }
+
                             $hourdiff_check = round((strtotime($anketa['date']) - Carbon::parse($aT->date)->timestamp)/60, 1);
 
-                            if($hourdiff_check < 1 && $hourdiff_check >= 0 && $aT->date) {
+                            if($hourdiff_check < 1 && $hourdiff_check >= 0) {
                                 $anketaDublicate['id'] = $aT->id;
                                 $anketaDublicate['date'] = $aT->date;
                                 $hourdiff = $hourdiff_check;
