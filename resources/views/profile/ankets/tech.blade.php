@@ -8,7 +8,7 @@
     <div class="form-group row">
         <label class="form-control-label col-md-3">ID компании:</label>
         <article class="col-md-9">
-            <input value="{{ $company_id ?? '' }}" required type="number" oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Company', event.target.value, 'name', $(event.target).parent())" min="5" name="company_id" class="MASK_ID_ELEM form-control">
+            <input value="{{ $company_id ?? '' }}" required type="number" oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Company', event.target.value, 'name', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})" min="5" name="company_id" class="MASK_ID_ELEM form-control">
             <p class="app-checker-prop"></p>
         </article>
     </div>
@@ -16,7 +16,7 @@
     <div class="form-group row">
         <label class="form-control-label col-md-3">ID водителя:</label>
         <article class="col-md-9">
-            <input value="{{ $driver_id ?? '' }}" type="number" oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent())" min="6" name="driver_id" class="MASK_ID_ELEM form-control">
+            <input value="{{ $driver_id ?? '' }}" type="number" oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})" min="6" name="driver_id" class="MASK_ID_ELEM form-control">
             <p class="app-checker-prop"></p>
         </article>
     </div>
@@ -26,7 +26,7 @@
         <div class="form-group row">
             <label class="col-md-3 form-control-label">ID автомобиля:</label>
             <article class="col-md-9">
-                <input required value="{{ $car_id ?? '' }}" type="number" oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent())" min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control">
+                <input required value="{{ $car_id ?? '' }}" type="number" oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})" min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control">
                 <p class="app-checker-prop"></p>
             </article>
         </div>
@@ -87,7 +87,7 @@
     <div class="form-group">
         <label class="form-control-label">ID водителя:</label>
         <article>
-            <input value="{{ $driver_id ?? '' }}" type="number" oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent())" min="6" name="driver_id" class="MASK_ID_ELEM form-control">
+            <input value="{{ $driver_id ?? '' }}" type="number" oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})" min="6" name="driver_id" class="MASK_ID_ELEM form-control">
             <p class="app-checker-prop"></p>
         </article>
     </div>
@@ -104,7 +104,7 @@
         <div class="form-group">
             <label class="form-control-label">ID автомобиля:</label>
             <article>
-                <input required value="{{ $car_id ?? '' }}" type="number" required oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent())" min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control">
+                <input required value="{{ $car_id ?? '' }}" type="number" required oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})" min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control">
                 <p class="app-checker-prop"></p>
             </article>
         </div>

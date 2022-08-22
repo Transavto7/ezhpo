@@ -427,107 +427,80 @@ class AnketsController extends Controller
             $Driver = Driver::where('hash_id', $d_id)->first();
             $cars = [];
 
-            //================== VALIDATE company/driver/car ===================//
-            // tech
-            if($data['type_anketa'] === 'tech'){
-                if($data['is_dop'] == 1){
-                    if(!Company::where('hash_id', $data['company_id'])->count()){
-                        $errorsAnketa[] = 'Не найдена компания.';
+            // Только обычные осмотры валидируем
+            if($data['is_dop'] != 1){
+
+                //================== VALIDATE company/driver/car ===================//
+                // tech
+                if($data['type_anketa'] === 'tech'){
+                    if($data['is_dop'] == 1){
+                        if(!Company::where('hash_id', $data['company_id'])->count()){
+                            $errorsAnketa[] = 'Не найдена компания.';
+                        }
                     }
-                }
-                if(!Car::where('hash_id', $data['anketa'][0]['car_id'])->count()){
-                    $errorsAnketa[] = 'Не найдена машина.';
-                }
-                if(!Driver::where('hash_id', $data['driver_id'])->count()){
-                    $errorsAnketa[] = 'Не найден водитель.';
-                }
-                if(count($errorsAnketa)){
-                    return redirect()->route('forms', [
-                        'errors' => $errorsAnketa,
-                        'type' => $data['type_anketa'],
-                        'is_dop' => $data['is_dop'],
-                    ]);
-                }
-            }
-
-            // medic
-            if($data['type_anketa'] === 'medic'){
-                if($data['is_dop'] == 1){
-                    if(!Company::where('hash_id', $data['company_id'])->count()){
-                        $errorsAnketa[] = 'Не найдена компания.';
-                    }
-                }
-                if(!Driver::where('hash_id', $data['driver_id'])->count()){
-                    $errorsAnketa[] = 'Не найден водитель.';
-                }
-                if(count($errorsAnketa)){
-                    return redirect()->route('forms', [
-                        'errors' => $errorsAnketa,
-                        'type' => $data['type_anketa'],
-                        'is_dop' => $data['is_dop'],
-                    ]);
-                }
-            }
-
-            // Журнал снятия отчетов с карт
-            if($data['type_anketa'] === 'report_cart'){
-                if(!Driver::where('hash_id', $data['driver_id'])->count()){
-                    $errorsAnketa[] = 'Не найден водитель.';
-                }
-                if(count($errorsAnketa)){
-                    return redirect()->route('forms', [
-                        'errors' => $errorsAnketa,
-                        'type' => $data['type_anketa']
-                    ]);
-                }
-            }
-
-            // Журнал печати путевых листов
-            if($data['type_anketa'] === 'pechat_pl'){
-                if(!Driver::where('hash_id', $data['anketa'][0]['driver_id'])->count()){
-                    $errorsAnketa[] = 'Не найден водитель.';
-                }
-                if(count($errorsAnketa)){
-                    return redirect()->route('forms', [
-                        'errors' => $errorsAnketa,
-                        'type' => $data['type_anketa']
-                    ]);
-                }
-            }
-
-            // Журнал ПЛ
-            if($data['type_anketa'] === 'Dop'){
-                if($data['driver_id']){
-                    if(!Driver::where('hash_id', $data['driver_id'])->count()){
-                        $errorsAnketa[] = 'Не найден водитель.';
-                    }
-                }else{
-                    $errorsAnketa[] = 'Не указана машина.';
-                }
-                if($data['car_id']){
-                    if(!Car::where('hash_id', $data['car_id'])->count()){
+                    if(!Car::where('hash_id', $data['anketa'][0]['car_id'])->count()){
                         $errorsAnketa[] = 'Не найдена машина.';
                     }
-                }else{
-                    $errorsAnketa[] = 'Не указана машина.';
-                }
-                if(count($errorsAnketa)){
-                    return redirect()->route('forms', [
-                        'errors' => $errorsAnketa,
-                        'type' => $data['type_anketa']
-                    ]);
-                }
-            }
-
-            // Журнал инструктажей по БДД
-            if($data['type_anketa'] === 'bdd'){
-                if($data['driver_id']){
                     if(!Driver::where('hash_id', $data['driver_id'])->count()){
                         $errorsAnketa[] = 'Не найден водитель.';
                     }
-                }else{
-                    $errorsAnketa[] = 'Не указана машина.';
                 }
+
+                // medic
+                if($data['type_anketa'] === 'medic'){
+                    if($data['is_dop'] == 1){
+                        if(!Company::where('hash_id', $data['company_id'])->count()){
+                            $errorsAnketa[] = 'Не найдена компания.';
+                        }
+                    }
+                    if(!Driver::where('hash_id', $data['driver_id'])->count()){
+                        $errorsAnketa[] = 'Не найден водитель.';
+                    }
+                }
+
+                // Журнал снятия отчетов с карт
+                if($data['type_anketa'] === 'report_cart'){
+                    if(!Driver::where('hash_id', $data['driver_id'])->count()){
+                        $errorsAnketa[] = 'Не найден водитель.';
+                    }
+                }
+
+                // Журнал печати путевых листов
+                if($data['type_anketa'] === 'pechat_pl'){
+                    if(!Driver::where('hash_id', $data['anketa'][0]['driver_id'])->count()){
+                        $errorsAnketa[] = 'Не найден водитель.';
+                    }
+                }
+
+                // Журнал ПЛ
+                if($data['type_anketa'] === 'Dop'){
+                    if($data['driver_id']){
+                        if(!Driver::where('hash_id', $data['driver_id'])->count()){
+                            $errorsAnketa[] = 'Не найден водитель.';
+                        }
+                    }else{
+                        $errorsAnketa[] = 'Не указана машина.';
+                    }
+                    if($data['car_id']){
+                        if(!Car::where('hash_id', $data['car_id'])->count()){
+                            $errorsAnketa[] = 'Не найдена машина.';
+                        }
+                    }else{
+                        $errorsAnketa[] = 'Не указана машина.';
+                    }
+                }
+
+                // Журнал инструктажей по БДД
+                if($data['type_anketa'] === 'bdd'){
+                    if($data['driver_id']){
+                        if(!Driver::where('hash_id', $data['driver_id'])->count()){
+                            $errorsAnketa[] = 'Не найден водитель.';
+                        }
+                    }else{
+                        $errorsAnketa[] = 'Не указана машина.';
+                    }
+                }
+
                 if(count($errorsAnketa)){
                     return redirect()->route('forms', [
                         'errors' => $errorsAnketa,
