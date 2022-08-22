@@ -15,6 +15,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Facades\Excel;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class HomeController extends Controller
 {
@@ -232,7 +234,7 @@ class HomeController extends Controller
         /**
          * Очистка корзины в очереди на утверждение от СДПО
          */
-        if (isset($_GET['clear']) && isset($_GET['type_anketa']) && $user->hasRole('admin', '==')) {
+        if (isset($_GET['clear']) && isset($_GET['type_anketa']) && $user->hasRole('admin')) {
             $typeClearAnkets = trim($_GET['type_anketa']);
 
             if ($typeClearAnkets === 'pak_queue') {
@@ -375,7 +377,9 @@ class HomeController extends Controller
 
         }
 
-        if (auth()->user()->hasRole('client', '==')) {
+        if (auth()->user()->hasRole('client')) {
+            $company_id_client = User::getUserCompanyId('hash_id');
+
             $company_id_client = auth()->user()->company->hash_id;
             $anketas = $anketas->where('anketas.company_id', $company_id_client);
         }
@@ -493,7 +497,7 @@ class HomeController extends Controller
             $anketsFieldsTable = $anketsFields;
         }
 
-        if (auth()->user()->hasRole('client', '==')) {
+        if (auth()->user()->hasRole('client')) {
             unset($fieldsKeys['created_at']);
             unset($fieldsKeys['is_pak']);
         }
@@ -505,7 +509,7 @@ class HomeController extends Controller
 
         $currentRole = $validTypeAnkets === 'Dop' ? 'medic' : $validTypeAnkets;
 
-        if ($typeAnkets === 'pak_queue' && $user->hasRole('operator_pak', '==')) {
+        if ($typeAnkets === 'pak_queue' && $user->hasRole('operator_sdpo')) {
             $currentRole = 'operator_pak';
         }
 
@@ -560,7 +564,7 @@ class HomeController extends Controller
             ? Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] : [];
         $anketsFields     = array_keys($fieldsKeys);
 
-        if (auth()->user()->hasRole('client', '==')) {
+        if (auth()->user()->hasRole('client')) {
             unset($fieldsKeys['created_at']);
             unset($fieldsKeys['is_pak']);
         }

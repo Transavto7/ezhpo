@@ -34,7 +34,7 @@
                         @php $default_value = isset($v['defaultValue']) ? $v['defaultValue'] : '' @endphp
 
                         @if($k !== 'id' && !isset($v['hidden']))
-                            @if($model === 'Instr' && $k === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
+                            @if($model === 'Instr' && $k === 'sort' && (!auth()->user()->hasRole('engineer_bdd') && !auth()->user()->hasRole('admin')))
                                 <!-- Сортировка инструктажей доступна админу или инженеру -->
                             @elseif($model === 'Instr' && $k === 'signature')
                             @else
@@ -234,7 +234,7 @@
     <div class="col-md-12">
         <div class="row bg-light p-2">
             @role(['manager', 'admin', 'tech', 'medic', 'client'])
-                @if($model === 'Company' && (auth()->user()->hasRole('tech', '==') || auth()->user()->hasRole('medic', '==')))
+                @if($model === 'Company' && (auth()->user()->hasRole('tech') || auth()->user()->hasRole('medic')))
                 @else
                     <div class="col-md-2">
                         <button type="button" data-toggle="modal" data-target="#elements-modal-add" class="@isset($_GET['continue']) TRIGGER_CLICK @endisset btn btn-sm btn-success">Добавить <i class="fa fa-plus"></i></button>
@@ -303,7 +303,7 @@
                                                 'is_required' => '',
                                                 'default_value' => request()->get($fk)
                                             ])
-                                        @elseif($model === 'Instr' && $fk === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
+                                        @elseif($model === 'Instr' && $fk === 'sort' && (!auth()->user()->hasRole('engineer_bdd') && !auth()->user()->hasRole('admin')))
                                             <!-- Сортировка доступна только инженеру БДД и Админу -->
                                         @else
                                             @include('templates.elements_field', [
@@ -353,7 +353,7 @@
                 @foreach ($fields as $k => $v)
                     @if(!isset($v['hidden']))
 
-                        @if($model === 'Instr' && $k === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
+                        @if($model === 'Instr' && $k === 'sort' && (!auth()->user()->hasRole('engineer_bdd') && !auth()->user()->hasRole('admin')))
                            <!-- Только админам -->
                         @elseif($model === 'Instr' && $k === 'signature')
                         @else
@@ -417,7 +417,7 @@
                                     @if($elK === 'products_id' || $elK === 'company_id' || $elK === 'req_id' || $elK === 'pv_id' || $elK === 'user_id' || $elK === 'town_id' || $elK === 'essence')
                                         @if($elK === 'company_id')
 
-                                            @if(($model === 'Driver' || $model === 'Car') && $el->$elK && auth()->user()->hasRole('client', '!=') && auth()->user()->hasRole('operator_pak', '!='))
+                                            @if(($model === 'Driver' || $model === 'Car') && $el->$elK && auth()->user()->hasRole('client') && auth()->user()->hasRole('operator_pak'))
                                                 <div>
                                                     <a href="{{ route('renderElements', ['model' => 'Company', 'filter' => 1, 'id' => $el->company_id ]) }}">{{ app('App\Company')->getName($el->company_id) }}</a>
 
@@ -447,12 +447,15 @@
                                         @endif
 
                                     @else
-                                        @if(Storage::disk('public')->exists($el[$elK]) && $el[$elK] !== '<' && $el[$elK] !== '>')
+                                        @if($elK == 'photo')
+                                           @if(Storage::disk('public')->exists($el[$elK]) && $el[$elK] !== '<' && $el[$elK] !== '>')
+
                                             <a href="{{ Storage::url($el[$elK]) }}" data-fancybox="gallery_{{ $el->id }}">
                                                 <b>
                                                     <i class="fa fa-camera"></i>
                                                 </b>
                                             </a>
+                                           @endif
                                         @else
                                             {{--ПРОВЕРКА ДАТЫ--}}
                                             @if($elK === 'date' || strpos($elK, '_at') > 0)
@@ -463,6 +466,7 @@
                                                 @endforeach
                                             @elseif ($elK === 'date_of_employment')
                                                 {{ $el[$elK] ? \Carbon\Carbon::parse($el[$elK])->format('d.m.Y') : '' }}
+                                            @elseif($model === 'Instr' && $elK === 'sort' && (!auth()->user()->hasRole('engineer_bdd') && !auth()->user()->hasRole('admin')))
                                             @elseif ($elK === 'trigger')
                                                 {{ $el[$elK] === '<' ? 'меньше' : 'больше'  }}
                                             @elseif($model === 'Instr' && $elK === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))

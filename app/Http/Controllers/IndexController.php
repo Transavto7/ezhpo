@@ -788,6 +788,7 @@ class IndexController extends Controller
                 // Парсим файлы
                 foreach($request->allFiles() as $file_key => $file) {
                     if((isset($data[$file_key])) && !isset($data[$file_key . '_base64'])) {
+//                    if((isset($data[$file_key]) || is_null($data[$file_key])) && !isset($data[$file_key . '_base64'])) {
                         Storage::disk('public')->delete($element[$file_key]);
 
                         $file_path = Storage::disk('public')->putFile('elements', $file);
@@ -873,7 +874,7 @@ class IndexController extends Controller
                 }
 
             }
-//dd($element->toArray()); //  || is_null($data[$file_key])
+
             /**
              * Пустые поля обновляем
              */
@@ -915,11 +916,11 @@ class IndexController extends Controller
             return view('auth.login');
         }
 
-        if($user->hasRole('operator_pak', '==')) {
+        if($user->hasRole('operator_pak')) {
             return redirect()->route('home', 'pak_queue');
         }
 
-        if($user->hasRole('manager', '==') || $user->role_manager) {
+        if($user->hasRole('manager')) {
             return redirect()->route('renderElements', 'Company');
         }
 
@@ -1025,8 +1026,8 @@ class IndexController extends Controller
                 }
             }
 
-            if(auth()->user()->hasRole('client', '==') && auth()->user()->company) {
-                $company_user_id = auth()->user()->company->id;
+            if(User::getUserCompanyId() && auth()->user()->hasRole('client')) {
+                $company_user_id = User::getUserCompanyId();
 
                 if($model == 'Driver' || $model == 'Car') {
                     $element['elements'] = $element['elements']->where('company_id', $company_user_id);
@@ -1042,7 +1043,7 @@ class IndexController extends Controller
             // Автоматическая загрузка справочников
             $excludeElementTypes = ['Settings', 'Discount', 'DDates', 'DDate', 'Product', 'Instr', 'Town', 'Point', 'FieldHistory', 'Req'];
 
-            if($filter || in_array($type, $excludeElementTypes) || ($user->hasRole('client', '==') && ($type === 'Driver' || $type === 'Car'))) {
+            if($filter || in_array($type, $excludeElementTypes) || ($user->hasRole('client') && ($type === 'Driver' || $type === 'Car'))) {
                 if($element['max']) {
                     $element['elements'] = $element['elements']->take($element['max'])->get();
                 } else {
@@ -1093,11 +1094,19 @@ class IndexController extends Controller
     {
         $user = Auth::user();
 
-        if($user->hasRole('client', '==')) {
-            return redirect( route('home') );
+        if($user->hasRole('client')) {
+            return redirect(route('home') );
+        }
+        $type = $request->get('type');
+
+        if(!$type){
+            if(user()->access('tech_create')){
+                $type = 'tech';
+            }else if(user()->access('medic_create')){
+                $type = 'medic';
+            }
         }
 
-        $type = $request->get('type', ($user->role === 1 ? 'tech' : 'medic') );
         $company_fields = $this->elements['Driver']['fields']['company_id'];
         $company_fields['getFieldKey'] = 'name';
 
