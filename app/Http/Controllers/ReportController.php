@@ -42,12 +42,12 @@ class ReportController extends Controller
         $pv_fields['multiple'] = 1;
 
         $date_field = 'date';
-        $date_from = isset($data['date_from']) ? $data['date_from'] : '';
-        $date_to = isset($data['date_to']) ? $data['date_to'] : date('Y-m-d');
+        $date_from = $data['date_from'] ?? Carbon::now()->startOfYear();
+        $date_to = $data['date_to'] ?? Carbon::now();
         $date_from_time = $request->get('date_from_time', '00:00:00');
         $date_to_time = $request->get('date_from_time', '23:59:59');
 
-        $pv_id = isset($data['pv_id']) ? $data['pv_id'] : [0];
+        $pv_id = $data['pv_id'] ?? [0];
 
         $dopData = [];
 
@@ -90,7 +90,7 @@ class ReportController extends Controller
 //                            ->where('type_anketa', 'medic')
                                           ->where('type_anketa', $request->get('type_anketa'))
                                           ->where('in_cart', 0)
-                                          ->whereRaw("(created_at >= ? AND created_at <= ?)", [
+                                          ->whereBetween("created_at", [
                                               $date_from." ".'00:00:00',
                                               $date_to." ".'23:59:59',
                                           ]);
@@ -105,7 +105,10 @@ class ReportController extends Controller
 
                         $reports = $reports->get();
                         $reports2 = $reports2->get();
-
+//dd(
+//    $reports->toArray(),
+//    $reports2->toArray()
+//);
                         return [
                             'reports' => $reports,
                             'reports2' => $reports2
