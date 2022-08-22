@@ -17,7 +17,7 @@ class CheckDriver
     {
         $user = $request->user();
 
-        if($user->hasRole('driver', '==')) {
+        if($user->hasRole('driver')) {
             return redirect(route('page.driver'));
         }
 

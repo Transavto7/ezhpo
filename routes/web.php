@@ -4,9 +4,26 @@ use App\Http\Middleware\ {
     CheckAdmin, CheckManager
 };
 
+Route::get('/fixRoles', function() {
+
+});
+
 // Маршруты статичных и главных страниц
 Route::get('/', 'IndexController@RenderIndex')->name('index');
 Route::get('/releases', 'IndexController@RenderReleases')->name('releases');
+
+
+
+// Users && Groups || permissions
+Route::get('/users', 'UserController@index')->name('users');
+Route::get('/users/fetchUserData', 'UserController@fetchUserData');
+Route::get('/users/saveUser', 'UserController@saveUser');
+//Route::get('/users/index', 'UserController@index')->name('users');
+
+Route::get('/groups', 'GroupController@index')->name('groups');
+
+
+
 
 Route::get('/fix', function() {
     \App\Anketa::whereIn('type_view', ['Предрейсовый', 'Предсменный', 'предрейсовый/Предсменный', 'Предрейсовый/предсменный',

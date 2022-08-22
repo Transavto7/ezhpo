@@ -177,6 +177,9 @@ return [
 
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
+        // PERMISSIONS
+        Spatie\Permission\PermissionServiceProvider::class,
+
     ],
 
     /*

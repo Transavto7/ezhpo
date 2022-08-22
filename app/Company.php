@@ -23,7 +23,7 @@ class Company extends Model
     public static function getAll () {
         $user = auth()->user();
 
-        if($user->hasRole('client', '==')) {
+        if($user->hasRole('client')) {
             $c_id = User::getUserCompanyId('id');
 
             if($c_id) {
