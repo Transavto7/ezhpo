@@ -170,6 +170,11 @@ class AnketsController extends Controller
     {
         $id = $request->id;
         $anketa = Anketa::find($id);
+        $hourdiff = 1;
+        $anketaDublicate = [
+            'id' => 0,
+            'date' => ''
+        ];
 
         $data = $request->all();
         $REFERER = isset($data['REFERER']) ? $data['REFERER'] : '';
@@ -182,6 +187,58 @@ class AnketsController extends Controller
         $type_anketa = $data['type_anketa'];
 
         if(isset($data['anketa'])) {
+            if($anketa->type_anketa === 'medic' && (!$anketa->is_dop || $anketa->result_dop != null)) {
+                $anketaMedic = Anketa::where('driver_id', $data['driver_id'])
+                    ->where('type_anketa', 'medic')
+                    ->where('type_view', $data['anketa'][0]['type_view'])
+                    ->where('in_cart', 0)
+                    ->orderBy('date', 'desc')
+                    ->get();
+
+                foreach($anketaMedic as $aM) {
+                    if (!$aM->date || $aM->id === $anketa->id || ($aM->is_dop && $aM->result_dop == null)) {
+                        continue;
+                    }
+
+                    $hourdiff_check = round((Carbon::parse($data['anketa'][0]['date'])->timestamp - Carbon::parse($aM->date)->timestamp)/60, 1);
+
+                    if($hourdiff_check < 1 && $hourdiff_check >= 0) {
+                        $anketaDublicate['id'] = $aM->id;
+                        $anketaDublicate['date'] = $aM->date;
+                        $hourdiff = $hourdiff_check;
+                    }
+                }
+            } else if($anketa->type_anketa === 'tech' && (!$anketa->is_dop || $anketa->result_dop != null)) {
+                $anketasTech = Anketa::where('car_id', $data['anketa'][0]['car_id'])
+                    ->whereIn('type_anketa', ['tech', 'dop'])
+                    ->where('type_anketa', 'tech')
+                    ->where('type_view', $data['anketa'][0]['type_view'] ?? '')
+                    ->where('in_cart', 0)
+                    ->orderBy('date', 'desc')
+                    ->get();
+
+                foreach($anketasTech as $aT) {
+                    if (!$aT->date || $aT->id === $anketa->id || ($aT->is_dop && $aT->result_dop == null)) {
+                        continue;
+                    }
+
+                    $hourdiff_check = round((Carbon::parse($data['anketa'][0]['date'])->timestamp - Carbon::parse($aT->date)->timestamp)/60, 1);
+
+                    if($hourdiff_check < 1 && $hourdiff_check >= 0) {
+                        $anketaDublicate['id'] = $aT->id;
+                        $anketaDublicate['date'] = $aT->date;
+                        $hourdiff = $hourdiff_check;
+                    }
+                }
+            }
+
+            if($hourdiff < 1 && $hourdiff >= 0) {
+                return redirect(route('forms.get', [
+                    'id' => $anketa->id,
+                    'errors' => ["Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])"]
+                ]));
+            }
+
             foreach($data['anketa'][0] as $daK => $daV) {
                 $company_id = null;
 
