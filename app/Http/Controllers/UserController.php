@@ -55,9 +55,14 @@ class UserController extends Controller
                });
 
         $result->disable = $disablePermissions
-                    ->unique('id')
-                    ->pluck('id')
-                    ->values();
+            ->unique('id')
+            ->pluck('id')
+            ->values();
+
+        $result->permission_user = $result->permissions()
+                                          ->get(['id'])
+                                          ->pluck('id')
+                                          ->values();
 
         return response($result);
     }

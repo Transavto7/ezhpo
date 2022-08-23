@@ -357,6 +357,11 @@ export default {
                         return item.id;
                     }),
                     blocked:  this.infoModalUser.blocked,
+                    permissions:  this.infoModalUser.permissions.filter((item)=>{
+                        return !(this.allPermissions.filter((all_prm) => {
+                            return all_prm.id == item
+                        })[0].disable)
+                    }),
                 },
             }).then(({data}) => {
                 if (data.status) {
@@ -394,6 +399,7 @@ export default {
                 },
             }).then(({data}) => {
                 // data = data[0]
+                console.log(data)
                 this.infoModalUser.id = data.id;
                 this.infoModalUser.name = data.name
                 this.infoModalUser.login = data.login;
@@ -412,6 +418,9 @@ export default {
                         this.allPermissions[index].disable = true;
                         this.infoModalUser.permissions.push(item.id)
                     }
+                })
+                data.permission_user.map((item) => {
+                    this.infoModalUser.permissions.push(item)
                 })
 
                 this.showModal()
@@ -443,13 +452,10 @@ export default {
 
         showModal() {
             this.enableModal = true
-            // this.$refs['users_modal'].show()
         },
 
         hideModal() {
             this.enableModal = false
-            // this.resetModal();
-            // this.$refs['users_modal'].hide()
         },
 
         toggleModal() {
@@ -457,7 +463,6 @@ export default {
             // когда модальное окно скрыто
             this.resetModal();
             this.enableModal = false
-            // this.$refs['users_modal'].toggle('#toggle-btn')
         },
     },
     mounted() {
@@ -468,7 +473,6 @@ export default {
     },
     watch: {
         enableModal(val) {
-            console.log(val)
             if (!val) {
                 this.resetModal()
             }
