@@ -18,9 +18,15 @@ Route::get('/releases', 'IndexController@RenderReleases')->name('releases');
 Route::get('/users', 'UserController@index')->name('users');
 Route::get('/users/fetchUserData', 'UserController@fetchUserData');
 Route::get('/users/saveUser', 'UserController@saveUser');
+Route::delete('/users/{$id}', 'UserController@destroy');
 //Route::get('/users/index', 'UserController@index')->name('users');
 
-Route::get('/groups', 'GroupController@index')->name('groups');
+Route::resource('roles', 'RoleController');
+
+//Route::get('/roles', 'RoleController@index')->name('roles');
+//Route::resource
+//Route::get('/roles/fetchRoleData', 'RoleController@fetchRoleData');
+
 
 
 

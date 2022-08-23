@@ -4,16 +4,8 @@
 @section('sidebar', 1)
 @php
 $points = \App\Town::with(['pvs'])->get();
-$roles = [];
-foreach (\App\User::$newUserRolesTextEN as $roleKey => $roleName){
-    $roles[] = [
-        'text' => \App\User::$newUserRolesText[$roleKey],
-        'value' => $roleName
-    ];
-}
-//dd(
-//    \App\User::with(['roles', 'pv', 'company'])->find(1)->toArray()
-//);
+$roles = \Spatie\Permission\Models\Role::all();
+$all_permissions = \Spatie\Permission\Models\Permission::all();
 @endphp
 @section('content')
 
@@ -22,7 +14,6 @@ foreach (\App\User::$newUserRolesTextEN as $roleKey => $roleName){
         <div class="card">
             <div class="card-body">
                 <form action="" class="row" method="GET">
-                    @csrf
 
                     <div class="col-md-2 form-group">
                         <input type="text" value="{{ request()->get('name') }}" name="name" placeholder="ФИО" class="form-control">
@@ -52,6 +43,7 @@ foreach (\App\User::$newUserRolesTextEN as $roleKey => $roleName){
         <admin-users-index
             :users='@json($users->getCollection())'
             :roles='@json($roles)'
+            :all_permissions='@json($all_permissions)'
             :points='@json($points->map(function ($q){
                                         $res['label'] = $q->name;
                                         foreach ($q->pvs as $pv){

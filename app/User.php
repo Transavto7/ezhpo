@@ -115,52 +115,57 @@ class User extends Authenticatable
 //        Role::truncate();
 //        DB::statement("SET foreign_key_checks=1");
 //
-        foreach (self::$newUserRolesTextEN as $keyRole => $nameRole) {
-            Role::updateOrCreate([
-                'name' => $nameRole,
-            ]);
-        }
+//        foreach (self::$newUserRolesTextEN as $keyRole => $nameRole) {
+//            Role::updateOrCreate([
+//                'name'       => $nameRole,
+//                'guard_name' => self::$newUserRolesText[$keyRole],
+//            ]);
+//        }
 
         $permissions = collect(config('access'));
 
-        foreach ($permissions->pluck('name') as $permission) {
+        foreach ($permissions as $permission) {
             Permission::updateOrCreate([
-                'name' => $permission,
+                'name'       => $permission['name'],
+                'guard_name' => $permission['description'],
             ]);
         }
 
         foreach (User::get() as $user) {
+            if($user->roles()){
+                continue;
+            }
             switch ($user->role) {
                 case 1:
-                    $user->assignRole('tech');
+                    $user->roles()->attach(1);
                     break;
                 case 2:
-                    $user->assignRole('medic');
+                    $user->roles()->attach(2);
                     break;
                 case 3:
-                    $user->assignRole('driver');
+                    $user->roles()->attach(3);
                     break;
                 case 4:
-                    $user->assignRole('operator_sdpo');
+                    $user->roles()->attach(4);
                     break;
                 case 11:
-                    $user->assignRole('manager');
+                    $user->roles()->attach(5);
                     break;
                 case 12:
-                    $user->assignRole('client');
+                    $user->roles()->attach(6);
                     break;
                 case 13:
-                    $user->assignRole('engineer_bdd');
+                    $user->roles()->attach(7);
                     break;
                 case 777:
-                    $user->assignRole('admin');
+                    $user->roles()->attach(8);
                     break;
                 case 778:
-                    $user->assignRole('terminal');
+                    $user->roles()->attach(9);
                     break;
             }
             if ($user->role_manager == 1) {
-                $user->assignRole('manager');
+                $user->roles()->attach(5);
             }
         }
 
@@ -171,16 +176,17 @@ class User extends Authenticatable
     {
         // permission for admin
         $adminRole = Role::where('name', 'admin')->first();
-        foreach ($permissions->pluck('name') as $permission) {
-            $adminRole->givePermissionTo($permission);
-        }
-        // permission for terminal
         $terminalRole = Role::where('name', 'terminal')->first();
-        foreach ($permissions->pluck('name') as $permission) {
-            $terminalRole->givePermissionTo($permission);
-        }
+
+        $allPermissions = Permission::get();
+
+        $adminRole->permissions()->sync($allPermissions->pluck('id'));
+        $terminalRole->permissions()->sync($allPermissions->pluck('id'));
+
         // permission for tech
         $techRole = Role::where('name', 'tech')->first();
+
+
 
         // admin permissions
         $permissionIgnore = [
@@ -247,45 +253,45 @@ class User extends Authenticatable
             'medic_delete',
             'medic_trash',
         ];
-        foreach ($permissions->pluck('name') as $permission) {
-            if (in_array($permission, [
+        foreach ($allPermissions as $permission) {
+            if (in_array($permission->name, [
                 'tech_create',
                 //                'tech_read',
                 'tech_update',
                 'tech_trash',
             ])) {
-                $techRole->givePermissionTo($permission);
+                $techRole->permissions()->sync($permission->pluck('id'));
                 continue;
             }
-            if (in_array($permission, $permissionIgnore)) {
+            if (in_array($permission->name, $permissionIgnore)) {
                 continue;
             }
-            $techRole->givePermissionTo($permission);
+            $techRole->permissions()->sync($permission->pluck('id'));
         }
         $medicRole = Role::where('name', 'medic')->first();
 
-        foreach ($permissions->pluck('name') as $permission) {
+        foreach ($allPermissions as $permission) {
             // Это нам надо
-            if (in_array($permission, [
+            if (in_array($permission->name, [
                 'report_service_company_read',
                 'report_schedule_pv_read',
                 'medic_trash',
             ])) {
-                $medicRole->givePermissionTo($permission);
+                $medicRole->permissions()->sync($permission->pluck('id'));
                 continue;
             }
             // Это нам не надо
-            if (in_array($permission, $permissionIgnore)) {
+            if (in_array($permission->name, $permissionIgnore)) {
                 continue;
             }
             // всё отсальное надо
-            $medicRole->givePermissionTo($permission);
+            $medicRole->permissions()->sync($permission->pluck('id'));
         }
         $operator_sdpoRole = Role::where('name', 'operator_sdpo')->first();
 
-        foreach ($permissions->pluck('name') as $permission) {
+        foreach ($allPermissions as $permission) {
             // Это нам не надо
-            if (in_array($permission, [
+            if (in_array($permission->name, [
                 'service_create',
                 'service_read',
                 'service_update',
@@ -293,19 +299,19 @@ class User extends Authenticatable
             ])) {
                 continue;
             }
-            if (in_array($permission, [
+            if (in_array($permission->name, [
                 'medic_create',
                 'medic_update',
                 'medic_trash',
             ])) {
-                $operator_sdpoRole->givePermissionTo($permission);
+                $operator_sdpoRole->permissions()->sync($permission->pluck('id'));
                 continue;
             }
             if (in_array($permission, $permissionIgnore)) {
                 continue;
             }
             // всё отсальное надо
-            $operator_sdpoRole->givePermissionTo($permission);
+            $operator_sdpoRole->permissions()->sync($permission->pluck('id'));
         }
     }
 

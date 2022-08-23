@@ -80,17 +80,17 @@
                     </div>
                 </div>
 
-                @manager
-                    <div class="line"></div>
-                    <div class="form-group row">
-                        <label class="col-sm-3 form-control-label">API TOKEN</label>
-                        <div class="col-sm-9">
-                            <input type="text" disabled value="{{ $user->api_token }}" class="form-control">
-                        </div>
-                    </div>
-                @endmanager
+{{--                @manager--}}
+{{--                    <div class="line"></div>--}}
+{{--                    <div class="form-group row">--}}
+{{--                        <label class="col-sm-3 form-control-label">API TOKEN</label>--}}
+{{--                        <div class="col-sm-9">--}}
+{{--                            <input type="text" disabled value="{{ $user->api_token }}" class="form-control">--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                @endmanager--}}
 
-                @if($user->role == 12)
+                @if(user()->hasRole('driver'))
                 <div class="line"></div>
                 <div class="form-group row">
                     <label class="col-sm-3 form-control-label">Ссылка на таблицу с документами БДД</label>

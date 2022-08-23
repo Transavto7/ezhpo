@@ -1,10 +1,10 @@
-<input type="hidden" name="type_anketa" value="{{ $type_anketa }}" />
+<input type="hidden" name="type_anketa" value="{{ $type_anketa }}"/>
 
 @include('profile.ankets.components.pvs')
 
 @include('profile.ankets.components.is_dop')
 @php
-//dd(get_defined_vars())
+    //dd(get_defined_vars())
 @endphp
 @if($is_dop)
     <div class="form-group row">
@@ -20,7 +20,9 @@
     <div class="form-group row">
         <label class="form-control-label col-md-3">ID водителя:</label>
         <article class="col-md-9">
-            <input value="{{ $driver_id ?? '' }}" type="number" oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})" min="6" name="driver_id" class="MASK_ID_ELEM form-control">
+            <input value="{{ $driver_id ?? '' }}" type="number"
+                   oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
+                   min="6" name="driver_id" class="MASK_ID_ELEM form-control">
             <p class="app-checker-prop"></p>
         </article>
     </div>
@@ -39,7 +41,8 @@
         <div class="form-group row">
             <label class="col-md-3 form-control-label">Период выдачи ПЛ:</label>
             <article class="col-md-9">
-                <input type="month" value="{{ isset($period_pl) ? $period_pl : '' }}" name="anketa[0][period_pl]" class="form-control">
+                <input type="month" value="{{ isset($period_pl) ? $period_pl : '' }}" name="anketa[0][period_pl]"
+                       class="form-control">
             </article>
         </div>
 
@@ -75,7 +78,8 @@
             <label class="col-md-3 form-control-label">Дата и время осмотра:</label>
             <article class="col-md-9">
                 <input min="1900-02-20T20:20"
-                       max="2999-02-20T20:20" type="datetime-local" required value="{{ $default_current_date }}" name="anketa[0][date]" class="form-control">
+                       max="2999-02-20T20:20" type="datetime-local" required value="{{ $default_current_date }}"
+                       name="anketa[0][date]" class="form-control">
             </article>
         </div>
 
@@ -123,7 +127,8 @@
     <div class="form-group row">
         <label class="col-md-3 form-control-label">Температура тела:</label>
         <article class="col-md-9">
-            <input type="number" step="0.1" value="{{ $t_people ?? '' }}" min="30" max="46" name="t_people" class="form-control">
+            <input type="number" step="0.1" value="{{ $t_people ?? '' }}" min="30" max="46" name="t_people"
+                   class="form-control">
         </article>
     </div>
 
@@ -176,7 +181,8 @@
     <div class="form-group row">
         <label class="col-md-3 form-control-label">Показания тонометра:</label>
         <article class="col-md-9">
-            <input type="text" min="4" minlength="4" max="7" maxlength="7" placeholder="90/120 или 120/80 (пример)" name="anketa[0][tonometer]" value="{{ $tonometer ?? '' }}" class="form-control">
+            <input type="text" min="4" minlength="4" max="7" maxlength="7" placeholder="90/120 или 120/80 (пример)"
+                   name="anketa[0][tonometer]" value="{{ $tonometer ?? '' }}" class="form-control">
             <small>Недопустимо верхнее давление < 50 или > 220 , нижнее < 40 или > 160</small>
         </article>
     </div>
@@ -196,7 +202,7 @@
                 @php $photo_path = $isUri ? $photo : Storage::url($photo); @endphp
 
                 <a href="{{ $photo_path }}" data-fancybox class="col-md-4">
-                    <img width="100%" src="{{ $photo_path }}" alt="photo" />
+                    <img width="100%" src="{{ $photo_path }}" alt="photo"/>
                 </a>
             @endforeach
         @endif

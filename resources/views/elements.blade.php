@@ -202,48 +202,44 @@
     </div>
 </div>
 @endif
+@php
 
-{{--<div id="elements-modal-import" tabindex="-1" role="dialog" aria-labelledby="elements-modal-import" aria-hidden="true" class="modal fade text-left">
-    <div role="document" class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Импорт</h4>
-                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
-            </div>
+$permissionToCreate = (
+    user()->access('drivers_create') && $model == 'Driver'
+    || user()->access('cars_create') && $model == 'Car'
+    || user()->access('company_create') && $model == 'Company'
+    || user()->access('service_create') && $model == 'Service'
+    || user()->access('discount_create') && $model == 'Discount'
+    || user()->access('briefings_create') && $model == 'Instr'
+);
 
-            <form action="{{ route('importElements', $model) }}" enctype="multipart/form-data" method="POST">
-                @csrf
+$permissionToDelete = (
+    user()->access('drivers_delete') && $model == 'Driver'
+    || user()->access('cars_delete') && $model == 'Car'
+    || user()->access('company_delete') && $model == 'Company'
+    || user()->access('service_delete') && $model == 'Service'
+    || user()->access('discount_delete') && $model == 'Discount'
+    || user()->access('briefings_delete') && $model == 'Instr'
+);
+$permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
 
-                <div class="modal-body">
-                    <p>Выберите файл импорта:</p>
-                    <input required type="file" name="file" />
-                </div>
-
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Импорт</button>
-                    <button type="button" data-dismiss="modal" class="btn btn-secondary">Закрыть</button>
-                </div>
-            </form>
-
-        </div>
-    </div>
-</div>--}}
-
+@endphp
 {{--NAVBAR--}}
 @if(!(count($elements) >= $max) || !$max)
     <div class="col-md-12">
         <div class="row bg-light p-2">
-            @role(['manager', 'admin', 'tech', 'medic', 'client'])
-                @if($model === 'Company' && (auth()->user()->hasRole('tech') || auth()->user()->hasRole('medic')))
-                @else
+            @if($permissionToCreate)
                     <div class="col-md-2">
-                        <button type="button" data-toggle="modal" data-target="#elements-modal-add" class="@isset($_GET['continue']) TRIGGER_CLICK @endisset btn btn-sm btn-success">Добавить <i class="fa fa-plus"></i></button>
+                        <button type="button" data-toggle="modal" data-target="#elements-modal-add" class="@isset($_GET['continue']) TRIGGER_CLICK @endisset btn btn-sm btn-success">
+                            Добавить <i class="fa fa-plus"></i>
+                        </button>
                     </div>
-                @endif
-            @endrole
+            @endif
 
             <div class="col-md-5">
-                <button type="button" data-toggle-show="#elements-filters" class="btn btn-sm btn-info"><i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры</button>
+                <button type="button" data-toggle-show="#elements-filters" class="btn btn-sm btn-info">
+                    <i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры
+                </button>
             </div>
 
             {{--<div class="col-md-3 text-right">
@@ -378,17 +374,11 @@
                     @endif
                 @endforeach
 
-                @if($model === 'Company')
-                    @role(['admin'])
+                @if($permissionToDelete)
                     {{--УДАЛЕНИЕ--}}
                     <th width="60">#</th>
-                    @endrole
                 @endif
 
-                @role(['manager', 'admin'])
-                {{--УДАЛЕНИЕ--}}
-                    <th width="60">#</th>
-                @endrole
             </tr>
         </thead>
         <tbody>
@@ -524,19 +514,19 @@
                             @endif
                         @endforeach
 
-                        @if($model === 'Company')
-                            @role(['admin'])
-                                <td class="td-option" title="При синхронизации все услуги компании будут присвоены водителям и автомобилям компании.">
-                                    <a href="{{ route('syncElement', ['type' => $model, 'id' => $el->id ]) }}" class="btn btn-sm btn-success"><i class="fa fa-refresh"></i></a>
-                                </td>
-                            @endrole
+                        @if($permissionToSyncCompany)
+                            <td class="td-option" title="При синхронизации все услуги компании будут присвоены водителям и автомобилям компании.">
+                                <a href="{{ route('syncElement', ['type' => $model, 'id' => $el->id ]) }}" class="btn btn-sm btn-success"><i class="fa fa-refresh"></i></a>
+                            </td>
                         @endif
 
-                        @role(['manager', 'admin'])
+
+                        @if($permissionToDelete)
+                            {{--УДАЛЕНИЕ--}}
                             <td class="td-option">
                                 <a href="{{ route('removeElement', ['type' => $model, 'id' => $el->id ]) }}" class="ACTION_DELETE btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>
                             </td>
-                        @endrole
+                        @endif
 
                     </tr>
                 @endforeach
@@ -555,12 +545,12 @@
 
         @include('templates.take_form')
 
-        @role(['client'])
+        @if(user()->hasRole('client'))
             <p>Элементов найдено: {{ method_exists($elements, 'total') ? $elements->total() : '' }}</p>
         @else
             <p>Элементов всего: {{ $elements_count_all }}</p>
             <p>Элементов найдено: {{ method_exists($elements, 'total') ? $elements->total() : $elements_count_all }}</p>
-        @endrole
+        @endif
     </div>
 </div>
 

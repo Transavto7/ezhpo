@@ -42,7 +42,7 @@
                                 </div>
 
 
-                                @manager
+                                @if(user()->hasRole('manager'))
                                     @if($type_ankets === 'tech')
                                         <div class="col-md-8 text-right">
                                             <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
@@ -57,7 +57,7 @@
                                             <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу <i class="fa fa-download"></i></a>
                                         </div>
                                     @endif
-                                @endmanager
+                                @endif
 
                                 <div class="toggle-hidden p-3" id="ankets-filters">
                                     <form action="{{ route('home.save-fields', $type_ankets) }}" method="POST" class="ankets-form">
@@ -104,9 +104,9 @@
                     @else
                         {{-- ОЧИСТКА ОЧЕРЕДИ СДПО --}}
                         @if($type_ankets === 'pak_queue')
-                            @role(['admin'])
+                            @if(user()->access('approval_queue_clear'))
                                 <a href="?clear=1&type_anketa={{ $type_ankets }}" class="btn btn-warning">Очистить очередь</a>
-                            @endrole
+                            @endif
                         @endif
                     @endif
 
@@ -152,6 +152,7 @@
                                     @endif
                                     <!-- /ОЧЕРЕДЬ ОСМОТРОВ -->
 
+                                    {{-- УДАЛЕНИЕ--}}
                                     @if(
                                             $type_ankets == 'medic' && user()->access('medic_delete')
                                             || $type_ankets == 'tech' && user()->access('tech_delete')

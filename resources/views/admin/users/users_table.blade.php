@@ -154,7 +154,7 @@
                                         <input type="number" value="{{ $user->timezone }}" name="timezone" placeholder="Часовой пояс" class="form-control">
                                     </div>
 
-                                    <div class="form-group users_show_pvs"  @if( $user->role == 12 ) style="display: none" @endif>
+                                    <div class="form-group users_show_pvs"  @if( user()->hasRole('driver') ) style="display: none" @endif>
                                         @include('admin.users.show_pvs', [
                                             'pv_id' => $user->pv_id
                                         ])

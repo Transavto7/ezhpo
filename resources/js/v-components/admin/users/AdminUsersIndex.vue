@@ -32,18 +32,22 @@
                 <template v-for="role in row.value">
                     <h5>
                         <span class="badge badge-success">
-                            {{
-                                roles.find((item) => {
-                                    return item.value == role.name
-                                }).text
-                            }}
+                            {{ role.guard_name }}
                         </span>
                     </h5>
                 </template>
             </template>
+
+            <template #cell(delete_btn)="row">
+                <b-button variant="danger" @click="deleteUser(row.item.id)">
+                    <b-icon icon="trash-fill" aria-hidden="true"></b-icon>
+                </b-button>
+                <!--                {{ row.value.name }}-->
+            </template>
         </b-table>
 
         <b-modal
+            v-model="enableModal"
             size="xl"
             ref="users_modal"
             hide-footer
@@ -153,17 +157,10 @@
                     <v-select
                         :multiple="true"
                         :options="optionsRoles"
-                        label="text"
+                        label="guard_name"
                         v-model="infoModalUser.roles"
                     >
                     </v-select>
-
-                    <!--                    <b-form-select v-model="infoModalUser.roles"-->
-                    <!--                                   :options="optionsRoles"-->
-                    <!--                                   multiple-->
-                    <!--                    >-->
-
-                    <!--                    </b-form-select>-->
                 </b-col>
             </b-row>
             <b-row class="my-1">
@@ -182,6 +179,42 @@
                     </b-form-checkbox>
                 </b-col>
             </b-row>
+            <b-row class="my-1">
+                <b-col>
+                    <b-button
+                        :class="permission_collapse ? null : 'collapsed'"
+                        :aria-expanded="permission_collapse ? 'true' : 'false'"
+                        aria-controls="collapse-4"
+                        @click="permission_collapse = !permission_collapse"
+                    >
+                        Раскрыть права
+                    </b-button>
+                    <b-collapse id="collapse-4" v-model="permission_collapse" class="mt-2">
+                        <b-card>
+                            <div class="alert alert-success m-3">
+                                <!--                <i class="fa fa-info"></i>-->
+                                <!--                <b>Доброго времени суток!</b><br>-->
+                                Не все права можно выставить, так как они предусматриваются наличием роли<br>
+                                У каждой роли есть набор прав<br>
+                                У каждого пользователя есть набор прав и ролей
+                            </div>
+                            <template v-for="(permission, index) in allPermissions">
+                                <b-col lg="3">
+                                    <b-form-checkbox
+                                        :value="permission.id"
+                                        :disabled="permission.disable"
+                                        :checked="permission.checked"
+                                        :key="index"
+                                        v-model="infoModalUser.permissions"
+                                    >
+                                        {{ permission.guard_name }}
+                                    </b-form-checkbox>
+                                </b-col>
+                            </template>
+                        </b-card>
+                    </b-collapse>
+                </b-col>
+            </b-row>
 
             <b-row>
                 <b-col>
@@ -196,30 +229,34 @@
 </template>
 
 <script>
-import Swal2 from "sweetalert2";
 import vSelect from "vue-select";
 import 'vue-select/dist/vue-select.css';
+import Swal2 from "sweetalert2";
 
 export default {
     name:       "AdminUsersIndex",
-    props:      ['users', 'roles', 'points'],
+    props:      ['users', 'roles', 'points', 'all_permissions'],
     components: {Swal2, vSelect},
 
     data() {
         return {
-            infoModalUser: {
-                id:       null,
-                name:     null,
-                login:    null,
-                email:    null,
-                password: null,
-                eds:      null,
-                timezone: null,
-                pv:       null,
-                roles:    [],
-                blocked:  null,
+            allPermissions:      [],
+            enableModal:         false,
+            permission_collapse: false,
+            infoModalUser:       {
+                id:          null,
+                name:        null,
+                login:       null,
+                email:       null,
+                password:    null,
+                eds:         null,
+                timezone:    null,
+                pv:          null,
+                roles:       [],
+                blocked:     null,
+                permissions: [],
             },
-            optionsPvs:    [
+            optionsPvs:          [
                 // {
                 //     label: 'Сгруппированные опции',
                 //     options: [
@@ -228,7 +265,7 @@ export default {
                 //     ]
                 // }
             ],
-            optionsRoles:  [],
+            optionsRoles:        [],
             // Поля таблицы
             fields:      [
                 {key: 'id', label: 'ID'},
@@ -242,6 +279,7 @@ export default {
                 {key: 'timezone', label: 'GMT'},
                 {key: 'blocked', label: 'Заблокирован'},
                 {key: 'roles', label: 'Роль'},
+                {key: 'delete_btn', label: '#'},
             ],
             items:       [],
             perPage:     15,
@@ -253,22 +291,47 @@ export default {
         }
     },
     methods: {
+        deleteUser(id) {
+            Swal2.fire({
+                title:              'Вы уверены, что хотите удалить?',
+                icon:               'warning',
+                showCancelButton:   true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor:  '#d33',
+                confirmButtonText:  'Да, удалить!',
+                cancelButtonText:   'Отмена',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.post('/users/' + id, {
+                        _method: 'DELETE',
+                    }).then(({data}) => {
+                        if (data.status) {
+                            Swal2.fire(
+                                'Удалено',
+                                'Данные были успешно удалены',
+                                'success',
+                            );
+                            this.items = this.items.filter((item) => {
+                                return item.id != id;
+                            })
+                        } else {
+                            Swal2.fire(
+                                'Ошибка',
+                                data.message,
+                                'warning',
+                            )
+                        }
+
+                    }).finally(() => {
+                        this.loading = false;
+                    });
+                }
+            })
+
+        },
+
         saveUser() {
             this.loading = true;
-
-            console.log({
-                params: {
-                    user_id:  this.infoModalUser.id,
-                    name:     this.infoModalUser.name,
-                    login:    this.infoModalUser.login,
-                    email:    this.infoModalUser.email,
-                    eds:      this.infoModalUser.eds,
-                    timezone: this.infoModalUser.timezone,
-                    pv:       this.infoModalUser.pv,
-                    roles:    this.infoModalUser.roles,
-                    blocked:  this.infoModalUser.blocked,
-                },
-            })
 
             axios.get('/users/saveUser', {
                 params: {
@@ -279,18 +342,13 @@ export default {
                     eds:      this.infoModalUser.eds,
                     timezone: this.infoModalUser.timezone,
                     pv:       this.infoModalUser.pv,
-                    roles:    this.infoModalUser.roles,
+                    roles:    this.infoModalUser.roles.map((item) => {
+                        return item.id;
+                    }),
                     blocked:  this.infoModalUser.blocked,
                 },
             }).then(({data}) => {
                 if (data.status) {
-                    console.log(data)
-                    // let user = this.items.find((element) => {
-                    //     if(element.id == data.user_info.id){
-                    //         return true;
-                    //     }
-                    //     return false;
-                    // })
 
                     this.items.forEach((item, i, arr) => {
                         if (item.id == data.user_info.id) {
@@ -298,15 +356,13 @@ export default {
                             // Или так Object.books[i].author = "..."; и так для каждого изменяемого свойства
                         }
                     })
+                    Swal2.fire(
+                        'Сохранено',
+                        'Данные были успешно записаны',
+                        'success',
+                    );
                     this.$refs.users_table.refresh()
-                    // this.$refs.users_table::refresh::table
-                    console.log(123123)
-
-
-                    // console.log(user)
-                    // user = data.user_info
-                    //
-                    // console.log(user)
+                    this.enableModal = false
 
                 }
 
@@ -314,6 +370,7 @@ export default {
                 this.loading = false;
             });
         },
+
         editUserData(id) {
             this.fetchUserData(id)
         },
@@ -327,7 +384,7 @@ export default {
                 },
             }).then(({data}) => {
                 console.log(data)
-                data = data[0]
+                // data = data[0]
                 this.infoModalUser.id = data.id;
                 this.infoModalUser.name = data.name
                 this.infoModalUser.login = data.login;
@@ -336,10 +393,17 @@ export default {
                 this.infoModalUser.eds = data.eds;
                 this.infoModalUser.timezone = data.timezone;
                 this.infoModalUser.pv = data.pv.id;
-                this.infoModalUser.roles = data.roles.map((role) => {
-                    return role.name
-                });
+                this.infoModalUser.roles = data.roles;
                 this.infoModalUser.blocked = data.blocked;
+
+                // console.log(data.disable)
+                this.allPermissions.map((item, index) => {
+                    // console.log(data.disable.includes(item.id))
+                    if (data.disable.includes(item.id)) {
+                        this.allPermissions[index].disable = true;
+                        this.infoModalUser.permissions.push(item.id)
+                    }
+                })
 
                 this.showModal()
             }).finally(() => {
@@ -352,21 +416,27 @@ export default {
             this.infoModalUser.name = null;
             this.infoModalUser.login = null;
             this.infoModalUser.email = null;
-            // this.infoModalUser.password = data.password;
+            this.infoModalUser.password = data.password;
             this.infoModalUser.eds = null;
             this.infoModalUser.timezone = null;
             this.infoModalUser.pv = null;
             this.infoModalUser.roles = [];
             this.infoModalUser.blocked = null;
+            this.permission_collapse = false;
+            this.infoModalUser.permissions = [];
         },
 
         showModal() {
-            this.$refs['users_modal'].show()
+            this.enableModal = true
+            // this.$refs['users_modal'].show()
         },
+
         hideModal() {
-            this.resetModal();
-            this.$refs['users_modal'].hide()
+            this.enableModal = false
+            // this.resetModal();
+            // this.$refs['users_modal'].hide()
         },
+
         toggleModal() {
             // Мы передаем идентификатор кнопки, на которую мы хотим вернуть фокус,
             // когда модальное окно скрыто
@@ -378,6 +448,14 @@ export default {
         this.items = this.users;
         this.optionsPvs = this.points;
         this.optionsRoles = this.roles;
+        this.allPermissions = this.all_permissions;
+    },
+    watch: {
+        enableModal(val) {
+            if (!val) {
+                this.resetModal()
+            }
+        },
     },
 }
 </script>
