@@ -115,12 +115,12 @@ class User extends Authenticatable
 //        Role::truncate();
 //        DB::statement("SET foreign_key_checks=1");
 //
-//        foreach (self::$newUserRolesTextEN as $keyRole => $nameRole) {
-//            Role::updateOrCreate([
-//                'name'       => $nameRole,
-//                'guard_name' => self::$newUserRolesText[$keyRole],
-//            ]);
-//        }
+        foreach (self::$newUserRolesTextEN as $keyRole => $nameRole) {
+            Role::updateOrCreate([
+                'name'       => $nameRole,
+                'guard_name' => self::$newUserRolesText[$keyRole],
+            ]);
+        }
 
         $permissions = collect(config('access'));
 
