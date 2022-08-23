@@ -131,10 +131,12 @@ class User extends Authenticatable
             ]);
         }
 
-        foreach (User::get() as $user) {
-            if($user->roles()){
+
+        foreach (User::with(['roles'])->get() as $user) {
+            if ($user->roles()->count()) {
                 continue;
             }
+
             switch ($user->role) {
                 case 1:
                     $user->roles()->attach(1);
@@ -150,7 +152,7 @@ class User extends Authenticatable
                     break;
                 case 11:
                     $user->roles()->attach(5);
-                    break;
+                    break 2;
                 case 12:
                     $user->roles()->attach(6);
                     break;
@@ -360,7 +362,7 @@ class User extends Authenticatable
         $point = Point::find($point);
 
         if ($point) {
-            $company = $point->company_id ? Company::fiqnd($point->company_id) : 0;
+            $company = $point->company_id ? Company::find($point->company_id) : 0;
 
             if ($company) {
                 return $company->$field;
