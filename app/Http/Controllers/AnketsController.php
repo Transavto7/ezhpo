@@ -484,7 +484,7 @@ class AnketsController extends Controller
             $cars = [];
 
             // Только обычные осмотры валидируем
-            if($data['is_dop'] != 1){
+            if(($data['is_dop'] ?? 0) != 1){
 
                 //================== VALIDATE company/driver/car ===================//
                 // tech
