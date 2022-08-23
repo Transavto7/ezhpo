@@ -1466,7 +1466,7 @@ class AnketsController extends Controller
                         ->orderBy('date', 'desc')
                         ->get();
 
-                    if($anketaMedic && !$anketa['is_dop']) {
+                    if($anketaMedic) {
                         foreach($anketaMedic as $aM) {
                             if (!$aM->date || ($aM->is_dop && $aM->result_dop == null)) {
                                 continue;
@@ -1529,7 +1529,7 @@ class AnketsController extends Controller
                         }
                     }
 
-                    if($anketaTech && !$anketa['is_dop']) {
+                    if($anketaTech) {
                         foreach($anketaTech as $aT) {
                             if (!$aT->date || ($aT->is_dop && $aT->result_dop == null)) {
                                 continue;
