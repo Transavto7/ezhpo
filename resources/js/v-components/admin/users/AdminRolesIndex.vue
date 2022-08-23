@@ -74,9 +74,10 @@
 
             <b-form-group label="Доступы:" v-slot="{ ariaDescribedby }">
                 <b-form-checkbox-group
-                    id="checkbox-group-2"
+                    ref="permissions_group"
                     :aria-describedby="ariaDescribedby"
                     name="flavour-2"
+                    v-model="infoModalRole.permissions"
                 >
                     <b-row>
                         <template v-for="(permission, index) in allPermissions">
@@ -84,7 +85,6 @@
                                 <b-form-checkbox
                                     :value="permission.id"
                                     :key="index"
-                                    v-model="infoModalRole.permissions"
                                 >
                                     {{ permission.guard_name }}
                                 </b-form-checkbox>
@@ -190,6 +190,7 @@ export default {
                             'success'
                         );
                         this.editModal = false;
+
                         this.resetModal();
                     }else {
                         Swal2.fire(
@@ -259,7 +260,16 @@ export default {
                     this.infoModalRole.permissions = data.permissions.map((item) => {
                         return item.id
                     });
-
+                    // data.permissions = data.permissions.map((item) => {
+                    //     return item.id
+                    // })
+                    // console.log(data.permissions)
+                    // this.allPermissions.map((item, index) => {
+                    //     if (data.permissions.includes(item.id)) {
+                    //         this.allPermissions[index].checked = true;
+                    //         // this.infoModalUser.permissions.push(item.id)
+                    //     }
+                    // })
 
                     this.showModal()
                 })

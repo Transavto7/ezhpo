@@ -198,21 +198,33 @@
                                 У каждой роли есть набор прав<br>
                                 У каждого пользователя есть набор прав и ролей
                             </div>
-                            <template v-for="(permission, index) in allPermissions">
-                                <b-col lg="3">
-                                    <b-form-checkbox
-                                        :value="permission.id"
-                                        :disabled="permission.disable"
-                                        :checked="permission.checked"
-                                        :key="index"
-                                        v-model="infoModalUser.permissions"
-                                    >
-                                        {{ permission.guard_name }}
-                                    </b-form-checkbox>
-                                </b-col>
-                            </template>
+
+                            <b-form-group label="Доступы:" v-slot="{ ariaDescribedby }">
+                                <b-form-checkbox-group
+                                    :aria-describedby="ariaDescribedby"
+                                    name="flavour-2"
+                                    v-model="infoModalUser.permissions"
+                                >
+                                    <b-row>
+                                        <template v-for="(permission, index) in allPermissions">
+                                            <b-col lg="3">
+                                                <b-form-checkbox
+                                                    :value="permission.id"
+                                                    :disabled="permission.disable"
+                                                    :checked="permission.checked"
+                                                    :key="index"
+                                                >
+                                                    {{ permission.guard_name }}
+                                                </b-form-checkbox>
+                                            </b-col>
+                                        </template>
+                                    </b-row>
+                                </b-form-checkbox-group>
+                            </b-form-group>
+
                         </b-card>
                     </b-collapse>
+
                 </b-col>
             </b-row>
 
