@@ -211,7 +211,6 @@
                                                 <b-form-checkbox
                                                     :value="permission.id"
                                                     :disabled="permission.disable"
-                                                    :checked="permission.checked"
                                                     :key="index"
                                                 >
                                                     {{ permission.guard_name }}
@@ -361,7 +360,6 @@ export default {
                 },
             }).then(({data}) => {
                 if (data.status) {
-
                     this.items.forEach((item, i, arr) => {
                         if (item.id == data.user_info.id) {
                             this.items[i] = data.user_info // Новый объект с новыми свойствами
@@ -395,7 +393,6 @@ export default {
                     user_id: id,
                 },
             }).then(({data}) => {
-                console.log(data)
                 // data = data[0]
                 this.infoModalUser.id = data.id;
                 this.infoModalUser.name = data.name
@@ -428,14 +425,20 @@ export default {
             this.infoModalUser.name = null;
             this.infoModalUser.login = null;
             this.infoModalUser.email = null;
-            this.infoModalUser.password = data.password;
+            this.infoModalUser.password = null;
             this.infoModalUser.eds = null;
             this.infoModalUser.timezone = null;
             this.infoModalUser.pv = null;
             this.infoModalUser.roles = [];
             this.infoModalUser.blocked = null;
-            this.permission_collapse = false;
             this.infoModalUser.permissions = [];
+            this.permission_collapse = false;
+
+            this.allPermissions = this.allPermissions.map((item) => {
+                item.disable = false;
+
+                return item;
+            })
         },
 
         showModal() {
@@ -453,7 +456,8 @@ export default {
             // Мы передаем идентификатор кнопки, на которую мы хотим вернуть фокус,
             // когда модальное окно скрыто
             this.resetModal();
-            this.$refs['users_modal'].toggle('#toggle-btn')
+            this.enableModal = false
+            // this.$refs['users_modal'].toggle('#toggle-btn')
         },
     },
     mounted() {
@@ -464,6 +468,7 @@ export default {
     },
     watch: {
         enableModal(val) {
+            console.log(val)
             if (!val) {
                 this.resetModal()
             }
