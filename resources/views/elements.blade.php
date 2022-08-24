@@ -209,27 +209,27 @@ $permissionToCreate = (
     || user()->access('cars_create') && $model == 'Car'
     || user()->access('company_create') && $model == 'Company'
     || user()->access('service_create') && $model == 'Service'
-    || user()->access('discount_create') && $model == 'Discount'
+    || user()->access('discount_create') && $model == 'Product'
     || user()->access('briefings_create') && $model == 'Instr'
-);
+) && !request()->get('deleted');
 
 $permissionToDelete = (
     user()->access('drivers_delete') && $model == 'Driver'
     || user()->access('cars_delete') && $model == 'Car'
     || user()->access('company_delete') && $model == 'Company'
     || user()->access('service_delete') && $model == 'Service'
-    || user()->access('discount_delete') && $model == 'Discount'
+    || user()->access('discount_delete') && $model == 'Product'
     || user()->access('briefings_delete') && $model == 'Instr'
-);
+) && !request()->get('deleted');
 
 $permissionToEdit = (
     user()->access('drivers_update') && $model == 'Driver'
     || user()->access('cars_update') && $model == 'Car'
     || user()->access('company_update') && $model == 'Company'
     || user()->access('service_update') && $model == 'Service'
-    || user()->access('discount_update') && $model == 'Discount'
+    || user()->access('discount_update') && $model == 'Product'
     || user()->access('briefings_update') && $model == 'Instr'
-);
+) && !request()->get('deleted');
 
 $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
 
@@ -238,20 +238,31 @@ $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync
 @if(!(count($elements) >= $max) || !$max)
     <div class="col-md-12">
         <div class="row bg-light p-2">
-            @if($permissionToCreate)
-                    <div class="col-md-2">
+            @if($permissionToCreate && !request()->get('deleted'))
+                    <div class="m-2">
                         <button type="button" data-toggle="modal" data-target="#elements-modal-add" class="@isset($_GET['continue']) TRIGGER_CLICK @endisset btn btn-sm btn-success">
                             Добавить <i class="fa fa-plus"></i>
                         </button>
                     </div>
             @endif
 
-            <div class="col-md-5">
+            <div class=" m-2">
                 <button type="button" data-toggle-show="#elements-filters" class="btn btn-sm btn-info">
                     <i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры
                 </button>
             </div>
 
+            <div class="m-2">
+                @if(!request()->get('deleted'))
+                <a href="?deleted=1" class="btn btn-sm btn-warning">
+                    Удалённые <i class="fa fa-trash"></i>
+                </a>
+                @else
+                <a href="{{ route('renderElements', ['model' => $model]) }}" class="btn btn-sm btn-warning">
+                    Назад <i class="fa fa-trash"></i>
+                </a>
+                @endif
+            </div>
             {{--<div class="col-md-3 text-right">
                 <div class="row">
                     <button type="button" data-toggle="modal" data-target="#elements-modal-import" class="btn btn-primary">Импорт <i class="fa fa-download"></i></button>
@@ -386,12 +397,15 @@ $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync
                 @endforeach
 
                 @if($permissionToSyncCompany)
-                    {{--УДАЛЕНИЕ--}}
                     <th width="60">#</th>
                 @endif
                 @if($permissionToDelete)
                     {{--УДАЛЕНИЕ--}}
                     <th width="60">#</th>
+                @endif
+                @if(request()->get('deleted'))
+                    <th width="60">Удаливший</th>
+                    <th width="60">Время удаления</th>
                 @endif
 
             </tr>
@@ -543,6 +557,14 @@ $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync
                             {{--УДАЛЕНИЕ--}}
                             <td class="td-option">
                                 <a href="{{ route('removeElement', ['type' => $model, 'id' => $el->id ]) }}" class="ACTION_DELETE btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>
+                            </td>
+                        @endif
+                        @if(request()->get('deleted'))
+                            <td class="td-option">
+                                {{ ($el->deleted_user->name) }}
+                            </td>
+                            <td class="td-option">
+                                {{ ($el->deleted_at) }}
                             </td>
                         @endif
 
