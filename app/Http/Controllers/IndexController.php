@@ -1218,12 +1218,12 @@ class IndexController extends Controller
 
                                     foreach($aFv as $aFvItemKey => $aFvItemValue) {
                                         if($isId) {
-                                            $q = $q->orWhere($aFk, $aFvItemValue);
+                                            $q = $q->where($aFk, $aFvItemValue);
                                         } else {
                                             if(strlen($aFvItemValue) === 0) {
-                                                $q = $q->orWhere($aFk, $aFvItemValue);
+                                                $q = $q->where($aFk, $aFvItemValue);
                                             } else {
-                                                $q = $q->orWhere($aFk, 'LIKE', '%' . trim($aFvItemValue) . '%');
+                                                $q = $q->where($aFk, 'LIKE', '%' . trim($aFvItemValue) . '%');
                                             }
                                         }
                                     }
