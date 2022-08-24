@@ -254,6 +254,10 @@ class HomeController extends Controller
         $trash         = $request->get('trash', 0);
         $getCounts     = isset($_GET['getCounts']);
 
+        if($trash){
+            $fieldsKeys['deleted_at'] = 'Время удаления';
+        }
+
         unset($filter_params['getCounts']);
         unset($filter_params['trash']);
         unset($filter_params['export']);
@@ -384,7 +388,7 @@ class HomeController extends Controller
             $anketas = $anketas->where('anketas.company_id', $company_id_client);
         }
 
-        $anketas = $anketas->where('type_anketa', $validTypeAnkets)->where('in_cart', $trash);
+        $anketas = $anketas->where('type_anketa', $validTypeAnkets)->where('in_cart', $trash)->with('deleted_user');
 
         /**
          * <Измеряем количество Авто и Водителей (уникальные ID)>

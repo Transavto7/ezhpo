@@ -39,6 +39,8 @@ class AnketsController extends Controller
 
         if($anketa) {
             $anketa->in_cart = $action;
+            $anketa->deleted_id = user()->id;
+            $anketa->deleted_at = \Carbon\Carbon::now();
 
             if($anketa->save()) {
                 return redirect($_SERVER['HTTP_REFERER']);

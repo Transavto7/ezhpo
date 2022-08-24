@@ -21,6 +21,14 @@ class Anketa extends Model
         return $this->belongsTo(User::class, 'driver_id', 'hash_id');
     }
 
+    public function deleted_user()
+    {
+        return $this->belongsTo(User::class, 'deleted_id', 'id')
+                    ->withDefault();
+    }
+    protected $casts = [
+        'deleted_at' => 'datetime:d-m-Y H:i:s'
+    ];
 
     public $fillable
         = [
@@ -93,7 +101,10 @@ class Anketa extends Model
             'comments',
             'flag_pak',
             'connected_hash',
+            'deleted_id',
+            'deleted_at',
         ];
+
 
     public static $anketsKeys
         = [
