@@ -1196,7 +1196,7 @@ class IndexController extends Controller
 
         if (isset($this->elements[$type])) {
             $element = $this->elements[$type];
-//dd($element);
+
             $model               = $element['model'];
             $MODEL_ELEMENTS      = app("App\\$model");
             $element['elements'] = $MODEL_ELEMENTS;
@@ -1205,16 +1205,8 @@ class IndexController extends Controller
 
             if ($deleted = $request->get('deleted')) {
                 $element['elements']   = $element['elements']->onlyTrashed();
-//                $element['fields']['deleted_id'] = [
-//                    'label' => 'Кем удалено',
-//                    'type'  => 'text',
-//                ];
-//                $element['fields']['deleted_at'] = [
-//                    'label' => 'Когда удалено',
-//                    'type'  => 'date',
-//                ];
             }
-//dd($element['elements']->get()->toArray());
+
             $element['type']     = $type;
             $element['orderBy']  = $orderBy;
             $element['orderKey'] = $orderKey;
@@ -1238,12 +1230,12 @@ class IndexController extends Controller
 
                                     foreach ($aFv as $aFvItemKey => $aFvItemValue) {
                                         if ($isId) {
-                                            $q = $q->orWhere($aFk, $aFvItemValue);
+                                            $q = $q->where($aFk, $aFvItemValue);
                                         } else {
                                             if (strlen($aFvItemValue) === 0) {
-                                                $q = $q->orWhere($aFk, $aFvItemValue);
+                                                $q = $q->where($aFk, $aFvItemValue);
                                             } else {
-                                                $q = $q->orWhere($aFk, 'LIKE', '%'.trim($aFvItemValue).'%');
+                                                $q = $q->where($aFk, 'LIKE', '%'.trim($aFvItemValue).'%');
                                             }
                                         }
                                     }
@@ -1324,8 +1316,7 @@ class IndexController extends Controller
                 $element['otherRoles'] = $roles;
             }
             $element['queryString'] = $queryString;
-//dd($element);
-//dd(view('elements', $element));
+
             return view('elements', $element);
         } else {
             return redirect(route('home'));
