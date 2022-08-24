@@ -8,6 +8,11 @@ class Town extends Model
 {
     public $fillable = ['id', 'hash_id', 'name'];
 
+    public function pvs()
+    {
+        return $this->hasMany(Point::class, 'pv_id');
+    }
+
     public static function getName ($id)
     {
         $id = explode(',', $id);

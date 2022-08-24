@@ -57,7 +57,7 @@
             <button type="button" data-croppie-id="{{ $uniqueInputId }}" class="btn croppie-delete btn-sm btn-danger">Удалить фото</button>
         </div>
     @endif
-@elseif ($v['type'] === 'select' && auth()->user()->role == 12 && $k === 'company_name')
+@elseif ($v['type'] === 'select' && user()->hasRole('driver') && $k === 'company_name')
     @php
         $default_value = is_array($default_value) ? $default_value : explode(',', $default_value);
         $key = isset($v['getFieldKey']) ? $v['getFieldKey'] : 'id';
@@ -68,12 +68,12 @@
         name="company_name"
         class="filled-select2 filled-select"
     >
-        <option selected value="{{ auth()->user()->company->name }}">
-            {{ auth()->user()->company->name }}
+        <option selected value="{{ user()->company->name }}">
+            {{ user()->company->name }}
         </option>
     </select>
 
-@elseif ($v['type'] === 'select' && auth()->user()->role == 12 && $k === 'company_id')
+@elseif ($v['type'] === 'select' && user()->hasRole('client') && $k === 'company_id')
     @php
         $default_value = is_array($default_value) ? $default_value : explode(',', $default_value);
         $key = isset($v['getFieldKey']) ? $v['getFieldKey'] : 'id';
@@ -84,16 +84,16 @@
         name="company_id"
         class="filled-select2 filled-select"
     >
-        <option selected value="{{ auth()->user()->company->hash_id }}">
-            {{ auth()->user()->company->name }}
+        <option selected value="{{ user()->company->hash_id }}">
+            {{ user()->company->name }}
         </option>
     </select>
 
 @elseif ($v['type'] === 'select')
     @php
         $default_value = is_array($default_value) ? $default_value : explode(',', $default_value);
-        $key = isset($v['getFieldKey']) ? $v['getFieldKey'] : 'id';
-        $value = isset($v['getField']) ? $v['getField'] : 'name';
+        $key = $v['getFieldKey'] ?? 'id';
+        $value = $v['getField'] ?? 'name';
     @endphp
     <select
         @isset($v['saveToHistory'])
@@ -119,7 +119,7 @@
         @endisset
 
         {{ $is_required }}
-        data-label="{{ isset($v['label']) ? $v['label'] : $k }}"
+        data-label="{{ $v['label'] ?? $k }}"
         data-field="{{ $model }}_{{ $k }}"
         class="filled-select2 filled-select"
     >

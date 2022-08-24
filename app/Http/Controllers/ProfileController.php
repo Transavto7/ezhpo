@@ -75,7 +75,7 @@ class ProfileController extends Controller
 //        $user = Auth::user();
         $user = User::with(['company'])->find(Auth::user()->id);
 
-//        if($user->hasRole('client', '==')) {
+//        if($user->hasRole('client')) {
 //            return redirect( route('home') );
 //        }
 

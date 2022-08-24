@@ -25,7 +25,7 @@ class ReportController extends Controller
 
     public function GetReport(Request $request)
     {
-        if(auth()->user()->hasRole('medic', '==') || auth()->user()->hasRole('tech', '==')) {
+        if(auth()->user()->hasRole('medic') || auth()->user()->hasRole('tech')) {
             return back();
         }
 

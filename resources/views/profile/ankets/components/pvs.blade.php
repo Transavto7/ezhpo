@@ -1,3 +1,6 @@
+@php
+//dd($points);
+@endphp
 @if(!isset($defaultShowPvs))
     <div class="form-group mb-4">
         <b>Пункт выпуска:</b> &nbsp;
@@ -8,6 +11,12 @@
                 @if(count($point['pvs']) > 0)
                     <optgroup label="{{ $point['name'] }}">
                         @foreach($point['pvs'] as $child)
+                            @php
+                                if(is_array($child)){
+                                $child = (object)$child;
+                                dd($child);
+                            }
+                            @endphp
                             <option
                                     @if(session()->has('anketa_pv_id'))
                                         @if($child->id == session('anketa_pv_id')['value'])
@@ -38,6 +47,11 @@
             @if(count($point['pvs']) > 0)
                 <optgroup label="{{ $point['name'] }}">
                     @foreach($point['pvs'] as $child)
+                        @php
+                            if(is_array($child)){
+                            $child = (object)$child;
+                        }
+                        @endphp
                         <option
                             {{ request()->get('pv_id') == $child->id ? 'selected' : '' }}
 

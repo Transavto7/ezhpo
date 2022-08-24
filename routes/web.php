@@ -4,23 +4,48 @@ use App\Http\Middleware\ {
     CheckAdmin, CheckManager
 };
 
+Route::get('/fixRoles', function() {
+
+});
+
 // Маршруты статичных и главных страниц
 Route::get('/', 'IndexController@RenderIndex')->name('index');
 Route::get('/releases', 'IndexController@RenderReleases')->name('releases');
 
+
+
+// Users && Groups || permissions
+Route::get('/users', 'UserController@index')->name('users');
+Route::get('/users/fetchUserData', 'UserController@fetchUserData');
+Route::get('/users/saveUser', 'UserController@saveUser');
+Route::delete('/users/{$id}', 'UserController@destroy');
+Route::get('users/fetchRoleData', 'UserController@fetchRoleData');
+//Route::get('/users/index', 'UserController@index')->name('users');
+
+Route::resource('roles', 'RoleController');
+
+//Route::get('/roles', 'RoleController@index')->name('roles');
+//Route::resource
+//Route::get('/roles/fetchRoleData', 'RoleController@fetchRoleData');
+
+
+
+
+
 Route::get('/fix', function() {
-    \App\Anketa::whereIn('type_view', ['Предрейсовый', 'Предсменный', 'предрейсовый/Предсменный', 'Предрейсовый/предсменный',
-        'предрейсовый/предсменный'])->update(
-        [
-            'type_view' => 'Предрейсовый/Предсменный'
-        ]
-    );
-    \App\Anketa::whereIn('type_view', ['Послерейсовый', 'Послесменный', 'послерейсовый/Послесменный', 'Послерейсовый/послесменый',
-        'Послерейсовый/послесменый', 'послерейсовый/послесменный'])->update(
-        [
-            'type_view' => 'Послерейсовый/Послесменный'
-        ]
-    );
+    \App\User::fetchRoles();
+//    \App\Anketa::whereIn('type_view', ['Предрейсовый', 'Предсменный', 'предрейсовый/Предсменный', 'Предрейсовый/предсменный',
+//        'предрейсовый/предсменный'])->update(
+//        [
+//            'type_view' => 'Предрейсовый/Предсменный'
+//        ]
+//    );
+//    \App\Anketa::whereIn('type_view', ['Послерейсовый', 'Послесменный', 'послерейсовый/Послесменный', 'Послерейсовый/послесменый',
+//        'Послерейсовый/послесменый', 'послерейсовый/послесменный'])->update(
+//        [
+//            'type_view' => 'Послерейсовый/Послесменный'
+//        ]
+//    );
 });
 
 Route::get('/show-video', function () {

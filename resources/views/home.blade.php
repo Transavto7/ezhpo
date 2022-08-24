@@ -42,7 +42,7 @@
                                 </div>
 
 
-                                @manager
+                                @if(user()->hasRole('manager'))
                                     @if($type_ankets === 'tech')
                                         <div class="col-md-8 text-right">
                                             <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
@@ -57,7 +57,7 @@
                                             <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу <i class="fa fa-download"></i></a>
                                         </div>
                                     @endif
-                                @endmanager
+                                @endif
 
                                 <div class="toggle-hidden p-3" id="ankets-filters">
                                     <form action="{{ route('home.save-fields', $type_ankets) }}" method="POST" class="ankets-form">
@@ -104,9 +104,9 @@
                     @else
                         {{-- ОЧИСТКА ОЧЕРЕДИ СДПО --}}
                         @if($type_ankets === 'pak_queue')
-                            @role(['admin'])
+                            @if(user()->access('approval_queue_clear'))
                                 <a href="?clear=1&type_anketa={{ $type_ankets }}" class="btn btn-warning">Очистить очередь</a>
-                            @endrole
+                            @endif
                         @endif
                     @endif
 
@@ -145,6 +145,12 @@
                                         <th class="not-export">ID автомобиля</th>
                                     @endaccessSetting
 
+
+                                    @if(request()->get('trash'))
+                                        <th width="60">Удаливший</th>
+                                        <th width="60">Время удаления</th>
+                                    @endif
+
                                     <!-- ОЧЕРЕДЬ ОСМОТРОВ -->
                                     @if($type_ankets === 'pak_queue')
                                         <th class="not-export">#</th>
@@ -152,20 +158,30 @@
                                     @endif
                                     <!-- /ОЧЕРЕДЬ ОСМОТРОВ -->
 
-                                    @role(['admin', 'manager', 'medic', 'tech', $currentRole])
+                                    {{-- УДАЛЕНИЕ--}}
+                                    @if(
+                                            $type_ankets == 'medic' && user()->access('medic_delete')
+                                            || $type_ankets == 'tech' && user()->access('tech_delete')
+                                            || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_delete')
+                                        )
                                         <th class="not-export">#</th>
-                                    @endrole
+                                    @endif
 
                                     @if($type_ankets !== 'pak_queue')
-                                        @role(['admin', 'manager', 'medic', 'tech'])
+                                            @if(
+                                                $type_ankets == 'medic' && user()->access('medic_trash')
+                                                || $type_ankets == 'tech' && user()->access('tech_trash')
+                                                || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_trash')
+                                            )
                                             <th class="not-export">#</th>
-                                        @endrole
+                                            @endif
                                     @endif
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($ankets as $anketaKey => $anketa)
                                     <tr data-field="{{ $anketaKey }}">
+
                                         @if($type_ankets === 'pak_queue')
                                             <td class="not-export">
                                                 <div class="App-Timer" data-date="{{ $anketa->created_at }}"></div>
@@ -233,6 +249,16 @@
                                             @endif
                                         @endforeach
 
+
+                                        @if(request()->get('trash'))
+                                            <td class="td-option">
+                                                {{ ($anketa->deleted_user->name) }}
+                                            </td>
+                                            <td class="td-option">
+                                                {{ ($anketa->deleted_at) }}
+                                            </td>
+                                        @endif
+
                                         @accessSetting('id_auto', 'medic')
                                             <td class="td-option not-export">
                                                 {{ $anketa->car_id }}
@@ -251,9 +277,13 @@
                                         @endif
                                         <!-- /ОЧЕРЕДЬ ОСМОТРОВ -->
 
-                                        @role(['admin', 'manager', 'medic', 'tech', $currentRole])
+                                            @if(
+                                                $type_ankets == 'medic' && user()->access('medic_update')
+                                                || $type_ankets == 'tech' && user()->access('tech_update')
+                                                || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_update')
+                                            )
                                             <td class="td-option not-export">
-                                                <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm"><i class="fa fa-search"></i></a>
+                                                <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i></a>
                                                 @if($anketa->is_dop && !$anketa->result_dop)
                                                     @if ($anketa->date)
                                                         <a
@@ -270,19 +300,32 @@
                                                     @endif
                                                 @endif
                                             </td>
-                                        @endrole
+                                        @endif
 
                                         @if($type_ankets !== 'pak_queue')
                                             <td class="td-option not-export">
-                                                @manager
-                                                <form action="{{ route('forms.delete', $anketa->id) }}" onsubmit="if(!confirm('Хотите удалить?')) return false;" method="POST">
-                                                    @csrf
-                                                    {{ method_field('DELETE') }}
-                                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-remove"></i></button>
-                                                </form>
-                                                @endmanager
 
-                                                @role(['admin', 'manager', 'medic', 'tech'])
+                                                {{--  poka ne nado--}}
+{{--                                                @if(false)--}}
+{{--                                                    @if(--}}
+{{--                                                        $type_ankets == 'medic' && user()->access('medic_delete')--}}
+{{--                                                        || $type_ankets == 'tech' && user()->access('tech_delete')--}}
+{{--                                                        || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_delete')--}}
+{{--                                                        )--}}
+{{--                                                    <form action="{{ route('forms.delete', $anketa->id) }}" onsubmit="if(!confirm('Хотите удалить?')) return false;" method="POST">--}}
+{{--                                                        @csrf--}}
+{{--                                                        {{ method_field('DELETE') }}--}}
+{{--                                                        <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-remove"></i></button>--}}
+{{--                                                    </form>--}}
+{{--                                                    @endif--}}
+{{--                                                @endif--}}
+
+
+                                                @if(
+                                                    $type_ankets == 'medic' && user()->access('medic_trash')
+                                                    || $type_ankets == 'tech' && user()->access('tech_trash')
+                                                    || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_trash')
+                                                )
                                                 <a href="{{ route('forms.trash', [
                                                     'id' => $anketa->id,
                                                     'action' => isset($_GET['trash']) ? 0 : 1
@@ -293,7 +336,7 @@
                                                         <i class="fa fa-trash"></i>
                                                     @endisset
                                                 </a>
-                                                @endrole
+                                                @endif
 
                                             </td>
                                         @endif

@@ -34,7 +34,7 @@
                         @php $default_value = isset($v['defaultValue']) ? $v['defaultValue'] : '' @endphp
 
                         @if($k !== 'id' && !isset($v['hidden']))
-                            @if($model === 'Instr' && $k === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
+                            @if($model === 'Instr' && $k === 'sort')
                                 <!-- Сортировка инструктажей доступна админу или инженеру -->
                             @elseif($model === 'Instr' && $k === 'signature')
                             @else
@@ -202,50 +202,67 @@
     </div>
 </div>
 @endif
+@php
 
-{{--<div id="elements-modal-import" tabindex="-1" role="dialog" aria-labelledby="elements-modal-import" aria-hidden="true" class="modal fade text-left">
-    <div role="document" class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Импорт</h4>
-                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
-            </div>
+$permissionToCreate = (
+    user()->access('drivers_create') && $model == 'Driver'
+    || user()->access('cars_create') && $model == 'Car'
+    || user()->access('company_create') && $model == 'Company'
+    || user()->access('service_create') && $model == 'Service'
+    || user()->access('discount_create') && $model == 'Product'
+    || user()->access('briefings_create') && $model == 'Instr'
+) && !request()->get('deleted');
 
-            <form action="{{ route('importElements', $model) }}" enctype="multipart/form-data" method="POST">
-                @csrf
+$permissionToDelete = (
+    user()->access('drivers_delete') && $model == 'Driver'
+    || user()->access('cars_delete') && $model == 'Car'
+    || user()->access('company_delete') && $model == 'Company'
+    || user()->access('service_delete') && $model == 'Service'
+    || user()->access('discount_delete') && $model == 'Product'
+    || user()->access('briefings_delete') && $model == 'Instr'
+) && !request()->get('deleted');
 
-                <div class="modal-body">
-                    <p>Выберите файл импорта:</p>
-                    <input required type="file" name="file" />
-                </div>
+$permissionToEdit = (
+    user()->access('drivers_update') && $model == 'Driver'
+    || user()->access('cars_update') && $model == 'Car'
+    || user()->access('company_update') && $model == 'Company'
+    || user()->access('service_update') && $model == 'Service'
+    || user()->access('discount_update') && $model == 'Product'
+    || user()->access('briefings_update') && $model == 'Instr'
+) && !request()->get('deleted');
 
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Импорт</button>
-                    <button type="button" data-dismiss="modal" class="btn btn-secondary">Закрыть</button>
-                </div>
-            </form>
+$permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
 
-        </div>
-    </div>
-</div>--}}
-
+@endphp
 {{--NAVBAR--}}
 @if(!(count($elements) >= $max) || !$max)
     <div class="col-md-12">
         <div class="row bg-light p-2">
-            @role(['manager', 'admin', 'tech', 'medic', 'client'])
-                @if($model === 'Company' && (auth()->user()->hasRole('tech', '==') || auth()->user()->hasRole('medic', '==')))
-                @else
-                    <div class="col-md-2">
-                        <button type="button" data-toggle="modal" data-target="#elements-modal-add" class="@isset($_GET['continue']) TRIGGER_CLICK @endisset btn btn-sm btn-success">Добавить <i class="fa fa-plus"></i></button>
+            @if($permissionToCreate && !request()->get('deleted'))
+                    <div class="m-2">
+                        <button type="button" data-toggle="modal" data-target="#elements-modal-add" class="@isset($_GET['continue']) TRIGGER_CLICK @endisset btn btn-sm btn-success">
+                            Добавить <i class="fa fa-plus"></i>
+                        </button>
                     </div>
-                @endif
-            @endrole
+            @endif
 
-            <div class="col-md-5">
-                <button type="button" data-toggle-show="#elements-filters" class="btn btn-sm btn-info"><i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры</button>
+            <div class=" m-2">
+                <button type="button" data-toggle-show="#elements-filters" class="btn btn-sm btn-info">
+                    <i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры
+                </button>
             </div>
 
+            <div class="m-2">
+                @if(!request()->get('deleted'))
+                <a href="?deleted=1" class="btn btn-sm btn-warning">
+                    Удалённые <i class="fa fa-trash"></i>
+                </a>
+                @else
+                <a href="{{ route('renderElements', ['model' => $model]) }}" class="btn btn-sm btn-warning">
+                    Назад <i class="fa fa-trash"></i>
+                </a>
+                @endif
+            </div>
             {{--<div class="col-md-3 text-right">
                 <div class="row">
                     <button type="button" data-toggle="modal" data-target="#elements-modal-import" class="btn btn-primary">Импорт <i class="fa fa-download"></i></button>
@@ -303,7 +320,7 @@
                                                 'is_required' => '',
                                                 'default_value' => request()->get($fk)
                                             ])
-                                        @elseif($model === 'Instr' && $fk === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
+                                        @elseif($model === 'Instr' && $fk === 'sort')
                                             <!-- Сортировка доступна только инженеру БДД и Админу -->
                                         @else
                                             @include('templates.elements_field', [
@@ -353,7 +370,8 @@
                 @foreach ($fields as $k => $v)
                     @if(!isset($v['hidden']))
 
-                        @if($model === 'Instr' && $k === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
+{{--                        // ($model === 'Instr' && $k === 'sort') тут какие то права были todo--}}
+                        @if(false)
                            <!-- Только админам -->
                         @elseif($model === 'Instr' && $k === 'signature')
                         @else
@@ -378,17 +396,18 @@
                     @endif
                 @endforeach
 
-                @if($model === 'Company')
-                    @role(['admin'])
+                @if($permissionToSyncCompany)
+                    <th width="60">#</th>
+                @endif
+                @if($permissionToDelete)
                     {{--УДАЛЕНИЕ--}}
                     <th width="60">#</th>
-                    @endrole
+                @endif
+                @if(request()->get('deleted'))
+                    <th width="60">Удаливший</th>
+                    <th width="60">Время удаления</th>
                 @endif
 
-                @role(['manager', 'admin'])
-                {{--УДАЛЕНИЕ--}}
-                    <th width="60">#</th>
-                @endrole
             </tr>
         </thead>
         <tbody>
@@ -406,18 +425,19 @@
 
                                 <td class="td-option">
                                     @if($elK === $editOnField)
-                                        @role($otherRoles)
+                                        @if($permissionToEdit)
+{{--                                        @role($otherRoles)--}}
 {{--                                           <a data-type="iframe" data-fancybox href="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}">--}}
                                                <a href="#" class="showEditModal" data-route="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}" data-toggle="modal" data-target="#modalEditor">
 {{--                                            <a href="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}" data-toggle="modal" data-target="#elements-modal-{{ $el->id }}-add" class="text-info">--}}
-
-                                        @endrole
+                                           @endif
+{{--                                        @endrole--}}
                                     @endif
 
                                     @if($elK === 'products_id' || $elK === 'company_id' || $elK === 'req_id' || $elK === 'pv_id' || $elK === 'user_id' || $elK === 'town_id' || $elK === 'essence')
                                         @if($elK === 'company_id')
 
-                                            @if(($model === 'Driver' || $model === 'Car') && $el->$elK && auth()->user()->hasRole('client', '!=') && auth()->user()->hasRole('operator_pak', '!='))
+                                            @if(($model === 'Driver' || $model === 'Car') && $el->$elK && auth()->user()->hasRole('client') && auth()->user()->hasRole('operator_pak'))
                                                 <div>
                                                     <a href="{{ route('renderElements', ['model' => 'Company', 'filter' => 1, 'id' => $el->company_id ]) }}">{{ app('App\Company')->getName($el->company_id) }}</a>
 
@@ -447,12 +467,15 @@
                                         @endif
 
                                     @else
-                                        @if(Storage::disk('public')->exists($el[$elK]) && $el[$elK] !== '<' && $el[$elK] !== '>')
+                                        @if($elK == 'photo')
+                                           @if(Storage::disk('public')->exists($el[$elK]) && $el[$elK] !== '<' && $el[$elK] !== '>')
+
                                             <a href="{{ Storage::url($el[$elK]) }}" data-fancybox="gallery_{{ $el->id }}">
                                                 <b>
                                                     <i class="fa fa-camera"></i>
                                                 </b>
                                             </a>
+                                           @endif
                                         @else
                                             {{--ПРОВЕРКА ДАТЫ--}}
                                             @if($elK === 'date' || strpos($elK, '_at') > 0)
@@ -463,9 +486,10 @@
                                                 @endforeach
                                             @elseif ($elK === 'date_of_employment')
                                                 {{ $el[$elK] ? \Carbon\Carbon::parse($el[$elK])->format('d.m.Y') : '' }}
+{{--                                            @elseif($model === 'Instr' && $elK === 'sort')--}}
                                             @elseif ($elK === 'trigger')
                                                 {{ $el[$elK] === '<' ? 'меньше' : 'больше'  }}
-                                            @elseif($model === 'Instr' && $elK === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
+                                            @elseif($model === 'Instr' && $elK === 'sort')
                                                 <!-- Сортировка инструктажей доступна ролям БДД и Админу -->
                                             @else
                                                 @foreach(explode(',', htmlspecialchars($el[$elK])) as $keyElK => $valElK)
@@ -508,31 +532,41 @@
 
                                     @if($elK === $editOnField)
                                         {{-- Если пользователь Менеджер --}}
-                                        @role($otherRoles)
-                                            </a>
+{{--                                        @role($otherRoles)--}}
+                                        @if($permissionToEdit)
+                                        </a>
+                                        @endif
 
                                             <!-- ЗДЕСЬ БЫЛА МОДАЛКА РЕДАКТИРОВАНИЯ -->
 
-                                        @endrole
+{{--                                        @endrole--}}
                                     @endif
 
                                 </td>
                             @endif
                         @endforeach
 
-                        @if($model === 'Company')
-                            @role(['admin'])
-                                <td class="td-option" title="При синхронизации все услуги компании будут присвоены водителям и автомобилям компании.">
-                                    <a href="{{ route('syncElement', ['type' => $model, 'id' => $el->id ]) }}" class="btn btn-sm btn-success"><i class="fa fa-refresh"></i></a>
-                                </td>
-                            @endrole
+                        @if($permissionToSyncCompany)
+                            <td class="td-option" title="При синхронизации все услуги компании будут присвоены водителям и автомобилям компании.">
+                                <a href="{{ route('syncElement', ['type' => $model, 'id' => $el->id ]) }}" class="btn btn-sm btn-success"><i class="fa fa-refresh"></i></a>
+                            </td>
                         @endif
 
-                        @role(['manager', 'admin'])
+
+                        @if($permissionToDelete)
+                            {{--УДАЛЕНИЕ--}}
                             <td class="td-option">
                                 <a href="{{ route('removeElement', ['type' => $model, 'id' => $el->id ]) }}" class="ACTION_DELETE btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>
                             </td>
-                        @endrole
+                        @endif
+                        @if(request()->get('deleted'))
+                            <td class="td-option">
+                                {{ ($el->deleted_user->name) }}
+                            </td>
+                            <td class="td-option">
+                                {{ ($el->deleted_at) }}
+                            </td>
+                        @endif
 
                     </tr>
                 @endforeach
@@ -551,12 +585,12 @@
 
         @include('templates.take_form')
 
-        @role(['client'])
+        @if(user()->hasRole('client'))
             <p>Элементов найдено: {{ method_exists($elements, 'total') ? $elements->total() : '' }}</p>
         @else
             <p>Элементов всего: {{ $elements_count_all }}</p>
             <p>Элементов найдено: {{ method_exists($elements, 'total') ? $elements->total() : $elements_count_all }}</p>
-        @endrole
+        @endif
     </div>
 </div>
 

@@ -39,6 +39,8 @@ class AnketsController extends Controller
 
         if($anketa) {
             $anketa->in_cart = $action;
+            $anketa->deleted_id = user()->id;
+            $anketa->deleted_at = \Carbon\Carbon::now();
 
             if($anketa->save()) {
                 return redirect($_SERVER['HTTP_REFERER']);
@@ -177,6 +179,7 @@ class AnketsController extends Controller
         ];
 
         $data = $request->all();
+
         $REFERER = isset($data['REFERER']) ? $data['REFERER'] : '';
 
         if(isset($data['REFERER'])) {
@@ -577,14 +580,11 @@ class AnketsController extends Controller
                 $anketasMedic = Anketa::where('driver_id', $d_id)
                     ->where('type_anketa', 'medic')
                     ->where('in_cart', 0)
-                    ->where('type_view', $anketa['type_view'] ?? '')
                     ->orderBy('date', 'desc')
                     ->get();
             } else if ($data['type_anketa'] === 'tech' || $data['type_anketa'] === 'vid_pl') {
                 $anketasTech = Anketa::whereIn('car_id', $cars)
                     ->whereIn('type_anketa', ['tech', 'dop'])
-                    ->where('type_anketa', 'tech')
-                    ->where('type_view', $anketa['type_view'] ?? '')
                     ->where('in_cart', 0)
                     ->orderBy('date', 'desc')
                     ->get();
@@ -645,7 +645,6 @@ class AnketsController extends Controller
                     $notifyTo = new Notify();
                     $notifyTo->sendMsgToUsersFrom('role', '4', 'Новый осмотр в очереди СДПО');
                 }
-
 
                 /**
                  * Компания
@@ -1529,7 +1528,7 @@ class AnketsController extends Controller
                         }
                     }
 
-                    if($anketaTech) {
+                    if($anketaTech && !$anketa['is_dop']) {
                         foreach($anketaTech as $aT) {
                             if (!$aT->date || ($aT->is_dop && $aT->result_dop == null)) {
                                 continue;
