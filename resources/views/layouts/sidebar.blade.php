@@ -228,7 +228,8 @@
 
                     @if(user()->access('pak_sdpo_read'))
                         <li><a href="{{ route('adminUsers', [
-                                    'filter' => 1
+                                    'filter' => 1,
+                                    'pak_sdpo' => 1
                                 ]) }}">ПАК СДПО</a></li>
                     @endif
 

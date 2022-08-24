@@ -159,7 +159,7 @@ class AdminController extends Controller
         $data['orderBy'] = $request->get('orderBy', 'DESC');
         //todo hui znaet kak
 //        $data['is_pak'] = isset($_GET['role']) ? $_GET['role'] == 778 : 0;
-        $data['is_pak'] = \user()->hasRole('terminal');
+        $data['is_pak'] = $request->get('pak_sdpo', 0);
 
         $users = app('App\\User');
         $fieldsModel = $users->fillable;

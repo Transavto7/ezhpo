@@ -322,17 +322,19 @@ export default {
                 })
             }
 
-            if(newRoles.length == 0){
-                return
-            }
             if(JSON.stringify(newRoles) != JSON.stringify(oldRoles)){
                 this.allPermissions = this.allPermissions.map((item) => {
                     item.disable = false;
+                    item.checked = false;
 
                     return item;
                 })
-
                 this.infoModalUser.permissions = [];
+
+                // Если не выьрана роль
+                if(newRoles.length == 0){
+                    return;
+                }
 
                 axios.get('/users/fetchRoleData', {
                     params: {
@@ -453,7 +455,6 @@ export default {
                 },
             }).then(({data}) => {
                 // data = data[0]
-                console.log(data)
                 this.infoModalUser.id = data.id;
                 this.infoModalUser.name = data.name
                 this.infoModalUser.login = data.login;
@@ -467,7 +468,6 @@ export default {
 
                 // не редактируемые
                 this.allPermissions.map((item, index) => {
-                    // console.log(data.disable.includes(item.id))
                     if (data.disable.includes(item.id)) {
                         this.allPermissions[index].disable = true;
                         this.infoModalUser.permissions.push(item.id)
@@ -534,9 +534,9 @@ export default {
             }
         },
         infoModalUser_roles(val) {
-            if(val.length){
+            // if(val.length){
                 this.fetchRoleData(this.infoModalUser_roles)
-            }
+            // }
         },
     },
 }
