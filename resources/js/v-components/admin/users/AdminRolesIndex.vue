@@ -72,29 +72,54 @@
                 </b-col>
             </b-row>
 
+            <b-row class="my-1">
+                <b-col>
+                    <b-button
+                        :class="permission_collapse ? null : 'collapsed'"
+                        :aria-expanded="permission_collapse ? 'true' : 'false'"
+                        aria-controls="collapse-4"
+                        @click="permission_collapse = !permission_collapse"
+                    >
+                        Раскрыть права
+                    </b-button>
+                    <b-collapse id="collapse-4" v-model="permission_collapse" class="mt-2">
+                        <b-card>
+                            <div class="alert alert-success m-3">
+                                <!--                <i class="fa fa-info"></i>-->
+                                <!--                <b>Доброго времени суток!</b><br>-->
+                                Не все права можно выставить, так как они предусматриваются наличием роли<br>
+                                У каждой роли есть набор прав<br>
+                                У каждого пользователя есть набор прав и ролей
+                            </div>
 
-            <b-form-group label="Доступы:" v-slot="{ ariaDescribedby }">
-                <b-form-checkbox-group
-                    ref="permissions_group"
-                    :aria-describedby="ariaDescribedby"
-                    name="flavour-2"
-                    v-model="infoModalRole.permissions"
-                >
-                    <b-row>
-                        <template v-for="(permission, index) in allPermissions">
-                            <b-col lg="3">
-                                <b-form-checkbox
-                                    :value="permission.id"
-                                    :key="index"
+                            <b-form-group label="Доступы:" v-slot="{ ariaDescribedby }">
+                                <b-form-checkbox-group
+                                    :aria-describedby="ariaDescribedby"
+                                    name="flavour-2"
+                                    v-model="infoModalRole.permissions"
                                 >
-                                    {{ permission.guard_name }}
-                                </b-form-checkbox>
-                            </b-col>
-                        </template>
-                    </b-row>
+                                    <b-row>
+                                        <div class="box">
+                                            <div v-for="(permission, index) in allPermissions">
+                                                <b-col>
+                                                    <b-form-checkbox
+                                                        :value="permission.id"
+                                                        :key="index"
+                                                    >
+                                                        {{ permission.guard_name }}
+                                                    </b-form-checkbox>
+                                                </b-col>
+                                            </div>
+                                        </div>
+                                    </b-row>
+                                </b-form-checkbox-group>
+                            </b-form-group>
 
-                </b-form-checkbox-group>
-            </b-form-group>
+                        </b-card>
+                    </b-collapse>
+
+                </b-col>
+            </b-row>
 
             <b-row>
                 <b-col>
@@ -122,6 +147,7 @@ export default {
         return {
             allPermissions: [],
             editModal:      false,
+            permission_collapse: false,
             infoModalRole:  {
                 id:          null,
                 name:        null,
@@ -307,5 +333,12 @@ export default {
 </script>
 
 <style scoped>
-
+.box {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: 500px;
+    height: 400px;
+    align-content: space-between;
+}
 </style>
