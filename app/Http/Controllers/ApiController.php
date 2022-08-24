@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Company;
 use App\Req;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -158,6 +159,8 @@ class ApiController extends Controller
                 $data_exists = $data;
             }
 
+            $data = $data->toArray();
+
             if($dateAnketa) {
                 if(isset($data['id'])) {
                     $redDates = AnketsController::ddateCheck($dateAnketa, $model, $data['id']);
@@ -169,6 +172,10 @@ class ApiController extends Controller
                     $data['company_name'] = $company->name;
                     $data['company_hash_id'] = $company->hash_id;
                 }
+            }
+
+            if (isset($data['date_of_employment'])) {
+                $data['date_of_employment'] = Carbon::parse($data['date_of_employment'])->format('Y-m-d');
             }
 
             return ApiController::r(['exists' => $data_exists, 'model' => $model, 'blockedFields' => $blockedFields, 'message' => $data, 'fieldsValues' => $fieldsValues, 'redDates' => $redDates], 1);
