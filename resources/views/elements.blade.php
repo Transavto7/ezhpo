@@ -34,7 +34,7 @@
                         @php $default_value = isset($v['defaultValue']) ? $v['defaultValue'] : '' @endphp
 
                         @if($k !== 'id' && !isset($v['hidden']))
-                            @if($model === 'Instr' && $k === 'sort' && (!auth()->user()->hasRole('engineer_bdd') && !auth()->user()->hasRole('admin')))
+                            @if($model === 'Instr' && $k === 'sort')
                                 <!-- Сортировка инструктажей доступна админу или инженеру -->
                             @elseif($model === 'Instr' && $k === 'signature')
                             @else
@@ -221,6 +221,16 @@ $permissionToDelete = (
     || user()->access('discount_delete') && $model == 'Discount'
     || user()->access('briefings_delete') && $model == 'Instr'
 );
+
+$permissionToEdit = (
+    user()->access('drivers_update') && $model == 'Driver'
+    || user()->access('cars_update') && $model == 'Car'
+    || user()->access('company_update') && $model == 'Company'
+    || user()->access('service_update') && $model == 'Service'
+    || user()->access('discount_update') && $model == 'Discount'
+    || user()->access('briefings_update') && $model == 'Instr'
+);
+
 $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
 
 @endphp
@@ -299,7 +309,7 @@ $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync
                                                 'is_required' => '',
                                                 'default_value' => request()->get($fk)
                                             ])
-                                        @elseif($model === 'Instr' && $fk === 'sort' && (!auth()->user()->hasRole('engineer_bdd') && !auth()->user()->hasRole('admin')))
+                                        @elseif($model === 'Instr' && $fk === 'sort')
                                             <!-- Сортировка доступна только инженеру БДД и Админу -->
                                         @else
                                             @include('templates.elements_field', [
@@ -349,7 +359,8 @@ $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync
                 @foreach ($fields as $k => $v)
                     @if(!isset($v['hidden']))
 
-                        @if($model === 'Instr' && $k === 'sort' && (!auth()->user()->hasRole('engineer_bdd') && !auth()->user()->hasRole('admin')))
+{{--                        // ($model === 'Instr' && $k === 'sort') тут какие то права были todo--}}
+                        @if(false)
                            <!-- Только админам -->
                         @elseif($model === 'Instr' && $k === 'signature')
                         @else
@@ -374,6 +385,10 @@ $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync
                     @endif
                 @endforeach
 
+                @if($permissionToSyncCompany)
+                    {{--УДАЛЕНИЕ--}}
+                    <th width="60">#</th>
+                @endif
                 @if($permissionToDelete)
                     {{--УДАЛЕНИЕ--}}
                     <th width="60">#</th>
@@ -396,12 +411,13 @@ $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync
 
                                 <td class="td-option">
                                     @if($elK === $editOnField)
-                                        @role($otherRoles)
+                                        @if($permissionToEdit)
+{{--                                        @role($otherRoles)--}}
 {{--                                           <a data-type="iframe" data-fancybox href="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}">--}}
                                                <a href="#" class="showEditModal" data-route="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}" data-toggle="modal" data-target="#modalEditor">
 {{--                                            <a href="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}" data-toggle="modal" data-target="#elements-modal-{{ $el->id }}-add" class="text-info">--}}
-
-                                        @endrole
+                                           @endif
+{{--                                        @endrole--}}
                                     @endif
 
                                     @if($elK === 'products_id' || $elK === 'company_id' || $elK === 'req_id' || $elK === 'pv_id' || $elK === 'user_id' || $elK === 'town_id' || $elK === 'essence')
@@ -456,10 +472,10 @@ $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync
                                                 @endforeach
                                             @elseif ($elK === 'date_of_employment')
                                                 {{ $el[$elK] ? \Carbon\Carbon::parse($el[$elK])->format('d.m.Y') : '' }}
-                                            @elseif($model === 'Instr' && $elK === 'sort' && (!auth()->user()->hasRole('engineer_bdd') && !auth()->user()->hasRole('admin')))
+{{--                                            @elseif($model === 'Instr' && $elK === 'sort')--}}
                                             @elseif ($elK === 'trigger')
                                                 {{ $el[$elK] === '<' ? 'меньше' : 'больше'  }}
-                                            @elseif($model === 'Instr' && $elK === 'sort' && (!auth()->user()->hasRole('engineer_bdd', '==') && !auth()->user()->hasRole('admin', '==')))
+                                            @elseif($model === 'Instr' && $elK === 'sort')
                                                 <!-- Сортировка инструктажей доступна ролям БДД и Админу -->
                                             @else
                                                 @foreach(explode(',', htmlspecialchars($el[$elK])) as $keyElK => $valElK)
@@ -502,12 +518,14 @@ $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync
 
                                     @if($elK === $editOnField)
                                         {{-- Если пользователь Менеджер --}}
-                                        @role($otherRoles)
-                                            </a>
+{{--                                        @role($otherRoles)--}}
+                                        @if($permissionToEdit)
+                                        </a>
+                                        @endif
 
                                             <!-- ЗДЕСЬ БЫЛА МОДАЛКА РЕДАКТИРОВАНИЯ -->
 
-                                        @endrole
+{{--                                        @endrole--}}
                                     @endif
 
                                 </td>

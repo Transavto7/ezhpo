@@ -322,6 +322,9 @@ export default {
                 })
             }
 
+            if(newRoles.length == 0){
+                return
+            }
             if(JSON.stringify(newRoles) != JSON.stringify(oldRoles)){
                 this.allPermissions = this.allPermissions.map((item) => {
                     item.disable = false;
