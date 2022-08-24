@@ -378,7 +378,7 @@ class IndexController extends Controller
                     'name'    => [
                         'label'                => 'Название компании клиента',
                         'type'                 => 'text',
-                        'filterJournalLinkKey' => 'company_name',
+                        'filterJournalLinkKey' => 'company_id',
                     ],
                     'note'    => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
                     'user_id' => [
@@ -1219,17 +1219,9 @@ class IndexController extends Controller
                             if(count($aFv) > 0) {
                                 $element['elements'] = $element['elements']->where(function ($q) use ($aFv, $aFk) {
                                     $isId = strpos($aFk, '_id') && $aFk !== 'products_id';
-                                    $strSearchCount = '';
 
                                     foreach($aFv as $aFvItemKey => $aFvItemValue) {
                                         if ($isId && $aFk === 'town_id') {
-                                            if ($strSearchCount) {
-                                                $strSearchCount .= ',%';
-                                            } else {
-                                                $strSearchCount = '%';
-                                            }
-
-
                                             $q = $q->where(function($q) use ($aFvItemValue, $aFk) {
                                                 return $q->orWhere($aFk, $aFvItemValue)
                                                     ->orWhere($aFk, 'like', "%,$aFvItemValue")
@@ -1243,13 +1235,6 @@ class IndexController extends Controller
                                             } else {
                                                 $q = $q->where($aFk, 'LIKE', '%' . trim($aFvItemValue) . '%');
                                             }
-                                        }
-                                    }
-                                    if ($strSearchCount) {
-                                        if ($strSearchCount === '%') {
-                                            $q->where($aFk, 'not like', '%,%');
-                                        } else {
-                                            $q->where($aFk, 'not like', $strSearchCount .= ',%');
                                         }
                                     }
 

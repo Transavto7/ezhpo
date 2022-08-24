@@ -1,4 +1,4 @@
-@extends('layouts.app')
+ @extends('layouts.app')
 
 @section('title', $title)
 @section('sidebar', 1)
@@ -232,6 +232,9 @@ $permissionToEdit = (
 ) && !request()->get('deleted');
 
 $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
+
+$date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
+$date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
 
 @endphp
 {{--NAVBAR--}}
@@ -528,9 +531,20 @@ $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync
                                             </td>
                                             <td class="td-option">
                                             <nobr>
-                                                <a class="btn btn-sm btn-danger" href="{{ route('home', 'medic') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['name'] }}">МЕД</a>
-                                                <a class="btn btn-sm btn-info" href="{{ route('home', 'tech') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['name'] }}">ТЕХ</a>
-                                                <a class="btn btn-sm btn-dark" href="{{ route('home', 'Dop') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['name'] }}">ПЛ</a>
+                                                <a class="btn btn-sm btn-danger"
+                                                   href="{{ route('home', 'medic') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
+                                                    МЕД
+                                                </a>
+
+                                                <a class="btn btn-sm btn-info"
+                                                   href="{{ route('home', 'tech') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
+                                                    ТЕХ
+                                                </a>
+
+                                                <a class="btn btn-sm btn-dark"
+                                                   href="{{ route('home', 'Dop') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
+                                                    ПЛ
+                                                </a>
                                             </nobr>
                                         @endisset
                                     @endif
