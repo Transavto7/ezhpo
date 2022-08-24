@@ -14,7 +14,7 @@
         >
 
             <template #cell(name)="row">
-                <b-button variant="success" @click="editUserData(row.item.id)">{{ row.value }}</b-button>
+                <a href="#" @click="editUserData(row.item.id)">{{ row.value }}</a>
                 <!--                {{ row.value.name }}-->
             </template>
 
@@ -158,7 +158,7 @@
                         :multiple="true"
                         :options="optionsRoles"
                         label="guard_name"
-                        v-model="infoModalUser.roles"
+                        v-model="infoModalUser_roles"
                     >
                     </v-select>
                 </b-col>
@@ -206,17 +206,21 @@
                                     v-model="infoModalUser.permissions"
                                 >
                                     <b-row>
-                                        <template v-for="(permission, index) in allPermissions">
-                                            <b-col lg="3">
-                                                <b-form-checkbox
-                                                    :value="permission.id"
-                                                    :disabled="permission.disable"
-                                                    :key="index"
-                                                >
-                                                    {{ permission.guard_name }}
-                                                </b-form-checkbox>
-                                            </b-col>
-                                        </template>
+<!--                                        <template v-for="(permission, index) in allPermissions">-->
+<!--                                        </template>-->
+                                        <div class="box">
+                                            <div v-for="(permission, index) in allPermissions">
+                                                <b-col>
+                                                    <b-form-checkbox
+                                                        :value="permission.id"
+                                                        :disabled="permission.disable"
+                                                        :key="index"
+                                                    >
+                                                        {{ permission.guard_name }}
+                                                    </b-form-checkbox>
+                                                </b-col>
+                                            </div>
+                                        </div>
                                     </b-row>
                                 </b-form-checkbox-group>
                             </b-form-group>
@@ -254,6 +258,8 @@ export default {
             allPermissions:      [],
             enableModal:         false,
             permission_collapse: false,
+            infoModalUser_roles: [],
+
             infoModalUser:       {
                 id:          null,
                 name:        null,
@@ -263,7 +269,6 @@ export default {
                 eds:         null,
                 timezone:    null,
                 pv:          null,
-                roles:       [],
                 blocked:     null,
                 permissions: [],
             },
@@ -279,7 +284,7 @@ export default {
             optionsRoles:        [],
             // Поля таблицы
             fields:      [
-                {key: 'id', label: 'ID'},
+                {key: 'hash_id', label: 'ID'},
                 {key: 'type', label: 'Фото', class: 'text-center'},
                 {key: 'name', label: 'ФИО'},
                 {key: 'eds', label: 'ЭЦП'},
@@ -302,6 +307,50 @@ export default {
         }
     },
     methods: {
+        fetchRoleData(e){
+
+            let newRoles = e.map((item) => {
+                return item.id
+            })
+            let oldRoles = [];
+
+            if(this.infoModalUser.id){
+                oldRoles = this.items.filter((item) => {
+                    return item.id == this.infoModalUser.id
+                })[0].roles.map((item) => {
+                    return item.id
+                })
+            }
+
+            if(JSON.stringify(newRoles) != JSON.stringify(oldRoles)){
+                this.allPermissions = this.allPermissions.map((item) => {
+                    item.disable = false;
+
+                    return item;
+                })
+
+                this.infoModalUser.permissions = [];
+
+                axios.get('/users/fetchRoleData', {
+                    params: {
+                        role_ids: newRoles,
+                    },
+                }).then(({data}) => {
+
+                    this.allPermissions.map((item, index) => {
+                        if (data.includes(item.id)) {
+                            this.allPermissions[index].disable = true;
+                            this.infoModalUser.permissions.push(item.id)
+                        }
+                    })
+
+                    this.showModal()
+                }).finally(() => {
+                    this.loading = false;
+                });
+            }
+        },
+
         deleteUser(id) {
             Swal2.fire({
                 title:              'Вы уверены, что хотите удалить?',
@@ -352,8 +401,9 @@ export default {
                     email:    this.infoModalUser.email,
                     eds:      this.infoModalUser.eds,
                     timezone: this.infoModalUser.timezone,
+                    password: this.infoModalUser.password,
                     pv:       this.infoModalUser.pv,
-                    roles:    this.infoModalUser.roles.map((item) => {
+                    roles:    this.infoModalUser_roles.map((item) => {
                         return item.id;
                     }),
                     blocked:  this.infoModalUser.blocked,
@@ -382,6 +432,7 @@ export default {
                 }
 
             }).finally(() => {
+                location.reload()
                 this.loading = false;
             });
         },
@@ -408,10 +459,10 @@ export default {
                 this.infoModalUser.eds = data.eds;
                 this.infoModalUser.timezone = data.timezone;
                 this.infoModalUser.pv = data.pv.id;
-                this.infoModalUser.roles = data.roles;
+                this.infoModalUser_roles = data.roles;
                 this.infoModalUser.blocked = data.blocked;
 
-                // console.log(data.disable)
+                // не редактируемые
                 this.allPermissions.map((item, index) => {
                     // console.log(data.disable.includes(item.id))
                     if (data.disable.includes(item.id)) {
@@ -419,6 +470,8 @@ export default {
                         this.infoModalUser.permissions.push(item.id)
                     }
                 })
+
+                // редактируемые
                 data.permission_user.map((item) => {
                     this.infoModalUser.permissions.push(item)
                 })
@@ -438,7 +491,7 @@ export default {
             this.infoModalUser.eds = null;
             this.infoModalUser.timezone = null;
             this.infoModalUser.pv = null;
-            this.infoModalUser.roles = [];
+            this.infoModalUser_roles = [];
             this.infoModalUser.blocked = null;
             this.infoModalUser.permissions = [];
             this.permission_collapse = false;
@@ -458,12 +511,12 @@ export default {
             this.enableModal = false
         },
 
-        toggleModal() {
-            // Мы передаем идентификатор кнопки, на которую мы хотим вернуть фокус,
-            // когда модальное окно скрыто
-            this.resetModal();
-            this.enableModal = false
-        },
+        // toggleModal() {
+        //     // Мы передаем идентификатор кнопки, на которую мы хотим вернуть фокус,
+        //     // когда модальное окно скрыто
+        //     // this.resetModal();
+        //     // this.enableModal = false
+        // },
     },
     mounted() {
         this.items = this.users;
@@ -477,10 +530,22 @@ export default {
                 this.resetModal()
             }
         },
+        infoModalUser_roles(val) {
+            if(val.length){
+                this.fetchRoleData(this.infoModalUser_roles)
+            }
+        },
     },
 }
 </script>
 
 <style scoped>
-
+.box {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: 500px;
+    height: 400px;
+    align-content: space-between;
+}
 </style>

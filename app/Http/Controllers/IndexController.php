@@ -1097,7 +1097,7 @@ class IndexController extends Controller
         if($user->hasRole('client')) {
             return redirect(route('home') );
         }
-        $type = $request->get('type');
+        $type = $request->get('type', ($user->hasRole('tech') ? 'tech' : 'medic'));
 
         if(!$type){
             if(user()->access('tech_create')){

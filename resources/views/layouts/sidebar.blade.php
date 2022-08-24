@@ -85,7 +85,8 @@
                 </li>
             @endif
 
-
+            @if(user()->access('medic_read', 'tech_read', 'journal_briefing_bdd_read',
+                    'journal_pl_read', 'map_report_read', 'journal_pl_accounting', 'errors_sdpo_read'))
             <li>
                 <a href="#" data-btn-collapse="#views" role="button"> <i class="icon-grid"></i>Журналы осмотров</a>
                 <ul id="views" class="collapse list-unstyle">
@@ -105,7 +106,7 @@
                         </li>
                     @endif
 
-                    @if(user()->access('journal_briefing_bdd_read'))
+                    @if(user()->access('journal_pl_read'))
                         <li>
                             <a href="{{ route('home', 'pechat_pl') }}"><i class="fa fa-book"></i>Журнал печати ПЛ</a>
                         </li>
@@ -118,7 +119,7 @@
                         </li>
                     @endif
 
-                    @if(user()->access('journal_pl_read'))
+                    @if(user()->access('journal_pl_accounting'))
                         <li>
                             <a href="{{ route('home', 'Dop') }}"><i class="fa fa-book"></i>Журнал учета ПЛ</a>
                         </li>
@@ -138,9 +139,9 @@
                             </a>
                         </li>
                     @endif
-
                 </ul>
             </li>
+            @endif
 
             @if(user()->access('report_service_company_read', 'report_schedule_pv_read'))
                 <li>
@@ -170,6 +171,7 @@
                 </li>
             @endif
 
+            @if(user()->access('drivers_read', 'cars_create', 'company_read', 'service_read', 'discount_read', 'briefings_create'))
             <li>
                 <a href="#" data-btn-collapse="#phoenic" role="button"> <i class="icon-interface-windows"></i>CRM</a>
                 <ul id="phoenic" class="collapse list-unstyle">
@@ -194,6 +196,7 @@
                     @endif
                 </ul>
             </li>
+            @endif
 
             <li>
                 <a href="#" data-btn-collapse="#spis-pol" role="button"><i class="fa fa-cog"></i> Настройки</a>

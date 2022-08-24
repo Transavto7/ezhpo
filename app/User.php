@@ -109,7 +109,7 @@ class User extends Authenticatable
 //        }
     }
 
-    public static function fetchRoles()
+    public static function fetchRoles($hard = false)
     {
 //        DB::statement("SET foreign_key_checks=0");
 //        Role::truncate();
@@ -118,7 +118,9 @@ class User extends Authenticatable
         foreach (self::$newUserRolesTextEN as $keyRole => $nameRole) {
             Role::updateOrCreate([
                 'name'       => $nameRole,
+            ], [
                 'guard_name' => self::$newUserRolesText[$keyRole],
+                'name'       => $nameRole,
             ]);
         }
 
@@ -127,10 +129,15 @@ class User extends Authenticatable
         foreach ($permissions as $permission) {
             Permission::updateOrCreate([
                 'name'       => $permission['name'],
+            ],[
+                'name'       => $permission['name'],
                 'guard_name' => $permission['description'],
             ]);
         }
 
+        if(!$hard){
+            return;
+        }
 
         foreach (User::with(['roles'])->get() as $user) {
             if ($user->roles()->count()) {
@@ -174,7 +181,7 @@ class User extends Authenticatable
         self::fetchOldDataPermission($permissions);
     }
 
-    public static function fetchOldDataPermission($permissions)
+    private static function fetchOldDataPermission($permissions)
     {
         // permission for admin
         $adminRole = Role::where('name', 'admin')->first();

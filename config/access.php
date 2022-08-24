@@ -5,23 +5,23 @@ return [
     //============== Медосмотр =====================//
     [
         'name'        => 'medic_create',
-        'description' => 'Медосмотры создание',
+        'description' => 'Медосмотры - создание',
     ],
     [
         'name'        => 'medic_read',
-        'description' => 'Медосмотры просмотр',
+        'description' => 'Медосмотры - просмотр',
     ],
     [
         'name'        => 'medic_update',
-        'description' => 'Медосмотры редактирование',
+        'description' => 'Медосмотры - редактирование',
     ],
     [
         'name'        => 'medic_delete',
-        'description' => 'Медосмотры удаление',
+        'description' => 'Медосмотры - удаление',
     ],
     [
         'name'        => 'medic_trash',
-        'description' => 'Медосмотры удаление',
+        'description' => 'Медосмотры - корзина',
     ],
 
     //============== Техосмотр =====================//
@@ -69,6 +69,14 @@ return [
     ],
     [
         'name'        => 'journal_pl_read',
+        'description' => 'Журнал печати ПЛ - просмотр',
+    ],
+    [
+        'name'        => 'journal_pl_accounting',
+        'description' => 'Журнал учета ПЛ - просмотр',
+    ],
+    [
+        'name'        => 'errors_sdpo_read',
         'description' => 'Реестр ошибок СДПО - Просмотр',
     ],
 
@@ -403,11 +411,8 @@ return [
     ],
 
 
-
-
-
-//    [
-//        'name'        => 'map_report_create',
-//        'description' => 'Внести отчёт с карты',
-//    ],
+    //    [
+    //        'name'        => 'map_report_create',
+    //        'description' => 'Внести отчёт с карты',
+    //    ],
 ];

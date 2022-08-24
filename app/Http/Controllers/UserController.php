@@ -21,7 +21,9 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $users = User::with(['roles', 'pv', 'company']);
-
+//            dd(
+//                $users->with(['permissions'])->find(1)->toArray()
+//            );
         if ($name = $request->get('name')) {
             $users->where('name', 'like', "%$name%");
         }
@@ -174,5 +176,23 @@ class UserController extends Controller
         return response([
             'status' => User::find($id)->delete(),
         ]);
+    }
+
+    public function fetchRoleData(Request $request)
+    {
+        $permissions = collect();
+        Role::with(['permissions'])
+            ->whereIn('id', $request->get('role_ids', [])) //
+            ->get()
+            ->map(function ($q) use (&$permissions) {
+                $permissions = $permissions->merge($q->permissions);
+            });
+
+        $permissions = $permissions
+            ->unique('id')
+            ->pluck('id')
+            ->values();
+
+        return response($permissions);
     }
 }

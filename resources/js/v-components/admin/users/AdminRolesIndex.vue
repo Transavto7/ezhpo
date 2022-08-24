@@ -12,7 +12,7 @@
         >
 
             <template #cell(name)="row">
-                <a href="#" class="btn btn-success" @click="editRoleData(row.item.id)">{{ row.item.guard_name }}</a>
+                <a href="#" @click="editRoleData(row.item.id)">{{ row.item.guard_name }}</a>
                 <!--                {{ row.value.name }}-->
             </template>
             <template #cell(delete_btn)="row">
@@ -260,16 +260,6 @@ export default {
                     this.infoModalRole.permissions = data.permissions.map((item) => {
                         return item.id
                     });
-                    // data.permissions = data.permissions.map((item) => {
-                    //     return item.id
-                    // })
-                    // console.log(data.permissions)
-                    // this.allPermissions.map((item, index) => {
-                    //     if (data.permissions.includes(item.id)) {
-                    //         this.allPermissions[index].checked = true;
-                    //         // this.infoModalUser.permissions.push(item.id)
-                    //     }
-                    // })
 
                     this.showModal()
                 })

@@ -5,7 +5,7 @@
 @php
 $points = \App\Town::with(['pvs'])->get();
 $roles = \Spatie\Permission\Models\Role::all();
-$all_permissions = \Spatie\Permission\Models\Permission::all();
+$all_permissions = \Spatie\Permission\Models\Permission::orderBy('guard_name')->get();
 @endphp
 @section('content')
 
