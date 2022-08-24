@@ -1200,6 +1200,9 @@ class IndexController extends Controller
             $element['orderKey'] = $orderKey;
             $element['take'] = $take;
 
+            if($request->get('deleted')){
+                $element['elements'] = $element['elements']->onlyTrashed();
+            }
             if($filter) {
                 $allFilters = $request->all();
                 unset($allFilters['filter']);
@@ -1207,6 +1210,7 @@ class IndexController extends Controller
                 unset($allFilters['orderBy']);
                 unset($allFilters['orderKey']);
                 unset($allFilters['page']);
+                unset($allFilters['deleted']);
 
                 foreach($allFilters as $aFk => $aFv) {
                     if(!empty($aFv)) {
@@ -1264,7 +1268,8 @@ class IndexController extends Controller
             // Автоматическая загрузка справочников
             $excludeElementTypes = ['Settings', 'Discount', 'DDates', 'DDate', 'Product', 'Instr', 'Town', 'Point', 'FieldHistory', 'Req'];
 
-            if($filter || in_array($type, $excludeElementTypes) || ($user->hasRole('client', '==') && ($type === 'Driver' || $type === 'Car'))) {
+
+            if($filter || in_array($type, $excludeElementTypes) || ($user->hasRole('client') && ($type === 'Driver' || $type === 'Car'))) {
                 if($element['max']) {
                     $element['elements'] = $element['elements']->take($element['max'])->get();
                 } else {

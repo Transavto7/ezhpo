@@ -286,7 +286,12 @@ $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync
 
             <div class="toggle-hidden col-md-12" id="elements-filters">
                 <form action="" method="GET" class="elements-form-filter">
+
                     <input type="hidden" name="filter" value="1">
+                    @if(request()->get('deleted'))
+                    <input type="hidden" name="deleted" value="1">
+                    @endif
+
                     <hr>
                     <div class="row">
                         {{--DEFAULT FIELDS--}}
