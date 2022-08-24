@@ -1215,9 +1215,23 @@ class IndexController extends Controller
                             if(count($aFv) > 0) {
                                 $element['elements'] = $element['elements']->where(function ($q) use ($aFv, $aFk) {
                                     $isId = strpos($aFk, '_id') && $aFk !== 'products_id';
+                                    $strSearchCount = '';
 
                                     foreach($aFv as $aFvItemKey => $aFvItemValue) {
-                                        if($isId) {
+                                        if ($isId && $aFk === 'town_id') {
+                                            if ($strSearchCount) {
+                                                $strSearchCount .= ',%';
+                                            } else {
+                                                $strSearchCount = '%';
+                                            }
+
+
+                                            $q = $q->where(function($q) use ($aFvItemValue, $aFk) {
+                                                return $q->orWhere($aFk, $aFvItemValue)
+                                                    ->orWhere($aFk, 'like', "%,$aFvItemValue")
+                                                    ->orWhere($aFk, 'like', "$aFvItemValue,%");
+                                            });
+                                        } else if($isId) {
                                             $q = $q->where($aFk, $aFvItemValue);
                                         } else {
                                             if(strlen($aFvItemValue) === 0) {
@@ -1227,11 +1241,18 @@ class IndexController extends Controller
                                             }
                                         }
                                     }
+                                    if ($strSearchCount) {
+                                        if ($strSearchCount === '%') {
+                                            $q->where($aFk, 'not like', '%,%');
+                                        } else {
+                                            $q->where($aFk, 'not like', $strSearchCount .= ',%');
+                                        }
+                                    }
 
                                     return $q;
                                 });
                             }
-
+//                        dd($element['elements']->toSql());
                         } else {
                             if ($aFk == 'date_of_employment') {
                                 $element['elements'] = $element['elements']->whereBetween($aFk, [
