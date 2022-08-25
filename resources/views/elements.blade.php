@@ -463,7 +463,7 @@ $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
                     @endif
                 @endforeach
 
-                @if($permissionToSyncCompany)
+                @if($permissionToSyncCompany && !request()->get('deleted'))
                     <th width="60">#</th>
                 @endif
                 @if($permissionToDelete)
@@ -625,7 +625,7 @@ $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
                             @endif
                         @endforeach
 
-                        @if($permissionToSyncCompany)
+                        @if($permissionToSyncCompany && !request()->get('deleted'))
                             <td class="td-option" title="При синхронизации все услуги компании будут присвоены водителям и автомобилям компании.">
                                 <a href="{{ route('syncElement', ['type' => $model, 'id' => $el->id ]) }}" class="btn btn-sm btn-success"><i class="fa fa-refresh"></i></a>
                             </td>
