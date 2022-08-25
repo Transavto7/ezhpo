@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Middleware\ {
-    CheckAdmin, CheckManager
-};
+//use App\Http\Middleware\ {
+//    CheckAdmin, CheckManager
+//};
 
 Route::get('/fixRoles', function() {
 

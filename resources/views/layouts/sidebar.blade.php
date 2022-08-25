@@ -207,7 +207,7 @@
             @endif
 
             @if(user()->access('system_read', 'settings_system_read',
-                'city_read', 'pv_read', 'employee_read','employee_read','employee_read'))
+                'city_read', 'pv_read', 'employee_read','employee_read','employee_read','city_create'))
                 <li>
                     <a href="#" data-btn-collapse="#spis-pol" role="button"><i class="fa fa-cog"></i> Настройки</a>
                     <ul id="spis-pol" class="collapse list-unstyle">
