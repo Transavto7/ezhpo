@@ -36,15 +36,22 @@
             <article class="col-md-9">
                 <input min="1900-02-20T20:20"
                        max="2999-02-20T20:20" type="datetime-local"
+                       @if (!isset($period_pl)) required @endif
+                       oninput="changeFormRequire(this, 'pl-period')"
                        @isset ($date) value="{{ $default_current_date ?? '' }}" @endisset
-                       name="anketa[0][date]" class="form-control">
+                       name="anketa[0][date]" class="form-control pl-date">
             </article>
         </div>
 
         <div class="form-group row">
             <label class="col-md-3 form-control-label">Период выдачи ПЛ:</label>
             <article class="col-md-9">
-                <input type="month" value="{{ isset($period_pl) ? $period_pl : '' }}" name="anketa[0][period_pl]" class="form-control">
+                <input type="month"
+                       @if (!isset($date)) required @endif
+                       oninput="changeFormRequire(this, 'pl-date')"
+                       value="{{ isset($period_pl) ? $period_pl : '' }}"
+                       name="anketa[0][period_pl]"
+                       class="form-control pl-period">
             </article>
         </div>
 

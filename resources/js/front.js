@@ -528,6 +528,14 @@ $(document).ready(function () {
         }
     }
 
+    window.changeFormRequire = (element, className) => {
+        if (element.value.length > 0) {
+            $(element).parents('.cloning')?.find('.' + className).prop('required', false);
+        } else {
+            $(element).parents('.cloning')?.find('.' + className).prop('required', true);
+        }
+    };
+
     // Проверка свойства по модели на бэкенда
     window.checkInputProp = async (prop = '0', model = '0', val = '0', label, parent, is_dop) => {
 
