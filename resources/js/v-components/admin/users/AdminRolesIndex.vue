@@ -78,7 +78,7 @@
                     <b-form-input v-model="infoModalRole.name"
                                   size="sm"
                                   placeholder="Введите код группы"
-                                  disabled
+                                  :disabled="infoModalRole.id"
                     >
 
                     </b-form-input>

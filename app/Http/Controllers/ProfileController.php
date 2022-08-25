@@ -122,7 +122,11 @@ class ProfileController extends Controller
                 $hash = sha1(time());
                 $path = "elements/$hash.png";
 
-                $base64_image = Storage::disk('public')->put($path, $base64_image);
+                if(Storage::disk('public')->exists($user->photo)){
+                    Storage::disk('public')->delete($user->photo);
+                }
+
+                Storage::disk('public')->put($path, $base64_image);
 
                 $user->$k = $path;
             } else {

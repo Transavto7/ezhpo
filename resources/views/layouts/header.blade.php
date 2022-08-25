@@ -1,4 +1,4 @@
-@php $user_avatar = \App\Http\Controllers\ProfileController::getAvatar(); @endphp
+@php $user_avatar = asset("storage/". auth()->user()->photo); @endphp
 
 <!-- Main Navbar-->
 <header class="header no-print">
