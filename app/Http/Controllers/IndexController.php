@@ -944,8 +944,12 @@ class IndexController extends Controller
         $model = app("App\\$model");
 
         if($model) {
+            if($request->get('undo')){
+                $model::withTrashed()->find($id)->restore();
+                return redirect( $_SERVER['HTTP_REFERER']);
+            }
             if($model::find($id)->delete()) {
-                return redirect( $_SERVER['HTTP_REFERER'] );
+                return redirect( $_SERVER['HTTP_REFERER']);
             }
         }
     }
@@ -1137,11 +1141,11 @@ class IndexController extends Controller
             return view('auth.login');
         }
 
-        if($user->hasRole('operator_pak', '==')) {
+        if($user->hasRole('operator_sdpo')) {
             return redirect()->route('home', 'pak_queue');
         }
 
-        if($user->hasRole('manager', '==') || $user->role_manager) {
+        if($user->hasRole('manager')) {
             return redirect()->route('renderElements', 'Company');
         }
 
@@ -1257,7 +1261,7 @@ class IndexController extends Controller
                 }
             }
 
-            if(User::getUserCompanyId() && auth()->user()->hasRole('client', '==')) {
+            if(User::getUserCompanyId() && auth()->user()->hasRole('client')) {
                 $company_user_id = User::getUserCompanyId();
 
                 if($model == 'Driver' || $model == 'Car') {
@@ -1326,7 +1330,7 @@ class IndexController extends Controller
     {
         $user = Auth::user();
 
-        if($user->hasRole('client', '==')) {
+        if($user->hasRole('client')) {
             return redirect( route('home') );
         }
 

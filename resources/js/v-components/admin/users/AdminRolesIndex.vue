@@ -1,9 +1,10 @@
 <template>
     <div class="">
-        <b-button @click="showModal">Добавить группу</b-button>
+        <b-button v-if="current_user_permissions.permission_to_create"  @click="showModal">Добавить группу</b-button>
 
 
         <b-table
+            v-if="current_user_permissions.permission_to_view"
             :items="items"
             :fields="fields"
             striped hover
@@ -12,11 +13,23 @@
         >
 
             <template #cell(name)="row">
-                <a href="#" @click="editRoleData(row.item.id)">{{ row.item.guard_name }}</a>
+                <template
+                    v-if="current_user_permissions.permission_to_edit"
+                >
+                    <a href="#" @click="editRoleData(row.item.id)">{{ row.item.guard_name }}</a>
+                </template>
+                <template
+                    v-else
+                >
+                    {{ row.value }}
+                </template>
                 <!--                {{ row.value.name }}-->
             </template>
             <template #cell(delete_btn)="row">
-                <b-button variant="danger" @click="deleteRole(row.item.id)">
+                <b-button
+                    :disabled="!current_user_permissions.permission_to_delete"
+                    variant="danger"
+                    @click="deleteRole(row.item.id)">
                     <b-icon icon="trash-fill" aria-hidden="true"></b-icon>
                 </b-button>
                 <!--                {{ row.value.name }}-->
@@ -140,7 +153,7 @@ import 'vue-select/dist/vue-select.css';
 
 export default {
     name:       "AdminRolesIndex",
-    props:      ['roles', 'all_permissions'],
+    props:      ['roles', 'all_permissions', 'current_user_permissions'],
     components: {Swal2, vSelect},
 
     data() {

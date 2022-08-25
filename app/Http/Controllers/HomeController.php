@@ -512,7 +512,7 @@ class HomeController extends Controller
         $currentRole = $validTypeAnkets === 'Dop' ? 'medic' : $validTypeAnkets;
 
         if ($typeAnkets === 'pak_queue' && $user->hasRole('operator_sdpo')) {
-            $currentRole = 'operator_pak';
+            $currentRole = 'operator_sdpo';
         }
 
 

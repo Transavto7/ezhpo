@@ -2,6 +2,13 @@
 
 @section('title', $title)
 @section('sidebar', 1)
+@php
+
+    $permissionEdit = user()->access('pak_sdpo_update');
+    $permissionView = user()->access('pak_sdpo_read');
+    $permissionDelete = user()->access('pak_sdpo_delete');
+    $permissionCreate = user()->access('pak_sdpo_create');
+@endphp
 
 @section('content')
 
@@ -9,13 +16,18 @@
 
     <div class="col-md-12">
         <div class="row bg-light p-2">
+            @if($permissionCreate)
             <div class="col-md-6">
                 <button type="button" data-toggle="modal" data-target="#users-modal-add" class="btn btn-success">Добавить {{ $is_pak ? 'терминал' : 'сотрудника' }} <i class="fa fa-plus"></i></button>
             </div>
+            @endif
+            @if($permissionView)
             <div class="col-md-6 text-right">
                 <button type="button" onclick="exportTable('elements-table', '{{ $title }}', '{{ $title }}.xls')" class="btn btn-dark">Экспорт <i class="fa fa-download"></i></button>
             </div>
+            @endif
         </div>
+        @if($permissionView)
         <div class="row bg-light p-2">
             <div class="col-md-12">
                 <form action="" class="row" method="GET">
@@ -45,6 +57,7 @@
                 </form>
             </div>
         </div>
+        @endif
     </div>
 
     <div class="card">
@@ -54,13 +67,16 @@
             @endforeach
         @endif
 
-        @include('admin.users.users_table')
+        @if($permissionView)
+            @include('admin.users.users_table')
 
-        <div class="col-md-12">
-            {{ $users->appends($_GET)->render() }}
+            <div class="col-md-12">
+                {{ $users->appends($_GET)->render() }}
 
-            <p>Количество элементов: {{ count($users) }}</p>
-        </div>
+                <p>Количество элементов: {{ count($users) }}</p>
+            </div>
+        @endif
+
     </div>
 
 @endsection

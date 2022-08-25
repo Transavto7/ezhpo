@@ -223,7 +223,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
 /**
  * Панель администратора
  */
-Route::middleware(['auth', CheckAdmin::class])->group(function () {
+Route::middleware(['auth'])->group(function () {
 
     Route::prefix('admin')->group(function () {
 

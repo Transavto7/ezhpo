@@ -24,7 +24,7 @@ class RoleController extends Controller
         return view('admin.groups.index')
             ->with([
                 'roles' => Role::all(),
-                'all_permissions' => \Spatie\Permission\Models\Permission::all()
+                'all_permissions' => \Spatie\Permission\Models\Permission::orderBy('guard_name')->get()
             ]);
     }
 
