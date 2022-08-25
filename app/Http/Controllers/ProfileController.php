@@ -45,6 +45,10 @@ class ProfileController extends Controller
 
         if($user->photo) {
             Storage::disk('public')->delete($user->photo);
+            $user->photo = null;
+
+            $user->save();
+
         }
 
         return back();

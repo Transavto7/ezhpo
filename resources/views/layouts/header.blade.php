@@ -1,5 +1,3 @@
-@php $user_avatar = asset("storage/". auth()->user()->photo); @endphp
-
 <!-- Main Navbar-->
 <header class="header no-print">
     <nav class="navbar">
@@ -27,6 +25,13 @@
                         </li>--}}
                     @endif
                 @else
+                    @php
+                        if(user()->photo){
+                            $user_avatar = asset("storage/". user()->photo);
+                        }else{
+                            $user_avatar = asset("img/default_profile.jpg");
+                        }
+                    @endphp
                     <li class="nav-item">
                         <a class="nav-link flex-center" href="{{ route('profile') }}">
 

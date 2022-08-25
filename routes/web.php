@@ -14,16 +14,6 @@ Route::get('/releases', 'IndexController@RenderReleases')->name('releases');
 
 
 
-// Users && Groups || permissions
-Route::get('/users', 'UserController@index')->name('users');
-Route::get('/users/fetchUserData', 'UserController@fetchUserData');
-Route::get('/users/saveUser', 'UserController@saveUser');
-Route::delete('/users/{$id}', 'UserController@destroy');
-Route::get('users/fetchRoleData', 'UserController@fetchRoleData');
-//Route::get('/users/index', 'UserController@index')->name('users');
-
-Route::resource('roles', 'RoleController');
-
 //Route::get('/roles', 'RoleController@index')->name('roles');
 //Route::resource
 //Route::get('/roles/fetchRoleData', 'RoleController@fetchRoleData');
@@ -157,6 +147,21 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/', 'ProfileController@UpdateData')->name('updateProfile');
     });
 });
+
+
+Route::middleware(['auth'])->group(function () {
+    // Users && Groups || permissions
+    Route::get('/users', 'UserController@index')->name('users');
+    Route::get('/users/fetchUserData', 'UserController@fetchUserData');
+    Route::get('/users/saveUser', 'UserController@saveUser');
+    Route::delete('/users/{$id}', 'UserController@destroy');
+    Route::get('users/fetchRoleData', 'UserController@fetchRoleData');
+    //Route::get('/users/index', 'UserController@index')->name('users');
+
+    Route::resource('roles', 'RoleController');
+});
+
+
 
 /**
  * Профиль, анкета, авторзация
