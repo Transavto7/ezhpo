@@ -171,7 +171,7 @@
                 </li>
             @endif
 
-            @if(user()->access('drivers_read', 'cars_create', 'company_read', 'service_read', 'discount_read', 'briefings_create', 'drivers_create'
+            @if(user()->access('drivers_read', 'cars_read', 'company_read', 'service_read', 'discount_read', 'briefings_create', 'drivers_create'
 , 'cars_create'
 , 'company_create'
 , 'service_create'
@@ -185,7 +185,7 @@
                         @if(user()->access('drivers_read', 'drivers_create'))
                             <li><a href="{{ route('renderElements', 'Driver') }}">Водители</a></li>
                         @endif
-                        @if(user()->access('cars_create', 'cars_create'))
+                        @if(user()->access('cars_read', 'cars_create'))
                             <li><a href="{{ route('renderElements', 'Car') }}">Автомобили</a></li>
                         @endif
                         @if(user()->access('company_read', 'company_create'))
