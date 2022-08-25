@@ -23,6 +23,24 @@
 
 @endsection
 
+@php
+//dd($type_ankets);
+    $permissionToView = (
+        user()->access('medic_read') && $type_ankets == 'medic'
+        || user()->access('tech') && $type_ankets == 'tech_read'
+        || user()->access('journal_briefing_bdd_read') && $type_ankets == 'bdd'
+        || user()->access('journal_pl_read') && $type_ankets == 'pechat_pl'
+        || user()->access('map_report_read') && $type_ankets == 'report_cart'
+        || user()->access('journal_pl_accounting') && $type_ankets == 'Dop'
+        || user()->access('errors_sdpo_read') && $type_ankets == 'pak'
+    );
+
+@endphp
+
+
+
+
+
 @section('content')
     <div class="col-md-12">
         <div class="card">
@@ -87,6 +105,7 @@
                             </div>
                         </div>
 
+                        @if($permissionToView)
                         <ul class="nav nav-tabs" id="filter-groups" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link active" id="filter-group-1-tab" data-toggle="tab" href="#filter-group-1" role="tab" aria-controls="filter-group-1" aria-selected="true"><i class="fa fa-filter"></i> Первая группа фильтров</a>
@@ -101,6 +120,7 @@
                                 <img src="{{ asset('images/loader.gif') }}" width="30" class="mb-4" />
                             </div>
                         </form>
+                        @endif
                     @else
                         {{-- ОЧИСТКА ОЧЕРЕДИ СДПО --}}
                         @if($type_ankets === 'pak_queue')
@@ -114,7 +134,7 @@
                         <div class="alert alert-danger" role="alert">{{ session()->get('error') }}</div>
                     @endif
 
-                    @if(count($ankets) > 0)
+                    @if((count($ankets) > 0) && $permissionToView)
                         <table id="ankets-table" class="ankets-table table table-striped table-sm">
                             <thead>
                                 <tr>
@@ -356,7 +376,9 @@
 
                 @include('templates.take_form')
 
+                @if($permissionToView)
                 <p class="text-success">Найдено записей: <b>{{ $anketasCountResult }}</b></p>
+                @endif
 
                 <div id="COUNTS_ANKETAS">
 

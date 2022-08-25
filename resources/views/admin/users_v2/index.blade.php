@@ -21,6 +21,7 @@
 
         <div class="card">
             <div class="card-body">
+                @if($current_user_permissions['permission_to_view'])
                 <form action="" class="row" method="GET">
 
                     <div class="col-md-2 form-group">
@@ -48,6 +49,7 @@
                     </div>
 
                 </form>
+                @endif
             </div>
         </div>
         <admin-users-index

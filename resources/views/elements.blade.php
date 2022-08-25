@@ -304,11 +304,13 @@ $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
                     </div>
             @endif
 
+            @if($permissionToView)
             <div class=" m-2">
                 <button type="button" data-toggle-show="#elements-filters" class="btn btn-sm btn-info">
                     <i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры
                 </button>
             </div>
+            @endif
 
             @if($permissionToTrashView)
             <div class="m-2">

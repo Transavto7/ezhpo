@@ -151,15 +151,13 @@
                     <ul id="reports" class="collapse list-unstyle">
 
                         {{--                        @excludeRole(['client'])--}}
-                        @if(user()->access('report_service_company_read'))
+                        @if(user()->access('report_schedule_pv_read'))
                             <li>
                                 <a href="{{ route('report.get', 'graph_pv') }}">
                                     <i class="fa fa-book"></i>График работы пунктов выпуска
                                 </a>
                             </li>
                         @endif
-
-                        {{--                        @endexcludeRole--}}
 
                         @if(user()->access('report_service_company_read'))
                             <li>
