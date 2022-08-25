@@ -4,17 +4,11 @@
 
 @section('content')
     @php
-        //echo asset('storage/file.txt');
-        //    dump(
-        //auth()->user()->toArray(),
-        //\Illuminate\Support\Facades\Storage::disk('public')->url('app/public/' . auth()->user()->photo),
-         //asset(auth()->user()->photo),
-
-         //asset("storage/app/public/". auth()->user()->photo ),
-         //'storage/app/public/elements/abccc3fab020169a1153af6f4f84e0b7b8f851bc.png',
-         //Storage::disk('public')->url('elements/abccc3fab020169a1153af6f4f84e0b7b8f851bc.png')
-
-    //  )
+        if(user()->photo){
+            $user_avatar = asset("storage/". user()->photo);
+        }else{
+            $user_avatar = asset("img/default_profile.jpg");
+        }
     @endphp
     <div class="container text-center">
         <h1>Здравствуйте, {{ auth()->user()->name }}!</h1>
@@ -23,13 +17,30 @@
         <div class="row">
             <div class="col-md-3">
                 <div class="card" style="width: 18rem;">
-                    <img class="card-img-top" src="{{ asset("storage/". auth()->user()->photo ) }}"
+                    <img class="card-img-top" src="{{ $user_avatar }}"
                          alt="Card image cap">
 
                     <div class="">
-                        <p>{{ user()->name }}</p>
-                        <p>{{ user()->email }}</p>
-                        <p>Должность - Водитель</p>
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-default">ФИО:</span>
+                            </div>
+                            <input value="{{user()->name}}" disabled type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-default">E-mail:</span>
+                            </div>
+                            <input value="{{user()->email}}" disabled type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-default">Должность:</span>
+                            </div>
+                            <input value="Водитель" disabled type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                        </div>
                         {{--                        <p>Диспетчер</p>--}}
                     </div>
                 </div>
@@ -95,6 +106,7 @@
             background-color: #4aa0e6;
             color: white;
             height: 150px;
+            font-size: 26px;
 
             display: flex;
             flex-direction: column;
@@ -104,6 +116,10 @@
 
         .menu_link_driver a {
             background: none;
+        }
+
+        main{
+            background-color: #BACEF4;
         }
 
     </style>
