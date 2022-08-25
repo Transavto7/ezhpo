@@ -1,9 +1,10 @@
 <template>
     <div class="">
-        <b-button @click="showModal">Добавить пользователя</b-button>
+        <b-button v-if="current_user_permissions.permission_to_create" @click="showModal">Добавить пользователя</b-button>
 
 
         <b-table
+            v-if="current_user_permissions.permission_to_view"
             :items="items"
             :fields="fields"
             ref="users_table"
@@ -14,8 +15,16 @@
         >
 
             <template #cell(name)="row">
-                <a href="#" @click="editUserData(row.item.id)">{{ row.value }}</a>
-                <!--                {{ row.value.name }}-->
+                <template
+                    v-if="current_user_permissions.permission_to_edit"
+                >
+                    <a  href="#" @click="editUserData(row.item.id)">{{ row.value }}</a>
+                </template>
+                <template
+                    v-else
+                >
+                    {{ row.value }}
+                </template>
             </template>
 
             <template #cell(pv)="row">
@@ -39,7 +48,10 @@
             </template>
 
             <template #cell(delete_btn)="row">
-                <b-button variant="danger" @click="deleteUser(row.item.id)">
+                <b-button
+                    :disabled="!current_user_permissions.permission_to_delete"
+                    variant="danger"
+                    @click="deleteUser(row.item.id)">
                     <b-icon icon="trash-fill" aria-hidden="true"></b-icon>
                 </b-button>
                 <!--                {{ row.value.name }}-->
@@ -250,7 +262,7 @@ import Swal2 from "sweetalert2";
 
 export default {
     name:       "AdminUsersIndex",
-    props:      ['users', 'roles', 'points', 'all_permissions'],
+    props:      ['users', 'roles', 'points', 'all_permissions', 'current_user_permissions'],
     components: {Swal2, vSelect},
 
     data() {

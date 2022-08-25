@@ -119,10 +119,10 @@ return [
     ],
 
     //============== Реестр ошибок СДПО =============//
-    [
-        'name'        => 'errors_2 sdpo_read',
-        'description' => 'Реестр ошибок СДПО - Просмотр',
-    ],
+//    [
+//        'name'        => 'errors_2 sdpo_read',
+//        'description' => 'Реестр ошибок СДПО - Просмотр',
+//    ],
 
     //============== Отчеты =============//
     [
@@ -151,6 +151,10 @@ return [
         'name'        => 'drivers_delete',
         'description' => 'Водители - Удаление',
     ],
+    [
+        'name'        => 'drivers_trash_read',
+        'description' => 'Водители - Мусорка просмотр',
+    ],
 
     //============== Автомобили =============//
     [
@@ -168,6 +172,10 @@ return [
     [
         'name'        => 'cars_delete',
         'description' => 'Автомобили - Удаление',
+    ],
+    [
+        'name'        => 'cars_trash_read',
+        'description' => 'Автомобили - Мусорка просмотр',
     ],
 
     //============== Компании =============//
@@ -191,6 +199,10 @@ return [
         'name'        => 'company_sync',
         'description' => 'Компании - Синхронизация',
     ],
+    [
+        'name'        => 'company_trash_read',
+        'description' => 'Компании - Мусорка просмотр',
+    ],
 
     //============== Услуги =============//
     [
@@ -209,6 +221,11 @@ return [
         'name'        => 'service_delete',
         'description' => 'Услуги - Удаление',
     ],
+    [
+        'name'        => 'service_trash_read',
+        'description' => 'Услуги - Мусорка просмотр',
+    ],
+
 
     //============== Скидки =============//
     [
@@ -226,6 +243,10 @@ return [
     [
         'name'        => 'discount_delete',
         'description' => 'Скидки - Удаление',
+    ],
+    [
+        'name'        => 'discount_trash_read',
+        'description' => 'Скидки - Мусорка просмотр',
     ],
 
     //============== Инструктажи =============//
@@ -245,45 +266,41 @@ return [
         'name'        => 'briefings_delete',
         'description' => 'Инструктажи - Удаление',
     ],
+    [
+        'name'        => 'briefings_trash_read',
+        'description' => 'Инструктажи - Мусорка просмотр',
+    ],
 
-    //============== Настойки =============//
-    [
-        'name'        => 'settings_read',
-        'description' => 'Настойки - Просмотр',
-    ],
     //============== Система =============//
-    [
-        'name'        => 'system_create',
-        'description' => 'Система - Создание',
-    ],
     [
         'name'        => 'system_read',
         'description' => 'Система - Просмотр',
     ],
     [
-        'name'        => 'system_update',
-        'description' => 'Система - Редактирование',
-    ],
-    [
         'name'        => 'system_delete',
         'description' => 'Система - Удаление',
     ],
+    //============== Система =============//
+//    [
+//        'name'        => 'system_create',
+//        'description' => 'Система - Создание',
+//    ],
+//    [
+//        'name'        => 'system_read',
+//        'description' => 'Система - Просмотр',
+//    ],
+//    [
+//        'name'        => 'system_update',
+//        'description' => 'Система - Редактирование',
+//    ],
+//    [
+//        'name'        => 'system_delete',
+//        'description' => 'Система - Удаление',
+//    ],
     //============== Системные настройки =============//
-    [
-        'name'        => 'settings_system_create',
-        'description' => 'Системные настройки - Создание',
-    ],
     [
         'name'        => 'settings_system_read',
         'description' => 'Системные настройки - Просмотр',
-    ],
-    [
-        'name'        => 'settings_system_update',
-        'description' => 'Системные настройки - Редактирование',
-    ],
-    [
-        'name'        => 'settings_system_delete',
-        'description' => 'Системные настройки - Удаление',
     ],
     //============== Города =============//
     [
@@ -302,6 +319,10 @@ return [
         'name'        => 'city_delete',
         'description' => 'Города - Удаление',
     ],
+//    [
+//        'name'        => 'city_trash_read',
+//        'description' => 'Города - Корзина',
+//    ],
     //============== Пункты выпуска =============//
     [
         'name'        => 'pv_create',
@@ -336,6 +357,23 @@ return [
         'name'        => 'employee_delete',
         'description' => 'Сотрудники - Удаление',
     ],
+    //============== Группы =============//
+    [
+        'name'        => 'group_create',
+        'description' => 'Группы - Создание',
+    ],
+    [
+        'name'        => 'group_read',
+        'description' => 'Группы - Просмотр',
+    ],
+    [
+        'name'        => 'group_update',
+        'description' => 'Группы - Редактирование',
+    ],
+    [
+        'name'        => 'group_delete',
+        'description' => 'Группы - Удаление',
+    ],
     //============== ПАК СДПО =============//
     [
         'name'        => 'pak_sdpo_create',
@@ -368,6 +406,10 @@ return [
     ],
     [
         'name'        => 'date_control_delete',
+        'description' => 'Контроль дат - Удаление',
+    ],
+    [
+        'name'        => 'date_control_trash_view',
         'description' => 'Контроль дат - Удаление',
     ],
     //============== История изменения полей =============//
@@ -404,6 +446,10 @@ return [
         'name'        => 'requisites_delete',
         'description' => 'Реквизиты нашей компании - Удаление',
     ],
+//    [
+//        'name'        => 'requisites_trash_read',
+//        'description' => 'Реквизиты нашей компании - Корзина',
+//    ],
     //============== Релизы =============//
     [
         'name'        => 'releases_read',

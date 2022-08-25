@@ -3,9 +3,17 @@
 @section('title', 'Сотрудники')
 @section('sidebar', 1)
 @php
-$points = \App\Town::with(['pvs'])->get();
-$roles = \Spatie\Permission\Models\Role::all();
-$all_permissions = \Spatie\Permission\Models\Permission::orderBy('guard_name')->get();
+    $points = \App\Town::with(['pvs'])->get();
+    $roles = \Spatie\Permission\Models\Role::all();
+    $all_permissions = \Spatie\Permission\Models\Permission::orderBy('guard_name')->get();
+
+    $current_user_permissions = [
+            'permission_to_edit' => user()->access('employee_update'),
+            'permission_to_view' => user()->access('employee_read'),
+            'permission_to_create' => user()->access('employee_create'),
+            'permission_to_delete' => user()->access('employee_delete'),
+        ];
+    //dd($current_user_permissions)
 @endphp
 @section('content')
 
@@ -16,11 +24,13 @@ $all_permissions = \Spatie\Permission\Models\Permission::orderBy('guard_name')->
                 <form action="" class="row" method="GET">
 
                     <div class="col-md-2 form-group">
-                        <input type="text" value="{{ request()->get('name') }}" name="name" placeholder="ФИО" class="form-control">
+                        <input type="text" value="{{ request()->get('name') }}" name="name" placeholder="ФИО"
+                               class="form-control">
                     </div>
 
                     <div class="col-md-2 form-group">
-                        <input type="text" name="email" value="{{ request()->get('email') }}" placeholder="E-mail" class="form-control">
+                        <input type="text" name="email" value="{{ request()->get('email') }}" placeholder="E-mail"
+                               class="form-control">
                     </div>
 
                     <div class="col-md-2 form-group">
@@ -43,6 +53,7 @@ $all_permissions = \Spatie\Permission\Models\Permission::orderBy('guard_name')->
         <admin-users-index
             :users='@json($users->getCollection())'
             :roles='@json($roles)'
+            :current_user_permissions='@json($current_user_permissions)'
             :all_permissions='@json($all_permissions)'
             :points='@json($points->map(function ($q){
                                         $res['label'] = $q->name;

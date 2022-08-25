@@ -198,6 +198,8 @@
             </li>
             @endif
 
+            @if(user()->access('system_read', 'settings_system_read',
+                'city_read', 'pv_read', 'employee_read','employee_read','employee_read'))
             <li>
                 <a href="#" data-btn-collapse="#spis-pol" role="button"><i class="fa fa-cog"></i> Настройки</a>
                 <ul id="spis-pol" class="collapse list-unstyle">
@@ -210,7 +212,7 @@
                         <li><a href="{{ route('systemSettings') }}">Системные настройки</a></li>
                     @endif
 
-                    @if(user()->access('city_read'))
+                    @if(user()->access('city_read', 'city_create'))
                         <li><a href="{{ route('renderElements', 'Town') }}">Города</a></li>
                     @endif
 
@@ -218,15 +220,19 @@
                         <li><a href="{{ route('renderElements', 'Point') }}">Пункты выпуска</a></li>
                     @endif
 
-                    @if(user()->access('employee_read'))
-                        <li><a href="{{ route('adminUsers') }}">Сотрудники</a></li>
+{{--                    @if(user()->access('employee_read'))--}}
+{{--                        <li><a href="{{ route('adminUsers') }}">Сотрудники</a></li>--}}
+{{--                    @endif--}}
+
+                    @if(user()->access('employee_read', 'employee_update'))
+                        <li><a href="{{ route('users') }}">Сотрудники</a></li>
                     @endif
 
-                    <li><a href="{{ route('users') }}">Сотрудники v2</a></li>
+                    @if(user()->access('group_read', 'group_update'))
+                        <li><a href="{{ route('roles.index') }}">Группы</a></li>
+                    @endif
 
-                    <li><a href="{{ route('roles.index') }}">Группы</a></li>
-
-                    @if(user()->access('pak_sdpo_read'))
+                    @if(user()->access('pak_sdpo_read', 'pak_sdpo_update'))
                         <li><a href="{{ route('adminUsers', [
                                     'filter' => 1,
                                     'pak_sdpo' => 1
@@ -237,7 +243,7 @@
                         <li><a href="{{ route('renderElements', 'DDates') }}">Контроль дат</a></li>
                     @endif
 
-                    @if(user()->access('story_field_read'))
+                    @if(user()->access('story_field_read', 'story_field_create'))
                         <li><a href="{{ route('renderElements', 'FieldHistory') }}">История изменения полей</a>
                         </li>
                     @endif
@@ -253,7 +259,7 @@
 
                 </ul>
             </li>
-
+            @endif
 
         </ul>
     </nav>

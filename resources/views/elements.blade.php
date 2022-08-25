@@ -203,14 +203,23 @@
 </div>
 @endif
 @php
-
+// DDates
+// Req
+// DDates
+// DDates
+// DDates
+//dd($model);
 $permissionToCreate = (
     user()->access('drivers_create') && $model == 'Driver'
     || user()->access('cars_create') && $model == 'Car'
     || user()->access('company_create') && $model == 'Company'
     || user()->access('service_create') && $model == 'Service'
+    || user()->access('discount_create') && $model == 'Discount'
     || user()->access('discount_create') && $model == 'Product'
     || user()->access('briefings_create') && $model == 'Instr'
+    || user()->access('city_create') && $model == 'Town'
+    || user()->access('requisites_create') && $model == 'Req'
+    || user()->access('date_control_create') && $model == 'DDates'
 ) && !request()->get('deleted');
 
 $permissionToDelete = (
@@ -218,8 +227,14 @@ $permissionToDelete = (
     || user()->access('cars_delete') && $model == 'Car'
     || user()->access('company_delete') && $model == 'Company'
     || user()->access('service_delete') && $model == 'Service'
-    || user()->access('discount_delete') && $model == 'Product'
+    || user()->access('discount_delete') && $model == 'Discount'
+    || user()->access('service_delete') && $model == 'Product'
     || user()->access('briefings_delete') && $model == 'Instr'
+    || user()->access('settings_delete') && $model == 'Settings'
+    || user()->access('city_delete') && $model == 'Town'
+    || user()->access('requisites_delete') && $model == 'Req'
+    || user()->access('date_control_delete') && $model == 'DDates'
+    || user()->access('system_delete') && $model == 'Settings'
 ) && !request()->get('deleted');
 
 $permissionToEdit = (
@@ -227,15 +242,55 @@ $permissionToEdit = (
     || user()->access('cars_update') && $model == 'Car'
     || user()->access('company_update') && $model == 'Company'
     || user()->access('service_update') && $model == 'Service'
-    || user()->access('discount_update') && $model == 'Product'
+    || user()->access('discount_update') && $model == 'Discount'
+    || user()->access('service_update') && $model == 'Product'
     || user()->access('briefings_update') && $model == 'Instr'
+    || user()->access('city_update') && $model == 'Town'
+    || user()->access('requisites_update') && $model == 'Req'
+    || user()->access('date_control_update') && $model == 'DDates'
 ) && !request()->get('deleted');
+
+$permissionToView = (
+    user()->access('drivers_read') && $model == 'Driver'
+    || user()->access('cars_read') && $model == 'Car'
+    || user()->access('company_read') && $model == 'Company'
+    || user()->access('service_read') && $model == 'Service'
+    || user()->access('discount_read') && $model == 'Discount'
+    || user()->access('service_read') && $model == 'Product'
+    || user()->access('briefings_read') && $model == 'Instr'
+    || user()->access('city_read') && $model == 'Town'
+    || user()->access('requisites_read') && $model == 'Req'
+    || user()->access('date_control_read') && $model == 'DDates'
+    || user()->access('system_read') && $model == 'Settings'
+);
+//dd($model);
+
+//$permissionToTrash = (
+//    user()->access('drivers_trash_can') && $model == 'Driver'
+//    || user()->access('drivers_trash_can') && $model == 'Car'
+//    || user()->access('drivers_trash_can') && $model == 'Company'
+//    || user()->access('drivers_trash_can') && $model == 'Service'
+//    || user()->access('drivers_trash_can') && $model == 'Product'
+//    || user()->access('drivers_trash_can') && $model == 'Instr'
+//);
+
+$permissionToTrashView = (
+    user()->access('drivers_trash_read') && $model == 'Driver'
+    || user()->access('cars_trash_read') && $model == 'Car'
+    || user()->access('company_trash_read') && $model == 'Company'
+    || user()->access('service_trash_read') && $model == 'Service'
+    || user()->access('discount_trash_read') && $model == 'Discount'
+    || user()->access('service_trash_read') && $model == 'Product'
+    || user()->access('briefings_trash_read') && $model == 'Instr'
+    || user()->access('city_trash_read') && $model == 'Town'
+    || user()->access('requisites_trash_read') && $model == 'Req'
+);
 
 $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
 
 $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
 $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
-
+//dd($permissionToTrash)
 @endphp
 {{--NAVBAR--}}
 @if(!(count($elements) >= $max) || !$max)
@@ -255,6 +310,7 @@ $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
                 </button>
             </div>
 
+            @if($permissionToTrashView)
             <div class="m-2">
                 @if(!request()->get('deleted'))
                 <a href="?deleted=1" class="btn btn-sm btn-warning">
@@ -266,22 +322,23 @@ $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
                 </a>
                 @endif
             </div>
-            {{--<div class="col-md-3 text-right">
-                <div class="row">
-                    <button type="button" data-toggle="modal" data-target="#elements-modal-import" class="btn btn-primary">Импорт <i class="fa fa-download"></i></button>
-                    <button type="button" onclick="exportTable('export-elements-table', '{{ $title }}', '{{ $title }}.xls')" class="btn btn-default">Шаблон .xls <i class="fa fa-download"></i></button>
-                </div>
+            @endif
+                {{--<div class="col-md-3 text-right">
+                                <div class="row">
+                                    <button type="button" data-toggle="modal" data-target="#elements-modal-import" class="btn btn-primary">Импорт <i class="fa fa-download"></i></button>
+                                    <button type="button" onclick="exportTable('export-elements-table', '{{ $title }}', '{{ $title }}.xls')" class="btn btn-default">Шаблон .xls <i class="fa fa-download"></i></button>
+                                </div>
 
-                <table style="display:none;" id="export-elements-table" class="table table-striped table-sm">
-                    <thead>
-                        <tr>
-                            @foreach ($fields as $k => $v)
-                                <th>{{ $k }}</th>
-                            @endforeach
-                        </tr>
-                    </thead>
-                </table>
-            </div>--}}
+                                <table style="display:none;" id="export-elements-table" class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            @foreach ($fields as $k => $v)
+                                                <th>{{ $k }}</th>
+                                            @endforeach
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>--}}
 
             <div class="col-md-2 text-right">
 {{--                <button type="button" onclick="exportTable('elements-table', '{{ $title }}', '{{ $title }}.xls')" class="btn btn-dark">Экспорт <i class="fa fa-download"></i></button>--}}
@@ -354,7 +411,9 @@ $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
         </div>
     </div>
 @endif
-
+@if(!$permissionToView)
+    @dump('Нет доступа для просмотра')
+@else
 <div class="card">
     @error('errors')
         <div class="text-red">
@@ -414,6 +473,7 @@ $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
                 @if(request()->get('deleted'))
                     <th width="60">Удаливший</th>
                     <th width="60">Время удаления</th>
+                    <th width="60">#</th>
                 @endif
 
             </tr>
@@ -445,7 +505,7 @@ $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
                                     @if($elK === 'products_id' || $elK === 'company_id' || $elK === 'req_id' || $elK === 'pv_id' || $elK === 'user_id' || $elK === 'town_id' || $elK === 'essence')
                                         @if($elK === 'company_id')
 
-                                            @if(($model === 'Driver' || $model === 'Car') && $el->$elK && auth()->user()->hasRole('client') && auth()->user()->hasRole('operator_pak'))
+                                            @if(($model === 'Driver' || $model === 'Car') && $el->$elK && auth()->user()->hasRole('client') && auth()->user()->hasRole('operator_sdpo'))
                                                 <div>
                                                     <a href="{{ route('renderElements', ['model' => 'Company', 'filter' => 1, 'id' => $el->company_id ]) }}">{{ app('App\Company')->getName($el->company_id) }}</a>
 
@@ -585,6 +645,9 @@ $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
                             <td class="td-option">
                                 {{ ($el->deleted_at) }}
                             </td>
+                            <td class="td-option">
+                                <a href="{{ route('removeElement', ['type' => $model, 'id' => $el->id , 'undo' => 1]) }}" class="btn btn-sm btn-warning"><i class="fa fa-undo"></i></a>
+                            </td>
                         @endif
 
                     </tr>
@@ -612,6 +675,7 @@ $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
         @endif
     </div>
 </div>
+@endif
 
 @if(count($elements) <= 0)
     @section('custom-scripts')
