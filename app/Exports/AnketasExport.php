@@ -2,11 +2,12 @@
 
 namespace App\Exports;
 
-use App\Anketa;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class AnketasExport implements FromView
+class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
 {
     private $anketas;
     private $fields;
@@ -23,5 +24,15 @@ class AnketasExport implements FromView
             'data' => $this->anketas,
             'fields' => $this->fields,
         ]);
+    }
+
+    public function batchSize(): int
+    {
+        return 1000;
+    }
+
+    public function chunkSize(): int
+    {
+        return 1000;
     }
 }

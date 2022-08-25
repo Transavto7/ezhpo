@@ -6,24 +6,23 @@ use App\Anketa;
 use App\Exports\AnketasExport;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Arr;
 use Maatwebsite\Excel\Facades\Excel;
 
-class exportAnketas extends Command
+class DeleteAnketas extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'export:anketas {--type=} {--from=} {--to=}';
+    protected $signature = 'delete:anketas {--type=} {--from=} {--to=}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Export anketas by type';
+    protected $description = 'Delete anketas by type';
 
     /**
      * Create a new command instance.
@@ -71,13 +70,10 @@ class exportAnketas extends Command
             $to
         ]);
 
-        $anketas = $request->get();
+        $this->info('Deleting anketas rows ' . $type . ' from ' . $from->format('d.m.Y i:s') .
+            ' to ' . $to->format('d.m.Y i:s') . ' | ' . $request->count() . ' rows');
 
-        $this->info('Exporting anketas rows ' . $type . ' from ' . $from->format('d.m.Y i:s') .
-        ' to ' . $to->format('d.m.Y i:s') . ' | ' . $anketas->count() . ' rows');
-
-        Excel::store(new AnketasExport($anketas, Anketa::$fieldsKeys[$type]),
-            'exports/anketas/' . $type . '.xlsx');
+        $request->delete();
 
         $this->info('finish!');
     }
