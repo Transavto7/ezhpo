@@ -374,9 +374,10 @@
                     @endif
                 @endif
 
+                @if($permissionToView)
+
                 @include('templates.take_form')
 
-                @if($permissionToView)
                 <p class="text-success">Найдено записей: <b>{{ $anketasCountResult }}</b></p>
                 @endif
 
