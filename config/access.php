@@ -76,6 +76,10 @@ return [
         'description' => 'Журнал учета ПЛ - просмотр',
     ],
     [
+        'name'        => 'journal_pl_accounting_trash',
+        'description' => 'Журнал учета ПЛ - корзина',
+    ],
+    [
         'name'        => 'errors_sdpo_read',
         'description' => 'Реестр ошибок СДПО - Просмотр',
     ],

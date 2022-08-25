@@ -171,7 +171,7 @@
                 </li>
             @endif
 
-            @if(user()->access('drivers_read', 'cars_read', 'company_read', 'service_read', 'discount_read', 'briefings_create', 'drivers_create'
+            @if(user()->access('drivers_read', 'cars_read', 'company_read', 'service_read', 'discount_read', 'briefings_read', 'drivers_create'
 , 'cars_create'
 , 'company_create'
 , 'service_create'
@@ -197,7 +197,7 @@
                         @if(user()->access('discount_read', 'discount_create'))
                             <li><a href="{{ route('renderElements', 'Discount') }}">Скидки</a></li>
                         @endif
-                        @if(user()->access('briefings_create', 'briefings_create'))
+                        @if(user()->access('briefings_read', 'briefings_create'))
                             <li><a href="{{ route('renderElements', 'Instr') }}">Инструктажи</a></li>
                         @endif
                     </ul>
@@ -205,7 +205,7 @@
             @endif
 
             @if(user()->access('system_read', 'settings_system_read',
-                'city_read', 'pv_read', 'employee_read','employee_read','employee_read','city_create'))
+                'city_read', 'pv_read', 'employee_read','employee_create','group_create','city_create', 'group_read', 'story_field_read', 'story_field_create'))
                 <li>
                     <a href="#" data-btn-collapse="#spis-pol" role="button"><i class="fa fa-cog"></i> Настройки</a>
                     <ul id="spis-pol" class="collapse list-unstyle">
@@ -230,11 +230,11 @@
                         {{--                        <li><a href="{{ route('adminUsers') }}">Сотрудники</a></li>--}}
                         {{--                    @endif--}}
 
-                        @if(user()->access('employee_read', 'employee_update'))
+                        @if(user()->access('employee_read', 'employee_create'))
                             <li><a href="{{ route('users') }}">Сотрудники</a></li>
                         @endif
 
-                        @if(user()->access('group_read', 'group_update'))
+                        @if(user()->access('group_read', 'group_create'))
                             <li><a href="{{ route('roles.index') }}">Группы</a></li>
                         @endif
 

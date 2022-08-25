@@ -27,13 +27,23 @@
 //dd($type_ankets);
     $permissionToView = (
         user()->access('medic_read') && $type_ankets == 'medic'
-        || user()->access('tech') && $type_ankets == 'tech_read'
+        || user()->access('tech_read') && $type_ankets == 'tech'
         || user()->access('journal_briefing_bdd_read') && $type_ankets == 'bdd'
         || user()->access('journal_pl_read') && $type_ankets == 'pechat_pl'
         || user()->access('map_report_read') && $type_ankets == 'report_cart'
         || user()->access('journal_pl_accounting') && $type_ankets == 'Dop'
         || user()->access('errors_sdpo_read') && $type_ankets == 'pak'
     );
+
+
+$permissionToTrashView = (
+    user()->access('medic_trash') && $type_ankets == 'medic'
+    || user()->access('tech_trash') && $type_ankets == 'tech'
+    || user()->access('journal_briefing_bdd_trash') && $type_ankets == 'bdd'
+    || user()->access('journal_pl_trash') && $type_ankets == 'pechat_pl'
+    || user()->access('map_report_trash') && $type_ankets == 'report_cart'
+    || user()->access('journal_pl_accounting_trash') && $type_ankets == 'Dop'
+);
 
 @endphp
 
