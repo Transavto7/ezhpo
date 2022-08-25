@@ -1077,7 +1077,7 @@ class AnketsController extends Controller
                 if($anketa['type_anketa'] === 'medic') {
                     $timezone = $user->timezone ?? 3;
                     $diffDateCheck = Carbon::now()->addHour($timezone)->diffInMinutes($anketa['date']);
-                    if($diffDateCheck <= 60+12) {
+                    if($diffDateCheck <= 60*12) {
                         $anketa['realy'] = 'да';
                     } else {
                         $anketa['realy'] = 'нет';
