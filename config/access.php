@@ -46,7 +46,7 @@ return [
         'description' => 'Техосмотры - корзина',
     ],
 
-    //============== Журнал снятия отчетов с карт =============//
+    //============== Журнал снятия отчетов с карт report_cart =============//
     [
         'name'        => 'map_report_create',
         'description' => 'Внести отчёт с карты',
@@ -55,6 +55,18 @@ return [
         'name'        => 'map_report_read',
         'description' => 'Реестр снятия отчетов с карт - Просмотр',
     ],
+    [
+        'name'        => 'map_report_update',
+        'description' => 'Реестр снятия отчетов с карт - Редактирование',
+    ],
+    [
+        'name'        => 'map_report_delete',
+        'description' => 'Реестр снятия отчетов с карт - Удаление',
+    ],
+    [
+        'name'        => 'map_report_trash',
+        'description' => 'Реестр снятия отчетов с карт - Корзина',
+    ],
 
     //============== Журнал печати путевых листов =============//
     [
@@ -62,26 +74,47 @@ return [
         'description' => 'Внести запись в Реестр печати ПЛ',
     ],
 
-    //============== Журнал ПЛ =================================//
+    //============== Журнал печать ПЛ pechat_pl =================================//
     [
         'name'        => 'journal_pl_create',
         'description' => 'Внести запись в Журнал ПЛ',
     ],
     [
         'name'        => 'journal_pl_read',
-        'description' => 'Журнал печати ПЛ - просмотр',
+        'description' => 'Журнал печати ПЛ - Просмотр',
     ],
+    [
+        'name'        => 'journal_pl_update',
+        'description' => 'Журнал печати ПЛ - Редактирование',
+    ],
+    [
+        'name'        => 'journal_pl_trash',
+        'description' => 'Журнал печати ПЛ - Корзина',
+    ],
+    [
+        'name'        => 'journal_pl_delete',
+        'description' => 'Журнал печати ПЛ - Удаление',
+    ],
+
+
+
+
+    //============== Журнал печать ПЛ Dop =================================//
     [
         'name'        => 'journal_pl_accounting',
         'description' => 'Журнал учета ПЛ - просмотр',
+    ],
+    [
+        'name'        => 'journal_pl_accounting_update',
+        'description' => 'Журнал учета ПЛ - Редактирование',
     ],
     [
         'name'        => 'journal_pl_accounting_trash',
         'description' => 'Журнал учета ПЛ - корзина',
     ],
     [
-        'name'        => 'errors_sdpo_read',
-        'description' => 'Реестр ошибок СДПО - Просмотр',
+        'name'        => 'journal_pl_accounting_delete',
+        'description' => 'Журнал учета ПЛ - Удаление',
     ],
 
     //============== Журнал инструктажей по БДД =============//
@@ -123,10 +156,26 @@ return [
     ],
 
     //============== Реестр ошибок СДПО =============//
-//    [
-//        'name'        => 'errors_2 sdpo_read',
-//        'description' => 'Реестр ошибок СДПО - Просмотр',
-//    ],
+    [
+        'name'        => 'errors_sdpo_read',
+        'description' => 'Реестр ошибок СДПО - Просмотр',
+    ],
+    [
+        'name'        => 'errors_sdpo_update',
+        'description' => 'Реестр ошибок СДПО - Редактирование',
+    ],
+    [
+        'name'        => 'errors_sdpo_delete',
+        'description' => 'Реестр ошибок СДПО - Удаление',
+    ],
+    [
+        'name'        => 'errors_sdpo_create',
+        'description' => 'Реестр ошибок СДПО - Создания',
+    ],
+    [
+        'name'        => 'errors_sdpo_trash',
+        'description' => 'Реестр ошибок СДПО - Корзина',
+    ],
 
     //============== Отчеты =============//
     [
@@ -208,7 +257,7 @@ return [
         'description' => 'Компании - Корзина просмотр',
     ],
 
-    //============== Услуги =============//
+    //============== Услуги - ЗКЩВГСЕ =============//
     [
         'name'        => 'service_create',
         'description' => 'Услуги - Создание',
@@ -283,6 +332,10 @@ return [
     [
         'name'        => 'system_delete',
         'description' => 'Система - Удаление',
+    ],
+    [
+        'name'        => 'system_update',
+        'description' => 'Система - Редактирование',
     ],
     //============== Система =============//
 //    [
@@ -412,10 +465,6 @@ return [
         'name'        => 'date_control_delete',
         'description' => 'Контроль дат - Удаление',
     ],
-    [
-        'name'        => 'date_control_trash_view',
-        'description' => 'Контроль дат - Удаление',
-    ],
     //============== История изменения полей =============//
     [
         'name'        => 'story_field_create',
@@ -450,19 +499,10 @@ return [
         'name'        => 'requisites_delete',
         'description' => 'Реквизиты нашей компании - Удаление',
     ],
-//    [
-//        'name'        => 'requisites_trash_read',
-//        'description' => 'Реквизиты нашей компании - Корзина',
-//    ],
     //============== Релизы =============//
     [
         'name'        => 'releases_read',
         'description' => 'Релизы - Просмотр',
     ],
 
-
-    //    [
-    //        'name'        => 'map_report_create',
-    //        'description' => 'Внести отчёт с карты',
-    //    ],
 ];

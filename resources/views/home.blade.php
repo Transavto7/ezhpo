@@ -25,15 +25,15 @@
 
 @php
 //dd($type_ankets);
-    $permissionToView = (
-        user()->access('medic_read') && $type_ankets == 'medic'
-        || user()->access('tech_read') && $type_ankets == 'tech'
-        || user()->access('journal_briefing_bdd_read') && $type_ankets == 'bdd'
-        || user()->access('journal_pl_read') && $type_ankets == 'pechat_pl'
-        || user()->access('map_report_read') && $type_ankets == 'report_cart'
-        || user()->access('journal_pl_accounting') && $type_ankets == 'Dop'
-        || user()->access('errors_sdpo_read') && $type_ankets == 'pak'
-    );
+$permissionToView = (
+    user()->access('medic_read') && $type_ankets == 'medic'
+    || user()->access('tech_read') && $type_ankets == 'tech'
+    || user()->access('journal_briefing_bdd_read') && $type_ankets == 'bdd'
+    || user()->access('journal_pl_read') && $type_ankets == 'pechat_pl'
+    || user()->access('map_report_read') && $type_ankets == 'report_cart'
+    || user()->access('journal_pl_accounting') && $type_ankets == 'Dop'
+    || user()->access('errors_sdpo_read') && $type_ankets == 'pak'
+);
 
 
 $permissionToTrashView = (
@@ -43,6 +43,26 @@ $permissionToTrashView = (
     || user()->access('journal_pl_trash') && $type_ankets == 'pechat_pl'
     || user()->access('map_report_trash') && $type_ankets == 'report_cart'
     || user()->access('journal_pl_accounting_trash') && $type_ankets == 'Dop'
+    || user()->access('errors_sdpo_trash') && $type_ankets == 'pak'
+);
+$permissionToDelete = (
+        $type_ankets == 'medic' && user()->access('medic_delete')
+        || $type_ankets == 'tech' && user()->access('tech_delete')
+        || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_delete')
+        || user()->access('journal_pl_delete') && $type_ankets == 'pechat_pl'
+        || user()->access('map_report_delete') && $type_ankets == 'report_cart'
+        || user()->access('journal_pl_accounting_delete') && $type_ankets == 'Dop'
+        || user()->access('errors_sdpo_delete') && $type_ankets == 'pak'
+);
+
+$permissionToUpdate = (
+            $type_ankets == 'medic' && user()->access('medic_update')
+            || $type_ankets == 'tech' && user()->access('tech_update')
+            || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_update')
+        || user()->access('journal_pl_update') && $type_ankets == 'pechat_pl'
+        || user()->access('map_report_update') && $type_ankets == 'report_cart'
+        || user()->access('journal_pl_accounting_update') && $type_ankets == 'Dop'
+        || user()->access('errors_sdpo_update') && $type_ankets == 'pak'
 );
 
 @endphp
@@ -62,11 +82,13 @@ $permissionToTrashView = (
                                 <div class="col-md-4">
                                     <button type="button" data-toggle-show="#ankets-filters" class="btn btn-sm btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
 
+                                    @if($permissionToTrashView)
                                     @isset($_GET['trash'])
                                         <a href="{{ route('home', $type_ankets) }}" class="btn btn-sm btn-warning">Назад</a>
                                     @else
                                         <a href="?trash=1" class="btn btn-sm btn-warning">Корзина <i class="fa fa-trash"></i></a>
                                     @endisset
+                                    @endif
                                 </div>
 
 
@@ -188,21 +210,18 @@ $permissionToTrashView = (
                                     @endif
                                     <!-- /ОЧЕРЕДЬ ОСМОТРОВ -->
 
-                                    {{-- УДАЛЕНИЕ--}}
-                                    @if(
-                                            $type_ankets == 'medic' && user()->access('medic_delete')
-                                            || $type_ankets == 'tech' && user()->access('tech_delete')
-                                            || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_delete')
-                                        )
+                                    {{-- redactirovanie --}}
+                                    @if($permissionToUpdate)
                                         <th class="not-export">#</th>
                                     @endif
 
+                                    {{-- УДАЛЕНИЕ--}}
+{{--                                    @if($permissionToDelete)--}}
+{{--                                        <th class="not-export">#</th>--}}
+{{--                                    @endif--}}
+
                                     @if($type_ankets !== 'pak_queue')
-                                            @if(
-                                                $type_ankets == 'medic' && user()->access('medic_trash')
-                                                || $type_ankets == 'tech' && user()->access('tech_trash')
-                                                || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_trash')
-                                            )
+                                            @if($permissionToDelete)
                                             <th class="not-export">#</th>
                                             @endif
                                     @endif
@@ -280,6 +299,7 @@ $permissionToTrashView = (
                                         @endforeach
 
 
+                                        @if($permissionToDelete)
                                         @if(request()->get('trash'))
                                             <td class="td-option">
                                                 {{ ($anketa->deleted_user->name) }}
@@ -287,6 +307,7 @@ $permissionToTrashView = (
                                             <td class="td-option">
                                                 {{ ($anketa->deleted_at) }}
                                             </td>
+                                        @endif
                                         @endif
 
                                         @accessSetting('id_auto', 'medic')
@@ -307,11 +328,7 @@ $permissionToTrashView = (
                                         @endif
                                         <!-- /ОЧЕРЕДЬ ОСМОТРОВ -->
 
-                                            @if(
-                                                $type_ankets == 'medic' && user()->access('medic_update')
-                                                || $type_ankets == 'tech' && user()->access('tech_update')
-                                                || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_update')
-                                            )
+                                            @if($permissionToUpdate)
                                             <td class="td-option not-export">
                                                 <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i></a>
                                                 @if($anketa->is_dop && !$anketa->result_dop)
@@ -351,11 +368,7 @@ $permissionToTrashView = (
 {{--                                                @endif--}}
 
 
-                                                @if(
-                                                    $type_ankets == 'medic' && user()->access('medic_trash')
-                                                    || $type_ankets == 'tech' && user()->access('tech_trash')
-                                                    || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_trash')
-                                                )
+                                                @if($permissionToDelete)
                                                 <a href="{{ route('forms.trash', [
                                                     'id' => $anketa->id,
                                                     'action' => isset($_GET['trash']) ? 0 : 1

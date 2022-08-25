@@ -205,7 +205,7 @@
             @endif
 
             @if(user()->access('system_read', 'settings_system_read',
-                'city_read', 'pv_read', 'employee_read','employee_create','group_create','city_create', 'group_read', 'story_field_read', 'story_field_create'))
+                'city_read', 'pv_read', 'employee_read','employee_create','group_create','city_create', 'group_read', 'story_field_read', 'story_field_create', 'pv_create'))
                 <li>
                     <a href="#" data-btn-collapse="#spis-pol" role="button"><i class="fa fa-cog"></i> Настройки</a>
                     <ul id="spis-pol" class="collapse list-unstyle">
@@ -222,7 +222,7 @@
                             <li><a href="{{ route('renderElements', 'Town') }}">Города</a></li>
                         @endif
 
-                        @if(user()->access('pv_read'))
+                        @if(user()->access('pv_read', 'pv_create'))
                             <li><a href="{{ route('renderElements', 'Point') }}">Пункты выпуска</a></li>
                         @endif
 

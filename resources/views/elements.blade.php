@@ -213,20 +213,20 @@ $permissionToCreate = (
     user()->access('drivers_create') && $model == 'Driver'
     || user()->access('cars_create') && $model == 'Car'
     || user()->access('company_create') && $model == 'Company'
-    || user()->access('service_create') && $model == 'Service'
     || user()->access('discount_create') && $model == 'Discount'
-    || user()->access('discount_create') && $model == 'Product'
+    || user()->access('service_create') && $model == 'Product'
     || user()->access('briefings_create') && $model == 'Instr'
     || user()->access('city_create') && $model == 'Town'
     || user()->access('requisites_create') && $model == 'Req'
     || user()->access('date_control_create') && $model == 'DDates'
+    || user()->access('story_field_create') && $model == 'FieldHistory'
+    || user()->access('pv_create') && $model == 'Point'
 ) && !request()->get('deleted');
 
 $permissionToDelete = (
     user()->access('drivers_delete') && $model == 'Driver'
     || user()->access('cars_delete') && $model == 'Car'
     || user()->access('company_delete') && $model == 'Company'
-    || user()->access('service_delete') && $model == 'Service'
     || user()->access('discount_delete') && $model == 'Discount'
     || user()->access('service_delete') && $model == 'Product'
     || user()->access('briefings_delete') && $model == 'Instr'
@@ -235,26 +235,29 @@ $permissionToDelete = (
     || user()->access('requisites_delete') && $model == 'Req'
     || user()->access('date_control_delete') && $model == 'DDates'
     || user()->access('system_delete') && $model == 'Settings'
+    || user()->access('story_field_delete') && $model == 'FieldHistory'
+    || user()->access('pv_delete') && $model == 'Point'
 ) && !request()->get('deleted');
 
 $permissionToEdit = (
     user()->access('drivers_update') && $model == 'Driver'
     || user()->access('cars_update') && $model == 'Car'
     || user()->access('company_update') && $model == 'Company'
-    || user()->access('service_update') && $model == 'Service'
     || user()->access('discount_update') && $model == 'Discount'
     || user()->access('service_update') && $model == 'Product'
     || user()->access('briefings_update') && $model == 'Instr'
     || user()->access('city_update') && $model == 'Town'
     || user()->access('requisites_update') && $model == 'Req'
     || user()->access('date_control_update') && $model == 'DDates'
+    || user()->access('system_update') && $model == 'Settings'
+    || user()->access('story_field_update') && $model == 'FieldHistory'
+    || user()->access('pv_update') && $model == 'Point'
 ) && !request()->get('deleted');
 
 $permissionToView = (
     user()->access('drivers_read') && $model == 'Driver'
     || user()->access('cars_read') && $model == 'Car'
     || user()->access('company_read') && $model == 'Company'
-    || user()->access('service_read') && $model == 'Service'
     || user()->access('discount_read') && $model == 'Discount'
     || user()->access('service_read') && $model == 'Product'
     || user()->access('briefings_read') && $model == 'Instr'
@@ -262,23 +265,14 @@ $permissionToView = (
     || user()->access('requisites_read') && $model == 'Req'
     || user()->access('date_control_read') && $model == 'DDates'
     || user()->access('system_read') && $model == 'Settings'
+    || user()->access('story_field_read') && $model == 'FieldHistory'
+    || user()->access('pv_read') && $model == 'Point'
 );
-//dd($model);
-
-//$permissionToTrash = (
-//    user()->access('drivers_trash_can') && $model == 'Driver'
-//    || user()->access('drivers_trash_can') && $model == 'Car'
-//    || user()->access('drivers_trash_can') && $model == 'Company'
-//    || user()->access('drivers_trash_can') && $model == 'Service'
-//    || user()->access('drivers_trash_can') && $model == 'Product'
-//    || user()->access('drivers_trash_can') && $model == 'Instr'
-//);
 
 $permissionToTrashView = (
     user()->access('drivers_trash_read') && $model == 'Driver'
     || user()->access('cars_trash_read') && $model == 'Car'
     || user()->access('company_trash_read') && $model == 'Company'
-    || user()->access('service_trash_read') && $model == 'Service'
     || user()->access('discount_trash_read') && $model == 'Discount'
     || user()->access('service_trash_read') && $model == 'Product'
     || user()->access('briefings_trash_read') && $model == 'Instr'
