@@ -205,7 +205,9 @@
             @endif
 
             @if(user()->access('system_read', 'settings_system_read',
-                'city_read', 'pv_read', 'employee_read','employee_create','group_create','city_create', 'group_read', 'story_field_read', 'story_field_create', 'pv_create'))
+                'city_read', 'pv_read', 'employee_read','employee_create','group_create',
+                'city_create', 'group_read', 'story_field_read', 'story_field_create', 'pv_create', 'date_control_create',
+                'date_control_read', 'pak_sdpo_read', 'pak_sdpo_update', 'requisites_read', 'requisites_create', 'releases_read'))
                 <li>
                     <a href="#" data-btn-collapse="#spis-pol" role="button"><i class="fa fa-cog"></i> Настройки</a>
                     <ul id="spis-pol" class="collapse list-unstyle">
@@ -245,7 +247,7 @@
                                 ]) }}">ПАК СДПО</a></li>
                         @endif
 
-                        @if(user()->access('date_control_read'))
+                        @if(user()->access('date_control_read', 'date_control_create'))
                             <li><a href="{{ route('renderElements', 'DDates') }}">Контроль дат</a></li>
                         @endif
 
@@ -254,7 +256,7 @@
                             </li>
                         @endif
 
-                        @if(user()->access('requisites_read'))
+                        @if(user()->access('requisites_read', 'requisites_create'))
                             <li><a href="{{ route('renderElements', 'Req') }}">Реквизиты нашей компании</a></li>
                         @endif
 

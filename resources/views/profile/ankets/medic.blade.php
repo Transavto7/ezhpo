@@ -141,10 +141,10 @@
             <select name="proba_alko" required class="form-control">
                 @if($proba_alko ?? false)
                     <option disabled selected value="{{ $proba_alko }}">{{ $proba_alko }}</option>
-                @else
+                @endif
                     <option selected value="Отрицательно">Отрицательно</option>
                     <option value="Положительно">Положительно</option>
-                @endif
+
             </select>
         </article>
     </div>
@@ -156,11 +156,11 @@
 
                 @if($test_narko ?? false)
                     <option disabled selected value="{{ $test_narko }}">{{ $test_narko }}</option>
-                @else
+                @endif
                     <option selected value="Не проводился">Не проводился</option>
                     <option value="Отрицательно">Отрицательно</option>
                     <option value="Положительно">Положительно</option>
-                @endif
+
             </select>
         </article>
     </div>
@@ -171,10 +171,10 @@
             <select name="med_view" required class="form-control">
                 @if($med_view ?? false)
                     <option disabled selected value="{{ $med_view }}">{{ $med_view }}</option>
-                @else
+                @endif
                     <option selected value="В норме">В норме</option>
                     <option value="Отстранение">Отстранение</option>
-                @endif
+
             </select>
         </article>
     </div>
