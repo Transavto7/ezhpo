@@ -460,6 +460,10 @@ return [
         'name'        => 'pak_sdpo_delete',
         'description' => 'ПАК СДПО - Удаление',
     ],
+    [
+        'name'        => 'pak_sdpo_trash',
+        'description' => 'ПАК СДПО - Корзина',
+    ],
     //============== Контроль дат =============//
     [
         'name'        => 'date_control_create',
