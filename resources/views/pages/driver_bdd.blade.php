@@ -21,13 +21,29 @@ $instrs = $instrs->merge($nullable);
 
                 <div class="row">
                     <div class="col-md-4 nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        @php $number = 0; @endphp
                         @foreach($instrs as $k => $instr)
-                            <a class="nav-link" id="instr-{{ $instr->id }}" data-toggle="pill" href="#instr-{{ $instr->id }}-tab" role="tab" aria-controls="instr-{{ $instr->id }}" aria-selected="false">{{ $instr->name }} [{{ $instr->type_briefing }}]</a>
+                            <a class="nav-link driver-bdd-link {{ $number === 0 ? 'active' : '' }}"
+                               id="instr-{{ $instr->id }}"
+                               data-toggle="pill"
+                               href="#instr-{{ $instr->id }}-tab"
+                               role="tab"
+                               aria-controls="instr-{{ $instr->id }}"
+                               aria-selected="false">
+                                {{ $instr->name }} [{{ $instr->type_briefing }}]
+                            </a>
+
+                            @php $number++; @endphp
                         @endforeach
                     </div>
                     <div class="col-md-8 tab-content text-left" id="v-pills-tabContent">
+                        @php $number = 0; @endphp
                         @foreach($instrs as $k => $instr)
-                            <div class="tab-pane fade" id="instr-{{ $instr->id }}-tab" role="tabpanel" aria-labelledby="instr-{{ $instr->id }}-tab">
+                            <div class="tab-pane fade {{ $number === 0 ? 'active show' : '' }}"
+                                 id="instr-{{ $instr->id }}-tab"
+                                 role="tabpanel"
+                                 aria-labelledby="instr-{{ $instr->id }}-tab"
+                            >
                                 <h3>{{ $instr->name }}</h3>
                                 <h6>Тип инструктажа: {{ $instr->type_briefing }}</h6>
 
@@ -67,6 +83,7 @@ $instrs = $instrs->merge($nullable);
                                     </div>
                                 </div>
                             </div>
+                            @php $number++; @endphp
                         @endforeach
                     </div>
                 </div>

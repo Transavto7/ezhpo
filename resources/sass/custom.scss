@@ -275,6 +275,61 @@ table.protokol {
     }
 }
 
+// Driver
+
+.menu_link_driver {
+    border-radius: 15px;
+    border: 1px solid white;
+    background-color: #4aa0e6;
+    color: white;
+    font-size: 1.3rem;
+    line-height: 1.5rem;
+    min-height: 100px;
+    padding: 10px;
+    transition: ease-in-out 0.2s;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu_link_driver:hover {
+    background-color: rgba(74, 160, 230, 0.7);
+}
+
+.menu_link_driver a {
+    background: none;
+    text-decoration: none;
+}
+
+.driver-card {
+    border-radius: 15px;
+}
+
+.driver-card-img {
+    box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.3);
+    border-radius: 100%;
+}
+
+.driver-bdd-link {
+    border-radius: 10px;
+    border: 1px solid white !important;
+    background-color: #4aa0e6 !important;
+    margin: 5px 0;
+    color: white;
+
+    &:hover {
+        background-color: rgba(74, 160, 230, 0.7)  !important;
+        color: white !important;
+    }
+
+    &.active {
+        background-color: rgba(228, 12, 25, 0.5) !important;
+    }
+}
+
+
 @page { margin-left: 1.18in; margin-right: 0.59in; margin-top: 0.59in; margin-bottom: 0.37in }
 P { margin-bottom: 0.08in; direction: ltr; widows: 2; orphans: 2 }
 
