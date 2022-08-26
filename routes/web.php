@@ -154,7 +154,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users', 'UserController@index')->name('users');
     Route::get('/users/fetchUserData', 'UserController@fetchUserData');
     Route::get('/users/saveUser', 'UserController@saveUser');
-    Route::delete('/users/{$id}', 'UserController@destroy');
+    Route::post('/users', 'UserController@destroy');
     Route::get('users/fetchRoleData', 'UserController@fetchRoleData');
     //Route::get('/users/index', 'UserController@index')->name('users');
 

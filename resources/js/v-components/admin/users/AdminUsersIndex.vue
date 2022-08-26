@@ -49,6 +49,7 @@
 
             <template #cell(delete_btn)="row">
                 <b-button
+                    v-if="!deleted"
                     :disabled="!current_user_permissions.permission_to_delete"
                     variant="danger"
                     @click="deleteUser(row.item.id)">
@@ -262,7 +263,7 @@ import Swal2 from "sweetalert2";
 
 export default {
     name:       "AdminUsersIndex",
-    props:      ['users', 'roles', 'points', 'all_permissions', 'current_user_permissions'],
+    props:      ['users','deleted', 'roles', 'points', 'all_permissions', 'current_user_permissions'],
     components: {Swal2, vSelect},
 
     data() {
@@ -379,8 +380,8 @@ export default {
                 cancelButtonText:   'Отмена',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post('/users/' + id, {
-                        _method: 'DELETE',
+                    axios.post('/users', {
+                        id: id
                     }).then(({data}) => {
                         if (data.status) {
                             Swal2.fire(
@@ -538,6 +539,15 @@ export default {
         this.optionsPvs = this.points;
         this.optionsRoles = this.roles;
         this.allPermissions = this.all_permissions;
+        if(this.deleted){
+            this.fields.push({
+                key: 'deleted_user.name',
+                label: 'Имя удалившего',
+            }, {
+                key: 'deleted_at',
+                label: 'Время удаления',
+            })
+        }
     },
     watch: {
         enableModal(val) {

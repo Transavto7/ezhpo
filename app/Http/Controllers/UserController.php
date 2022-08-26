@@ -24,6 +24,10 @@ class UserController extends Controller
 //            dd(
 //                $users->with(['permissions'])->find(1)->toArray()
 //            );
+
+        if($request->get('deleted')){
+            $users->with(['deleted_user'])->onlyTrashed();
+        }
         if ($name = $request->get('name')) {
             $users->where('name', 'like', "%$name%");
         }
@@ -167,14 +171,11 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
-     *
-     * @return Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
         return response([
-            'status' => User::find($id)->delete(),
+            'status' => User::find($request->post('id'))->delete(),
         ]);
     }
 

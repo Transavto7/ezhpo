@@ -2,6 +2,7 @@
 @php $user_role = \App\Http\Controllers\ProfileController::getUserRole(false);
 //dd(user()->hasRole('driver'))
 //
+//dd(user()->roles()->get()->toArray())
 @endphp
 
 @if(!user()->hasRole('driver'))
@@ -16,7 +17,6 @@
                             {{ $role->guard_name }}
                         </div>
                     @endforeach
-
                 </article>
             </div>
         </div>
@@ -86,7 +86,7 @@
             @endif
 
             @if(user()->access('medic_read', 'tech_read', 'journal_briefing_bdd_read',
-                    'journal_pl_read', 'map_report_read', 'journal_pl_accounting', 'errors_sdpo_read'))
+                    'journal_pl_read', 'map_report_read', 'journal_pl_accounting', 'errors_sdpo_read', 'errors_sdpo_create'))
                 <li>
                     <a href="#" data-btn-collapse="#views" role="button"> <i class="icon-grid"></i>Журналы осмотров</a>
                     <ul id="views" class="collapse list-unstyle">
@@ -127,7 +127,7 @@
                             </li>
                         @endif
 
-                        @if(user()->access('errors_sdpo_read'))
+                        @if(user()->access('errors_sdpo_read', 'errors_sdpo_create'))
                             @php
                                 $countErrorsPak = \Illuminate\Support\Facades\Cache::remember('countErrorsPak', 3600,
                                                 function (){

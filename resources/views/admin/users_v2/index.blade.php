@@ -13,13 +13,29 @@
             'permission_to_create' => user()->access('employee_create'),
             'permission_to_delete' => user()->access('employee_delete'),
         ];
-    //dd($current_user_permissions)
+    //dd($current_user_permissions
+    $permissionToTrashView  = user()->access('employee_trash');
 @endphp
 @section('content')
 
     <div class="col-md-12">
 
         <div class="card">
+
+{{--            @if($permissionToTrashView)--}}
+{{--                <div class="m-2">--}}
+{{--                    @if(!request()->get('deleted'))--}}
+{{--                        <a href="?deleted=1" class="btn btn-sm btn-warning">--}}
+{{--                            Удалённые <i class="fa fa-trash"></i>--}}
+{{--                        </a>--}}
+{{--                    @else--}}
+{{--                        <a href="{{ route('users') }}" class="btn btn-sm btn-warning">--}}
+{{--                            Назад <i class="fa fa-trash"></i>--}}
+{{--                        </a>--}}
+{{--                    @endif--}}
+{{--                </div>--}}
+{{--            @endif--}}
+
             <div class="card-body">
                 @if($current_user_permissions['permission_to_view'])
                 <form action="" class="row" method="GET">
@@ -54,6 +70,7 @@
         </div>
         <admin-users-index
             :users='@json($users->getCollection())'
+            :deleted="{{request()->get('deleted')}}"
             :roles='@json($roles)'
             :current_user_permissions='@json($current_user_permissions)'
             :all_permissions='@json($all_permissions)'

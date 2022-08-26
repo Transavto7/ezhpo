@@ -337,6 +337,10 @@ return [
         'name'        => 'system_update',
         'description' => 'Система - Редактирование',
     ],
+    [
+        'name'        => 'system_trash',
+        'description' => 'Система - Корзина',
+    ],
     //============== Система =============//
 //    [
 //        'name'        => 'system_create',
@@ -376,10 +380,10 @@ return [
         'name'        => 'city_delete',
         'description' => 'Города - Удаление',
     ],
-//    [
-//        'name'        => 'city_trash_read',
-//        'description' => 'Города - Корзина',
-//    ],
+    [
+        'name'        => 'city_trash_read',
+        'description' => 'Города - Корзина',
+    ],
     //============== Пункты выпуска =============//
     [
         'name'        => 'pv_create',
@@ -397,6 +401,10 @@ return [
         'name'        => 'pv_delete',
         'description' => 'Пункты выпуска - Удаление',
     ],
+    [
+        'name'        => 'pv_trash_read',
+        'description' => 'Пункты выпуска - Корзина',
+    ],
     //============== Сотрудники =============//
     [
         'name'        => 'employee_create',
@@ -413,6 +421,10 @@ return [
     [
         'name'        => 'employee_delete',
         'description' => 'Сотрудники - Удаление',
+    ],
+    [
+        'name'        => 'employee_trash',
+        'description' => 'Сотрудники - Корзина',
     ],
     //============== Группы =============//
     [
@@ -498,6 +510,10 @@ return [
     [
         'name'        => 'requisites_delete',
         'description' => 'Реквизиты нашей компании - Удаление',
+    ],
+    [
+        'name'        => 'requisites_trash_read',
+        'description' => 'Реквизиты нашей компании - Корзина',
     ],
     //============== Релизы =============//
     [
