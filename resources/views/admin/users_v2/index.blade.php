@@ -70,7 +70,6 @@
         </div>
         <admin-users-index
             :users='@json($users->getCollection())'
-            :deleted="{{request()->get('deleted')}}"
             :roles='@json($roles)'
             :current_user_permissions='@json($current_user_permissions)'
             :all_permissions='@json($all_permissions)'
