@@ -522,7 +522,6 @@ class ReportController extends Controller
                 $query->where('anketas.company_id', $company->hash_id)
                     ->orWhere('anketas.company_name', $company->name);
             })
-            ->whereNotNull('car_id')
             ->where('in_cart', 0)
             ->whereBetween('anketas.created_at', [
                 $date_from,
