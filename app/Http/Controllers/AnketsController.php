@@ -77,6 +77,9 @@ class AnketsController extends Controller
         }
 
         $data['date'] = $anketa->date;
+        $data['proba_alko'] = $anketa->proba_alko;
+        $data['test_narko'] = $anketa->test_narko;
+        $data['med_view'] = $anketa->med_view;
         $data['default_point'] = $point;
         $data['points'] = $points;
         $data['is_dop'] = $anketa->is_dop;

@@ -140,10 +140,23 @@
         <article class="col-md-9">
             <select name="proba_alko" required class="form-control">
                 @if($proba_alko ?? false)
-                    <option disabled selected value="{{ $proba_alko }}">{{ $proba_alko }}</option>
-                @endif
+                    <option
+                        @if ($proba_alko === 'Отрицательно') selected @endif
+                        value="Отрицательно"
+                    >
+                        Отрицательно
+                    </option>
+
+                    <option
+                        @if ($proba_alko === 'Положительно') selected @endif
+                        value="Положительно"
+                    >
+                        Положительно
+                    </option>
+                @else
                     <option selected value="Отрицательно">Отрицательно</option>
                     <option value="Положительно">Положительно</option>
+                @endif
 
             </select>
         </article>
@@ -155,11 +168,30 @@
             <select name="test_narko" required class="form-control">
 
                 @if($test_narko ?? false)
-                    <option disabled selected value="{{ $test_narko }}">{{ $test_narko }}</option>
-                @endif
+                    <option
+                        @if ($test_narko === 'Не проводился') selected @endif
+                        value="Не проводился"
+                    >
+                        Не проводился
+                    </option>
+
+                    <option
+                        @if ($test_narko === 'Отрицательно') selected @endif
+                        value="Отрицательно"
+                    >Отрицательно
+                    </option>
+
+                    <option
+                        @if ($test_narko === 'Положительно') selected @endif
+                        value="Положительно"
+                    >
+                        Положительно
+                    </option>
+                @else
                     <option selected value="Не проводился">Не проводился</option>
                     <option value="Отрицательно">Отрицательно</option>
                     <option value="Положительно">Положительно</option>
+                @endif
 
             </select>
         </article>
@@ -170,10 +202,23 @@
         <article class="col-md-9">
             <select name="med_view" required class="form-control">
                 @if($med_view ?? false)
-                    <option disabled selected value="{{ $med_view }}">{{ $med_view }}</option>
-                @endif
+                    <option
+                        @if ($med_view === 'В норме') selected @endif
+                        value="В норме"
+                    >
+                        В норме
+                    </option>
+
+                    <option
+                        @if ($med_view === 'Отстранение') selected @endif
+                        value="Отстранение"
+                    >
+                        Отстранение
+                    </option>
+                @else
                     <option selected value="В норме">В норме</option>
                     <option value="Отстранение">Отстранение</option>
+                @endif
 
             </select>
         </article>
