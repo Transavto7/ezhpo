@@ -1238,11 +1238,11 @@ class IndexController extends Controller
 
                             if(count($aFv) > 0) {
                                 $element['elements'] = $element['elements']->where(function ($q) use ($aFv, $aFk) {
-                                    $isId = strpos($aFk, '_id') && $aFk !== 'products_id';
+                                    $isId = strpos($aFk, '_id');
 
                                     foreach($aFv as $aFvItemKey => $aFvItemValue) {
-                                        if ($isId && $aFk === 'town_id') {
-                                            $q = $q->where(function($q) use ($aFvItemValue, $aFk) {
+                                        if ($isId && ($aFk === 'town_id' || $aFk === 'products_id')) {
+                                            $q = $q->where(function ($q) use ($aFvItemValue, $aFk) {
                                                 return $q->orWhere($aFk, $aFvItemValue)
                                                     ->orWhere($aFk, 'like', "%,$aFvItemValue")
                                                     ->orWhere($aFk, 'like', "$aFvItemValue,%");
@@ -1261,7 +1261,6 @@ class IndexController extends Controller
                                     return $q;
                                 });
                             }
-//                        dd($element['elements']->toSql());
                         } else {
                             if ($aFk == 'date_of_employment') {
                                 $element['elements'] = $element['elements']->whereBetween($aFk, [
