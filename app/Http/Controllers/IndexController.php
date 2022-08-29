@@ -787,7 +787,6 @@ class IndexController extends Controller
                      */
 
                     $data['hash_id'] = mt_rand(1000, 9999).date('s');
-
                     break;
 
                 case 'Car':
@@ -930,7 +929,23 @@ class IndexController extends Controller
                 }
             }
 
-            if ($model::create($data)) {
+            $created = $model::create($data);
+            if ($created) {
+                if ($model_type === 'Company') {
+                    $userData = [
+                        'hash_id'  => mt_rand(0,9999) . date('s'),
+                        'email'    => $created->hash_id . '-' . mt_rand(100000, 499999).'@ta-7.ru',
+                        'login'    => $created->hash_id,
+                        'password' => $created->hash_id,
+                        'name'     => $created->name,
+                        'role'     => 12,
+                        'company_id' => $created->id
+                    ];
+
+                    $register = new RegisterController();
+                    $register->create($userData);
+                }
+
                 return redirect($_SERVER['HTTP_REFERER']);
             }
 
