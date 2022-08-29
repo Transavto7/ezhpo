@@ -4,6 +4,9 @@
 //    CheckAdmin, CheckManager
 //};
 
+use App\User;
+use Illuminate\Support\Facades\Hash;
+
 Route::get('/fixRoles', function() {
 
 });
@@ -20,7 +23,27 @@ Route::get('/releases', 'IndexController@RenderReleases')->name('releases');
 
 
 
+Route::get('/fix/company', function() {
+    $companies = \App\Company::all();
+    foreach ($companies as $company) {
+        if (User::where('login', $company->hash_id)->first()) {
+            continue;
+        }
 
+        $user = User::create([
+            'hash_id'  => mt_rand(10000,99999) . date('s'),
+            'email'    => $company->hash_id . '-' . mt_rand(100000, 499999).'@ta-7.ru',
+            'api_token' => Hash::make(date('H:i:s').sha1($company->hash_id)),
+            'login'    => 'c' . $company->hash_id,
+            'password' => 'c' . Hash::make($company->hash_id),
+            'name'     => $company->name,
+            'role'     => 12,
+            'company_id' => $company->id
+        ]);
+
+        $user->roles()->attach(6);
+    }
+});
 
 Route::get('/fix', function() {
     \App\User::fetchRoles();

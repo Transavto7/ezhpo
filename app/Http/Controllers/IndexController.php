@@ -937,8 +937,8 @@ class IndexController extends Controller
                         'hash_id'  => mt_rand(0,9999) . date('s'),
                         'email'    => $created->hash_id . '-' . mt_rand(100000, 499999).'@ta-7.ru',
                         'api_token' => Hash::make(date('H:i:s').sha1($created->hash_id)),
-                        'login'    => $created->hash_id,
-                        'password' => Hash::make($created->hash_id),
+                        'login'    => 'c' . $created->hash_id,
+                        'password' => 'c' . Hash::make($created->hash_id),
                         'name'     => $created->name,
                         'role'     => 12,
                         'company_id' => $created->id
