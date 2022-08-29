@@ -71,6 +71,12 @@ class RegisterController extends Controller
             $data['login'] = $data['email'];
         }
 
-        return User::create($data);
+        $user = User::create($data);
+
+        if (isset($data['role'])) {
+            $user->roles()->attach($data['role']);
+        }
+
+        return $user;
     }
 }
