@@ -97,17 +97,6 @@ Route::prefix('snippet')->group(function () {
             echo '['.$driver->hash_id.'] Создан Водитель Как Пользователь ' . '  ('.count($drivers).')<br/>';
         }
     });
-
-//    Route::get('/register-user-admin/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', function () {
-//        $reg = new \App\Http\Controllers\Auth\RegisterController();
-//        return response()->json($reg->create([
-//            'name' => 'ADMIN',
-//            'email' => 'webmazaretto@gmail.com',
-//            'role' => 777,
-//            'password' => 'webmazaretto@gmail.com',
-//            'login' => 'webmazaretto@gmail.com'
-//        ]));
-//    });
 });
 
 Route::middleware(['auth'])->group(function () {

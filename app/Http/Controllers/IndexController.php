@@ -6,7 +6,6 @@ use App\Anketa;
 use App\Car;
 use App\Company;
 use App\Driver;
-use App\Http\Controllers\Auth\RegisterController;
 use App\Imports\CarImport;
 use App\Imports\CompanyImport;
 use App\Imports\DriverImport;
@@ -18,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App as FacadesApp;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Excel;
@@ -850,9 +850,10 @@ class IndexController extends Controller
 
                     $userData = [
                         'hash_id'  => $data['hash_id'],
+                        'api_token' => Hash::make(date('H:i:s').sha1($data['hash_id'])),
                         'email'    => mt_rand(100000, 499999).'@ta-7.ru',
                         'login'    => $data['hash_id'],
-                        'password' => $data['hash_id'],
+                        'password' => Hash::make($data['hash_id']),
                         'name'     => $data['fio'],
                         'role'     => 3,
                     ];
@@ -861,8 +862,8 @@ class IndexController extends Controller
                         $userData['pv_id'] = $pv_id;
                     }
 
-                    $register = new RegisterController();
-                    $register->create($userData);
+                    $user = User::create($userData);
+                    $user->roles()->attach(3);
 
                     // СИНХРОНИЗАЦИЯ ПОЛЕЙ
                     if (isset($data['company_id'])) {
@@ -932,18 +933,18 @@ class IndexController extends Controller
             $created = $model::create($data);
             if ($created) {
                 if ($model_type === 'Company') {
-                    $userData = [
+                    $user = User::create([
                         'hash_id'  => mt_rand(0,9999) . date('s'),
                         'email'    => $created->hash_id . '-' . mt_rand(100000, 499999).'@ta-7.ru',
+                        'api_token' => Hash::make(date('H:i:s').sha1($created->hash_id)),
                         'login'    => $created->hash_id,
-                        'password' => $created->hash_id,
+                        'password' => Hash::make($created->hash_id),
                         'name'     => $created->name,
                         'role'     => 12,
                         'company_id' => $created->id
-                    ];
+                    ]);
 
-                    $register = new RegisterController();
-                    $register->create($userData);
+                    $user->roles()->attach(6);
                 }
 
                 return redirect($_SERVER['HTTP_REFERER']);
