@@ -21,9 +21,14 @@ class RoleController extends Controller
      */
     public function index()
     {
+        if(request()->get('deleted')){
+            $roles = Role::whereNotNull('deleted_at')->get();
+        }else{
+            $roles = Role::all();
+        }
         return view('admin.groups.index')
             ->with([
-                'roles' => Role::all(),
+                'roles' => $roles,
                 'all_permissions' => \Spatie\Permission\Models\Permission::orderBy('guard_name')->get()
             ]);
     }
@@ -102,8 +107,27 @@ class RoleController extends Controller
      */
     public function destroy($id)
     {
+        $role = Role::find($id);
+        $role->deleted_id = user()->id;
+        $role->deleted_at = now();
+
+        $role->save();
+
         return response([
-            'status' => Role::find($id)->delete()
+            'status' => 1
+        ]);
+    }
+
+    public function returnTrash(Request $request)
+    {
+        $role = Role::find($request->post('id'));
+        $role->deleted_id = null;
+        $role->deleted_at = null;
+
+        $role->save();
+
+        return response([
+            'status' => 1,
         ]);
     }
 }

@@ -4,6 +4,7 @@ require('./front')
 import Vue from 'vue';
 import Multiselect from 'vue-multiselect'
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue'
+import "bootstrap-vue/dist/bootstrap-vue.css"
 
 Vue.use(BootstrapVue)
 Vue.use(BootstrapVueIcons)

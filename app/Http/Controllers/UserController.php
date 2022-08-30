@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Company;
 use App\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -10,6 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
+use function foo\func;
 
 class UserController extends Controller
 {
@@ -20,12 +22,12 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $users = User::with(['roles', 'pv', 'company']);
-//            dd(
-//                $users->with(['permissions'])->find(1)->toArray()
-//            );
+        $users = User::with(['roles', 'pv', 'company'])
+                     ->whereHas('roles', function ($q) {
+                         $q->where('id', '<>', 3);
+                     });
 
-        if($request->get('deleted')){
+        if ($request->get('deleted')) {
             $users->with(['deleted_user'])->onlyTrashed();
         }
         if ($name = $request->get('name')) {
@@ -36,6 +38,25 @@ class UserController extends Controller
         }
         if ($pv_id = $request->get('pv_id')) {
             $users->where('pv_id', $pv_id);
+        }
+        if ($sortBy = $request->get('sortBy', 'id')) {
+            if ($sortBy == 'company') {
+                $users->leftjoin('companies', 'users.company_id', '=', 'companies.id')
+                      ->select('users.*', 'companies.name as company_name')
+                      ->orderBy('companies.name', $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC');
+            } else {
+                $users->orderBy($sortBy, $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC');
+            }
+        }
+
+        if ($request->get('api')) {
+            $res = $users->paginate();
+
+            return response([
+                'total_rows'   => $res->total(),
+                'current_page' => $res->currentPage(),
+                'items'        => $res->getCollection(),
+            ]);
         }
 
         return view('admin.users_v2.index')
@@ -82,6 +103,13 @@ class UserController extends Controller
      */
     public function saveUser(Request $request)
     {
+        if (array_search(5, $request->get('roles', []))) {
+            $pv      = null;
+            $company = $request->get('company', null);
+        } else {
+            $company = null;
+            $pv      = $request->get('pv', null);
+        }
 
         if ($userId = $request->get('user_id')) {
             $user           = User::find($userId);
@@ -132,7 +160,8 @@ class UserController extends Controller
         $user->permissions()->sync($request->get('permissions', []));
 
 
-        $user->pv()->associate($request->get('pv', null));
+        $user->company()->associate($company);
+        $user->pv()->associate($pv);
         $user->save();
 
         return response([
@@ -179,6 +208,13 @@ class UserController extends Controller
         ]);
     }
 
+    public function returnTrash(Request $request)
+    {
+        return response([
+            'status' => User::withTrashed()->find($request->post('id'))->restore(),
+        ]);
+    }
+
     public function fetchRoleData(Request $request)
     {
         $permissions = collect();
@@ -195,5 +231,17 @@ class UserController extends Controller
             ->values();
 
         return response($permissions);
+    }
+
+    public function fetchCompanies(Request $request)
+    {
+
+        $search = mb_strtolower($request->get("query", ""));
+
+        $companies = Company::whereRaw("LOWER(name) LIKE '%{$search}%'")
+                            ->limit(50)
+                            ->get();
+
+        return response($companies);
     }
 }

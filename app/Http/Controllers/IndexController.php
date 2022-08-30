@@ -1157,14 +1157,6 @@ class IndexController extends Controller
             return view('auth.login');
         }
 
-        if($user->hasRole('operator_sdpo')) {
-            return redirect()->route('home', 'pak_queue');
-        }
-
-        if($user->hasRole('manager')) {
-            return redirect()->route('renderElements', 'Company');
-        }
-
         return redirect()->route('forms');
     }
 
@@ -1181,9 +1173,9 @@ class IndexController extends Controller
         $oBy = 'orderBy';
 
         // ОПЕРАТОР ПАК & КОМПАНИИ
-        if($user->role === 4 && $type === 'Company') {
-            return back();
-        }
+//        if($user->role === 4 && $type === 'Company') {
+//            return back();
+//        }
 
         foreach($_GET as $getK => $getV) {
             if($getK !== $oKey && $getK !== $oBy) {
@@ -1345,11 +1337,29 @@ class IndexController extends Controller
     {
         $user = Auth::user();
 
-        if($user->hasRole('client')) {
-            return redirect( route('home') );
-        }
+        if(!($type = $request->get('type'))){
+            if(user()->hasRole('tech')){
+                $type = 'tech';
+            }
+            if(user()->hasRole('medic')){
+                $type = 'medic';
+            }
+            if(user()->hasRole('manager') || user()->hasRole('engineer_bdd')){
+                return redirect()->route('renderElements', 'Company');
+            }
+            if(user()->hasRole('operator_sdpo')){
+                return redirect()->route('home', 'pak_queue');
+            }
 
-        $type = $request->get('type', ($user->role === 1 ? 'tech' : 'medic') );
+            if(user()->hasRole('client')){
+                return redirect()->route('report.journal');
+            }
+            if(!$type){
+                return redirect()->route('renderElements', 'Company');
+            }
+        }
+//        $type = $request->get('type', ($user->role === 1 ? 'tech' : 'medic') );
+
         $company_fields = $this->elements['Driver']['fields']['company_id'];
         $company_fields['getFieldKey'] = 'name';
 

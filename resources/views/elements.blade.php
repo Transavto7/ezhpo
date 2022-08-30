@@ -315,7 +315,7 @@
                     <div class="m-2">
                         @if(!request()->get('deleted'))
                             <a href="?deleted=1" class="btn btn-sm btn-warning">
-                                Удалённые <i class="fa fa-trash"></i>
+                                Корзина <i class="fa fa-trash"></i>
                             </a>
                         @else
                             <a href="{{ route('renderElements', ['model' => $model]) }}" class="btn btn-sm btn-warning">
@@ -582,18 +582,24 @@
                                     <td class="td-option">
                                         <nobr>
 
-                                            <a class="btn btn-sm btn-outline-success"
-                                               href="{{ route('report.get', ['type' => 'journal', 'company_id' => $el->hash_id]) }}">
-                                                ₽
-                                            </a>
-                                            <a class="btn btn-sm btn-default"
-                                               href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'company_id' => $el->id ]) }}">
-                                                <i class="fa fa-car"></i>
-                                            </a>
-                                            <a class="btn btn-sm btn-default"
-                                               href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'company_id' => $el->id ]) }}">
-                                                <i class="fa fa-user"></i>
-                                            </a>
+                                            @if(user()->access('report_service_company_read'))
+                                                <a class="btn btn-sm btn-outline-success"
+                                                   href="{{ route('report.get', ['type' => 'journal', 'company_id' => $el->hash_id]) }}">
+                                                    ₽
+                                                </a>
+                                            @endif
+                                            @if(user()->access('cars_read'))
+                                                <a class="btn btn-sm btn-default"
+                                                   href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'company_id' => $el->id ]) }}">
+                                                    <i class="fa fa-car"></i>
+                                                </a>
+                                            @endif
+                                            @if(user()->access('drivers_read'))
+                                                <a class="btn btn-sm btn-default"
+                                                   href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'company_id' => $el->id ]) }}">
+                                                    <i class="fa fa-user"></i>
+                                                </a>
+                                            @endif
                                         </nobr>
                                         @endif
 
@@ -601,20 +607,25 @@
                                     </td>
                                     <td class="td-option">
                                         <nobr>
-                                            <a class="btn btn-sm btn-danger"
-                                               href="{{ route('home', 'medic') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
-                                                МЕД
-                                            </a>
+                                            @if(user()->access('medic_read'))
+                                                <a class="btn btn-sm btn-danger"
+                                                   href="{{ route('home', 'medic') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
+                                                    МЕД
+                                                </a>
+                                            @endif
+                                            @if(user()->access('tech_read'))
+                                                <a class="btn btn-sm btn-info"
+                                                   href="{{ route('home', 'tech') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
+                                                    ТЕХ
+                                                    @endif
+                                                </a>
 
-                                            <a class="btn btn-sm btn-info"
-                                               href="{{ route('home', 'tech') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
-                                                ТЕХ
-                                            </a>
-
-                                            <a class="btn btn-sm btn-dark"
-                                               href="{{ route('home', 'Dop') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
-                                                ПЛ
-                                            </a>
+                                                @if(user()->access('journal_pl_accounting'))
+                                                    <a class="btn btn-sm btn-dark"
+                                                       href="{{ route('home', 'Dop') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
+                                                        ПЛ
+                                                    </a>
+                                                @endif
                                         </nobr>
                                         @endisset
                                         @endif
