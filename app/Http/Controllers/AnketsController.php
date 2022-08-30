@@ -698,9 +698,9 @@ class AnketsController extends Controller
                         $anketa['driver_group_risk'] = $Driver->group_risk;
 
                         if($Driver->dismissed === 'Да') {
-                            $errMsg = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
-
+                            $errMsg = 'Водитель уволен. Осмотр не зарегистрирован. Обратитесь к менеджеру';
                             array_push($errorsAnketa, $errMsg);
+                            continue;
                         }
 
                         /**
@@ -718,7 +718,6 @@ class AnketsController extends Controller
                                     $errMsg = 'Компания в черном списке. Необходимо связаться с руководителем!';
 
                                     array_push($errorsAnketa, $errMsg);
-
                                     continue;
                                 }
 
@@ -728,7 +727,6 @@ class AnketsController extends Controller
                                 array_push($errorsAnketa, $errMsg);
 
                                 $this->savePakForm($anketa, $errMsg);
-
                                 continue;
                             }
 
@@ -1323,9 +1321,10 @@ class AnketsController extends Controller
                         $anketa['driver_group_risk'] = $Driver->group_risk;
 
                         if($Driver->dismissed === 'Да') {
-                            $errMsg = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
+                            $errMsg = 'Водитель уволен. Осмотр не зарегистрирован. Обратитесь к менеджеру';
 
                             array_push($errorsAnketa, $errMsg);
+                            continue;
                         }
 
                         /**
