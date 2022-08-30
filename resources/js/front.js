@@ -2,6 +2,7 @@ import axios from 'axios'
 import swal from 'sweetalert2'
 import { v4 as uidv4 } from 'uuid'
 import {ApiController} from "./components/ApiController";
+import visibleFields from "./config/visibleFields";
 import { Fancybox } from "@fancyapps/ui";
 
 require('./init-plugins')
@@ -383,6 +384,22 @@ $(document).ready(function () {
     }
 
     $(window).on('load', function () {
+        let checks = JSON.parse(sessionStorage.getItem('fields'));
+        console.log(checks);
+        if (!checks) {
+            checks = visibleFields;
+        }
+
+        $('.ankets-form input').each(function () {
+            const type = $(this).parents('.ankets-form').attr('anketa');
+            const name = $(this).attr('name');
+            if (checks[type] && checks[type][name]) {
+                $(this).prop("checked", true);
+            } else {
+                $(this).prop("checked", false);
+            }
+        });
+
         // Форма поиска по анкетам
         function anketsFormCheckFieldsToShow ()
         {
@@ -409,6 +426,19 @@ $(document).ready(function () {
 
             $('.ankets-form input').change(e => {
                 let el = $(e.target)
+                const type = el.parents('.ankets-form').attr('anketa');
+                const id = el.attr('name');
+                const prop_checked = el.prop('checked');
+
+                let checks = JSON.parse(sessionStorage.getItem('fields'));
+                if (!checks) {
+                    checks = Object.assign({}, visibleFields);
+                }
+
+                checks[type][id] = prop_checked;
+
+                console.log(checks);
+                sessionStorage.setItem('fields', JSON.stringify(checks));
 
                 showTableData(el)
             })

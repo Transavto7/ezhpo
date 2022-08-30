@@ -110,28 +110,17 @@ $permissionToUpdate = (
                                 @endif
 
                                 <div class="toggle-hidden p-3" id="ankets-filters">
-                                    <form action="{{ route('home.save-fields', $type_ankets) }}" method="POST" class="ankets-form">
-                                        @csrf
-
+                                    <form class="ankets-form" anketa="{{ $type_ankets }}">
                                         @foreach($anketsFields as $fieldKey => $fieldValue)
                                             @isset($fieldsKeys[$fieldValue])
                                                 <label>
                                                     <input
-                                                        @if(session()->exists("fields_$type_ankets"))
-                                                            @isset(session()->get("fields_$type_ankets")[$fieldValue])
-                                                            checked
-                                                            @endisset
-                                                        @else
-                                                            checked
-                                                        @endif
-
+                                                        checked
                                                         type="checkbox" name="{{ $fieldValue }}" data-value="{{ $fieldKey+1 }}" />
                                                     {{ (isset($fieldsKeys[$fieldValue]['name'])) ? $fieldsKeys[$fieldValue]['name'] : $fieldsKeys[$fieldValue] }} &nbsp;
                                                 </label>
                                             @endisset
                                         @endforeach
-
-                                        <button type="submit" class="btn btn-success btn-sm"><i class="fa fa-save"></i> Сохранить в сессию</button>
                                     </form>
                                 </div>
                             </div>
