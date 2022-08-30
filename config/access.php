@@ -5,23 +5,23 @@ return [
     //============== Медосмотр =====================//
     [
         'name'        => 'medic_create',
-        'description' => 'Медосмотры - создание',
+        'description' => 'Медосмотры - Создание',
     ],
     [
         'name'        => 'medic_read',
-        'description' => 'Медосмотры - просмотр',
+        'description' => 'Медосмотры - Просмотр',
     ],
     [
         'name'        => 'medic_update',
-        'description' => 'Медосмотры - редактирование',
+        'description' => 'Медосмотры - Редактирование',
     ],
     [
         'name'        => 'medic_delete',
-        'description' => 'Медосмотры - удаление',
+        'description' => 'Медосмотры - Удаление',
     ],
     [
         'name'        => 'medic_trash',
-        'description' => 'Медосмотры - корзина',
+        'description' => 'Медосмотры - Корзина',
     ],
     [
         'name'        => 'medic_export',
@@ -138,7 +138,7 @@ return [
     //============== Журнал печать ПЛ Dop =================================//
     [
         'name'        => 'journal_pl_accounting',
-        'description' => 'Журнал учета ПЛ - просмотр',
+        'description' => 'Журнал учета ПЛ - Просмотр',
     ],
     [
         'name'        => 'journal_pl_accounting_update',
@@ -146,7 +146,7 @@ return [
     ],
     [
         'name'        => 'journal_pl_accounting_trash',
-        'description' => 'Журнал учета ПЛ - корзина',
+        'description' => 'Журнал учета ПЛ - Корзина',
     ],
     [
         'name'        => 'journal_pl_accounting_delete',
@@ -194,11 +194,11 @@ return [
     //============== Очередь утверждения =============//
     [
         'name'        => 'approval_queue_view',
-        'description' => 'Очередь утверждения - просмотр',
+        'description' => 'Очередь утверждения - Просмотр',
     ],
     [
         'name'        => 'approval_queue_clear',
-        'description' => 'Очередь утверждения - очистка',
+        'description' => 'Очередь утверждения - Очистка',
     ],
 
     //============== Клиент =============//
@@ -258,7 +258,7 @@ return [
     ],
     [
         'name'        => 'drivers_trash_read',
-        'description' => 'Водители - Корзина просмотр',
+        'description' => 'Водители - Корзина Просмотр',
     ],
 
     //============== Автомобили =============//
@@ -280,7 +280,7 @@ return [
     ],
     [
         'name'        => 'cars_trash_read',
-        'description' => 'Автомобили - Корзина просмотр',
+        'description' => 'Автомобили - Корзина Просмотр',
     ],
 
     //============== Компании =============//
@@ -306,7 +306,7 @@ return [
     ],
     [
         'name'        => 'company_trash_read',
-        'description' => 'Компании - Корзина просмотр',
+        'description' => 'Компании - Корзина Просмотр',
     ],
 
     //============== Услуги - ЗКЩВГСЕ =============//
@@ -328,7 +328,7 @@ return [
     ],
     [
         'name'        => 'service_trash_read',
-        'description' => 'Услуги - Корзина просмотр',
+        'description' => 'Услуги - Корзина Просмотр',
     ],
 
 
@@ -351,7 +351,7 @@ return [
     ],
     [
         'name'        => 'discount_trash_read',
-        'description' => 'Скидки - Корзина просмотр',
+        'description' => 'Скидки - Корзина Просмотр',
     ],
 
     //============== Инструктажи =============//
@@ -373,7 +373,7 @@ return [
     ],
     [
         'name'        => 'briefings_trash_read',
-        'description' => 'Инструктажи - Корзина просмотр',
+        'description' => 'Инструктажи - Корзина Просмотр',
     ],
 
     //============== Система =============//
