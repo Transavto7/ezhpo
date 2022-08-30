@@ -1,6 +1,7 @@
 <template>
     <div class="">
-        <b-button v-if="current_user_permissions.permission_to_create" @click="showModal">Добавить пользователя</b-button>
+        <b-button v-if="current_user_permissions.permission_to_create" @click="showModal">Добавить пользователя
+        </b-button>
 
 
         <b-table
@@ -11,14 +12,18 @@
             striped hover
             no-local-sorting
             :busy="loading"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
+            :current-page="currentPage"
             responsive
+            @sort-changed="sortChanged"
         >
 
             <template #cell(name)="row">
                 <template
                     v-if="current_user_permissions.permission_to_edit"
                 >
-                    <a  href="#" @click="editUserData(row.item.id)">{{ row.value }}</a>
+                    <a href="#" @click="editUserData(row.item.id)">{{ row.value }}</a>
                 </template>
                 <template
                     v-else
@@ -30,6 +35,10 @@
             <template #cell(pv)="row">
                 <!--                <b-button variant="success" @click="editUserData(row.item.id)">{{ row.value.name }}</b-button>-->
                 {{ row.value.name }}
+            </template>
+            <template #cell(photo)="row">
+                <img v-if="row.value" style="width: 100px; height: 100px" :src="'/storage/' + row.value" alt="">
+                <img v-else style="width: 100px; height: 100px" :src="'/img/default_profile.jpg'" alt="">
             </template>
             <template #cell(company)="row">
                 {{ row.value.name }}
@@ -54,6 +63,15 @@
                     variant="danger"
                     @click="deleteUser(row.item.id)">
                     <b-icon icon="trash-fill" aria-hidden="true"></b-icon>
+                </b-button>
+                <!--                {{ row.value.name }}-->
+            </template>
+            <template #cell(return_trash)="row">
+                <b-button
+                    :disabled="!current_user_permissions.permission_to_trash"
+                    variant="warning"
+                    @click="returnTrash(row.item.id)">
+                    <i class="fa fa-undo"></i>
                 </b-button>
                 <!--                {{ row.value.name }}-->
             </template>
@@ -147,12 +165,26 @@
                     </b-form-input>
                 </b-col>
             </b-row>
-            <b-row class="my-1">
+            <b-row class="my-1"  v-if="!infoModalUser_roles.filter((item) => {return item.id == 5})[0]">
                 <b-col sm="2">
                     <label>Пункт выпуска:</label>
                 </b-col>
                 <b-col sm="10">
                     <b-form-select v-model="infoModalUser.pv" :options="optionsPvs"></b-form-select>
+                </b-col>
+            </b-row>
+            <b-row class="my-1" v-if="infoModalUser_roles.filter((item) => {return item.id == 5})[0]">
+                <b-col sm="2">
+                    <label>Компания:</label>
+                </b-col>
+                <b-col sm="10">
+                    <v-select
+                        :options="optionsCompany"
+                        label="name"
+                        v-model="infoModalUser.company"
+                        @search="fetchCompanies">
+                    </v-select>
+<!--                    <b-form-select v-model="infoModalUser.company" :options="options_company"></b-form-select>-->
                 </b-col>
             </b-row>
             <b-row class="my-1">
@@ -219,8 +251,8 @@
                                     v-model="infoModalUser.permissions"
                                 >
                                     <b-row>
-<!--                                        <template v-for="(permission, index) in allPermissions">-->
-<!--                                        </template>-->
+                                        <!--                                        <template v-for="(permission, index) in allPermissions">-->
+                                        <!--                                        </template>-->
                                         <div class="box">
                                             <div v-for="(permission, index) in allPermissions">
                                                 <b-col>
@@ -253,6 +285,18 @@
                 </b-col>
             </b-row>
         </b-modal>
+
+        <b-pagination
+            v-model="currentPage"
+            :total-rows="totalRows"
+            :per-page="perPage"
+            align="fill"
+            size="sm"
+            class="my-0"
+        ></b-pagination>
+        <p>
+            Количество элементов: {{ totalRows }}
+        </p>
     </div>
 </template>
 
@@ -263,7 +307,7 @@ import Swal2 from "sweetalert2";
 
 export default {
     name:       "AdminUsersIndex",
-    props:      ['users','deleted', 'roles', 'points', 'all_permissions', 'current_user_permissions'],
+    props:      ['users', 'deleted', 'roles', 'points', 'all_permissions', 'current_user_permissions', 'options_company'],
     components: {Swal2, vSelect},
 
     data() {
@@ -272,8 +316,15 @@ export default {
             enableModal:         false,
             permission_collapse: false,
             infoModalUser_roles: [],
+            optionsCompany: [],
 
-            infoModalUser:       {
+            currentPage: 1,
+            totalRows:   0,
+            perPage:     15,
+            sortBy:      '',
+            sortDesc:    false,
+
+            infoModalUser: {
                 id:          null,
                 name:        null,
                 login:       null,
@@ -283,9 +334,10 @@ export default {
                 timezone:    null,
                 pv:          null,
                 blocked:     null,
+                company:     null,
                 permissions: [],
             },
-            optionsPvs:          [
+            optionsPvs:    [
                 // {
                 //     label: 'Сгруппированные опции',
                 //     options: [
@@ -294,40 +346,87 @@ export default {
                 //     ]
                 // }
             ],
-            optionsRoles:        [],
+            optionsRoles:  [],
             // Поля таблицы
-            fields:      [
-                {key: 'hash_id', label: 'ID'},
-                {key: 'type', label: 'Фото', class: 'text-center'},
-                {key: 'name', label: 'ФИО'},
-                {key: 'eds', label: 'ЭЦП'},
-                {key: 'login', label: 'Login'},
-                {key: 'email', label: 'E-mail'},
-                {key: 'pv', label: 'ПВ'},
-                {key: 'company', label: 'Компания'},
-                {key: 'timezone', label: 'GMT'},
-                {key: 'blocked', label: 'Заблокирован'},
-                {key: 'roles', label: 'Роль'},
-                {key: 'delete_btn', label: '#'},
+            fields:  [
+                {key: 'hash_id', label: 'ID', sortable: true},
+                {key: 'photo', label: 'Фото', class: 'text-center', sortable: true},
+                {key: 'name', label: 'ФИО', sortable: true},
+                {key: 'eds', label: 'ЭЦП', sortable: true},
+                {key: 'login', label: 'Login', sortable: true},
+                {key: 'email', label: 'E-mail', sortable: true},
+                {key: 'pv', label: 'ПВ', sortable: true},
+                {key: 'company.name', label: 'Компания', sortable: true},
+                {key: 'timezone', label: 'GMT', sortable: true},
+                {key: 'blocked', label: 'Заблокирован', sortable: true},
+                {key: 'roles', label: 'Роль', sortable: true},
+                {key: 'delete_btn', label: '#', class: 'text-center'},
             ],
-            items:       [],
-            perPage:     15,
-            sortBy:      'id',
-            sortDesc:    false,
-            currentPage: 1,
-            total:       0,
-            loading:     false,
+            items:   [],
+            loading: false,
         }
     },
     methods: {
-        fetchRoleData(e){
+        fetchCompanies(search, loading) {
+            // loading(true);
+
+            let data = {
+                params: {
+                    query: search,
+                },
+            }
+
+            axios.get("/users/fetchCompanies", data)
+
+                .then(response => {
+                    this.optionsCompany = response.data;
+                    // loading(false);
+                })
+
+                .catch(error => {
+                    //Ошибка
+                    Swal.fire({
+                        title: "Неизвестная ошибка",
+                        icon:  "error",
+                    });
+                    // loading(false);
+                });
+        },
+
+        sortChanged(e) {
+            this.sortBy = e.sortBy;
+            this.sortDesc = e.sortDesc;
+            this.loadData();
+        },
+
+        loadData() {
+            axios.get('/users' + window.location.search, {
+                params: {
+                    sortBy:   this.sortBy,
+                    sortDesc: this.sortDesc,
+                    page:     this.currentPage,
+                    take:     this.perPage,
+                    api:      1,
+                },
+            }).then(({data}) => {
+                console.log(data)
+                this.items = data.items;
+                this.currentPage = data.current_page;
+                this.totalRows = data.total_rows;
+
+            }).finally(() => {
+                this.loading = false;
+            });
+        },
+
+        fetchRoleData(e) {
 
             let newRoles = e.map((item) => {
                 return item.id
             })
             let oldRoles = [];
 
-            if(this.infoModalUser.id){
+            if (this.infoModalUser.id) {
                 oldRoles = this.items.filter((item) => {
                     return item.id == this.infoModalUser.id
                 })[0].roles.map((item) => {
@@ -335,7 +434,7 @@ export default {
                 })
             }
 
-            if(JSON.stringify(newRoles) != JSON.stringify(oldRoles)){
+            if (JSON.stringify(newRoles) != JSON.stringify(oldRoles)) {
                 this.allPermissions = this.allPermissions.map((item) => {
                     item.disable = false;
                     item.checked = false;
@@ -345,7 +444,7 @@ export default {
                 this.infoModalUser.permissions = [];
 
                 // Если не выьрана роль
-                if(newRoles.length == 0){
+                if (newRoles.length == 0) {
                     return;
                 }
 
@@ -381,7 +480,7 @@ export default {
             }).then((result) => {
                 if (result.isConfirmed) {
                     axios.post('/users', {
-                        id: id
+                        id: id,
                     }).then(({data}) => {
                         if (data.status) {
                             Swal2.fire(
@@ -408,24 +507,52 @@ export default {
 
         },
 
+        returnTrash(id) {
+            axios.post('/users/return_trash', {
+                id: id,
+            }).then(({data}) => {
+                if (data.status) {
+                    Swal2.fire(
+                        'Восстановлено',
+                        'Данные были успешно восстановлены',
+                        'success',
+                    );
+                    this.items = this.items.filter((item) => {
+                        return item.id != id;
+                    })
+                } else {
+                    Swal2.fire(
+                        'Ошибка',
+                        data.message,
+                        'warning',
+                    )
+                }
+
+            }).finally(() => {
+                this.loading = false;
+            });
+
+        },
+
         saveUser() {
             this.loading = true;
 
             axios.get('/users/saveUser', {
                 params: {
-                    user_id:  this.infoModalUser.id,
-                    name:     this.infoModalUser.name,
-                    login:    this.infoModalUser.login,
-                    email:    this.infoModalUser.email,
-                    eds:      this.infoModalUser.eds,
-                    timezone: this.infoModalUser.timezone,
-                    password: this.infoModalUser.password,
-                    pv:       this.infoModalUser.pv,
-                    roles:    this.infoModalUser_roles.map((item) => {
+                    user_id:     this.infoModalUser.id,
+                    name:        this.infoModalUser.name,
+                    login:       this.infoModalUser.login,
+                    email:       this.infoModalUser.email,
+                    eds:         this.infoModalUser.eds,
+                    timezone:    this.infoModalUser.timezone,
+                    password:    this.infoModalUser.password,
+                    pv:          this.infoModalUser.pv,
+                    company:          this.infoModalUser.company?.id,
+                    roles:       this.infoModalUser_roles.map((item) => {
                         return item.id;
                     }),
-                    blocked:  this.infoModalUser.blocked,
-                    permissions:  this.infoModalUser.permissions.filter((item)=>{
+                    blocked:     this.infoModalUser.blocked,
+                    permissions: this.infoModalUser.permissions.filter((item) => {
                         return !(this.allPermissions.filter((all_prm) => {
                             return all_prm.id == item
                         })[0].disable)
@@ -478,6 +605,7 @@ export default {
                 this.infoModalUser.pv = data.pv.id;
                 this.infoModalUser_roles = data.roles;
                 this.infoModalUser.blocked = data.blocked;
+                this.infoModalUser.company = data.company.name;
 
                 // не редактируемые
                 this.allPermissions.map((item, index) => {
@@ -509,6 +637,7 @@ export default {
             this.infoModalUser.pv = null;
             this.infoModalUser_roles = [];
             this.infoModalUser.blocked = null;
+            this.infoModalUser.company = null;
             this.infoModalUser.permissions = [];
             this.permission_collapse = false;
 
@@ -534,18 +663,25 @@ export default {
         //     // this.enableModal = false
         // },
     },
+
     mounted() {
-        this.items = this.users;
+        this.fetchCompanies()
+        this.loadData()
+        // this.items = this.users;
         this.optionsPvs = this.points;
         this.optionsRoles = this.roles;
         this.allPermissions = this.all_permissions;
-        if(this.deleted){
+
+        if (this.deleted) {
             this.fields.push({
-                key: 'deleted_user.name',
+                key:   'deleted_user.name',
                 label: 'Имя удалившего',
             }, {
-                key: 'deleted_at',
+                key:   'deleted_at',
                 label: 'Время удаления',
+            }, {
+                key:   'return_trash',
+                label: '#',
             })
         }
     },
@@ -556,10 +692,11 @@ export default {
             }
         },
         infoModalUser_roles(val) {
-            // if(val.length){
-                this.fetchRoleData(this.infoModalUser_roles)
-            // }
+            this.fetchRoleData(this.infoModalUser_roles)
         },
+        currentPage(){
+            this.loadData();
+        }
     },
 }
 </script>

@@ -23,27 +23,47 @@ return [
         'name'        => 'medic_trash',
         'description' => 'Медосмотры - корзина',
     ],
+    [
+        'name'        => 'medic_export',
+        'description' => 'Медосмотры - Экспорт',
+    ],
+    [
+        'name'        => 'medic_export_prikaz',
+        'description' => 'Медосмотры - Экспорт приказ',
+    ],
 
     //============== Техосмотр =====================//
     [
         'name'        => 'tech_create',
-        'description' => 'Техосмотры - создание',
+        'description' => 'Техосмотры - Создание',
     ],
     [
         'name'        => 'tech_read',
-        'description' => 'Техосмотры - просмотр',
+        'description' => 'Техосмотры - Просмотр',
     ],
     [
         'name'        => 'tech_update',
-        'description' => 'Техосмотры - редактирование',
+        'description' => 'Техосмотры - Редактирование',
     ],
     [
         'name'        => 'tech_delete',
-        'description' => 'Техосмотры - удаление',
+        'description' => 'Техосмотры - Удаление',
     ],
     [
         'name'        => 'tech_trash',
-        'description' => 'Техосмотры - корзина',
+        'description' => 'Техосмотры - Корзина',
+    ],
+    [
+        'name'        => 'tech_export',
+        'description' => 'Техосмотры - Экспорт',
+    ],
+    [
+        'name'        => 'tech_export_prikaz',
+        'description' => 'Техосмотры - Экспорт приказ',
+    ],
+    [
+        'name'        => 'tech_export_prikaz_pl',
+        'description' => 'Техосмотры - Экспорт приказ ПЛ',
     ],
 
     //============== Журнал снятия отчетов с карт report_cart =============//
@@ -66,6 +86,14 @@ return [
     [
         'name'        => 'map_report_trash',
         'description' => 'Реестр снятия отчетов с карт - Корзина',
+    ],
+    [
+        'name'        => 'map_report_export',
+        'description' => 'Реестр снятия отчетов с карт - Экспорт',
+    ],
+    [
+        'name'        => 'map_report_export_prikaz',
+        'description' => 'Реестр снятия отчетов с карт - Экспорт приказ',
     ],
 
     //============== Журнал печати путевых листов =============//
@@ -95,6 +123,14 @@ return [
         'name'        => 'journal_pl_delete',
         'description' => 'Журнал печати ПЛ - Удаление',
     ],
+    [
+        'name'        => 'journal_pl_export',
+        'description' => 'Журнал печати ПЛ - Экспорт',
+    ],
+    [
+        'name'        => 'journal_pl_export_prikaz',
+        'description' => 'Журнал печати ПЛ - Экспорт приказ',
+    ],
 
 
 
@@ -115,6 +151,14 @@ return [
     [
         'name'        => 'journal_pl_accounting_delete',
         'description' => 'Журнал учета ПЛ - Удаление',
+    ],
+    [
+        'name'        => 'journal_pl_accounting_export',
+        'description' => 'Журнал учета ПЛ - Экспорт',
+    ],
+    [
+        'name'        => 'journal_pl_accounting_export_prikaz',
+        'description' => 'Журнал учета ПЛ - Экспорт приказ',
     ],
 
     //============== Журнал инструктажей по БДД =============//
@@ -137,6 +181,14 @@ return [
     [
         'name'        => 'journal_briefing_bdd_trash',
         'description' => 'Инструктаж БДД - Корзина',
+    ],
+    [
+        'name'        => 'journal_briefing_bdd_export',
+        'description' => 'Инструктаж БДД - Экспорт',
+    ],
+    [
+        'name'        => 'journal_briefing_bdd_export_prikaz',
+        'description' => 'Инструктаж БДД - Экспорт приказ',
     ],
 
     //============== Очередь утверждения =============//
@@ -442,6 +494,10 @@ return [
     [
         'name'        => 'group_delete',
         'description' => 'Группы - Удаление',
+    ],
+    [
+        'name'        => 'group_trash',
+        'description' => 'Группы - Корзина',
     ],
     //============== ПАК СДПО =============//
     [

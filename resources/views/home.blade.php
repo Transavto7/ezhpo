@@ -65,6 +65,30 @@ $permissionToUpdate = (
         || user()->access('errors_sdpo_update') && $type_ankets == 'pak'
 );
 
+
+$permissionToExport = (
+    $type_ankets == 'tech' && user()->access('tech_export')
+    || $type_ankets == 'medic' && user()->access('medic_export')
+    || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_export')
+    || $type_ankets == 'pechat_pl' && user()->access('journal_pl_export')
+    || $type_ankets == 'report_cart' && user()->access('map_report_export')
+    || $type_ankets == 'Dop' && user()->access('journal_pl_accounting_export')
+);
+
+$permissionToExportPrikaz = (
+    $type_ankets == 'tech' && user()->access('tech_export_prikaz')
+    || $type_ankets == 'medic' && user()->access('medic_export_prikaz')
+    || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_export_prikaz')
+    || $type_ankets == 'pechat_pl' && user()->access('journal_pl_export_prikaz')
+    || $type_ankets == 'report_cart' && user()->access('map_report_export_prikaz')
+    || $type_ankets == 'Dop' && user()->access('journal_pl_accounting_export')
+);
+
+$permissionToExportPrikazPL = (
+    $type_ankets == 'tech' && user()->access('tech_export_prikaz_pl')
+);
+
+
 @endphp
 
 
@@ -92,22 +116,32 @@ $permissionToUpdate = (
                                 </div>
 
 
-                                @if(user()->hasRole('manager'))
+{{--                                @if(user()->hasRole('manager'))--}}
                                     @if($type_ankets === 'tech')
                                         <div class="col-md-8 text-right">
+                                            @if($permissionToExport)
                                             <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
-                                            <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ТО <i class="fa fa-download"></i></a>
-                                            <a href="?export=1{{ $queryString }}&exportPrikazPL=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ПЛ <i class="fa fa-download"></i></a>
+                                            @endif
+                                            @if($permissionToExportPrikaz)
+                                                <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ТО <i class="fa fa-download"></i></a>
+                                            @endif
+                                            @if($permissionToExportPrikazPL)
+                                                <a href="?export=1{{ $queryString }}&exportPrikazPL=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ПЛ <i class="fa fa-download"></i></a>
+                                            @endif
                                         </div>
                                     @else
                                         <div class="col-md-8 text-right">
                                             <!--                                    <button type="button" onclick="exportTable('ankets-table', true)" class="btn btn-default">Экспорт результатов <i class="fa fa-download"></i></button>-->
                                             <!--                                    <button type="button" onclick="exportTable('ankets-table')" class="btn btn-default">Экспорт результатов по приказу <i class="fa fa-download"></i></button>-->
-                                            <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
-                                            <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу <i class="fa fa-download"></i></a>
+                                            @if($permissionToExport)
+                                                <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
+                                            @endif
+                                            @if($permissionToExportPrikaz)
+                                                <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу <i class="fa fa-download"></i></a>
+                                            @endif
                                         </div>
                                     @endif
-                                @endif
+{{--                                @endif--}}
 
                                 <div class="toggle-hidden p-3" id="ankets-filters">
                                     <form class="ankets-form" anketa="{{ $type_ankets }}">

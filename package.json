@@ -8,17 +8,17 @@
         "production": "mix --production"
     },
     "devDependencies": {
-        "bootstrap": "^4.1.0",
+        "bootstrap": "^4.6.1",
         "cross-env": "^5.1",
         "jquery": "^3.2",
         "laravel-mix": "^6.0.37",
         "lodash": "^4.17.21",
-        "popper.js": "^1.12",
+        "popper.js": "^1.16",
         "resolve-url-loader": "^4.0.0",
         "sass": "^1.15.2",
         "sass-loader": "^7.1.0",
         "select2": "^4.0.13",
-        "vue": "^2.5.17",
+        "vue": "^2.6",
         "vue-template-compiler": "^2.6.12"
     },
     "dependencies": {
@@ -29,6 +29,7 @@
         "chosen-js": "^1.8.7",
         "croppie": "^2.6.5",
         "jquery-mask-plugin": "^1.14.16",
+        "portal-vue": "^2.1.7",
         "suggestions-jquery": "^21.2.0",
         "sweetalert": "^2.1.2",
         "sweetalert2": "^11.3.0",

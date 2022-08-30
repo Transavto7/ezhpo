@@ -27,10 +27,21 @@
             </template>
             <template #cell(delete_btn)="row">
                 <b-button
+                    v-if="!deleted"
                     :disabled="!current_user_permissions.permission_to_delete"
                     variant="danger"
                     @click="deleteRole(row.item.id)">
                     <b-icon icon="trash-fill" aria-hidden="true"></b-icon>
+                </b-button>
+                <!--                {{ row.value.name }}-->
+            </template>
+
+            <template #cell(return_trash)="row">
+                <b-button
+                    :disabled="!current_user_permissions.permission_to_trash"
+                    variant="warning"
+                    @click="returnTrash(row.item.id)">
+                    <i class="fa fa-undo"></i>
                 </b-button>
                 <!--                {{ row.value.name }}-->
             </template>
@@ -153,7 +164,7 @@ import 'vue-select/dist/vue-select.css';
 
 export default {
     name:       "AdminRolesIndex",
-    props:      ['roles', 'all_permissions', 'current_user_permissions'],
+    props:      ['roles', 'all_permissions', 'current_user_permissions', 'deleted'],
     components: {Swal2, vSelect},
 
     data() {
@@ -173,7 +184,7 @@ export default {
                 {key: 'name', label: 'Название'},
                 {key: 'id', label: 'ID'},
                 {key: 'code', label: 'Код'},
-                {key: 'delete_btn', label: '#'},
+                {key: 'delete_btn', label: '#', class: 'text-center'},
             ],
             items:       [],
             perPage:     15,
@@ -285,6 +296,33 @@ export default {
 
         },
 
+        returnTrash(id) {
+            axios.post('/roles/return_trash', {
+                id: id,
+            }).then(({data}) => {
+                if (data.status) {
+                    Swal2.fire(
+                        'Восстановлено',
+                        'Данные были успешно восстановлены',
+                        'success',
+                    );
+                    this.items = this.items.filter((item) => {
+                        return item.id != id;
+                    })
+                } else {
+                    Swal2.fire(
+                        'Ошибка',
+                        data.message,
+                        'warning',
+                    )
+                }
+
+            }).finally(() => {
+                this.loading = false;
+            });
+
+        },
+
         editRoleData(id) {
             this.fetchRoleData(id)
         },
@@ -334,6 +372,20 @@ export default {
     mounted() {
         this.items = this.roles;
         this.allPermissions = this.all_permissions;
+
+        if (this.deleted) {
+            this.fields.push({
+                key:   'deleted_user.name',
+                label: 'Имя удалившего',
+            }, {
+                key:   'deleted_at',
+                label: 'Время удаления',
+            }, {
+                key:   'return_trash',
+                label: '#',
+                class: 'text-center'
+            })
+        }
     },
     watch:{
         editModal(val){
