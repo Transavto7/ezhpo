@@ -24,9 +24,14 @@ class ApiController extends Controller
             $key = $request->key;
         }
 
-        return app("App\\" . $model)::where(DB::raw("LOWER($field)"),
-            'like', '%' . strtolower($request->search) . '%')
-            ->select($field, $key)->limit(100)->get();
+        $query = app("App\\" . $model)::where(DB::raw("LOWER($field)"),
+            'like', '%' . strtolower($request->search) . '%');
+
+        if ($model === 'User') {
+            $query = $query->whereNotIn('role', [3, 12]);
+        }
+
+        return $query->select($field, $key)->limit(100)->get();
     }
 
     // Response
