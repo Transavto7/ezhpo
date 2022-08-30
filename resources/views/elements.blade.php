@@ -232,7 +232,6 @@
             || user()->access('discount_delete') && $model == 'Discount'
             || user()->access('service_delete') && $model == 'Product'
             || user()->access('briefings_delete') && $model == 'Instr'
-            || user()->access('settings_delete') && $model == 'Settings'
             || user()->access('city_delete') && $model == 'Town'
             || user()->access('requisites_delete') && $model == 'Req'
             || user()->access('date_control_delete') && $model == 'DDates'
@@ -289,9 +288,11 @@
         $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
         $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
         //dd($permissionToTrash)
+       //dd($elements);
+    // $permissionToCreate = true;
     @endphp
     {{--NAVBAR--}}
-    @if(!(count($elements) >= $max) || !$max)
+    @if(!(count($elements) > $max) || !$max)
         <div class="col-md-12">
             <div class="row bg-light p-2">
                 @if($permissionToCreate && !request()->get('deleted'))
@@ -304,11 +305,13 @@
                 @endif
 
                 @if($permissionToView)
+                        @if(!(count($elements) >= $max) || !$max)
                     <div class=" m-2">
                         <button type="button" data-toggle-show="#elements-filters" class="btn btn-sm btn-info">
                             <i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры
                         </button>
                     </div>
+                        @endif
                 @endif
 
                 @if($permissionToTrashView)

@@ -69,7 +69,7 @@ return [
     //============== Журнал снятия отчетов с карт report_cart =============//
     [
         'name'        => 'map_report_create',
-        'description' => 'Внести отчёт с карты',
+        'description' => 'Реестр снятия отчетов с карт - Создание',
     ],
     [
         'name'        => 'map_report_read',
@@ -99,13 +99,13 @@ return [
     //============== Журнал печати путевых листов =============//
     [
         'name'        => 'print_register_pl_create',
-        'description' => 'Внести запись в Реестр печати ПЛ',
+        'description' => 'Реестр печати ПЛ - создание',
     ],
 
     //============== Журнал печать ПЛ pechat_pl =================================//
     [
         'name'        => 'journal_pl_create',
-        'description' => 'Внести запись в Журнал ПЛ',
+        'description' => 'Журнал печати ПЛ - Создание',
     ],
     [
         'name'        => 'journal_pl_read',
@@ -220,10 +220,10 @@ return [
         'name'        => 'errors_sdpo_delete',
         'description' => 'Реестр ошибок СДПО - Удаление',
     ],
-    [
-        'name'        => 'errors_sdpo_create',
-        'description' => 'Реестр ошибок СДПО - Создания',
-    ],
+//    [
+//        'name'        => 'errors_sdpo_create',
+//        'description' => 'Реестр ошибок СДПО - Создания',
+//    ],
     [
         'name'        => 'errors_sdpo_trash',
         'description' => 'Реестр ошибок СДПО - Корзина',
@@ -258,7 +258,7 @@ return [
     ],
     [
         'name'        => 'drivers_trash_read',
-        'description' => 'Водители - Корзина Просмотр',
+        'description' => 'Водители - Корзина',
     ],
 
     //============== Автомобили =============//
@@ -280,7 +280,7 @@ return [
     ],
     [
         'name'        => 'cars_trash_read',
-        'description' => 'Автомобили - Корзина Просмотр',
+        'description' => 'Автомобили - Корзина',
     ],
 
     //============== Компании =============//
@@ -306,7 +306,7 @@ return [
     ],
     [
         'name'        => 'company_trash_read',
-        'description' => 'Компании - Корзина Просмотр',
+        'description' => 'Компании - Корзина',
     ],
 
     //============== Услуги - ЗКЩВГСЕ =============//
@@ -328,7 +328,7 @@ return [
     ],
     [
         'name'        => 'service_trash_read',
-        'description' => 'Услуги - Корзина Просмотр',
+        'description' => 'Услуги - Корзина',
     ],
 
 
@@ -351,7 +351,7 @@ return [
     ],
     [
         'name'        => 'discount_trash_read',
-        'description' => 'Скидки - Корзина Просмотр',
+        'description' => 'Скидки - Корзина',
     ],
 
     //============== Инструктажи =============//
@@ -373,7 +373,7 @@ return [
     ],
     [
         'name'        => 'briefings_trash_read',
-        'description' => 'Инструктажи - Корзина Просмотр',
+        'description' => 'Инструктажи - Корзина',
     ],
 
     //============== Система =============//
@@ -519,6 +519,10 @@ return [
     [
         'name'        => 'pak_sdpo_trash',
         'description' => 'ПАК СДПО - Корзина',
+    ],
+    [
+        'name'        => 'pak_sdpo_export',
+        'description' => 'ПАК СДПО - Экспорт',
     ],
     //============== Контроль дат =============//
     [

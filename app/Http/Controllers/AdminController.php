@@ -179,11 +179,20 @@ class AdminController extends Controller
             }
         }
 
-        if(!isset($_GET['role'])) {
-            $users = $users->where('role', '!=', 778);
+//        if(!isset($_GET['role'])) {
+//            $users = $users->where('role', '!=', 778);
+//        }
+        if($request->get('deleted')){
+            $users = $users->onlyTrashed();
         }
+        $users = $users->with(['roles'])
+                       ->whereHas('roles', function ($q) {
+                           $q->where('id', '<>', 3);
+                       });
 
-        $users = $users->where('role', '!=', 3);
+//        $users = $users->where('role', '!=', 3);
+
+
         $users = $users->orderBy($data['orderKey'], $data['orderBy'])->paginate(10);
         $points = Point::getAll();
 
@@ -191,6 +200,7 @@ class AdminController extends Controller
         $data['points'] = $points;
         $data['title'] = $data['is_pak'] ? 'ПАК СДПО' : 'Сотрудники';
         $data['errors'] = $errors;
+
 
         return view('admin.users.all', $data);
     }

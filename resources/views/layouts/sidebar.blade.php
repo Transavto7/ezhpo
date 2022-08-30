@@ -240,7 +240,7 @@
                             <li><a href="{{ route('roles.index') }}">Группы</a></li>
                         @endif
 
-                        @if(user()->access('pak_sdpo_read', 'pak_sdpo_update'))
+                        @if(user()->access('pak_sdpo_read', 'pak_sdpo_create'))
                             <li><a href="{{ route('adminUsers', [
                                     'filter' => 1,
                                     'pak_sdpo' => 1

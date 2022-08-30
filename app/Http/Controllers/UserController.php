@@ -103,7 +103,7 @@ class UserController extends Controller
      */
     public function saveUser(Request $request)
     {
-        if (array_search(5, $request->get('roles', []))) {
+        if (array_search(6, $request->get('roles', []))) {
             $pv      = null;
             $company = $request->get('company', null);
         } else {

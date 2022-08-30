@@ -8,6 +8,9 @@
     $permissionView = user()->access('pak_sdpo_read');
     $permissionDelete = user()->access('pak_sdpo_delete');
     $permissionCreate = user()->access('pak_sdpo_create');
+    $permissionTrash = user()->access('pak_sdpo_trash');
+    $permissionExport = user()->access('pak_sdpo_export');
+
 @endphp
 
 @section('content')
@@ -16,16 +19,30 @@
 
     <div class="col-md-12">
         <div class="row bg-light p-2">
-            @if($permissionCreate)
-            <div class="col-md-6">
+            <div class="col">
+                @if($permissionCreate)
                 <button type="button" data-toggle="modal" data-target="#users-modal-add" class="btn btn-success">Добавить {{ $is_pak ? 'терминал' : 'сотрудника' }} <i class="fa fa-plus"></i></button>
+                @endif
+                @if($permissionTrash)
+                    @if(request()->get('deleted'))
+                        <a href="{{ route('adminUsers', [
+                                'filter' => 1,
+                                'pak_sdpo' => 1
+                            ]) }}" class="btn btn-warning btn-sm">Назад</a>
+                    @else
+                        <a href="{{ route('adminUsers', [
+                                'filter' => 1,
+                                'pak_sdpo' => 1,
+                                'deleted' => 1
+                            ]) }}" class="btn btn-warning btn-sm">Корзина</a>
+                    @endif
+                @endif
             </div>
-            @endif
-            @if($permissionView)
-            <div class="col-md-6 text-right">
+            <div class="col text-right">
+                @if($permissionExport)
                 <button type="button" onclick="exportTable('elements-table', '{{ $title }}', '{{ $title }}.xls')" class="btn btn-dark">Экспорт <i class="fa fa-download"></i></button>
+                @endif
             </div>
-            @endif
         </div>
         @if($permissionView)
         <div class="row bg-light p-2">

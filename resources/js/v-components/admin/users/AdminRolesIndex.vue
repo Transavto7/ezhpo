@@ -12,11 +12,11 @@
             responsive
         >
 
-            <template #cell(name)="row">
+            <template #cell(guard_name)="row">
                 <template
                     v-if="current_user_permissions.permission_to_edit"
                 >
-                    <a href="#" @click="editRoleData(row.item.id)">{{ row.item.guard_name }}</a>
+                    <a href="#" @click="editRoleData(row.item.id)">{{ row.value }}</a>
                 </template>
                 <template
                     v-else
@@ -181,9 +181,9 @@ export default {
             optionsRoles:   [],
             // Поля таблицы
             fields:      [
-                {key: 'name', label: 'Название'},
+                {key: 'guard_name', label: 'Название'},
                 {key: 'id', label: 'ID'},
-                {key: 'code', label: 'Код'},
+                {key: 'name', label: 'Код'},
                 {key: 'delete_btn', label: '#', class: 'text-center'},
             ],
             items:       [],

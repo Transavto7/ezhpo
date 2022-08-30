@@ -88,10 +88,18 @@
             <td>{{ $user->company['name'] ?? '' }}</td>
             <td>{{ $user->timezone }}</td>
             <td>{{ $user->blocked ? 'Да' : 'Нет' }}</td>
-            <td>{{ \App\Http\Controllers\ProfileController::getUserRole(true, $user->id) }}</td>
-            <td class="td-option">
-
+            <td>
+                @foreach($user->roles as $role)
+                    <h5>
+                        <span class="badge badge-success">
+                            {{ $role['guard_name'] }}
+                        </span>
+                    </h5>
+                @endforeach
+            </td>
             @if($permissionEdit)
+                <td class="td-option">
+
                     <a href="" data-toggle="modal" data-target="#users-modal-edit-{{ $user->id }}" class="btn btn-info"><i class="fa fa-edit"></i></a>
 
                     <!-- Редактирование элемента -->
@@ -234,18 +242,14 @@
                             </div>
                         </div>
                     </div>
-            @else
+            </td>
 
             @endif
-
-            </td>
+            @if($permissionDelete)
             <td class="td-option">
-                @if($permissionDelete)
                 <a href="{{ route('adminDeleteUser', $user->id) }}" class="ACTION_DELETE btn btn-danger"><i class="fa fa-trash"></i></a>
-                @else
-
-                @endif
             </td>
+            @endif
         </tr>
     @endforeach
     </tbody>

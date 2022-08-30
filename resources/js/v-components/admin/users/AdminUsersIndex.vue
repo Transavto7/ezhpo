@@ -165,7 +165,7 @@
                     </b-form-input>
                 </b-col>
             </b-row>
-            <b-row class="my-1"  v-if="!infoModalUser_roles.filter((item) => {return item.id == 5})[0]">
+            <b-row class="my-1"  v-if="!infoModalUser_roles.filter((item) => {return item.id == 6})[0]">
                 <b-col sm="2">
                     <label>Пункт выпуска:</label>
                 </b-col>
@@ -173,7 +173,7 @@
                     <b-form-select v-model="infoModalUser.pv" :options="optionsPvs"></b-form-select>
                 </b-col>
             </b-row>
-            <b-row class="my-1" v-if="infoModalUser_roles.filter((item) => {return item.id == 5})[0]">
+            <b-row class="my-1" v-if="infoModalUser_roles.filter((item) => {return item.id == 6})[0]">
                 <b-col sm="2">
                     <label>Компания:</label>
                 </b-col>
