@@ -26,15 +26,15 @@
 
     <div class="col-md-12">
 
-        <div class="col-md-4 m-2">
-            @if($current_user_permissions['permission_to_trash'])
-                @isset($_GET['deleted'])
-                    <a href="/roles" class="btn btn-sm btn-warning">Назад</a>
-                @else
-                    <a href="?deleted=1" class="btn btn-sm btn-warning">Корзина <i class="fa fa-trash"></i></a>
-                @endisset
-            @endif
-        </div>
+{{--        <div class="col-md-4 m-2">--}}
+{{--            @if($current_user_permissions['permission_to_trash'])--}}
+{{--                @isset($_GET['deleted'])--}}
+{{--                    <a href="/roles" class="btn btn-sm btn-warning">Назад</a>--}}
+{{--                @else--}}
+{{--                    <a href="?deleted=1" class="btn btn-sm btn-warning">Корзина <i class="fa fa-trash"></i></a>--}}
+{{--                @endisset--}}
+{{--            @endif--}}
+{{--        </div>--}}
 
         <admin-roles-index
             :roles='@json($roles)'

@@ -1,12 +1,27 @@
 <template>
     <div class="">
-        <b-button v-if="current_user_permissions.permission_to_create"  @click="showModal">Добавить группу</b-button>
+        <div class="my-2">
+            <b-button variant="success" size="sm" v-if="current_user_permissions.permission_to_create" @click="showModal">
+                Добавить группу
+                <i class="fa fa-plus"></i>
+            </b-button>
+
+            <b-button v-if="current_user_permissions.permission_to_trash"
+                      variant="warning" size="sm" :href="deleted ? '/users' : '?deleted=1'">
+                {{ deleted ? 'Назад' : `Корзина` }}
+                <template v-if="!deleted">
+                    <i class="fa fa-trash"></i>
+                </template>
+            </b-button>
+        </div>
 
 
         <b-table
             v-if="current_user_permissions.permission_to_view"
             :items="items"
             :fields="fields"
+            :per-page="perPage"
+            :current-page="currentPage"
             striped hover
             no-local-sorting
             responsive
@@ -47,6 +62,13 @@
             </template>
         </b-table>
 
+        <b-pagination
+            v-model="currentPage"
+            :total-rows="total"
+            :per-page="perPage"
+            aria-controls="my-table"
+        ></b-pagination>
+
         <b-modal
             size="xl"
             v-model="editModal"
@@ -54,19 +76,19 @@
             hide-footer
             :title="infoModalRole.id ? 'Редактирование группы' : 'Добавление группы'"
         >
-<!--            <b-row class="my-1">-->
-<!--                <b-col sm="2">-->
-<!--                    <label>Id</label>-->
-<!--                </b-col>-->
-<!--                <b-col sm="10">-->
-<!--                    <b-form-input v-model="infoModalRole.id"-->
-<!--                                  size="sm"-->
-<!--                                  placeholder="Введите эл. почту"-->
-<!--                    >-->
+            <!--            <b-row class="my-1">-->
+            <!--                <b-col sm="2">-->
+            <!--                    <label>Id</label>-->
+            <!--                </b-col>-->
+            <!--                <b-col sm="10">-->
+            <!--                    <b-form-input v-model="infoModalRole.id"-->
+            <!--                                  size="sm"-->
+            <!--                                  placeholder="Введите эл. почту"-->
+            <!--                    >-->
 
-<!--                    </b-form-input>-->
-<!--                </b-col>-->
-<!--            </b-row>-->
+            <!--                    </b-form-input>-->
+            <!--                </b-col>-->
+            <!--            </b-row>-->
 
             <b-row class="my-1">
                 <b-col sm="2">
@@ -169,16 +191,16 @@ export default {
 
     data() {
         return {
-            allPermissions: [],
-            editModal:      false,
+            allPermissions:      [],
+            editModal:           false,
             permission_collapse: false,
-            infoModalRole:  {
+            infoModalRole:       {
                 id:          null,
                 name:        null,
                 guard_name:  null,
                 permissions: [],
             },
-            optionsRoles:   [],
+            optionsRoles:        [],
             // Поля таблицы
             fields:      [
                 {key: 'guard_name', label: 'Название'},
@@ -206,15 +228,15 @@ export default {
                             Swal2.fire(
                                 'Сохранено',
                                 'Данные были успешно записаны',
-                                'success'
+                                'success',
                             );
                             this.editModal = false;
                             this.resetModal();
-                        }else {
+                        } else {
                             Swal2.fire(
                                 'Ошибка',
                                 data.message,
-                                'warning'
+                                'warning',
                             )
                         }
 
@@ -223,31 +245,31 @@ export default {
                         Swal2.fire(
                             'Ошибка!',
                             '',
-                            'warning'
+                            'warning',
                         )
                     })
                     .finally(() => {
-                    this.loading = false;
-                });
+                        this.loading = false;
+                    });
             } else {
                 axios.post('/roles/' + this.infoModalRole.id, {
-                    params: this.infoModalRole,
-                    _method: 'PUT'
+                    params:  this.infoModalRole,
+                    _method: 'PUT',
                 }).then(({data}) => {
                     if (data.status) {
                         Swal2.fire(
                             'Сохранено',
                             'Данные были успешно записаны',
-                            'success'
+                            'success',
                         );
                         this.editModal = false;
 
                         this.resetModal();
-                    }else {
+                    } else {
                         Swal2.fire(
                             'Ошибка',
                             data.message,
-                            'warning'
+                            'warning',
                         )
                     }
 
@@ -259,32 +281,32 @@ export default {
 
         deleteRole(id) {
             Swal2.fire({
-                title: 'Вы уверены, что хотите удалить?',
-                icon: 'warning',
-                showCancelButton: true,
+                title:              'Вы уверены, что хотите удалить?',
+                icon:               'warning',
+                showCancelButton:   true,
                 confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Да, удалить!',
-                cancelButtonText: 'Отмена'
+                cancelButtonColor:  '#d33',
+                confirmButtonText:  'Да, удалить!',
+                cancelButtonText:   'Отмена',
             }).then((result) => {
                 if (result.isConfirmed) {
                     axios.post('/roles/' + id, {
-                        _method: 'DELETE'
+                        _method: 'DELETE',
                     }).then(({data}) => {
                         if (data.status) {
                             Swal2.fire(
                                 'Удалено',
                                 'Данные были успешно удалены',
-                                'success'
+                                'success',
                             );
                             this.items = this.items.filter((item) => {
                                 return item.id != id;
                             })
-                        }else {
+                        } else {
                             Swal2.fire(
                                 'Ошибка',
                                 data.message,
-                                'warning'
+                                'warning',
                             )
                         }
 
@@ -342,8 +364,8 @@ export default {
                     this.showModal()
                 })
                 .finally(() => {
-                this.loading = false;
-            });
+                    this.loading = false;
+                });
         },
 
         resetModal() {
@@ -369,6 +391,7 @@ export default {
             this.$refs['groups_modal'].toggle('#toggle-btn')
         },
     },
+
     mounted() {
         this.items = this.roles;
         this.allPermissions = this.all_permissions;
@@ -383,16 +406,19 @@ export default {
             }, {
                 key:   'return_trash',
                 label: '#',
-                class: 'text-center'
+                class: 'text-center',
             })
         }
+
+        this.total = this.roles.length;
     },
-    watch:{
-        editModal(val){
-            if(!val){
+
+    watch: {
+        editModal(val) {
+            if (!val) {
                 this.resetModal()
             }
-        }
+        },
     },
 }
 </script>

@@ -24,7 +24,7 @@ class RoleController extends Controller
         if(request()->get('deleted')){
             $roles = Role::whereNotNull('deleted_at')->get();
         }else{
-            $roles = Role::all();
+            $roles = Role::whereNull('deleted_at')->get();
         }
         return view('admin.groups.index')
             ->with([

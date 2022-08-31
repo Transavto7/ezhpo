@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
+// this is huita for SDPO in SETTINGS ->>>> ONLY
 class AdminController extends Controller
 {
     public static function getTimeZones () {
@@ -76,7 +77,9 @@ class AdminController extends Controller
         }
 
         // Создаем Пользователя
-        $registerController->create($data);
+        $user = $registerController->create($data);
+
+        $user->roles()->sync([9]);
 
         return redirect($_SERVER['HTTP_REFERER']);
     }
@@ -187,7 +190,7 @@ class AdminController extends Controller
         }
         $users = $users->with(['roles'])
                        ->whereHas('roles', function ($q) {
-                           $q->where('id', '<>', 3);
+                           $q->where('id', 9);
                        });
 
 //        $users = $users->where('role', '!=', 3);

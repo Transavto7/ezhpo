@@ -40,15 +40,15 @@
             {{--            @endif--}}
 
             <div class="card-body">
-                <div class="col-md-4 m-2">
-                    @if($permissionToTrashView)
-                        @isset($_GET['deleted'])
-                            <a href="{{ route('users') }}" class="btn btn-sm btn-warning">Назад</a>
-                        @else
-                            <a href="?deleted=1" class="btn btn-sm btn-warning">Корзина <i class="fa fa-trash"></i></a>
-                        @endisset
-                    @endif
-                </div>
+{{--                <div class="col-md-4 m-2">--}}
+{{--                    @if($permissionToTrashView)--}}
+{{--                        @isset($_GET['deleted'])--}}
+{{--                            <a href="{{ route('users') }}" class="btn btn-sm btn-warning">Назад</a>--}}
+{{--                        @else--}}
+{{--                            <a href="?deleted=1" class="btn btn-sm btn-warning">Корзина <i class="fa fa-trash"></i></a>--}}
+{{--                        @endisset--}}
+{{--                    @endif--}}
+{{--                </div>--}}
 
                 @if($current_user_permissions['permission_to_view'])
                     <form action="" class="row" method="GET">

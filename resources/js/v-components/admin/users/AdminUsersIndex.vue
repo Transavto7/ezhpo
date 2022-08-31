@@ -1,309 +1,326 @@
 <template>
     <div class="">
-        <b-button variant="success"
-                  v-if="current_user_permissions.permission_to_create"
-                  @click="showModal"
-        >
-            Добавить пользователя
-        </b-button>
-
-
-        <b-table
-            v-if="current_user_permissions.permission_to_view"
-            :items="items"
-            :fields="fields"
-            ref="users_table"
-            striped hover
-            no-local-sorting
-            :busy="loading"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
-            :current-page="currentPage"
-            responsive
-            @sort-changed="sortChanged"
-        >
-
-            <template #cell(name)="row">
-                <template
-                    v-if="current_user_permissions.permission_to_edit"
+        <div class="">
+            <div class="my-2">
+                <b-button variant="success"
+                          v-if="current_user_permissions.permission_to_create"
+                          @click="showModal"
+                          size="sm"
                 >
-                    <a href="#" @click="editUserData(row.item.id)">{{ row.value }}</a>
-                </template>
-                <template
-                    v-else
-                >
-                    {{ row.value }}
-                </template>
-            </template>
-
-            <template #cell(pv)="row">
-                <!--                <b-button variant="success" @click="editUserData(row.item.id)">{{ row.value.name }}</b-button>-->
-                {{ row.value.name }}
-            </template>
-            <template #cell(photo)="row">
-                <img v-if="row.value" style="width: 100px; height: 100px" :src="'/storage/' + row.value" alt="">
-                <img v-else style="width: 100px; height: 100px" :src="'/img/default_profile.jpg'" alt="">
-            </template>
-            <template #cell(company)="row">
-                {{ row.value.name }}
-            </template>
-            <template #cell(blocked)="row">
-                {{ row.value ? 'Да' : 'Нет' }}
-            </template>
-            <template #cell(roles)="row">
-                <template v-for="role in row.value">
-                    <h5>
-                        <span class="badge badge-success">
-                            {{ role.guard_name }}
-                        </span>
-                    </h5>
-                </template>
-            </template>
-
-            <template #cell(delete_btn)="row">
-                <b-button
-                    v-if="!deleted"
-                    :disabled="!current_user_permissions.permission_to_delete"
-                    variant="danger"
-                    @click="deleteUser(row.item.id)">
-                    <b-icon icon="trash-fill" aria-hidden="true"></b-icon>
+                    Добавить пользователя
+                    <i class="fa fa-plus"></i>
                 </b-button>
-                <!--                {{ row.value.name }}-->
-            </template>
-            <template #cell(return_trash)="row">
-                <b-button
-                    :disabled="!current_user_permissions.permission_to_trash"
-                    variant="warning"
-                    @click="returnTrash(row.item.id)">
-                    <i class="fa fa-undo"></i>
+
+                <b-button v-if="current_user_permissions.permission_to_trash" variant="warning" size="sm" :href="deleted ? '/roles' : '?deleted=1'">
+                    {{ deleted ? 'Назад' : `Корзина` }}
+                    <template v-if="!deleted">
+                        <i class="fa fa-trash"></i>
+                    </template>
                 </b-button>
-                <!--                {{ row.value.name }}-->
-            </template>
-        </b-table>
 
-        <b-row class="w-100 d-flex justify-content-center">
-            <b-col class="my-1 d-flex justify-content-center">
-                <b-pagination
-                    v-model="currentPage"
-                    :total-rows="totalRows"
-                    :per-page="perPage"
-                    align="fill"
-                    class="my-0"
-                ></b-pagination>
-            </b-col>
-        </b-row>
-        <p class="text-center">
-            Количество элементов: {{ totalRows }}
-        </p>
+            </div>
 
-        <b-modal
-            v-model="enableModal"
-            size="xl"
-            ref="users_modal"
-            hide-footer
-            :title="'Добавление сотрудника'"
-        >
+            <b-table
+                v-if="current_user_permissions.permission_to_view"
+                :items="items"
+                :fields="fields"
+                ref="users_table"
+                striped hover
+                no-local-sorting
+                :busy="loading"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                :current-page="currentPage"
+                responsive
+                @sort-changed="sortChanged"
+            >
 
-            <b-row class="my-1">
-                <b-col sm="2">
-                    <label>ФИО:</label>
-                </b-col>
-                <b-col sm="10">
-                    <b-form-input v-model="infoModalUser.name"
-                                  id="input-small"
-                                  size="sm"
-                                  placeholder="Введите ФИО"
+                <template #cell(name)="row">
+                    <template
+                        v-if="current_user_permissions.permission_to_edit"
                     >
-
-                    </b-form-input>
-                </b-col>
-            </b-row>
-            <b-row class="my-1">
-                <b-col sm="2">
-                    <label>Login:</label>
-                </b-col>
-                <b-col sm="10">
-                    <b-form-input v-model="infoModalUser.login"
-                                  size="sm"
-                                  placeholder="Введите логин"
+                        <a href="#" @click="editUserData(row.item.id)">{{ row.value }}</a>
+                    </template>
+                    <template
+                        v-else
                     >
+                        {{ row.value }}
+                    </template>
+                </template>
 
-                    </b-form-input>
-                </b-col>
-            </b-row>
-            <b-row class="my-1">
-                <b-col sm="2">
-                    <label>E-mail:</label>
-                </b-col>
-                <b-col sm="10">
-                    <b-form-input v-model="infoModalUser.email"
-                                  size="sm"
-                                  placeholder="Введите эл. почту"
-                    >
+                <template #cell(pv)="row">
+                    <!--                <b-button variant="success" @click="editUserData(row.item.id)">{{ row.value.name }}</b-button>-->
+                    {{ row.value.name }}
+                </template>
+                <template #cell(photo)="row">
+                    <img v-if="row.value" style="width: 100px; height: 100px" :src="'/storage/' + row.value" alt="">
+                    <img v-else style="width: 100px; height: 100px" :src="'/img/default_profile.jpg'" alt="">
+                </template>
+                <template #cell(company)="row">
+                    {{ row.value.name }}
+                </template>
+                <template #cell(blocked)="row">
+                    {{ row.value ? 'Да' : 'Нет' }}
+                </template>
+                <template #cell(roles)="row">
+                    <template v-for="role in row.value">
+                        <h5>
+                            <span class="badge badge-success">
+                                {{ role.guard_name }}
+                            </span>
+                        </h5>
+                    </template>
+                </template>
 
-                    </b-form-input>
-                </b-col>
-            </b-row>
-            <b-row class="my-1">
-                <b-col sm="2">
-                    <label>Пароль:</label>
-                </b-col>
-                <b-col sm="10">
-                    <b-form-input v-model="infoModalUser.password"
-                                  size="sm"
-                                  type="password"
-                                  placeholder="Введите пароль"
-                    >
-
-                    </b-form-input>
-                </b-col>
-            </b-row>
-            <b-row class="my-1">
-                <b-col sm="2">
-                    <label>"ЭЦП":</label>
-                </b-col>
-                <b-col sm="10">
-                    <b-form-input v-model="infoModalUser.eds"
-                                  size="sm"
-                                  placeholder="Введите эл. подпись"
-                    >
-
-                    </b-form-input>
-                </b-col>
-            </b-row>
-            <b-row class="my-1">
-                <b-col sm="2">
-                    <label>Часовой пояс:</label>
-                </b-col>
-                <b-col sm="10">
-                    <b-form-input v-model="infoModalUser.timezone"
-                                  size="sm"
-                                  placeholder="Введите часовой пояс"
-                    >
-
-                    </b-form-input>
-                </b-col>
-            </b-row>
-            <b-row class="my-1"  v-if="!infoModalUser_roles.filter((item) => {return item.id == 6})[0]">
-                <b-col sm="2">
-                    <label>Пункт выпуска:</label>
-                </b-col>
-                <b-col sm="10">
-                    <b-form-select v-model="infoModalUser.pv" :options="optionsPvs"></b-form-select>
-                </b-col>
-            </b-row>
-            <b-row class="my-1" v-if="infoModalUser_roles.filter((item) => {return item.id == 6})[0]">
-                <b-col sm="2">
-                    <label>Компания:</label>
-                </b-col>
-                <b-col sm="10">
-                    <v-select
-                        :options="optionsCompany"
-                        label="name"
-                        v-model="infoModalUser.company"
-                        @search="fetchCompanies">
-                    </v-select>
-<!--                    <b-form-select v-model="infoModalUser.company" :options="options_company"></b-form-select>-->
-                </b-col>
-            </b-row>
-            <b-row class="my-1">
-                <b-col sm="2">
-                    <label>Роль:</label>
-                </b-col>
-                <b-col sm="10">
-                    <!--                    <b-form-input v-model="infoModalUser.role"-->
-                    <!--                                  size="sm"-->
-                    <!--                                  placeholder="Введите роль клиента"-->
-                    <!--                    >-->
-
-                    <!--                    </b-form-input>-->
-
-                    <v-select
-                        :multiple="true"
-                        :options="optionsRoles"
-                        label="guard_name"
-                        v-model="infoModalUser_roles"
-                    >
-                    </v-select>
-                </b-col>
-            </b-row>
-            <b-row class="my-1">
-                <b-col sm="2">
-                    <!--                    <label>Заблокирован:</label>-->
-                </b-col>
-                <b-col sm="10">
-                    <b-form-checkbox
-                        id="checkbox-1"
-                        v-model="infoModalUser.blocked"
-                        name="checkbox-1"
-                        value="1"
-                        unchecked-value="0"
-                    >
-                        Заблокирован
-                    </b-form-checkbox>
-                </b-col>
-            </b-row>
-            <b-row class="my-1">
-                <b-col>
+                <template #cell(delete_btn)="row">
                     <b-button
-                        :class="permission_collapse ? null : 'collapsed'"
-                        :aria-expanded="permission_collapse ? 'true' : 'false'"
-                        aria-controls="collapse-4"
-                        @click="permission_collapse = !permission_collapse"
-                    >
-                        Раскрыть права
+                        v-if="!deleted"
+                        :disabled="!current_user_permissions.permission_to_delete"
+                        variant="danger"
+                        @click="deleteUser(row.item.id)">
+                        <b-icon icon="trash-fill" aria-hidden="true"></b-icon>
                     </b-button>
-                    <b-collapse id="collapse-4" v-model="permission_collapse" class="mt-2">
-                        <b-card>
-                            <div class="alert alert-success m-3">
-                                <!--                <i class="fa fa-info"></i>-->
-                                <!--                <b>Доброго времени суток!</b><br>-->
-                                Не все права можно выставить, так как они предусматриваются наличием роли<br>
-                                У каждой роли есть набор прав<br>
-                                У каждого пользователя есть набор прав и ролей
-                            </div>
+                    <!--                {{ row.value.name }}-->
+                </template>
+                <template #cell(return_trash)="row">
+                    <b-button
+                        :disabled="!current_user_permissions.permission_to_trash"
+                        variant="warning"
+                        @click="returnTrash(row.item.id)">
+                        <i class="fa fa-undo"></i>
+                    </b-button>
+                    <!--                {{ row.value.name }}-->
+                </template>
+            </b-table>
 
-                            <b-form-group label="Доступы:" v-slot="{ ariaDescribedby }">
-                                <b-form-checkbox-group
-                                    :aria-describedby="ariaDescribedby"
-                                    name="flavour-2"
-                                    v-model="infoModalUser.permissions"
-                                >
-                                    <b-row>
-                                        <!--                                        <template v-for="(permission, index) in allPermissions">-->
-                                        <!--                                        </template>-->
-                                        <div class="box">
-                                            <div v-for="(permission, index) in allPermissions">
-                                                <b-col>
-                                                    <b-form-checkbox
-                                                        :value="permission.id"
-                                                        :disabled="permission.disable"
-                                                        :key="index"
-                                                    >
-                                                        {{ permission.guard_name }}
-                                                    </b-form-checkbox>
-                                                </b-col>
+            <b-row class="w-100 d-flex justify-content-center">
+                <b-col class="my-1 d-flex justify-content-left">
+                    <b-pagination
+                        :disabled="busy"
+                        v-model="currentPage"
+                        :total-rows="totalRows"
+                        :per-page="perPage"
+                        align="fill"
+                        class="my-0"
+                    ></b-pagination>
+                </b-col>
+            </b-row>
+
+            <p class="text-center">
+                Количество элементов: {{ totalRows }}
+            </p>
+            <b-modal
+                v-model="enableModal"
+                size="xl"
+                ref="users_modal"
+                hide-footer
+                :title="'Добавление сотрудника'"
+            >
+
+                <b-row class="my-1">
+                    <b-col sm="2">
+                        <label>ФИО:</label>
+                    </b-col>
+                    <b-col sm="10">
+                        <b-form-input v-model="infoModalUser.name"
+                                      id="input-small"
+                                      size="sm"
+                                      placeholder="Введите ФИО"
+                        >
+
+                        </b-form-input>
+                    </b-col>
+                </b-row>
+                <b-row class="my-1">
+                    <b-col sm="2">
+                        <label>Login:</label>
+                    </b-col>
+                    <b-col sm="10">
+                        <b-form-input v-model="infoModalUser.login"
+                                      size="sm"
+                                      placeholder="Введите логин"
+                        >
+
+                        </b-form-input>
+                    </b-col>
+                </b-row>
+                <b-row class="my-1">
+                    <b-col sm="2">
+                        <label>E-mail:</label>
+                    </b-col>
+                    <b-col sm="10">
+                        <b-form-input v-model="infoModalUser.email"
+                                      size="sm"
+                                      placeholder="Введите эл. почту"
+                        >
+
+                        </b-form-input>
+                    </b-col>
+                </b-row>
+                <b-row class="my-1">
+                    <b-col sm="2">
+                        <label>Пароль:</label>
+                    </b-col>
+                    <b-col sm="10">
+                        <b-form-input v-model="infoModalUser.password"
+                                      size="sm"
+                                      type="password"
+                                      placeholder="Введите пароль"
+                        >
+
+                        </b-form-input>
+                    </b-col>
+                </b-row>
+                <b-row class="my-1">
+                    <b-col sm="2">
+                        <label>"ЭЦП":</label>
+                    </b-col>
+                    <b-col sm="10">
+                        <b-form-input v-model="infoModalUser.eds"
+                                      size="sm"
+                                      placeholder="Введите эл. подпись"
+                        >
+
+                        </b-form-input>
+                    </b-col>
+                </b-row>
+                <b-row class="my-1">
+                    <b-col sm="2">
+                        <label>Часовой пояс:</label>
+                    </b-col>
+                    <b-col sm="10">
+                        <b-form-input v-model="infoModalUser.timezone"
+                                      size="sm"
+                                      placeholder="Введите часовой пояс"
+                        >
+
+                        </b-form-input>
+                    </b-col>
+                </b-row>
+                <b-row class="my-1"  v-if="!infoModalUser_roles.filter((item) => {return item.id == 6})[0]">
+                    <b-col sm="2">
+                        <label>Пункт выпуска:</label>
+                    </b-col>
+                    <b-col sm="10">
+                        <b-form-select v-model="infoModalUser.pv" :options="optionsPvs"></b-form-select>
+                    </b-col>
+                </b-row>
+                <b-row class="my-1" v-if="infoModalUser_roles.filter((item) => {return item.id == 6})[0]">
+                    <b-col sm="2">
+                        <label>Компания:</label>
+                    </b-col>
+                    <b-col sm="10">
+                        <v-select
+                            :options="optionsCompany"
+                            label="name"
+                            v-model="infoModalUser.company"
+                            @search="fetchCompanies">
+                        </v-select>
+                        <!--                    <b-form-select v-model="infoModalUser.company" :options="options_company"></b-form-select>-->
+                    </b-col>
+                </b-row>
+                <b-row class="my-1">
+                    <b-col sm="2">
+                        <label>Роль:</label>
+                    </b-col>
+                    <b-col sm="10">
+                        <!--                    <b-form-input v-model="infoModalUser.role"-->
+                        <!--                                  size="sm"-->
+                        <!--                                  placeholder="Введите роль клиента"-->
+                        <!--                    >-->
+
+                        <!--                    </b-form-input>-->
+
+                        <v-select
+                            :multiple="true"
+                            :options="optionsRoles"
+                            label="guard_name"
+                            v-model="infoModalUser_roles"
+                        >
+                        </v-select>
+                    </b-col>
+                </b-row>
+                <b-row class="my-1">
+                    <b-col sm="2">
+                        <!--                    <label>Заблокирован:</label>-->
+                    </b-col>
+                    <b-col sm="10">
+                        <b-form-checkbox
+                            id="checkbox-1"
+                            v-model="infoModalUser.blocked"
+                            name="checkbox-1"
+                            value="1"
+                            unchecked-value="0"
+                        >
+                            Заблокирован
+                        </b-form-checkbox>
+                    </b-col>
+                </b-row>
+                <b-row class="my-1">
+                    <b-col>
+                        <b-button
+                            :class="permission_collapse ? null : 'collapsed'"
+                            :aria-expanded="permission_collapse ? 'true' : 'false'"
+                            aria-controls="collapse-4"
+                            @click="permission_collapse = !permission_collapse"
+                        >
+                            Раскрыть права
+                        </b-button>
+                        <b-collapse id="collapse-4" v-model="permission_collapse" class="mt-2">
+                            <b-card>
+                                <div class="alert alert-success m-3">
+                                    <!--                <i class="fa fa-info"></i>-->
+                                    <!--                <b>Доброго времени суток!</b><br>-->
+                                    Не все права можно выставить, так как они предусматриваются наличием роли<br>
+                                    У каждой роли есть набор прав<br>
+                                    У каждого пользователя есть набор прав и ролей
+                                </div>
+
+                                <b-form-group label="Доступы:" v-slot="{ ariaDescribedby }">
+                                    <b-form-checkbox-group
+                                        :aria-describedby="ariaDescribedby"
+                                        name="flavour-2"
+                                        v-model="infoModalUser.permissions"
+                                    >
+                                        <b-row>
+                                            <!--                                        <template v-for="(permission, index) in allPermissions">-->
+                                            <!--                                        </template>-->
+                                            <div class="box">
+                                                <div v-for="(permission, index) in allPermissions">
+                                                    <b-col>
+                                                        <b-form-checkbox
+                                                            :value="permission.id"
+                                                            :disabled="permission.disable"
+                                                            :key="index"
+                                                        >
+                                                            {{ permission.guard_name }}
+                                                        </b-form-checkbox>
+                                                    </b-col>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </b-row>
-                                </b-form-checkbox-group>
-                            </b-form-group>
+                                        </b-row>
+                                    </b-form-checkbox-group>
+                                </b-form-group>
 
-                        </b-card>
-                    </b-collapse>
+                            </b-card>
+                        </b-collapse>
 
-                </b-col>
-            </b-row>
+                    </b-col>
+                </b-row>
 
-            <b-row>
-                <b-col>
-                    <b-button class="mt-2" variant="outline-danger" block @click="hideModal">Закрыть</b-button>
-                </b-col>
-                <b-col>
-                    <b-button class="mt-2" variant="outline-success" block @click="saveUser">Сохранить</b-button>
-                </b-col>
-            </b-row>
-        </b-modal>
+                <b-row>
+                    <b-col>
+                        <b-button class="mt-2" variant="outline-danger" block @click="hideModal">Закрыть</b-button>
+                    </b-col>
+                    <b-col>
+                        <b-button class="mt-2" variant="outline-success" block @click="saveUser">Сохранить</b-button>
+                    </b-col>
+                </b-row>
+            </b-modal>
+        </div>
+<!--        <div class="text-center" v-if="busy">-->
+<!--            <b-spinner label="Spinning"></b-spinner>-->
+<!--        </div>-->
     </div>
 </template>
 
@@ -324,6 +341,7 @@ export default {
             permission_collapse: false,
             infoModalUser_roles: [],
             optionsCompany: [],
+            busy: false,
 
             currentPage: 1,
             totalRows:   0,
@@ -407,6 +425,8 @@ export default {
         },
 
         loadData() {
+            this.busy = true;
+
             axios.get('/users' + window.location.search, {
                 params: {
                     sortBy:   this.sortBy,
@@ -420,6 +440,7 @@ export default {
                 this.items = data.items;
                 this.currentPage = data.current_page;
                 this.totalRows = data.total_rows;
+                this.busy = false;
 
             }).finally(() => {
                 this.loading = false;
@@ -676,7 +697,9 @@ export default {
         this.loadData()
         // this.items = this.users;
         this.optionsPvs = this.points;
-        this.optionsRoles = this.roles;
+        this.optionsRoles = this.roles.filter((item) => {
+            return ![3, 9].includes(item.id)
+        });
         this.allPermissions = this.all_permissions;
 
         if (this.deleted) {

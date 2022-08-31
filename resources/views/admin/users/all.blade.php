@@ -21,7 +21,9 @@
         <div class="row bg-light p-2">
             <div class="col">
                 @if($permissionCreate)
-                <button type="button" data-toggle="modal" data-target="#users-modal-add" class="btn btn-success  btn-sm">Добавить {{ $is_pak ? 'терминал' : 'сотрудника' }} <i class="fa fa-plus"></i></button>
+                    <button type="button" data-toggle="modal" data-target="#users-modal-add"
+                            class="btn btn-success  btn-sm">Добавить {{ $is_pak ? 'терминал' : 'сотрудника' }} <i
+                            class="fa fa-plus"></i></button>
                 @endif
                 @if($permissionTrash)
                     @if(request()->get('deleted'))
@@ -40,40 +42,44 @@
             </div>
             <div class="col text-right">
                 @if($permissionExport)
-                <button type="button" onclick="exportTable('elements-table', '{{ $title }}', '{{ $title }}.xls')" class="btn btn-dark">Экспорт <i class="fa fa-download"></i></button>
+                    <button type="button" onclick="exportTable('elements-table', '{{ $title }}', '{{ $title }}.xls')"
+                            class="btn btn-dark">Экспорт <i class="fa fa-download"></i></button>
                 @endif
             </div>
         </div>
         @if($permissionView)
-        <div class="row bg-light p-2">
-            <div class="col-md-12">
-                <form action="" class="row" method="GET">
-                    @csrf
-                    <input type="hidden" name="filter" value="1" />
+            <div class="row bg-light p-2">
+                <div class="col-md-12">
+                    <form action="" class="row" method="GET">
+                        @csrf
+                        <input type="hidden" name="filter" value="1"/>
+                        <input type="hidden" name="pak_sdpo" value="1"/>
 
-                    <div class="col-md-2 form-group">
-                        <input type="text" value="{{ request()->get('name') }}" name="name" placeholder="ФИО" class="form-control">
-                    </div>
+                        <div class="col-md-2 form-group">
+                            <input type="text" value="{{ request()->get('name') }}" name="name" placeholder="ФИО"
+                                   class="form-control">
+                        </div>
 
-                    <div class="col-md-2 form-group">
-                        <input type="text" name="email" value="{{ request()->get('email') }}" placeholder="E-mail" class="form-control">
-                    </div>
+                        <div class="col-md-2 form-group">
+                            <input type="text" name="email" value="{{ request()->get('email') }}" placeholder="E-mail"
+                                   class="form-control">
+                        </div>
 
-                    <div class="col-md-2 form-group">
-                        @include('profile.ankets.components.pvs', [
-                            'defaultShowPvs' => 1,
-                            'classesPvs' => 'form-control'
-                        ])
-                    </div>
+                        <div class="col-md-2 form-group">
+                            @include('profile.ankets.components.pvs', [
+                                'defaultShowPvs' => 1,
+                                'classesPvs' => 'form-control'
+                            ])
+                        </div>
 
-                    <div class="col-md-3 form-group">
-                        <input type="submit" class="btn btn-success btn-sm" value="Поиск">
-                        <a href="{{ route('adminUsers') }}" class="btn btn-danger btn-sm">Сбросить</a>
-                    </div>
+                        <div class="col-md-3 form-group">
+                            <input type="submit" class="btn btn-success btn-sm" value="Поиск">
+                            <a href="{{ route('adminUsers') }}" class="btn btn-danger btn-sm">Сбросить</a>
+                        </div>
 
-                </form>
+                    </form>
+                </div>
             </div>
-        </div>
         @endif
     </div>
 
