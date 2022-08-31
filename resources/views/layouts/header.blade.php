@@ -32,9 +32,9 @@
                             $user_avatar = asset("img/default_profile.jpg");
                         }
                     @endphp
+
                     <li class="nav-item">
                         <a class="nav-link flex-center" href="{{ route('profile') }}">
-
                             <span class="client">
                                 <span class="client-avatar">
                                     <img src="{{ $user_avatar }}" width="50" alt="avatar">

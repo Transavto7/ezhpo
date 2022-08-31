@@ -338,6 +338,36 @@ main.blue {
     background-color: #BACEF4;
 }
 
+.footer-inner {
+    padding: 20px 25px;
+}
+
+.footer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.cp-logo, .cp-logo:hover {
+    font-family: "Montserrat", sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    color: #000;
+    text-decoration: none;
+    text-transform: none;
+
+    span {
+        color: #E93223;
+    }
+}
+
+@media (max-width: 800px) {
+    .footer-inner {
+        padding: 20px 10px;
+    }
+}
+
 @media print
 {
     .no-print, .no-print *

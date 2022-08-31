@@ -26,6 +26,7 @@
     <link href="https://cdn.jsdelivr.net/npm/suggestions-jquery@20.3.0/dist/css/suggestions.min.css" rel="stylesheet" />
     <link href="{{ mix('css/app.css') }}?v={{ time() }}" rel="stylesheet" type="text/css">
     <link rel="shortcut icon" href="/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
 
     @auth
         <script type="text/javascript">
@@ -89,6 +90,18 @@
                             @yield('content')
                         </div>
                     </section>
+
+                    <footer class="footer" style="background-color: rgb(255, 255, 255)">
+                        <div class="d-flex justify-content-between footer-inner">
+                            <div class="text-center" style="vertical-align: middle">
+{{--                                Сделано в--}}
+{{--                                <a href="https://nozdratenko.ru" target="_blank" class="cp-logo">nozdr<span>a</span>tenko</a>--}}
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <a href="https://crmta7.ru/" target="_blank">Полезная информация</a>
+                            </div>
+                        </div>
+                    </footer>
                 </div>
             @endauth
         </main>
