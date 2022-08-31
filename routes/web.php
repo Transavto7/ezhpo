@@ -34,8 +34,8 @@ Route::get('/fix/company', function() {
             'hash_id'  => mt_rand(10000,99999) . date('s'),
             'email'    => $company->hash_id . '-' . mt_rand(100000, 499999).'@ta-7.ru',
             'api_token' => Hash::make(date('H:i:s').sha1($company->hash_id)),
-            'login'    => 'c' . $company->hash_id,
-            'password' => 'c' . Hash::make($company->hash_id),
+            'login'    => '0' . $company->hash_id,
+            'password' => '0' . Hash::make($company->hash_id),
             'name'     => $company->name,
             'role'     => 12,
             'company_id' => $company->id
