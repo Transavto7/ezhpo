@@ -81,6 +81,21 @@
             </template>
         </b-table>
 
+        <b-row class="w-100 d-flex justify-content-center">
+            <b-col class="my-1 d-flex justify-content-center">
+                <b-pagination
+                    v-model="currentPage"
+                    :total-rows="totalRows"
+                    :per-page="perPage"
+                    align="fill"
+                    class="my-0"
+                ></b-pagination>
+            </b-col>
+        </b-row>
+        <p class="text-center">
+            Количество элементов: {{ totalRows }}
+        </p>
+
         <b-modal
             v-model="enableModal"
             size="xl"
@@ -289,18 +304,6 @@
                 </b-col>
             </b-row>
         </b-modal>
-
-        <b-pagination
-            v-model="currentPage"
-            :total-rows="totalRows"
-            :per-page="perPage"
-            align="fill"
-            size="sm"
-            class="my-0"
-        ></b-pagination>
-        <p>
-            Количество элементов: {{ totalRows }}
-        </p>
     </div>
 </template>
 
