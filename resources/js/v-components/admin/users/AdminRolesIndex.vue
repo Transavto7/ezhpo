@@ -29,7 +29,7 @@
                 <b-button
                     v-if="!deleted"
                     :disabled="!current_user_permissions.permission_to_delete"
-                    variant="danger"
+                    variant="warning"
                     @click="deleteRole(row.item.id)">
                     <b-icon icon="trash-fill" aria-hidden="true"></b-icon>
                 </b-button>

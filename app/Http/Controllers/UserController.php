@@ -22,9 +22,13 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
+        // ebat' ya query builder
         $users = User::with(['roles', 'pv', 'company'])
-                     ->whereHas('roles', function ($q) {
-                         $q->where('id', '<>', 3);
+                     ->where(function ($query) {
+                         $query->whereDoesntHave('roles')
+                               ->orWhereHas('roles', function ($q) {
+                                   $q->whereNotIn('roles.id', [3]);
+                               });
                      });
 
         if ($request->get('deleted')) {
@@ -118,7 +122,7 @@ class UserController extends Controller
             $user->email    = $request->get('email', null);
             $user->eds      = $request->get('eds', null);
             $user->timezone = $request->get('timezone', null);
-            $user->blocked  = $request->get('blocked', null);
+            $user->blocked  = $request->get('blocked', 0);
 
         } else {
             $validator = Validator::make($request->all(), [
@@ -136,6 +140,7 @@ class UserController extends Controller
             $user = User::create([
                 'name'     => $request->get('name', null),
                 'email'    => $request->get('email', null),
+                'hash_id'  => mt_rand(1000, 9999).date('s'),
                 'eds'      => $request->get('eds', null),
                 'timezone' => $request->get('timezone', null),
                 'blocked'  => $request->get('blocked', null),
