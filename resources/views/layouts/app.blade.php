@@ -58,7 +58,7 @@
             @endif
         @endauth
 
-        <main class="page-content d-flex align-items-stretch">
+        <main class="page-content d-flex align-items-stretch @if (user() && (user()->role == 12 || user()->role == 3)) blue @endif">
 
             @hasSection ('sidebar')
                 @auth

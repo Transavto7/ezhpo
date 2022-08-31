@@ -92,11 +92,3 @@ $instrs = $instrs->merge($nullable);
 
     </div>
 @endsection
-
-@section('custom-styles')
-    <style>
-        main{
-            background-color: #BACEF4;
-        }
-    </style>
-@endsection

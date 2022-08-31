@@ -21,12 +21,10 @@ Route::get('/releases', 'IndexController@RenderReleases')->name('releases');
 //Route::resource
 //Route::get('/roles/fetchRoleData', 'RoleController@fetchRoleData');
 
-
-
 Route::get('/fix/company', function() {
     $companies = \App\Company::all();
     foreach ($companies as $company) {
-        if (User::where('login', $company->hash_id)->first()) {
+        if (User::where('login', '0' . $company->hash_id)->first()) {
             continue;
         }
 
@@ -35,7 +33,7 @@ Route::get('/fix/company', function() {
             'email'    => $company->hash_id . '-' . mt_rand(100000, 499999).'@ta-7.ru',
             'api_token' => Hash::make(date('H:i:s').sha1($company->hash_id)),
             'login'    => '0' . $company->hash_id,
-            'password' => '0' . Hash::make($company->hash_id),
+            'password' => Hash::make('0' . $company->hash_id),
             'name'     => $company->name,
             'role'     => 12,
             'company_id' => $company->id
