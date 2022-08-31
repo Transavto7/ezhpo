@@ -577,7 +577,7 @@ export default {
                     );
                     this.$refs.users_table.refresh()
                     this.enableModal = false
-                    // location.reload()
+                    location.reload()
 
                 }
 
