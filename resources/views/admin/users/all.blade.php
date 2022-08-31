@@ -21,7 +21,7 @@
         <div class="row bg-light p-2">
             <div class="col">
                 @if($permissionCreate)
-                <button type="button" data-toggle="modal" data-target="#users-modal-add" class="btn btn-success">Добавить {{ $is_pak ? 'терминал' : 'сотрудника' }} <i class="fa fa-plus"></i></button>
+                <button type="button" data-toggle="modal" data-target="#users-modal-add" class="btn btn-success  btn-sm">Добавить {{ $is_pak ? 'терминал' : 'сотрудника' }} <i class="fa fa-plus"></i></button>
                 @endif
                 @if($permissionTrash)
                     @if(request()->get('deleted'))
@@ -34,7 +34,7 @@
                                 'filter' => 1,
                                 'pak_sdpo' => 1,
                                 'deleted' => 1
-                            ]) }}" class="btn btn-warning btn-sm">Корзина</a>
+                            ]) }}" class="btn btn-warning btn-sm">Корзина <i class="fa fa-trash"></i></a>
                     @endif
                 @endif
             </div>

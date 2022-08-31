@@ -1,6 +1,10 @@
 <template>
     <div class="">
-        <b-button v-if="current_user_permissions.permission_to_create" @click="showModal">Добавить пользователя
+        <b-button variant="success"
+                  v-if="current_user_permissions.permission_to_create"
+                  @click="showModal"
+        >
+            Добавить пользователя
         </b-button>
 
 
@@ -333,7 +337,7 @@ export default {
                 eds:         null,
                 timezone:    null,
                 pv:          null,
-                blocked:     null,
+                blocked:     0,
                 company:     null,
                 permissions: [],
             },
@@ -573,11 +577,11 @@ export default {
                     );
                     this.$refs.users_table.refresh()
                     this.enableModal = false
+                    // location.reload()
 
                 }
 
             }).finally(() => {
-                location.reload()
                 this.loading = false;
             });
         },
@@ -636,7 +640,7 @@ export default {
             this.infoModalUser.timezone = null;
             this.infoModalUser.pv = null;
             this.infoModalUser_roles = [];
-            this.infoModalUser.blocked = null;
+            this.infoModalUser.blocked = 0;
             this.infoModalUser.company = null;
             this.infoModalUser.permissions = [];
             this.permission_collapse = false;
