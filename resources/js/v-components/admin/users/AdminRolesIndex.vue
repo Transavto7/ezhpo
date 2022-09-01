@@ -237,6 +237,7 @@ export default {
                                 'success',
                             );
                             this.editModal = false;
+                            location.reload()
                             this.resetModal();
                         } else {
                             Swal2.fire(
@@ -268,8 +269,8 @@ export default {
                             'Данные были успешно записаны',
                             'success',
                         );
+                        location.reload()
                         this.editModal = false;
-            location.reload()
                         this.resetModal();
                     } else {
                         Swal2.fire(
