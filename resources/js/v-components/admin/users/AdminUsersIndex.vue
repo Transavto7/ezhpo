@@ -1,7 +1,7 @@
 <template>
     <div class="">
         <div class="">
-            <div class="my-2">
+            <div class="my-3">
                 <b-button variant="success"
                           v-if="current_user_permissions.permission_to_create"
                           @click="showModal"
@@ -17,8 +17,9 @@
                         <i class="fa fa-trash"></i>
                     </template>
                 </b-button>
-
             </div>
+
+            <slot></slot>
 
             <b-table
                 v-if="current_user_permissions.permission_to_view"
