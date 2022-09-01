@@ -385,7 +385,12 @@ $(document).ready(function () {
 
     $(window).on('load', function () {
         let checks = JSON.parse(sessionStorage.getItem('fields'));
-        console.log(checks);
+
+        if (!checks) {
+            checks = JSON.parse(localStorage.getItem('fields'));
+            console.log(JSON.parse(localStorage.getItem('fields')));
+        }
+
         if (!checks) {
             checks = visibleFields;
         }
@@ -436,8 +441,6 @@ $(document).ready(function () {
                 }
 
                 checks[type][id] = prop_checked;
-
-                console.log(checks);
                 sessionStorage.setItem('fields', JSON.stringify(checks));
 
                 showTableData(el)
@@ -673,6 +676,34 @@ $(document).ready(function () {
                 return;
             }
         });
+    }
+
+    window.saveChecks = function () {
+       let checks = JSON.parse(sessionStorage.getItem('fields'));
+       if (!checks) {
+           checks = Object.assign({}, visibleFields);
+       }
+
+       localStorage.setItem('fields', JSON.stringify(checks));
+        $('.toast-save-checks').toast('show');
+    }
+
+    window.resetChecks = function () {
+        let checks = Object.assign({}, visibleFields);
+        localStorage.setItem('fields',  JSON.stringify(checks));
+        sessionStorage.setItem('fields',  JSON.stringify(checks));
+
+        $('.ankets-form input').each(function () {
+            const type = $(this).parents('.ankets-form').attr('anketa');
+            const name = $(this).attr('name');
+            if (checks[type] && checks[type][name]) {
+                $(this).prop("checked", true);
+            } else {
+                $(this).prop("checked", false);
+            }
+        });
+
+        $('.toast-reset-checks').toast('show');
     }
 
     window.addFieldToHistory = (value, field) => {

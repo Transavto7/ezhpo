@@ -156,6 +156,20 @@ $permissionToExportPrikazPL = (
                                             @endisset
                                         @endforeach
                                     </form>
+
+                                    <button class="btn btn-success btn-sm mt-3" onclick="saveChecks()">Сохранить</button>
+                                    <button class="btn btn-danger btn-sm mt-3" onclick="resetChecks()">Сбросить</button>
+                                    <div class="toast mt-2 toast-save-checks position-absolute">
+                                        <div class="toast-body bg-success text-white">
+                                            Успешно сохранено
+                                        </div>
+                                    </div>
+
+                                    <div class="toast mt-2 toast-reset-checks position-absolute">
+                                        <div class="toast-body bg-danger text-white">
+                                            Успешно сброшенно
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
