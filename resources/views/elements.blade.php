@@ -217,6 +217,7 @@
             || user()->access('date_control_create') && $model == 'DDates'
             || user()->access('story_field_create') && $model == 'FieldHistory'
             || user()->access('pv_create') && $model == 'Point'
+            || (($model == 'Car' || $model == 'Driver' || $model == 'Company') && user()->access('client_create'))
         ) && !request()->get('deleted');
 
         $permissionToDelete = (
