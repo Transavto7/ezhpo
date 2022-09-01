@@ -226,7 +226,7 @@ export default {
                 let max = 99999;
                 let min = 1000;
 
-                this.infoModalRole.name = Math.random() * (max - min) + min;
+                this.infoModalRole.name = 'role_' + Math.floor(Math.random() * max) + min;
 
                 axios.post('/roles', this.infoModalRole)
                     .then(({data}) => {
