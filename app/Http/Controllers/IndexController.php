@@ -1355,7 +1355,7 @@ class IndexController extends Controller
                 return redirect()->route('report.journal');
             }
             if(!$type){
-                return redirect()->route('renderElements', 'Company');
+                return redirect()->route('releases');
             }
         }
 //        $type = $request->get('type', ($user->role === 1 ? 'tech' : 'medic') );

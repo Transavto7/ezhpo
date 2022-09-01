@@ -97,7 +97,7 @@ Route::prefix('snippet')->group(function () {
             $pv_id = isset($driver->company_id) ? \App\Company::where('id', $driver->company_id)->first() : 0;
 
             if($pv_id) {
-                $pv_id = isset($pv_id->pv_id) ? $pv_id->pv_id : 0;
+                $pv_id = $pv_id->pv_id ?? 0;
             }
 
             if(!$pv_id) {
