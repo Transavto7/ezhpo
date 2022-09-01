@@ -103,20 +103,21 @@
                     </b-form-input>
                 </b-col>
             </b-row>
-            <b-row class="my-1">
-                <b-col sm="2">
-                    <label>Код группы:</label>
-                </b-col>
-                <b-col sm="10">
-                    <b-form-input v-model="infoModalRole.name"
-                                  size="sm"
-                                  placeholder="Введите код группы"
-                                  :disabled="infoModalRole.id"
-                    >
 
-                    </b-form-input>
-                </b-col>
-            </b-row>
+<!--            <b-row class="my-1">-->
+<!--                <b-col sm="2">-->
+<!--                    <label>Код группы:</label>-->
+<!--                </b-col>-->
+<!--                <b-col sm="10">-->
+<!--                    <b-form-input v-model="infoModalRole.name"-->
+<!--                                  size="sm"-->
+<!--                                  placeholder="Введите код группы"-->
+<!--                                  :disabled="infoModalRole.id"-->
+<!--                    >-->
+
+<!--                    </b-form-input>-->
+<!--                </b-col>-->
+<!--            </b-row>-->
 
             <b-row class="my-1">
                 <b-col>
@@ -205,7 +206,7 @@ export default {
             fields:      [
                 {key: 'guard_name', label: 'Название'},
                 {key: 'id', label: 'ID'},
-                {key: 'name', label: 'Код'},
+                // {key: 'name', label: 'Код'},
                 {key: 'delete_btn', label: '#', class: 'text-center'},
             ],
             items:       [],
@@ -222,6 +223,11 @@ export default {
             this.loading = true;
 
             if (!this.infoModalRole.id) {
+                let max = 99999;
+                let min = 1000;
+
+                this.infoModalRole.name = Math.random() * (max - min) + min;
+
                 axios.post('/roles', this.infoModalRole)
                     .then(({data}) => {
                         if (data.status) {
