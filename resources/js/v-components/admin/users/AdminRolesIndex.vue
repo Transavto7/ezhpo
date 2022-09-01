@@ -231,11 +231,11 @@ export default {
                 axios.post('/roles', this.infoModalRole)
                     .then(({data}) => {
                         if (data.status) {
-                            Swal2.fire(
-                                'Сохранено',
-                                'Данные были успешно записаны',
-                                'success',
-                            );
+                            // Swal2.fire(
+                            //     'Сохранено',
+                            //     'Данные были успешно записаны',
+                            //     'success',
+                            // );
                             this.editModal = false;
                             location.reload()
                             this.resetModal();
@@ -264,11 +264,11 @@ export default {
                     _method: 'PUT',
                 }).then(({data}) => {
                     if (data.status) {
-                        Swal2.fire(
-                            'Сохранено',
-                            'Данные были успешно записаны',
-                            'success',
-                        );
+                        // Swal2.fire(
+                        //     'Сохранено',
+                        //     'Данные были успешно записаны',
+                        //     'success',
+                        // );
                         location.reload()
                         this.editModal = false;
                         this.resetModal();
