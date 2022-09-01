@@ -269,7 +269,7 @@ export default {
                             'success',
                         );
                         this.editModal = false;
-
+            location.reload()
                         this.resetModal();
                     } else {
                         Swal2.fire(
