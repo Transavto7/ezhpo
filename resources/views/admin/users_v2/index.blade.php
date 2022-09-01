@@ -4,7 +4,7 @@
 @section('sidebar', 1)
 @php
     $points = \App\Town::with(['pvs'])->get();
-    $roles = \Spatie\Permission\Models\Role::all();
+    $roles = \App\Role::whereNull('deleted_at')->get();
     $all_permissions = \Spatie\Permission\Models\Permission::orderBy('guard_name')->get();
 
     $current_user_permissions = [

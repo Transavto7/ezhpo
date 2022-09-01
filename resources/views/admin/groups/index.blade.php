@@ -17,8 +17,8 @@
 //foreach(config('access') as $permission){
 //    \Spatie\Permission\Models\Permission::where('name', $permission['name'])->update(['guard_name' => $permission['description']]);
 //}
-//dd(\Spatie\Permission\Models\Role::all());
-//$role = \Spatie\Permission\Models\Role::with(['permissions'])->find(1);
+//dd(\App\Role::all());
+//$role = \App\Role::with(['permissions'])->find(1);
 //dd($role->toArray());
 //$role->permissions()->attach([1,2,3]);
 @endphp

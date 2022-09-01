@@ -7,7 +7,7 @@
             </b-button>
 
             <b-button v-if="current_user_permissions.permission_to_trash"
-                      variant="warning" size="sm" :href="deleted ? '/users' : '?deleted=1'">
+                      variant="warning" size="sm" :href="deleted ? '/roles' : '?deleted=1'">
                 {{ deleted ? 'Назад' : `Корзина` }}
                 <template v-if="!deleted">
                     <i class="fa fa-trash"></i>

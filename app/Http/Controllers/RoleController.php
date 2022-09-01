@@ -10,7 +10,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
-use Spatie\Permission\Models\Role;
+use App\Role;
+//use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
@@ -22,7 +23,7 @@ class RoleController extends Controller
     public function index()
     {
         if(request()->get('deleted')){
-            $roles = Role::whereNotNull('deleted_at')->get();
+            $roles = Role::onlyTrashed()->get();
         }else{
             $roles = Role::whereNull('deleted_at')->get();
         }
@@ -107,9 +108,33 @@ class RoleController extends Controller
      */
     public function destroy($id)
     {
-        $role = Role::find($id);
+        $role = Role::with(['users', 'permissions'])
+                    ->find($id);
+
         $role->deleted_id = user()->id;
         $role->deleted_at = now();
+
+//        dd($role->users());
+//        $role->users()->pivot->deleted = 1;
+//        $role->permissions()->pivot->deleted = 1;
+//        dd($role);
+        $role->users()
+             ->get()
+             ->each(function($option) {
+                $option->pivot->deleted = 1;
+                $option->pivot->save();
+            });
+        $role->permissions()
+             ->get()
+             ->each(function($option) {
+                $option->pivot->deleted = 1;
+                $option->pivot->save();
+            });
+//        $role->users()->save();
+//        $role->permissions()->save();
+
+//        $role->users()->updateExistingPivot($id, ['deleted' => 1]);
+//        $role->permissions()->updateExistingPivot($id, ['deleted' => 1]);
 
         $role->save();
 
@@ -120,9 +145,27 @@ class RoleController extends Controller
 
     public function returnTrash(Request $request)
     {
-        $role = Role::find($request->post('id'));
+        $role = Role::onlyTrashed()->find($request->post('id'));
+
         $role->deleted_id = null;
         $role->deleted_at = null;
+
+//        $role->users()->updateExistingPivot($request->post('id'), ['deleted' => 1]);
+//        $role->permissions()->updateExistingPivot($request->post('id'), ['deleted' => 1]);
+
+        $role->users(true)
+             ->get()
+             ->each(function($option) {
+                 $option->pivot->deleted = 0;
+                 $option->pivot->save();
+             });
+
+        $role->permissions(true)
+             ->get()
+             ->each(function($option) {
+                 $option->pivot->deleted = 0;
+                 $option->pivot->save();
+             });
 
         $role->save();
 

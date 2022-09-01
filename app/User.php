@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -61,6 +62,36 @@ class User extends Authenticatable
 
         return parent::delete();
     }
+
+    public function roles($deleted = false) : BelongsToMany
+    {
+        // pizdec huita///.....// prosto nahui relationship
+        return $this->belongsToMany(\App\Role::class,
+            'model_has_roles',
+            'model_id',
+            'role_id',
+            'id',
+            'id'
+        )->withPivot('deleted')
+        ->wherePivot('deleted', $deleted ? 1 : 0);
+    }
+
+//    public function scopePermissions() : BelongsToMany
+//    {
+//        return parent::permissions()->wherePivot('deleted',0);
+//    }
+//    public function roles() : BelongsToMany
+//    {
+//        // pizdec huita///.....// prosto nahui relationship
+//        return $this->belongsToMany(\App\Role::class,
+//            'model_has_roles',
+//            'model_id',
+//            'role_id',
+//            'id',
+//            'id'
+//        )->withPivot('deleted')
+//                    ->wherePivot('deleted', 0);
+//    }
 
     public function anketas()
     {

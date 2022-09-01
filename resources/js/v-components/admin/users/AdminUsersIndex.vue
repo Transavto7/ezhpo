@@ -95,20 +95,24 @@
 
             <b-row class="w-100 d-flex justify-content-center">
                 <b-col class="my-1 d-flex justify-content-left">
-                    <b-pagination
-                        :disabled="busy"
-                        v-model="currentPage"
-                        :total-rows="totalRows"
-                        :per-page="perPage"
-                        align="fill"
-                        class="my-0"
-                    ></b-pagination>
+                        <b-pagination
+                            :disabled="busy"
+                            v-model="currentPage"
+                            :total-rows="totalRows"
+                            :per-page="perPage"
+                            align="fill"
+                            class="my-0"
+                        ></b-pagination>
+                </b-col>
+            </b-row>
+            <b-row class="w-100 d-flex justify-content-center">
+                <b-col class="my-1 d-flex justify-content-left">
+                    <p class="text-center">
+                        Количество элементов: {{ totalRows }}
+                    </p>
                 </b-col>
             </b-row>
 
-            <p class="text-center">
-                Количество элементов: {{ totalRows }}
-            </p>
             <b-modal
                 v-model="enableModal"
                 size="xl"
