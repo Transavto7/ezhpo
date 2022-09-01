@@ -59,7 +59,7 @@
             @endif
         @endauth
 
-        <main class="page-content d-flex align-items-stretch @if (user() && (user()->role == 12 || user()->role == 3)) blue @endif">
+        <main class="page-content d-flex align-items-stretch @if (user() && (user()->hasRole('driver') || user()->hasRole('client'))) blue @endif">
 
             @hasSection ('sidebar')
                 @auth

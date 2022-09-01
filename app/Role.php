@@ -25,7 +25,8 @@ class Role extends \Spatie\Permission\Models\Role
             'permission_id',
             'id',
             'id'
-        )->withPivot('deleted')
+        )
+                    ->withPivot('deleted')
                     ->wherePivot('deleted', $deleted ? 1 : 0);
     }
 
