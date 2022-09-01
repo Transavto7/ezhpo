@@ -150,17 +150,11 @@
                                         data-label="Тип осмотра" data-field="Product_type_view"
                                         class="js-chosen" style="display: none;">
                                     <option value="">Не установлено</option>
-                                    <option value="Предрейсовый">
-                                        Предрейсовый
+                                    <option value="Предрейсовый/Предсменный">
+                                        Предрейсовый/Предсменный
                                     </option>
-                                    <option value="Послерейсовый">
-                                        Послерейсовый
-                                    </option>
-                                    <option value="Предсменный">
-                                        Предсменный
-                                    </option>
-                                    <option value="Послесменный">
-                                        Послесменный
+                                    <option value="Послерейсовый/Послесменный">
+                                        Послерейсовый/Послесменный
                                     </option>
                                     <option value="БДД">
                                         БДД
