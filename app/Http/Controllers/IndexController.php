@@ -1236,6 +1236,7 @@ class IndexController extends Controller
                                         if ($isId && ($aFk === 'town_id' || $aFk === 'products_id')) {
                                             $q = $q->where(function ($q) use ($aFvItemValue, $aFk) {
                                                 return $q->orWhere($aFk, $aFvItemValue)
+                                                    ->orWhere($aFk, 'like', "%,$aFvItemValue,%")
                                                     ->orWhere($aFk, 'like', "%,$aFvItemValue")
                                                     ->orWhere($aFk, 'like', "$aFvItemValue,%");
                                             });
@@ -1252,6 +1253,7 @@ class IndexController extends Controller
 
                                     return $q;
                                 });
+
                             }
                         } else {
                             if ($aFk == 'date_of_employment') {
