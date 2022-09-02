@@ -91,7 +91,7 @@
                         </div>
                     </section>
 
-                    <footer class="footer" style="background-color: rgb(255, 255, 255)">
+                    <footer class="footer no-print" style="background-color: rgb(255, 255, 255)">
                         <div class="d-flex justify-content-between footer-inner">
                             <div class="text-center" style="vertical-align: middle">
 {{--                                Сделано в--}}
