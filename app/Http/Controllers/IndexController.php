@@ -1234,12 +1234,10 @@ class IndexController extends Controller
 
                                     foreach($aFv as $aFvItemKey => $aFvItemValue) {
                                         if ($isId && ($aFk === 'town_id' || $aFk === 'products_id')) {
-                                            $q = $q->where(function ($q) use ($aFvItemValue, $aFk) {
-                                                return $q->orWhere($aFk, $aFvItemValue)
-                                                    ->orWhere($aFk, 'like', "%,$aFvItemValue,%")
-                                                    ->orWhere($aFk, 'like', "%,$aFvItemValue")
-                                                    ->orWhere($aFk, 'like', "$aFvItemValue,%");
-                                            });
+                                            return $q->orWhere($aFk, $aFvItemValue)
+                                                ->orWhere($aFk, 'like', "%,$aFvItemValue,%")
+                                                ->orWhere($aFk, 'like', "%,$aFvItemValue")
+                                                ->orWhere($aFk, 'like', "$aFvItemValue,%");
                                         } else if($isId) {
                                             $q = $q->where($aFk, $aFvItemValue);
                                         } else {
