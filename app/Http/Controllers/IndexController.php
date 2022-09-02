@@ -542,7 +542,7 @@ class IndexController extends Controller
             ],
 
             'Instr' => [
-                'title'       => 'Инструктажи',
+                'title'       => 'Виды инструктажей',
                 'role'        => 0,
                 'popupTitle'  => 'Инструктажа',
                 'editOnField' => 'name',

@@ -159,7 +159,7 @@
                             </li>
                         @endif
 
-                        @if(user()->access('report_service_company_read'))
+                        @if(user()->access('report_service_company_read', 'report_service_company_export'))
                             <li>
                                 <a href="{{ route('report.get', 'journal') }}">
                                     <i class="fa fa-book"></i>Отчет по услугам компании
@@ -198,7 +198,7 @@
                             <li><a href="{{ route('renderElements', 'Discount') }}">Скидки</a></li>
                         @endif
                         @if(user()->access('briefings_read', 'briefings_create'))
-                            <li><a href="{{ route('renderElements', 'Instr') }}">Инструктажи</a></li>
+                            <li><a href="{{ route('renderElements', 'Instr') }}">Виды инструктажей</a></li>
                         @endif
                     </ul>
                 </li>

@@ -235,6 +235,10 @@ return [
         'description' => 'Отчет по услугам компании - Просмотр',
     ],
     [
+        'name'        => 'report_service_company_export',
+        'description' => 'Отчет по услугам компании - Экспорт',
+    ],
+    [
         'name'        => 'report_schedule_pv_read',
         'description' => 'График работы пунктов выпуска - Просмотр',
     ],
@@ -354,26 +358,26 @@ return [
         'description' => 'Скидки - Корзина',
     ],
 
-    //============== Инструктажи =============//
+    //============== Виды инструктажей =============//
     [
         'name'        => 'briefings_create',
-        'description' => 'Инструктажи - Создание',
+        'description' => 'Виды инструктажей - Создание',
     ],
     [
         'name'        => 'briefings_read',
-        'description' => 'Инструктажи - Просмотр',
+        'description' => 'Виды инструктажей - Просмотр',
     ],
     [
         'name'        => 'briefings_update',
-        'description' => 'Инструктажи - Редактирование',
+        'description' => 'Виды инструктажей - Редактирование',
     ],
     [
         'name'        => 'briefings_delete',
-        'description' => 'Инструктажи - Удаление',
+        'description' => 'Виды инструктажей - Удаление',
     ],
     [
         'name'        => 'briefings_trash_read',
-        'description' => 'Инструктажи - Корзина',
+        'description' => 'Виды инструктажей - Корзина',
     ],
 
     //============== Система =============//

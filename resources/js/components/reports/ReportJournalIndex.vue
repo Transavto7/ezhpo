@@ -31,11 +31,11 @@
               </div>
               <div class="row">
                   <div class="form-group col-lg-12">
-                      <button type="submit" @click="report" class="btn btn-info" :disabled="loading">
+                      <button v-if="permissions.create" type="submit" @click="report" class="btn btn-info" :disabled="loading">
                           <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                           Сформировать отчет
                       </button>
-                      <button type="submit" @click="exportData" class="btn btn-info" :disabled="loadingExport">
+                      <button v-if="permissions.export" type="submit" @click="exportData" class="btn btn-info" :disabled="loadingExport">
                           <span v-if="loadingExport" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                           Экспортировать
                       </button>
@@ -76,7 +76,7 @@ import ReportJournalOther from "./ReportJournalOther";
 
 export default {
     name: "ReportJournalIndex",
-    props: ['default_company', 'client_company'],
+    props: ['default_company', 'client_company', 'permissions'],
     components: {
         ReportJournalMedic,
         ReportJournalTech,

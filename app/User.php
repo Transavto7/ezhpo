@@ -156,10 +156,10 @@ class User extends Authenticatable
 
     public static function fetchRoles($hard = false)
     {
-        DB::statement("SET foreign_key_checks=0");
-        Role::truncate();
-        Permission::truncate();
-        DB::statement("SET foreign_key_checks=1");
+//        DB::statement("SET foreign_key_checks=0");
+//        Role::truncate();
+//        Permission::truncate();
+//        DB::statement("SET foreign_key_checks=1");
 //
         foreach (self::$newUserRolesTextEN as $keyRole => $nameRole) {
             Role::updateOrCreate([
@@ -224,6 +224,9 @@ class User extends Authenticatable
             }
         }
 
+//        if(!$hard){
+            return;
+//        }
         self::fetchOldDataPermission($permissions);
     }
 
