@@ -210,20 +210,6 @@
                         <b-form-select v-model="infoModalUser.pv" :options="optionsPvs"></b-form-select>
                     </b-col>
                 </b-row>
-                <b-row class="my-1" v-if="infoModalUser_roles.filter((item) => {return item.id == 6})[0]">
-                    <b-col sm="2">
-                        <label>Компания:</label>
-                    </b-col>
-                    <b-col sm="10">
-                        <v-select
-                            :options="optionsCompany"
-                            label="name"
-                            v-model="infoModalUser.company"
-                            @search="fetchCompanies">
-                        </v-select>
-                        <!--                    <b-form-select v-model="infoModalUser.company" :options="options_company"></b-form-select>-->
-                    </b-col>
-                </b-row>
                 <b-row class="my-1">
                     <b-col sm="2">
                         <label>Роль:</label>
@@ -386,10 +372,9 @@ export default {
                 {key: 'login', label: 'Login', sortable: true},
                 {key: 'email', label: 'E-mail', sortable: true},
                 {key: 'pv', label: 'ПВ', sortable: true},
-                {key: 'company.name', label: 'Компания', sortable: true},
                 {key: 'timezone', label: 'GMT', sortable: true},
                 {key: 'blocked', label: 'Заблокирован', sortable: true},
-                {key: 'roles', label: 'Роль', sortable: true},
+                {key: 'roles', label: 'Роль' },
                 {key: 'delete_btn', label: '#', class: 'text-center'},
             ],
             items:   [],

@@ -27,7 +27,7 @@ class UserController extends Controller
                      ->where(function ($query) {
                          $query->whereDoesntHave('roles')
                                ->orWhereHas('roles', function ($q) {
-                                   $q->whereNotIn('roles.id', [3, 6]);
+                                   $q->whereNotIn('roles.id', [3, 6, 9]);
                                });
                      });
 
@@ -44,13 +44,7 @@ class UserController extends Controller
             $users->where('pv_id', $pv_id);
         }
         if ($sortBy = $request->get('sortBy', 'id')) {
-            if ($sortBy == 'company') {
-                $users->leftjoin('companies', 'users.company_id', '=', 'companies.id')
-                      ->select('users.*', 'companies.name as company_name')
-                      ->orderBy('companies.name', $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC');
-            } else {
-                $users->orderBy($sortBy, $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC');
-            }
+            $users->orderBy($sortBy, $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC');
         }
 
         if ($request->get('api')) {
