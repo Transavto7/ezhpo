@@ -703,7 +703,7 @@ export default {
         // this.items = this.users;
         this.optionsPvs = this.points;
         this.optionsRoles = this.roles.filter((item) => {
-            return ![3, 9].includes(item.id)
+            return ![3, 9, 6].includes(item.id)
         });
         this.allPermissions = this.all_permissions;
 

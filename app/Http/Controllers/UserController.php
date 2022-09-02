@@ -27,7 +27,7 @@ class UserController extends Controller
                      ->where(function ($query) {
                          $query->whereDoesntHave('roles')
                                ->orWhereHas('roles', function ($q) {
-                                   $q->whereNotIn('roles.id', [3]);
+                                   $q->whereNotIn('roles.id', [3, 6]);
                                });
                      });
 
