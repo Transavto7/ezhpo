@@ -486,6 +486,18 @@ class HomeController extends Controller
         }
 
 
+        if (auth()->user()->hasRole('client')) {
+            unset($fieldsKeys['created_at']);
+            unset($fieldsKeys['is_pak']);
+            unset($fieldsKeys['realy']);
+            unset($fieldsKeys['period_pl']);
+            unset($fieldsKeys['company_id']);
+            unset($fieldsKeys['is_dop']);
+            unset($fieldsKeys['driver_id']);
+            $fieldsKeys['id'] = true;
+
+        }
+
         $anketas = ($filter_activated || $typeAnkets === 'pak_queue')
             ? $anketas->orderBy('anketas.' . $orderKey, $orderBy)->paginate($take) : [];
 
@@ -499,10 +511,6 @@ class HomeController extends Controller
             $anketsFieldsTable = $anketsFields;
         }
 
-        if (auth()->user()->hasRole('client')) {
-            unset($fieldsKeys['created_at']);
-            unset($fieldsKeys['is_pak']);
-        }
 
         /**
          * Check VIEW

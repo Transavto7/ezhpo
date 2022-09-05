@@ -104,7 +104,9 @@ $permissionToExportPrikazPL = (
                         <div class="col-md-12">
                             <div class="row bg-light p-2">
                                 <div class="col-md-4">
-                                    <button type="button" data-toggle-show="#ankets-filters" class="btn btn-sm btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
+                                    @if (!user()->hasRole('client'))
+                                        <button type="button" data-toggle-show="#ankets-filters" class="btn btn-sm btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
+                                    @endif
 
                                     @if($permissionToTrashView)
                                     @isset($_GET['trash'])
@@ -143,34 +145,36 @@ $permissionToExportPrikazPL = (
                                     @endif
 {{--                                @endif--}}
 
-                                <div class="toggle-hidden p-3" id="ankets-filters">
-                                    <form class="ankets-form" anketa="{{ $type_ankets }}">
-                                        @foreach($anketsFields as $fieldKey => $fieldValue)
-                                            @isset($fieldsKeys[$fieldValue])
-                                                <label>
-                                                    <input
-                                                        checked
-                                                        type="checkbox" name="{{ $fieldValue }}" data-value="{{ $fieldKey+1 }}" />
-                                                    {{ (isset($fieldsKeys[$fieldValue]['name'])) ? $fieldsKeys[$fieldValue]['name'] : $fieldsKeys[$fieldValue] }} &nbsp;
-                                                </label>
-                                            @endisset
-                                        @endforeach
-                                    </form>
+                                @if (!user()->hasRole('client'))
+                                    <div class="toggle-hidden p-3" id="ankets-filters">
+                                        <form class="ankets-form" anketa="{{ $type_ankets }}">
+                                            @foreach($anketsFields as $fieldKey => $fieldValue)
+                                                @isset($fieldsKeys[$fieldValue])
+                                                    <label>
+                                                        <input
+                                                            checked
+                                                            type="checkbox" name="{{ $fieldValue }}" data-value="{{ $fieldKey+1 }}" />
+                                                        {{ (isset($fieldsKeys[$fieldValue]['name'])) ? $fieldsKeys[$fieldValue]['name'] : $fieldsKeys[$fieldValue] }} &nbsp;
+                                                    </label>
+                                                @endisset
+                                            @endforeach
+                                        </form>
 
-                                    <button class="btn btn-success btn-sm mt-3" onclick="saveChecks()">Сохранить</button>
-                                    <button class="btn btn-danger btn-sm mt-3" onclick="resetChecks()">Сбросить</button>
-                                    <div class="toast mt-2 toast-save-checks position-absolute">
-                                        <div class="toast-body bg-success text-white">
-                                            Успешно сохранено
+                                        <button class="btn btn-success btn-sm mt-3" onclick="saveChecks()">Сохранить</button>
+                                        <button class="btn btn-danger btn-sm mt-3" onclick="resetChecks()">Сбросить</button>
+                                        <div class="toast mt-2 toast-save-checks position-absolute">
+                                            <div class="toast-body bg-success text-white">
+                                                Успешно сохранено
+                                            </div>
+                                        </div>
+
+                                        <div class="toast mt-2 toast-reset-checks position-absolute">
+                                            <div class="toast-body bg-danger text-white">
+                                                Успешно сброшенно
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <div class="toast mt-2 toast-reset-checks position-absolute">
-                                        <div class="toast-body bg-danger text-white">
-                                            Успешно сброшенно
-                                        </div>
-                                    </div>
-                                </div>
+                                @endif
                             </div>
                         </div>
 
@@ -211,7 +215,7 @@ $permissionToExportPrikazPL = (
                                         <th class="not-export">
                                             Таймер
                                         </th>
-                                    @else
+                                    @elseif (!isset($fieldsKeys['id']))
                                         <th width="60" class="not-export">ID записи</th>
                                     @endif
 
@@ -272,7 +276,7 @@ $permissionToExportPrikazPL = (
                                             <td class="not-export">
                                                 <div class="App-Timer" data-date="{{ $anketa->created_at }}"></div>
                                             </td>
-                                        @else
+                                        @elseif (!isset($fieldsKeys['id']))
                                             <td class="not-export">{{ $anketa->id }}</td>
                                         @endif
 
