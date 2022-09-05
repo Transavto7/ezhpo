@@ -1352,7 +1352,7 @@ class IndexController extends Controller
             }
 
             if(user()->hasRole('client')){
-                return redirect()->route('report.journal');
+                return redirect()->route('home', ['type_ankets' => 'medic']);
             }
             if(!$type){
                 return redirect()->route('releases');
