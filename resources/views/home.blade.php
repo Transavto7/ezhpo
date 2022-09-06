@@ -28,6 +28,34 @@
 @endsection
 
 @php
+function checkChangeResult($anketa) {
+    if (!$anketa->is_dop) {
+        return false;
+    }
+
+    if ($anketa->result_dop) {
+        return false;
+    }
+
+    if (!$anketa->company_id || !$anketa->company_name) {
+        return false;
+    }
+
+    if ($anketa->type_anketa === 'medic') {
+        if (!$anketa->driver_id || !$anketa->driver_fio) {
+            return false;
+        }
+    }
+
+    if ($anketa->type_anketa === 'tech') {
+        if (!$anketa->car_id || !$anketa->car_gos_number) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 //dd($type_ankets);
 $permissionToView = (
     user()->access('medic_read') && $type_ankets == 'medic'
@@ -376,7 +404,7 @@ $permissionToExportPrikazPL = (
                                             @if($permissionToUpdate)
                                             <td class="td-option not-export">
                                                 <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i></a>
-                                                @if($anketa->is_dop && !$anketa->result_dop)
+                                                @if(checkChangeResult($anketa))
                                                     @if ($anketa->date)
                                                         <a
                                                             href="{{ route('changeResultDop', ['result_dop' => 'Утвержден', 'id' => $anketa->id]) }}"
