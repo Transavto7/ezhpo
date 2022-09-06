@@ -508,15 +508,19 @@
 
                                                             @if(($model === 'Driver' || $model === 'Car') && $el->$elK && auth()->user()->hasRole('client') && auth()->user()->hasRole('operator_sdpo'))
                                                                 <div>
-                                                                    <a href="{{ route('renderElements', ['model' => 'Company', 'filter' => 1, 'id' => $el->company_id ]) }}">{{ app('App\Company')->getName($el->company_id) }}</a>
+                                                                    <a href="{{ route('renderElements', ['model' => 'Company', 'filter' => 1, 'id' => $el->company_id ]) }}">
+                                                                        {{ app('App\Company')->getName($el->company_id) }}
+                                                                    </a>
 
                                                                     <p>
-                                                                        <a class="btn btn-sm btn-default"
-                                                                           href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'company_id' => $el->company_id ]) }}"><i
-                                                                                class="fa fa-car"></i></a>
-                                                                        <a class="btn btn-sm btn-default"
-                                                                           href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'company_id' => $el->company_id ]) }}"><i
-                                                                                class="fa fa-user"></i></a>
+                                                                        <a class="btn btn-sm btn-outline-info"
+                                                                           href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'company_id' => $el->company_id ]) }}">
+                                                                            <i class="fa fa-car"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-sm btn-outline-info"
+                                                                           href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'company_id' => $el->company_id ]) }}">
+                                                                            <i class="fa fa-user"></i>
+                                                                        </a>
                                                                     </p>
                                                                 </div>
                                                             @else
@@ -581,19 +585,19 @@
                                         <nobr>
 
                                             @if(user()->access('report_service_company_read'))
-                                                <a class="btn btn-sm btn-outline-success"
+                                                <a class="btn btn-sm btn-outline-info"
                                                    href="{{ route('report.get', ['type' => 'journal', 'company_id' => $el->hash_id]) }}">
                                                     ₽
                                                 </a>
                                             @endif
                                             @if(user()->access('cars_read'))
-                                                <a class="btn btn-sm btn-default"
+                                                <a class="btn btn-sm btn-outline-info"
                                                    href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'company_id' => $el->id ]) }}">
                                                     <i class="fa fa-car"></i>
                                                 </a>
                                             @endif
                                             @if(user()->access('drivers_read'))
-                                                <a class="btn btn-sm btn-default"
+                                                <a class="btn btn-sm btn-outline-info"
                                                    href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'company_id' => $el->id ]) }}">
                                                     <i class="fa fa-user"></i>
                                                 </a>
@@ -606,20 +610,20 @@
                                     <td class="td-option">
                                         <nobr>
                                             @if(user()->access('medic_read'))
-                                                <a class="btn btn-sm btn-danger"
+                                                <a class="btn btn-sm btn-outline-info"
                                                    href="{{ route('home', 'medic') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
                                                     МЕД
                                                 </a>
                                             @endif
                                             @if(user()->access('tech_read'))
-                                                <a class="btn btn-sm btn-info"
+                                                <a class="btn btn-sm btn-outline-info"
                                                    href="{{ route('home', 'tech') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
                                                     ТЕХ
                                                     @endif
                                                 </a>
 
                                                 @if(user()->access('journal_pl_accounting'))
-                                                    <a class="btn btn-sm btn-dark"
+                                                    <a class="btn btn-sm btn-outline-info"
                                                        href="{{ route('home', 'Dop') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
                                                         ПЛ
                                                     </a>
