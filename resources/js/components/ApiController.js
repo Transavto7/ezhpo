@@ -56,4 +56,10 @@ export class ApiController {
             params
         });
     }
+
+    saveFieldsVisible(params) {
+        return this.client.post('/api/fields/visible', {
+            params,
+        });
+    }
 }

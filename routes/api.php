@@ -124,4 +124,6 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/field-history', 'FieldHistoryController@save');
     Route::put('/update-ddate/{item_model}/{item_id}/{item_field}', 'ApiController@UpdateProperty')->name('updateDDate');
+
+    Route::post('/fields/visible', 'ApiController@saveFieldsVisible');
 });

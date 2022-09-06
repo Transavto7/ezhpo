@@ -204,4 +204,9 @@ class ApiController extends Controller
             ]);
         }
     }
+
+    public function saveFieldsVisible(Request $request) {
+        $request->user()->fields_visible = json_encode($request->params);
+        $request->user()->save();
+    }
 }

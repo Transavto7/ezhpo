@@ -387,11 +387,6 @@ $(document).ready(function () {
         let checks = JSON.parse(sessionStorage.getItem('fields'));
 
         if (!checks) {
-            checks = JSON.parse(localStorage.getItem('fields'));
-            console.log(JSON.parse(localStorage.getItem('fields')));
-        }
-
-        if (!checks) {
             checks = visibleFields;
         }
 
@@ -678,19 +673,18 @@ $(document).ready(function () {
         });
     }
 
-    window.saveChecks = function () {
+    window.saveChecks = async function () {
        let checks = JSON.parse(sessionStorage.getItem('fields'));
        if (!checks) {
            checks = Object.assign({}, visibleFields);
        }
 
-       localStorage.setItem('fields', JSON.stringify(checks));
+        await API_CONTROLLER.saveFieldsVisible(checks);
         $('.toast-save-checks').toast('show');
     }
 
-    window.resetChecks = function () {
+    window.resetChecks = async function () {
         let checks = Object.assign({}, visibleFields);
-        localStorage.setItem('fields',  JSON.stringify(checks));
         sessionStorage.setItem('fields',  JSON.stringify(checks));
 
         $('.ankets-form input').each(function () {
@@ -703,6 +697,7 @@ $(document).ready(function () {
             }
         });
 
+        await API_CONTROLLER.saveFieldsVisible(null);
         $('.toast-reset-checks').toast('show');
     }
 
