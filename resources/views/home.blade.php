@@ -37,7 +37,7 @@ function checkChangeResult($anketa) {
         return false;
     }
 
-    if (!$anketa->company_id || !$anketa->company_name) {
+    if (!$anketa->company_id || !$anketa->company_name || !$anketa->date) {
         return false;
     }
 
@@ -404,8 +404,8 @@ $permissionToExportPrikazPL = (
                                             @if($permissionToUpdate)
                                             <td class="td-option not-export">
                                                 <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i></a>
-                                                @if(checkChangeResult($anketa))
-                                                    @if ($anketa->date)
+                                                @if($anketa->is_dop && !$anketa->result_dop)
+                                                    @if (checkChangeResult($anketa))
                                                         <a
                                                             href="{{ route('changeResultDop', ['result_dop' => 'Утвержден', 'id' => $anketa->id]) }}"
                                                             class="btn btn-sm btn-success">
