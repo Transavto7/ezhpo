@@ -9,6 +9,7 @@ require('./init-plugins')
 require('chosen-js')
 require('croppie')
 require('suggestions-jquery')
+
 $.fn.select2.amd.require(['select2/selection/search'], function (Search) {
     Search.prototype.searchRemoveChoice = function (decorated, item) {
         this.trigger('unselect', {
@@ -21,6 +22,10 @@ $.fn.select2.amd.require(['select2/selection/search'], function (Search) {
 });
 
 $(document).ready(function () {
+
+    if (typeof fieldsVisible !== 'undefined' && !fieldsVisible) {
+        fieldsVisible = JSON.parse(JSON.stringify(visibleFields));
+    }
 
     const Toast = swal.mixin({
         toast: true,
@@ -384,16 +389,10 @@ $(document).ready(function () {
     }
 
     $(window).on('load', function () {
-        let checks = JSON.parse(sessionStorage.getItem('fields'));
-
-        if (!checks) {
-            checks = visibleFields;
-        }
-
         $('.ankets-form input').each(function () {
             const type = $(this).parents('.ankets-form').attr('anketa');
             const name = $(this).attr('name');
-            if (checks[type] && checks[type][name]) {
+            if (fieldsVisible[type] && fieldsVisible[type][name]) {
                 $(this).prop("checked", true);
             } else {
                 $(this).prop("checked", false);
@@ -430,13 +429,7 @@ $(document).ready(function () {
                 const id = el.attr('name');
                 const prop_checked = el.prop('checked');
 
-                let checks = JSON.parse(sessionStorage.getItem('fields'));
-                if (!checks) {
-                    checks = Object.assign({}, visibleFields);
-                }
-
-                checks[type][id] = prop_checked;
-                sessionStorage.setItem('fields', JSON.stringify(checks));
+                fieldsVisible[type][id] = prop_checked;
 
                 showTableData(el)
             })
@@ -674,23 +667,19 @@ $(document).ready(function () {
     }
 
     window.saveChecks = async function () {
-       let checks = JSON.parse(sessionStorage.getItem('fields'));
-       if (!checks) {
-           checks = Object.assign({}, visibleFields);
-       }
-
-        await API_CONTROLLER.saveFieldsVisible(checks);
+        await API_CONTROLLER.saveFieldsVisible(fieldsVisible);
         $('.toast-save-checks').toast('show');
     }
 
     window.resetChecks = async function () {
-        let checks = Object.assign({}, visibleFields);
-        sessionStorage.setItem('fields',  JSON.stringify(checks));
+        fieldsVisible = JSON.parse(JSON.stringify(visibleFields));
+
+        console.log(fieldsVisible);
 
         $('.ankets-form input').each(function () {
             const type = $(this).parents('.ankets-form').attr('anketa');
             const name = $(this).attr('name');
-            if (checks[type] && checks[type][name]) {
+            if (fieldsVisible[type] && fieldsVisible[type][name]) {
                 $(this).prop("checked", true);
             } else {
                 $(this).prop("checked", false);

@@ -20,9 +20,7 @@
             @endif
         };
 
-        console.log(JSON.parse(`{!! user()->fields_visible !!}`));
-        sessionStorage.setItem('fields',  `{!! user()->fields_visible !!}`);
-        console.log(sessionStorage.getItem('fields'));
+        let fieldsVisible = JSON.parse(`{!! user()->fields_visible !!}`)
     </script>
 
 @endsection
