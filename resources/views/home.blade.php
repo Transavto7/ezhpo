@@ -20,7 +20,12 @@
             @endif
         };
 
-        let fieldsVisible = JSON.parse(`{!! user()->fields_visible !!}`)
+        @if (user()->fields_visible)
+            let fieldsVisible = JSON.parse(`{!! user()->fields_visible !!}`)
+        @else
+            let fieldsVisible = null;
+        @endif
+
     </script>
 
 @endsection
