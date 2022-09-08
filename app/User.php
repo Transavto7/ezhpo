@@ -205,7 +205,7 @@ class User extends Authenticatable
                     break;
                 case 11:
                     $user->roles()->attach(5);
-                    break 2;
+                    continue 2;
                 case 12:
                     $user->roles()->attach(6);
                     break;

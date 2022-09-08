@@ -165,7 +165,7 @@ class HomeController extends Controller
 
         $user = \Auth::user();
 
-        $validTypeAnkets       = User::$userRolesKeys[$user->role];
+        $validTypeAnkets       = User::$userRolesKeys[$user->role] ?? 'medic';
         $blockedToExportFields = [];
         $typeAnkets            = $request->type_ankets;
 
