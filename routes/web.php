@@ -21,44 +21,6 @@ Route::get('/releases', 'IndexController@RenderReleases')->name('releases');
 //Route::resource
 //Route::get('/roles/fetchRoleData', 'RoleController@fetchRoleData');
 
-Route::get('/fix/company', function() {
-    $companies = \App\Company::all();
-    foreach ($companies as $company) {
-        if (User::where('login', '0' . $company->hash_id)->first()) {
-            continue;
-        }
-
-        $user = User::create([
-            'hash_id'  => mt_rand(10000,99999) . date('s'),
-            'email'    => $company->hash_id . '-' . mt_rand(100000, 499999).'@ta-7.ru',
-            'api_token' => Hash::make(date('H:i:s').sha1($company->hash_id)),
-            'login'    => '0' . $company->hash_id,
-            'password' => Hash::make('0' . $company->hash_id),
-            'name'     => $company->name,
-            'role'     => 12,
-            'company_id' => $company->id
-        ]);
-
-        $user->roles()->attach(6);
-    }
-});
-
-Route::get('/fix', function() {
-    \App\User::fetchRoles();
-//    \App\Anketa::whereIn('type_view', ['Предрейсовый', 'Предсменный', 'предрейсовый/Предсменный', 'Предрейсовый/предсменный',
-//        'предрейсовый/предсменный'])->update(
-//        [
-//            'type_view' => 'Предрейсовый/Предсменный'
-//        ]
-//    );
-//    \App\Anketa::whereIn('type_view', ['Послерейсовый', 'Послесменный', 'послерейсовый/Послесменный', 'Послерейсовый/послесменый',
-//        'Послерейсовый/послесменый', 'послерейсовый/послесменный'])->update(
-//        [
-//            'type_view' => 'Послерейсовый/Послесменный'
-//        ]
-//    );
-});
-
 Route::get('/show-video', function () {
     $url = isset($_GET['url']) ? $_GET['url'] : '';
 

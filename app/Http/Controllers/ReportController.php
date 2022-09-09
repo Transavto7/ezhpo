@@ -440,14 +440,14 @@ class ReportController extends Controller
                 array_unique($reports->where('driver_id', $report->driver_id)->pluck('pv_id')->toArray()));
 
             $total = $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['total'] =
-                $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['total']?? 0 + 1;
+                ($result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['total']?? 0) + 1;
 
             $result[$key]['reports'][$report->driver_id]['types'][$report->type_anketa]['total'] =
-                $result[$key]['reports'][$report->driver_id]['types'][$report->type_anketa]['total'] ?? 0 + 1;
+                ($result[$key]['reports'][$report->driver_id]['types'][$report->type_anketa]['total'] ?? 0) + 1;
 
             if ($report->is_dop && $report->result_dop == null) {
                 $result[$key]['reports'][$report->driver_id]['types']['is_dop']['total'] =
-                    $result[$key]['reports'][$report->driver_id]['types']['is_dop']['total'] ?? 0 + 1;
+                    ($result[$key]['reports'][$report->driver_id]['types']['is_dop']['total'] ?? 0) + 1;
             }
 
             if ($report->driver_id == null) {
@@ -565,12 +565,11 @@ class ReportController extends Controller
                 array_unique($reports->where('car_id', $report->car_id)->pluck('pv_id')->toArray()));
 
             $total = $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['total']
-                = $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['total'] ?? 0 + 1;
-
+                = ($result[$key]['reports'][$report->car_id]['types'][$report->type_view]['total'] ?? 0) + 1;
 
             if ($report->is_dop && $report->result_dop == null) {
                 $result[$key]['reports'][$report->car_id]['types']['is_dop']['total']
-                    = $result[$key]['reports'][$report->car_id]['types']['is_dop']['total'] ?? 0 + 1;
+                    = ($result[$key]['reports'][$report->car_id]['types']['is_dop']['total'] ?? 0) + 1;
             }
 
             if ($report->products_id == null) {
