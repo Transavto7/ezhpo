@@ -542,7 +542,8 @@ class ReportController extends Controller
                         ]);
                     });
             })
-            ->select('anketas.car_gos_number', 'type_auto', 'period_pl', 'car_id', 'date', 'result_dop', 'type_anketa',
+            ->select('anketas.car_gos_number', 'type_auto', 'period_pl', 'car_id', 'date', 'result_dop',
+                'type_anketa', 'is_dop',
                'pv_id', 'products_id', 'type_view')
             ->get();
 
@@ -565,6 +566,7 @@ class ReportController extends Controller
 
             $total = $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['total']
                 = $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['total'] ?? 0 + 1;
+
 
             if ($report->is_dop && $report->result_dop == null) {
                 $result[$key]['reports'][$report->car_id]['types']['is_dop']['total']
