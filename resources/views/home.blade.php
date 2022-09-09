@@ -68,6 +68,7 @@ $permissionToView = (
     || user()->access('map_report_read') && $type_ankets == 'report_cart'
     || user()->access('journal_pl_accounting') && $type_ankets == 'Dop'
     || user()->access('errors_sdpo_read') && $type_ankets == 'pak'
+    || user()->access('approval_queue_view') && $type_ankets == 'pak_queue'
 );
 
 
@@ -233,7 +234,7 @@ $permissionToExportPrikazPL = (
                         {{-- ОЧИСТКА ОЧЕРЕДИ СДПО --}}
                         @if($type_ankets === 'pak_queue')
                             @if(user()->access('approval_queue_clear'))
-                                <a href="?clear=1&type_anketa={{ $type_ankets }}" class="btn btn-warning">Очистить очередь</a>
+                                <a href="?clear=1&type_anketa={{ $type_ankets }}" class="btn btn-warning mb-2">Очистить очередь</a>
                             @endif
                         @endif
                     @endif
