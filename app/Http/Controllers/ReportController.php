@@ -12,6 +12,7 @@ use App\Product;
 use App\Req;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -206,7 +207,9 @@ class ReportController extends Controller
 
         foreach ($medics->groupBy('driver_id') as $driver) {
             $id = $driver->first()->driver_id;
-            $result[$id]['driver_fio'] = $driver->first()->driver_fio;
+            $driver_fio = $driver->where('driver_fio', '!=', null)->first()->driver_fio;
+            $result[$id]['driver_fio'] = $driver_fio;
+
             $result[$id]['pv_id'] = implode('; ', array_unique($driver->pluck('pv_id')->toArray()));
 
             foreach ($driver->where('type_anketa', 'medic')->groupBy('type_view') as $rows) {
@@ -334,8 +337,8 @@ class ReportController extends Controller
 
         foreach ($techs->groupBy('car_id') as $car) {
             $id = $car->first()->car_id;
-            $result[$id]['car_gos_number'] = $car->first()->car_gos_number;
-            $result[$id]['type_auto'] = $car->first()->type_auto;
+            $result[$id]['car_gos_number'] = $car->where('car_gos_number', '!=', null)->first()->car_gos_number;
+            $result[$id]['type_auto'] = $car->where('type_auto', '!=', null)->first()->type_auto;
             $result[$id]['pv_id'] = implode('; ', array_unique($car->pluck('pv_id')->toArray()));
 
             foreach ($car->groupBy('type_view') as $rows) {
@@ -426,10 +429,14 @@ class ReportController extends Controller
         $result = [];
 
         foreach ($reports as $report) {
-            if ($report->period_pl) {
-                $date = Carbon::parse($report->period_pl);
-            } else {
-                $date = Carbon::parse($report->date);
+            try {
+                if ($report->period_pl) {
+                    $date = Carbon::parse($report->period_pl);
+                } else {
+                    $date = Carbon::parse($report->date);
+                }
+            } catch (Exception $e) {
+                continue;
             }
             $key = $date->year . '-' . $date->month; // key by date
 
@@ -550,10 +557,14 @@ class ReportController extends Controller
         $result = [];
 
         foreach ($reports as $report) {
-            if ($report->period_pl) {
-                $date = Carbon::parse($report->period_pl);
-            } else {
-                $date = Carbon::parse($report->date);
+            try {
+                if ($report->period_pl) {
+                    $date = Carbon::parse($report->period_pl);
+                } else {
+                    $date = Carbon::parse($report->date);
+                }
+            } catch (Exception $e) {
+                continue;
             }
             $key = $date->year . '-' . $date->month; // key by date
 
