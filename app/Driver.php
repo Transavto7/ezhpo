@@ -138,32 +138,42 @@ class Driver extends Model
         $Driver = Driver::where('hash_id', $id)->first();
 
         if($Driver) {
-            $y = date('Y');
-
-            $year_birthday = date('Y', strtotime($Driver->year_birthday));
-            $age = $y - $year_birthday;
-            $group_risk = '';
-
-            if($age > 50) {
-                $group_risk = 'Возраст';
-            }
-
-            if($tonometer > 140) {
-                $group_risk = 'А\Д';
-            }
-
-            if($test_narko === 'Положительно') {
-                $group_risk = 'Наркотики';
-            } else if ($proba_alko === 'Положительно') {
-                $group_risk = 'Алкоголь';
-            }
-
-            $Driver->group_risk = $group_risk;
-            $Driver->save();
+            $Driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
 
             return true;
         }
 
         return false;
+    }
+
+    public function checkGroupRisk($tonometer, $test_narko, $proba_alko) {
+        $y = date('Y');
+
+        $year_birthday = date('Y', strtotime($this->year_birthday));
+        $age = $y - $year_birthday;
+        $group_risk = '';
+
+        if($age > 50) {
+            $group_risk = 'Возраст';
+        }
+
+        if($tonometer > 140) {
+            $group_risk = 'А\Д';
+        }
+
+        if($test_narko === 'Положительно') {
+            $group_risk = 'Наркотики';
+        } else if ($proba_alko === 'Положительно') {
+            $group_risk = 'Алкоголь';
+        }
+
+        $this->group_risk = $group_risk;
+        $this->save();
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id', 'id')
+            ->withDefault();
     }
 }

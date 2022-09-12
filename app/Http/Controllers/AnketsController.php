@@ -1394,7 +1394,6 @@ class AnketsController extends Controller
                  * ПРОВЕРЯЕМ СТАТУС для поля "Заключение" - от ПАК
                  */
                 if(isset($anketa['sleep_status']) && isset($anketa['people_status']) && isset($anketa['alcometer_result'])) {
-
                     if($anketa['sleep_status'] === 'Да' && $anketa['people_status'] === 'Да' && $anketa['alcometer_result'] <= 0) {
                         $anketa['admitted'] = 'Допущен';
                     } else {

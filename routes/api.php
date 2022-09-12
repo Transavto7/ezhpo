@@ -2,9 +2,7 @@
 
 use Illuminate\Http\Request;
 
-use App\Http\Middleware\{
-    VerifyApiToken
-};
+use Illuminate\Support\Facades\Route;
 
 use App\User;
 use App\Point;
@@ -126,4 +124,8 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/update-ddate/{item_model}/{item_id}/{item_field}', 'ApiController@UpdateProperty')->name('updateDDate');
 
     Route::post('/fields/visible', 'ApiController@saveFieldsVisible');
+});
+
+Route::middleware('auth:api')->prefix('sdpo')->name('sdpo')->group(function () {
+    Route::post('/anketa', 'Api\SdpoController@createAnketa');
 });
