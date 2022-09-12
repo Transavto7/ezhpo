@@ -207,8 +207,8 @@ class ReportController extends Controller
 
         foreach ($medics->groupBy('driver_id') as $driver) {
             $id = $driver->first()->driver_id;
-            $driver_fio = $driver->where('driver_fio', '!=', null)->first()->driver_fio;
-            $result[$id]['driver_fio'] = $driver_fio;
+            $driver_fio = $driver->where('driver_fio', '!=', null)->first();
+            $result[$id]['driver_fio'] = $driver_fio ? $driver_fio->driver_fio : null;
 
             $result[$id]['pv_id'] = implode('; ', array_unique($driver->pluck('pv_id')->toArray()));
 
@@ -337,8 +337,10 @@ class ReportController extends Controller
 
         foreach ($techs->groupBy('car_id') as $car) {
             $id = $car->first()->car_id;
-            $result[$id]['car_gos_number'] = $car->where('car_gos_number', '!=', null)->first()->car_gos_number;
-            $result[$id]['type_auto'] = $car->where('type_auto', '!=', null)->first()->type_auto;
+            $car_gos_number = $car->where('car_gos_number', '!=', null)->first();
+            $type_auto = $car->where('type_auto', '!=', null)->first();
+            $result[$id]['car_gos_number'] = $car_gos_number ? $car_gos_number->car_gos_number : null;
+            $result[$id]['type_auto'] = $type_auto ? $type_auto->type_auto : null;
             $result[$id]['pv_id'] = implode('; ', array_unique($car->pluck('pv_id')->toArray()));
 
             foreach ($car->groupBy('type_view') as $rows) {
