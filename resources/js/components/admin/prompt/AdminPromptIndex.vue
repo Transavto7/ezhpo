@@ -1,6 +1,5 @@
 <template>
     <div class="col-lg-12">
-        {{ permissions }}
         <div class="d-flex buttons flex-wrap">
             <div class="d-flex justify-content-center flex-wrap">
                 <b-button class="mb-3"
