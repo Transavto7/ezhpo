@@ -176,6 +176,22 @@ label {
     z-index: 1000;
 }
 
+.multiselect__option--selected {
+    font-weight: normal;
+}
+
+.ql-toolbar.ql-snow {
+    border: 1px solid #e8e8e8 !important;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.ql-container.ql-snow {
+    border: 1px solid #e8e8e8 !important;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
 /**
 PRINT
  */

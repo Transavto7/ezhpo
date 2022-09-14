@@ -6,6 +6,7 @@
 
 use App\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/fixRoles', function() {
 
@@ -134,6 +135,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('roles', 'RoleController');
     Route::post('roles/return_trash', 'RoleController@returnTrash');
+
+    Route::any('/field/prompt/filter', 'FieldPromptController@getAll');
+    Route::resource('field/prompt', 'FieldPromptController');
 });
 
 

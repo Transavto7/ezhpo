@@ -264,6 +264,10 @@
                             <li><a href="{{ route('releases') }}">Релизы</a></li>
                         @endif
 
+                        @if(user()->access('field_prompt_read'))
+                            <li><a href="{{ route('prompt.index') }}">Подсказки полей</a></li>
+                        @endif
+
 
                     </ul>
                 </li>

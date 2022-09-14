@@ -195,7 +195,6 @@ $permissionToExportPrikazPL = (
                                                 @endisset
                                             @endforeach
                                         </form>
-
                                         <button class="btn btn-success btn-sm mt-3" onclick="saveChecks()">Сохранить</button>
                                         <button class="btn btn-danger btn-sm mt-3" onclick="resetChecks()">Сбросить</button>
                                         <div class="toast mt-2 toast-save-checks position-absolute">
@@ -206,7 +205,7 @@ $permissionToExportPrikazPL = (
 
                                         <div class="toast mt-2 toast-reset-checks position-absolute">
                                             <div class="toast-body bg-danger text-white">
-                                                Успешно сброшенно
+                                                Успешно сброшено
                                             </div>
                                         </div>
                                     </div>
@@ -260,8 +259,22 @@ $permissionToExportPrikazPL = (
                                             @continue
                                         @endif
                                         @isset($fieldsKeys[$field])
-                                            <th @isset($blockedToExportFields[$field]) class="not-export" @endif data-field-key="{{ $field }}">
-                                                {{ (isset($fieldsKeys[$field]['name'])) ? $fieldsKeys[$field]['name'] : $fieldsKeys[$field] }}
+                                            @php $prompt = $fieldPrompts->where('field', $field)->first() @endphp
+                                            <th @isset($blockedToExportFields[$field])
+                                                class="not-export"
+                                                @endisset
+                                                data-field-key="{{ $field }}"
+                                            >
+                                                <span class="user-select-none"
+                                                    @if ($prompt)
+                                                        data-toggle="tooltip"
+                                                        data-html="true"
+                                                        data-trigger="click hover"
+                                                        title="{{ $prompt->content }}"
+                                                    @endif
+                                                >
+                                                    {{ (isset($fieldsKeys[$field]['name'])) ? $fieldsKeys[$field]['name'] : $fieldsKeys[$field] }}
+                                                </span>
 
                                                 <a class="not-export" href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field . $queryString }}">
                                                     <i class="fa fa-sort"></i>
@@ -299,7 +312,7 @@ $permissionToExportPrikazPL = (
 
                                     @if($type_ankets !== 'pak_queue')
                                             @if($permissionToDelete)
-                                            <th class="not-export">#</th>
+                                                <th class="not-export">#</th>
                                             @endif
                                     @endif
                                 </tr>

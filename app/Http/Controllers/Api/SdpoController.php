@@ -21,7 +21,7 @@ class SdpoController extends Controller
      * Creating anketa by sdpo request
      */
     public function createAnketa(Request $request) {
-        $driver = Driver::find($request->driver_id);
+        $driver = Driver::where('hash_id', $request->driver_id)->first();
         $user = $request->user('api');
         $sms = new SmsController();
 
@@ -62,7 +62,7 @@ class SdpoController extends Controller
         $medic['type_view'] = $request->type_view ?? 'Послерейсовый/Послесменный';
         $medic['flag_pak'] = 'СДПО А';
 
-        if($driver->year_birthday !== '' && $driver->year_birthday !== '0000-00-00') {
+        if ($driver->year_birthday !== '' && $driver->year_birthday !== '0000-00-00') {
             $medic['driver_year_birthday'] = $driver->year_birthday;
         }
 
@@ -78,8 +78,8 @@ class SdpoController extends Controller
         if ($request->number_list_road) {
             $medic['number_list_road'] = $request->number_list_road;
         } else {
-            $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
-            $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
+            $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->count();
+            $suffix_anketa = $findCurrentPL > 0 ? '/' . ($findCurrentPL + 1) : '';
             $medic['number_list_road'] = $driver->hash_id . '-' . date('d.m.Y', strtotime($medic['date'])) . $suffix_anketa;
         }
 
@@ -89,11 +89,11 @@ class SdpoController extends Controller
 
         //ПРОВЕРЯЕМ статус для поля "Заключение"
         $ton = explode('/', $tonometer);
-        if($proba_alko === 'Положительно' || $test_narko === 'Положительно'
+        if ($proba_alko === 'Положительно' || $test_narko === 'Положительно'
             || $medic['med_view'] !== 'В норме' || $medic['t_people'] >= 38 || $ton[0] >= 150) {
             $admitted = 'Не допущен';
         }
-        if($request->sleep_status && $request->people_status && $request->alcometer_result) {
+        if ($request->sleep_status && $request->people_status && $request->alcometer_result) {
             if($request->sleep_status === 'Нет' && $request->people_status === 'Нет' && $request->alcometer_result > 0) {
                 $admitted = 'Не допущен';
             }
@@ -110,7 +110,7 @@ class SdpoController extends Controller
         $anketa = Anketa::create($medic);
 
         // ОТПРАВКА SMS
-        if($anketa['admitted'] == 'Не допущен' && isset($Company)) {
+        if ($anketa['admitted'] == 'Не допущен') {
             $phone_to_call = Settings::setting('sms_text_phone');
             $sms->sms($company->where_call, Settings::setting('sms_text_driver') . " $driver->fio . $phone_to_call");
         }
