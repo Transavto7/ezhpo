@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { VueEditor } from "vue2-editor";
+import { VueEditor, Quill } from "vue2-editor";
 
 export default {
     components: { VueEditor },
@@ -46,6 +46,10 @@ export default {
 
             ]
         }
+    },
+    mounted() {
+        const ColorClass = Quill.import('attributors/class/color');
+        Quill.register(ColorClass, true);
     },
     methods: {
         validate() {
