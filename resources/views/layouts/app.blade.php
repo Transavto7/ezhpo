@@ -56,10 +56,10 @@
     @yield('custom-styles')
 </head>
 <body>
-{{--    <div id="page-preloader" class="preloader">--}}
-{{--        <div class="lds-ring"><div></div><div></div><div></div><div></div></div>--}}
-{{--        <span class="text-white">Загрузка</span>--}}
-{{--    </div>--}}
+    <div id="page-preloader" class="preloader">
+        <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+        <span class="text-white">Загрузка</span>
+    </div>
 
     <div id="app" class="page @yield('class-page')">
         @include('layouts.header')
