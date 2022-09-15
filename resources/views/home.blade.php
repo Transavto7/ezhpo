@@ -372,6 +372,22 @@ $permissionToExportPrikazPL = (
                                                             @endforeach
                                                         @endif
 
+                                                    @elseif($anketaKey === 'company_name' && user()->access('company_read'))
+                                                        <a href="{{ route('renderElements', ['model' => 'Company', 'filter' => 1, 'name' => $anketa[$anketaKey] ]) }}">
+                                                            {{ $anketa[$anketaKey] }}
+                                                        </a>
+                                                    @elseif($anketaKey === 'user_name' && user()->access('employee_read'))
+                                                        <a href="{{ route('users', ['name' => $anketa[$anketaKey] ]) }}">
+                                                            {{ $anketa[$anketaKey] }}
+                                                        </a>
+                                                    @elseif($anketaKey === 'driver_fio' && user()->access('drivers_read'))
+                                                        <a href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'fio' => $anketa[$anketaKey] ]) }}">
+                                                            {{ $anketa[$anketaKey] }}
+                                                        </a>
+                                                    @elseif($anketaKey === 'car_gos_number' && user()->access('cars_read'))
+                                                        <a href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'gos_number' => $anketa[$anketaKey] ]) }}">
+                                                            {{ $anketa[$anketaKey] }}
+                                                        </a>
                                                     @else
 
                                                         {{ $anketa[$anketaKey] }}

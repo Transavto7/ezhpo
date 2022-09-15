@@ -505,27 +505,29 @@
 
                                                     @if($elK === 'products_id' || $elK === 'company_id' || $elK === 'req_id' || $elK === 'pv_id' || $elK === 'user_id' || $elK === 'town_id' || $elK === 'essence')
                                                         @if($elK === 'company_id')
-
-                                                            @if(($model === 'Driver' || $model === 'Car') && $el->$elK && auth()->user()->hasRole('client') && auth()->user()->hasRole('operator_sdpo'))
-                                                                <div>
-                                                                    <a href="{{ route('renderElements', ['model' => 'Company', 'filter' => 1, 'id' => $el->company_id ]) }}">
-                                                                        {{ app('App\Company')->getName($el->company_id) }}
-                                                                    </a>
-
-                                                                    <p>
+                                                            <div>
+                                                                @if(user()->access('company_read'))
+                                                                        <a href="{{ route('renderElements', ['model' => 'Company', 'filter' => 1, 'id' => $el->company_id ]) }}">
+                                                                            {{ app('App\Company')->getName($el->company_id) }}
+                                                                        </a>
+                                                                @else
+                                                                    {{ app('App\Company')->getName($el->company_id) }}
+                                                                @endif
+                                                                <p>
+                                                                    @if(user()->access('cars_read'))
                                                                         <a class="btn btn-sm btn-outline-info"
                                                                            href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'company_id' => $el->company_id ]) }}">
                                                                             <i class="fa fa-car"></i>
                                                                         </a>
+                                                                    @endif
+                                                                    @if(user()->access('drivers_read'))
                                                                         <a class="btn btn-sm btn-outline-info"
                                                                            href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'company_id' => $el->company_id ]) }}">
                                                                             <i class="fa fa-user"></i>
                                                                         </a>
-                                                                    </p>
-                                                                </div>
-                                                            @else
-                                                                {{ app('App\Company')->getName($el->company_id) }}
-                                                            @endif
+                                                                    @endif
+                                                                </p>
+                                                            </div>
 
                                                         @elseif ($elK === 'user_id')
                                                             {{ app('App\User')->getName($el->user_id, false) }}

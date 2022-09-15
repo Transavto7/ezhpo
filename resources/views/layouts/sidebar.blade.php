@@ -68,7 +68,7 @@
                 </li>
             @endif
 
-            @if(user()->access('approval_queue_view'))
+            @if(user()->access('approval_queue_view', 'approval_queue_clear'))
                 @php
                     $countPakQueue = \App\Anketa::where('type_anketa', 'pak_queue')->count();
                 @endphp
