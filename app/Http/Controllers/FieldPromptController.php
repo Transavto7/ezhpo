@@ -14,7 +14,7 @@ class FieldPromptController extends Controller
     public function index()
     {
         $types = FieldPrompt::getTypes();
-        $fields = FieldPrompt::getFieldList();
+        $fields = FieldPrompt::getFields();
 
         return view('admin.prompt.index', [
             'types' => $types,
@@ -40,6 +40,15 @@ class FieldPromptController extends Controller
             $prompts->where('field', $request->field);
         }
 
+        if ($request->sortBy) {
+            $sort = 'asc';
+            if ($request->sortDesc) {
+                $sort = 'desc';
+            }
+
+            $prompts->orderBy($request->sortBy, $sort);
+        }
+
         return $prompts->paginate(15);
     }
 
@@ -56,16 +65,7 @@ class FieldPromptController extends Controller
      */
     public function store(Request $request)
     {
-        FieldPrompt::updateOrCreate(
-            [
-            'type' => $request->type,
-            'field' => $request->field,
-            ],
-            [
-            'type' => $request->type,
-            'field' => $request->field,
-            'content' => $request->get('content')
-        ]);
+        //
     }
 
     /**
@@ -93,7 +93,7 @@ class FieldPromptController extends Controller
         $prompt = FieldPrompt::find($id);
 
         if ($prompt) {
-            $prompt->update($request->only('type', 'field', 'content'));
+            $prompt->update($request->only('name', 'content'));
         }
     }
 

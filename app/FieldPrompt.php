@@ -12,77 +12,35 @@ class FieldPrompt extends Model
     public $fillable = [
         'type',
         'field',
+        'name',
         'content',
         'deleted_id',
     ];
 
-    /*
-     * return array
-     * journal => array key and name fields
-     */
-    public static function getFieldList(): array
+    public static function getTypes(): array
     {
-        $result = [];
-
-        $result['medic'] = self::getFieldsByType('medic');
-        $result['tech'] = self::getFieldsByType('tech');
-        $result['bdd'] = self::getFieldsByType('bdd');
-        $result['dop'] = self::getFieldsByType('Dop');
-        $result['pechat_pl'] = self::getFieldsByType('pechat_pl');
-        $result['report_cart'] = self::getFieldsByType('report_cart');
-
-        return $result;
-    }
-
-    /*
-     * return array key => name
-     * by only key array
-     */
-    private static function getFieldsByType(string $type): array
-    {
-        $result = [];
-
-        foreach (Anketa::$fieldsKeysTable[$type] as $key) {
-            $result[] =[
-              'key' => $key,
-              'name' => __("fields.$type.$key"),
+        $types = [];
+        foreach (FieldPrompt::groupBy('type')->pluck('type') as $type) {
+            $types[] = [
+                'key' => $type,
+                'name' => __('ankets.' . strtolower($type)),
             ];
         }
 
-        return $result;
+        return $types;
     }
 
-    /*
-     * Return all types journal in system
-     */
-    public static function getTypes(): array
+    public static function getFields(): array
     {
-        return [
-                [
-                    'key' => 'medic',
-                    'name' => __('ankets.medic'),
-                ],
-                [
-                    'key' => 'tech',
-                    'name' => __('ankets.tech'),
-                ],
-                [
-                    'key' => 'bdd',
-                    'name' => __('ankets.bdd'),
-                ],
-                [
-                    'key' => 'dop',
-                    'name' => __('ankets.dop'),
-                ],
-                [
-                    'key' => 'pechat_pl',
-                    'name' => __('ankets.pechat_pl'),
-                ],
-                [
-                    'key' => 'report_cart',
-                    'name' => __('ankets.report_cart'),
-                ],
-        ];
+        $fields = [];
+        foreach (FieldPrompt::select('type', 'field', 'name')->get() as $field) {
+            $fields[$field->type][] = [
+                'key' => $field->field,
+                'name'=> $field->name
+            ];
+        }
+
+        return $fields;
     }
 
     public function deleted_user()

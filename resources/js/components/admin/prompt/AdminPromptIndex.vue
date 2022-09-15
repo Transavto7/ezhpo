@@ -2,14 +2,6 @@
     <div class="col-lg-12">
         <div class="d-flex buttons flex-wrap">
             <div class="d-flex justify-content-center flex-wrap">
-                <b-button class="mb-3"
-                          variant="success"
-                          size="sm"
-                          @click="$refs.addModal.open()"
-                          v-if="permissions.permission_to_create"
-                >
-                    <b-icon-plus></b-icon-plus> Добавить
-                </b-button>
                 <div v-if="permissions.permission_to_trash">
                     <b-button class="mb-3 ml-2"
                               size="sm"
@@ -45,6 +37,7 @@
                             placeholder="Выберите журнал"
                             label="name"
                             :taggable="true"
+                            @sort-changed="loadData"
                         >
                             <span slot="noResult">Результатов не найдено</span>
                             <span slot="noOptions">Результатов не найдено</span>
@@ -54,7 +47,7 @@
                         <multiselect
                             v-model="field"
                             :options="fieldsType()"
-                            :disabled="!filters.type"
+                            :disabled="!type"
                             :searchable="true"
                             :close-on-select="true"
                             :show-labels="false"
@@ -106,12 +99,9 @@
                         {{ types.filter((el) => el.key === item.type)[0].name }}
                     </template>
 
-                    <template #cell(field)="{ item }">
-                        {{ fields[item.type].filter((el) => el.key === item.field)[0].name }}
-                    </template>
-
                     <template #cell(content)="{ item }">
-                        <div class="text-center" v-html="item.content"></div>
+                        <div v-if="item.content" class="text-center" v-html="item.content"></div>
+                        <span v-else class="badge bg-success text-white">Отсутствует</span>
                     </template>
 
                     <template #cell(actions)="row">
@@ -151,19 +141,12 @@
                             :per-page="perPage"
                             v-model="currentPage"
                             class="my-0"
-                            @change="loadData"
+                            @change="changePage"
                         />
                     </b-col>
                 </b-row>
             </div>
         </div>
-
-        <AdminPromptAddModal
-            :types="types"
-            :fields="fields"
-            ref="addModal"
-            v-on:success="loadData"
-        />
 
         <AdminPromptDeleteModal
             ref="deleteModal"
@@ -179,13 +162,12 @@
             :types="types"
             :fields="fields"
             ref="editModal"
-            v-on:success="loadData"
+            v-on:success="updatePrompt"
         />
     </div>
 </template>
 
 <script>
-import AdminPromptAddModal from "./AdminPromptAddModal";
 import AdminPromptDeleteModal from "./AdminPromptDeleteModal";
 import AdminPromptRestoreModal from "./AdminPromptRestoreModal";
 import AdminPromptEditModal from "./AdminPromptEditModal";
@@ -194,7 +176,6 @@ import {addParams, getParams} from "../../const/params";
 export default {
     props: ['types', 'fields', 'permissions'],
     components: {
-        AdminPromptAddModal,
         AdminPromptDeleteModal,
         AdminPromptRestoreModal,
         AdminPromptEditModal
@@ -219,7 +200,7 @@ export default {
                     label: "Журнал"
                 },
                 {
-                    key: "field",
+                    key: "name",
                     sortable: true,
                     label: "Поле"
                 },
@@ -251,18 +232,21 @@ export default {
         }
     },
     mounted() {
-      this.filters = getParams();
-      if (this.filters.trash) {
-          this.changeTrash(true);
-      }
-      if (this.filters.type) {
-          this.type = this.types.filter(el => el.key === this.filters.type)[0];
+        this.filters = getParams();
+        if (this.filters.trash) {
+            this.changeTrash(true);
+        }
+        if (this.filters.type) {
+            this.type = this.types.filter(el => el.key === this.filters.type)[0];
 
-          if (this.filters.field) {
-              this.field = this.fields[this.filters.type].filter(el => el.key === this.filters.field)[0];
-          }
-      }
-      this.loadData();
+            if (this.filters.field) {
+                this.field = this.fields[this.filters.type].filter(el => el.key === this.filters.field)[0];
+            }
+        }
+
+        this.currentPage = Number(this.filters.page) || 1;
+
+        this.loadData();
     },
     methods: {
         fieldsType() {
@@ -283,13 +267,29 @@ export default {
             }
             this.loadData();
         },
-        loadData(page = this.currentPage) {
+        updatePrompt(prompt) {
+            this.fields[prompt.type] = this.fields[prompt.type].map(p => {
+                if (p.key === prompt.field) {
+                    p.name = prompt.name;
+                }
+                return p;
+            });
+
+            this.loadData();
+        },
+        changePage(page) {
+          this.currentPage = page;
+          this.loadData();
+        },
+        loadData() {
             this.filters.field = this.field?.key;
             this.filters.type = this.type?.key;
 
             const data = {
-                page,
                 ...this.filters,
+                page: this.currentPage,
+                sortBy: this.sortBy,
+                sortDesc: this.sortDesc
             };
 
             addParams(data);
