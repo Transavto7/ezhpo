@@ -344,7 +344,7 @@
                 </div>
 
                 <div class="toggle-hidden col-md-12" id="elements-filters">
-                    <form action="" method="GET" class="elements-form-filter">
+                    <form onsubmit="document.querySelector('#page-preloader').classList.remove('hide')" action="" method="GET" class="elements-form-filter">
 
                         <input type="hidden" name="filter" value="1">
                         @if(request()->get('deleted'))
