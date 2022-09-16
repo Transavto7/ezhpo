@@ -566,9 +566,8 @@ $(document).ready(function () {
             PARENT_ELEM = parent;
         }
 
-        console.log(is_dop)
         //check-prop-one
-        if(!is_dop){
+        if(!is_dop) {
             let answer = await $.ajax({
                 url: `/api/check-prop-one/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
                 headers: {'Authorization': 'Bearer ' + API_TOKEN},
@@ -579,6 +578,7 @@ $(document).ready(function () {
                         PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', false);
                     }else{
                         element.removeClass('text-success').addClass('text-danger').text(`Не найдено`);
+                        parent.prevObject.attr('company', null);
                         PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', true);
                     }
                 }
@@ -590,7 +590,6 @@ $(document).ready(function () {
         }
 
 
-        console.log(prop, model, val)
         $.ajax({
             url: `/api/check-prop/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
             headers: {'Authorization': 'Bearer ' + API_TOKEN},
@@ -599,7 +598,7 @@ $(document).ready(function () {
                 const DATA = data.data.message;
 
                 if ((model === 'Driver' || model === 'Car') && DATA.company_hash_id) {
-                    const form =  parent.closest('#ANKETA_FORM');
+                    const form = parent.closest('#ANKETA_FORM');
                     form.find('input[name="company_id"]').val(DATA.company_hash_id);
                     const select = form.find('select[name="company_id"]');
 
@@ -608,7 +607,6 @@ $(document).ready(function () {
                             return element.value === DATA.company_hash_id;
                         });
 
-                        console.log(DATA);
                         if (exist.length < 1) {
                             select.append($('<option>', {
                                 value: DATA.company_hash_id,
@@ -658,6 +656,41 @@ $(document).ready(function () {
                         $('#ANKETA_FORM').find('input[name="company_id"]').parent().find('.app-checker-prop').removeClass('text-danger').addClass('text-success').text(DATA.company_name);
                         PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', false);
                         checkInputProp('id', 'Company', DATA.company_id, 'name', $('#ANKETA_FORM').find('input[name="company_id"]').parent())
+                    }
+                }
+
+                if (model === 'Driver' && DATA.company_hash_id) {
+                    parent.prevObject.attr('company', DATA.company_hash_id);
+                    const driverInput = parent.closest('#ANKETA_FORM').find('.car-input');
+                    driverInput.each((id, input) => {
+                        const attr = $(input).attr('company');
+                       if (attr && attr !== DATA.company_hash_id) {
+                           const mess = $(input).parent()?.find('.app-checker-prop');
+                           if (mess?.find('#company')?.length < 1) {
+                               mess.append(
+                                   `<br><span id="company" class="text-danger">Компания автомобиля не соответствует компании водителя</span>`
+                               );
+                           }
+                       } else if (attr && attr === DATA.company_hash_id) {
+                           const mess = $(input).parent()?.find('.app-checker-prop');
+                           if (mess?.find('#company')?.length > 0) {
+                               mess.find('#company').remove();
+                           }
+                       }
+                    });
+                }
+
+                if (model === 'Car' && DATA.company_hash_id) {
+                    const driverInput = parent.closest('#ANKETA_FORM').find('input[name="driver_id"]');
+                    parent.prevObject.attr('company', DATA.company_hash_id);
+
+                    if (driverInput) {
+                        const driverCompany = driverInput.attr('company');
+                        if (driverCompany && driverCompany !== DATA.company_hash_id) {
+                            parent.find('.app-checker-prop').append(
+                                `<br><span id="company" class="text-danger">Компания автомобиля не соответствует компании водителя</span>`
+                            );
+                        }
                     }
                 }
 
@@ -1008,7 +1041,7 @@ $(document).ready(function () {
      */
     $('.API_FORM_SEND').submit(function (e) {
         e.preventDefault()
-
+        document.querySelector('#page-preloader').classList.remove('hide');
         let data = $(this).serialize(), action = this.action, method = this.method,
             formData = new FormData(this), successTitle = $(this).data('successTitle')
 
@@ -1019,13 +1052,13 @@ $(document).ready(function () {
                 'Authorization': 'Bearer ' + API_TOKEN
             }
         }).then(response => {
-            console.log(response)
-
             swal.fire({
                 title: successTitle,
                 icon: 'info'
             });
-        })
+        }).final(() => {
+            document.querySelector('#page-preloader').classList.add('hide');
+        });
     })
 
     // Проверяем ссылки в меню

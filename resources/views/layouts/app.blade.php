@@ -51,6 +51,16 @@
             const preloader = document.querySelector('#page-preloader');
             preloader.classList.add('hide');
         });
+
+        setInterval(() => {
+            if (document.readyState !== "complete") {
+                return;
+            }
+            const preloader = document.querySelector('#page-preloader');
+            if (preloader && !preloader.classList.contains('hide')) {
+                preloader.classList.add('hide');
+            }
+        }, 1000);
     </script>
 
     @yield('custom-styles')

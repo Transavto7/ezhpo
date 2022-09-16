@@ -145,7 +145,7 @@
                             action="{{ route('addAnket') }}"
                           @endif
                           class="form-horizontal"
-
+                          onsubmit="document.querySelector('#page-preloader').classList.remove('hide')"
                           enctype="multipart/form-data"
                           id="ANKETA_FORM"
                     >
