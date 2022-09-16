@@ -38,10 +38,6 @@ class CreateFieldPromptsTable extends Migration
             'guard_name' => 'Подсказки полей - Редактирование',
         ]);
         Permission::updateOrCreate([
-            'name'        => 'field_prompt_create',
-            'guard_name' => 'Подсказки полей - Добавление',
-        ]);
-        Permission::updateOrCreate([
             'name'        => 'field_prompt_delete',
             'guard_name' => 'Подсказки полей - Удаление',
         ]);
@@ -227,7 +223,6 @@ class CreateFieldPromptsTable extends Migration
         Permission::whereIn('name', [
             'field_prompt_read',
             'field_prompt_edit',
-            'field_prompt_create',
             'field_prompt_delete',
             'field_prompt_trash',
         ]);

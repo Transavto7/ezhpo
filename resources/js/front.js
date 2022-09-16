@@ -1039,7 +1039,7 @@ $(document).ready(function () {
     /**
      * АВТО-ОТПРАВКА ФОРМ
      */
-    $('.API_FORM_SEND').submit(function (e) {
+    $('.API_FORM_SEND').submit(async function (e) {
         e.preventDefault()
         document.querySelector('#page-preloader').classList.remove('hide');
         let data = $(this).serialize(), action = this.action, method = this.method,
@@ -1047,7 +1047,7 @@ $(document).ready(function () {
 
         successTitle = successTitle ? successTitle : 'Успешно!'
 
-        axios[method](action, data, {
+        await axios[method](action, data, {
             headers: {
                 'Authorization': 'Bearer ' + API_TOKEN
             }
@@ -1056,9 +1056,9 @@ $(document).ready(function () {
                 title: successTitle,
                 icon: 'info'
             });
-        }).final(() => {
-            document.querySelector('#page-preloader').classList.add('hide');
-        });
+        })
+
+        document.querySelector('#page-preloader').classList.add('hide');
     })
 
     // Проверяем ссылки в меню
