@@ -267,6 +267,11 @@
                                     У каждого пользователя есть набор прав и ролей
                                 </div>
 
+                                <div>
+                                    <b-form-input v-model="searchPermissions" placeholder="Поиск прав">
+
+                                    </b-form-input>
+                                </div>
                                 <b-form-group label="Доступы:" v-slot="{ ariaDescribedby }">
                                     <b-form-checkbox-group
                                         :aria-describedby="ariaDescribedby"
@@ -330,6 +335,7 @@ export default {
             allPermissions:      [],
             enableModal:         false,
             permission_collapse: false,
+            searchPermissions: '',
             infoModalUser_roles: [],
             optionsCompany: [],
             busy: false,
@@ -573,7 +579,7 @@ export default {
                     permissions: this.infoModalUser.permissions.filter((item) => {
                         return !(this.allPermissions.filter((all_prm) => {
                             return all_prm.id == item
-                        })[0].disable)
+                        })[0]?.disable)
                     }),
                 },
             }).then(({data}) => {
@@ -706,6 +712,16 @@ export default {
         }
     },
     watch: {
+        searchPermissions(val){
+            if(val === ''){
+                this.allPermissions = this.all_permissions
+                return;
+            }
+            val = val.toLowerCase();
+            this.allPermissions = this.all_permissions.filter((item) => {
+                return item.guard_name.toLowerCase().match(val)
+            })
+        },
         enableModal(val) {
             if (!val) {
                 this.resetModal()
