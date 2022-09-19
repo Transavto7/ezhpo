@@ -202,6 +202,125 @@ class CreateFieldPromptsTable extends Migration
         $this->addField('bdd', 'user_eds', 'Подпись лица, проводившего инструктаж');
         $this->addField('bdd', 'driver_id', 'ID водителя');
         $this->addField('bdd', 'signature', 'ЭЛ подпись водителя');
+
+        // Drivers
+        $this->addField('driver', 'hash_id', 'ID');
+        $this->addField('driver', 'photo', 'Фото');
+        $this->addField('driver', 'fio', 'ФИО');
+        $this->addField('driver', 'year_birthday', 'Дата рождения');
+        $this->addField('driver', 'phone', 'Телефон');
+        $this->addField('driver', 'gender', 'Пол');
+        $this->addField('driver', 'group_risk', 'Группа риска');
+        $this->addField('driver', 'company_id', 'Компания');
+        $this->addField('driver', 'products_id', 'Услуги');
+        $this->addField('driver', 'note', 'Примечание');
+        $this->addField('driver', 'procedure_pv', 'Порядок выпуска');
+        $this->addField('driver', 'date_bdd', 'Дата БДД');
+        $this->addField('driver', 'date_prmo', 'Дата ПРМО');
+        $this->addField('driver', 'date_report_driver', 'Дата снятия отчета с карты водителя');
+        $this->addField('driver', 'time_card_driver', 'Срок действия карты водителя');
+        $this->addField('driver', 'town_id', 'Город');
+        $this->addField('driver', 'dismissed', 'Уволен');
+        $this->addField('driver', 'date_of_employment', 'Дата устройства на работу');
+
+        // Cars
+        $this->addField('car', 'hash_id', 'ID');
+        $this->addField('car', 'gos_number', 'Гос.номер');
+        $this->addField('car', 'mark_model', 'Марка и модель');
+        $this->addField('car', 'type_auto', 'Тип автомобиля');
+        $this->addField('car', 'products_id', 'Услуги');
+        $this->addField('car', 'trailer', 'Прицеп');
+        $this->addField('car', 'company_id', 'Компания');
+        $this->addField('car', 'note', 'Примечание');
+        $this->addField('car', 'procedure_pv', 'Порядок выпуска');
+        $this->addField('car', 'date_prto', 'Дата ПРТО');
+        $this->addField('car', 'date_techview', 'Дата техосмотра');
+        $this->addField('car', 'time_skzi', 'Срок действия СКЗИ');
+        $this->addField('car', 'date_osago', 'Дата ОСАГО');
+        $this->addField('car', 'town_id', 'Город');
+        $this->addField('car', 'dismissed', 'Уволен');
+
+        // Companies
+        $this->addField('company', 'hash_id', 'ID');
+        $this->addField('company', 'name', 'Название компании клиента');
+        $this->addField('company', 'crm', 'Реестры');
+        $this->addField('company', 'journals', 'Справочники');
+        $this->addField('company', 'note', 'Примечание');
+        $this->addField('company', 'user_id', 'Ответственный');
+        $this->addField('company', 'req_id', 'Реквизиты нашей компании');
+        $this->addField('company', 'pv_id', 'ПВ');
+        $this->addField('company', 'town_id', 'Город');
+        $this->addField('company', 'products_id', 'Услуги');
+        $this->addField('company', 'where_call', 'Кому отправлять СМС при отстранении');
+        $this->addField('company', 'where_call_name', 'Кому звонить при отстранении (имя, должность)');
+        $this->addField('company', 'inn', 'ИНН');
+        $this->addField('company', 'procedure_pv', 'Порядок выпуска');
+        $this->addField('company', 'dismissed', 'Черный список');
+
+        // products
+        $this->addField('product', 'hash_id', 'ID');
+        $this->addField('product', 'name', 'Название');
+        $this->addField('product', 'type_product', 'Тип');
+        $this->addField('product', 'unit', 'Ед.изм.');
+        $this->addField('product', 'price_unit', 'Стоимость за единицу');
+        $this->addField('product', 'type_anketa', 'Реестр');
+        $this->addField('product', 'type_view', 'Тип осмотра');
+        $this->addField('product', 'essence', 'Сущности');
+
+        // discounts
+        $this->addField('discount', 'hash_id', 'ID');
+        $this->addField('discount', 'products_id', 'Услуга');
+        $this->addField('discount', 'trigger', 'Триггер (больше/меньше)');
+        $this->addField('discount', 'porog', 'Пороговое значение');
+        $this->addField('discount', 'discount', 'Скидка (%)');
+
+        // instrs
+        $this->addField('instr', 'hash_id', 'ID');
+        $this->addField('instr', 'photos', 'Фото');
+        $this->addField('instr', 'name', 'Название');
+        $this->addField('instr', 'descr', 'Описание');
+        $this->addField('instr', 'type_briefing', 'Вид инструктажа');
+        $this->addField('instr', 'youtube', 'Ссылка на YouTube');
+        $this->addField('instr', 'active', 'Активен');
+        $this->addField('instr', 'sort', 'Сортировка');
+
+        // points
+        $this->addField('point', 'hash_id', 'ID');
+        $this->addField('point', 'name', 'Пункт выпуска');
+        $this->addField('point', 'pv_id', 'Город');
+        $this->addField('point', 'company_id', 'Компания');
+
+        // town
+        $this->addField('town', 'hash_id', 'ID');
+        $this->addField('town', 'name', 'Город');
+
+        // users
+        $this->addField('users', 'hash_id', 'ID');
+        $this->addField('users', 'photo', 'Фото');
+        $this->addField('users', 'name', 'ФИО');
+        $this->addField('users', 'login', 'Логин');
+        $this->addField('users', 'email', 'E-mail');
+        $this->addField('users', 'pv', 'ПВ');
+        $this->addField('users', 'timezone', 'GMT');
+        $this->addField('users', 'blocked', 'Заблокирован');
+        $this->addField('users', 'roles', 'Роль');
+
+        // roles
+        $this->addField('roles', 'id', 'ID');
+        $this->addField('roles', 'guard_name', 'Название');
+
+        // d_dates
+        $this->addField('ddates', 'hash_id', 'ID');
+        $this->addField('ddates', 'field', 'Поле даты проверки');
+        $this->addField('ddates', 'days', 'Кол-во дней');
+        $this->addField('ddates', 'action', 'Действие');
+
+        // field history
+        $this->addField('fieldhistory', 'hash_id', 'ID');
+        $this->addField('fieldhistory', 'user_id', 'Пользователь');
+        $this->addField('fieldhistory', 'value', 'Значение');
+        $this->addField('fieldhistory', 'field', 'Поле');
+        $this->addField('fieldhistory', 'created_at', 'Дата');
     }
 
     public function addField(string $type, string $field, string $name) {

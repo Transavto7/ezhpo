@@ -79,7 +79,7 @@ export default {
                 content: this.prompt.content,
             }).then(({ data }) => {
                 this.show = false;
-                this.$toast('Изменения соханены');
+                this.$toast('Изменения сохранены');
                 this.$emit('success', this.prompt);
             }).catch((error) => {
 

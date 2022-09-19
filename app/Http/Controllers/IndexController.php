@@ -6,6 +6,7 @@ use App\Anketa;
 use App\Car;
 use App\Company;
 use App\Driver;
+use App\FieldPrompt;
 use App\Imports\CarImport;
 use App\Imports\CompanyImport;
 use App\Imports\DriverImport;
@@ -1306,8 +1307,8 @@ class IndexController extends Controller
             }
 
             $element['queryString'] = $queryString;
-//dd($element);
-//dd(view('elements', $element));
+            $element['fieldPrompts'] = FieldPrompt::where('type', strtolower($model))->get();
+
             return view('elements', $element);
         } else {
             return redirect( route('home') );
