@@ -623,13 +623,6 @@
                                                     ТЕХ
                                                     @endif
                                                 </a>
-
-                                                @if(user()->access('journal_pl_accounting'))
-                                                    <a class="btn btn-sm btn-outline-info"
-                                                       href="{{ route('home', 'Dop') }}/?filter=1&{{ $fields[$elK]['filterJournalLinkKey'] }}={{ $el['hash_id'] }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
-                                                        ПЛ
-                                                    </a>
-                                                @endif
                                         </nobr>
                                         @endisset
                                         @endif
