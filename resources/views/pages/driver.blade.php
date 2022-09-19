@@ -11,50 +11,7 @@
         }
     @endphp
     <div class="container text-center">
-        <h1>Здравствуйте, {{ auth()->user()->name }}!</h1>
-        <hr>
-
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card p-2 driver-card">
-                    <div class="p-4">
-                        <img class="card-img-top driver-card-img" src="{{ $user_avatar }}"
-                             alt="Card image cap">
-                    </div>
-
-                    <div>
-                        <div class="input-group my-3 d-flex align-items-center">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="line-height: 1.3" id="inputGroup-sizing-default">ID:</span>
-                            </div>
-                            <input value="{{ user()->hash_id }}" disabled type="text" class="form-control p-3 fw-bold" aria-label="Default" aria-describedby="inputGroup-sizing-default">
-                        </div>
-
-                        <div class="input-group my-3 d-flex align-items-center">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="line-height: 1.3" id="inputGroup-sizing-default">ФИО:</span>
-                            </div>
-                            <input value="{{ user()->name }}" disabled type="text" class="form-control p-3 fw-bold" aria-label="Default" aria-describedby="inputGroup-sizing-default">
-                        </div>
-
-                        <div class="input-group mb-3 d-flex align-items-center">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="line-height: 1.3">Должность:</span>
-                            </div>
-                            <input value="Водитель" disabled type="text" class="form-control p-3 fw-bold" aria-label="Default" aria-describedby="inputGroup-sizing-default">
-                        </div>
-
-                        <div class="input-group mb-3 d-flex align-items-center">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="line-height: 1.3">Пункт выпуска:</span>
-                            </div>
-                            <input value="{{ user()->pv->name ?? 'Неизвестно' }}" disabled type="text"
-                                   class="form-control p-3 fw-bold" aria-label="Default"
-                                   aria-describedby="inputGroup-sizing-default">
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="row d-flex justify-content-center">
             <div class="col-md-8">
 
                 <div class="container overflow-hidden">
@@ -103,7 +60,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 

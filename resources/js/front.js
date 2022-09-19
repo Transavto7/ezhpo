@@ -352,6 +352,7 @@ $(document).ready(function () {
                 });
 
                 $(`#croppie-result-base64${id}`).val(image)
+                $('#croppie-block' + id).hide()
             })
         })
 
