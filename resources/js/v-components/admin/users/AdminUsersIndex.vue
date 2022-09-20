@@ -116,7 +116,6 @@
 
             <b-modal
                 v-model="enableModal"
-                size="xl"
                 ref="users_modal"
                 hide-footer
                 :title="'Добавление сотрудника'"
@@ -737,7 +736,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .box {
     display: flex;
     flex-wrap: wrap;
@@ -745,5 +744,10 @@ export default {
     width: 500px;
     height: 400px;
     align-content: space-between;
+}
+
+.modal-dialog {
+    max-width: 90%;
+    margin: 1.75rem auto;
 }
 </style>

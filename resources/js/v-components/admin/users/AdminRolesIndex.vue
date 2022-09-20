@@ -455,4 +455,8 @@ export default {
     height: 400px;
     align-content: space-between;
 }
+.modal-dialog {
+    max-width: 90%;
+    margin: 1.75rem auto;
+}
 </style>
