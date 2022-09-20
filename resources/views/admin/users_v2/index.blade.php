@@ -14,10 +14,7 @@
             'permission_to_delete' => user()->access('employee_delete'),
             'permission_to_trash' => user()->access('employee_trash'),
         ];
-    //dd($current_user_permissions);
-    //dd($current_user_permissions
     $permissionToTrashView  = user()->access('employee_trash');
-  //  dd(request()->get('deleted'))
 @endphp
 @section('content')
         <admin-users-index
@@ -25,44 +22,19 @@
             :deleted='{{ request()->get('deleted', 0) }}'
             :current_user_permissions='@json($current_user_permissions)'
             :all_permissions='@json($all_permissions)'
-            :points='@json($points->map(function ($q){
-                                        $res['label'] = $q->name;
-                                        foreach ($q->pvs as $pv){
-                                            $res['options'][] = ['value' => $pv['id'], 'text' => $pv['name']];
-                                        }
-                                        return $res;
-                                        }))'
+            :points='@json($points->map( function ($q) {
+                $res['label'] = $q->name;
+                foreach ($q->pvs as $pv){
+                    $res['options'][] = ['value' => $pv['id'], 'text' => $pv['name']];
+                }
+                return $res;
+            }))'
+            :fields='@json($fields)'
         >
             <div class="card mb-3">
-
-                {{--            @if($permissionToTrashView)--}}
-                {{--                <div class="m-2">--}}
-                {{--                    @if(!request()->get('deleted'))--}}
-                {{--                        <a href="?deleted=1" class="btn btn-sm btn-warning">--}}
-                {{--                            Удалённые <i class="fa fa-trash"></i>--}}
-                {{--                        </a>--}}
-                {{--                    @else--}}
-                {{--                        <a href="{{ route('users') }}" class="btn btn-sm btn-warning">--}}
-                {{--                            Назад <i class="fa fa-trash"></i>--}}
-                {{--                        </a>--}}
-                {{--                    @endif--}}
-                {{--                </div>--}}
-                {{--            @endif--}}
-
                 <div class="card-body">
-                    {{--                <div class="col-md-4 m-2">--}}
-                    {{--                    @if($permissionToTrashView)--}}
-                    {{--                        @isset($_GET['deleted'])--}}
-                    {{--                            <a href="{{ route('users') }}" class="btn btn-sm btn-warning">Назад</a>--}}
-                    {{--                        @else--}}
-                    {{--                            <a href="?deleted=1" class="btn btn-sm btn-warning">Корзина <i class="fa fa-trash"></i></a>--}}
-                    {{--                        @endisset--}}
-                    {{--                    @endif--}}
-                    {{--                </div>--}}
-
                     @if($current_user_permissions['permission_to_view'])
                         <form action="" class="row" method="GET">
-
                             @isset($_GET['deleted'])
                                 <input type="hidden" value="1" name="deleted">
                             @endif
@@ -94,12 +66,6 @@
                     @endif
                 </div>
         </admin-users-index>
-
-{{--        <div class="col-md-12">--}}
-{{--            {{ $users->appends($_GET)->render() }}--}}
-
-{{--            <p>Количество элементов: {{ count($users) }}</p>--}}
-{{--        </div>--}}
     </div>
 
 @endsection

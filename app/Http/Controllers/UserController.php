@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Company;
+use App\FieldPrompt;
 use App\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -57,9 +58,11 @@ class UserController extends Controller
             ]);
         }
 
+        $fields = FieldPrompt::where('type', 'users')->get();
         return view('admin.users_v2.index')
             ->with([
                 'users' => $users->paginate(),
+                'fields' => $fields
             ]);
     }
 

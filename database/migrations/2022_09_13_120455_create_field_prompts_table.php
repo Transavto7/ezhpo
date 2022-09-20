@@ -321,6 +321,27 @@ class CreateFieldPromptsTable extends Migration
         $this->addField('fieldhistory', 'value', 'Значение');
         $this->addField('fieldhistory', 'field', 'Поле');
         $this->addField('fieldhistory', 'created_at', 'Дата');
+
+        $this->addField('pak_sdpo', 'hash_id', 'ID');
+        $this->addField('pak_sdpo', 'api_token', 'Токен');
+        $this->addField('pak_sdpo', 'login', 'Логин');
+        $this->addField('pak_sdpo', 'email', 'E-mail');
+        $this->addField('pak_sdpo', 'pv_id', 'ПВ');
+        $this->addField('pak_sdpo', 'company_id', 'Компания');
+        $this->addField('pak_sdpo', 'timezone', 'GMT');
+        $this->addField('pak_sdpo', 'blocked', 'Заблокирован');
+        $this->addField('pak_sdpo', 'roles', 'Роль');
+
+        $this->addField('req', 'hash_id', 'id');
+        $this->addField('req', 'name', 'Название');
+        $this->addField('req', 'inn', 'ИНН');
+        $this->addField('req', 'bik', 'БИК');
+        $this->addField('req', 'kc', 'К/С');
+        $this->addField('req', 'rc', 'Р/С');
+        $this->addField('req', 'banks', 'Банки');
+        $this->addField('req', 'director', 'Должность руководителя');
+        $this->addField('req', 'director_fio', 'ФИО Руководителя');
+        $this->addField('req', 'seal', 'Печать');
     }
 
     public function addField(string $type, string $field, string $name) {

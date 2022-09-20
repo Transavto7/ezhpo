@@ -76,7 +76,6 @@
                             <input type="submit" class="btn btn-success btn-sm" value="Поиск">
                             <a href="{{ route('adminUsers') }}" class="btn btn-danger btn-sm">Сбросить</a>
                         </div>
-
                     </form>
                 </div>
             </div>
