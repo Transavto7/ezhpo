@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\SystemSetting;
+use App\Settings;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
@@ -51,10 +51,16 @@ class AppServiceProvider extends ServiceProvider
             return 0;
         });
 
-        Blade::if('accessSetting', function ($setting, $category) {
-            $accessed = SystemSetting::check($setting, $category);
+        Blade::if('accessSetting', function ($setting) {
+            $setting = Settings::where('key', $setting)->first();
+            if (!$setting) {
+                return false;
+            }
+            if ($setting->value == '1') {
+                return true;
+            }
 
-            return !!$accessed;
+            return false;
         });
 
         Blade::if('excludeRole', function ($dataRoles) {

@@ -50,6 +50,7 @@
                                         class="custom-file-input"
                                         id="croppie-inputPHOTO"
                                         name="photo"
+                                        accept="image/*"
                                         data-label="photo"
                                         data-field="User_photo"
                                         aria-describedby="inputPHOTO">

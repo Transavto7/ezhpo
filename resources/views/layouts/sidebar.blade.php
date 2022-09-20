@@ -212,12 +212,8 @@
                     <a href="#" data-btn-collapse="#spis-pol" role="button"><i class="fa fa-cog"></i> Настройки</a>
                     <ul id="spis-pol" class="collapse list-unstyle">
 
-                        @if(user()->access('system_read'))
-                            <li><a href="{{ route('renderElements', 'Settings') }}">Система</a></li>
-                        @endif
-
                         @if(user()->access('settings_system_read'))
-                            <li><a href="{{ route('systemSettings') }}">Системные настройки</a></li>
+                            <li><a href="{{ route('settings.index') }}">Системные настройки</a></li>
                         @endif
 
                         @if(user()->access('city_read', 'city_create'))

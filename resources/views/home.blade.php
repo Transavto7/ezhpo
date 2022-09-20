@@ -277,11 +277,6 @@ $permissionToExportPrikazPL = (
                                         </th>
                                     @endforeach
 
-                                    @accessSetting('id_auto', 'medic')
-                                        <th class="not-export">ID автомобиля</th>
-                                    @endaccessSetting
-
-
                                     @if(request()->get('trash'))
                                         <th width="60">Удаливший</th>
                                         <th width="60">Время удаления</th>
@@ -410,12 +405,6 @@ $permissionToExportPrikazPL = (
                                             </td>
                                         @endif
                                         @endif
-
-                                        @accessSetting('id_auto', 'medic')
-                                            <td class="td-option not-export">
-                                                {{ $anketa->car_id }}
-                                            </td>
-                                        @endaccessSetting
 
                                         <!-- ОЧЕРЕДЬ ОСМОТРОВ -->
                                         @if($type_ankets === 'pak_queue')
