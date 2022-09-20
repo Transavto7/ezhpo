@@ -119,6 +119,7 @@
             </div>
 
             <b-modal
+                size="xl"
                 v-model="enableModal"
                 ref="users_modal"
                 hide-footer

@@ -85,7 +85,6 @@
         </div>
 
         <b-modal
-            class="extra-large"
             size="xl"
             v-model="editModal"
             ref="groups_modal"

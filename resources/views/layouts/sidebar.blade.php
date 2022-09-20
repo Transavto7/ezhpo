@@ -233,7 +233,7 @@
                         @endif
 
                         @if(user()->access('group_read', 'group_create'))
-                            <li><a href="{{ route('roles.index') }}">Группы</a></li>
+                            <li><a href="{{ route('roles.index') }}">Роли</a></li>
                         @endif
 
                         @if(user()->access('pak_sdpo_read', 'pak_sdpo_create'))
