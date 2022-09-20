@@ -39,7 +39,7 @@ class ChangeStructureInSettingsTable extends Migration
             $table->dropColumn('sms_text_car');
             $table->dropColumn('sms_text_phone');
             $table->dropColumn('sms_text_default');
-            $table->dropColumn('delete_id');
+            $table->dropColumn('deleted_id');
             $table->dropColumn('deleted_at');
         });
 
