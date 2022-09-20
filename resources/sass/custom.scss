@@ -58,6 +58,12 @@
     margin: 20px 0px;
 }
 
+.page-content {
+    .content-inner {
+        width: 100% !important;
+    }
+}
+
 // Snippets
 .m-center {
     margin-left: auto;

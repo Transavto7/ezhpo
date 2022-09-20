@@ -2900,11 +2900,12 @@ body {
   a {
     color: #01519b;
     text-decoration: none;
+      transition: ease-in-out;
   }
 
   a:focus, a:hover {
     color: #e30c17;
-    text-decoration: underline;
+    text-decoration: none;
   }
 
   h1,
