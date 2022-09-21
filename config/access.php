@@ -480,22 +480,22 @@ return [
         'name'        => 'employee_trash',
         'description' => 'Сотрудники - Корзина',
     ],
-    //============== Группы =============//
+    //============== Роли =============//
     [
         'name'        => 'group_create',
-        'description' => 'Группы - Создание',
+        'description' => 'Роли - Создание',
     ],
     [
         'name'        => 'group_read',
-        'description' => 'Группы - Просмотр',
+        'description' => 'Роли - Просмотр',
     ],
     [
         'name'        => 'group_update',
-        'description' => 'Группы - Редактирование',
+        'description' => 'Роли - Редактирование',
     ],
     [
         'name'        => 'group_delete',
-        'description' => 'Группы - Удаление',
+        'description' => 'Роли - Удаление',
     ],
     [
         'name'        => 'group_trash',
