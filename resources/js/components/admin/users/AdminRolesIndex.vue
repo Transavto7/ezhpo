@@ -7,7 +7,7 @@
                 v-if="current_user_permissions.permission_to_create"
                 @click="showModal"
             >
-                Добавить группу
+                Добавить роль
                 <i class="fa fa-plus"></i>
             </b-button>
 
@@ -89,15 +89,15 @@
             v-model="editModal"
             ref="groups_modal"
             hide-footer
-            :title="infoModalRole.id ? 'Редактирование группы' : 'Добавление группы'"
+            :title="infoModalRole.id ? 'Редактирование роли' : 'Добавление роли'"
         >
             <b-row class="my-1">
                 <b-col lg="1">
-                    <label>Группа:</label>
+                    <label>Роль:</label>
                 </b-col>
                 <b-col lg="5">
                     <b-form-input v-model="infoModalRole.guard_name"
-                                  placeholder="Введите группу"
+                                  placeholder="Введите роль"
                     />
                 </b-col>
                 <b-button

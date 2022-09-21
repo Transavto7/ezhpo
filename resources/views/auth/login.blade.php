@@ -48,11 +48,13 @@
                                 {{ __('Войти') }}
                             </button>
 
-                            @if (Route::has('password.request'))
-                                <a hidden class="btn btn-link" href="{{ route('password.request') }}">
-                                    {{ __('Забыли пароль?') }}
-                                </a>
-                            @endif
+                            <div class="row mx-1 mt-4 d-flex justify-content-between">
+                                <div class="d-flex flex-column align-items-end">
+                                    <a href="tel:88005507077">8 (800) 550-70-77</a>
+                                    <a class="mt-2" href="tel:79787775555">+7 (978) 777-55-55</a>
+                                </div>
+                                <a href="https://t.me/transavto7_bot">Чат в Telegram</a>
+                            </div>
                             </form>
                         </div>
                     </div>

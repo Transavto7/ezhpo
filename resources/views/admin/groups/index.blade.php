@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Группы')
+@section('title', 'Роли')
 @section('sidebar', 1)
 @php
     $current_user_permissions = [
