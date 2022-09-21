@@ -28,23 +28,6 @@ class CreateFieldPromptsTable extends Migration
 
         $this->addAllFields();
 
-        // Add new permissions
-        Permission::updateOrCreate([
-            'name'        => 'field_prompt_read',
-            'guard_name' => 'Подсказки полей - Просмотр',
-        ]);
-        Permission::updateOrCreate([
-            'name'        => 'field_prompt_edit',
-            'guard_name' => 'Подсказки полей - Редактирование',
-        ]);
-        Permission::updateOrCreate([
-            'name'        => 'field_prompt_delete',
-            'guard_name' => 'Подсказки полей - Удаление',
-        ]);
-        Permission::updateOrCreate([
-            'name'        => 'field_prompt_trash',
-            'guard_name' => 'Подсказки полей - Карзина',
-        ]);
     }
 
     /*
