@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Point;
+use App\Settings;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -96,58 +97,16 @@ class ProfileController extends Controller
     {
         $data = $request->all();
         $user = Auth::user();
-        $new_password = trim(
-            (isset($data['password_new'])) ? $data['password_new'] : ''
-        );
-        $password = trim(
-            (isset($data['password'])) ? $data['password'] : ''
-        );
 
-        // Обновлляем пароль, если надо
-        if(Hash::check($password, $user->password) && $new_password != '' && strlen($new_password) >= 5) {
-            $new_password_hash = Hash::make($new_password);
+        if ($request->photo_base64) {
+            $base64_image = substr($request->photo_base64, strpos($request->photo_base64, ',') + 1);
 
-            $user->password = $new_password_hash;
+            $photo = $user->photo;
+            Storage::disk('public')->delete($photo);
+            $path = 'elements/' . md5($request->photo_base64) . '.png';
+            Storage::disk('public')->put($path, base64_decode($base64_image));
+            $user->photo = $path;
         }
-
-        // Удаляем поля которые не пойдут в повторное обновление
-        unset($data['password']);
-        unset($data['password_new']);
-
-        // Обновляем все данные что нашли, кроме пароля
-        foreach ($data as $k => $v) {
-
-            if(preg_match('/^data:image\/(\w+);base64,/', $v)) {
-                $k = str_replace('_base64', '', $k);
-
-                $base64_image = substr($v, strpos($v, ',') + 1);
-                $base64_image = base64_decode($base64_image);
-
-                $hash = sha1(time());
-                $path = "elements/$hash.png";
-
-                if(Storage::disk('public')->exists($user->photo)){
-                    Storage::disk('public')->delete($user->photo);
-                }
-
-                Storage::disk('public')->put($path, $base64_image);
-
-                $user->$k = $path;
-            } else {
-                if($user[$k]) $user[$k] = $v;
-            }
-        }
-
-        /*foreach($request->allFiles() as $file_key => $file) {
-            if($file_key === 'photo') {
-                Storage::disk('public')->delete($user->$file_key);
-
-                $file_path = Storage::disk('public')->putFile('avatars', $file);
-
-                $user[$file_key] = $file_path;
-            }
-        }*/
-
         // Если пользователь сохранился
         if($user->save()) {
             return redirect( route('profile') );

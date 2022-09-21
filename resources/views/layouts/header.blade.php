@@ -45,7 +45,7 @@
 
                             <span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp; {{ __(user()->name) }} <i class="fa fa-user"></i></span>
                             @if(user()->hasRole('driver'))
-                            <span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp; {{user()->hash_id}} </span>
+                            <span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp; {{ user()->login }} </span>
                             @endif
                         </a>
                     </li>
