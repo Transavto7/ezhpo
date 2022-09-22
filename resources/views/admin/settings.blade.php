@@ -138,7 +138,7 @@
                             </div>
 
                             <div class="form-group col-lg-12">
-                                <div class="row">
+                                <div class="row px-3">
                                     <div class="custom-control custom-checkbox col-lg-3">
                                         <input name="id_auto"
                                                type="checkbox"
