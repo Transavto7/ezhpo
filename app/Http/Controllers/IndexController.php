@@ -1268,13 +1268,11 @@ class IndexController extends Controller
                 }
             }
 
-            if(User::getUserCompanyId() && auth()->user()->hasRole('client')) {
-                $company_user_id = User::getUserCompanyId();
-
+            if(auth()->user()->hasRole('client')) {
                 if($model == 'Driver' || $model == 'Car') {
-                    $element['elements'] = $element['elements']->where('company_id', $company_user_id);
+                    $element['elements'] = $element['elements']->where('company_id', auth()->user()->company_id);
                 } else if ($model == 'Company') {
-                    $element['elements'] = $element['elements']->where('id', $company_user_id);
+                    $element['elements'] = $element['elements']->where('id', auth()->user()->company_id);
                 }
             }
 
