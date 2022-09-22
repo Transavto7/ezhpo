@@ -104,12 +104,12 @@
                         <span v-else class="badge bg-success text-white">Отсутствует</span>
                     </template>
 
-                    <template #cell(actions)="row">
+                    <template #cell(actions)="{ item }">
                         <div class="d-flex justify-content-end">
                             <b-button size="sm"
                                       variant="info"
                                       class="mr-2"
-                                      @click="$refs.editModal.open(row.item)"
+                                      @click="$refs.editModal.open(item)"
                                       v-if="!filters.trash && permissions.permission_to_edit"
                             >
                                 <b-icon-pencil></b-icon-pencil>
@@ -117,8 +117,8 @@
                             <b-button size="sm"
                                       variant="danger"
                                       class="mr-2"
-                                      @click="$refs.deleteModal.open(row.item)"
-                                      v-if="!filters.trash && permissions.permission_to_delete"
+                                      @click="$refs.deleteModal.open(item)"
+                                      v-if="!filters.trash && permissions.permission_to_delete && item.type !== 'field_prompts'"
                             >
                                 <b-icon-trash-fill></b-icon-trash-fill>
                             </b-button>
@@ -127,7 +127,7 @@
                                       variant="warning"
                                       class="mr-2"
                                       v-if="filters.trash"
-                                      @click="$refs.restoreModal.open(row.item)"
+                                      @click="$refs.restoreModal.open(item)"
                             >
                                 <i class="fa fa-undo"></i>
                             </b-button>
@@ -174,7 +174,7 @@ import AdminPromptEditModal from "./AdminPromptEditModal";
 import {addParams, getParams} from "../../const/params";
 
 export default {
-    props: ['types', 'fields', 'permissions'],
+    props: ['types', 'fields', 'permissions', 'selfprompts'],
     components: {
         AdminPromptDeleteModal,
         AdminPromptRestoreModal,
@@ -194,22 +194,6 @@ export default {
             },
             currentPage: 1,
             column: [
-                {
-                    key: "type",
-                    sortable: true,
-                    label: "Журнал"
-                },
-                {
-                    key: "name",
-                    sortable: true,
-                    label: "Поле"
-                },
-                {
-                    key: "content",
-                    sortable: true,
-                    label: "Подсказка",
-                    class: "text-center options-column"
-                },
                 {
                     key: "actions",
                     sortable: false,
@@ -245,7 +229,29 @@ export default {
         }
 
         this.currentPage = Number(this.filters.page) || 1;
+        const column = [];
 
+        this.selfprompts.forEach(field => {
+            const cm = {
+                key: field.field,
+                label: field.name,
+                sortable: true,
+                thAttr: {
+                    'data-toggle': 'tooltip',
+                    'data-html': true,
+                    'data-trigger': 'hover',
+                    'data-placement': 'top',
+                    title: field.content,
+                }
+            };
+
+            if (cm.key === 'content')
+                cm['class'] = 'text-center options-column';
+
+            column.push(cm);
+        });
+
+        this.column = [...column, ...this.column];
         this.loadData();
     },
     methods: {

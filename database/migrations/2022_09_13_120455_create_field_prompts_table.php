@@ -325,6 +325,10 @@ class CreateFieldPromptsTable extends Migration
         $this->addField('req', 'director', 'Должность руководителя');
         $this->addField('req', 'director_fio', 'ФИО Руководителя');
         $this->addField('req', 'seal', 'Печать');
+
+        $this->addField('field_prompts', 'type', 'Журнал');
+        $this->addField('field_prompts', 'name', 'Поле');
+        $this->addField('field_prompts', 'content', 'Подсказка');
     }
 
     public function addField(string $type, string $field, string $name) {

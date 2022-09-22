@@ -15,10 +15,12 @@ class FieldPromptController extends Controller
     {
         $types = FieldPrompt::getTypes();
         $fields = FieldPrompt::getFields();
+        $prompts = FieldPrompt::where('type', 'field_prompts')->get();
 
         return view('admin.prompt.index', [
             'types' => $types,
-            'fields' => $fields
+            'fields' => $fields,
+            'prompts' => $prompts->toArray()
         ]);
     }
 

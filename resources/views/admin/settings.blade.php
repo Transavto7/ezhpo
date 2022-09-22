@@ -137,29 +137,31 @@
                                 </div>
                             </div>
 
-                            <div class="form-group col-lg-12 row">
-                                <div class="custom-control custom-checkbox col-lg-3">
-                                    <input name="id_auto"
-                                           type="checkbox"
-                                           class="custom-control-input"
-                                           id="id_auto"
-                                        {{ $id_auto->value === '1' ? 'checked' : '' }}
-                                    >
-                                    <label class="custom-control-label" style="padding-top: 2px" for="id_auto">
-                                        Поле "ID авто" в МО
-                                    </label>
-                                </div>
+                            <div class="form-group col-lg-12">
+                                <div class="row">
+                                    <div class="custom-control custom-checkbox col-lg-3">
+                                        <input name="id_auto"
+                                               type="checkbox"
+                                               class="custom-control-input"
+                                               id="id_auto"
+                                            {{ $id_auto->value === '1' ? 'checked' : '' }}
+                                        >
+                                        <label class="custom-control-label" style="padding-top: 2px" for="id_auto">
+                                            Поле "ID авто" в МО
+                                        </label>
+                                    </div>
 
-                                <div class="custom-control custom-checkbox col-lg-3">
-                                    <input name="id_auto_required"
-                                           type="checkbox"
-                                           class="custom-control-input"
-                                           id="id_auto_required"
-                                        {{ $id_auto_required->value === '1' ? 'checked' : '' }}
-                                    >
-                                    <label class="custom-control-label" style="padding-top: 2px" for="id_auto_required">
-                                        Обязательное поле ID авто в МО
-                                    </label>
+                                    <div class="custom-control custom-checkbox col-lg-3">
+                                        <input name="id_auto_required"
+                                               type="checkbox"
+                                               class="custom-control-input"
+                                               id="id_auto_required"
+                                            {{ $id_auto_required->value === '1' ? 'checked' : '' }}
+                                        >
+                                        <label class="custom-control-label" style="padding-top: 2px" for="id_auto_required">
+                                            Обязательное поле ID авто в МО
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
 

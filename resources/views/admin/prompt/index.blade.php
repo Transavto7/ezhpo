@@ -12,8 +12,9 @@
         ];
     @endphp
     <admin-prompt-index
-        :permissions="JSON.parse(`{{ json_encode($current_user_permissions) }}`)"
-        :types="JSON.parse(`{{ json_encode($types) }}`)"
-        :fields="JSON.parse(`{{ json_encode($fields) }}`)"
+        :permissions='@json($current_user_permissions)'
+        :types='@json($types)'
+        :fields='@json($fields)'
+        :selfprompts='@json($prompts)'
     ></admin-prompt-index>
 @endsection
