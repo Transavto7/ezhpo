@@ -128,6 +128,17 @@
                                    class="form-control p-3 fw-bold" aria-label="Default"
                                    aria-describedby="inputGroup-sizing-default">
                         </div>
+
+                        @if ($user->hasRole('client'))
+                            <div class="input-group mb-3 d-flex align-items-center">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="line-height: 1.3">Ссылка на таблицу с документами БДД:</span>
+                                </div>
+                                <input value="{{ $user->company->document_bdd ?? 'Отсутствует' }}" disabled type="text"
+                                       class="form-control p-3 fw-bold" aria-label="Default"
+                                       aria-describedby="inputGroup-sizing-default">
+                            </div>
+                        @endif
                     </div>
                 </div>
             </form>
