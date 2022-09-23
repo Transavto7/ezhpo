@@ -1029,6 +1029,10 @@ class IndexController extends Controller
 
             unset($data['_token']);
 
+            if ($request->user()->hasRole('client')) {
+                $data['company_id'] = $request->user()->company_id;
+            }
+
             // Обновляем данные
             if($element) {
                 // Парсим файлы
