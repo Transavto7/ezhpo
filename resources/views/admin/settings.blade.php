@@ -26,7 +26,8 @@
                                          style="height: 100%;"
                                     >
                                 </div>
-                                <div class="custom-file mt-2">
+                                <label for="slogo-input" class="ml-1 mt-2">API ключ sms.ru</label>
+                                <div class="custom-file">
                                     <input
                                         type="file"
                                         class="custom-file-input "
