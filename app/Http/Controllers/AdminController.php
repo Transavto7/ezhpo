@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\FieldPrompt;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Point;
 use App\Req;
@@ -182,23 +183,20 @@ class AdminController extends Controller
             }
         }
 
-//        if(!isset($_GET['role'])) {
-//            $users = $users->where('role', '!=', 778);
-//        }
         if($request->get('deleted')){
             $users = $users->onlyTrashed();
         }
         $users = $users->with(['roles'])
-                       ->whereHas('roles', function ($q) {
-                           $q->where('id', 9);
-                       });
-
-//        $users = $users->where('role', '!=', 3);
+           ->whereHas('roles', function ($q) {
+               $q->where('id', 9);
+           });
 
 
-        $users = $users->orderBy($data['orderKey'], $data['orderBy'])->paginate(10);
+
+        $users = $users->orderBy($data['orderKey'], $data['orderBy'])->paginate(50);
         $points = Point::getAll();
 
+        $data['fields'] = FieldPrompt::where('type', 'pak_sdpo')->get();
         $data['users'] = $users;
         $data['points'] = $points;
         $data['title'] = $data['is_pak'] ? 'ПАК СДПО' : 'Сотрудники';

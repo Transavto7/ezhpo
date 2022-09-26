@@ -10,7 +10,9 @@
                 <img src="{{ Storage::url(App\Settings::setting('logo')) }}" width="150" alt="">
 
                 </a>
-                <!-- Toggle Button--><a id="toggle-btn" href="#" class="menu-btn active"><span></span><span></span><span></span></a>
+                @if(user() && !user()->hasRole('driver'))
+                    <a id="toggle-btn" href="#" class="menu-btn active"><span></span><span></span><span></span></a>
+                @endif
             </div>
             <!-- Navbar Menu -->
             <ul class="nav-menu list-unstyled d-flex flex-md-row align-items-md-center">
@@ -43,7 +45,7 @@
 
                             <span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp; {{ __(user()->name) }} <i class="fa fa-user"></i></span>
                             @if(user()->hasRole('driver'))
-                            <span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp; {{user()->hash_id}} </span>
+                            <span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp; {{ user()->login }} </span>
                             @endif
                         </a>
                     </li>

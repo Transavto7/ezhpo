@@ -58,6 +58,12 @@
     margin: 20px 0px;
 }
 
+.page-content {
+    .content-inner {
+        width: 100% !important;
+    }
+}
+
 // Snippets
 .m-center {
     margin-left: auto;
@@ -174,6 +180,22 @@ label {
 
 .multiselect__content-wrapper {
     z-index: 1000;
+}
+
+.multiselect__option--selected {
+    font-weight: normal;
+}
+
+.ql-toolbar.ql-snow {
+    border: 1px solid #e8e8e8 !important;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.ql-container.ql-snow {
+    border: 1px solid #e8e8e8 !important;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 /**
@@ -359,6 +381,178 @@ main.blue {
 
     span {
         color: #E93223;
+    }
+}
+
+.preloader {
+    position: fixed;
+    z-index: 99999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.preloader.hide {
+    display: none;
+}
+
+.lds-ring {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+.lds-ring div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    margin: 8px;
+    border: 3px solid #e30c17;
+    border-radius: 50%;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #e30c17 transparent transparent transparent;
+}
+.lds-ring div:nth-child(1) {
+    animation-delay: -0.45s;
+}
+.lds-ring div:nth-child(2) {
+    animation-delay: -0.3s;
+}
+.lds-ring div:nth-child(3) {
+    animation-delay: -0.15s;
+}
+
+.ql-size-large {
+    font-size: 18px;
+}
+.ql-size-small {
+    font-size: 10px;
+}
+.ql-color-\#5c0000 {
+    color: #5c0000;
+}
+.ql-color-\#e60000 {
+    color: #e60000;
+}
+.ql-color-\#ff9900 {
+    color: #ff9900;
+}
+.ql-color-\#ffff00 {
+    color: #ffff00;
+}
+.ql-color-\#008a00 {
+    color: #008a00;
+}
+.ql-color-\#0066cc {
+    color: #0066cc;
+}
+.ql-color-\#0066cc {
+    color: #0066cc;
+}
+.ql-color-\#9933ff {
+    color: #9933ff;
+}
+.ql-color-\#ffffff {
+    color: #ffffff;
+}
+.ql-color-\#facccc {
+    color: #facccc;
+}
+.ql-color-\#ffebcc {
+    color: #ffebcc;
+}
+.ql-color-\#ffffcc {
+    color: #ffffcc;
+}
+.ql-color-\#cce8cc {
+    color: #cce8cc;
+}
+.ql-color-\#cce0f5 {
+    color: #cce0f5;
+}
+.ql-color-\#ebd6ff {
+    color: #ebd6ff;
+}
+.ql-color-\#bbbbbb {
+    color: #bbbbbb;
+}
+.ql-color-\#f06666 {
+    color: #f06666;
+}
+.ql-color-\#ffc266 {
+    color: #ffc266;
+}
+.ql-color-\#ffff66 {
+    color: #ffff66;
+}
+.ql-color-\#66b966 {
+    color: #66b966;
+}
+.ql-color-\#66a3e0 {
+    color: #66a3e0;
+}
+.ql-color-\#c285ff {
+    color: #c285ff;
+}
+.ql-color-\#888888 {
+    color: #888888;
+}
+.ql-color-\#a10000 {
+    color: #a10000;
+}
+.ql-color-\#b26b00 {
+    color: #b26b00;
+}
+.ql-color-\#b2b200 {
+    color: #b2b200;
+}
+.ql-color-\#006100 {
+    color: #006100;
+}
+.ql-color-\#0047b2 {
+    color: #0047b2;
+}
+.ql-color-\#6b24b2 {
+    color: #6b24b2;
+}
+.ql-color-\#444444 {
+    color: #444444;
+}
+.ql-color-\#5c0000 {
+    color: #5c0000;
+}
+.ql-color-\#663d00 {
+    color: #663d00;
+}
+.ql-color-\#666600 {
+    color: #666600;
+}
+.ql-color-\#003700 {
+    color: #003700;
+}
+.ql-color-\#002966 {
+    color: #002966;
+}
+.ql-color-\#3d1466 {
+    color: #3d1466;
+}
+
+@keyframes lds-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
     }
 }
 

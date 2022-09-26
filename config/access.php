@@ -133,8 +133,6 @@ return [
     ],
 
 
-
-
     //============== Журнал печать ПЛ Dop =================================//
     [
         'name'        => 'journal_pl_accounting',
@@ -220,10 +218,10 @@ return [
         'name'        => 'errors_sdpo_delete',
         'description' => 'Реестр ошибок СДПО - Удаление',
     ],
-//    [
-//        'name'        => 'errors_sdpo_create',
-//        'description' => 'Реестр ошибок СДПО - Создания',
-//    ],
+    //    [
+    //        'name'        => 'errors_sdpo_create',
+    //        'description' => 'Реестр ошибок СДПО - Создания',
+    //    ],
     [
         'name'        => 'errors_sdpo_trash',
         'description' => 'Реестр ошибок СДПО - Корзина',
@@ -398,22 +396,22 @@ return [
         'description' => 'Система - Корзина',
     ],
     //============== Система =============//
-//    [
-//        'name'        => 'system_create',
-//        'description' => 'Система - Создание',
-//    ],
-//    [
-//        'name'        => 'system_read',
-//        'description' => 'Система - Просмотр',
-//    ],
-//    [
-//        'name'        => 'system_update',
-//        'description' => 'Система - Редактирование',
-//    ],
-//    [
-//        'name'        => 'system_delete',
-//        'description' => 'Система - Удаление',
-//    ],
+    //    [
+    //        'name'        => 'system_create',
+    //        'description' => 'Система - Создание',
+    //    ],
+    //    [
+    //        'name'        => 'system_read',
+    //        'description' => 'Система - Просмотр',
+    //    ],
+    //    [
+    //        'name'        => 'system_update',
+    //        'description' => 'Система - Редактирование',
+    //    ],
+    //    [
+    //        'name'        => 'system_delete',
+    //        'description' => 'Система - Удаление',
+    //    ],
     //============== Системные настройки =============//
     [
         'name'        => 'settings_system_read',
@@ -482,26 +480,26 @@ return [
         'name'        => 'employee_trash',
         'description' => 'Сотрудники - Корзина',
     ],
-    //============== Группы =============//
+    //============== Роли =============//
     [
         'name'        => 'group_create',
-        'description' => 'Группы - Создание',
+        'description' => 'Роли - Создание',
     ],
     [
         'name'        => 'group_read',
-        'description' => 'Группы - Просмотр',
+        'description' => 'Роли - Просмотр',
     ],
     [
         'name'        => 'group_update',
-        'description' => 'Группы - Редактирование',
+        'description' => 'Роли - Редактирование',
     ],
     [
         'name'        => 'group_delete',
-        'description' => 'Группы - Удаление',
+        'description' => 'Роли - Удаление',
     ],
     [
         'name'        => 'group_trash',
-        'description' => 'Группы - Корзина',
+        'description' => 'Роли - Корзина',
     ],
     //============== ПАК СДПО =============//
     [
@@ -589,4 +587,22 @@ return [
         'description' => 'Релизы - Просмотр',
     ],
 
+
+    //============== Подсказки полей =============//
+    [
+        'name'       => 'field_prompt_read',
+        'description' => 'Подсказки полей - Просмотр',
+    ],
+    [
+        'name'       => 'field_prompt_edit',
+        'description' => 'Подсказки полей - Редактирование',
+    ],
+    [
+        'name'       => 'field_prompt_delete',
+        'description' => 'Подсказки полей - Удаление',
+    ],
+    [
+        'name'       => 'field_prompt_trash',
+        'description' => 'Подсказки полей - Карзина',
+    ],
 ];

@@ -1,59 +1,24 @@
 <table id="elements-table" class="table table-striped table-sm">
     <thead>
     <tr>
-        <th width="60">ID
-            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=id">
-                <i class="fa fa-sort"></i>
-            </a>
-        </th>
-
-        @if(!$is_pak)
-            <th width="60">Фото</th>
-            <th>ФИО
-                <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=name">
+        @foreach($fields as $field)
+            <th>
+                <span class="user-select-none"
+                  @if ($field->content)
+                      data-toggle="tooltip"
+                      data-html="true"
+                      data-trigger="click hover"
+                      title="{{ $field->content }}"
+                    @endif
+                >
+                    {{ $field->name }}
+                </span>
+                <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field }}">
                     <i class="fa fa-sort"></i>
                 </a>
             </th>
-            <th>ЭЦП
-                <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=eds">
-                    <i class="fa fa-sort"></i>
-                </a>
-            </th>
-        @else
-            <th>Token</th>
-        @endif
+        @endforeach
 
-        <th>Login</th>
-        <th>E-mail
-            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=email">
-                <i class="fa fa-sort"></i>
-            </a>
-        </th>
-        <th>ПВ
-            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=pv_id">
-                <i class="fa fa-sort"></i>
-            </a>
-        </th>
-        <th>Компания
-            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=company_id">
-                <i class="fa fa-sort"></i>
-            </a>
-        </th>
-        <th>GMT
-            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=timezone">
-                <i class="fa fa-sort"></i>
-            </a>
-        </th>
-        <th>Заблокирован
-            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=blocked">
-                <i class="fa fa-sort"></i>
-            </a>
-        </th>
-        <th width="60">Роль
-            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=role">
-                <i class="fa fa-sort"></i>
-            </a>
-        </th>
         @if($permissionEdit)
             <th>#</th>
         @endif
@@ -66,41 +31,31 @@
     <tbody>
     @foreach ($users as $user)
         <tr>
-            <td>{{ $user->id }}</td>
-
-            @if(!$is_pak)
+            @foreach($fields as $field)
                 <td>
-                    <a href="{{ \App\Http\Controllers\ProfileController::getAvatar($user->id) }}" data-fancybox="gallery_{{ $user->id }}">
-                        <b>
-                            <i class="fa fa-camera"></i>
-                        </b>
-                    </a>
+                @if($field->field === 'pv_id')
+                    {{ \App\Point::getPointText($user->pv_id) }}
+                @elseif($field->field === 'company_id')
+                    {{ $user->company['name'] ?? '' }}
+                @elseif($field->field === 'blocked')
+                    {{ $user->blocked ? 'Да' : 'Нет' }}
+                @elseif($field->field === 'roles')
+                        @foreach($user->roles as $role)
+                            <h5>
+                            <span class="badge badge-success">
+                                {{ $role['guard_name'] }}
+                            </span>
+                            </h5>
+                        @endforeach
+                @else
+                    {{ $user[$field->field] }}
+                @endif
                 </td>
-                <td>{{ $user->name }}</td>
-                <td>{{ $user->eds }}</td>
-            @else
-                <td>{{ $user->api_token }}</td>
-            @endif
+            @endforeach
 
-            <td>{{ $user->login }}</td>
-            <td>{{ $user->email }}</td>
-            <td>{{ \App\Point::getPointText($user->pv_id) }}</td>
-            <td>{{ $user->company['name'] ?? '' }}</td>
-            <td>{{ $user->timezone }}</td>
-            <td>{{ $user->blocked ? 'Да' : 'Нет' }}</td>
-            <td>
-                @foreach($user->roles as $role)
-                    <h5>
-                        <span class="badge badge-success">
-                            {{ $role['guard_name'] }}
-                        </span>
-                    </h5>
-                @endforeach
-            </td>
             @if($permissionEdit)
                 <td class="td-option">
-
-                    <a href="" data-toggle="modal" data-target="#users-modal-edit-{{ $user->id }}" class="btn btn-info"><i class="fa fa-edit"></i></a>
+                    <a href="" data-toggle="modal" data-target="#users-modal-edit-{{ $user->id }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i></a>
 
                     <!-- Редактирование элемента -->
                     <div id="users-modal-edit-{{ $user->id }}" role="dialog" aria-hidden="true" class="modal fade text-left">
@@ -247,7 +202,7 @@
             @endif
             @if($permissionDelete)
             <td class="td-option">
-                <a href="{{ route('adminDeleteUser', $user->id) }}" class="ACTION_DELETE btn btn-danger"><i class="fa fa-trash"></i></a>
+                <a href="{{ route('adminDeleteUser', $user->id) }}" class="ACTION_DELETE btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
             </td>
             @endif
         </tr>

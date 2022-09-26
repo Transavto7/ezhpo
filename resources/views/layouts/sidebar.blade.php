@@ -68,7 +68,7 @@
                 </li>
             @endif
 
-            @if(user()->access('approval_queue_view'))
+            @if(user()->access('approval_queue_view', 'approval_queue_clear'))
                 @php
                     $countPakQueue = \App\Anketa::where('type_anketa', 'pak_queue')->count();
                 @endphp
@@ -212,12 +212,8 @@
                     <a href="#" data-btn-collapse="#spis-pol" role="button"><i class="fa fa-cog"></i> Настройки</a>
                     <ul id="spis-pol" class="collapse list-unstyle">
 
-                        @if(user()->access('system_read'))
-                            <li><a href="{{ route('renderElements', 'Settings') }}">Система</a></li>
-                        @endif
-
                         @if(user()->access('settings_system_read'))
-                            <li><a href="{{ route('systemSettings') }}">Системные настройки</a></li>
+                            <li><a href="{{ route('settings.index') }}">Системные настройки</a></li>
                         @endif
 
                         @if(user()->access('city_read', 'city_create'))
@@ -237,7 +233,7 @@
                         @endif
 
                         @if(user()->access('group_read', 'group_create'))
-                            <li><a href="{{ route('roles.index') }}">Группы</a></li>
+                            <li><a href="{{ route('roles.index') }}">Роли</a></li>
                         @endif
 
                         @if(user()->access('pak_sdpo_read', 'pak_sdpo_create'))
@@ -262,6 +258,10 @@
 
                         @if(user()->access('releases_read'))
                             <li><a href="{{ route('releases') }}">Релизы</a></li>
+                        @endif
+
+                        @if(user()->access('field_prompt_read'))
+                            <li><a href="{{ route('prompt.index') }}">Подсказки полей</a></li>
                         @endif
 
 

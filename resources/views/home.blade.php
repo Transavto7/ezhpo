@@ -184,18 +184,15 @@ $permissionToExportPrikazPL = (
                                 @if (!user()->hasRole('client'))
                                     <div class="toggle-hidden p-3" id="ankets-filters">
                                         <form class="ankets-form" anketa="{{ $type_ankets }}">
-                                            @foreach($anketsFields as $fieldKey => $fieldValue)
-                                                @isset($fieldsKeys[$fieldValue])
+                                            @foreach($fieldPrompts as $key => $field)
                                                     <label>
                                                         <input
                                                             checked
-                                                            type="checkbox" name="{{ $fieldValue }}" data-value="{{ $fieldKey+1 }}" />
-                                                        {{ (isset($fieldsKeys[$fieldValue]['name'])) ? $fieldsKeys[$fieldValue]['name'] : $fieldsKeys[$fieldValue] }} &nbsp;
+                                                            type="checkbox" name="{{ $field->field }}" data-value="{{ $key+1 }}" />
+                                                        {{ $field->name }} &nbsp;
                                                     </label>
-                                                @endisset
                                             @endforeach
                                         </form>
-
                                         <button class="btn btn-success btn-sm mt-3" onclick="saveChecks()">Сохранить</button>
                                         <button class="btn btn-danger btn-sm mt-3" onclick="resetChecks()">Сбросить</button>
                                         <div class="toast mt-2 toast-save-checks position-absolute">
@@ -206,7 +203,7 @@ $permissionToExportPrikazPL = (
 
                                         <div class="toast mt-2 toast-reset-checks position-absolute">
                                             <div class="toast-body bg-danger text-white">
-                                                Успешно сброшенно
+                                                Успешно сброшено
                                             </div>
                                         </div>
                                     </div>
@@ -224,7 +221,7 @@ $permissionToExportPrikazPL = (
                             </li>
                         </ul>
 
-                        <form action="" method="GET" class="tab-content ankets-form-filter mb-3 pt-3" id="filter-groupsContent">
+                        <form  onsubmit="document.querySelector('#page-preloader').classList.remove('hide')" action="" method="GET" class="tab-content ankets-form-filter mb-3 pt-3" id="filter-groupsContent">
                             <div class="text-center">
                                 <img src="{{ asset('images/loader.gif') }}" width="30" class="mb-4" />
                             </div>
@@ -251,29 +248,34 @@ $permissionToExportPrikazPL = (
                                         <th class="not-export">
                                             Таймер
                                         </th>
-                                    @elseif (!isset($fieldsKeys['id']))
-                                        <th width="60" class="not-export">ID записи</th>
                                     @endif
 
-                                    @foreach($anketsFieldsTable as $field)
-                                        @if($field == 'hour_from' || $field == 'hour_to')
+                                    @foreach($fieldPrompts as $field)
+                                        @if($field->field == 'hour_from' || $field->field == 'hour_to')
                                             @continue
                                         @endif
-                                        @isset($fieldsKeys[$field])
-                                            <th @isset($blockedToExportFields[$field]) class="not-export" @endif data-field-key="{{ $field }}">
-                                                {{ (isset($fieldsKeys[$field]['name'])) ? $fieldsKeys[$field]['name'] : $fieldsKeys[$field] }}
 
-                                                <a class="not-export" href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field . $queryString }}">
-                                                    <i class="fa fa-sort"></i>
-                                                </a>
-                                            </th>
-                                        @endisset
+                                        <th @isset($blockedToExportFields[$field->field])
+                                            class="not-export"
+                                            @endisset
+                                            data-field-key="{{ $field->field }}"
+                                        >
+                                            <span class="user-select-none"
+                                                @if ($field->content)
+                                                    data-toggle="tooltip"
+                                                    data-html="true"
+                                                    data-trigger="click hover"
+                                                    title="{{ $field->content }}"
+                                                @endif
+                                            >
+                                                {{ $field->name }}
+                                            </span>
+
+                                            <a class="not-export" href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field . $queryString }}">
+                                                <i class="fa fa-sort"></i>
+                                            </a>
+                                        </th>
                                     @endforeach
-
-                                    @accessSetting('id_auto', 'medic')
-                                        <th class="not-export">ID автомобиля</th>
-                                    @endaccessSetting
-
 
                                     @if(request()->get('trash'))
                                         <th width="60">Удаливший</th>
@@ -299,7 +301,7 @@ $permissionToExportPrikazPL = (
 
                                     @if($type_ankets !== 'pak_queue')
                                             @if($permissionToDelete)
-                                            <th class="not-export">#</th>
+                                                <th class="not-export">#</th>
                                             @endif
                                     @endif
                                 </tr>
@@ -312,67 +314,84 @@ $permissionToExportPrikazPL = (
                                             <td class="not-export">
                                                 <div class="App-Timer" data-date="{{ $anketa->created_at }}"></div>
                                             </td>
-                                        @elseif (!isset($fieldsKeys['id']))
-                                            <td class="not-export">{{ $anketa->id }}</td>
                                         @endif
 
 
-                                        @foreach($anketsFieldsTable as $anketaKey)
-                                            @if(isset($fieldsKeys[$anketaKey]))
-                                                <td @isset($blockedToExportFields[$anketaKey]) class="not-export" @endisset data-field-key="{{ $anketaKey }}">
-                                                    @if($anketaKey === 'date' || strpos($anketaKey, '_at') > 0)
-                                                        @if($anketa[$anketaKey])
-                                                            {{ date('d-m-Y H:i:s', strtotime($anketa[$anketaKey])) }}
-                                                        @endif
-                                                    @elseif($anketaKey === 'photos')
+                                        @foreach($fieldPrompts as $field)
+                                            <td
+                                                @isset($blockedToExportFields[$field->field])
+                                                    class="not-export"
+                                                @endisset
+                                                data-field-key="{{ $field->field }}"
+                                            >
+                                                @if($field->field === 'date' || strpos($field->field, '_at') > 0)
+                                                    @if($anketa[$field->field])
+                                                        {{ date('d-m-Y H:i:s', strtotime($anketa[$field->field])) }}
+                                                    @endif
+                                                @elseif($field->field === 'photos')
 
-                                                        @if($anketa[$anketaKey])
-                                                            @php $photos = explode(',', $anketa[$anketaKey]); @endphp
+                                                    @if($anketa[$field->field])
+                                                        @php $photos = explode(',', $anketa[$field->field]); @endphp
 
-                                                            @foreach($photos as $phI => $ph)
-                                                                @php $isUri = strpos($ph, 'sdpo.ta-7'); @endphp
+                                                        @foreach($photos as $phI => $ph)
+                                                            @php $isUri = strpos($ph, 'sdpo.ta-7'); @endphp
 
-                                                                @if($phI == 0)
-                                                                    <a href="{{ $isUri ? $ph : Storage::url($ph) }}" data-fancybox="gallery_{{ $anketa->id }}"><i class="fa fa-camera"></i> ({{ count($photos) }})</a>
-                                                                @else
-                                                                    <a href="{{ $isUri ? $ph : Storage::url($ph) }}" data-fancybox="gallery_{{ $anketa->id }}"></a>
-                                                                @endif
-                                                            @endforeach
-                                                        @endif
-
-                                                    @elseif($anketaKey === 'videos')
-
-                                                        @if($anketa[$anketaKey])
-                                                            @php $videos = explode(',', $anketa[$anketaKey]); @endphp
-
-                                                            @foreach($videos as $vK => $vV)
-                                                                @if($vK == 0)
-                                                                    <a data-type="iframe" href="{{ route('showVideo', ['url' => $vV]) }}" data-fancybox="video_{{ $anketa->id }}">
-                                                                        <i class="fa fa-video-camera"></i>
-
-                                                                        ({{ count($videos) }})
-                                                                    </a>
-                                                                @else
-                                                                    <a data-type="iframe" href="{{ $vV }}" data-fancybox="video_{{ $anketa->id }}"></a>
-                                                                @endif
-
-                                                            @endforeach
-                                                        @endif
-
-                                                    @else
-
-                                                        {{ $anketa[$anketaKey] }}
-
-                                                        @if($type_ankets === 'medic' && $anketaKey === 'admitted' && $anketa[$anketaKey] === 'Не допущен')
-                                                            @if ($anketa->proba_alko === 'Положительно')
-                                                                <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
+                                                            @if($phI == 0)
+                                                                <a href="{{ $isUri ? $ph : Storage::url($ph) }}" data-fancybox="gallery_{{ $anketa->id }}"><i class="fa fa-camera"></i> ({{ count($photos) }})</a>
                                                             @else
-                                                                <a href="{{ route('docs.get', ['type' => 'other', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
+                                                                <a href="{{ $isUri ? $ph : Storage::url($ph) }}" data-fancybox="gallery_{{ $anketa->id }}"></a>
                                                             @endif
+                                                        @endforeach
+                                                    @endif
+
+                                                @elseif($field->field === 'videos')
+
+                                                    @if($anketa[$field->field])
+                                                        @php $videos = explode(',', $anketa[$field->field]); @endphp
+
+                                                        @foreach($videos as $vK => $vV)
+                                                            @if($vK == 0)
+                                                                <a data-type="iframe" href="{{ route('showVideo', ['url' => $vV]) }}" data-fancybox="video_{{ $anketa->id }}">
+                                                                    <i class="fa fa-video-camera"></i>
+
+                                                                    ({{ count($videos) }})
+                                                                </a>
+                                                            @else
+                                                                <a data-type="iframe" href="{{ $vV }}" data-fancybox="video_{{ $anketa->id }}"></a>
+                                                            @endif
+
+                                                        @endforeach
+                                                    @endif
+
+                                                @elseif($field->field === 'company_name' && user()->access('company_read'))
+                                                    <a href="{{ route('renderElements', ['model' => 'Company', 'filter' => 1, 'name' => $anketa[$field->field] ]) }}">
+                                                        {{ $anketa[$field->field] }}
+                                                    </a>
+                                                @elseif($field->field === 'user_name' && user()->access('employee_read'))
+                                                    <a href="{{ route('users', ['name' => $anketa[$field->field] ]) }}">
+                                                        {{ $anketa[$field->field] }}
+                                                    </a>
+                                                @elseif($field->field === 'driver_fio' && user()->access('drivers_read'))
+                                                    <a href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'fio' => $anketa[$field->field] ]) }}">
+                                                        {{ $anketa[$field->field] }}
+                                                    </a>
+                                                @elseif($field->field === 'car_gos_number' && user()->access('cars_read'))
+                                                    <a href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'gos_number' => $anketa[$field->field] ]) }}">
+                                                        {{ $anketa[$field->field] }}
+                                                    </a>
+                                                @else
+
+                                                    {{ $anketa[$field->field] }}
+
+                                                    @if($type_ankets === 'medic' && $field->field === 'admitted' && $anketa[$field->field] === 'Не допущен')
+                                                        @if ($anketa->proba_alko === 'Положительно')
+                                                            <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
+                                                        @else
+                                                            <a href="{{ route('docs.get', ['type' => 'other', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
                                                         @endif
                                                     @endif
-                                                </td>
-                                            @endif
+                                                @endif
+                                            </td>
                                         @endforeach
 
 
@@ -386,12 +405,6 @@ $permissionToExportPrikazPL = (
                                             </td>
                                         @endif
                                         @endif
-
-                                        @accessSetting('id_auto', 'medic')
-                                            <td class="td-option not-export">
-                                                {{ $anketa->car_id }}
-                                            </td>
-                                        @endaccessSetting
 
                                         <!-- ОЧЕРЕДЬ ОСМОТРОВ -->
                                         @if($type_ankets === 'pak_queue')

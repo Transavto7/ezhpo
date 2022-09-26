@@ -16,3 +16,11 @@ use Illuminate\Foundation\Inspiring;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->describe('Display an inspiring quote');
+
+
+Artisan::command('fetch:permissions', function () {
+    $permissions = \App\User::fetchPermissions();
+    $this->comment($permissions['total'].' - доступов всего, '
+                   .$permissions['added'].' - доступов добавлено, '
+                   .$permissions['deleted'].' - доступов удалено');
+})->describe('Display an inspiring quote');

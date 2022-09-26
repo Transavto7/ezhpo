@@ -172,6 +172,7 @@ class ApiController extends Controller
                 }
             }
 
+
             if (isset($data['company_id'])) {
                 if($company = Company::select('name', 'hash_id')->find($data['company_id'])){
                     $data['company_name'] = $company->name;

@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -16,7 +17,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use Notifiable, HasRoles, \Illuminate\Database\Eloquent\SoftDeletes;
+    use Notifiable, HasRoles, SoftDeletes;
 
     public $fillable
         = [
@@ -154,225 +155,35 @@ class User extends Authenticatable
 //        }
     }
 
-    public static function fetchRoles($hard = false)
+    public static function fetchPermissions()
     {
-//        DB::statement("SET foreign_key_checks=0");
-//        Role::truncate();
-//        Permission::truncate();
-//        DB::statement("SET foreign_key_checks=1");
-//
-        foreach (self::$newUserRolesTextEN as $keyRole => $nameRole) {
-            Role::updateOrCreate([
-                'name'       => $nameRole,
-            ], [
-                'guard_name' => self::$newUserRolesText[$keyRole],
-                'name'       => $nameRole,
-            ]);
-        }
-
         $permissions = collect(config('access'));
+        DB::statement("SET foreign_key_checks=0");
 
+        $counter['added'] = 0;
         foreach ($permissions as $permission) {
-            Permission::updateOrCreate([
-                'name'       => $permission['name'],
-            ],[
-                'name'       => $permission['name'],
-                'guard_name' => $permission['description'],
-            ]);
-        }
+            if($updatePermission = Permission::where('name', $permission['name'])->first()){
+                $updatePermission->guard_name = $permission['description'];
 
-        if(!$hard){
-            return;
-        }
-
-        foreach (User::with(['roles'])->get() as $user) {
-            if ($user->roles()->count()) {
-                continue;
-            }
-
-            switch ($user->role) {
-                case 1:
-                    $user->roles()->attach(1);
-                    break;
-                case 2:
-                    $user->roles()->attach(2);
-                    break;
-                case 3:
-                    $user->roles()->attach(3);
-                    break;
-                case 4:
-                    $user->roles()->attach(4);
-                    break;
-                case 11:
-                    $user->roles()->attach(5);
-                    continue 2;
-                case 12:
-                    $user->roles()->attach(6);
-                    break;
-                case 13:
-                    $user->roles()->attach(7);
-                    break;
-                case 777:
-                    $user->roles()->attach(8);
-                    break;
-                case 778:
-                    $user->roles()->attach(9);
-                    break;
-            }
-            if ($user->role_manager == 1) {
-                $user->roles()->attach(5);
+                $updatePermission->save();
+            }else{
+                $counter['added']++;
+                Permission::create([
+                    'name'       => $permission['name'],
+                    'guard_name' => $permission['description'],
+                ]);
             }
         }
+        $deleted = Permission::whereNotIn('name', $permissions->pluck('name'));
+        $counter['deleted'] = $deleted->count();
+        $deleted->delete();
 
-//        if(!$hard){
-            return;
-//        }
-        self::fetchOldDataPermission($permissions);
+        $counter['total'] = Permission::count();
+
+        DB::statement("SET foreign_key_checks=1");
+
+        return $counter;
     }
-
-    private static function fetchOldDataPermission($permissions)
-    {
-        // permission for admin
-        $adminRole = Role::where('name', 'admin')->first();
-        $terminalRole = Role::where('name', 'terminal')->first();
-
-        $allPermissions = Permission::get();
-
-        $adminRole->permissions()->sync($allPermissions->pluck('id'));
-        $terminalRole->permissions()->sync($allPermissions->pluck('id'));
-
-        // permission for tech
-        $techRole = Role::where('name', 'tech')->first();
-
-
-
-        // admin permissions
-        $permissionIgnore = [
-            'client_create',
-            'report_service_company_read',
-            'report_schedule_pv_read',
-            'report_schedule_pv_read',
-            'discount_create',
-            'discount_read',
-            'discount_update',
-            'discount_delete',
-            'briefings_create',
-            'briefings_read',
-            'briefings_update',
-            'briefings_delete',
-            'settings_read',
-            'system_create',
-            'system_read',
-            'system_update',
-            'system_delete',
-            'settings_system_create',
-            'settings_system_read',
-            'settings_system_update',
-            'settings_system_delete',
-            'city_create',
-            'city_read',
-            'city_update',
-            'city_delete',
-            'pv_create',
-            'pv_read',
-            'pv_update',
-            'pv_delete',
-            'employee_create',
-            'employee_read',
-            'employee_update',
-            'employee_delete',
-            'pak_sdpo_create',
-            'pak_sdpo_read',
-            'pak_sdpo_update',
-            'pak_sdpo_delete',
-            'date_control_create',
-            'date_control_read',
-            'date_control_update',
-            'date_control_delete',
-            'story_field_create',
-            'story_field_read',
-            'story_field_update',
-            'story_field_delete',
-            'requisites_create',
-            'requisites_read',
-            'requisites_update',
-            'requisites_delete',
-            'releases_read',
-
-            'tech_create',
-            //            'tech_read',
-            'tech_update',
-            'tech_delete',
-            'tech_trash',
-
-            'medic_create',
-            //            'medic_read',
-            'medic_update',
-            'medic_delete',
-            'medic_trash',
-        ];
-        foreach ($allPermissions as $permission) {
-            if (in_array($permission->name, [
-                'tech_create',
-                //                'tech_read',
-                'tech_update',
-                'tech_trash',
-            ])) {
-                $techRole->permissions()->sync($permission->pluck('id'));
-                continue;
-            }
-            if (in_array($permission->name, $permissionIgnore)) {
-                continue;
-            }
-            $techRole->permissions()->sync($permission->pluck('id'));
-        }
-        $medicRole = Role::where('name', 'medic')->first();
-
-        foreach ($allPermissions as $permission) {
-            // Это нам надо
-            if (in_array($permission->name, [
-                'report_service_company_read',
-                'report_schedule_pv_read',
-                'medic_trash',
-            ])) {
-                $medicRole->permissions()->sync($permission->pluck('id'));
-                continue;
-            }
-            // Это нам не надо
-            if (in_array($permission->name, $permissionIgnore)) {
-                continue;
-            }
-            // всё отсальное надо
-            $medicRole->permissions()->sync($permission->pluck('id'));
-        }
-        $operator_sdpoRole = Role::where('name', 'operator_sdpo')->first();
-
-        foreach ($allPermissions as $permission) {
-            // Это нам не надо
-            if (in_array($permission->name, [
-                'service_create',
-                'service_read',
-                'service_update',
-                'service_delete',
-            ])) {
-                continue;
-            }
-            if (in_array($permission->name, [
-                'medic_create',
-                'medic_update',
-                'medic_trash',
-            ])) {
-                $operator_sdpoRole->permissions()->sync($permission->pluck('id'));
-                continue;
-            }
-            if (in_array($permission, $permissionIgnore)) {
-                continue;
-            }
-            // всё отсальное надо
-            $operator_sdpoRole->permissions()->sync($permission->pluck('id'));
-        }
-    }
-
 
     public static $userRolesValues
         = [

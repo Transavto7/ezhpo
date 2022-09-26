@@ -6,6 +6,7 @@ use App\Anketa;
 use App\Car;
 use App\Company;
 use App\Driver;
+use App\FieldPrompt;
 use App\Imports\CarImport;
 use App\Imports\CompanyImport;
 use App\Imports\DriverImport;
@@ -767,6 +768,10 @@ class IndexController extends Controller
 
             unset($data['_token']);
 
+            if ($request->user()->hasRole('client')) {
+                $data['company_id'] = $request->user()->company_id;
+            }
+
             switch ($model_type) {
                 case 'Company':
 
@@ -1024,6 +1029,10 @@ class IndexController extends Controller
 
             unset($data['_token']);
 
+            if ($request->user()->hasRole('client')) {
+                $data['company_id'] = $request->user()->company_id;
+            }
+
             // Обновляем данные
             if($element) {
                 // Парсим файлы
@@ -1267,13 +1276,11 @@ class IndexController extends Controller
                 }
             }
 
-            if(User::getUserCompanyId() && auth()->user()->hasRole('client')) {
-                $company_user_id = User::getUserCompanyId();
-
+            if(auth()->user()->hasRole('client')) {
                 if($model == 'Driver' || $model == 'Car') {
-                    $element['elements'] = $element['elements']->where('company_id', $company_user_id);
+                    $element['elements'] = $element['elements']->where('company_id', auth()->user()->company_id);
                 } else if ($model == 'Company') {
-                    $element['elements'] = $element['elements']->where('id', $company_user_id);
+                    $element['elements'] = $element['elements']->where('id', auth()->user()->company_id);
                 }
             }
 
@@ -1306,8 +1313,8 @@ class IndexController extends Controller
             }
 
             $element['queryString'] = $queryString;
-//dd($element);
-//dd(view('elements', $element));
+            $element['fieldPrompts'] = FieldPrompt::where('type', strtolower($model))->get();
+
             return view('elements', $element);
         } else {
             return redirect( route('home') );

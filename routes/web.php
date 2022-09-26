@@ -6,6 +6,7 @@
 
 use App\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/fixRoles', function() {
 
@@ -134,6 +135,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('roles', 'RoleController');
     Route::post('roles/return_trash', 'RoleController@returnTrash');
+
+    Route::any('/field/prompt/filter', 'FieldPromptController@getAll');
+    Route::resource('field/prompt', 'FieldPromptController');
 });
 
 
@@ -214,9 +218,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/users/{id}', 'AdminController@UpdateUser')->name('adminUpdateUser');
 
         Route::prefix('settings')->group(function () {
-            Route::get('/import_admin_data_settings', 'SettingsController@ImportSystemSettings');
-            Route::get('/', 'SettingsController@RenderSystemSettings')->name('systemSettings');
-            Route::post('/', 'SettingsController@UpdateSystemSetting')->name('systemSettings.update');
+            Route::get('/', 'SettingsController@index')->name('settings.index');
+            Route::post('/', 'SettingsController@update')->name('settings.update');
         });
 
     });

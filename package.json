@@ -23,6 +23,7 @@
     },
     "dependencies": {
         "@fancyapps/ui": "^4.0.8",
+        "@vueup/vue-quill": "^1.0.0-beta.10",
         "axios": "^0.27.2",
         "bootstrap-vue": "^2.22.0",
         "chart.js": "^2.9.4",
@@ -37,6 +38,8 @@
         "vue-chartjs": "^3.5.1",
         "vue-loader": "^15.9.8",
         "vue-multiselect": "^2.1.6",
-        "vue-select": "^3.20.0"
+        "vue-select": "^3.20.0",
+        "vue-toastification": "^1.7.14",
+        "vue2-editor": "^2.10.3"
     }
 }

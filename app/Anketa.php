@@ -32,13 +32,24 @@ class Anketa extends Model
 
     public $fillable
         = [
+            // all
             'id',
             'type_anketa',
+            'created_at',
+            'deleted_id',
+            'deleted_at',
+            'is_dop',
+            'result_dop',
+            'realy',
+            'is_pak',
+            'flag_pak',
 
+            // tech
             'car_id',
             'car_gos_number',
             'car_mark_model',
 
+            // medic
             'driver_id',
             'driver_fio',
             'driver_group_risk',
@@ -52,7 +63,6 @@ class Anketa extends Model
 
             'pv_id',
             'date',
-            'created_at',
             'number_list_road', //'date_number_list_road',
             'type_view',
             'tonometer',
@@ -71,8 +81,6 @@ class Anketa extends Model
             'complaint',
             'condition_visible_sliz',
             'condition_koj_pokr',
-            'is_dop',
-            'result_dop',
 
             // Журнал печати ПЛ
             'date_pechat_pl',
@@ -80,7 +88,6 @@ class Anketa extends Model
             'period_pl',
             'added_to_dop',
             'added_to_mo',
-            'realy',
 
             // Журнал БДД
             'type_briefing',
@@ -96,13 +103,9 @@ class Anketa extends Model
 
             //системные поля
             'in_cart',
-            'is_pak',
             'protokol_path',
             'comments',
-            'flag_pak',
             'connected_hash',
-            'deleted_id',
-            'deleted_at',
         ];
 
 

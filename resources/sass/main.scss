@@ -2898,13 +2898,14 @@ body {
   }
 
   a {
-    color: #e40c19;
+    color: #01519b;
     text-decoration: none;
+      transition: ease-in-out;
   }
 
   a:focus, a:hover {
-    color: #254be6;
-    text-decoration: underline;
+    color: #e30c17;
+    text-decoration: none;
   }
 
   h1,
@@ -3509,6 +3510,22 @@ body {
   .card-img-top {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+    max-width: 250px;
+  }
+
+  .custom-file-label::after {
+      content: "Обзор";
+      cursor: pointer;
+  }
+
+  .croppie-block-profile {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.95);
+      z-index: 999;
   }
 
   .card-img-bottom {

@@ -11,12 +11,6 @@
             id="croppie-input{{ $uniqueInputId }}"
         @endif
 
-{{--        @if ($default_value === 'current_date')--}}
-{{--            @php--}}
-{{--                $default_value = \Carbon\Carbon::now()->format('Y-m-d');--}}
-{{--            @endphp--}}
-{{--        @endif--}}
-
         @if ($k === 'date_of_employment')
             @php
                 if ($default_value == 'current_date') {
@@ -73,7 +67,7 @@
         </option>
     </select>
 
-@elseif ($v['type'] === 'select' && user()->hasRole('client') && $k === 'company_id')
+@elseif ($v['type'] === 'select' && user()->hasRole('client') && ($k === 'company_id' || $k === 'company_name'))
     @php
         $default_value = is_array($default_value) ? $default_value : explode(',', $default_value);
         $key = isset($v['getFieldKey']) ? $v['getFieldKey'] : 'id';

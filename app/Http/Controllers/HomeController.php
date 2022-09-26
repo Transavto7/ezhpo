@@ -8,6 +8,7 @@ use App\Company;
 use App\Driver;
 use App\Exports\AnketasExport;
 use App\Exports\TechAnketasExport;
+use App\FieldPrompt;
 use App\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -523,6 +524,7 @@ class HomeController extends Controller
             $currentRole = 'operator_sdpo';
         }
 
+        $fieldPrompts = FieldPrompt::where('type', $validTypeAnkets)->get();
 
         return view($_view, [
             'title'                 => Anketa::$anketsKeys[$validTypeAnkets],
@@ -533,6 +535,7 @@ class HomeController extends Controller
             'anketsFields'          => $anketsFields,
             'anketsFieldsTable'     => $anketsFieldsTable,
             'fieldsKeys'            => $fieldsKeys,
+            'fieldPrompts'          => $fieldPrompts,
             'fieldsGroupFirst'      => $fieldsGroupFirst,
             'blockedToExportFields' => $blockedToExportFields,
 

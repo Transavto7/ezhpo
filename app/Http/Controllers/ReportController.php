@@ -337,10 +337,10 @@ class ReportController extends Controller
 
         foreach ($techs->groupBy('car_id') as $car) {
             $id = $car->first()->car_id;
-            $car_gos_number = $car->where('car_gos_number', '!=', null)->first();
-            $type_auto = $car->where('type_auto', '!=', null)->first();
-            $result[$id]['car_gos_number'] = $car_gos_number ? $car_gos_number->car_gos_number : null;
-            $result[$id]['type_auto'] = $type_auto ? $type_auto->type_auto : null;
+            $numberCar = $car->where('car_gos_number', '!=', null)->first();
+            $typeCar = $car->where('type_auto', '!=', null)->first();
+            $result[$id]['car_gos_number'] = $numberCar ? $numberCar->car_gos_number : null;
+            $result[$id]['type_auto'] = $typeCar ? $typeCar->type_auto : null;
             $result[$id]['pv_id'] = implode('; ', array_unique($car->pluck('pv_id')->toArray()));
 
             foreach ($car->groupBy('type_view') as $rows) {

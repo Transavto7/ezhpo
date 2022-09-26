@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\FieldPrompt;
 use App\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -27,10 +28,14 @@ class RoleController extends Controller
         }else{
             $roles = Role::whereNull('deleted_at')->get();
         }
+
+        $fields = FieldPrompt::where('type', 'roles')->get();
+
         return view('admin.groups.index')
             ->with([
                 'roles' => $roles,
-                'all_permissions' => \Spatie\Permission\Models\Permission::orderBy('guard_name')->get()
+                'all_permissions' => \Spatie\Permission\Models\Permission::orderBy('guard_name')->get(),
+                'fields' => $fields,
             ]);
     }
 
