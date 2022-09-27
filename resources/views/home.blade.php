@@ -346,7 +346,7 @@ $permissionToExportPrikazPL = (
                                                 {{ $field->name }}
                                             </span>
 
-                                            <a class="not-export" href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field . $queryString }}">
+                                            <a class="not-export" href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field }}{{ $queryString }}">
                                                 <i class="fa fa-sort"></i>
                                             </a>
                                         </th>
