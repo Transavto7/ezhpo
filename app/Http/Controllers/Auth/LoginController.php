@@ -32,8 +32,6 @@ class LoginController extends Controller
     // Переписал, чтобы записывать сессии для полей анкет
     public function login(Request $request)
     {
-        HomeController::setSessionForField();
-
         $this->validateLogin($request);
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle

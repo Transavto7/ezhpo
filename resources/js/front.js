@@ -2,7 +2,6 @@ import axios from 'axios'
 import swal from 'sweetalert2'
 import { v4 as uidv4 } from 'uuid'
 import {ApiController} from "./components/ApiController";
-import visibleFields from "./config/visibleFields";
 import { Fancybox } from "@fancyapps/ui";
 
 require('./init-plugins')
@@ -22,11 +21,6 @@ $.fn.select2.amd.require(['select2/selection/search'], function (Search) {
 });
 
 $(document).ready(function () {
-
-    if (typeof fieldsVisible !== 'undefined' && !fieldsVisible) {
-        fieldsVisible = JSON.parse(JSON.stringify(visibleFields));
-    }
-
     const Toast = swal.mixin({
         toast: true,
         position: 'top-end',
@@ -389,58 +383,6 @@ $(document).ready(function () {
         });
     }
 
-    $(window).on('load', function () {
-        $('.ankets-form input').each(function () {
-            const type = $(this).parents('.ankets-form').attr('anketa');
-            const name = $(this).attr('name');
-            if (fieldsVisible[type] && fieldsVisible[type][name]) {
-                $(this).prop("checked", true);
-            } else {
-                $(this).prop("checked", false);
-            }
-        });
-
-        // Форма поиска по анкетам
-        function anketsFormCheckFieldsToShow ()
-        {
-            const showTableData = el => {
-                if(el) {
-                    const id = el.attr('name');
-                    const prop_checked = el.prop('checked');
-
-                    let anketsTable = $(`.ankets-table thead th[data-field-key="${id}"], .ankets-table tbody tr td[data-field-key="${id}"]`),
-                        displayProp = (!prop_checked ? 'none' : 'table-cell')
-
-                    anketsTable.attr('hidden', !prop_checked).css({'display': displayProp })
-                } else {
-                    $('.ankets-form input').each(function () {
-                        let $t = $(this)
-
-                        if(this.name !== '_token') {
-                            showTableData($t)
-                        }
-
-                    })
-                }
-            }
-
-            $('.ankets-form input').change(e => {
-                let el = $(e.target)
-                const type = el.parents('.ankets-form').attr('anketa');
-                const id = el.attr('name');
-                const prop_checked = el.prop('checked');
-
-                fieldsVisible[type][id] = prop_checked;
-
-                showTableData(el)
-            })
-
-            showTableData()
-        }
-
-        anketsFormCheckFieldsToShow()
-    })
-
 
     /**
      * Показываем данные в сущностях в карточках Анкеты
@@ -700,29 +642,7 @@ $(document).ready(function () {
         });
     }
 
-    window.saveChecks = async function () {
-        await API_CONTROLLER.saveFieldsVisible(fieldsVisible);
-        $('.toast-save-checks').toast('show');
-    }
 
-    window.resetChecks = async function () {
-        fieldsVisible = JSON.parse(JSON.stringify(visibleFields));
-
-        console.log(fieldsVisible);
-
-        $('.ankets-form input').each(function () {
-            const type = $(this).parents('.ankets-form').attr('anketa');
-            const name = $(this).attr('name');
-            if (fieldsVisible[type] && fieldsVisible[type][name]) {
-                $(this).prop("checked", true);
-            } else {
-                $(this).prop("checked", false);
-            }
-        });
-
-        await API_CONTROLLER.saveFieldsVisible(null);
-        $('.toast-reset-checks').toast('show');
-    }
 
     window.addFieldToHistory = (value, field) => {
         API.post('/api/field-history', {
