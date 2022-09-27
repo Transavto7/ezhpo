@@ -3,12 +3,6 @@
     &--error,
     &--success {
         background: #fff!important;
-
-        .page-content {
-            .content-inner {
-                width: 100% !important;
-            }
-        }
     }
 
     &.page-protokol {
@@ -56,12 +50,6 @@
 .cloning-clone {
     background: #fcfcfc;
     margin: 20px 0px;
-}
-
-.page-content {
-    .content-inner {
-        width: 100% !important;
-    }
 }
 
 // Snippets
