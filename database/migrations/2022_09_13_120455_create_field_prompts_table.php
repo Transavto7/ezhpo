@@ -238,6 +238,8 @@ class CreateFieldPromptsTable extends Migration
         $this->addField('company', 'where_call_name', 'Кому звонить при отстранении (имя, должность)');
         $this->addField('company', 'inn', 'ИНН');
         $this->addField('company', 'procedure_pv', 'Порядок выпуска');
+        $this->addField('company', 'has_actived_prev_month', 'Были ли активны в прошлом месяце');
+        $this->addField('company', 'document_bdd', 'Ссылка на таблицу с документами по бдд');
         $this->addField('company', 'dismissed', 'Черный список');
 
         // products

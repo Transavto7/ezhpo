@@ -190,10 +190,8 @@ class ApiController extends Controller
         return ApiController::r(['exists' => false, 'message' => '', 'model' => $model], 0);
     }
 
-    // {prop}/{model}/{val}
     public function OneCheckProperty($prop, $model, $val, Request $request)
     {
-//        dd($prop, $model, $val);
         if ($model = app("App\\$request->model")->where($prop, $val)->first()) {
             return response([
                 'status' => true,
@@ -207,7 +205,11 @@ class ApiController extends Controller
     }
 
     public function saveFieldsVisible(Request $request) {
-        $request->user()->fields_visible = json_encode($request->params);
+        if ($request->params && $request->params !== 'null') {
+            $request->user()->fields_visible = json_encode($request->params);
+        } else {
+            $request->user()->fields_visible = null;
+        }
         $request->user()->save();
     }
 }

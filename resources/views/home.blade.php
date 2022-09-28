@@ -20,12 +20,87 @@
             @endif
         };
 
-        @if (user()->fields_visible)
-            let fieldsVisible = JSON.parse(`{!! user()->fields_visible !!}`)
-        @else
-            let fieldsVisible = null;
-        @endif
+        $(document).ready(function () {
+            @if (user()->fields_visible)
+                let fieldsVisible = JSON.parse(`{!! user()->fields_visible !!}`);
+            @else
+                let fieldsVisible = JSON.parse(`{!! json_encode(config('fields.visible')) !!}`);
+            @endif
 
+            $('.ankets-form input').each(function () {
+                const type = $(this).parents('.ankets-form').attr('anketa');
+                const name = $(this).attr('name');
+                if (fieldsVisible[type] && fieldsVisible[type][name]) {
+                    $(this).prop("checked", true);
+                } else {
+                    $(this).prop("checked", false);
+                }
+            });
+
+            const showTableData = el => {
+                if(el) {
+                    const id = el.attr('name');
+                    const prop_checked = el.prop('checked');
+
+                    let anketsTable = $(`.ankets-table thead th[data-field-key="${id}"], .ankets-table tbody tr td[data-field-key="${id}"]`),
+                        displayProp = (!prop_checked ? 'none' : 'table-cell')
+
+                    anketsTable.attr('hidden', !prop_checked).css({'display': displayProp })
+                } else {
+                    $('.ankets-form input').each(function () {
+                        let $t = $(this)
+
+                        if(this.name !== '_token') {
+                            showTableData($t)
+                        }
+
+                    })
+                }
+            }
+
+            showTableData()
+
+            $('.ankets-form input').change(e => {
+                let el = $(e.target)
+                const type = el.parents('.ankets-form').attr('anketa');
+                const id = el.attr('name');
+                const prop_checked = el.prop('checked');
+
+                fieldsVisible[type][id] = prop_checked;
+
+                showTableData(el)
+            });
+
+            $('#saveFieldsBtn').click(async function () {
+                await saveFieldsVisible(fieldsVisible);
+                $('.toast-save-checks').toast('show');
+            });
+
+            $('#resetFieldsBtn').click(async function () {
+                fieldsVisible = JSON.parse(`{!! json_encode(config('fields.visible')) !!}`);
+
+                $('.ankets-form input').each(function () {
+                    const type = $(this).parents('.ankets-form').attr('anketa');
+                    const name = $(this).attr('name');
+                    if (fieldsVisible[type] && fieldsVisible[type][name]) {
+                        $(this).prop("checked", true);
+                    } else {
+                        $(this).prop("checked", false);
+                    }
+                });
+
+                await saveFieldsVisible(null);
+                $('.toast-reset-checks').toast('show');
+            });
+        });
+
+        function saveFieldsVisible(params) {
+            return axios.post('/api/fields/visible', { params }, {
+                headers: {
+                    Authorization: 'Bearer ' + API_TOKEN
+                },
+            });
+        }
     </script>
 
 @endsection
@@ -193,8 +268,8 @@ $permissionToExportPrikazPL = (
                                                     </label>
                                             @endforeach
                                         </form>
-                                        <button class="btn btn-success btn-sm mt-3" onclick="saveChecks()">Сохранить</button>
-                                        <button class="btn btn-danger btn-sm mt-3" onclick="resetChecks()">Сбросить</button>
+                                        <button class="btn btn-success btn-sm mt-3" id="saveFieldsBtn">Сохранить</button>
+                                        <button class="btn btn-danger btn-sm mt-3" id="resetFieldsBtn">Сбросить</button>
                                         <div class="toast mt-2 toast-save-checks position-absolute">
                                             <div class="toast-body bg-success text-white">
                                                 Успешно сохранено
@@ -271,7 +346,7 @@ $permissionToExportPrikazPL = (
                                                 {{ $field->name }}
                                             </span>
 
-                                            <a class="not-export" href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field . $queryString }}">
+                                            <a class="not-export" href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field }}{{ $queryString }}">
                                                 <i class="fa fa-sort"></i>
                                             </a>
                                         </th>

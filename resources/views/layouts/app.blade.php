@@ -72,10 +72,8 @@
 
         <main class="page-content d-flex align-items-stretch @if (user() && (user()->hasRole('driver') || user()->hasRole('client'))) blue @endif">
 
-            @hasSection ('sidebar')
-                @auth
+            @if (user() && !user()->hasRole('driver'))
                     @include('layouts.sidebar')
-                @endauth
             @endif
 
             @guest
@@ -84,7 +82,7 @@
 
             @auth
                 <div
-                    class="content-inner @hasSection ('sidebar') @else w-100 @endif"
+                    class="content-inner @if (user() && user()->hasRole('driver')) w-100 @endif"
                 >
                     @hasSection ('sidebar')
                         <!-- Хэдер-->
