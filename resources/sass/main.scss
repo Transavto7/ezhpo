@@ -2900,12 +2900,18 @@ body {
   a {
     color: #01519b;
     text-decoration: none;
-      transition: ease-in-out;
+    transition: ease-in-out;
+      svg {
+          fill: #01519b;
+      }
   }
 
   a:focus, a:hover {
     color: #e30c17;
     text-decoration: none;
+    svg {
+        fill: #e30c17;
+    }
   }
 
   h1,

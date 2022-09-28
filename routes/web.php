@@ -1,9 +1,5 @@
 <?php
 
-//use App\Http\Middleware\ {
-//    CheckAdmin, CheckManager
-//};
-
 use App\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
@@ -16,11 +12,6 @@ Route::get('/fixRoles', function() {
 Route::get('/', 'IndexController@RenderIndex')->name('index');
 Route::get('/releases', 'IndexController@RenderReleases')->name('releases');
 
-
-
-//Route::get('/roles', 'RoleController@index')->name('roles');
-//Route::resource
-//Route::get('/roles/fetchRoleData', 'RoleController@fetchRoleData');
 
 Route::get('/show-video', function () {
     $url = isset($_GET['url']) ? $_GET['url'] : '';

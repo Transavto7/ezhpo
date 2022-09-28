@@ -22,6 +22,8 @@ class SettingsController extends Controller
             'sms_text_default' => $settings->where('key', 'sms_text_default')->first(),
             'id_auto' => $settings->where('key', 'id_auto')->first(),
             'id_auto_required' => $settings->where('key', 'id_auto_required')->first(),
+            'phone' => $settings->where('key', 'phone')->first(),
+            'telegram' => $settings->where('key', 'telegram')->first(),
         ]);
     }
 
@@ -40,6 +42,8 @@ class SettingsController extends Controller
         Settings::where('key', 'sms_text_driver')->update(['value' => $request->sms_text_driver]);
         Settings::where('key', 'sms_text_car')->update(['value' => $request->sms_text_car]);
         Settings::where('key', 'sms_text_default')->update(['value' => $request->sms_text_default]);
+        Settings::where('key', 'phone')->update(['value' => $request->phone]);
+        Settings::where('key', 'telegram')->update(['value' => $request->telegram]);
 
         $id_auto = (bool) $request->id_auto;
         Settings::where('key', 'id_auto')->update(['value' => $id_auto ? '1' : '0']);

@@ -66,7 +66,7 @@
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="sms_api_key_prepend">
-                                            <i class="fa fa-key"></i>
+                                            <i class="fa fa-phone"></i>
                                         </span>
                                     </div>
                                     <input type="text"
@@ -81,12 +81,52 @@
                                 </div>
                             </div>
 
+                            <div class="form-group col-lg-6">
+                                <label for="phone" class="mb-1">Телефон на странице авторизации</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="sms_api_key_prepend">
+                                            <i class="fa fa-phone"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="phone"
+                                           style="height: auto"
+                                           placeholder="Введите телефон"
+                                           name="phone"
+                                           aria-describedby="sms_text_phone_prepend"
+                                           value="{{ $phone->value }}"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-6">
+                                <label for="telegram" class="mb-1">Telegram ссылка</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="sms_api_key_prepend">
+                                            <i class="fa fa-link"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="telegram"
+                                           style="height: auto"
+                                           placeholder="Введите ссылку на телеграм"
+                                           name="telegram"
+                                           aria-describedby="sms_text_phone_prepend"
+                                           value="{{ $telegram->value }}"
+                                    >
+                                </div>
+                            </div>
+
                             <div class="form-group col-lg-12">
                                 <label for="sms_text_driver" class="mb-1">Текст SMS для Водителя при непрохождении осмотра</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="sms_text_driver_prepend">
-                                            <i class="fa fa-key"></i>
+                                            <i class="fa fa-copy"></i>
                                         </span>
                                     </div>
                                     <textarea
@@ -105,7 +145,7 @@
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="sms_text_car_prepend">
-                                            <i class="fa fa-key"></i>
+                                            <i class="fa fa-copy"></i>
                                         </span>
                                     </div>
                                     <textarea
@@ -124,7 +164,7 @@
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="sms_text_default_prepend">
-                                            <i class="fa fa-key"></i>
+                                            <i class="fa fa-copy"></i>
                                         </span>
                                     </div>
                                     <textarea
