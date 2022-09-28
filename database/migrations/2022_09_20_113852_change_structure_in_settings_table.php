@@ -32,19 +32,19 @@ class ChangeStructureInSettingsTable extends Migration
         $this->createSetting('id_auto_required', 0);
 //        $settings->delete();
 
-        Schema::table('settings', function (Blueprint $table) {
-            $table->dropColumn('logo');
-            $table->dropColumn('sms_api_key');
-            $table->dropColumn('sms_text_driver');
-            $table->dropColumn('sms_text_car');
-            $table->dropColumn('sms_text_phone');
-            $table->dropColumn('sms_text_default');
-            $table->dropColumn('deleted_id');
-            $table->dropColumn('deleted_at');
-        });
-
-        Schema::drop('system_settings');
-        Permission::whereIn('name', ['system_read', 'system_delete', 'system_update', 'system_trash'])->delete();
+//        Schema::table('settings', function (Blueprint $table) {
+//            $table->dropColumn('logo');
+//            $table->dropColumn('sms_api_key');
+//            $table->dropColumn('sms_text_driver');
+//            $table->dropColumn('sms_text_car');
+//            $table->dropColumn('sms_text_phone');
+//            $table->dropColumn('sms_text_default');
+//            $table->dropColumn('deleted_id');
+//            $table->dropColumn('deleted_at');
+//        });
+//
+//        Schema::drop('system_settings');
+//        Permission::whereIn('name', ['system_read', 'system_delete', 'system_update', 'system_trash'])->delete();
     }
 
     public function createSetting($key, $value) {
