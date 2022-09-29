@@ -1331,9 +1331,9 @@ class IndexController extends Controller
         ]);
     }
 
-    public function RenderReleases ()
+    public function RenderHome()
     {
-        return view('releases');
+        return view('index');
     }
 
     /**
@@ -1361,10 +1361,9 @@ class IndexController extends Controller
                 return redirect()->route('home', ['type_ankets' => 'medic']);
             }
             if(!$type){
-                return redirect()->route('releases');
+                return redirect()->route('index');
             }
         }
-//        $type = $request->get('type', ($user->role === 1 ? 'tech' : 'medic') );
 
         $company_fields = $this->elements['Driver']['fields']['company_id'];
         $company_fields['getFieldKey'] = 'name';

@@ -253,10 +253,6 @@
                         <li><a href="{{ route('renderElements', 'Req') }}">Реквизиты нашей компании</a></li>
                     @endif
 
-                    @if(user()->access('releases_read'))
-                        <li><a href="{{ route('releases') }}">Релизы</a></li>
-                    @endif
-
                     @if(user()->access('field_prompt_read'))
                         <li><a href="{{ route('prompt.index') }}">Подсказки полей</a></li>
                     @endif

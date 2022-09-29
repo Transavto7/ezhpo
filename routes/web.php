@@ -10,7 +10,7 @@ Route::get('/fixRoles', function() {
 
 // Маршруты статичных и главных страниц
 Route::get('/', 'IndexController@RenderIndex')->name('index');
-Route::get('/releases', 'IndexController@RenderReleases')->name('releases');
+Route::get('/index', 'IndexController@RenderHome')->name('index');
 
 
 Route::get('/show-video', function () {
