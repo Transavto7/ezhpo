@@ -134,6 +134,7 @@ class Anketa extends Model
                 'type_view'    => 'Тип осмотра',
                 'proba_alko'   => 'Признаки опьянения', // Проба на алкоголь
                 'test_narko'   => 'Тест на наркотики',
+                'pv_id'          => 'Пункт выпуска',
             ],
 
             'pak' => [
@@ -167,6 +168,7 @@ class Anketa extends Model
                 'car_type_auto' => 'Категория ТС',
                 'company_id'   => 'Компания',
                 'type_view'          => 'Тип осмотра',
+                'pv_id'          => 'Пункт выпуска',
             ],
 
             'Dop' => [
@@ -183,18 +185,21 @@ class Anketa extends Model
                 'company_id'  => 'Компания',
                 'date'          => 'Дата инструктажа',
                 'driver_fio'   => 'Ф.И.О водителя',
+                'pv_id'          => 'Пункт выпуска',
             ],
 
             'report_cart' => [
                 'date'         => 'Дата снятия отчета',
                 'driver_fio'   => 'Ф.И.О водителя',
                 'company_id' => 'Компания',
+                'pv_id'          => 'Пункт выпуска',
             ],
 
             'pechat_pl' => [
                 'date'         => 'Дата выдачи',
                 'driver_fio'   => 'ФИО водителя',
                 'company_name' => 'Компания',
+                'pv_id'          => 'Пункт выпуска',
             ],
 
             /*'vid_pl' => [
@@ -426,7 +431,7 @@ class Anketa extends Model
                 't_people'               => 'Температура тела',
                 'tonometer'              => "Артериальное давление",
                 'pulse'                  => 'Пульс',
-                'test_narko'             => 'Тест на наркотики',
+//                'test_narko'             => 'Тест на наркотики',
                 'admitted'               => 'Заключение о результатах осмотра',
                 'user_name'              => 'ФИО ответственного',
                 'user_eds'               => 'ЭЦП медицинского работника',
