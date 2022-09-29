@@ -424,9 +424,10 @@ class HomeController extends Controller
             $fieldsKeys['id'] = true;
 
         }
+        $table = $orderKey === 'car_type_auto' ? '' : 'anketas.';
 
         $anketas = ($filter_activated || $typeAnkets === 'pak_queue')
-            ? $anketas->orderBy('anketas.' . $orderKey, $orderBy)->paginate($take) : [];
+            ? $anketas->orderBy($table . $orderKey, $orderBy)->paginate($take) : [];
 
         $anketasCountResult = ($filter_activated || $typeAnkets === 'pak_queue')
             ? $anketas->total() : 0;
