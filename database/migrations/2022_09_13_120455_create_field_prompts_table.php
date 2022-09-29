@@ -45,7 +45,6 @@ class CreateFieldPromptsTable extends Migration
         $this->addField('medic', 'driver_group_risk', 'Группа риска');
         $this->addField('medic', 'type_view', 'Тип осмотра');
         $this->addField('medic', 'proba_alko', 'Признаки опьянения');
-        $this->addField('medic', 'test_narko', 'Тест на наркотики');
         $this->addField('medic', 'driver_gender', 'Пол');
         $this->addField('medic', 'driver_year_birthday', 'Дата рождения');
         $this->addField('medic', 'complaint', 'Жалобы');
