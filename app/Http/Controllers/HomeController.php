@@ -337,7 +337,7 @@ class HomeController extends Controller
             ]);
         }
 
-        if ($typeAnkets == 'tech') {
+        if ($validTypeAnkets == 'tech') {
             $anketas = $anketas->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')->select('anketas.*',
                 'cars.type_auto as car_type_auto');
         }
@@ -348,7 +348,7 @@ class HomeController extends Controller
         // Экспорт из техосмотров и БДД
         if ($is_export && $filter_activated) {
 
-            if ($typeAnkets == 'tech') {
+            if ($validTypeAnkets == 'tech') {
 
                 if ($request->get('exportPrikaz')) {
                     $techs = $anketas->where('type_anketa', 'tech')
@@ -367,7 +367,7 @@ class HomeController extends Controller
                 }
             }
 
-            if ($typeAnkets == 'medic') {
+            if ($validTypeAnkets == 'medic') {
                 if ($request->get('exportPrikaz')) {
                     $medic = $anketas->where('type_anketa', 'medic')
                         ->get();
@@ -377,7 +377,7 @@ class HomeController extends Controller
                 }
             }
 
-            if ($typeAnkets == 'bdd') {
+            if ($validTypeAnkets == 'bdd') {
                 if ($request->get('exportPrikaz')) {
                     $bdd = $anketas->where('type_anketa', 'bdd')
                               ->with([
@@ -398,7 +398,7 @@ class HomeController extends Controller
                 }
             }
 
-            if ($typeAnkets == 'Dop') {
+            if ($validTypeAnkets == 'Dop') {
                 if ($request->get('exportPrikaz')) {
                     return Excel::download(new AnketasExport($anketas->where('type_anketa', 'Dop')
                         ->get(), Anketa::$fieldsKeys['dop_export_pl']),
@@ -407,8 +407,8 @@ class HomeController extends Controller
                 }
             }
 
-            return Excel::download(new AnketasExport($anketas->where('type_anketa', $typeAnkets)
-                ->get(), Anketa::$fieldsKeys[$typeAnkets]),
+            return Excel::download(new AnketasExport($anketas->where('type_anketa', $validTypeAnkets)
+                ->get(), Anketa::$fieldsKeys[$validTypeAnkets]),
                 'ЭЖ.xlsx');
         }
 

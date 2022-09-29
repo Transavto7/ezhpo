@@ -83,7 +83,7 @@ class CreateFieldPromptsTable extends Migration
         $this->addField('tech', 'driver_id', 'ID водителя');
         $this->addField('tech', 'car_id', 'ID автомобиля');
         $this->addField('tech', 'number_list_road', 'Номер ПЛ');
-        $this->addField('tech', 'odometer', 'показания одометра');
+        $this->addField('tech', 'odometer', 'Показания одометра');
         $this->addField('tech', 'point_reys_control', 'Отметка о прохождении контроля');
         $this->addField('tech', 'user_name', 'ФИО ответственного');
         $this->addField('tech', 'user_eds', 'Подпись лица, проводившего контроль');
