@@ -43,18 +43,6 @@ return [
             'company_name' => true,
             'user_name' => true,
         ],
-        'Dop' => [
-            'date' => true,
-            'created_at' => true,
-            'driver_fio' => true,
-            'company_name' => true,
-            'company_id' => true,
-            'pv_id' => true,
-            'number_list_road' => true,
-            'car_gos_number' => true,
-            'car_mark_model' => true,
-            'user_name' => true,
-        ],
         'pak' => [
             'id' => true,
             'date' => true,

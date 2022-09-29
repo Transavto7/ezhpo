@@ -485,7 +485,6 @@ class AnketsController extends Controller
             $createdAnketasDataResponseApi = [];
             $data_anketa = $data['anketa'];
             $errorsAnketa = array();
-            $dopAnketas = [];
             $Driver = Driver::where('hash_id', $d_id)->first();
             $cars = [];
 
@@ -531,24 +530,6 @@ class AnketsController extends Controller
                 if($data['type_anketa'] === 'pechat_pl'){
                     if(!Driver::where('hash_id', $data['anketa'][0]['driver_id'])->count()){
                         $errorsAnketa[] = 'Не найден водитель.';
-                    }
-                }
-
-                // Журнал ПЛ
-                if($data['type_anketa'] === 'Dop'){
-                    if($data['driver_id']){
-                        if(!Driver::where('hash_id', $data['driver_id'])->count()){
-                            $errorsAnketa[] = 'Не найден водитель.';
-                        }
-                    }else{
-                        $errorsAnketa[] = 'Не указана машина.';
-                    }
-                    if($data['car_id']){
-                        if(!Car::where('hash_id', $data['car_id'])->count()){
-                            $errorsAnketa[] = 'Не найдена машина.';
-                        }
-                    }else{
-                        $errorsAnketa[] = 'Не указана машина.';
                     }
                 }
 
@@ -962,24 +943,6 @@ class AnketsController extends Controller
                         $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
                         $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id) . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
                     }
-
-                    // Проверка записи в Журнале ПЛ, если у нас ТО
-                    if($anketa['type_anketa'] === 'tech') {
-                        $anketaPL = $anketasTech
-                            ->where('type_anketa', 'Dop');
-
-                        if($anketaPL) {
-                            foreach($anketaPL as $aPL) {
-                                $hourdiff_check_minus = round((strtotime($anketa['date']) - strtotime($aPL->date))/1800, 1);
-                                $hourdiff_check_plus = round((strtotime($anketa['date']) + strtotime($aPL->date))/1800, 1);
-
-                                if(($hourdiff_check_minus < 1 && $hourdiff_check_minus >= 0) || ($hourdiff_check_plus < 1 && $hourdiff_check_plus >= 0)) {
-                                    $aPL->delete();
-                                }
-                            }
-                        }
-                    }
-
                 }
 
                 /**
@@ -1039,17 +1002,7 @@ class AnketsController extends Controller
 
                 $connected_hash = sha1(time() . rand(99,9999));
 
-                /**
-                 * Проверка на "Дополнительный осмотр"
-                 */
-                if($is_tech_dop) {
-                    $anketa['connected_hash'] = $connected_hash;
-                    $dopAnketa = $anketa;
-                    $dopAnketa['type_anketa'] = 'Dop';
 
-                    $ank = new Anketa();
-                    $dopAnketas[] = Arr::only($dopAnketa, $ank->getFillable());
-                }
 
                 /**
                  * Проверяем ПАК на наличие осмотра
@@ -1101,10 +1054,6 @@ class AnketsController extends Controller
 
                 $ank = new Anketa();
                 $createdAnketas[] = Arr::only($anketa, $ank->getFillable());
-            }
-
-            if (count($dopAnketas) > 0) {
-                Anketa::insert($dopAnketas);
             }
 
             Anketa::insert($createdAnketas);
@@ -1561,27 +1510,6 @@ class AnketsController extends Controller
                         $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
                         $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id) . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
                     }
-
-                    // Проверка записи в Журнале ПЛ, если у нас ТО
-                    if($anketa['type_anketa'] === 'tech') {
-                        $anketaPL = Anketa::where('car_id', $c_id)
-                            ->where('type_anketa', 'Dop')
-                            ->where('in_cart', 0)
-                            ->orderBy('date', 'desc')
-                            ->get();
-
-                        if($anketaPL) {
-                            foreach($anketaPL as $aPL) {
-                                $hourdiff_check_minus = round((strtotime($anketa['date']) - strtotime($aPL->date))/1800, 1);
-                                $hourdiff_check_plus = round((strtotime($anketa['date']) + strtotime($aPL->date))/1800, 1);
-
-                                if(($hourdiff_check_minus < 1 && $hourdiff_check_minus >= 0) || ($hourdiff_check_plus < 1 && $hourdiff_check_plus >= 0)) {
-                                    $aPL->delete();
-                                }
-                            }
-                        }
-                    }
-
                 }
 
                 /**
@@ -1640,16 +1568,6 @@ class AnketsController extends Controller
                 $anketa['created_at'] = isset($anketa['created_at']) ? $anketa['created_at'] : $time;
 
                 $connected_hash = sha1(time() . rand(99,9999));
-
-                /**
-                 * Проверка на "Дополнительный осмотр"
-                 */
-                if($is_tech_dop) {
-                    $anketa['connected_hash'] = $connected_hash;
-                    $dopAnketa = $anketa;
-                    $dopAnketa['type_anketa'] = 'Dop';
-                    Anketa::create($dopAnketa);
-                }
 
                 /**
                  * Проверяем ПАК на наличие осмотра
