@@ -30,7 +30,7 @@
             $('.ankets-form input').each(function () {
                 const type = $(this).parents('.ankets-form').attr('anketa');
                 const name = $(this).attr('name');
-                if (fieldsVisible[type] && fieldsVisible[type][name]) {
+                if (!fieldsVisible[type] || fieldsVisible[type][name]) {
                     $(this).prop("checked", true);
                 } else {
                     $(this).prop("checked", false);
@@ -65,6 +65,10 @@
                 const type = el.parents('.ankets-form').attr('anketa');
                 const id = el.attr('name');
                 const prop_checked = el.prop('checked');
+
+                if (!fieldsVisible[type]) {
+                    fieldsVisible[type] = {};
+                }
 
                 fieldsVisible[type][id] = prop_checked;
 
