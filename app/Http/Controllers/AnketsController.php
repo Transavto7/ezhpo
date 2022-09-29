@@ -137,7 +137,7 @@ class AnketsController extends Controller
             }
         } else if($anketa->type_anketa === 'tech') {
             $anketasTech = Anketa::where('car_id', $anketa->car_id)
-                ->whereIn('type_anketa', ['tech', 'dop'])
+                ->whereIn('type_anketa', ['tech'])
                 ->where('type_anketa', 'tech')
                 ->where('type_view', $anketa->type_view ?? '')
                 ->where('in_cart', 0)

@@ -145,7 +145,6 @@ $permissionToView = (
     || user()->access('journal_briefing_bdd_read') && $type_ankets == 'bdd'
     || user()->access('journal_pl_read') && $type_ankets == 'pechat_pl'
     || user()->access('map_report_read') && $type_ankets == 'report_cart'
-    || user()->access('journal_pl_accounting') && $type_ankets == 'Dop'
     || user()->access('errors_sdpo_read') && $type_ankets == 'pak'
     || user()->access('approval_queue_view') && $type_ankets == 'pak_queue'
 );
@@ -157,7 +156,6 @@ $permissionToTrashView = (
     || user()->access('journal_briefing_bdd_trash') && $type_ankets == 'bdd'
     || user()->access('journal_pl_trash') && $type_ankets == 'pechat_pl'
     || user()->access('map_report_trash') && $type_ankets == 'report_cart'
-    || user()->access('journal_pl_accounting_trash') && $type_ankets == 'Dop'
     || user()->access('errors_sdpo_trash') && $type_ankets == 'pak'
 );
 $permissionToDelete = (
@@ -166,7 +164,6 @@ $permissionToDelete = (
         || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_delete')
         || user()->access('journal_pl_delete') && $type_ankets == 'pechat_pl'
         || user()->access('map_report_delete') && $type_ankets == 'report_cart'
-        || user()->access('journal_pl_accounting_delete') && $type_ankets == 'Dop'
         || user()->access('errors_sdpo_delete') && $type_ankets == 'pak'
 );
 
@@ -176,7 +173,6 @@ $permissionToUpdate = (
             || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_update')
         || user()->access('journal_pl_update') && $type_ankets == 'pechat_pl'
         || user()->access('map_report_update') && $type_ankets == 'report_cart'
-        || user()->access('journal_pl_accounting_update') && $type_ankets == 'Dop'
         || user()->access('errors_sdpo_update') && $type_ankets == 'pak'
 );
 
@@ -187,7 +183,6 @@ $permissionToExport = (
     || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_export')
     || $type_ankets == 'pechat_pl' && user()->access('journal_pl_export')
     || $type_ankets == 'report_cart' && user()->access('map_report_export')
-    || $type_ankets == 'Dop' && user()->access('journal_pl_accounting_export')
 );
 
 $permissionToExportPrikaz = (
@@ -196,7 +191,6 @@ $permissionToExportPrikaz = (
     || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_export_prikaz')
     || $type_ankets == 'pechat_pl' && user()->access('journal_pl_export_prikaz')
     || $type_ankets == 'report_cart' && user()->access('map_report_export_prikaz')
-    || $type_ankets == 'Dop' && user()->access('journal_pl_accounting_export')
 );
 
 $permissionToExportPrikazPL = (

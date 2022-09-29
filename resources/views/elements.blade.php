@@ -128,9 +128,6 @@
                                     <option value="tech">
                                         Технический
                                     </option>
-                                    <option value="Dop">
-                                        Учет ПЛ
-                                    </option>
                                     <option value="pechat_pl">
                                         Печать ПЛ
                                     </option>

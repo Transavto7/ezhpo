@@ -111,7 +111,6 @@ class Anketa extends Model
 
     public static $anketsKeys
         = [
-            'Dop'         => 'Журнал учёта путевых листов',
             'medic'       => 'Журнал МО',
             'tech'        => 'Журнал ТО',
             'bdd'         => 'Журнал инструктажей по БДД',
@@ -171,15 +170,6 @@ class Anketa extends Model
                 'pv_id'          => 'Пункт выпуска',
             ],
 
-            'Dop' => [
-                'date'           => 'Дата, время проведения осмотра',
-                'car_mark_model' => 'Автомобиль',
-                'company_id'   => 'Компания',
-                'driver_fio'     => 'Водитель',
-
-                // Доп поля
-                'pv_id'          => 'Пункт выпуска',
-            ],
 
             'bdd' => [
                 'company_id'  => 'Компания',
@@ -298,21 +288,6 @@ class Anketa extends Model
             'is_dop',
             'user_name',
         ],
-        'Dop' => [
-            'date',
-            'created_at',
-            'driver_fio',
-            'company_name',
-            'company_id',
-            'pv_id',
-            'number_list_road',
-            'car_gos_number',
-            'car_mark_model',
-            'driver_id',
-            'car_id',
-            'user_eds',
-            'user_name',
-        ],
         'bdd' => [
             'date',
             'driver_fio',
@@ -400,17 +375,6 @@ class Anketa extends Model
                 'signature'     => 'Подпись водителя, прошедшего инструктаж',
                 'user_eds'      => 'Подпись лица, проводившего инструктаж (ЭЦП)',
             ],
-
-            'dop_export_pl' => [
-                'number_list_road' => 'Номер ПЛ',
-                'date' => 'Дата и время выдачи ПЛ',
-                'car_mark_model' => 'Наименование марки, модели транспортного средства',
-                'car_gos_number' => 'Государственный регистрационный номер транспортного средства',
-                'driver_fio' => 'ФИО водителя',
-                'user_name' => 'ФИО лица, выдавшего ПЛ',
-                'user_eds' => 'Подпись лица, выдавшего ПЛ (ЭЦП)'
-            ],
-
 
             'medic' => [
                 'company_name'             => 'Компания',
@@ -529,41 +493,6 @@ class Anketa extends Model
             ],
 
             /**
-             * Дополнительные осмотр (параметры полей)
-             */
-            'Dop'       => [
-                'date'           => 'Дата и время выдачи пл',
-                'company_name'   => 'Компания',
-                'driver_fio'     => 'ФИО водителя',
-                'car_mark_model' => 'Марка автомобиля',
-                'car_gos_number' => 'Государственный регистрационный номер транспортного средства',
-
-                // ID'шники
-                'company_id'     => 'ID компании',
-                'driver_id'      => 'ID водителя',
-                'car_id'         => 'ID автомобиля',
-
-                // Доп поля
-
-                'number_list_road' => 'Номер путевого листа',
-                //'date_number_list_road' => 'Срок действия путевого листа',
-                'pv_id'            => 'Пункт выпуска',
-                'user_name'        => 'ФИО ответственного',
-                'user_eds'         => 'ЭЦП контролера',
-                'created_at'       => 'Дата/Время создания записи',
-            ],
-
-            'Dop_prikaz'  => [
-                'number_list_road' => 'Номер ПЛ',
-                'date'             => 'Дата и время выдачи ПЛ',
-                'car_mark_model'   => 'Наименование марки, модели транспортного средства',
-                'car_gos_number' => 'Гос. регистрационный номер ТС',
-                'driver_fio'       => 'ФИО водителя',
-                'user_name'        => 'ФИО лица, выдавшего ПЛ',
-                'user_eds'         => 'Подпись лица, выдавшего ПЛ (ЭЦП)',
-            ],
-
-            /**
              * ЖУРНАЛЫ
              */
             'report_cart' => [
@@ -589,22 +518,6 @@ class Anketa extends Model
                 'user_eds'     => 'ЭЦП сотрудника',
                 'pv_id'        => 'Пункт выпуска',
             ],
-
-            /*'vid_pl' => [
-                'date' => 'Дата выдачи ПЛ',
-                'company_name' => 'Компания',
-                'count_pl' => 'Количество выданных ПЛ',
-                'user_name' => 'Ф.И.О сотрудника, который выдал ПЛ',
-                'user_eds' => 'ЭЦП сотрудника',
-                'pv_id' => 'Пункт выпуска',
-                'driver_id' => 'ID водителя',
-                'driver_fio' => 'Ф.И.О водителя',
-                'car_gos_number' => 'Государственный регистрационный номер транспортного средства',
-                'car_id' => 'ID автомобиля',
-                'added_to_dop' => 'Внесено в журнал ТО',
-                'added_to_mo' => 'Внесено в журнал МО',
-                'period_pl' => 'Комментарий'
-            ],*/
 
             'bdd' => [
                 'company_name'    => 'Компания',

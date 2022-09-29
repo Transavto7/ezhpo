@@ -51,13 +51,6 @@
             </li>
         @endif
 
-        @if(user()->access('journal_pl_create'))
-            <li>
-                <a href="{{ route('forms', ['type' => 'Dop']) }}" class="bg-yellow"><i
-                        class="icon-padnote"></i>Внести запись в Журнал ПЛ</a>
-            </li>
-        @endif
-
         @if(user()->access('journal_briefing_bdd_create'))
             <li>
                 <a href="{{ route('forms', ['type' => 'bdd']) }}" class="bg-yellow"><i
@@ -83,7 +76,7 @@
         @endif
 
         @if(user()->access('medic_read', 'tech_read', 'journal_briefing_bdd_read',
-                'journal_pl_read', 'map_report_read', 'journal_pl_accounting', 'errors_sdpo_read', 'errors_sdpo_create'))
+               'map_report_read', 'errors_sdpo_read', 'errors_sdpo_create'))
             <li>
                 <a href="#" data-btn-collapse="#views" role="button"> <i class="icon-grid"></i>Журналы осмотров</a>
                 <ul id="views" class="collapse list-unstyle">
@@ -118,11 +111,6 @@
                         </li>
                     @endif
 
-                    @if(user()->access('journal_pl_accounting'))
-                        <li>
-                            <a href="{{ route('home', 'Dop') }}"><i class="fa fa-book"></i>Журнал учета ПЛ</a>
-                        </li>
-                    @endif
 
                     @if(user()->access('errors_sdpo_read', 'errors_sdpo_create'))
                         @php

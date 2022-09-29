@@ -132,33 +132,6 @@ return [
         'description' => 'Журнал печати ПЛ - Экспорт приказ',
     ],
 
-
-    //============== Журнал печать ПЛ Dop =================================//
-    [
-        'name'        => 'journal_pl_accounting',
-        'description' => 'Журнал учета ПЛ - Просмотр',
-    ],
-    [
-        'name'        => 'journal_pl_accounting_update',
-        'description' => 'Журнал учета ПЛ - Редактирование',
-    ],
-    [
-        'name'        => 'journal_pl_accounting_trash',
-        'description' => 'Журнал учета ПЛ - Корзина',
-    ],
-    [
-        'name'        => 'journal_pl_accounting_delete',
-        'description' => 'Журнал учета ПЛ - Удаление',
-    ],
-    [
-        'name'        => 'journal_pl_accounting_export',
-        'description' => 'Журнал учета ПЛ - Экспорт',
-    ],
-    [
-        'name'        => 'journal_pl_accounting_export_prikaz',
-        'description' => 'Журнал учета ПЛ - Экспорт приказ',
-    ],
-
     //============== Журнал инструктажей по БДД =============//
     [
         'name'        => 'journal_briefing_bdd_create',

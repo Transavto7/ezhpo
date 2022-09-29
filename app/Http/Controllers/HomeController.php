@@ -124,37 +124,13 @@ class HomeController extends Controller
         /**
          * Выбор полей
          */
-        if ($typePrikaz === 'Dop' || ( !isset($_GET['getFormFilter']) && $request->get('exportPrikazPL'))) {
-            $fieldsKeysTypeAnkets = 'Dop_prikaz';
-        } else {
-            $fieldsKeysTypeAnkets = $validTypeAnkets;
-        }
-
-        // Экспорты новые писать тут всё
-//        if ($request->get('export')) {
-//            if ($typeAnkets == 'tech') {
-//                if ($request->get('exportPrikaz')) {
-//                    $fieldsKeysTypeAnkets = 'tech_export_to'; // экспорт по приказу ТО
-//                } elseif ($request->get('exportPrikazPL')) {
-//                    $fieldsKeysTypeAnkets = 'tech_export_pl';// экспорт по приказу ПЛ
-//                } else {
-//                    $fieldsKeysTypeAnkets = 'tech';// экспорт просто
-//                }
-//            } elseif ($typeAnkets == 'bdd') {
-//                if ($request->get('exportPrikaz')) {
-//                    $fieldsKeysTypeAnkets = 'bdd_export_prikaz';// экспорт по приказу
-//
-//                } else {
-//                    $fieldsKeysTypeAnkets = 'bdd';// экспорт просто
-//                }
-//            }
-//        }
+        $fieldsKeysTypeAnkets = $validTypeAnkets;
 
         $fieldsKeys       = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
         $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets])
             ? Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] : [];
 
-        if ($typePrikaz === 'Dop' || $request->get('export')) {
+        if ($request->get('export')) {
             $take = 10000;
         }
 
@@ -398,15 +374,6 @@ class HomeController extends Controller
                 }
             }
 
-            if ($validTypeAnkets == 'Dop') {
-                if ($request->get('exportPrikaz')) {
-                    return Excel::download(new AnketasExport($anketas->where('type_anketa', 'Dop')
-                        ->get(), Anketa::$fieldsKeys['dop_export_pl']),
-                        'ЭЖ.xlsx');
-
-                }
-            }
-
             return Excel::download(new AnketasExport($anketas->where('type_anketa', $validTypeAnkets)
                 ->get(), Anketa::$fieldsKeys[$validTypeAnkets]),
                 'ЭЖ.xlsx');
@@ -445,7 +412,7 @@ class HomeController extends Controller
          */
         $_view = isset($_GET['getFormFilter']) ? 'home_filters' : 'home';
 
-        $currentRole = $validTypeAnkets === 'Dop' ? 'medic' : $validTypeAnkets;
+        $currentRole = $validTypeAnkets;
 
         if ($typeAnkets === 'pak_queue' && $user->hasRole('operator_sdpo')) {
             $currentRole = 'operator_sdpo';
@@ -493,11 +460,7 @@ class HomeController extends Controller
         /**
          * Выбор полей
          */
-        if ($typePrikaz === 'Dop' || ( !isset($_GET['getFormFilter']) && $request->get('exportPrikazPL'))) {
-            $fieldsKeysTypeAnkets = 'Dop_prikaz';
-        } else {
-            $fieldsKeysTypeAnkets = $validTypeAnkets;
-        }
+        $fieldsKeysTypeAnkets = $validTypeAnkets;
 
         $fieldsKeys       = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
         $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets])

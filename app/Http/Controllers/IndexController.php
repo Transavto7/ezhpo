@@ -518,7 +518,6 @@ class IndexController extends Controller
                             'bdd'         => 'БДД',
                             'medic'       => 'Медицинский',
                             'tech'        => 'Технический',
-                            'Dop'         => 'Учет ПЛ',
                             'pechat_pl'   => 'Печать ПЛ',
                             'report_cart' => 'Отчеты с карт',
                         ],
@@ -691,10 +690,6 @@ class IndexController extends Controller
             'tech'  => [
                 'title'       => 'Технический осмотр',
                 'anketa_view' => 'profile.ankets.tech',
-            ],
-            'Dop'   => [
-                'title'       => 'Журнал ПЛ',
-                'anketa_view' => 'profile.ankets.Dop',
             ],
 
             'pechat_pl' => [
