@@ -325,7 +325,6 @@ class HomeController extends Controller
         if ($is_export && $filter_activated) {
 
             if ($validTypeAnkets == 'tech') {
-
                 if ($request->get('exportPrikaz')) {
                     $techs = $anketas->where('type_anketa', 'tech')
                         ->get();
