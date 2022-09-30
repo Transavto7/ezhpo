@@ -75,7 +75,7 @@
             </li>
         @endif
 
-        @if(user()->access('medic_read', 'tech_read', 'journal_briefing_bdd_read', 'journal_pl_read'
+        @if(user()->access('medic_read', 'tech_read', 'journal_briefing_bdd_read', 'journal_pl_read',
                'map_report_read', 'errors_sdpo_read', 'errors_sdpo_create'))
             <li>
                 <a href="#" data-btn-collapse="#views" role="button"> <i class="icon-grid"></i>Журналы осмотров</a>
