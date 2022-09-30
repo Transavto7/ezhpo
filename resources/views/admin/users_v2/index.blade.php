@@ -47,6 +47,17 @@
                                 <input type="text" name="email" value="{{ request()->get('email') }}" placeholder="E-mail"
                                        class="form-control">
                             </div>
+                            <div class="col-md-2 form-group">
+                                    <select class="form-control" name="role" style="color: gray;">
+                                        <option value="" selected>Роль</option>
+                                        @foreach(\App\Role::get() as $role)
+                                            @if($role->name == 'driver')
+                                            @continue
+                                            @endif
+                                        <option value="{{$role->id}}" <?= $role->id == request()->get('role') ? 'selected' : '' ?>>{{$role->guard_name}}</option>
+                                        @endforeach
+                                    </select>
+                            </div>
 
                             <div class="col-md form-group">
                                 @include('profile.ankets.components.pvs', [
@@ -65,7 +76,6 @@
                         </form>
                     @endif
                 </div>
+            </div>
         </admin-users-index>
-    </div>
-
 @endsection

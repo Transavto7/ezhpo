@@ -47,6 +47,11 @@ class UserController extends Controller
         if ($sortBy = $request->get('sortBy', 'id')) {
             $users->orderBy($sortBy, $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC');
         }
+        if ($role = $request->get('role')) {
+            $users->whereHas('roles', function ($q) use ($role){
+                $q->where('id', $role);
+            });
+        }
 
         if ($request->get('api')) {
             $res = $users->paginate();
