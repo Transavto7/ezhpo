@@ -45,7 +45,14 @@ class UserController extends Controller
             $users->where('pv_id', $pv_id);
         }
         if ($sortBy = $request->get('sortBy', 'id')) {
-            $users->orderBy($sortBy, $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC');
+            if($sortBy == 'roles'){
+                $users->join('model_has_roles', 'users.id', 'model_has_roles.model_id')
+                      ->join('roles', 'model_has_roles.role_id', 'roles.id')
+                    ->orderBy('roles.guard_name', $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC')
+                    ->select('users.*');
+            }else{
+                $users->orderBy($sortBy, $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC');
+            }
         }
         if ($role = $request->get('role')) {
             $users->whereHas('roles', function ($q) use ($role){
@@ -64,6 +71,9 @@ class UserController extends Controller
         }
 
         $fields = FieldPrompt::where('type', 'users')->get();
+
+//        dd($fields->toArray());
+
         return view('admin.users_v2.index')
             ->with([
                 'users' => $users->paginate(),

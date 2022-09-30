@@ -358,6 +358,7 @@ export default {
         },
         loadData() {
             this.busy = true;
+            this.loading = true;
 
             axios.get('/users' + window.location.search, {
                 params: {
@@ -594,7 +595,7 @@ export default {
             this.columns.push({
                 'key': field.field,
                 'label': field.name,
-                'sortable': field.field !== 'roles',
+                'sortable': true, // field.field !== 'roles'
                 'thAttr': {
                     'data-toggle': 'tooltip',
                     'data-html': true,
