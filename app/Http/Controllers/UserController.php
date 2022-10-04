@@ -50,8 +50,8 @@ class UserController extends Controller
 
         if ($sortBy = $request->get('sortBy', 'id')) {
             if($sortBy == 'roles'){
-                $users->join('model_has_roles', 'users.id', 'model_has_roles.model_id')
-                      ->join('roles', function ($join)  {
+                $users->rightJoin('model_has_roles', 'users.id', 'model_has_roles.model_id')
+                      ->rightJoin('roles', function ($join)  {
                           $join->on('model_has_roles.role_id', '=', 'roles.id')
                           ;
                 })
