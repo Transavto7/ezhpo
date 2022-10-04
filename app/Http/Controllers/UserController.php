@@ -9,6 +9,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
@@ -24,10 +25,12 @@ class UserController extends Controller
     public function index(Request $request)
     {
         // ebat' ya query builder
-        $users = User::with(['roles', 'pv', 'company'])
-                     ->where(function ($query) {
+        $users = User::with(['roles'  => function ($q) use ($request) {
+            $q->orderBy('guard_name', ($request->get('sortDesc') == 'true' && $request->get('sortBy') == 'roles') ? 'DESC' : 'ASC');
+        }, 'pv', 'company'])
+                     ->where(function ($query) use ($request) {
                          $query->whereDoesntHave('roles')
-                               ->orWhereHas('roles', function ($q) {
+                               ->orWhereHas('roles', function ($q) use ($request) {
                                    $q->whereNotIn('roles.id', [3, 6, 9]);
                                });
                      });
@@ -44,12 +47,16 @@ class UserController extends Controller
         if ($pv_id = $request->get('pv_id')) {
             $users->where('pv_id', $pv_id);
         }
+
         if ($sortBy = $request->get('sortBy', 'id')) {
             if($sortBy == 'roles'){
                 $users->join('model_has_roles', 'users.id', 'model_has_roles.model_id')
-                      ->join('roles', 'model_has_roles.role_id', 'roles.id')
-                    ->orderBy('roles.guard_name', $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC')
-                    ->select('users.*');
+                      ->join('roles', function ($join)  {
+                          $join->on('model_has_roles.role_id', '=', 'roles.id')
+                          ;
+                })
+                    ->orderBy('roles.guard_name', $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC')//;
+                    ->select('users.*', 'guard_name');
             }else{
                 $users->orderBy($sortBy, $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC');
             }
@@ -59,7 +66,7 @@ class UserController extends Controller
                 $q->where('id', $role);
             });
         }
-
+//dd($users->limit(3)->get()->toArray());
         if ($request->get('api')) {
             $res = $users->paginate();
 
