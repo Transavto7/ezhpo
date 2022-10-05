@@ -10,6 +10,7 @@
             'permission_to_delete' => user()->access('group_delete'),
             'permission_to_trash' => user()->access('group_trash'),
         ];
+
 @endphp
 @section('content')
 

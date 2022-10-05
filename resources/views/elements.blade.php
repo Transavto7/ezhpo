@@ -31,6 +31,9 @@
                             <p>Заполните форму внимательно и нажмите кнопку "Добавить"</p>
 
                         @foreach ($fields as $k => $v)
+                            @if($k == 'products_id' && user()->hasRole('client'))
+                                @continue
+                            @endif
                             @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
                             @php $default_value = isset($v['defaultValue']) ? $v['defaultValue'] : '' @endphp
 
@@ -383,6 +386,9 @@
                 <thead>
                 <tr>
                     @foreach ($fieldPrompts as $field)
+                        @if($field->field == 'products_id' && user()->hasRole('client'))
+                            @continue
+                        @endif
                         <th data-key="{{ $field->field }}">
                             <span class="user-select-none"
                               @if ($field->content)

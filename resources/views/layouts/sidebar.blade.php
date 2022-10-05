@@ -39,21 +39,21 @@
 
         @if(user()->access('map_report_create'))
             <li>
-                <a href="{{ route('forms', ['type' => 'report_cart']) }}" class="bg-yellow"><i
+                <a href="{{ route('forms', ['type' => 'report_cart']) }}" class="bg-gray"><i
                         class="icon-padnote"></i>Внести Отчёт с карты</a>
             </li>
         @endif
 
         @if(user()->access('print_register_pl_create'))
             <li>
-                <a href="{{ route('forms', ['type' => 'pechat_pl']) }}" class="bg-yellow"><i
+                <a href="{{ route('forms', ['type' => 'pechat_pl']) }}" class="bg-gray"><i
                         class="icon-padnote"></i>Внести запись в Реестр печати ПЛ</a>
             </li>
         @endif
 
         @if(user()->access('journal_briefing_bdd_create'))
             <li>
-                <a href="{{ route('forms', ['type' => 'bdd']) }}" class="bg-yellow"><i
+                <a href="{{ route('forms', ['type' => 'bdd']) }}" class="bg-gray"><i
                         class="icon-padnote"></i>Внести Инструктаж БДД</a>
             </li>
         @endif
