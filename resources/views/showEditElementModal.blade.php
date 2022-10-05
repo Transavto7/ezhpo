@@ -10,6 +10,9 @@
 
         <div class="modal-body">
             @foreach ($fields as $k => $v)
+                @if($k == 'products_id' && user()->hasRole('client'))
+                    @continue
+                @endif
                 @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
                 @php if ($model === 'Instr' && $k === 'signature') continue; @endphp
 
