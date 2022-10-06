@@ -2,7 +2,9 @@
 
 @section('title', $title)
 @section('sidebar', 1)
+@php
 
+@endphp
 @section('content')
     <!-- Модалка для редактирования см front.js  -->
     <div class="modal fade editor-modal" id="modalEditor" role="dialog" aria-hidden="true">
@@ -32,6 +34,12 @@
 
                         @foreach ($fields as $k => $v)
                             @if($k == 'products_id' && user()->hasRole('client'))
+                                @continue
+                            @endif
+                            @if($k == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
+                                @continue
+                            @endif
+                            @if($k == 'where_call' && !user()->access('companies_access_field_where_call'))
                                 @continue
                             @endif
                             @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
@@ -329,6 +337,12 @@
                                 @if($fk == 'products_id' && user()->hasRole('client'))
                                     @continue
                                 @endif
+                                @if($fk == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
+                                    @continue
+                                @endif
+                                @if($fk == 'where_call' && !user()->access('companies_access_field_where_call'))
+                                    @continue
+                                @endif
                                 @php $fv['multiple'] = true; @endphp
 
                                 @if(!in_array($fk, ['photo']) && !isset($fv['hidden']))
@@ -392,6 +406,12 @@
                         @if($field->field == 'products_id' && user()->hasRole('client'))
                             @continue
                         @endif
+                        @if($field->field == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
+                            @continue
+                        @endif
+                        @if($field->field == 'where_call' && !user()->access('companies_access_field_where_call'))
+                            @continue
+                        @endif
                         <th data-key="{{ $field->field }}">
                             <span class="user-select-none"
                                   @if ($field->content)
@@ -430,6 +450,12 @@
                     <tr>
                         @foreach ($fieldPrompts as $field)
                             @if($field->field == 'products_id' && user()->hasRole('client'))
+                                @continue
+                            @endif
+                            @if($field->field == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
+                                @continue
+                            @endif
+                            @if($field->field == 'where_call' && !user()->access('companies_access_field_where_call'))
                                 @continue
                             @endif
                             <td class="td-option">

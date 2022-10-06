@@ -13,6 +13,12 @@
                 @if($k == 'products_id' && user()->hasRole('client'))
                     @continue
                 @endif
+                @if($k == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
+                    @continue
+                @endif
+                @if($k == 'where_call' && !user()->access('companies_access_field_where_call'))
+                    @continue
+                @endif
                 @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
                 @php if ($model === 'Instr' && $k === 'signature') continue; @endphp
 

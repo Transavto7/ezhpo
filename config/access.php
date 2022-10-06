@@ -559,19 +559,29 @@ return [
 
     //============== Подсказки полей =============//
     [
-        'name'       => 'field_prompt_read',
+        'name'        => 'field_prompt_read',
         'description' => 'Подсказки полей - Просмотр',
     ],
     [
-        'name'       => 'field_prompt_edit',
+        'name'        => 'field_prompt_edit',
         'description' => 'Подсказки полей - Редактирование',
     ],
     [
-        'name'       => 'field_prompt_delete',
+        'name'        => 'field_prompt_delete',
         'description' => 'Подсказки полей - Удаление',
     ],
     [
-        'name'       => 'field_prompt_trash',
+        'name'        => 'field_prompt_trash',
         'description' => 'Подсказки полей - Карзина',
+    ],
+
+    //============== Кому отправлять СМС && Кому звонить при отстранении (имя, должность) =============//
+    [
+        'name'        => 'companies_access_field_where_call',
+        'description' => 'Компании - Кому отправлять СМС при отстранении',
+    ],
+    [
+        'name'        => 'companies_access_field_where_call_name',
+        'description' => 'Компании - Кому звонить при отстранении',
     ],
 ];
