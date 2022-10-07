@@ -73,22 +73,70 @@ class Contract extends Model
 
 
     public static function startContract(){
-        FieldPrompt::where('field', 'products_id')->where('type', 'company')->delete();
-        FieldPrompt::where('field', 'products_id')->where('type', 'car')->delete();
-        FieldPrompt::where('field', 'products_id')->where('type', 'driver')->delete();
+//        FieldPrompt::where('field', 'products_id')->where('type', 'company')->delete();
+//        FieldPrompt::where('field', 'products_id')->where('type', 'car')->delete();
+//        FieldPrompt::where('field', 'products_id')->where('type', 'driver')->delete();
 
-        $products = Product::get()->toArray();
+//        $products = Product::get()->toArray();
+//
+//        Service::insert($products);
 
-        Service::insert($products);
+//        FieldPrompt::create([
+//            'field' => 'service_id',
+//            'type' => 'car',
+//        ]);
+//        FieldPrompt::create([
+//            'field' => 'service_id',
+//            'type' => 'driver',
+//        ]);
 
-        FieldPrompt::create([
-            'field' => 'service_id',
-            'type' => 'car',
-        ]);
-        FieldPrompt::create([
-            'field' => 'service_id',
-            'type' => 'driver',
-        ]);
+
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 400);
+        set_time_limit(400);
+
+        $companies = Company::whereNotNull('products_id')
+                            ->get(['id', 'products_id']);
+        $services = Service::get();
+
+        $comp_products_arr = [];
+        foreach ($companies as $company){
+            $services_item = explode(',', $company->products_id);
+            $res = [];
+            foreach ($services_item as $item){
+                if($tar = $services->where('id', $item)->first()){
+                    $res[] = $tar->id;
+                }
+            }
+
+            $comp_products_arr[$company->id] = $res;
+        }
+
+        foreach ($comp_products_arr as $company_id => $services){
+            if(Contract::where('company_id', $company_id)->first()){
+                continue;
+            }
+            $contract = Contract::create([
+                'name' => "Договор $company_id",
+                'company_id' => $company_id
+            ]);
+
+            $contract->services()->sync($services);
+
+            Driver::where('company_id', $company_id)->update([
+                'contract_id' => $contract->id
+            ]);
+            Car::where('company_id', $company_id)->update([
+                'contract_id' => $contract->id
+            ]);
+        }
+
+
+
+
+
+
+
 
         return true;
     }

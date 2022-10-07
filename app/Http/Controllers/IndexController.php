@@ -218,6 +218,9 @@ class IndexController extends Controller
                     ],
                     'company_id'    => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
 
+                    'contract_id'      => [
+                        'label' => 'Договор', 'type' => 'select', 'values' => 'Models\Contract'
+                    ],
 //                    'products_id'        => [
 //                        'label'      => 'Услуги',
 //                        'multiple'   => 1,

@@ -16,7 +16,6 @@ class ContractController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-//        app()
     }
 
     public function view()

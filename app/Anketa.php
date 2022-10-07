@@ -119,6 +119,8 @@ class Anketa extends Model
             'protokol_path',
             'comments',
             'connected_hash',
+            'contract_id',
+            'contract_snapshot_id',
         ];
 
 
