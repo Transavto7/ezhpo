@@ -595,15 +595,17 @@ return [
     [
         'name'       => 'contract_trash',
         'description' => 'Договор - Корзина',
+        'name'        => 'field_prompt_trash',
+        'description' => 'Подсказки полей - Корзина',
     ],
 
     //============== Кому отправлять СМС && Кому звонить при отстранении (имя, должность) =============//
     [
         'name'        => 'companies_access_field_where_call',
-        'description' => 'Компании - Кому отправлять СМС при отстранении',
+        'description' => 'Компании - Номер телефона при отстранении',
     ],
     [
         'name'        => 'companies_access_field_where_call_name',
-        'description' => 'Компании - Кому звонить при отстранении',
+        'description' => 'Компании - ФИО и должность кому звонить при отстранении',
     ],
 ];
