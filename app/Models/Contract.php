@@ -105,15 +105,23 @@ class Contract extends Model
             $res = [];
             foreach ($services_item as $item){
                 if($tar = $services->where('id', $item)->first()){
-                    $res[] = $tar->id;
+                    $res[$tar->id] =  ['service_cost' => $tar->price_unit];
+//                        [$tar->id => ['service_cost' => $tar->price_unit]];
                 }
             }
 
             $comp_products_arr[$company->id] = $res;
         }
-
-        foreach ($comp_products_arr as $company_id => $services){
-            if(Contract::where('company_id', $company_id)->first()){
+//        dd($comp_products_arr);
+        foreach ($comp_products_arr as $company_id => $services_item){
+            if(!$services_item){
+                continue;
+            }
+//            if(!(($services_item['pr_id'] ?? false) && ($services_item['sync'] ?? false))){
+//                continue;
+//            }
+            if($contract = Contract::where('company_id', $company_id)->first()){
+                $contract->services()->sync($services_item);
                 continue;
             }
             $contract = Contract::create([
@@ -121,7 +129,7 @@ class Contract extends Model
                 'company_id' => $company_id
             ]);
 
-            $contract->services()->sync($services);
+            $contract->services()->sync($services_item);
 
             Driver::where('company_id', $company_id)->update([
                 'contract_id' => $contract->id
@@ -130,11 +138,6 @@ class Contract extends Model
                 'contract_id' => $contract->id
             ]);
         }
-
-
-
-
-
 
 
 
