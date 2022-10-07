@@ -4,8 +4,19 @@ use App\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/fixRoles', function() {
-
+Route::get('/fix/types', function() {
+    \App\Anketa::whereIn('type_view', ['Предрейсовый', 'Предсменный', 'предрейсовый/Предсменный', 'Предрейсовый/предсменный',
+        'предрейсовый/предсменный'])->update(
+        [
+            'type_view' => 'Предрейсовый/Предсменный'
+        ]
+    );
+    \App\Anketa::whereIn('type_view', ['Послерейсовый', 'Послесменный', 'послерейсовый/Послесменный', 'Послерейсовый/послесменый',
+        'Послерейсовый/послесменый', 'послерейсовый/послесменный'])->update(
+        [
+            'type_view' => 'Послерейсовый/Послесменный'
+        ]
+    );
 });
 
 // Маршруты статичных и главных страниц
