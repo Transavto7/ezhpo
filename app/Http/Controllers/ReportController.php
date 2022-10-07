@@ -8,6 +8,7 @@ use App\Company;
 use App\Discount;
 use App\Driver;
 use App\Exports\ReportJournalExport;
+use App\Models\Service;
 use App\Product;
 use App\Req;
 use Carbon\Carbon;
@@ -162,16 +163,17 @@ class ReportController extends Controller
             return response(null, 404);
         }
 
-        $company = Company::select('id', 'hash_id', 'name', 'products_id')->where('hash_id', $company)->first();
-        $products = Product::all();
+        $company = Company::with(['contract.services'])->select('id', 'hash_id', 'name', 'products_id')->where('hash_id', $company)->first();
+//        $products = Product::all();
+        $services = Service::all();
         $discounts = Discount::all();
 
         return [
-            'medics' => $this->getJournalMedic($company, $date_from, $date_to, $products, $discounts),
-            'techs' => $this->getJournalTechs($company, $date_from, $date_to, $products, $discounts),
-            'medics_other' => $this->getJournalMedicsOther($company, $date_from, $date_to, $products, $discounts),
-            'techs_other' => $this->getJournalTechsOther($company, $date_from, $date_to, $products, $discounts),
-            'other' => $this->getJournalOther($company, $products),
+            'medics' => $this->getJournalMedic($company, $date_from, $date_to, $services, $discounts),
+            'techs' => $this->getJournalTechs($company, $date_from, $date_to, $services, $discounts),
+            'medics_other' => $this->getJournalMedicsOther($company, $date_from, $date_to, $services, $discounts),
+            'techs_other' => $this->getJournalTechsOther($company, $date_from, $date_to, $services, $discounts),
+            'other' => $this->getJournalOther($company, $services),
         ];
     }
 
@@ -205,6 +207,16 @@ class ReportController extends Controller
 
         $result = [];
 
+        $drivers_services = Driver::with(['contract','contract.services'])
+                                  ->where('company_id', $company->id)
+                                  ->get();
+
+        $companyProdsID = $company
+            ->contracts
+            ->pluck('services')
+            ->flatten()
+            ->pluck('id')
+            ->toArray();
         foreach ($medics->groupBy('driver_id') as $driver) {
             $id = $driver->first()->driver_id;
             $driver_fio = $driver->where('driver_fio', '!=', null)->first();
@@ -217,11 +229,19 @@ class ReportController extends Controller
                 $total = $rows->count();
                 $result[$id]['types'][$type]['total'] = $total;
 
-                if ($id == null) {
-                    $services = explode(',', $company->products_id);
-                } else {
-                    $services = explode(',', $driver->first()->products_id);
-                }
+                $services = $drivers_services
+                    ->where('hash_id', $id)
+                    ->first()
+                    ->contract
+                    ->services
+                    ->pluck('id')
+                    ->toArray();
+
+//                if ($id == null) {
+//                    $services = explode(',', $company->products_id);
+//                } else {
+//                    $services = explode(',', $driver->first()->products_id);
+//                }
 
                 $types = explode('/', $type);
                 $prods = $products->whereIn('id', $services)->where('type_anketa', 'medic');
@@ -247,7 +267,7 @@ class ReportController extends Controller
                         foreach ($types as $type_view) {
                             if (strpos($vt, $type_view) !== false) {
                                 $result[$id]['types'][$type]['sync'] =
-                                    in_array($service->id, explode(',', $company->products_id));
+                                    in_array($service->id, $companyProdsID);
 
                                 $result[$id]['types'][$type]['name'] = $service->name;
                                 if ($service->type_product === 'Разовые осмотры') {
@@ -285,8 +305,7 @@ class ReportController extends Controller
                             }
                         }
 
-                        $result[$id]['types'][$type]['sync'] =
-                            in_array($service->id, explode(',', $company->products_id));
+                        $result[$id]['types'][$type]['sync'] = in_array($service->id, $companyProdsID);
 
                         if ($service->type_product === 'Разовые осмотры') {
                             $result[$id]['types'][$type]['sum'] = $service->price * $total;
@@ -335,6 +354,16 @@ class ReportController extends Controller
 
         $result = [];
 
+        $cars_services = Car::with(['contract','contract.services'])
+                                  ->where('company_id', $company->id)
+                                  ->get();
+
+        $companyProdsID = $company
+            ->contracts
+            ->pluck('services')
+            ->flatten()
+            ->pluck('id')
+            ->toArray();
         foreach ($techs->groupBy('car_id') as $car) {
             $id = $car->first()->car_id;
             $numberCar = $car->where('car_gos_number', '!=', null)->first();
@@ -348,11 +377,18 @@ class ReportController extends Controller
                 $total = $rows->count();
                 $result[$id]['types'][$type]['total'] = $total;
 
-                if ($id == null) {
-                    $services = explode(',', $company->products_id);
-                } else {
-                    $services = explode(',', $car->first()->products_id);
-                }
+                $services = $cars_services
+                    ->where('hash_id', $id)
+                    ->first()
+                    ->contract
+                    ->services
+                    ->pluck('id')
+                    ->toArray();
+//                if ($id == null) {
+//                    $services = explode(',', $company->products_id);
+//                } else {
+//                    $services = explode(',', $car->first()->products_id);
+//                }
 
                 $types = explode('/', $type);
                 $prods = $products->whereIn('id', $services)->where('type_anketa', 'tech');
@@ -377,7 +413,7 @@ class ReportController extends Controller
                         foreach ($types as $type_view) {
                             if (strpos($vt, $type_view) !== false) {
                                 $result[$id]['types'][$type]['sync'] =
-                                    in_array($service->id, explode(',', $company->products_id));
+                                    in_array($service->id, $companyProdsID);
 
                                 if ($service->type_product === 'Разовые осмотры') {
                                     $result[$id]['types'][$type]['sum'] = $service->price * $total;
@@ -430,6 +466,17 @@ class ReportController extends Controller
 
         $result = [];
 
+        $drivers_services = Driver::with(['contract','contract.services'])
+                               ->whereIn('company_id', $company->id)
+                               ->get();
+
+        $companyProdsID = $company
+            ->contracts
+            ->pluck('services')
+            ->flatten()
+            ->pluck('id')
+            ->toArray();
+
         foreach ($reports as $report) {
             try {
                 if ($report->period_pl) {
@@ -459,11 +506,19 @@ class ReportController extends Controller
                     ($result[$key]['reports'][$report->driver_id]['types']['is_dop']['total'] ?? 0) + 1;
             }
 
-            if ($report->driver_id == null) {
-                $services = explode(',', $company->products_id);
-            } else {
-                $services = explode(',', $report->products_id);
-            }
+            $services = $drivers_services
+                ->where('hash_id', $report->driver_id)
+                ->first()
+                ->contract
+                ->services
+                ->pluck('id')
+                ->toArray();
+
+//            if ($report->driver_id == null) {
+//                $services = explode(',', $company->products_id);
+//            } else {
+//                $services = explode(',', $report->products_id);
+//            }
 
             $types = explode('/', $report->type_view);
             $prods = $products->whereIn('id', $services);
@@ -490,7 +545,7 @@ class ReportController extends Controller
                         foreach ($types as $type_view) {
                             if (strpos($vt, $type_view) !== false) {
                                 $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['sync'] =
-                                    in_array($service->id, explode(',', $company->products_id));
+                                    in_array($service->id, $companyProdsID);
 
                                 if ($service->type_product === 'Разовые осмотры') {
                                     $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['sum'] = $service->price * $total;
@@ -505,7 +560,7 @@ class ReportController extends Controller
                         }
                     } else if (isset($result[$key]['reports'][$report->driver_id]['types'][$service->type_anketa])) {
                         $result[$key]['reports'][$report->driver_id]['types'][$service->type_anketa]['sync'] =
-                            in_array($service->id, explode(',', $company->products_id));
+                            in_array($service->id, $companyProdsID);
 
                         if ($service->type_product === 'Разовые осмотры') {
                             $result[$key]['reports'][$report->driver_id]['types'][$service->type_anketa]['sum'] = $service->price * $total;
@@ -558,6 +613,18 @@ class ReportController extends Controller
 
         $result = [];
 
+        $cars_services = Car::with(['contract','contract.services'])
+                               ->whereIn('company_id', $company->id)
+                               ->get();
+
+
+        $companyProdsID = $company
+            ->contracts
+            ->pluck('services')
+            ->flatten()
+            ->pluck('id')
+            ->toArray();
+
         foreach ($reports as $report) {
             try {
                 if ($report->period_pl) {
@@ -585,11 +652,19 @@ class ReportController extends Controller
                     = ($result[$key]['reports'][$report->car_id]['types']['is_dop']['total'] ?? 0) + 1;
             }
 
-            if ($report->products_id == null) {
-                $services = explode(',', $company->products_id);
-            } else {
-                $services = explode(',', $report->products_id);
-            }
+            $services = $cars_services
+                ->where('hash_id', $report->car_id)
+                ->first()
+                ->contract
+                ->services
+                ->pluck('id')
+                ->toArray();
+
+//            if ($report->products_id == null) {
+//                $services = explode(',', $company->products_id);
+//            } else {
+//                $services = explode(',', $report->products_id);
+//            }
 
             $types = explode('/', $report->type_view);
             $prods = $products->whereIn('id', $services);
@@ -616,7 +691,7 @@ class ReportController extends Controller
                         foreach ($types as $type_view) {
                             if (strpos($vt, $type_view) !== false) {
                                 $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['sync'] =
-                                    in_array($service->id, explode(',', $company->products_id));
+                                    in_array($service->id, $companyProdsID);
 
                                 if ($service->type_product === 'Разовые осмотры') {
                                     $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['sum'] = $service->price * $total;
@@ -637,36 +712,47 @@ class ReportController extends Controller
         return array_reverse($result);
     }
 
-    public function getJournalOther($company, $products) {
+    public function getJournalOther($company, $services) {
         $result = [];
-        $companyProdsID = explode(',', $company->products_id);
-        $prods = $products->where('type_product', 'Абонентская плата без реестров');
-        $drivers = Driver::where('company_id', $company->id)->get();
-        $cars = Car::where('company_id', $company->id)->get();
+//        $companyProdsID = explode(',', $company->products_id);
 
-        foreach ($prods->whereIn('id', $companyProdsID)->where('essence', 0) as $product) {
-            $result['company'][$product->name] = $product->price_unit;
+        $companyProdsID = $company
+            ->contracts
+            ->pluck('services')
+            ->flatten()
+            ->pluck('id')
+            ->toArray();
+
+        $services = $services->where('type_product', 'Абонентская плата без реестров');
+
+        $drivers = Driver::with(['contract.services'])->where('company_id', $company->id)->get();
+
+        $cars = Car::with(['contract.services'])->where('company_id', $company->id)->get();
+
+        foreach ($services->whereIn('id', $companyProdsID)->where('essence', 0) as $service) {
+            $result['company'][$service->name] = $service->price_unit;
         }
 
         foreach ($drivers as $driver) {
-            $driverProdsID = explode(',', $driver->products_id);
-            foreach ($prods->whereIn('id', $driverProdsID)->whereIn('essence', [1, 3]) as $product) {
+//            $driverProdsID = explode(',', $driver->products_id);
+            $driverProdsID = $drivers->contract->services->pluck('id');
+            foreach ($services->whereIn('id', $driverProdsID)->whereIn('essence', [1, 3]) as $service) {
                 $result['drivers'][] = [
                     'driver_fio' => $driver->fio,
-                    'name' => $product->name,
-                    'sum' => 1 * $product->price_unit
+                    'name' => $service->name,
+                    'sum' => 1 * $service->price_unit
                 ];
             }
         }
 
         foreach ($cars as $car) {
             $carProdsID = explode(',', $car->products_id);
-            foreach ($prods->whereIn('id', $carProdsID)->whereIn('essence', [2, 3]) as $product) {
+            foreach ($services->whereIn('id', $carProdsID)->whereIn('essence', [2, 3]) as $service) {
                 $result['cars'][] = [
                     'gos_number' => $car->gos_number,
                     'type_auto' => $car->type_auto,
-                    'name' => $product->name,
-                    'sum' => 1 * $product->price_unit
+                    'name' => $service->name,
+                    'sum' => 1 * $service->price_unit
                 ];
             }
         }

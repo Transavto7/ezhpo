@@ -24,3 +24,9 @@ Artisan::command('fetch:permissions', function () {
                    .$permissions['added'].' - доступов добавлено, '
                    .$permissions['deleted'].' - доступов удалено');
 })->describe('Display an inspiring quote');
+
+Artisan::command('init:contracts', function () {
+    if(\App\Models\Contract::startContract()){
+        $this->comment('Договора вроде инициализированы');
+    }
+})->describe('Display an inspiring quote');

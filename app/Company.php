@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Models\Contract;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
@@ -23,6 +25,15 @@ class Company extends Model
     {
         return $this->belongsTo(User::class, 'deleted_id', 'id')
                     ->withDefault();
+    }
+
+    public function contracts()
+    {
+        return $this->hasMany(
+            Contract::class,
+            'company_id',
+            'id'
+        );
     }
 
     public function cars()

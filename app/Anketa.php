@@ -2,10 +2,23 @@
 
 namespace App;
 
+use App\Models\Contract;
+use App\Models\ContractAnketaSnapshot;
 use Illuminate\Database\Eloquent\Model;
 
 class Anketa extends Model
 {
+    public function contract_snapshot()
+    {
+        return $this->belongsTo(ContractAnketaSnapshot::class, 'contract_snapshot_id', 'id')
+                    ->withDefault();
+    }
+    public function contract()
+    {
+        return $this->belongsTo(Contract::class, 'contract_id', 'id')
+                    ->withDefault();
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');

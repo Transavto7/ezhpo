@@ -10,6 +10,7 @@ use App\FieldPrompt;
 use App\Imports\CarImport;
 use App\Imports\CompanyImport;
 use App\Imports\DriverImport;
+use App\Models\Contract;
 use App\Point;
 use App\Product;
 use App\User;
@@ -217,13 +218,13 @@ class IndexController extends Controller
                     ],
                     'company_id'    => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
 
-                    'products_id'        => [
-                        'label'      => 'Услуги',
-                        'multiple'   => 1,
-                        'type'       => 'select',
-                        'values'     => 'Product',
-                        'noRequired' => 1,
-                    ],
+//                    'products_id'        => [
+//                        'label'      => 'Услуги',
+//                        'multiple'   => 1,
+//                        'type'       => 'select',
+//                        'values'     => 'Product',
+//                        'noRequired' => 1,
+//                    ],
 
                     //                'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1, 'saveToHistory' => 1],
                     'note'               => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
@@ -307,13 +308,13 @@ class IndexController extends Controller
                         'defaultValue' => 'Не установлено',
                     ],
 
-                    'products_id' => [
-                        'label'      => 'Услуги',
-                        'multiple'   => 1,
-                        'type'       => 'select',
-                        'values'     => 'Product',
-                        'noRequired' => 1,
-                    ],
+//                    'products_id' => [
+//                        'label'      => 'Услуги',
+//                        'multiple'   => 1,
+//                        'type'       => 'select',
+//                        'values'     => 'Product',
+//                        'noRequired' => 1,
+//                    ],
 
                     'trailer'         => [
                         'label'        => 'Прицеп',
@@ -323,6 +324,9 @@ class IndexController extends Controller
                         'noRequired'   => 1,
                     ],
                     'company_id'      => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
+                    'contract_id'      => [
+                        'label' => 'Договор', 'type' => 'select', 'values' => 'Models\Contract'
+                    ],
                     //                'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1],
                     'note'            => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
                     'procedure_pv'    => [
@@ -402,15 +406,25 @@ class IndexController extends Controller
                         ],
                     ],
 
-                    'products_id' => [
+//                    'products_id' => [
+//                        'label'    => 'Услуги',
+//                        'multiple' => 1,
+//                        'type'     => 'select',
+//                        'values'   => 'Product',
+//                        'syncData' => [
+//                            ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
+//                            ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
+//                        ],
+//                    ],
+                    'contracts' => [
                         'label'    => 'Услуги',
                         'multiple' => 1,
                         'type'     => 'select',
-                        'values'   => 'Product',
-                        'syncData' => [
-                            ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
-                            ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
-                        ],
+                        'values'   => 'Models\Service',
+//                        'syncData' => [
+//                            ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
+//                            ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
+//                        ],
                     ],
 
                     'where_call'      => [
@@ -642,13 +656,13 @@ class IndexController extends Controller
         $is_api = $request->get('api', 0);
 
         if ($model) {
-            $model = $this->syncDataFunc([
-                'model'          => $model_text,
-                'fieldFind'      => $fieldFind,
-                'fieldFindId'    => $fieldFindId,
-                'fieldSync'      => $fieldSync,
-                'fieldSyncValue' => $fieldSyncValue,
-            ]);
+//            $model = $this->syncDataFunc([
+//                'model'          => $model_text,
+//                'fieldFind'      => $fieldFind,
+//                'fieldFindId'    => $fieldFindId,
+//                'fieldSync'      => $fieldSync,
+//                'fieldSyncValue' => $fieldSyncValue,
+//            ]);
 
             if ($model) {
                 if ( !$is_api) {
@@ -1044,6 +1058,12 @@ class IndexController extends Controller
                 foreach($data as $k => $v) {
                     $oldDataModel[$k] = $element[$k];
 
+                    if ($k === 'contracts') {
+                        Contract::whereIn('id', $v)
+                                ->update(['company_id' => $element->id]);
+                        continue;
+                    }
+
                     if(is_array($v)) {
                         $element[$k] = join(',', $v);
                     }
@@ -1096,27 +1116,27 @@ class IndexController extends Controller
                     }
                  }
 
-                if ($model_text === 'Company') {
-
-                    if(isset($element->products_id)) {
-                        $this->syncDataFunc([
-                            'model' => 'Driver',
-                            'fieldFind' => 'company_id',
-                            'fieldFindId' => $element->id,
-                            'fieldSync' => 'products_id',
-                            'fieldSyncValue' => $element->products_id
-                        ]);
-
-                        $this->syncDataFunc([
-                            'model' => 'Car',
-                            'fieldFind' => 'company_id',
-                            'fieldFindId' => $element->id,
-                            'fieldSync' => 'products_id',
-                            'fieldSyncValue' => $element->products_id
-                        ]);
-                    }
-
-                }
+//                if ($model_text === 'Company') {
+//
+//                    if(isset($element->products_id)) {
+//                        $this->syncDataFunc([
+//                            'model' => 'Driver',
+//                            'fieldFind' => 'company_id',
+//                            'fieldFindId' => $element->id,
+//                            'fieldSync' => 'products_id',
+//                            'fieldSyncValue' => $element->products_id
+//                        ]);
+//
+//                        $this->syncDataFunc([
+//                            'model' => 'Car',
+//                            'fieldFind' => 'company_id',
+//                            'fieldFindId' => $element->id,
+//                            'fieldSync' => 'products_id',
+//                            'fieldSyncValue' => $element->products_id
+//                        ]);
+//                    }
+//
+//                }
 
             }
 

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Contract;
 use Illuminate\Database\Eloquent\Model;
 
 class Car extends Model
@@ -16,6 +17,7 @@ class Car extends Model
         'time_skzi', 'date_osago',
         'town_id', 'dismissed',
         'autosync_fields',
+        'contract_id',
         'deleted_id'
     ];
 
@@ -25,6 +27,11 @@ class Car extends Model
                     ->withDefault();
     }
 
+    public function contract()
+    {
+        return $this->belongsTo(Contract::class, 'contract_id', 'id')
+                    ->withDefault();
+    }
     // sorry for name
     public function company()
     {

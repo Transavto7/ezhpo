@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContractController;
 use App\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
@@ -85,7 +86,40 @@ Route::prefix('snippet')->group(function () {
     });
 });
 
+
 Route::middleware(['auth'])->group(function () {
+
+
+    Route::prefix('v-search')->group(function () {
+        Route::get('/companies', '\App\Helpers\VSelect@companies');
+        Route::get('/cars', '\App\Helpers\VSelect@cars');
+        Route::get('/drivers', '\App\Helpers\VSelect@drivers');
+        Route::get('/services', '\App\Helpers\VSelect@services');
+        Route::get('/our_companies', '\App\Helpers\VSelect@our_companies');
+    });
+
+
+    Route::prefix('contract')->group(function () {
+        Route::get('/', 'ContractController@view');
+
+        Route::get('/index', 'ContractController@index');
+
+        Route::get('/getOne', 'ContractController@getOne');
+
+        Route::put('/update', 'ContractController@update');
+
+        Route::get('/create', 'ContractController@create');
+
+        Route::delete('/{id}', 'ContractController@destroy');
+
+        Route::get('/getTypes', 'ContractController@getTypes');
+
+        Route::post('/getAvailableForCompany', 'ContractController@getAvailableForCompany');
+    });
+
+
+
+
     Route::get('driver-dashboard', function () {
         return view('pages.driver');
     })->name('page.driver');

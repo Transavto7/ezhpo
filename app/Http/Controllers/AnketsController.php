@@ -7,6 +7,7 @@ use App\Car;
 use App\Company;
 use App\DDates;
 use App\Driver;
+use App\Models\Contract;
 use App\Notify;
 use App\Point;
 use App\Settings;
@@ -243,6 +244,15 @@ class AnketsController extends Controller
                     'id' => $anketa->id,
                     'errors' => ["Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])"]
                 ]));
+            }
+            // ДОГОВОР СНЕПШОТ
+            if($data['type_anketa'] === 'tech'){
+//                ContractSnap::create([
+//
+//                ]);
+            }
+            if($data['type_anketa'] === 'medic'){
+
             }
 
             foreach($data['anketa'][0] as $daK => $daV) {
@@ -551,6 +561,7 @@ class AnketsController extends Controller
                     ]);
                 }
             }
+
 
             if (isset($data['car_id'])) {
                 $cars[] = $data['car_id'];

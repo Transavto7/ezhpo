@@ -42,6 +42,48 @@
                         </div>
                     @continue
                 @endif
+                @if($k == 'contracts')
+                    @php
+                        $contractCollect = collect($el->contracts);
+                    @endphp
+                    <div data-field="contracts" class="form-group">
+                        <label>Договор</label>
+                        <select name="contracts[]"
+                                data-label="Договоры"
+                                class="js-chosen"
+                                style="display: none;"
+                                multiple="multiple"
+                        >
+                            <option value="" selected>Не установлено</option>
+                            @foreach(\App\Models\Contract::whereNull('company_id')->orWhere('company_id', $el->id)->get(['id', 'name']) as $contract)
+                                <option value="{{ $contract->id }}"
+                                        @if ($contractCollect->where('id', $contract->id)->first()) selected @endif>
+                                    {{ $contract->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @continue
+                @endif
+                @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
+                    <div data-field="contract" class="form-group">
+                        <label>Договор</label>
+                        <select name="contract_id"
+                                class="form-control"
+                                data-label="Договор"
+                                id="select_for_contract_driver_car"
+                        >
+                            <option value="" selected>Не установлено</option>
+                            @foreach(\App\Models\Contract::where('company_id', $el->company_id)->get(['id', 'name']) as $contract)
+                                <option value="{{ $contract->id }}"
+                                        @if ($contract->id == $el->contract_id) selected @endif>
+                                    {{ $contract->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @continue
+                @endif
 
                 @if($k !== 'id' && !isset($v['hidden']))
                     <div class="form-group" data-field="{{ $k }}" @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' ))  style="display: none" @endif>

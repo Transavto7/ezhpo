@@ -152,21 +152,27 @@
                         </li>
                     @endif
 
+
                 </ul>
             </li>
         @endif
 
         @if(user()->access('drivers_read', 'cars_read', 'company_read', 'service_read', 'discount_read', 'briefings_read', 'drivers_create'
-, 'cars_create'
-, 'company_create'
-, 'service_create'
-, 'discount_create'
-, 'briefings_create'))
+, 'cars_create', 'company_create'
+, 'service_create', 'discount_create'
+, 'briefings_create','contract_read', 'contract_create'))
             <li>
                 <a href="#" data-btn-collapse="#phoenic" role="button"> <i
                         class="icon-interface-windows"></i>CRM</a>
                 <ul id="phoenic" class="collapse list-unstyle">
 
+                    @if(user()->access('contract_read', 'contract_create'))
+                        <li>
+                            <a href="/contract">
+                                Договор
+                            </a>
+                        </li>
+                    @endif
                     @if(user()->access('drivers_read', 'drivers_create'))
                         <li><a href="{{ route('renderElements', 'Driver') }}">Водители</a></li>
                     @endif

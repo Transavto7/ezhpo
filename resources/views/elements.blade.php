@@ -2,9 +2,7 @@
 
 @section('title', $title)
 @section('sidebar', 1)
-@php
 
-@endphp
 @section('content')
     <!-- Модалка для редактирования см front.js  -->
     <div class="modal fade editor-modal" id="modalEditor" role="dialog" aria-hidden="true">
@@ -40,6 +38,38 @@
                                 @continue
                             @endif
                             @if($k == 'where_call' && !user()->access('companies_access_field_where_call'))
+                                @continue
+                            @endif
+                                @if($k == 'contracts')
+                                    <div data-field="contracts" class="form-group">
+                                        <label>Договор</label>
+                                        <select name="contracts[]"
+                                                data-label="Договоры"
+                                                class="js-chosen"
+                                                style="display: none;"
+                                                multiple="multiple"
+                                        >
+                                            <option value="" selected>Не установлено</option>
+                                            @foreach(\App\Models\Contract::whereNull('company_id')->get(['id', 'name']) as $contract)
+                                                <option value="{{ $contract->id }}">
+                                                    {{ $contract->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @continue
+                                @endif
+                            @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
+                                <div data-field="contract" class="form-group">
+                                    <label>Договор</label>
+                                    <select name="contract_id"
+                                            class="form-control"
+                                            data-label="Договор"
+                                            id="select_for_contract_driver_car"
+                                    >
+                                        <option value="" selected>Не установлено</option>
+                                    </select>
+                                </div>
                                 @continue
                             @endif
                             @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
@@ -281,7 +311,7 @@
             || user()->access('pv_trash_read') && $model == 'Point'
         );
 
-        $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
+        //$permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
 
         $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
         $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
@@ -300,13 +330,13 @@
                 @endif
 
                 @if($permissionToView)
-                    @if(!(count($elements) >= $max) || !$max)
-                        <div class=" m-2">
-                            <button type="button" data-toggle-show="#elements-filters" class="btn btn-sm btn-info">
-                                <i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры
-                            </button>
-                        </div>
-                    @endif
+                        @if(!(count($elements) >= $max) || !$max)
+                    <div class=" m-2">
+                        <button type="button" data-toggle-show="#elements-filters" class="btn btn-sm btn-info">
+                            <i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры
+                        </button>
+                    </div>
+                        @endif
                 @endif
 
                 @if($permissionToTrashView)
@@ -334,15 +364,6 @@
                         <hr>
                         <div class="row">
                             @foreach($fields as $fk => $fv)
-                                @if($fk == 'products_id' && user()->hasRole('client'))
-                                    @continue
-                                @endif
-                                @if($fk == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
-                                    @continue
-                                @endif
-                                @if($fk == 'where_call' && !user()->access('companies_access_field_where_call'))
-                                    @continue
-                                @endif
                                 @php $fv['multiple'] = true; @endphp
 
                                 @if(!in_array($fk, ['photo']) && !isset($fv['hidden']))
@@ -403,18 +424,9 @@
                 <thead>
                 <tr>
                     @foreach ($fieldPrompts as $field)
-                        @if($field->field == 'products_id' && user()->hasRole('client'))
-                            @continue
-                        @endif
-                        @if($field->field == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
-                            @continue
-                        @endif
-                        @if($field->field == 'where_call' && !user()->access('companies_access_field_where_call'))
-                            @continue
-                        @endif
                         <th data-key="{{ $field->field }}">
                             <span class="user-select-none"
-                                  @if ($field->content)
+                              @if ($field->content)
                                   data-toggle="tooltip"
                                   data-html="true"
                                   data-trigger="click hover"
@@ -430,9 +442,9 @@
                         </th>
                     @endforeach
 
-                    @if($permissionToSyncCompany && !request()->get('deleted'))
-                        <th width="60">#</th>
-                    @endif
+{{--                    @if($permissionToSyncCompany && !request()->get('deleted'))--}}
+{{--                        <th width="60">#</th>--}}
+{{--                    @endif--}}
                     @if($permissionToDelete)
                         {{--УДАЛЕНИЕ--}}
                         <th width="60">#</th>
@@ -572,13 +584,13 @@
                             </td>
                         @endforeach
 
-                        @if($permissionToSyncCompany && !request()->get('deleted'))
-                            <td class="td-option"
-                                title="При синхронизации все услуги компании будут присвоены водителям и автомобилям компании.">
-                                <a href="{{ route('syncElement', ['type' => $model, 'id' => $el->id ]) }}"
-                                   class="btn btn-sm btn-success"><i class="fa fa-refresh"></i></a>
-                            </td>
-                        @endif
+{{--                        @if($permissionToSyncCompany && !request()->get('deleted'))--}}
+{{--                            <td class="td-option"--}}
+{{--                                title="При синхронизации все услуги компании будут присвоены водителям и автомобилям компании.">--}}
+{{--                                <a href="{{ route('syncElement', ['type' => $model, 'id' => $el->id ]) }}"--}}
+{{--                                   class="btn btn-sm btn-success"><i class="fa fa-refresh"></i></a>--}}
+{{--                            </td>--}}
+{{--                        @endif--}}
 
 
                         @if($permissionToDelete)

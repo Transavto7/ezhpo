@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Contract;
 use Illuminate\Database\Eloquent\Model;
 
 class Driver extends Model
@@ -17,13 +18,21 @@ class Driver extends Model
         'date_report_driver',
         'time_card_driver',
         'town_id', 'dismissed',
-        'autosync_fields', 'date_of_employment',
+        'autosync_fields',
+        'date_of_employment',
+        'contract_id',
         'deleted_id'
     ];
 
     protected $casts = [
         'date_of_employment' => 'datetime'
     ];
+
+    public function contract()
+    {
+        return $this->belongsTo(Contract::class, 'contract_id', 'id')
+                    ->withDefault();
+    }
 
     public function deleted_user()
     {

@@ -3,6 +3,7 @@ import swal from 'sweetalert2'
 import { v4 as uidv4 } from 'uuid'
 import {ApiController} from "./components/ApiController";
 import { Fancybox } from "@fancyapps/ui";
+import Swal2 from "sweetalert2";
 
 require('./init-plugins')
 require('chosen-js')
@@ -1188,5 +1189,56 @@ $(document).ready(function () {
             field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', true) // Реестр
         }
     });
+
+
+    $(document).on('change ready', 'select[name="company_id"]', function (e) {
+        //select_for_contract_driver_car 'input[name="company_id"]'
+        let value = $(this).val();
+        let targetSelect = $('select[name="company_id"]').parent().parent().parent().find('#select_for_contract_driver_car');
+        // let targetSelect = $('#select_for_contract_driver_car');
+        targetSelect.empty();
+
+        axios.post('/contract/getAvailableForCompany', {
+            company_id: value,
+        }).then(({data}) => {
+            console.log(data)
+            if (data.status) {
+                targetSelect.append($('<option>', {
+                    value: '',
+                    text: 'Не установлено'
+                }));
+                data.contracts.map((item) => {
+                    targetSelect.append($('<option>', {
+                        value: item.id,
+                        text: item.name
+                    }));
+                })
+            } else {
+                Swal2.fire('Ошибка', data.message, 'warning');
+            }
+
+        });
+
+
+        // $.ajax({
+        //     type:     'post',
+        //     url:      '/app/purchase/check-active-discount',
+        //     dataType: 'json',
+        //     data:     {
+        //         current_category_id: select.value,
+        //     },
+        //     success:  function (response) {
+        //         if (response.status) {
+        //         } else {
+        //             alert('Ошибка');
+        //         }
+        //     },
+        //     error:    function () {
+        //         alert('Ошибка на сервере при запросе на checkActiveDiscount');
+        //     },
+        // });
+    })
+
+
     // let field = $('*[data-field="Product_type_product"]')
 });
