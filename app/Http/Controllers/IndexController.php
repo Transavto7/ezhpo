@@ -414,13 +414,13 @@ class IndexController extends Controller
                     ],
 
                     'where_call'      => [
-                        'label'      => 'Кому отправлять СМС при отстранении',
+                        'label'      => 'Номер телефона при отстранении',
                         'classes'    => 'MASK_PHONE',
                         'type'       => 'text',
                         'noRequired' => 1,
                     ],
                     'where_call_name' => [
-                        'label'      => 'Кому звонить при отстранении (имя, должность)',
+                        'label'      => 'ФИО и должность кому звонить при отстранении',
                         'type'       => 'text',
                         'noRequired' => 1,
                     ],
