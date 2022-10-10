@@ -107,7 +107,7 @@
                 >
                     <template #cell(service_cost)="row">
                         <template
-                            v-if="contractData.id"
+                            v-if="row.item.pivot"
                         >
                             <b-form-input v-model="row.item.pivot.service_cost"></b-form-input>
                         </template>
@@ -139,7 +139,7 @@
                     </b-button>
                 </template>
 
-                <b-button variant="danger" @click="show = false">Закрыть</b-button>
+                <b-button variant="danger" @click="hideModal">Закрыть</b-button>
             </b-col>
             <!--                <b-col>-->
             <!--                </b-col>-->
@@ -186,11 +186,16 @@ export default {
                 main_for_company:  null, // Главный для компании
                 services: [],
             },
+            oldData: null
         }
     },
     mounted() {
     },
     methods: {
+        hideModal(){
+            // this.contractData = this.oldData;
+            this.show = false
+        },
         async open(data = null) {
             if (!this.companies.length) {
                 axios.get(`/v-search/companies`).then(({data}) => this.companies = data)
@@ -210,17 +215,16 @@ export default {
                 // await axios.get(`/v-search/cars`)
                 //     .then(({data}) => this.cars = data)
                 //     .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
-                axios.get(`/v-search/services`)
+                await axios.get(`/v-search/services`)
                     .then(({data}) => this.products = data)
                     .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
             }
 
             this.show = true
             if (data) {
-                this.contractData = data
-                // this.contractData.product_ids = data.products.map((item) => {
-                //     return item.id
-                // })
+                // this.oldData = data
+                this.contractData = Object.assign({}, data)
+                // this.contractData = data
             } else {
                 this.contractData = {}
             }
@@ -374,6 +378,37 @@ export default {
                 });
         },
     },
+
+    watch:{
+        // contractData(val){
+        //     if(this.contractData.id){
+        //         let newValue = null
+        //         console.log(this.contractData.services)
+        //         this.contractData.services = this.contractData.services.filter((item) => {
+        //             console.log(item)
+        //             if(!item.pivot){
+        //                 console.log('=NAHUI')
+        //                 newValue = {
+        //                     id: item.id,
+        //                     name: item.name,
+        //                     pivot: {
+        //                         service_id: item.id,
+        //                         contract_id: this.contractData.id,
+        //                         service_cost: item.price_unit
+        //                     },
+        //                 }
+        //                 return false;
+        //             }
+        //             return true;
+        //         });
+        //         console.log(this.contractData.services)
+        //         console.log(newValue)
+        //         if(newValue){
+        //             this.contractData.services = this.contractData.services.push(newValue)
+        //         }
+        //     }
+        // }
+    }
 }
 </script>
 

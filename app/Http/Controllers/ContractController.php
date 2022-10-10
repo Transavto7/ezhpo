@@ -30,7 +30,7 @@ class ContractController extends Controller
      */
     public function index(Request $request)
     {
-        $contracts = Contract::with(['company','our_company', 'services']);
+        $contracts = Contract::with(['company', 'our_company', 'services']);
         $filters   = $request->all();
 
         if ($filters['sortBy'] == 'company.name') {
@@ -66,16 +66,16 @@ class ContractController extends Controller
         unset($data_to_save['services']);
 
         $contract = Contract::create([
-            'name'        => $data_to_save['name'] ?? null,
-            'date_of_end' => $data_to_save['date_of_end'] ?? null,
-            'sum'         => $data_to_save['sum'] ?? null,
-            'company_id'  => $data_to_save['company']['id'] ?? null,
-            'our_company_id'  => $data_to_save['our_company']['id'] ?? null,
+            'name'           => $data_to_save['name'] ?? null,
+            'date_of_end'    => $data_to_save['date_of_end'] ?? null,
+            'sum'            => $data_to_save['sum'] ?? null,
+            'company_id'     => $data_to_save['company']['id'] ?? null,
+            'our_company_id' => $data_to_save['our_company']['id'] ?? null,
         ]);
 
 //        $collectServices = collect($services);
         $servicesToSync = [];
-        foreach ($services as $service){
+        foreach ($services as $service) {
             $servicesToSync[$service['id']] = ['service_cost' => $service['price_unit']];
         }
 
@@ -139,18 +139,18 @@ class ContractController extends Controller
         unset($data_to_save['services']);
 
         $servicesToSync = [];
-        foreach ($services as $service){
-            $servicesToSync[$service['id']] = ['service_cost' => $service['pivot']['service_cost']];
+        foreach ($services as $service) {
+            $servicesToSync[$service['id']] = ['service_cost' => $service['pivot']['service_cost'] ?? $service['price_unit']];
         }
 
         $contract->services()->sync($servicesToSync);
 
         $contract->update([
-            'name'        => $data_to_save['name'] ?? null,
-            'date_of_end' => $data_to_save['date_of_end'] ?? null,
-            'sum'         => $data_to_save['sum'] ?? null,
-            'company_id'  => $data_to_save['company']['id'] ?? null,
-            'our_company_id'  => $data_to_save['our_company']['id'] ?? null,
+            'name'           => $data_to_save['name'] ?? null,
+            'date_of_end'    => $data_to_save['date_of_end'] ?? null,
+            'sum'            => $data_to_save['sum'] ?? null,
+            'company_id'     => $data_to_save['company']['id'] ?? null,
+            'our_company_id' => $data_to_save['our_company']['id'] ?? null,
         ]);
 
         return response([
