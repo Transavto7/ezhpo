@@ -1109,7 +1109,7 @@ class AnketsController extends Controller
 
 
             // ДОГОВОР СНЕПШОТ
-            $type_anketa = $data['type_anketa']);
+            $type_anketa = $data['type_anketa'];
 
             if($type_anketa === 'tech' || $type_anketa === 'medic'){
 
