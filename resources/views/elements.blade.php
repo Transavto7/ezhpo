@@ -49,7 +49,7 @@
                                                 style="display: none;"
                                                 multiple="multiple"
                                         >
-                                            <option value="" selected>Не установлено</option>
+                                            <option value="">Не установлено</option>
                                             @foreach(\App\Models\Contract::whereNull('company_id')->get(['id', 'name']) as $contract)
                                                 <option value="{{ $contract->id }}">
                                                     {{ $contract->name }}
