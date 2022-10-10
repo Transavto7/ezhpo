@@ -17,6 +17,8 @@ class ContractAnketaSnapshot extends Model
             'car_snapshot'     => 'json',   // Инфа на момент создания анкеты
         ];
 
+    protected $guarded = [];
+
 
     public function company()
     {

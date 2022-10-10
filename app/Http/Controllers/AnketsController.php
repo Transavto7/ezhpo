@@ -1103,6 +1103,8 @@ class AnketsController extends Controller
                 $createdAnketas[] = Arr::only($anketa, $ank->getFillable());
             }
 
+//            dd($createdAnketas);
+
             Anketa::insert($createdAnketas);
             $createdAnketas = Anketa::where('type_anketa', $data['type_anketa'])
                 ->limit(count($createdAnketas))->orderBy('id', 'desc')->get();
@@ -1111,53 +1113,56 @@ class AnketsController extends Controller
             // ДОГОВОР СНЕПШОТ
             $type_anketa = $data['type_anketa'];
 
-            if($type_anketa === 'tech' || $type_anketa === 'medic'){
-
-                $anketas = Anketa::with(['car', 'contract','contract_snapshot', 'company', 'driver'])
-                                ->whereIn('id', $createdAnketas->pluck('id'))
-                                ->get();
-                if($type_anketa === 'tech'){
-                    $taget_value = 'car';
-                }
-                if($type_anketa === 'medic'){
-                    $taget_value = 'driver';
-                }
-                foreach ($anketas as $anketa){
-
-                    if($anketa->contract_snapshot->id){
-                        $anketa->contract_snapshot()->update([
-                            'anketa_id' => $anketa->id,
-                            'contract_id' => $anketa->$taget_value->id,
-
-                            'time_of_action' => $anketa->$taget_value->time_of_action,
-                            'sum' => $anketa->$taget_value->sum,
-
-                            'company_id' => $anketa->company->id,
-                            'our_company_id' => $anketa->our_company->id,
-                            'driver_id' => $anketa->driver->id,
-                            'car_id' => $anketa->car->id,
-                        ]);
-                        $snapshot = $anketa->contract_snapshot;
-                    }else{
-                        $snapshot = ContractAnketaSnapshot::create([
-                            'anketa_id' => $anketa->id,
-                            'contract_id' => $anketa->$taget_value->id,
-
-                            'time_of_action' => $anketa->$taget_value->time_of_action,
-                            'sum' => $anketa->$taget_value->sum,
-
-                            'company_id' => $anketa->company->id,
-                            'our_company_id' => $anketa->our_company->id,
-                            'driver_id' => $anketa->driver->id,
-                            'car_id' => $anketa->car->id,
-                        ]);
-                    }
-                    $anketa->contract_id = $anketa->$taget_value->id;
-                    $anketa->contract_snapshot_id = $snapshot->id;
-
-                    $anketa->save();
-                }
-            }
+//            if($type_anketa === 'tech' || $type_anketa === 'medic'){
+//
+//                $anketas = Anketa::with(['car', 'contract','contract_snapshot', 'company', 'driver'])
+//                                ->whereIn('id', $createdAnketas->pluck('id'))
+//                                ->get();
+////dd($createdAnketas);
+//                dd($anketas->toArray());
+//
+//                if($type_anketa === 'tech'){
+//                    $taget_value = 'car';
+//                }
+//                if($type_anketa === 'medic'){
+//                    $taget_value = 'driver';
+//                }
+//                foreach ($anketas as $anketa){
+//
+//                    if($anketa->contract_snapshot->id){
+//                        $anketa->contract_snapshot()->update([
+//                            'anketa_id' => $anketa->id,
+//                            'contract_id' => $anketa->$taget_value->id,
+//
+//                            'time_of_action' => $anketa->$taget_value->time_of_action,
+//                            'sum' => $anketa->$taget_value->sum,
+//
+//                            'company_id' => $anketa->company->id,
+//                            'our_company_id' => $anketa->our_company->id,
+//                            'driver_id' => $anketa->driver->id,
+//                            'car_id' => $anketa->car->id,
+//                        ]);
+//                        $snapshot = $anketa->contract_snapshot;
+//                    }else{
+//                        $snapshot = ContractAnketaSnapshot::create([
+//                            'anketa_id' => $anketa->id,
+//                            'contract_id' => $anketa->$taget_value->id,
+//
+//                            'time_of_action' => $anketa->$taget_value->time_of_action,
+//                            'sum' => $anketa->$taget_value->sum,
+//
+//                            'company_id' => $anketa->company->id,
+//                            'our_company_id' => $anketa->our_company->id,
+//                            'driver_id' => $anketa->driver->id,
+//                            'car_id' => $anketa->car->id,
+//                        ]);
+//                    }
+//                    $anketa->contract_id = $anketa->$taget_value->id;
+//                    $anketa->contract_snapshot_id = $snapshot->id;
+//
+//                    $anketa->save();
+//                }
+//            }
 
 
             $responseData = [

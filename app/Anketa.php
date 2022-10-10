@@ -19,19 +19,36 @@ class Anketa extends Model
                     ->withDefault();
     }
 
+    public function our_company()
+    {
+        return $this->belongsTo(
+            Req::class,
+            'our_company_id',
+            'id'
+        )->withDefault();
+    }
+
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id')
+                    ->withDefault();
     }
 
     public function company()
     {
-        return $this->belongsTo(Company::class, 'company_id', 'hash_id');
+        return $this->belongsTo(Company::class, 'company_id', 'hash_id')
+                    ->withDefault();
+    }
+    public function car()
+    {
+        return $this->belongsTo(Car::class, 'car_id', 'hash_id')
+                    ->withDefault();
     }
 
     public function driver()
     {
-        return $this->belongsTo(User::class, 'driver_id', 'hash_id');
+        return $this->belongsTo(User::class, 'driver_id', 'hash_id')
+                    ->withDefault();
     }
 
     public function deleted_user()
