@@ -232,8 +232,8 @@ class HomeController extends Controller
                     // Поиск по дефолтным полям в таблице Anketas
 
                     // Проверяем пустые поля
-                    if (isset($fv)) {
-
+                    if (isset($fv)) { //  && !is_null($fv)
+//dd($filter_params);
                         if ($fk !== 'date' && $fk !== 'created_at') {
                             $explodeData = is_array($fv) ? $fv : explode(',', $fv);
                             $explodeData = (count($explodeData) == 1) ? $explodeData[0] : $explodeData;

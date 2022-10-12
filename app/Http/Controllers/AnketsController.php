@@ -183,7 +183,7 @@ class AnketsController extends Controller
 
         $data = $request->all();
 
-        $REFERER = isset($data['REFERER']) ? $data['REFERER'] : '';
+        $REFERER = $data['REFERER'] ?? '';
 
         if(isset($data['REFERER'])) {
             unset($data['REFERER']);
@@ -343,6 +343,20 @@ class AnketsController extends Controller
                 } else {
                     $anketa['company_id'] = '';
                     $anketa['company_name'] = '';
+                }
+            }
+
+            if(
+                (Carbon::parse($anketa->date) != Carbon::parse($data['date']))
+                && $data['date']){
+
+                $timezone = $user->timezone ?? 3;
+                $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($data['date']);
+
+                if($diffDateCheck <= 60*12 && $anketa['date']) {
+                    $anketa->realy = 'да';
+                } else {
+                    $anketa->realy = 'нет';
                 }
             }
 
@@ -1026,10 +1040,12 @@ class AnketsController extends Controller
                 /**
                  * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
                  */
+
                 if($anketa['type_anketa'] === 'medic') {
                     $timezone = $user->timezone ?? 3;
-                    $diffDateCheck = Carbon::now()->addHour($timezone)->diffInMinutes($anketa['date']);
-                    if($diffDateCheck <= 60*12) {
+                    $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($anketa['date']);
+
+                    if($diffDateCheck <= 60*12 && $anketa['date']) {
                         $anketa['realy'] = 'да';
                     } else {
                         $anketa['realy'] = 'нет';
@@ -1593,9 +1609,9 @@ class AnketsController extends Controller
                  */
                 if($createdAnketa->type_anketa === 'medic') {
                     $timezone = $user->timezone ?? 3;
-                    $diffDateCheck = Carbon::now()->addHour($timezone)->diffInMinutes($createdAnketa->date);
+                    $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($createdAnketa->date);
 
-                    if($diffDateCheck <= 60*12) {
+                    if($diffDateCheck <= 60*12 && $anketa['date']) {
                         $anketaCreated->realy = 'да';
                         $anketaCreated->save();
                     } else {
