@@ -275,14 +275,16 @@
             || user()->access('discount_trash_read') && $model == 'Discount'
             || user()->access('service_trash_read') && $model == 'Product'
             || user()->access('briefings_trash_read') && $model == 'Instr'
-                || user()->access('system_trash') && $model == 'Settings'
-        || user()->access('city_trash_read') && $model == 'Town'
+            || user()->access('system_trash') && $model == 'Settings'
+            || user()->access('city_trash_read') && $model == 'Town'
+            || user()->access('story_field_trash') && $model == 'FieldHistory'
+            || user()->access('date_control_trash') && $model == 'DDates'
             || user()->access('requisites_trash_read') && $model == 'Req'
             || user()->access('pv_trash_read') && $model == 'Point'
         );
 
         $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
-
+//dd($permissionToTrashView);
         $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
         $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
     @endphp
