@@ -39,10 +39,10 @@
         <label class="col-md-3 form-control-label">Тип осмотра:</label>
         <article class="col-md-9">
             <select name="anketa[0][type_view]" required class="form-control">
-                <option value="Предрейсовый" @if($type_view ?? '' == "Предрейсовый") selected @endif>Предрейсовый</option>
-                <option value="Послерейсовый" @if($type_view ?? '' == "Послерейсовый") selected @endif>Послерейсовый</option>
-                <option value="Предсменный" @if($type_view ?? '' == "Предсменный") selected @endif>Предсменный</option>
-                <option value="Послесменный" @if($type_view ?? '' == "Послесменный") selected @endif>Послесменный</option>
+                <option value="Предрейсовый" @if(($type_view ?? '') == "Предрейсовый") selected @endif>Предрейсовый</option>
+                <option value="Послерейсовый" @if(($type_view ?? '') == "Послерейсовый") selected @endif>Послерейсовый</option>
+                <option value="Предсменный" @if(($type_view ?? '') == "Предсменный") selected @endif>Предсменный</option>
+                <option value="Послесменный" @if(($type_view ?? '') == "Послесменный") selected @endif>Послесменный</option>
             </select>
         </article>
     </div>

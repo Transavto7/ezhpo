@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use function foo\func;
 
 class HomeController extends Controller
 {
@@ -233,7 +234,14 @@ class HomeController extends Controller
 
                     // Проверяем пустые поля
                     if (isset($fv)) { //  && !is_null($fv)
-//dd($filter_params);
+                        if ($fk == 'is_dop' && !$fv){
+                            $anketas = $anketas->where(function ($q){
+                                $q->whereNull('is_dop')
+                                  ->orwhere('is_dop', 0);
+                            });
+                            continue;
+                        }
+
                         if ($fk !== 'date' && $fk !== 'created_at') {
                             $explodeData = is_array($fv) ? $fv : explode(',', $fv);
                             $explodeData = (count($explodeData) == 1) ? $explodeData[0] : $explodeData;

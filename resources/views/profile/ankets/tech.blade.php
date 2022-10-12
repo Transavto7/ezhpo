@@ -73,8 +73,8 @@
             <label class="form-control-label col-md-3">Тип осмотра:</label>
             <article class="col-md-9">
                 <select name="anketa[0][type_view]" class="form-control">
-                    <option value="Предрейсовый/Предсменный" @if($type_view ?? '' == "Предрейсовый/Предсменный") selected @endif>Предрейсовый/Предсменный</option>
-                    <option value="Послерейсовый/Послесменный" @if($type_view ?? '' == "Послерейсовый/Послесменный") selected @endif>Послерейсовый/Послесменный</option>
+                    <option value="Предрейсовый/Предсменный" @if(($type_view ?? '') == "Предрейсовый/Предсменный") selected @endif>Предрейсовый/Предсменный</option>
+                    <option value="Послерейсовый/Послесменный" @if(($type_view ?? '') == "Послерейсовый/Послесменный") selected @endif>Послерейсовый/Послесменный</option>
                 </select>
             </article>
         </div>
@@ -118,8 +118,8 @@
             <label class="form-control-label">Тип осмотра:</label>
             <article>
                 <select name="anketa[0][type_view]" required class="form-control">
-                    <option value="Предрейсовый/Предсменный" @if($type_view ?? '' == "Предрейсовый/Предсменный") selected @endif>Предрейсовый/Предсменный</option>
-                    <option value="Послерейсовый/Послесменный" @if($type_view ?? '' == "Послерейсовый/Послесменный") selected @endif>Послерейсовый/Послесменный</option>
+                    <option value="Предрейсовый/Предсменный" @if(($type_view ?? ')' == "Предрейсовый/Предсменный") selected @endif>Предрейсовый/Предсменный</option>
+                    <option value="Послерейсовый/Послесменный" @if(($type_view ?? '') == "Послерейсовый/Послесменный") selected @endif>Послерейсовый/Послесменный</option>
                 </select>
             </article>
         </div>
