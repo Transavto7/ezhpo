@@ -346,14 +346,15 @@ class AnketsController extends Controller
                 }
             }
 
-            if(
-                (Carbon::parse($anketa->date) != Carbon::parse($data['date']))
-                && $data['date']){
+            if ($anketa->created_at &&
+//                (Carbon::parse($anketa->date) != Carbon::parse($data['date']))
+//                &&
+            ($data['date'] ?? false)) {
 
-                $timezone = $user->timezone ?? 3;
-                $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($data['date']);
+                $timezone      = $user->timezone ?? 3;
+                $diffDateCheck = Carbon::parse($anketa->created_at)->addHours($timezone)->diffInMinutes($data['date']);
 
-                if($diffDateCheck <= 60*12 && $anketa['date']) {
+                if ($diffDateCheck <= 60 * 12 && $anketa['date']) {
                     $anketa->realy = 'да';
                 } else {
                     $anketa->realy = 'нет';
