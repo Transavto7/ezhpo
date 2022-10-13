@@ -269,12 +269,13 @@ class ReportController extends Controller
 
                 if ($services = $drivers_services
                     ->where('hash_id', $id)
-                    ->first()
-                    ->contract){
-                    $services = $services->services
+                    ->first()) {
+                    $services = $services
+                        ->contract
+                        ->services
                         ->pluck('id')
                         ->toArray();
-                }else{
+                } else {
                     $services = [];
                 }
 
@@ -422,15 +423,15 @@ class ReportController extends Controller
                 $total                                = $rows->count();
                 $result[$id]['types'][$type]['total'] = $total;
 
-                if($services = $cars_services
+                if ($services = $cars_services
                     ->where('hash_id', $id)
-                    ->first()){
+                    ->first()) {
                     $services = $services
                         ->contract
                         ->services
                         ->pluck('id')
                         ->toArray();
-                }else{
+                } else {
                     $services = [];
                 }
 
@@ -559,14 +560,15 @@ class ReportController extends Controller
                 $result[$key]['reports'][$report->driver_id]['types']['is_dop']['total']
                     = ($result[$key]['reports'][$report->driver_id]['types']['is_dop']['total'] ?? 0) + 1;
             }
-            if($services = $drivers_services
+            if ($services = $drivers_services
                 ->where('hash_id', $report->driver_id)
-                ->first()){
-                $services = $services->contract
+                ->first()) {
+                $services = $services
+                    ->contract
                     ->services
                     ->pluck('id')
                     ->toArray();
-            }else{
+            } else {
                 $services = [];
             }
 
@@ -718,13 +720,17 @@ class ReportController extends Controller
                     = ($result[$key]['reports'][$report->car_id]['types']['is_dop']['total'] ?? 0) + 1;
             }
 
-            $services = $cars_services
+            if ($services = $cars_services
                 ->where('hash_id', $report->car_id)
-                ->first()
-                ->contract
-                ->services
-                ->pluck('id')
-                ->toArray();
+                ->first()) {
+                $services = $services
+                    ->contract
+                    ->services
+                    ->pluck('id')
+                    ->toArray();
+            } else {
+                $services = [];
+            }
 
 //            if ($report->products_id == null) {
 //                $services = explode(',', $company->products_id);
