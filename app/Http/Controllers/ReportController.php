@@ -208,7 +208,7 @@ class ReportController extends Controller
         ];
     }
 
-    public function getJournalMedic($company, $date_from, $date_to, $products, $discounts)
+    public function getJournalMedic($company, $date_from, $date_to, $services, $discounts)
     {
         // Get table info by filters
         $medics = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart', 'pechat_pl'])
@@ -254,6 +254,7 @@ class ReportController extends Controller
             ->flatten()
             ->pluck('id')
             ->toArray();
+
         foreach ($medics->groupBy('driver_id') as $driver) {
             $id                        = $driver->first()->driver_id;
             $driver_fio                = $driver->where('driver_fio', '!=', null)->first();
@@ -266,16 +267,17 @@ class ReportController extends Controller
                 $total                                = $rows->count();
                 $result[$id]['types'][$type]['total'] = $total;
 
-                if ($services = $drivers_services
+                if ($d_services = $drivers_services
                     ->where('hash_id', $id)
                     ->first()) {
                     $services = $services
                         ->contract
                         ->services
-                        ->pluck('id')
-                        ->toArray();
+//                        ->pluck('id')
+//                        ->toArray()
+                    ;
                 } else {
-                    $services = [];
+                    $d_services = [];
                 }
 
 
@@ -286,20 +288,22 @@ class ReportController extends Controller
 //                }
 
                 $types = explode('/', $type);
-                $prods = $products->whereIn('id', $services)->where('type_anketa', 'medic');
+//                $prods = $products->whereIn('id', $services)->where('type_anketa', 'medic');
+
+                $d_services_medic = $d_services->where('type_anketa', 'medic');
 
 
-                if ($prods->count() > 0) {
-                    foreach ($prods as $service) {
+                if ($d_services_medic->count() > 0) {
+                    foreach ($d_services_medic as $service) {
                         $disc           = $discounts->where('products_id', $service->id);
-                        $service->price = $service->price_unit;
+                        $service->price = $service->pivot->service_cost;
 
                         if ($disc->count()) {
                             foreach ($disc as $discount) {
                                 $disSum = $discount->getDiscount($total);
                                 if ($disSum) {
-                                    $service->price                          = $service->price_unit
-                                                                               - ($service->price_unit * $disSum / 100);
+                                    $service->price                          = $service->pivot->service_cost
+                                                                               - ($service->pivot->service_cost * $disSum / 100);
                                     $result[$id]['types'][$type]['discount'] = 1 * $disSum;
                                 }
                             }
@@ -329,20 +333,20 @@ class ReportController extends Controller
                 $total                                = $rows->count();
                 $result[$id]['types'][$type]['total'] = $total;
 
-                $services = explode(',', $driver->first()->products_id);
-                $prods    = $products->whereIn('id', $services)->where('type_anketa', $type);
+//                $services = explode(',', $driver->first()->products_id);
+                $prods    = $d_services->where('type_anketa', $type);
 
                 if ($prods->count() > 0) {
                     foreach ($prods as $service) {
                         $disc           = $discounts->where('products_id', $service->id);
-                        $service->price = $service->price_unit;
+                        $service->price = $service->pivot->service_cost;
 
                         if ($disc->count()) {
                             foreach ($disc as $discount) {
                                 $disSum = $discount->getDiscount($total);
                                 if ($disSum) {
-                                    $service->price                          = $service->price_unit
-                                                                               - ($service->price_unit * $disSum / 100);
+                                    $service->price                          = $service->pivot->service_cost
+                                                                               - ($service->pivot->service_cost * $disSum / 100);
                                     $result[$id]['types'][$type]['discount'] = 1 * $disSum;
                                 }
                             }
@@ -409,6 +413,7 @@ class ReportController extends Controller
             ->flatten()
             ->pluck('id')
             ->toArray();
+
         foreach ($techs->groupBy('car_id') as $car) {
             $id                            = $car->first()->car_id;
             $numberCar                     = $car->where('car_gos_number', '!=', null)->first();
@@ -428,8 +433,9 @@ class ReportController extends Controller
                     $services = $services
                         ->contract
                         ->services
-                        ->pluck('id')
-                        ->toArray();
+//                        ->pluck('id')
+//                        ->toArray()
+                    ;
                 } else {
                     $services = [];
                 }
@@ -441,20 +447,22 @@ class ReportController extends Controller
 //                    $services = explode(',', $car->first()->products_id);
 //                }
 
-                $types = explode('/', $type);
-                $prods = $products->whereIn('id', $services)->where('type_anketa', 'tech');
+                $types = explode('/', $type); //
 
-                if ($prods->count() > 0) {
-                    foreach ($prods as $service) {
+                $t_service_local = $services->where('type_anketa', 'tech');
+//                $prods = $products->whereIn('id', $services)->where('type_anketa', 'tech');
+
+                if ($t_service_local->count() > 0) {
+                    foreach ($t_service_local as $service) {
                         $disc           = $discounts->where('products_id', $service->id);
-                        $service->price = $service->price_unit;
+                        $service->price = $service->pivot->service_cost;
 
                         if ($disc->count()) {
                             foreach ($disc as $discount) {
                                 $disSum = $discount->getDiscount($total);
                                 if ($disSum) {
-                                    $service->price                          = $service->price_unit
-                                                                               - ($service->price_unit * $disSum / 100);
+                                    $service->price                          = $service->pivot->service_cost
+                                                                               - ($service->pivot->service_cost * $disSum / 100);
                                     $result[$id]['types'][$type]['discount'] = 1 * $disSum;
                                 }
                             }
@@ -565,8 +573,9 @@ class ReportController extends Controller
                 $services = $services
                     ->contract
                     ->services
-                    ->pluck('id')
-                    ->toArray();
+//                    ->pluck('id')
+//                    ->toArray()
+                ;
             } else {
                 $services = [];
             }
@@ -578,19 +587,20 @@ class ReportController extends Controller
 //            }
 
             $types = explode('/', $report->type_view);
-            $prods = $products->whereIn('id', $services);
+//            $prods = $products->whereIn('id', $services);
+//            $prods = $products->whereIn('id', $services);
 
-            if ($prods->count() > 0) {
-                foreach ($prods as $service) {
+            if ($services->count() > 0) {
+                foreach ($services as $service) {
                     $disc              = $discounts->where('products_id', $service->id);
-                    $service->price    = $service->price_unit;
+                    $service->price    = $service->pivot->service_cost;
                     $service->discount = 0;
 
                     if ($disc->count()) {
                         foreach ($disc as $discount) {
                             $disSum = $discount->getDiscount($total);
                             if ($disSum) {
-                                $service->price    = $service->price_unit - ($service->price_unit * $disSum / 100);
+                                $service->price    = $service->pivot->service_cost - ($service->pivot->service_cost * $disSum / 100);
                                 $service->discount = 1 * $disSum;
                             }
                         }
@@ -725,8 +735,9 @@ class ReportController extends Controller
                 $services = $services
                     ->contract
                     ->services
-                    ->pluck('id')
-                    ->toArray();
+//                    ->pluck('id')
+//                    ->toArray()
+                ;
             } else {
                 $services = [];
             }
@@ -738,19 +749,19 @@ class ReportController extends Controller
 //            }
 
             $types = explode('/', $report->type_view);
-            $prods = $products->whereIn('id', $services);
+//            $prods = $services;
 
-            if ($prods->count() > 0) {
-                foreach ($prods as $service) {
+            if ($services->count() > 0) {
+                foreach ($services as $service) {
                     $disc              = $discounts->where('products_id', $service->id);
-                    $service->price    = $service->price_unit;
+                    $service->price    = $service->pivot->service_cost;
                     $service->discount = 0;
 
                     if ($disc->count()) {
                         foreach ($disc as $discount) {
                             $disSum = $discount->getDiscount($total);
                             if ($disSum) {
-                                $service->price    = $service->price_unit - ($service->price_unit * $disSum / 100);
+                                $service->price    = $service->pivot->service_cost - ($service->pivot->service_cost * $disSum / 100);
                                 $service->discount = 1 * $disSum;
                             }
                         }
@@ -791,12 +802,13 @@ class ReportController extends Controller
         $result = [];
 //        $companyProdsID = explode(',', $company->products_id);
 
-        $companyProdsID = $company
+        $companyServices = $company
             ->contracts
             ->pluck('services')
             ->flatten()
-            ->pluck('id')
-            ->toArray();
+//            ->pluck('id')
+//            ->toArray()
+        ;
 
         $services = $services->where('type_product', 'Абонентская плата без реестров');
 
@@ -810,30 +822,31 @@ class ReportController extends Controller
                    ->where('company_id', $company->id)
                    ->get();
 
-        foreach ($services->whereIn('id', $companyProdsID)->where('essence', 0) as $service) {
-            $result['company'][$service->name] = $service->price_unit;
+        foreach ($companyServices->where('essence', 0) as $service) {
+            $result['company'][$service->name] = $service->pivot->service_cost;
         }
 
         foreach ($drivers as $driver) {
 //            $driverProdsID = explode(',', $driver->products_id);
-            $driverProdsID = $driver->contract->services->pluck('id');
-            foreach ($services->whereIn('id', $driverProdsID)->whereIn('essence', [1, 3]) as $service) {
+            $driverProdsID = $driver->contract->services;
+            foreach ($driverProdsID->whereIn('essence', [1, 3]) as $service) {
                 $result['drivers'][] = [
                     'driver_fio' => $driver->fio,
                     'name'       => $service->name,
-                    'sum'        => 1 * $service->price_unit,
+                    'sum'        => 1 * $service->pivot->service_cost,
                 ];
             }
         }
 
         foreach ($cars as $car) {
-            $carProdsID = explode(',', $car->products_id);
-            foreach ($services->whereIn('id', $carProdsID)->whereIn('essence', [2, 3]) as $service) {
+//            $carProdsID = explode(',', $car->products_id);
+            $carProdsID = $cars->contract->services;
+            foreach ($carProdsID->whereIn('essence', [2, 3]) as $service) {
                 $result['cars'][] = [
                     'gos_number' => $car->gos_number,
                     'type_auto'  => $car->type_auto,
                     'name'       => $service->name,
-                    'sum'        => 1 * $service->price_unit,
+                    'sum'        => 1 * $service->pivot->service_cost,
                 ];
             }
         }
