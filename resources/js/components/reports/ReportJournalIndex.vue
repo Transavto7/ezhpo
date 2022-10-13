@@ -23,6 +23,18 @@
                           <span slot="noOptions">Список пуст</span>
                       </multiselect>
                   </div>
+                  <div class="form-group col-lg-3">
+                      <label class="mb-1" for="contract">Договор</label>
+                      <v-select
+                          v-model="contracts"
+                          :options="contracts_options"
+                          key="id"
+                          label="name"
+                          multiple
+                          class="is-invalid"
+                      >
+                      </v-select>
+                  </div>
                   <div class="form-group col-lg-2">
                       <label class="mb-1" for="date_from">Период:</label>
                       <input type="month" required ref="month" v-model="month"
@@ -73,6 +85,8 @@ import ReportJournalTech from "./ReportJournalTech";
 import ReportJournalTechOther from "./ReportJournalTechOther";
 import ReportJournalMedicOther from "./ReportJournalMedicOther";
 import ReportJournalOther from "./ReportJournalOther";
+import Swal2 from "sweetalert2";
+import vSelect from "vue-select";
 
 export default {
     name: "ReportJournalIndex",
@@ -82,6 +96,7 @@ export default {
         ReportJournalTech,
         ReportJournalTechOther,
         ReportJournalMedicOther,
+        vSelect,
         ReportJournalOther
     },
     data() {
@@ -93,6 +108,9 @@ export default {
             companies: [],
             month: null,
             company_id: 0,
+
+            contracts: [],
+            contracts_options: [],
         }
     },
     mounted() {
@@ -115,6 +133,23 @@ export default {
         }
     },
     methods: {
+        searchServices() {
+            this.loading = true
+            this.contracts = [];
+            this.contracts_options = [];
+
+            axios.get('/api/reports/getContractsForCompany', {
+                params: {
+                    id: this.company_id
+                }
+            }).then(({ data }) => {
+                this.contracts = data
+                this.contracts_options = data
+            }).finally(() => {
+                this.loading = false
+            });
+        },
+
         reset() {
             this.$refs.reportsMedic.hide();
             this.$refs.reportsTech.hide();
@@ -128,6 +163,7 @@ export default {
             axios.get('/api/reports/journal', {
                 params: {
                     company_id: this.company_id,
+                    contracts_ids: this.contracts.map((item) => item.id),
                     month: this.month
                 }
             }).then(({ data }) => {
@@ -168,6 +204,17 @@ export default {
                 this.companies = data;
             });
         },
+    },
+
+    watch:{
+        company_id(val){
+            if(this.company_id == 0){
+                this.loading = true
+                return;
+            }
+
+            this.searchServices()
+        }
     }
 }
 </script>

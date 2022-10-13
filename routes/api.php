@@ -23,6 +23,8 @@ Route::get('/find/{model}', 'ApiController@modelList');
 
 Route::get('reports/journal', 'ReportController@getJournalData')->name('api.reports.journal');
 Route::get('reports/journal/export', 'ReportController@exportJournalData')->name('api.reports.journal.export');
+Route::get('reports/getContractsForCompany', 'ReportController@getContractsForCompany')->name('api.reports.journal');
+
 
 Route::get('/sync-fields/{model}/{id}', function ($model, $id) {
     $data = app("App\\$model")->getAutoSyncFieldsFromHashId($id);
