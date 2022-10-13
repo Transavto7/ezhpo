@@ -241,11 +241,10 @@ class ReportController extends Controller
         $result = [];
 
         $drivers_services = Driver::with([
-            'contract' => function ($q) {
-                $q->whereIn('contracts.id', $this->contracts_ids);
-            },
+            'contract',
             'contract.services',
         ])
+                                  ->whereIn('contract_id', $this->contracts_ids)
                                   ->where('company_id', $company->id)
                                   ->get();
 
@@ -801,9 +800,15 @@ class ReportController extends Controller
 
         $services = $services->where('type_product', 'Абонентская плата без реестров');
 
-        $drivers = Driver::with(['contract.services'])->where('company_id', $company->id)->get();
+        $drivers = Driver::with(['contract.services'])
+                         ->whereIn('contract_id', $this->contracts_ids)
+                         ->where('company_id', $company->id)
+                         ->get();
 
-        $cars = Car::with(['contract.services'])->where('company_id', $company->id)->get();
+        $cars = Car::with(['contract.services'])
+                   ->whereIn('contract_id', $this->contracts_ids)
+                   ->where('company_id', $company->id)
+                   ->get();
 
         foreach ($services->whereIn('id', $companyProdsID)->where('essence', 0) as $service) {
             $result['company'][$service->name] = $service->price_unit;
