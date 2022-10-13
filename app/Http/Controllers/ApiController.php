@@ -24,8 +24,8 @@ class ApiController extends Controller
             $key = $request->key;
         }
 
-        $query = app("App\\" . $model)::where(DB::raw("LOWER($field)"),
-            'like', '%' . strtolower($request->search) . '%');
+        $query = app("App\\" . $model)::where(DB::raw("($field)"),
+            'like', '%' . $request->search . '%');
 
         if ($model === 'User') {
             $query = $query->whereNotIn('role', [3, 12]);

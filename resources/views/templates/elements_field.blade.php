@@ -141,7 +141,7 @@
                     {{ $option[$value] }}
                 </option>
             @endforeach
-            @foreach(app("App\\" . $v['values'])::whereNotIn($key, $default_value)->get() as $option)
+            @foreach(app("App\\" . $v['values'])::whereNotIn($key, $default_value)->limit(100)->get() as $option)
                 <option value="{{ $option[$key] }}">
                     {{ $option[$value] }}
                 </option>
