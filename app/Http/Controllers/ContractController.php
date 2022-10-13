@@ -66,14 +66,27 @@ class ContractController extends Controller
         unset($data_to_save['services']);
 
         $contract = Contract::create([
-            'name'           => $data_to_save['name'] ?? null,
-            'date_of_end'    => $data_to_save['date_of_end'] ?? null,
-            'sum'            => $data_to_save['sum'] ?? null,
-            'company_id'     => $data_to_save['company']['id'] ?? null,
-            'our_company_id' => $data_to_save['our_company']['id'] ?? null,
+            'name'             => $data_to_save['name'] ?? null,
+            'date_of_end'      => $data_to_save['date_of_end'] ?? null,
+            'sum'              => $data_to_save['sum'] ?? null,
+            'company_id'       => $data_to_save['company']['id'] ?? null,
+            'our_company_id'   => $data_to_save['our_company']['id'] ?? null,
+            'main_for_company' => $data_to_save['main_for_company'] ?? null,
         ]);
 
-//        $collectServices = collect($services);
+        if ($data_to_save['company']['id'] ?? false) {
+            Car::where('company_id', $data_to_save['company']['id'])
+               ->whereNull('contract_id')
+               ->update([
+                   'contract_id' => $contract->id,
+               ]);
+            Driver::where('company_id', $data_to_save['company']['id'])
+                  ->whereNull('contract_id')
+                  ->update([
+                      'contract_id' => $contract->id,
+                  ]);
+        }
+
         $servicesToSync = [];
         foreach ($services as $service) {
             $servicesToSync[$service['id']] = ['service_cost' => $service['price_unit']];
@@ -140,18 +153,34 @@ class ContractController extends Controller
 
         $servicesToSync = [];
         foreach ($services as $service) {
-            $servicesToSync[$service['id']] = ['service_cost' => $service['pivot']['service_cost'] ?? $service['price_unit']];
+            $servicesToSync[$service['id']] = [
+                'service_cost' => $service['pivot']['service_cost'] ?? $service['price_unit'],
+            ];
         }
 
         $contract->services()->sync($servicesToSync);
 
         $contract->update([
-            'name'           => $data_to_save['name'] ?? null,
-            'date_of_end'    => $data_to_save['date_of_end'] ?? null,
-            'sum'            => $data_to_save['sum'] ?? null,
-            'company_id'     => $data_to_save['company']['id'] ?? null,
-            'our_company_id' => $data_to_save['our_company']['id'] ?? null,
+            'name'             => $data_to_save['name'] ?? null,
+            'date_of_end'      => $data_to_save['date_of_end'] ?? null,
+            'sum'              => $data_to_save['sum'] ?? null,
+            'company_id'       => $data_to_save['company']['id'] ?? null,
+            'our_company_id'   => $data_to_save['our_company']['id'] ?? null,
+            'main_for_company' => $data_to_save['main_for_company'] ?? null,
         ]);
+
+        if ($data_to_save['company']['id'] ?? false) {
+            Car::where('company_id', $data_to_save['company']['id'])
+               ->whereNull('contract_id')
+               ->update([
+                   'contract_id' => $contract->id,
+               ]);
+            Driver::where('company_id', $data_to_save['company']['id'])
+                  ->whereNull('contract_id')
+                  ->update([
+                      'contract_id' => $contract->id,
+                  ]);
+        }
 
         return response([
             'status'   => true,

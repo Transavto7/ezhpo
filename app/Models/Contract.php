@@ -90,12 +90,14 @@ class Contract extends Model
 //        Service::insert($products);
 
 //        FieldPrompt::create([
-//            'field' => 'service_id',
+//            'field' => 'contract',
 //            'type' => 'car',
+//            'name' => 'Договор',
 //        ]);
 //        FieldPrompt::create([
-//            'field' => 'service_id',
+//            'field' => 'contract',
 //            'type' => 'driver',
+//            'name' => 'Договор',
 //        ]);
         FieldPrompt::create([
             'field' => 'contracts',
