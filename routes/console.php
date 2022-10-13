@@ -30,3 +30,18 @@ Artisan::command('init:contracts', function () {
         $this->comment('Договора вроде инициализированы');
     }
 })->describe('Display an inspiring quote');
+
+Artisan::command('companies:procedure_pv-fix', function () {
+    \App\Company::whereNotIn('procedure_pv', [
+        'Наперед без дат',
+        'Наперёд с датами',
+        'Задним числом',
+        'Фактовый',
+    ])
+                ->orWhereNull('procedure_pv')
+                ->update([
+                    'procedure_pv' => 'Фактовый',
+                ]);
+    $this->comment('Компани пофикшенс');
+
+})->describe('Display an inspiring quote');

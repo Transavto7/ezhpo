@@ -116,9 +116,10 @@
         data-label="{{ $v['label'] ?? $k }}"
         data-field="{{ $model }}_{{ $k }}"
         class="filled-select2 filled-select"
+        data-allow-clear=true
     >
         {{-- disabled selected --}}
-        <option value="">Не установлено</option>
+{{--        <option value="">Не установлено</option>--}}
 
         @if(is_array($v['values']))
             @foreach($v['values'] as $optionK => $optionV)

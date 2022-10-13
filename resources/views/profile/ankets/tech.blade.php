@@ -73,12 +73,10 @@
             <label class="form-control-label col-md-3">Тип осмотра:</label>
             <article class="col-md-9">
                 <select name="anketa[0][type_view]" class="form-control">
-                    @isset($type_view)
-                        <option disabled selected value="{{ $type_view }}">{{ $type_view }}</option>
-                    @endisset
-
-                    <option selected value="Предрейсовый/Предсменный">Предрейсовый/Предсменный</option>
-                    <option value="Послерейсовый/Послесменный">Послерейсовый/Послесменный</option>
+                    <option value="Предрейсовый/Предсменный" @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>Предрейсовый/Предсменный</option>
+                    <option value="Послерейсовый/Послесменный" @if(strcasecmp($type_view ?? '', 'Послерейсовый/Послесменный') == 0) selected @endif>Послерейсовый/Послесменный</option>
+{{--                    <option value="Предрейсовый/Предсменный" @if(($type_view ?? '') == "Предрейсовый/Предсменный") selected @endif>Предрейсовый/Предсменный</option>--}}
+{{--                    <option value="Послерейсовый/Послесменный" @if(($type_view ?? '') == "Послерейсовый/Послесменный") selected @endif>Послерейсовый/Послесменный</option>--}}
                 </select>
             </article>
         </div>
@@ -122,12 +120,10 @@
             <label class="form-control-label">Тип осмотра:</label>
             <article>
                 <select name="anketa[0][type_view]" required class="form-control">
-                    @isset($type_view)
-                        <option disabled selected value="{{ $type_view }}">{{ $type_view }}</option>
-                    @endisset
-
-                    <option selected value="Предрейсовый/Предсменный">Предрейсовый/Предсменный</option>
-                    <option value="Послерейсовый/Послесменный">Послерейсовый/Послесменный</option>
+                    <option value="Предрейсовый/Предсменный" @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>Предрейсовый/Предсменный</option>
+                    <option value="Послерейсовый/Послесменный" @if(strcasecmp($type_view ?? '', 'Послерейсовый/Послесменный') == 0) selected @endif>Послерейсовый/Послесменный</option>
+{{--                    <option value="Предрейсовый/Предсменный" @if(($type_view ?? ')' == "Предрейсовый/Предсменный") selected @endif>Предрейсовый/Предсменный</option>--}}
+{{--                    <option value="Послерейсовый/Послесменный" @if(($type_view ?? '') == "Послерейсовый/Послесменный") selected @endif>Послерейсовый/Послесменный</option>--}}
                 </select>
             </article>
         </div>

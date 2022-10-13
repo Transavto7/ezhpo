@@ -512,6 +512,10 @@ return [
         'name'        => 'date_control_delete',
         'description' => 'Контроль дат - Удаление',
     ],
+    [
+        'name'        => 'date_control_trash',
+        'description' => 'Контроль дат - Корзина',
+    ],
     //============== История изменения полей =============//
     [
         'name'        => 'story_field_create',
@@ -528,6 +532,10 @@ return [
     [
         'name'        => 'story_field_delete',
         'description' => 'История изменения полей - Удаление',
+    ],
+    [
+        'name'        => 'story_field_trash',
+        'description' => 'История изменения полей - Корзина',
     ],
     //============== Реквизиты нашей компании =============//
     [
