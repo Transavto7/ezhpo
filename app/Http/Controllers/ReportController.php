@@ -267,13 +267,17 @@ class ReportController extends Controller
                 $total                                = $rows->count();
                 $result[$id]['types'][$type]['total'] = $total;
 
-                $services = $drivers_services
+                if ($services = $drivers_services
                     ->where('hash_id', $id)
                     ->first()
-                    ->contract
-                    ->services
-                    ->pluck('id')
-                    ->toArray();
+                    ->contract){
+                    $services = $services->services
+                        ->pluck('id')
+                        ->toArray();
+                }else{
+                    $services = [];
+                }
+
 
 //                if ($id == null) {
 //                    $services = explode(',', $company->products_id);
@@ -418,13 +422,19 @@ class ReportController extends Controller
                 $total                                = $rows->count();
                 $result[$id]['types'][$type]['total'] = $total;
 
-                $services = $cars_services
+                if($services = $cars_services
                     ->where('hash_id', $id)
-                    ->first()
-                    ->contract
-                    ->services
-                    ->pluck('id')
-                    ->toArray();
+                    ->first()){
+                    $services = $services
+                        ->contract
+                        ->services
+                        ->pluck('id')
+                        ->toArray();
+                }else{
+                    $services = [];
+                }
+
+
 //                if ($id == null) {
 //                    $services = explode(',', $company->products_id);
 //                } else {
@@ -556,6 +566,8 @@ class ReportController extends Controller
                     ->services
                     ->pluck('id')
                     ->toArray();
+            }else{
+                $services = [];
             }
 
 //            if ($report->driver_id == null) {
