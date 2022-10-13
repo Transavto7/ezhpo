@@ -100,6 +100,7 @@ class Contract extends Model
         FieldPrompt::create([
             'field' => 'contracts',
             'type' => 'company',
+            'name' => 'Договор',
         ]);
 
 
