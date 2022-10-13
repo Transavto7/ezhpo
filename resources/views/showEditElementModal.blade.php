@@ -54,7 +54,7 @@
                                 style="display: none;"
                                 multiple="multiple"
                         >
-                            <option value="" selected>Не установлено</option>
+{{--                            <option value=""  @if(!$contractCollect->count()) selected @endif>Не установлено</option>--}}
                             @foreach(\App\Models\Contract::whereNull('company_id')->orWhere('company_id', $el->id)->get(['id', 'name']) as $contract)
                                 <option value="{{ $contract->id }}"
                                         @if ($contractCollect->where('id', $contract->id)->first()) selected @endif>
@@ -66,6 +66,9 @@
                     @continue
                 @endif
                 @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
+                        @php
+                            $contractCollect = \App\Models\Contract::where('company_id', $el->company_id)->get(['id', 'name']);
+                        @endphp
                     <div data-field="contract" class="form-group">
                         <label>Договор</label>
                         <select name="contract_id"
@@ -73,8 +76,8 @@
                                 data-label="Договор"
                                 id="select_for_contract_driver_car"
                         >
-                            <option value="" selected>Не установлено</option>
-                            @foreach(\App\Models\Contract::where('company_id', $el->company_id)->get(['id', 'name']) as $contract)
+                            <option value="" @if(!$el->contract_id) selected @endif>Не установлено</option>
+                            @foreach($contractCollect as $contract)
                                 <option value="{{ $contract->id }}"
                                         @if ($contract->id == $el->contract_id) selected @endif>
                                     {{ $contract->name }}

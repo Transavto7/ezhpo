@@ -218,16 +218,18 @@ class IndexController extends Controller
                     ],
                     'company_id'    => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
 
-                    'contract_id'      => [
-                        'label' => 'Договор', 'type' => 'select', 'values' => 'Models\Contract'
+                    'contract_id'        => [
+                        'label'  => 'Договор',
+                        'type'   => 'select',
+                        'values' => 'Models\Contract',
                     ],
-//                    'products_id'        => [
-//                        'label'      => 'Услуги',
-//                        'multiple'   => 1,
-//                        'type'       => 'select',
-//                        'values'     => 'Product',
-//                        'noRequired' => 1,
-//                    ],
+                    //                    'products_id'        => [
+                    //                        'label'      => 'Услуги',
+                    //                        'multiple'   => 1,
+                    //                        'type'       => 'select',
+                    //                        'values'     => 'Product',
+                    //                        'noRequired' => 1,
+                    //                    ],
 
                     //                'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1, 'saveToHistory' => 1],
                     'note'               => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
@@ -311,13 +313,13 @@ class IndexController extends Controller
                         'defaultValue' => 'Не установлено',
                     ],
 
-//                    'products_id' => [
-//                        'label'      => 'Услуги',
-//                        'multiple'   => 1,
-//                        'type'       => 'select',
-//                        'values'     => 'Product',
-//                        'noRequired' => 1,
-//                    ],
+                    //                    'products_id' => [
+                    //                        'label'      => 'Услуги',
+                    //                        'multiple'   => 1,
+                    //                        'type'       => 'select',
+                    //                        'values'     => 'Product',
+                    //                        'noRequired' => 1,
+                    //                    ],
 
                     'trailer'         => [
                         'label'        => 'Прицеп',
@@ -327,8 +329,10 @@ class IndexController extends Controller
                         'noRequired'   => 1,
                     ],
                     'company_id'      => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
-                    'contract_id'      => [
-                        'label' => 'Договор', 'type' => 'select', 'values' => 'Models\Contract'
+                    'contract_id'     => [
+                        'label'  => 'Договор',
+                        'type'   => 'select',
+                        'values' => 'Models\Contract',
                     ],
                     //                'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1],
                     'note'            => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
@@ -383,21 +387,21 @@ class IndexController extends Controller
 
                 'model'  => 'Company',
                 'fields' => [
-                    'name'    => [
+                    'name'      => [
                         'label'                => 'Название компании клиента',
                         'type'                 => 'text',
                         'filterJournalLinkKey' => 'company_id',
                     ],
-                    'note'    => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
-                    'user_id' => [
+                    'note'      => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
+                    'user_id'   => [
                         'label'      => 'Ответственный',
                         'type'       => 'select',
                         'values'     => 'User',
                         'noRequired' => 1,
                     ],
-                    'req_id'  => ['label' => 'Реквизиты нашей компании', 'type' => 'select', 'values' => 'Req'],
-                    'pv_id'   => ['label' => 'ПВ', 'type' => 'select', 'values' => 'Point', 'noRequired' => 1],
-                    'town_id' => [
+                    'req_id'    => ['label' => 'Реквизиты нашей компании', 'type' => 'select', 'values' => 'Req'],
+                    'pv_id'     => ['label' => 'ПВ', 'type' => 'select', 'values' => 'Point', 'noRequired' => 1],
+                    'town_id'   => [
                         'label'      => 'Город',
                         'multiple'   => 1,
                         'type'       => 'select',
@@ -409,25 +413,25 @@ class IndexController extends Controller
                         ],
                     ],
 
-//                    'products_id' => [
-//                        'label'    => 'Услуги',
-//                        'multiple' => 1,
-//                        'type'     => 'select',
-//                        'values'   => 'Product',
-//                        'syncData' => [
-//                            ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
-//                            ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
-//                        ],
-//                    ],
+                    //                    'products_id' => [
+                    //                        'label'    => 'Услуги',
+                    //                        'multiple' => 1,
+                    //                        'type'     => 'select',
+                    //                        'values'   => 'Product',
+                    //                        'syncData' => [
+                    //                            ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
+                    //                            ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
+                    //                        ],
+                    //                    ],
                     'contracts' => [
                         'label'    => 'Услуги',
                         'multiple' => 1,
                         'type'     => 'select',
                         'values'   => 'Models\Service',
-//                        'syncData' => [
-//                            ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
-//                            ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
-//                        ],
+                        //                        'syncData' => [
+                        //                            ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
+                        //                            ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
+                        //                        ],
                     ],
 
                     'where_call'      => [
@@ -866,13 +870,13 @@ class IndexController extends Controller
                      */
 
                     $userData = [
-                        'hash_id'  => $data['hash_id'],
+                        'hash_id'   => $data['hash_id'],
                         'api_token' => Hash::make(date('H:i:s').sha1($data['hash_id'])),
-                        'email'    => mt_rand(100000, 499999).'@ta-7.ru',
-                        'login'    => $data['hash_id'],
-                        'password' => Hash::make($data['hash_id']),
-                        'name'     => $data['fio'],
-                        'role'     => 3,
+                        'email'     => mt_rand(100000, 499999).'@ta-7.ru',
+                        'login'     => $data['hash_id'],
+                        'password'  => Hash::make($data['hash_id']),
+                        'name'      => $data['fio'],
+                        'role'      => 3,
                     ];
 
                     if ($pv_id) {
@@ -925,6 +929,11 @@ class IndexController extends Controller
             // парсим данные
             foreach ($data as $dataKey => $dataItem) {
                 if (is_array($dataItem)) {
+                    if ('contracts') {
+                        $contracts = $data['contracts'] ?? [];
+                        unset($data['contracts']);
+                        continue;
+                    }
                     if ($dataItem !== null) {
                         $data[$dataKey] = join(',', $dataItem);
                     }
@@ -948,17 +957,26 @@ class IndexController extends Controller
             }
 
             $created = $model::create($data);
+
+            if ($model_type == 'Company') {
+                if ( !empty($contracts)) {
+                    Contract::whereIn('id', $contracts)
+                            ->update(['company_id' => $created->id]);
+                }
+            }
+
+
             if ($created) {
                 if ($model_type === 'Company') {
                     $user = User::create([
-                        'hash_id'  => mt_rand(0,9999) . date('s'),
-                        'email'    => $created->hash_id . '-' . mt_rand(100000, 499999).'@ta-7.ru',
-                        'api_token' => Hash::make(date('H:i:s').sha1($created->hash_id)),
-                        'login'    => '0' . $created->hash_id,
-                        'password' => '0' . Hash::make($created->hash_id),
-                        'name'     => $created->name,
-                        'role'     => 12,
-                        'company_id' => $created->id
+                        'hash_id'    => mt_rand(0, 9999).date('s'),
+                        'email'      => $created->hash_id.'-'.mt_rand(100000, 499999).'@ta-7.ru',
+                        'api_token'  => Hash::make(date('H:i:s').sha1($created->hash_id)),
+                        'login'      => '0'.$created->hash_id,
+                        'password'   => '0'.Hash::make($created->hash_id),
+                        'name'       => $created->name,
+                        'role'       => 12,
+                        'company_id' => $created->id,
                     ]);
 
                     $user->roles()->attach(6);
@@ -970,19 +988,20 @@ class IndexController extends Controller
         }
     }
 
-    public function RemoveElement (Request $request)
+    public function RemoveElement(Request $request)
     {
         $model = $request->type;
-        $id = $request->id;
+        $id    = $request->id;
         $model = app("App\\$model");
 
-        if($model) {
-            if($request->get('undo')){
+        if ($model) {
+            if ($request->get('undo')) {
                 $model::withTrashed()->find($id)->restore();
-                return redirect( $_SERVER['HTTP_REFERER']);
+
+                return redirect($_SERVER['HTTP_REFERER']);
             }
-            if($model::find($id)->delete()) {
-                return redirect( $_SERVER['HTTP_REFERER']);
+            if ($model::find($id)->delete()) {
+                return redirect($_SERVER['HTTP_REFERER']);
             }
         }
     }
@@ -997,7 +1016,7 @@ class IndexController extends Controller
         $id      = $request->id;
         $company = Company::find($id);
 
-        if(!$company->products_id){
+        if ( !$company->products_id) {
             return redirect($_SERVER['HTTP_REFERER']);
         }
 
@@ -1008,15 +1027,15 @@ class IndexController extends Controller
         return redirect($_SERVER['HTTP_REFERER']);
     }
 
-    public function DeleteFileElement (Request $request)
+    public function DeleteFileElement(Request $request)
     {
-        $id = $request->id;
-        $field = $request->field;
+        $id         = $request->id;
+        $field      = $request->field;
         $model_text = $request->model;
 
         $model = app("App\\$model_text");
 
-        if($model) {
+        if ($model) {
             $model = $model->find($id);
 
             Storage::disk('public')->delete($model->$field);
@@ -1025,19 +1044,19 @@ class IndexController extends Controller
             $model->save();
         }
 
-        return redirect( $_SERVER['HTTP_REFERER'] );
+        return redirect($_SERVER['HTTP_REFERER']);
     }
 
-    public function UpdateElement (Request $request)
+    public function UpdateElement(Request $request)
     {
         $model_text = $request->type;
-        $model = app("App\\$model_text");
-        $id = $request->id;
+        $model      = app("App\\$model_text");
+        $id         = $request->id;
 
-        if($model) {
-            $data = $request->all();
+        if ($model) {
+            $data         = $request->all();
             $oldDataModel = [];
-            $element = $model->find($id);
+            $element      = $model->find($id);
 
             unset($data['_token']);
 
@@ -1046,10 +1065,10 @@ class IndexController extends Controller
             }
 
             // Обновляем данные
-            if($element) {
+            if ($element) {
                 // Парсим файлы
-                foreach($request->allFiles() as $file_key => $file) {
-                    if(isset($data[$file_key]) && !isset($data[$file_key . '_base64'])) {
+                foreach ($request->allFiles() as $file_key => $file) {
+                    if (isset($data[$file_key]) && !isset($data[$file_key.'_base64'])) {
                         Storage::disk('public')->delete($element[$file_key]);
 
                         $file_path = Storage::disk('public')->putFile('elements', $file);
@@ -1058,47 +1077,101 @@ class IndexController extends Controller
                     }
                 }
 
-                foreach($data as $k => $v) {
+                // company with sync
+                if ($model_text == 'Company') {
+                    Contract::where('company_id', $element->id)
+                            ->update(['company_id' => null]);
+
+                    Contract::whereIn('id', $data['contracts'] ?? [])
+                            ->update(['company_id' => $element->id]);
+
+                    $mainContract = Contract::mainForCompany($element->id);
+
+                    Car::where('company_id', $element->id)
+                       ->whereNotIn('contract_id', $data['contracts'] ?? [])
+                       ->update([
+                           'contract_id' => $mainContract->id ?? null
+                       ]);
+
+                    Driver::where('company_id', $element->id)
+                       ->whereNotIn('contract_id', $data['contracts'] ?? [])
+                       ->update([
+                           'contract_id' => $mainContract->id ?? null
+                       ]);
+                }
+                // (driver && car) =>
+                if ($model_text == 'Driver') {
+                    if(
+                        $data['company_id'] != $element->company_id
+                        && !$data['contract_id']
+                    ){
+                        $mainContract = Contract::mainForCompany($data['company_id']);
+
+                        Driver::where('id', $element->id)->update([
+                            'contract_id' => $mainContract->id ?? null
+                        ]);
+                    }else{
+                        Driver::where('id', $element->id)->update([
+                            'contract_id' => $data['contract_id'] ?? null
+                        ]);
+                    }
+                }
+                if ($model_text == 'Car') {
+                    if(
+                        $data['company_id'] != $element->company_id
+                        && !$data['contract_id']
+                    ){
+                        $mainContract = Contract::mainForCompany($data['company_id']);
+
+                        Car::where('id', $element->id)->update([
+                            'contract_id' => $mainContract->id ?? null
+                        ]);
+                    }else{
+                        Car::where('id', $element->id)->update([
+                            'contract_id' => $data['contract_id'] ?? null
+                        ]);
+                    }
+                }
+
+                foreach ($data as $k => $v) {
                     $oldDataModel[$k] = $element[$k];
 
-                    if ($k === 'contracts') {
-                        Contract::whereIn('id', $v)
-                                ->update(['company_id' => $element->id]);
+                    if ($k === 'contracts' || $k === 'contract_id') {
                         continue;
                     }
 
-                    if(is_array($v)) {
+                    if (is_array($v)) {
                         $element[$k] = join(',', $v);
-                    }
-                    else if(preg_match('/^data:image\/(\w+);base64,/', $v)) {
-                        $k = str_replace('_base64', '', $k);
+                    } else {
+                        if (preg_match('/^data:image\/(\w+);base64,/', $v)) {
+                            $k = str_replace('_base64', '', $k);
 
-                        $base64_image = substr($v, strpos($v, ',') + 1);
-                        $base64_image = base64_decode($base64_image);
+                            $base64_image = substr($v, strpos($v, ',') + 1);
+                            $base64_image = base64_decode($base64_image);
 
-                        $hash = sha1(time());
-                        $path = "elements/$hash.png";
+                            $hash = sha1(time());
+                            $path = "elements/$hash.png";
 
-                        $base64_image = Storage::disk('public')->put($path, $base64_image);
+                            $base64_image = Storage::disk('public')->put($path, $base64_image);
 
-                        $element->$k = $path;
-                    }
-                    else {
-                        if(isset($v) && !$request->hasFile($k)) {
-                            $element[$k] = $v;
+                            $element->$k = $path;
+                        } else {
+                            if (isset($v) && !$request->hasFile($k)) {
+                                $element[$k] = $v;
+                            }
                         }
                     }
                 }
 
 
                 //АВТО <- КОМПАНИЯ (СИНХРОНИЗАЦИЯ ПОЛЕЙ)
-                 if($model_text === 'Driver' || $model_text === 'Car') {
-                    if(isset($element->company_id)) {
-                        if($element->company_id) {
-                            if($oldDataModel['company_id'] != $element->company_id) {
+                if ($model_text === 'Driver' || $model_text === 'Car') {
+                    if (isset($element->company_id)) {
+                        if ($element->company_id) {
+                            if ($oldDataModel['company_id'] != $element->company_id) {
                                 $aSyncFields = explode(',', $element->autosync_fields);
 
-                                foreach($aSyncFields as $fSync) {
+                                foreach ($aSyncFields as $fSync) {
                                     $element->$fSync = Company::find($element->company_id)->$fSync;
                                 }
                             }
@@ -1106,18 +1179,18 @@ class IndexController extends Controller
                     }
                 }
 
-                 if ($model_text === 'Product') {
+                if ($model_text === 'Product') {
                     if ($element->type_product === 'Абонентская плата без реестров') {
                         $element->type_anketa = null;
-                        $element->type_view = null;
+                        $element->type_view   = null;
 
-                        if (!isset($data['essence'])) {
+                        if ( !isset($data['essence'])) {
                             $element->essence = null;
                         }
                     } else {
                         $element->essence = null;
                     }
-                 }
+                }
 
 //                if ($model_text === 'Company') {
 //
@@ -1146,25 +1219,26 @@ class IndexController extends Controller
             /**
              * Пустые поля обновляем
              */
-            foreach($oldDataModel as $oldDataItemKey => $oldDataItemValue) {
-                if(!isset($data[$oldDataItemKey]) && $oldDataItemKey == 'note') {
+            foreach ($oldDataModel as $oldDataItemKey => $oldDataItemValue) {
+                if ( !isset($data[$oldDataItemKey]) && $oldDataItemKey == 'note') {
                     $element[$oldDataItemKey] = '';
                 }
             }
 
-            if($element->save()) {
-                return redirect( $_SERVER['HTTP_REFERER'] );
+            if ($element->save()) {
+                return redirect($_SERVER['HTTP_REFERER']);
             }
         }
 
         return abort(500);
     }
 
-    public function showEditModal ($model, $id) {
+    public function showEditModal($model, $id)
+    {
         $page = $this->elements[$model];
 
         $page['model'] = $model;
-        $page['id'] = $id;
+        $page['id']    = $id;
 
         $el = app("App\\$model")->find($id);
 
@@ -1176,11 +1250,11 @@ class IndexController extends Controller
     /**
      * Рендеры страниц
      */
-    public function RenderIndex (Request $request)
+    public function RenderIndex(Request $request)
     {
         $user = Auth::user();
 
-        if(!$user) {
+        if ( !$user) {
             return view('auth.login');
         }
 
@@ -1190,28 +1264,28 @@ class IndexController extends Controller
     /**
      * Рендер просмотра вкладок CRM
      */
-    public function RenderElements (Request $request)
+    public function RenderElements(Request $request)
     {
         $user = Auth::user();
         $type = $request->type;
 
         $queryString = '';
-        $oKey = 'orderKey';
-        $oBy = 'orderBy';
+        $oKey        = 'orderKey';
+        $oBy         = 'orderBy';
 
         // ОПЕРАТОР ПАК & КОМПАНИИ
 //        if($user->role === 4 && $type === 'Company') {
 //            return back();
 //        }
 
-        foreach($_GET as $getK => $getV) {
-            if($getK !== $oKey && $getK !== $oBy) {
-                if(is_array($getV)) {
-                    foreach($getV as $getVkey => $getVvalue) {
-                        $queryString .= '&' . $getK . "[$getVkey]" . '=' . $getVvalue;
+        foreach ($_GET as $getK => $getV) {
+            if ($getK !== $oKey && $getK !== $oBy) {
+                if (is_array($getV)) {
+                    foreach ($getV as $getVkey => $getVvalue) {
+                        $queryString .= '&'.$getK."[$getVkey]".'='.$getVvalue;
                     }
                 } else {
-                    $queryString .= '&' . $getK . '=' . $getV;
+                    $queryString .= '&'.$getK.'='.$getV;
                 }
 
             }
@@ -1221,28 +1295,38 @@ class IndexController extends Controller
          * Сортировка
          */
         $orderKey = $request->get($oKey, 'created_at');
-        $orderBy = $request->get($oBy, 'DESC');
-        $filter = $request->get('filter', 0);
+        $orderBy  = $request->get($oBy, 'DESC');
+        $filter   = $request->get('filter', 0);
 
         $take = $request->get('take', 500);
 
-        if(isset($this->elements[$type])) {
+        if (isset($this->elements[$type])) {
             $element = $this->elements[$type];
 
-            $model = $element['model'];
+            $model          = $element['model'];
             $MODEL_ELEMENTS = app("App\\$model");
+
+            $element['elements_count_all'] = $MODEL_ELEMENTS->count();
+
+//            $fieldsModel = $MODEL_ELEMENTS->fillable;
+            if ($model == 'Company') {
+                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contracts']);
+            } elseif ($model == 'Car' || $model == 'Driver') {
+                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contract']);
+            }
+
             $element['elements'] = $MODEL_ELEMENTS;
-            $fieldsModel = $element['elements']->fillable;
 
-            $element['type'] = $type;
-            $element['orderBy'] = $orderBy;
+            $element['type']     = $type;
+            $element['orderBy']  = $orderBy;
             $element['orderKey'] = $orderKey;
-            $element['take'] = $take;
+            $element['take']     = $take;
 
-            if($request->get('deleted')){
+            if ($request->get('deleted')) {
                 $element['elements'] = $element['elements']->onlyTrashed();
             }
-            if($filter) {
+
+            if ($filter) {
                 $allFilters = $request->all();
                 unset($allFilters['filter']);
                 unset($allFilters['take']);
@@ -1251,27 +1335,29 @@ class IndexController extends Controller
                 unset($allFilters['page']);
                 unset($allFilters['deleted']);
 
-                foreach($allFilters as $aFk => $aFv) {
-                    if(!empty($aFv)) {
-                        if(is_array($aFv)) {
+                foreach ($allFilters as $aFk => $aFv) {
+                    if ( !empty($aFv)) {
+                        if (is_array($aFv)) {
 
-                            if(count($aFv) > 0) {
+                            if (count($aFv) > 0) {
                                 $element['elements'] = $element['elements']->where(function ($q) use ($aFv, $aFk) {
                                     $isId = strpos($aFk, '_id');
 
-                                    foreach($aFv as $aFvItemKey => $aFvItemValue) {
+                                    foreach ($aFv as $aFvItemKey => $aFvItemValue) {
                                         if ($isId && ($aFk === 'town_id' || $aFk === 'products_id')) {
                                             $q = $q->orWhere($aFk, $aFvItemValue)
-                                                ->orWhere($aFk, 'like', "%,$aFvItemValue,%")
-                                                ->orWhere($aFk, 'like', "%,$aFvItemValue")
-                                                ->orWhere($aFk, 'like', "$aFvItemValue,%");
-                                        } else if($isId) {
-                                            $q = $q->where($aFk, $aFvItemValue);
+                                                   ->orWhere($aFk, 'like', "%,$aFvItemValue,%")
+                                                   ->orWhere($aFk, 'like', "%,$aFvItemValue")
+                                                   ->orWhere($aFk, 'like', "$aFvItemValue,%");
                                         } else {
-                                            if(strlen($aFvItemValue) === 0) {
+                                            if ($isId) {
                                                 $q = $q->where($aFk, $aFvItemValue);
                                             } else {
-                                                $q = $q->where($aFk, 'LIKE', '%' . trim($aFvItemValue) . '%');
+                                                if (strlen($aFvItemValue) === 0) {
+                                                    $q = $q->where($aFk, $aFvItemValue);
+                                                } else {
+                                                    $q = $q->where($aFk, 'LIKE', '%'.trim($aFvItemValue).'%');
+                                                }
                                             }
                                         }
                                     }
@@ -1283,35 +1369,51 @@ class IndexController extends Controller
                             if ($aFk == 'date_of_employment') {
                                 $element['elements'] = $element['elements']->whereBetween($aFk, [
                                         Carbon::parse($aFv)->startOfDay(),
-                                        Carbon::parse($aFv)->endOfDay()
-                                        ]
+                                        Carbon::parse($aFv)->endOfDay(),
+                                    ]
                                 );
                             } else {
-                                $element['elements'] = $element['elements']->where($aFk, 'LIKE', '%' . trim($aFv) . '%');
+                                $element['elements'] = $element['elements']->where($aFk, 'LIKE', '%'.trim($aFv).'%');
                             }
                         }
                     }
                 }
             }
 
-            if(auth()->user()->hasRole('client')) {
-                if($model == 'Driver' || $model == 'Car') {
+            if (auth()->user()->hasRole('client')) {
+                if ($model == 'Driver' || $model == 'Car') {
                     $element['elements'] = $element['elements']->where('company_id', auth()->user()->company_id);
-                } else if ($model == 'Company') {
-                    $element['elements'] = $element['elements']->where('id', auth()->user()->company_id);
+                } else {
+                    if ($model == 'Company') {
+                        $element['elements'] = $element['elements']->where('id', auth()->user()->company_id);
+                    }
                 }
             }
 
             $element['max'] = isset($element['max']) ? $element['max'] : null;
-            $element['elements_count_all'] = $MODEL_ELEMENTS->all()->count();
+//            $element['elements_count_all'] = $MODEL_ELEMENTS->count();
             $element['elements'] = $element['elements']->orderBy($orderKey, $orderBy);
 
             // Автоматическая загрузка справочников
-            $excludeElementTypes = ['Settings', 'Discount', 'DDates', 'DDate', 'Product', 'Instr', 'Town', 'Point', 'FieldHistory', 'Req'];
+            $excludeElementTypes = [
+                'Settings',
+                'Discount',
+                'DDates',
+                'DDate',
+                'Product',
+                'Instr',
+                'Town',
+                'Point',
+                'FieldHistory',
+                'Req',
+            ];
 
 
-            if($filter || in_array($type, $excludeElementTypes) || ($user->hasRole('client') && ($type === 'Driver' || $type === 'Car'))) {
-                if($element['max']) {
+            if ($filter || in_array($type, $excludeElementTypes)
+                || ($user->hasRole('client')
+                    && ($type === 'Driver'
+                        || $type === 'Car'))) {
+                if ($element['max']) {
                     $element['elements'] = $element['elements']->take($element['max'])->get();
                 } else {
                     $element['elements'] = $element['elements']->paginate($take);
@@ -1322,30 +1424,30 @@ class IndexController extends Controller
 
             // Проверка прав доступа
             $roles = ['manager', 'admin'];
-            if(isset($element['otherRoles'])) {
-                foreach($roles as $roleOther) {
+            if (isset($element['otherRoles'])) {
+                foreach ($roles as $roleOther) {
                     array_push($element['otherRoles'], $roleOther);
                 }
             } else {
                 $element['otherRoles'] = $roles;
             }
 
-            $element['queryString'] = $queryString;
+            $element['queryString']  = $queryString;
             $element['fieldPrompts'] = FieldPrompt::where('type', strtolower($model))->get();
 
             return view('elements', $element);
         } else {
-            return redirect( route('home') );
+            return redirect(route('home'));
         }
     }
 
     /**
      * Рендер последовательного добавления Клиента
      */
-    public function RenderAddClient (Request $request)
+    public function RenderAddClient(Request $request)
     {
         return view('pages.add_client', [
-            'title' => 'Добавление клиента'
+            'title' => 'Добавление клиента',
         ]);
     }
 
@@ -1357,40 +1459,40 @@ class IndexController extends Controller
     /**
      * Рендер анкет
      */
-    public function RenderForms (Request $request)
+    public function RenderForms(Request $request)
     {
         $user = Auth::user();
 
-        if(!($type = $request->get('type'))){
-            if(user()->hasRole('tech')){
+        if ( !($type = $request->get('type'))) {
+            if (user()->hasRole('tech')) {
                 $type = 'tech';
             }
-            if(user()->hasRole('medic')){
+            if (user()->hasRole('medic')) {
                 $type = 'medic';
             }
-            if(user()->hasRole('manager') || user()->hasRole('engineer_bdd')){
+            if (user()->hasRole('manager') || user()->hasRole('engineer_bdd')) {
                 return redirect()->route('renderElements', 'Company');
             }
-            if(user()->hasRole('operator_sdpo')){
+            if (user()->hasRole('operator_sdpo')) {
                 return redirect()->route('home', 'pak_queue');
             }
 
-            if(user()->hasRole('client')){
+            if (user()->hasRole('client')) {
                 return redirect()->route('home', ['type_ankets' => 'medic']);
             }
-            if(!$type){
+            if ( !$type) {
                 return redirect()->route('index');
             }
         }
 
-        $company_fields = $this->elements['Driver']['fields']['company_id'];
+        $company_fields                = $this->elements['Driver']['fields']['company_id'];
         $company_fields['getFieldKey'] = 'name';
 
         $anketa_key = $type;
 
         // Отображаем данные
         $anketa = $this->ankets[$anketa_key];
-        $point = Point::getPointText($user->pv_id);
+        $point  = Point::getPointText($user->pv_id);
         $points = Point::getAll();
 
         // Конвертация текущего времени Юзера
@@ -1405,20 +1507,20 @@ class IndexController extends Controller
 
         // Дефолтные значения
         $anketa['default_current_date'] = $time;
-        $anketa['default_point'] = $point;
-        $anketa['points'] = $points;
-        $anketa['type_anketa'] = $anketa_key;
-        $anketa['default_pv_id'] = $user->pv_id;
-        $anketa['company_fields'] = $company_fields;
+        $anketa['default_point']        = $point;
+        $anketa['points']               = $points;
+        $anketa['type_anketa']          = $anketa_key;
+        $anketa['default_pv_id']        = $user->pv_id;
+        $anketa['company_fields']       = $company_fields;
 
         $anketa['Driver'] = Driver::class;
-        $anketa['Car'] = Car::class;
+        $anketa['Car']    = Car::class;
 
         // Проверяем выставленный ПВ
-        if(session()->exists('anketa_pv_id')) {
+        if (session()->exists('anketa_pv_id')) {
             $session_pv_id = session('anketa_pv_id');
 
-            if(date('d.m') > $session_pv_id['expired']) {
+            if (date('d.m') > $session_pv_id['expired']) {
                 session()->remove('anketa_pv_id');
             }
         }

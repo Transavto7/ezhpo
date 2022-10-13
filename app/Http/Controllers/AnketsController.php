@@ -381,10 +381,10 @@ class AnketsController extends Controller
             if($anketa->contract_snapshot->id){
                 $anketa->contract_snapshot()->update([
                     'anketa_id' => $anketa->id,
-                    'contract_id' => $anketa->$taget_value->id,
+                    'contract_id' => $anketa->$taget_value->contract_id ?? null,
 
-                    'time_of_action' => $anketa->$taget_value->time_of_action,
-                    'sum' => $anketa->$taget_value->sum,
+                    'time_of_action' => $anketa->contract->time_of_action,
+                    'sum' => $anketa->contract->sum,
 
                     'company_id' => $anketa->company->id,
                     'our_company_id' => $anketa->our_company->id,
@@ -395,10 +395,10 @@ class AnketsController extends Controller
             }else{
                 $snapshot = ContractAnketaSnapshot::create([
                     'anketa_id' => $anketa->id,
-                    'contract_id' => $anketa->$taget_value->id,
+                    'contract_id' => $anketa->$taget_value->contract_id ?? null,
 
-                    'time_of_action' => $anketa->$taget_value->time_of_action,
-                    'sum' => $anketa->$taget_value->sum,
+                    'time_of_action' => $anketa->contract->time_of_action,
+                    'sum' => $anketa->contract->sum,
 
                     'company_id' => $anketa->company->id,
                     'our_company_id' => $anketa->our_company->id,
@@ -406,7 +406,7 @@ class AnketsController extends Controller
                     'car_id' => $anketa->car->id,
                 ]);
             }
-            $anketa->contract_id = $anketa->$taget_value->id;
+            $anketa->contract_id = $anketa->$taget_value->contract_id;
             $anketa->contract_snapshot_id = $snapshot->id;
 
             $anketa->save();

@@ -3,6 +3,10 @@
 @section('title', $title)
 @section('sidebar', 1)
 
+@php
+//dd($elements[0]->toArray());
+@endphp
+
 @section('content')
     <!-- Модалка для редактирования см front.js  -->
     <div class="modal fade editor-modal" id="modalEditor" role="dialog" aria-hidden="true">
@@ -428,6 +432,15 @@
                 <thead>
                 <tr>
                     @foreach ($fieldPrompts as $field)
+                        @if($field->field == 'products_id')
+                            @continue
+                        @endif
+                        @if($field->field == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
+                            @continue
+                        @endif
+                        @if($field->field == 'where_call' && !user()->access('companies_access_field_where_call'))
+                            @continue
+                        @endif
                         <th data-key="{{ $field->field }}">
                             <span class="user-select-none"
                               @if ($field->content)
@@ -465,7 +478,7 @@
                 @foreach ($elements as $el)
                     <tr>
                         @foreach ($fieldPrompts as $field)
-                            @if($field->field == 'products_id' && user()->hasRole('client'))
+                            @if($field->field == 'products_id')
                                 @continue
                             @endif
                             @if($field->field == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
@@ -534,6 +547,14 @@
                                             {{ app('App\Product')->getName($el->products_id) }}
                                         @elseif ($field->field === 'essence')
                                             {{ \App\Product::$essence[$el->essence] ?? ''  }}
+                                        @elseif ($field->field === 'contract' )
+                                            {{ $el['contract']['name']  }}
+                                        @elseif ( $field->field === 'contracts')
+                                            @foreach($el[$field->field] as $contract)
+                                                <div class="badge badge-rounded bg-green">
+                                                    {{ $contract['name']  }}
+                                                </div>
+                                            @endforeach
                                         @elseif ($field->field === 'photo')
                                             @if(Storage::disk('public')->exists($el[$field->field]) && $el[$field->field] !== '<' && $el[$field->field] !== '>')
                                                 <a href="{{ Storage::url($el[$field->field]) }}"

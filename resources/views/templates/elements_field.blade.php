@@ -89,6 +89,12 @@
         $key = $v['getFieldKey'] ?? 'id';
         $value = $v['getField'] ?? 'name';
     @endphp
+    @php
+    //if($v['label'] == 'Компания'){
+    //        dd($v, app("App\\" . $v['values'])::whereIn($key, $default_value)->get()->toArray(), $key, $default_value);
+//
+    //}
+    @endphp
     <select
         @isset($v['saveToHistory'])
             onchange="addFieldToHistory(event.target.value, '{{ $v['label'] }}');"
@@ -135,7 +141,7 @@
                     {{ $option[$value] }}
                 </option>
             @endforeach
-            @foreach(app("App\\" . $v['values'])::whereNotIn($key, $default_value)->limit(100)->get() as $option)
+            @foreach(app("App\\" . $v['values'])::whereNotIn($key, $default_value)->get() as $option)
                 <option value="{{ $option[$key] }}">
                     {{ $option[$value] }}
                 </option>
