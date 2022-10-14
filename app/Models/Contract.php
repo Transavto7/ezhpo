@@ -17,23 +17,25 @@ class Contract extends Model
 
     protected $table = 'contracts';
 
-    protected $casts = [
-        'date_of_end' => 'datetime:d.m.Y'
-    ];
+    protected $casts
+        = [
+            'date_of_end' => 'datetime:d.m.Y',
+        ];
 
     protected $guarded = [];
 
-    public static $types = [
-        1 => 'Абонентская плата',
-        2 => 'Разовая',
-    ];
+    public static $types
+        = [
+            1 => 'Абонентская плата',
+            2 => 'Разовая',
+        ];
 
     // main contract for company
-    function scopeMainForCompany($query, $contract_id)
+    public static function mainForCompany($contract_id)
     {
-        return $query->where('company_id', $contract_id)
-                     ->orderBy("main_for_company",'DESC')
-                     ->first();
+        return self::where('company_id', $contract_id)
+                   ->orderBy("main_for_company", 'DESC')
+                   ->first();
     }
 
     public function deleted_user()
@@ -76,11 +78,13 @@ class Contract extends Model
     {
         $this->deleted_id = user()->id;
         $this->save();
+
         return parent::delete();
     }
 
 
-    public static function startContract(){
+    public static function startContract()
+    {
 //        FieldPrompt::where('field', 'products_id')->where('type', 'company')->delete();
 //        FieldPrompt::where('field', 'products_id')->where('type', 'car')->delete();
 //        FieldPrompt::where('field', 'products_id')->where('type', 'driver')->delete();
@@ -101,8 +105,8 @@ class Contract extends Model
 //        ]);
         FieldPrompt::create([
             'field' => 'contracts',
-            'type' => 'company',
-            'name' => 'Договор',
+            'type'  => 'company',
+            'name'  => 'Договор',
         ]);
 
 
@@ -153,7 +157,6 @@ class Contract extends Model
 //                'contract_id' => $contract->id
 //            ]);
 //        }
-
 
 
         return true;
