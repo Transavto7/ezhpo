@@ -19,8 +19,9 @@ class VSelect
         return response(
             Company::where('name', 'like', "%$query%")
                    ->orWhere('hash_id', 'like', "%$query%")
+                   ->orWhere('inn', 'like', "%$query%")
 //                   ->selectRaw("CONCAT(name, ' [', hash_id, ']') as label, id as key")
-                   ->selectRaw("CONCAT(name, ' [', hash_id, ']') as name, id")
+                   ->selectRaw("CONCAT(name, ' [h_ID:', hash_id, '][ИНН:', COALESCE(inn, ''), ']') as name, id")
                    ->limit(10)
                    ->get()
         );
@@ -32,11 +33,11 @@ class VSelect
 
         return response(
             Req::where('name', 'like', "%$query%")
-                   ->orWhere('hash_id', 'like', "%$query%")
-//                   ->selectRaw("CONCAT(name, ' [', hash_id, ']') as label, id as key")
-                   ->selectRaw("CONCAT(name, ' [', hash_id, ']') as name, id")
-                   ->limit(10)
-                   ->get()
+               ->orWhere('inn', 'like', "%$query%")
+               ->orWhere('hash_id', 'like', "%$query%")
+               ->selectRaw("CONCAT(name, ' [h_ID', hash_id, '][ИНН:', COALESCE(inn, ''), ']') as name, id")
+               ->limit(10)
+               ->get()
         );
     }
 
@@ -72,10 +73,10 @@ class VSelect
 
         return response(
             Service::where('name', 'like', "%$query%")
-                  ->orWhere('hash_id', 'like', "%$query%")
-                  ->selectRaw("CONCAT(name, ' [', hash_id, ']') as name, id, price_unit")
-                  ->limit(10)
-                  ->get()
+                   ->orWhere('hash_id', 'like', "%$query%")
+                   ->selectRaw("CONCAT(name, ' [', hash_id, ']') as name, id, price_unit")
+                   ->limit(10)
+                   ->get()
         );
     }
 }
