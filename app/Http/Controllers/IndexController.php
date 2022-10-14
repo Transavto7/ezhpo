@@ -424,7 +424,7 @@ class IndexController extends Controller
                     //                        ],
                     //                    ],
                     'contracts' => [
-                        'label'    => 'Услуги',
+                        'label'    => 'Договор',
                         'multiple' => 1,
                         'type'     => 'select',
                         'values'   => 'Models\Service',

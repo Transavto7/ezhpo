@@ -397,6 +397,8 @@ $(document).ready(function () {
 
             $(`#${dbItemId}`).html('<b class="text-info">Загружаем данные...</b>')
 
+            console.log(data)
+            console.log(fieldsValues)
             /**
              * Вставляем поля
              */
@@ -413,27 +415,39 @@ $(document).ready(function () {
                        if(isBlocked === ''){
                            otherHtmlItems = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
                        }
-                       if(i == 'contract_id'){
+                       if(i === 'contract_id' || i === 'contracts'){
                            fvItem['type'] = 'text';
                        }
 
-                       if(fvItem['type'] == 'select') {
-                            await API_CONTROLLER.getFieldHTML({ field: i, model, default_value: encodeURIComponent(data[i]) }).then(response => {
-                                field = response.data
-                            })
-                        } else {
-                           if(i === 'note') {
-                               field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${(data[i] ? data[i] : '').trim()}</textarea>`
-                           } else if(i === 'photo') {
-                               otherHtmlItems = ''
+                       if(i === 'contract_id'){
+                           field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${(data['contract']['name'] ? data['contract']['name'] : '').trim()}</textarea>`
+                       }else if(i === 'contracts'){
+                           let text_contract = '';
+                           data['contracts'].map((item) => {
+                               text_contract += item.name + "\n";
+                           })
 
-                               if(data[i]) {
-                                   field = `<img src="/storage/${data[i]}" width="60%" />`
-                               }
+                           field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${text_contract}</textarea>`
+
+                       }else{
+                           if(fvItem['type'] === 'select') {
+                               await API_CONTROLLER.getFieldHTML({ field: i, model, default_value: encodeURIComponent(data[i]) }).then(response => {
+                                   field = response.data
+                               })
                            } else {
-                               field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${data[i] ? data[i] : ''}' name="${i}" />`
+                               if(i === 'note') {
+                                   field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${(data[i] ? data[i] : '').trim()}</textarea>`
+                               } else if(i === 'photo') {
+                                   otherHtmlItems = ''
+
+                                   if(data[i]) {
+                                       field = `<img src="/storage/${data[i]}" width="60%" />`
+                                   }
+                               } else {
+                                   field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${data[i] ? data[i] : ''}' name="${i}" />`
+                               }
                            }
-                        }
+                       }
 
                        msg += `
                         <p style="${i === 'dismissed' ? data[i].toUpperCase() === 'ДА' ? 'color: red; font-weight: bold;' : '' : ''}" data-field-card="${model}_${i}" class="text-small m-0">${fvItem.label}:<br/>

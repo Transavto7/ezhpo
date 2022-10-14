@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Car;
 use App\Company;
+use App\Driver;
 use App\Req;
 use App\User;
 use Carbon\Carbon;
@@ -129,6 +131,7 @@ class ApiController extends Controller
             'old_id', 'req_id', 'inn',
             'date_bdd',
             'date_report_driver',
+            'contracts',
             'contract_id'
         ];
 
@@ -139,8 +142,14 @@ class ApiController extends Controller
         if(isset($models[$model]) && !empty($val)) {
             $_model = $models[$model];
             $data = app($_model['model']);
-            $fields = $data->fillable;
-            array_push($fields, 'id');
+
+            if ($_model['model'] == Company::class){
+                $data = $data::with(['contracts']);
+            }elseif($_model['model'] == Driver::class || $_model['model'] == Car::class){
+                $data = $data::with(['contract']);
+            }
+//            $fields = $data->fillable;
+//            array_push($fields, 'id');
 
             /**
              * Контроль дат
@@ -150,14 +159,14 @@ class ApiController extends Controller
             /**
              * Фильтрация полей
              */
-            $fields = array_filter($fields, function ($item) use ($deleteImportantFields) {
-                return !in_array($item, $deleteImportantFields);
-            });
+//            $fields = array_filter($fields, function ($item) use ($deleteImportantFields) {
+//                return !in_array($item, $deleteImportantFields);
+//            });
 
             $fieldsValues = new IndexController();
             $fieldsValues = $fieldsValues->elements[$model]['fields'];
 
-            $data = $data->where($prop, $val)->get($fields)->first();
+            $data = $data->where($prop, $val)->get()->first();
 
             if(isset($data)) {
                 $data_exists = $data->count() > 0;
