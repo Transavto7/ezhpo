@@ -453,9 +453,11 @@
                                 {{ $field->name }}
                             </span>
 
-                            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field . $queryString }}">
-                                <i class="fa fa-sort"></i>
-                            </a>
+                            @if($field->field !== 'contracts' && $field->field !== 'contract')
+                                <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field . $queryString }}">
+                                    <i class="fa fa-sort"></i>
+                                </a>
+                            @endif
                         </th>
                     @endforeach
 
