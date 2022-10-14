@@ -1094,7 +1094,7 @@ class IndexController extends Controller
 
                         Car::where('company_id', $element->id)
                            ->where(function ($q){
-                               $q->whereNull('contract_id')
+                               $q->whereDoesntHave('contract')
                                  ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
                            })
                            ->update([
@@ -1103,7 +1103,7 @@ class IndexController extends Controller
 
                         Driver::where('company_id', $element->id)
                               ->where(function ($q){
-                                  $q->whereNull('contract_id')
+                                  $q->whereDoesntHave('contract')
                                     ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
                               })
                               ->update([
@@ -1112,7 +1112,7 @@ class IndexController extends Controller
                     }else{
                         Car::where('company_id', $element->id)
                            ->where(function ($q){
-                               $q->whereNull('contract_id')
+                               $q->whereDoesntHave('contract')
                                  ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
                            })
                            ->update([
@@ -1121,7 +1121,7 @@ class IndexController extends Controller
 
                         Driver::where('company_id', $element->id)
                               ->where(function ($q){
-                                  $q->whereNull('contract_id')
+                                  $q->whereDoesntHave('contract')
                                     ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
                               })
                               ->update([

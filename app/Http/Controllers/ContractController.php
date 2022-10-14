@@ -119,12 +119,12 @@ class ContractController extends Controller
 
         if ($data_to_save['company']['id'] ?? false) {
             Car::where('company_id', $data_to_save['company']['id'])
-               ->whereNull('contract_id')
+               ->whereDoesntHave('contract')
                ->update([
                    'contract_id' => $contract->id,
                ]);
             Driver::where('company_id', $data_to_save['company']['id'])
-                  ->whereNull('contract_id')
+                  ->whereDoesntHave('contract')
                   ->update([
                       'contract_id' => $contract->id,
                   ]);
@@ -213,12 +213,12 @@ class ContractController extends Controller
 
         if ($data_to_save['company']['id'] ?? false) {
             Car::where('company_id', $data_to_save['company']['id'])
-               ->whereNull('contract_id')
+               ->whereDoesntHave('contract')
                ->update([
                    'contract_id' => $contract->id,
                ]);
             Driver::where('company_id', $data_to_save['company']['id'])
-                  ->whereNull('contract_id')
+                  ->whereDoesntHave('contract')
                   ->update([
                       'contract_id' => $contract->id,
                   ]);
