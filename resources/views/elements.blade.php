@@ -372,6 +372,9 @@
                         <hr>
                         <div class="row">
                             @foreach($fields as $fk => $fv)
+                                @if($fk == 'contract' || $fk == 'contract_id' || $fk == 'contracts')
+                                    @continue
+                                @endif
                                 @php $fv['multiple'] = true; @endphp
 
                                 @if(!in_array($fk, ['photo']) && !isset($fv['hidden']))
@@ -453,7 +456,7 @@
                                 {{ $field->name }}
                             </span>
 
-                            @if($field->field !== 'contracts' && $field->field !== 'contract')
+                            @if($field->field !== 'contracts' && $field->field !== 'contract' && $field->field !== 'contract_id')
                                 <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field . $queryString }}">
                                     <i class="fa fa-sort"></i>
                                 </a>
