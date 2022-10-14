@@ -369,7 +369,21 @@ class AnketsController extends Controller
         $anketa->save();
 
 
-        // ДОГОВОР СНЕПШОТ
+        // ДОГОВОР СНЕПШОТ update
+        if($type_anketa == 'medic'){
+            if(isset($driver)){
+                $anketa->update([
+                          'contract_id' => $driver->contract_id
+                      ]);
+            }
+        }
+        if($type_anketa == 'tech'){
+            if(isset($car)){
+                $anketa->update([
+                          'contract_id' => $car->contract_id
+                      ]);
+            }
+        }
 //        $anketa = Anketa::with(['car', 'contract','contract_snapshot', 'company', 'driver'])->find($anketa->id);
 //        if($type_anketa === 'tech' || $type_anketa === 'medic'){
 //            if($type_anketa === 'tech'){
@@ -1127,8 +1141,28 @@ class AnketsController extends Controller
                 ->limit(count($createdAnketas))->orderBy('id', 'desc')->get();
 
 
-            // ДОГОВОР СНЕПШОТ
+            // ДОГОВОР СНЕПШОТ create
             $type_anketa = $data['type_anketa'];
+            if($type_anketa == 'medic'){
+                if($Driver){
+                    Anketa::where('type_anketa', $data['type_anketa'])
+                          ->limit(count($createdAnketas))
+                          ->orderBy('id', 'desc')
+                          ->update([
+                              'contract_id' => $Driver->contract_id
+                          ]);
+                }
+            }
+            if($type_anketa == 'tech'){
+                if($Car){
+                    Anketa::where('type_anketa', $data['type_anketa'])
+                          ->limit(count($createdAnketas))
+                          ->orderBy('id', 'desc')
+                          ->update([
+                              'contract_id' => $Car->contract_id
+                          ]);
+                }
+            }
 
 //            if($type_anketa === 'tech' || $type_anketa === 'medic'){
 //
