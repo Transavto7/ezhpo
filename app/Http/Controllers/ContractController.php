@@ -110,11 +110,11 @@ class ContractController extends Controller
 
         $contract = Contract::create([
             'name'             => $data_to_save['name'] ?? null,
-            'date_of_end'      => $data_to_save['date_of_end'] ? Carbon::parse($data_to_save['date_of_end']) : null,
+            'date_of_end'      => isset($data_to_save['date_of_end']) ? Carbon::parse($data_to_save['date_of_end']) : null,
             'sum'              => $data_to_save['sum'] ?? null,
             'company_id'       => $data_to_save['company']['id'] ?? null,
             'our_company_id'   => $data_to_save['our_company']['id'] ?? null,
-            'main_for_company' => $data_to_save['main_for_company'] ?? null,
+            'main_for_company' => $data_to_save['main_for_company'] ?? 0,
         ]);
 
         if ($data_to_save['company']['id'] ?? false) {
@@ -202,11 +202,11 @@ class ContractController extends Controller
         }
         $contract->update([
             'name'             => $data_to_save['name'] ?? null,
-            'date_of_end'      => $data_to_save['date_of_end'] ? Carbon::parse($data_to_save['date_of_end']) : null,
+            'date_of_end'      => isset($data_to_save['date_of_end']) ? Carbon::parse($data_to_save['date_of_end']) : null,
             'sum'              => $data_to_save['sum'] ?? null,
             'company_id'       => $data_to_save['company']['id'] ?? null,
             'our_company_id'   => $data_to_save['our_company']['id'] ?? null,
-            'main_for_company' => $data_to_save['main_for_company'] ?? false,
+            'main_for_company' => $data_to_save['main_for_company'] ?? 0,
         ]);
 
         $contract->services()->sync($servicesToSync);
