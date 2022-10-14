@@ -20,11 +20,11 @@
 
 
         <template #cell(services)="row">
-            <h5 v-for="service in row.value">
+            <h2 v-for="service in row.value">
                 <span class="badge badge-success">
                     {{ service.name }}
                 </span>
-            </h5>
+            </h2>
         </template>
         <template #cell(date_of_end)="row">
             {{ row.value ? new Date(row.value).toLocaleDateString("ru-RU") : '' }}

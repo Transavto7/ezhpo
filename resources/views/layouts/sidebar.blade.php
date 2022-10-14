@@ -9,10 +9,12 @@
     <div class="sidebar-header d-flex align-items-center">
         <div class="title">
             <article>
-                @foreach(user()->roles()->get() as $role)
-                    <div class="badge badge-rounded bg-green">
-                        {{ $role->guard_name }}
-                    </div>
+                @foreach(user()->roles as $role)
+                    <h3>
+                        <span class="badge badge-success">
+                            {{ $role->guard_name }}
+                        </span>
+                    </h3>
                 @endforeach
             </article>
         </div>

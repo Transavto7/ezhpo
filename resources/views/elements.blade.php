@@ -556,9 +556,11 @@
                                             {{ $el['contract']['name']  }}
                                         @elseif ( $field->field === 'contracts')
                                             @foreach($el[$field->field] as $contract)
-                                                <div class="badge badge-rounded bg-green">
-                                                    {{ $contract['name']  }}
-                                                </div>
+                                                <h3>
+                                                    <span class="badge badge-success">
+                                                        {{ $contract['name']  }}
+                                                    </span>
+                                                </h3>
                                             @endforeach
                                         @elseif ($field->field === 'photo')
                                             @if(Storage::disk('public')->exists($el[$field->field]) && $el[$field->field] !== '<' && $el[$field->field] !== '>')
