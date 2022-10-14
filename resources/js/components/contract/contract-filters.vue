@@ -1,21 +1,255 @@
 <template>
-<div class="">
-    <b-button variant="success" @click="$emit('create_new')">Создать</b-button>
-</div>
+    <div class="">
+        <b-row>
+            <b-col class="d-flex align-items-center col-lg-3">
+                <b-button class="m-1" variant="success" @click="$emit('create_new')">Создать</b-button>
+            </b-col>
+        </b-row>
+
+        <div class="card" style="overflow-x: inherit">
+            <div class="card-body">
+                <div class="row">
+                    <div class="d-flex align-items-center col-lg-3">
+                        <b-form-group label="ID договора" v-slot="{ ariaDescribedby }" class="w-100">
+                            <b-form-input
+                                v-model="filters.id"
+                                placeholder="Введите ID договора"
+                            ></b-form-input>
+                        </b-form-group>
+                    </div>
+                    <div class="d-flex align-items-center col-lg-3">
+                        <b-form-group label="Название" v-slot="{ ariaDescribedby }" class="w-100">
+                            <b-form-input
+                                v-model="filters.name"
+                                placeholder="Введите название"
+                            ></b-form-input>
+                        </b-form-group>
+                    </div>
+                    <div class="d-flex align-items-center col-lg-3">
+                        <b-form-group label="Услуги" v-slot="{ ariaDescribedby }" class="w-100">
+                            <v-select
+                                v-model="filters.service_id"
+                                :options="services"
+                                key="id"
+                                label="name"
+                                @search="searchServices"
+                                placeholder="Выберите услуги"
+                                :reduce="item => item.id"
+                            >
+                            </v-select>
+                        </b-form-group>
+                    </div>
+
+                    <div class="d-flex align-items-center col-lg-3">
+                        <b-form-group label="Компания" v-slot="{ ariaDescribedby }" class="w-100">
+                            <v-select
+                                v-model="filters.company_id"
+                                :options="companies"
+                                @search="searchCompanies"
+                                placeholder="Выберите компанию"
+                                :reduce="companies => companies.id"
+                                label="name"
+                            >
+                            </v-select>
+                        </b-form-group>
+                    </div>
+                    <div class="d-flex align-items-center col-lg-3">
+                        <b-form-group label="Выберите нашу компанию" v-slot="{ ariaDescribedby }" class="w-100">
+                            <v-select
+                                v-model="filters.our_company_id"
+                                :options="our_companies"
+                                key="id"
+                                label="name"
+                                @search="searchOurCompanies"
+                                placeholder="Выберите нашу компанию"
+                                :reduce="item => item.id"
+                            >
+                            </v-select>
+                        </b-form-group>
+                    </div>
+                    <div class="d-flex align-items-center col-lg-3">
+                        <b-form-group label="Главный" v-slot="{ ariaDescribedby }" class="w-100">
+                            <b-form-radio v-model="filters.main_for_company" :aria-describedby="ariaDescribedby"
+                                          name="some-radios"
+                                          :value="null">Все
+                            </b-form-radio>
+                            <b-form-radio v-model="filters.main_for_company" :aria-describedby="ariaDescribedby"
+                                          name="some-radios"
+                                          :value="1">Главный
+                            </b-form-radio>
+                            <b-form-radio v-model="filters.main_for_company" :aria-describedby="ariaDescribedby"
+                                          name="some-radios"
+                                          :value="0">Не главный
+                            </b-form-radio>
+                        </b-form-group>
+                    </div>
+                    <div class="d-flex align-items-center col-lg-3">
+                        <b-form-group label="Время окончания договора от" v-slot="{ ariaDescribedby }" class="w-100">
+                            <b-form-datepicker id="date_of_end_start" v-model="filters.date_of_end_start"
+                                               placeholder="Укажите дату"
+                                               reset-button
+                                               close-button
+                                               label-reset-button="Сбросить"
+                                               label-close-button="Закрыть"
+                                               class="mb-2"></b-form-datepicker>
+                        </b-form-group>
+                    </div>
+                    <div class="d-flex align-items-center col-lg-3">
+                        <b-form-group label="Время окончания договора до" v-slot="{ ariaDescribedby }" class="w-100">
+                            <b-form-datepicker id="date_of_end_end" v-model="filters.date_of_end_end"
+                                               placeholder="Укажите дату"
+                                               reset-button
+                                               close-button
+                                               label-reset-button="Сбросить"
+                                               label-close-button="Закрыть"
+                                               class="mb-2"></b-form-datepicker>
+                        </b-form-group>
+                    </div>
+                    <div class="d-flex align-items-center col-lg-3">
+                        <b-button
+                            variant="info"
+                            @click="search"
+                            class="m-1"
+                        >
+                            Поиск
+                        </b-button>
+                        <b-button
+                            variant="danger"
+                            @click="reset_filters"
+                            class="m-1"
+                        >
+                            Сброс фильтров
+                        </b-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
+import vSelect from "vue-select";
+import 'vue-select/dist/vue-select.css';
+import Swal2 from "sweetalert2";
+
 export default {
     name: "contract-filters",
-    props: ['change_filters'],
+    // props: ['change_filters'],
+    components: {
+        vSelect,
+        Swal2,
+    },
 
-    data(){
+    data() {
         return {
+            filters: {},
 
+            services:      [],
+            companies:     [],
+            our_companies: [],
         }
     },
-    methods:{
-    }
+    mounted() {
+        axios.get(`/v-search/companies`).then(({data}) => this.companies = data)
+            .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
+        axios.get(`/v-search/our_companies`).then(({data}) => this.our_companies = data)
+            .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
+        axios.get(`/v-search/services`)
+            .then(({data}) => this.services = data)
+            .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
+    },
+    methods: {
+        search() {
+            this.$emit('change_filters', this.filters);
+        },
+        reset_filters() {
+            this.filters = {};
+        },
+        searchCompanies(value, loading) {
+            loading(true);
+
+            // this.companies = [];
+            // this.companies.fil
+            axios
+                .get(`/v-search/companies`, {
+                    params: {
+                        query: value,
+                    },
+                })
+                .then(({data}) => {
+                    data.map((item) => {
+                        if (
+                            this.filters.company_id !== item.id
+                            && !this.companies.filter((company_option) => {
+                                return company_option.id == item.id
+                            }).length
+                        ) {
+                            this.companies.push(item);
+                        }
+                    })
+                    loading(false);
+                })
+                .catch((err) => {
+                    //Ошибка
+                    Swal2.fire('Ошибка!', '', 'warning');
+                    loading(false);
+                });
+        },
+        searchOurCompanies(value, loading) {
+            loading(true);
+
+            axios.get(`/v-search/our_companies`, {
+                params: {
+                    query: value,
+                },
+            })
+                .then(({data}) => {
+                    data.map((item) => {
+                        if (
+                            this.filters.our_company_id !== item.id
+                            && !this.our_companies.filter((our_company_option) => {
+                                return our_company_option.id == item.id
+                            }).length
+                        ) {
+                            this.our_companies.push(item);
+                        }
+                    })
+                    loading(false);
+                })
+                .catch((err) => {
+                    //Ошибка
+                    Swal2.fire('Ошибка!', '', 'warning');
+                    loading(false);
+                });
+        },
+        searchServices(value, loading) {
+            loading(true);
+
+            axios.get(`/v-search/services`, {
+                params: {
+                    query: value,
+                },
+            })
+                .then(({data}) => {
+                    data.map((item) => {
+                        if (
+                            this.filters.service_id !== item.id
+                            && !this.services.filter((service_option) => {
+                                return service_option.id == item.id
+                            }).length
+                        ) {
+                            this.services.push(item);
+                        }
+                    })
+                    loading(false);
+                })
+                .catch((err) => {
+                    //Ошибка
+                    Swal2.fire('Ошибка!', '', 'warning');
+                    loading(false);
+                });
+        },
+    },
 }
 </script>
 

@@ -270,14 +270,14 @@ class ReportController extends Controller
                 if ($d_services = $drivers_services
                     ->where('hash_id', $id)
                     ->first()) {
-                    $services = $services
+                    $d_services = $d_services
                         ->contract
                         ->services
 //                        ->pluck('id')
 //                        ->toArray()
                     ;
                 } else {
-                    $d_services = [];
+                    $d_services = collect();
                 }
 
 
@@ -437,7 +437,7 @@ class ReportController extends Controller
 //                        ->toArray()
                     ;
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
 
 
@@ -577,7 +577,7 @@ class ReportController extends Controller
 //                    ->toArray()
                 ;
             } else {
-                $services = [];
+                $services = collect();
             }
 
 //            if ($report->driver_id == null) {
@@ -739,7 +739,7 @@ class ReportController extends Controller
 //                    ->toArray()
                 ;
             } else {
-                $services = [];
+                $services = collect();
             }
 
 //            if ($report->products_id == null) {
@@ -829,7 +829,10 @@ class ReportController extends Controller
         foreach ($drivers as $driver) {
 //            $driverProdsID = explode(',', $driver->products_id);
             $driverProdsID = $driver->contract->services;
-            foreach ($driverProdsID->whereIn('essence', [1, 3]) as $service) {
+            foreach ($driverProdsID->whereIn('essence', [
+                Product::ESSENCE_DRIVER,
+                Product::ESSENCE_CAR_DRIVER
+            ]) as $service) {
                 $result['drivers'][] = [
                     'driver_fio' => $driver->fio,
                     'name'       => $service->name,
@@ -840,7 +843,7 @@ class ReportController extends Controller
 
         foreach ($cars as $car) {
 //            $carProdsID = explode(',', $car->products_id);
-            $carProdsID = $cars->contract->services;
+            $carProdsID = $car->contract->services;
             foreach ($carProdsID->whereIn('essence', [2, 3]) as $service) {
                 $result['cars'][] = [
                     'gos_number' => $car->gos_number,

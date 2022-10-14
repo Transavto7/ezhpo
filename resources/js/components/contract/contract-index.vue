@@ -28,6 +28,47 @@
                 />
             </b-col>
         </b-row>
+        <b-row>
+            <b-col class="my-1">
+                <b-form-group
+                    label="Количество элементов на странице:"
+                    label-for="per-page-select"
+                    label-cols-sm="6"
+                    label-cols-md="4"
+                    label-cols-lg="3"
+                    label-align-sm="right"
+                    label-size="sm"
+                    class="mb-0"
+                >
+                    <b-form-select
+                        id="per-page-select"
+                        v-model="filters.perPage"
+                        :options="pageOptions"
+                        size="sm"
+                        @change="selectPerPage"
+                    ></b-form-select>
+                </b-form-group>
+            </b-col>
+        </b-row>
+        <b-row class="mb-3">
+            <b-col class="my-1">
+                <b-form-group
+                    label-class="font-weight-bold pt-0"
+                    class="mb-0"
+                    disabled
+                >
+                    <b-form-group
+                        label="Всего записей:"
+                        label-for="nested-street"
+                        label-cols-sm="3"
+                        label-align-sm="right"
+                    >
+                        <b-form-input id="nested-street" v-model="total"></b-form-input>
+                    </b-form-group>
+                </b-form-group>
+
+            </b-col>
+        </b-row>
 
         <contract-create
             ref="contractCreate"
@@ -49,11 +90,11 @@ import ContractCreate from "./contract-create";
 import ContractFilters from "./contract-filters";
 
 export default {
-    name: "contract-index",
-    components:  {
+    name:       "contract-index",
+    components: {
         Swal2,
         ContractCreate,
-        ContractFilters
+        ContractFilters,
     },
     data() {
         return {
@@ -74,8 +115,8 @@ export default {
                         label:    "Название",
                     },
                     {
-                        key:      "services",
-                        label:    "Услуги",
+                        key:   "services",
+                        label: "Услуги",
                     },
                     {
                         key:      "company.name",
@@ -83,14 +124,17 @@ export default {
                         label:    "Компания",
                     },
                     {
-                        key:      "company.inn",
-                        sortable: true,
-                        label:    "ИНН",
+                        key:   "company.inn",
+                        label: "ИНН",
                     },
                     {
-                        key:      "our_company.inn",
+                        key:      "our_company.name",
                         sortable: true,
-                        label:    "ИНН",
+                        label:    "Наша компания",
+                    },
+                    {
+                        key:   "our_company.inn",
+                        label: "ИНН нашей компании",
                     },
                     {
                         key:      "main_for_company",
@@ -103,41 +147,36 @@ export default {
                         label:    "Время окончания договора",
                     },
                     {
-                        key:      "buttons",
-                        label:    "#",
-                        class:    "text-center",
+                        key:   "buttons",
+                        label: "#",
+                        class: "text-center",
                     },
                 ],
             },
 
-            filters: {
+            filters:     {
                 sortBy:      'id',
                 sortDesc:    true,
                 currentPage: 1,
-                perPage: 15,
+                perPage:     15,
             },
-            total: 0,
+            total:       0,
+            pageOptions: [15, 100, 500],
         }
     },
     mounted() {
-
         this.loadData()
-        // this.$bvToast.toast('Артикулы были добавлены', {
-        //     title:         `Добавление артикулов`,
-        //     variant:       'success',
-        //     autoHideDelay: 1500,
-        //     appendToast:   true,
-        //     noCloseButton: true,
-        //     solid:         true,
-        // });
     },
     methods: {
         selectPage(page) {
             this.filters.currentPage = page;
-            this.loadData(page);
+            this.loadData();
+        },
+        selectPerPage(perPage) {
+            this.filters.perPage = perPage;
+            this.loadData();
         },
         showCreateModal(data = null) {
-            // console.log(123)
             this.$refs.contractCreate.open(data)
         },
 
@@ -153,6 +192,7 @@ export default {
                     if (data.status) {
                         this.table.items = data.result.contracts
                         this.total = data.result.total;
+                        this.filters.currentPage = data.currentPage;
                     } else {
                         Swal2.fire({title: "Неизвестная ошибка сервера", icon: "error"});
                     }
@@ -160,19 +200,23 @@ export default {
 
                 .catch(error => {
                     Swal2.fire({title: "Неизвестная ошибка", icon: "error"});
-                }).finally(()=>this.busy = false);
+                }).finally(() => this.busy = false);
         },
 
         changeOne() {
 
         },
 
-        changeFilters() {
-            // poka pusto
+        changeFilters(filters) {
+            this.filters.currentPage = 1;
+            for (let filter_key in filters) {
+                this.filters[filter_key] = filters[filter_key];
+            }
+
+            this.loadData();
         },
 
         changeSort(e) {
-            console.log(e)
             this.filters.sortBy = e.sortBy;
             this.filters.sortDesc = e.sortDesc;
             this.loadData();

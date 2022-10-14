@@ -240,6 +240,15 @@ export default {
                 .then(({data}) => {
                     if (data.status) {
                         this.$emit('success');
+
+                        this.$bvToast.toast('Договор добавлен', {
+                            title:         `Добавление договора`,
+                            variant:       'success',
+                            autoHideDelay: 1500,
+                            appendToast:   true,
+                            noCloseButton: true,
+                            solid:         true,
+                        });
                     } else {
                         Swal2.fire('Ошибка!', '', 'warning')
                     }
@@ -250,6 +259,8 @@ export default {
                 .finally(() => {
                     e.target.disabled = false
                     this.show = false
+
+
                 });
         },
         updateContract(e) {
@@ -261,6 +272,15 @@ export default {
                 .then(({data}) => {
                     if (data.status) {
                         this.$emit('success');
+
+                        this.$bvToast.toast('Договор обновлён', {
+                            title:         `Редактирование договора`,
+                            variant:       'success',
+                            autoHideDelay: 1500,
+                            appendToast:   true,
+                            noCloseButton: true,
+                            solid:         true,
+                        });
                     } else {
                         Swal2.fire('Ошибка!', '', 'warning')
                     }
