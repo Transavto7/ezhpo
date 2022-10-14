@@ -995,6 +995,11 @@ class IndexController extends Controller
         $model = app("App\\$model");
 
         if ($model) {
+            if($model instanceof Company){
+                Car::where('company_id', $model->id)->update(['contract_id' => null]);
+                Driver::where('company_id', $model->id)->update(['contract_id' => null]);
+            }
+
             if ($request->get('undo')) {
                 $model::withTrashed()->find($id)->restore();
 
@@ -1085,28 +1090,40 @@ class IndexController extends Controller
                     Contract::whereIn('id', $data['contracts'] ?? [])
                             ->update(['company_id' => $element->id]);
 
-
                     if($mainContract = Contract::mainForCompany($element->id)){
+
                         Car::where('company_id', $element->id)
-                           ->whereNotIn('contract_id', $data['contracts'] ?? [])
+                           ->where(function ($q){
+                               $q->whereNull('contract_id')
+                                 ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+                           })
                            ->update([
                                'contract_id' => $mainContract->id ?? null
                            ]);
 
                         Driver::where('company_id', $element->id)
-                              ->whereNotIn('contract_id', $data['contracts'] ?? [])
+                              ->where(function ($q){
+                                  $q->whereNull('contract_id')
+                                    ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+                              })
                               ->update([
                                   'contract_id' => $mainContract->id ?? null
                               ]);
                     }else{
                         Car::where('company_id', $element->id)
-                           ->whereNotIn('contract_id', $data['contracts'] ?? [])
+                           ->where(function ($q){
+                               $q->whereNull('contract_id')
+                                 ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+                           })
                            ->update([
                                'contract_id' => null
                            ]);
 
                         Driver::where('company_id', $element->id)
-                              ->whereNotIn('contract_id', $data['contracts'] ?? [])
+                              ->where(function ($q){
+                                  $q->whereNull('contract_id')
+                                    ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+                              })
                               ->update([
                                   'contract_id' => null
                               ]);

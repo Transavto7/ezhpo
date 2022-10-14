@@ -33,6 +33,18 @@
 
         <template #cell(buttons)="row">
             <div class="d-flex justify-content-center">
+                <template v-if="trash">
+
+                    <b-button size="sm"
+                              variant="outline-primary"
+                              class="mr-2"
+                              style="border: none"
+                              @click="restoreItem(row.item.id, $event.target)"
+                    >
+                        <i class="fa fa-undo"></i>
+                    </b-button>
+            </template>
+            <template v-else>
                 <b-button size="sm"
                           variant="outline-primary"
                           class="mr-2"
@@ -50,6 +62,7 @@
                 >
                     <b-icon-trash-fill></b-icon-trash-fill>
                 </b-button>
+            </template>
             </div>
         </template>
     </b-table>
@@ -61,7 +74,7 @@ import Swal2 from "sweetalert2";
 
 export default {
     name: "contract-table",
-    props: ['table', 'change_sort', 'busy'],
+    props: ['table', 'change_sort', 'busy', 'trash'],
     mounted() {
     },
     methods:{
@@ -73,6 +86,27 @@ export default {
 
             axios.post(`/contract/` + id, {
                 _method: 'DELETE'
+            })
+                .then(({data}) => {
+                    if (data.status) {
+                        this.$emit('success');
+                    } else {
+                        Swal2.fire('Ошибка!', '', 'warning')
+                    }
+                })
+                .catch((err) => {
+                    Swal2.fire('Ошибка!', '', 'warning');
+                })
+                .finally(() => {
+                    element.disabled = false
+                });
+        },
+
+        restoreItem(id, element) {
+            element.disabled = true
+
+            axios.post(`/contract/restore/` + id, {
+                _method: 'PUT'
             })
                 .then(({data}) => {
                     if (data.status) {

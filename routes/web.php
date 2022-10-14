@@ -102,6 +102,8 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('contract')->group(function () {
         Route::get('/', 'ContractController@view');
 
+        Route::put('/restore/{id}', 'ContractController@restore');
+
         Route::get('/index', 'ContractController@index');
 
         Route::get('/getOne', 'ContractController@getOne');

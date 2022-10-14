@@ -46,6 +46,9 @@ class ContractController extends Controller
             $contracts->orderBy($filters['sortBy'], $filters['sortDesc'] == 'true' ? 'DESC' : 'ASC');
         }
 
+        if($filters['trash'] ?? false){
+            $contracts->onlyTrashed();
+        }
         if ($filters['id'] ?? false) {
             $contracts->where('id', 'like', "%{$filters['id']}%");
         }
@@ -240,6 +243,13 @@ class ContractController extends Controller
         return response([
             'status'   => true,
             'contract' => Contract::find($id)->delete(),
+        ]);
+    }
+    public function restore($id, Request $request)
+    {
+        return response([
+            'status'   => true,
+            'contract' => Contract::withTrashed()->find($id)->restore(),
         ]);
     }
 

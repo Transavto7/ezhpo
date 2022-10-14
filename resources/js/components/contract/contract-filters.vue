@@ -3,6 +3,10 @@
         <b-row>
             <b-col class="d-flex align-items-center col-lg-3">
                 <b-button class="m-1" variant="success" @click="$emit('create_new')">Создать</b-button>
+                <b-button class="m-1" variant="warning" @click="$emit('view_trash_toggle')">
+                    {{ trash ? 'Назад' : 'Корзина' }}
+                    <i v-if="!trash" class="fa fa-trash"></i>
+                </b-button>
             </b-col>
         </b-row>
 
@@ -134,7 +138,7 @@ import Swal2 from "sweetalert2";
 
 export default {
     name: "contract-filters",
-    // props: ['change_filters'],
+    props: ['trash'],
     components: {
         vSelect,
         Swal2,

@@ -4,7 +4,9 @@
         <contract-filters
             v-on:change_filters="changeFilters"
             ref="contractFilters"
+            :trash="trash"
             v-on:create_new="showCreateModal"
+            v-on:view_trash_toggle="toggleTrash"
         >
         </contract-filters>
 
@@ -12,6 +14,7 @@
         <contract-table
             :table="table"
             :busy="busy"
+            :trash="trash"
             v-on:change_sort="changeSort"
             ref="contractTable"
             v-on:update_data="showCreateModal"
@@ -119,6 +122,8 @@ export default {
     },
     data() {
         return {
+            trash: 0,
+
             busy: false,
             user: null,
 
@@ -189,6 +194,10 @@ export default {
         this.loadData()
     },
     methods: {
+        toggleTrash() {
+            this.trash = this.trash ? 0 : 1;
+            this.loadData();
+        },
         selectPage(page = 1) {
             this.filters.currentPage = page;
             this.loadData();
@@ -221,6 +230,8 @@ export default {
             let data = {
                 params: this.filters,
             };
+            data.params.trash = this.trash;
+
             console.log(data)
             axios.get("/contract/index", data)
                 .then(({data}) => {
