@@ -1,5 +1,6 @@
 <template>
     <div class="">
+        <!-- filters -->
         <contract-filters
             v-on:change_filters="changeFilters"
             ref="contractFilters"
@@ -7,6 +8,7 @@
         >
         </contract-filters>
 
+        <!-- table -->
         <contract-table
             :table="table"
             :busy="busy"
@@ -17,17 +19,34 @@
         >
         </contract-table>
 
+        <!-- paginator/ -->
         <b-row class="w-100 d-flex justify-content-center" v-if="total > 1">
-            <b-col class="my-1 d-flex justify-content-center">
-                <b-pagination
-                    :total-rows="total"
-                    :per-page="filters.perPage"
-                    v-model="filters.currentPage"
-                    class="my-0"
-                    @change="selectPage"
-                />
+<!--            <b-col class="my-1 d-flex justify-content-center">-->
+            <b-col class="my-1">
+                <b-form-group
+                    label="Выберите страницу:"
+                    label-for="paginate_filters"
+                    label-cols-sm="6"
+                    label-cols-md="4"
+                    label-cols-lg="3"
+                    label-align-sm="right"
+                    content-cols="4"
+                    label-size="sm"
+                    class="mb-0"
+                >
+                    <b-pagination
+                        id="paginate_filters"
+                        :total-rows="total"
+                        :per-page="filters.perPage"
+                        v-model="filters.currentPage"
+                        class="my-0 mx-2"
+                        @change="selectPage"
+                    />
+                </b-form-group>
             </b-col>
         </b-row>
+
+        <!-- perPage -->
         <b-row>
             <b-col class="my-1">
                 <b-form-group
@@ -37,6 +56,7 @@
                     label-cols-md="4"
                     label-cols-lg="3"
                     label-align-sm="right"
+                    content-cols="4"
                     label-size="sm"
                     class="mb-0"
                 >
@@ -44,12 +64,15 @@
                         id="per-page-select"
                         v-model="filters.perPage"
                         :options="pageOptions"
+                        label-cols="4"
                         size="sm"
                         @change="selectPerPage"
                     ></b-form-select>
                 </b-form-group>
             </b-col>
         </b-row>
+
+        <!-- totalRow -->
         <b-row class="mb-3">
             <b-col class="my-1">
                 <b-form-group
@@ -60,7 +83,9 @@
                     <b-form-group
                         label="Всего записей:"
                         label-for="nested-street"
+                        label-cols="4"
                         label-cols-sm="3"
+                        content-cols="4"
                         label-align-sm="right"
                     >
                         <b-form-input id="nested-street" v-model="total"></b-form-input>
@@ -70,17 +95,13 @@
             </b-col>
         </b-row>
 
+
+        <!-- create/update contracts -->
         <contract-create
             ref="contractCreate"
             v-on:success="loadData"
         >
         </contract-create>
-
-        <!--    <contract-update-->
-        <!--        :change_one="changeOne"-->
-        <!--        ref="contract-update"-->
-        <!--    >-->
-        <!--    </contract-update>-->
     </div>
 </template>
 
@@ -168,14 +189,29 @@ export default {
         this.loadData()
     },
     methods: {
-        selectPage(page) {
+        selectPage(page = 1) {
             this.filters.currentPage = page;
             this.loadData();
         },
-        selectPerPage(perPage) {
+        selectPerPage(perPage = 15) {
             this.filters.perPage = perPage;
             this.loadData();
         },
+        changeSort(e) {
+            this.filters.sortBy = e.sortBy;
+            this.filters.sortDesc = e.sortDesc;
+            this.loadData();
+        },
+        changeFilters(filters) {
+            this.filters.currentPage = 1;
+            console.log(filters)
+            for (let filter_key in filters) {
+                this.filters[filter_key] = filters[filter_key];
+            }
+
+            this.loadData();
+        },
+
         showCreateModal(data = null) {
             this.$refs.contractCreate.open(data)
         },
@@ -192,7 +228,7 @@ export default {
                     if (data.status) {
                         this.table.items = data.result.contracts
                         this.total = data.result.total;
-                        this.filters.currentPage = data.currentPage;
+                        this.filters.currentPage = data.result.currentPage;
                     } else {
                         Swal2.fire({title: "Неизвестная ошибка сервера", icon: "error"});
                     }
@@ -203,24 +239,7 @@ export default {
                 }).finally(() => this.busy = false);
         },
 
-        changeOne() {
 
-        },
-
-        changeFilters(filters) {
-            this.filters.currentPage = 1;
-            for (let filter_key in filters) {
-                this.filters[filter_key] = filters[filter_key];
-            }
-
-            this.loadData();
-        },
-
-        changeSort(e) {
-            this.filters.sortBy = e.sortBy;
-            this.filters.sortDesc = e.sortDesc;
-            this.loadData();
-        },
     },
 }
 </script>
