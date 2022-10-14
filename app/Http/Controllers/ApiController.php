@@ -128,7 +128,8 @@ class ApiController extends Controller
         $blockedFields = [
             'old_id', 'req_id', 'inn',
             'date_bdd',
-            'date_report_driver'
+            'date_report_driver',
+            'contract_id'
         ];
 
         $deleteImportantFields = [
