@@ -1098,6 +1098,18 @@ class IndexController extends Controller
                               ->update([
                                   'contract_id' => $mainContract->id ?? null
                               ]);
+                    }else{
+                        Car::where('company_id', $element->id)
+                           ->whereNotIn('contract_id', $data['contracts'] ?? [])
+                           ->update([
+                               'contract_id' => null
+                           ]);
+
+                        Driver::where('company_id', $element->id)
+                              ->whereNotIn('contract_id', $data['contracts'] ?? [])
+                              ->update([
+                                  'contract_id' => null
+                              ]);
                     }
                 }
                 // (driver && car) =>
@@ -1109,6 +1121,10 @@ class IndexController extends Controller
                         if($mainContract = Contract::mainForCompany($data['company_id'])){
                             Driver::where('id', $element->id)->update([
                                 'contract_id' => $mainContract->id ?? null
+                            ]);
+                        }else{
+                            Driver::where('id', $element->id)->update([
+                                'contract_id' => null
                             ]);
                         }
                     }else{
@@ -1122,11 +1138,15 @@ class IndexController extends Controller
                         $data['company_id'] != $element->company_id
                         && !$data['contract_id']
                     ){
-                        $mainContract = Contract::mainForCompany($data['company_id']);
-
-                        Car::where('id', $element->id)->update([
-                            'contract_id' => $mainContract->id ?? null
-                        ]);
+                        if($mainContract = Contract::mainForCompany($data['company_id'])){
+                            Car::where('id', $element->id)->update([
+                                'contract_id' => $mainContract->id ?? null
+                            ]);
+                        }else{
+                            Car::where('id', $element->id)->update([
+                                'contract_id' => null
+                            ]);
+                        }
                     }else{
                         Car::where('id', $element->id)->update([
                             'contract_id' => $data['contract_id'] ?? null
