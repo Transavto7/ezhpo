@@ -33,7 +33,7 @@ class Contract extends Model
     // main contract for company/ ppizdec tyt zapros ebanii.. sorry
     public static function mainForCompany($company_id)
     {
-        $NORMAL_FUCKING_ID_FOR_COMPANY = Company::where('hash_id', $company_id)->limit(1)->get(['id'])[0]->id;
+        $NORMAL_FUCKING_ID_FOR_COMPANY = Company::where('hash_id', $company_id)->first()->id;
         return self::where('company_id', $NORMAL_FUCKING_ID_FOR_COMPANY)
                    ->orderBy("main_for_company", 'DESC')
                    ->first();
