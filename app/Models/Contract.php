@@ -19,7 +19,7 @@ class Contract extends Model
 
     protected $casts
         = [
-            'date_of_end' => 'datetime:d.m.Y',
+            'date_of_end' => 'datetime', // :d.m.Y
         ];
 
     protected $guarded = [];

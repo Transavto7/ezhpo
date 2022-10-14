@@ -166,7 +166,7 @@ export default {
         return {
             show: false,
             // v-selects
-            companies: [],
+            companies:     [],
             our_companies: [],
             // cars:        [],
             // drivers:     [],
@@ -176,23 +176,23 @@ export default {
             contractData: {
                 id:          null,
                 name:        null,
-                date_of_end: null,
+                date_of_end: 0,
                 // type: null,
                 sum: null,
                 // driver:      null,
                 // car_id:         null,
-                company:  null,
-                our_company:  null,
-                main_for_company:  null, // Главный для компании
-                services: [],
+                company:          null,
+                our_company:      null,
+                main_for_company: false, // Главный для компании
+                services:         [],
             },
-            oldData: null
+            oldData:      null,
         }
     },
     mounted() {
     },
     methods: {
-        hideModal(){
+        hideModal() {
             // this.contractData = this.oldData;
             this.show = false
         },
@@ -224,6 +224,10 @@ export default {
             if (data) {
                 // this.oldData = data
                 this.contractData = Object.assign({}, data)
+                if (this.contractData.main_for_company) {
+                    this.contractData.main_for_company = true
+                }
+                // moment()
                 // this.contractData = data
             } else {
                 this.contractData = {}
@@ -399,7 +403,7 @@ export default {
         },
     },
 
-    watch:{
+    watch: {
         // contractData(val){
         //     if(this.contractData.id){
         //         let newValue = null
@@ -428,7 +432,7 @@ export default {
         //         }
         //     }
         // }
-    }
+    },
 }
 </script>
 

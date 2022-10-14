@@ -26,6 +26,9 @@
                 </span>
             </h5>
         </template>
+        <template #cell(date_of_end)="row">
+            {{ row.value ? new Date(row.value).toLocaleDateString("ru-RU") : '' }}
+        </template>
 
         <template #cell(main_for_company)="row">
             {{ row.value ? 'Да' : 'Нет' }}
