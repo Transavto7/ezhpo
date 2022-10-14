@@ -125,7 +125,9 @@
         data-allow-clear=true
     >
         {{-- disabled selected --}}
-{{--        <option value="">Не установлено</option>--}}
+        @isset($v['multiple'])
+        <option value="">Не установлено</option>
+        @endisset
 
         @if(is_array($v['values']))
             @foreach($v['values'] as $optionK => $optionV)
