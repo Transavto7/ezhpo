@@ -146,7 +146,16 @@ export default {
 
     data() {
         return {
-            filters: {},
+            filters: {
+                date_of_end_end: null,
+                date_of_end_start: null,
+                main_for_company: null,
+                our_company_id: null,
+                company_id: null,
+                id: null,
+                name: null,
+                service_id: null,
+            },
 
             services:      [],
             companies:     [],
@@ -167,7 +176,17 @@ export default {
             this.$emit('change_filters', this.filters);
         },
         reset_filters() {
-            this.filters = {};
+            this.filters = {
+                date_of_end_end: null,
+                date_of_end_start: null,
+                main_for_company: null,
+                our_company_id: null,
+                company_id: null,
+                id: null,
+                name: null,
+                service_id: null,
+            };
+            this.$emit('change_filters', this.filters);
         },
         searchCompanies(value, loading) {
             loading(true);

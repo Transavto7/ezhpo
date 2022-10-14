@@ -213,7 +213,7 @@ export default {
         },
         changeFilters(filters) {
             this.filters.currentPage = 1;
-            console.log(filters)
+
             for (let filter_key in filters) {
                 this.filters[filter_key] = filters[filter_key];
             }
