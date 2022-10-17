@@ -30,13 +30,16 @@ class Contract extends Model
             2 => 'Разовая',
         ];
 
-    // main contract for company/ ppizdec tyt zapros ebanii.. sorry
+    // main contract for company
     public static function mainForCompany($company_id)
     {
-        $NORMAL_FUCKING_ID_FOR_COMPANY = Company::where('hash_id', $company_id)->first()->id;
-        return self::where('company_id', $NORMAL_FUCKING_ID_FOR_COMPANY)
-                   ->orderBy("main_for_company", 'DESC')
-                   ->first();
+        if($normalCompany = Company::where('hash_id', $company_id)->first()){
+            return self::where('company_id', $normalCompany->id)
+                       ->orderBy("main_for_company", 'DESC')
+                       ->first();
+        }else{
+            return null;
+        }
     }
 
     public function deleted_user()
