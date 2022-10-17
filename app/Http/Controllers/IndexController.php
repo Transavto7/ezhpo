@@ -1082,94 +1082,6 @@ class IndexController extends Controller
                     }
                 }
 
-                // company with sync
-                if ($model_text == 'Company') {
-                    Contract::where('company_id', $element->id)
-                            ->update(['company_id' => null]);
-
-                    Contract::whereIn('id', $data['contracts'] ?? [])
-                            ->update(['company_id' => $element->id]);
-
-                    if($mainContract = Contract::mainForCompany($element->id)){
-
-                        Car::where('company_id', $element->id)
-                           ->where(function ($q){
-                               $q->whereDoesntHave('contract')
-                                 ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
-                           })
-                           ->update([
-                               'contract_id' => $mainContract->id ?? null
-                           ]);
-
-                        Driver::where('company_id', $element->id)
-                              ->where(function ($q){
-                                  $q->whereDoesntHave('contract')
-                                    ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
-                              })
-                              ->update([
-                                  'contract_id' => $mainContract->id ?? null
-                              ]);
-                    }else{
-                        Car::where('company_id', $element->id)
-                           ->where(function ($q){
-                               $q->whereDoesntHave('contract')
-                                 ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
-                           })
-                           ->update([
-                               'contract_id' => null
-                           ]);
-
-                        Driver::where('company_id', $element->id)
-                              ->where(function ($q){
-                                  $q->whereDoesntHave('contract')
-                                    ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
-                              })
-                              ->update([
-                                  'contract_id' => null
-                              ]);
-                    }
-                }
-                // (driver && car) =>
-                if ($model_text == 'Driver') {
-                    if(
-                        $data['company_id'] != $element->company_id
-                        && !$data['contract_id']
-                    ){
-                        if($mainContract = Contract::mainForCompany($data['company_id'])){
-                            Driver::where('id', $element->id)->update([
-                                'contract_id' => $mainContract->id ?? null
-                            ]);
-                        }else{
-                            Driver::where('id', $element->id)->update([
-                                'contract_id' => null
-                            ]);
-                        }
-                    }else{
-                        Driver::where('id', $element->id)->update([
-                            'contract_id' => $data['contract_id'] ?? null
-                        ]);
-                    }
-                }
-                if ($model_text == 'Car') {
-                    if(
-                        $data['company_id'] != $element->company_id
-                        && !$data['contract_id']
-                    ){
-                        if($mainContract = Contract::mainForCompany($data['company_id'])){
-                            Car::where('id', $element->id)->update([
-                                'contract_id' => $mainContract->id ?? null
-                            ]);
-                        }else{
-                            Car::where('id', $element->id)->update([
-                                'contract_id' => null
-                            ]);
-                        }
-                    }else{
-                        Car::where('id', $element->id)->update([
-                            'contract_id' => $data['contract_id'] ?? null
-                        ]);
-                    }
-                }
 
                 foreach ($data as $k => $v) {
                     $oldDataModel[$k] = $element[$k];
@@ -1264,6 +1176,94 @@ class IndexController extends Controller
             }
 
             if ($element->save()) {
+                // company with sync
+                if ($model_text == 'Company') {
+                    Contract::where('company_id', $element->id)
+                            ->update(['company_id' => null]);
+
+                    Contract::whereIn('id', $data['contracts'] ?? [])
+                            ->update(['company_id' => $element->id]);
+
+                    if($mainContract = Contract::mainForCompany($element->id)){
+
+                        Car::where('company_id', $element->id)
+                           ->where(function ($q){
+                               $q->whereDoesntHave('contract')
+                                 ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+                           })
+                           ->update([
+                               'contract_id' => $mainContract->id ?? null
+                           ]);
+
+                        Driver::where('company_id', $element->id)
+                              ->where(function ($q){
+                                  $q->whereDoesntHave('contract')
+                                    ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+                              })
+                              ->update([
+                                  'contract_id' => $mainContract->id ?? null
+                              ]);
+                    }else{
+                        Car::where('company_id', $element->id)
+                           ->where(function ($q){
+                               $q->whereDoesntHave('contract')
+                                 ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+                           })
+                           ->update([
+                               'contract_id' => null
+                           ]);
+
+                        Driver::where('company_id', $element->id)
+                              ->where(function ($q){
+                                  $q->whereDoesntHave('contract')
+                                    ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+                              })
+                              ->update([
+                                  'contract_id' => null
+                              ]);
+                    }
+                }
+                // (driver && car) =>
+                if ($model_text == 'Driver') {
+                    if(
+                        $data['company_id'] != $element->company_id
+                        && !$data['contract_id']
+                    ){
+                        if($mainContract = Contract::mainForCompany($data['company_id'])){
+                            Driver::where('id', $element->id)->update([
+                                'contract_id' => $mainContract->id ?? null
+                            ]);
+                        }else{
+                            Driver::where('id', $element->id)->update([
+                                'contract_id' => null
+                            ]);
+                        }
+                    }else{
+                        Driver::where('id', $element->id)->update([
+                            'contract_id' => $data['contract_id'] ?? null
+                        ]);
+                    }
+                }
+                if ($model_text == 'Car') {
+                    if(
+                        $data['company_id'] != $element->company_id
+                        && !$data['contract_id']
+                    ){
+                        if($mainContract = Contract::mainForCompany($data['company_id'])){
+                            Car::where('id', $element->id)->update([
+                                'contract_id' => $mainContract->id ?? null
+                            ]);
+                        }else{
+                            Car::where('id', $element->id)->update([
+                                'contract_id' => null
+                            ]);
+                        }
+                    }else{
+                        Car::where('id', $element->id)->update([
+                            'contract_id' => $data['contract_id'] ?? null
+                        ]);
+                    }
+                }
                 return redirect($_SERVER['HTTP_REFERER']);
             }
         }
