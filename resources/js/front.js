@@ -502,11 +502,12 @@ $(document).ready(function () {
 
     // Проверка свойства по модели на бэкенда
     window.checkInputProp = async (prop = '0', model = '0', val = '0', label, parent, is_dop) => {
-
-        let PARENT_ELEM = $(event.target).parent();
-
+        let PARENT_ELEM;
+        console.log('---------------')
         if(parent){
             PARENT_ELEM = parent;
+        }else{
+            PARENT_ELEM = $(event.target).parent();
         }
 
         //check-prop-one
