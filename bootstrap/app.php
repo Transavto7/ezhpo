@@ -5,8 +5,8 @@ ini_set('max_execution_time', 120);
 set_time_limit(120);
 
 header("X-XSS-Protection: 1; mode=block");
-header('X-Frame-Options: DENY');
-header("Content-Security-Policy: child-src 'none'");
+//header('X-Frame-Options: DENY');
+//header("Content-Security-Policy: child-src 'none'");
 header('X-Content-Type-Options: nosniff');
 header('Strict-Transport-Security: max-age=15768000');
 /*
