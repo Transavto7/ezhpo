@@ -1033,17 +1033,13 @@ class AnketsController extends Controller
                 /**
                  * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
                  */
+                $timezone = $user->timezone ?? 3;
+                $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($anketa['date'] ?? null);
 
-                if($anketa['type_anketa'] === 'medic') {
-                    $timezone = $user->timezone ?? 3;
-                    $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($anketa['date'] ?? null);
-
-                    if($diffDateCheck <= 60*12 && ($anketa['date'] ?? null)) {
-                        $anketa['realy'] = 'да';
-                    } else {
-                        $anketa['realy'] = 'нет';
-                    }
-
+                if($diffDateCheck <= 60*12 && ($anketa['date'] ?? null)) {
+                    $anketa['realy'] = 'да';
+                } else {
+                    $anketa['realy'] = 'нет';
                 }
 
                 /**
