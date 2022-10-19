@@ -153,17 +153,20 @@ class ApiController extends Controller
                 return !in_array($item, $deleteImportantFields);
             });
 
-            if ($_model['model'] == Company::class){
-                if(!user()->access('companies_access_field_where_call')){   //'Кому отправлять СМС при отстранении'
-                    unset($fields['where_call']);
-                }
-                if(!user()->access('companies_access_field_where_call_name')){  //'Кому звонить при отстранении (имя, должность)
-                    unset($fields['where_call_name']);
-                }
-            }
 
             $fieldsValues = new IndexController();
             $fieldsValues = $fieldsValues->elements[$model]['fields'];
+
+            if ($_model['model'] == Company::class){
+                if(!user()->access('companies_access_field_where_call')){   //'Кому отправлять СМС при отстранении'
+                    unset($fields['where_call']);
+                    unset($fieldsValues['where_call']);
+                }
+                if(!user()->access('companies_access_field_where_call_name')){  //'Кому звонить при отстранении (имя, должность)
+                    unset($fields['where_call_name']);
+                    unset($fieldsValues['where_call_name']);
+                }
+            }
 
             $data = $data->where($prop, $val)->get($fields)->first();
 
