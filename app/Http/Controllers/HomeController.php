@@ -324,7 +324,11 @@ class HomeController extends Controller
         if ($validTypeAnkets == 'tech') {
             $anketas = $anketas->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')->select('anketas.*',
                 'cars.type_auto as car_type_auto');
+        } else if ($validTypeAnkets == 'pak') {
+            $anketas = $anketas->leftJoin('points', 'anketas.pv_id', '=', 'points.id')->select('anketas.*',
+                'points.name as pv_id');
         }
+
         /**
          * </Измеряем количество Авто и Водителей (уникальные ID)>
          */
