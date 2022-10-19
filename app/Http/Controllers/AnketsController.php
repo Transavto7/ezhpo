@@ -137,7 +137,6 @@ class AnketsController extends Controller
             }
         } else if($anketa->type_anketa === 'tech') {
             $anketasTech = Anketa::where('car_id', $anketa->car_id)
-                ->whereIn('type_anketa', ['tech'])
                 ->where('type_anketa', 'tech')
                 ->where('type_view', $anketa->type_view ?? '')
                 ->where('in_cart', 0)
@@ -216,7 +215,6 @@ class AnketsController extends Controller
                 }
             } else if($anketa->type_anketa === 'tech' && (!$anketa->is_dop || $anketa->result_dop != null)) {
                 $anketasTech = Anketa::where('car_id', $data['anketa'][0]['car_id'])
-                    ->whereIn('type_anketa', ['tech', 'dop'])
                     ->where('type_anketa', 'tech')
                     ->where('type_view', $data['anketa'][0]['type_view'] ?? '')
                     ->where('in_cart', 0)
@@ -583,7 +581,7 @@ class AnketsController extends Controller
                     ->get();
             } else if ($data['type_anketa'] === 'tech' || $data['type_anketa'] === 'vid_pl') {
                 $anketasTech = Anketa::whereIn('car_id', $cars)
-                    ->whereIn('type_anketa', ['tech', 'dop'])
+                    ->where('type_anketa', 'tech')
                     ->where('in_cart', 0)
                     ->orderBy('date', 'desc')
                     ->get();
