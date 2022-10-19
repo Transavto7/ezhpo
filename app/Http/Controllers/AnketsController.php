@@ -1606,7 +1606,6 @@ class AnketsController extends Controller
                 /**
                  * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
                  */
-                if($createdAnketa->type_anketa === 'medic') {
                     $timezone = $user->timezone ?? 3;
                     $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($createdAnketa->date);
 
@@ -1618,7 +1617,6 @@ class AnketsController extends Controller
                         $anketaCreated->save();
                     }
 
-                }
 
                 /**
                  * ОТПРАВКА SMS
