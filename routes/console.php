@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Facades\Hash;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,5 +38,17 @@ Artisan::command('companies:procedure_pv-fix', function () {
                     'procedure_pv' => 'Фактовый',
                 ]);
     $this->comment('Компани пофикшенс');
+
+})->describe('Display an inspiring quote');
+
+Artisan::command('company:password-fix', function () {
+    $companyProfiles = \App\User::where('role', 12)->get();
+
+    foreach ($companyProfiles as $companyProfile){
+        $companyProfile->password = Hash::make($companyProfile->login);
+        $companyProfile->save();
+    }
+
+    $this->comment('Компани пофикшенs');
 
 })->describe('Display an inspiring quote');
