@@ -90,7 +90,7 @@
                             <input value="{{ user()->name }}" disabled type="text" class="form-control p-3 fw-bold" aria-label="Default" aria-describedby="inputGroup-sizing-default">
                         </div>
 
-                        @if (!user()->hasRole('driver'))
+                        @if (!user()->hasRole('driver') && !user()->hasRole('client'))
                             <div class="input-group mb-3 d-flex align-items-center">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" style="line-height: 1.3">E-mail:</span>
@@ -113,21 +113,24 @@
                             </div>
                         @endif
 
-                        <div class="input-group mb-3 d-flex align-items-center">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="line-height: 1.3">Должность:</span>
-                            </div>
-                            <input value="{{ implode(', ',  $user->roles()->pluck('guard_name')->toArray()) }}" disabled type="text" class="form-control p-3 fw-bold" aria-label="Default" aria-describedby="inputGroup-sizing-default">
-                        </div>
 
-                        <div class="input-group mb-3 d-flex align-items-center">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" style="line-height: 1.3">Пункт выпуска:</span>
+                        @if (!$user->hasRole('client'))
+                            <div class="input-group mb-3 d-flex align-items-center">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="line-height: 1.3">Должность:</span>
+                                </div>
+                                <input value="{{ implode(', ',  $user->roles()->pluck('guard_name')->toArray()) }}" disabled type="text" class="form-control p-3 fw-bold" aria-label="Default" aria-describedby="inputGroup-sizing-default">
                             </div>
-                            <input value="{{ user()->pv->name ?? 'Неизвестно' }}" disabled type="text"
-                                   class="form-control p-3 fw-bold" aria-label="Default"
-                                   aria-describedby="inputGroup-sizing-default">
-                        </div>
+
+                            <div class="input-group mb-3 d-flex align-items-center">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="line-height: 1.3">Пункт выпуска:</span>
+                                </div>
+                                <input value="{{ user()->pv->name ?? 'Неизвестно' }}" disabled type="text"
+                                       class="form-control p-3 fw-bold" aria-label="Default"
+                                       aria-describedby="inputGroup-sizing-default">
+                            </div>
+                        @endif
 
                         @if ($user->hasRole('client'))
                             <div class="input-group mb-3 d-flex align-items-center">
