@@ -381,7 +381,16 @@ class IndexController extends Controller
                         'type'                 => 'text',
                         'filterJournalLinkKey' => 'company_id',
                     ],
-                    'note'    => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
+                    'note'    => [
+                        'label' => 'Договоренности управляющего филиалов с клиентом',
+                        'type' => 'text',
+                        'noRequired' => 1
+                    ],
+                    'comment' => [
+                        'label' => 'Комментарий',
+                        'type' => 'text',
+                        'noRequired' => 1
+                    ],
                     'user_id' => [
                         'label'      => 'Ответственный',
                         'type'       => 'select',
