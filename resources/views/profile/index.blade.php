@@ -73,6 +73,8 @@
                             <input
                                 @if(user()->hasRole('driver'))
                                     value="{{ user()->login }}"
+                                @elseif(user()->hasRole('client'))
+                                    value="{{ user()->company->hash_id }}"
                                 @else
                                     value="{{ user()->hash_id }}"
                                 @endif
@@ -85,7 +87,9 @@
 
                         <div class="input-group my-3 d-flex align-items-center">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" style="line-height: 1.3" id="inputGroup-sizing-default">ФИО:</span>
+                                <span class="input-group-text" style="line-height: 1.3" id="inputGroup-sizing-default">
+                                 {{ user()->hasRole('client') ? 'Название компании' : 'ФИО'  }}:
+                                </span>
                             </div>
                             <input value="{{ user()->name }}" disabled type="text" class="form-control p-3 fw-bold" aria-label="Default" aria-describedby="inputGroup-sizing-default">
                         </div>
