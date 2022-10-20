@@ -172,18 +172,16 @@ class ApiController extends Controller
 
             if(isset($data)) {
                 $data_exists = $data->count() > 0;
+                $data = $data->toArray();
             } else {
                 $data_exists = $data;
             }
-
-            $data = $data->toArray();
 
             if($dateAnketa) {
                 if(isset($data['id'])) {
                     $redDates = AnketsController::ddateCheck($dateAnketa, $model, $data['id']);
                 }
             }
-
 
             if (isset($data['company_id'])) {
                 if($company = Company::select('name', 'hash_id')->find($data['company_id'])){
