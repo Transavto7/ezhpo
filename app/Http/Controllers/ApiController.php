@@ -7,6 +7,7 @@ use App\Req;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class ApiController extends Controller
@@ -175,6 +176,10 @@ class ApiController extends Controller
                 $data = $data->toArray();
             } else {
                 $data_exists = $data;
+            }
+
+            if ($_model['model'] == Company::class && isset($data['dismissed']) && isset($data['name'])) {
+                $data = [ 'name' => $data['name'], 'dismissed' => $data['dismissed'] ] + Arr::except($data, ['name', 'dismissed']);
             }
 
             if($dateAnketa) {
