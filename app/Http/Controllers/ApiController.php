@@ -178,9 +178,9 @@ class ApiController extends Controller
                 $data_exists = $data;
             }
 
-//            if ($_model['model'] == Company::class && isset($data['dismissed']) && isset($data['name'])) {
-//                $data = [ 'name' => $data['name'], 'dismissed' => $data['dismissed'] ] + Arr::except($data, ['name', 'dismissed']);
-//            }
+            if ($_model['model'] == Company::class && isset($data['dismissed']) && isset($data['name'])) {
+                $data = [ 'name' => $data['name'], 'dismissed' => $data['dismissed'] ] + Arr::except($data, ['name', 'dismissed']);
+            }
 
             if($dateAnketa) {
                 if(isset($data['id'])) {

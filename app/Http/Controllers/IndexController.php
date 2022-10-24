@@ -382,7 +382,7 @@ class IndexController extends Controller
                         'filterJournalLinkKey' => 'company_id',
                     ],
                     'note'    => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
-//                    'comment'    => ['label' => 'Комментарий', 'type' => 'text', 'noRequired' => 1],
+                    'comment'    => ['label' => 'Комментарий', 'type' => 'text', 'noRequired' => 1],
                     'user_id' => [
                         'label'      => 'Ответственный',
                         'type'       => 'select',
