@@ -381,7 +381,7 @@ class IndexController extends Controller
                         'type'                 => 'text',
                         'filterJournalLinkKey' => 'company_id',
                     ],
-                    'note'    => ['label' => 'Договоренности управляющего филиалов с клиентом', 'type' => 'text', 'noRequired' => 1],
+                    'note'    => ['label' => 'Договоренности с клиентом', 'type' => 'text', 'noRequired' => 1],
                     'comment'    => ['label' => 'Комментарий', 'type' => 'text', 'noRequired' => 1],
                     'user_id' => [
                         'label'      => 'Ответственный',
@@ -457,6 +457,12 @@ class IndexController extends Controller
                             'Да'  => 'Да',
                             'Нет' => 'Нет',
                         ],
+                        'noRequired' => 1,
+                    ],
+
+                    'bitrix_link' => [
+                        'label'      => 'Ссылка на компанию в Bitrix24',
+                        'type'       => 'text',
                         'noRequired' => 1,
                     ],
 

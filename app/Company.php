@@ -16,6 +16,7 @@ class Company extends Model
         'procedure_pv',
         'dismissed',
         'has_actived_prev_month',
+        'bitrix_link',
         'document_bdd',
         'deleted_id',
     ];
