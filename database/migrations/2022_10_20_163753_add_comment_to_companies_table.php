@@ -16,6 +16,12 @@ class AddCommentToCompaniesTable extends Migration
         Schema::table('companies', function (Blueprint $table) {
             $table->longText('comment')->after('note')->nullable();
         });
+
+        \App\FieldPrompt::create([
+            'type' => 'company',
+            'field' => 'comment',
+            'name' => 'Комментарий'
+        ]);
     }
 
     /**

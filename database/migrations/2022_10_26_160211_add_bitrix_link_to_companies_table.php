@@ -16,6 +16,12 @@ class AddBitrixLinkToCompaniesTable extends Migration
         Schema::table('companies', function (Blueprint $table) {
             $table->text('bitrix_link')->after('deleted_at')->nullable();
         });
+
+        \App\FieldPrompt::create([
+            'type' => 'company',
+            'field' => 'bitrix_link',
+            'name' => 'Ссылка на компанию в Bitrix24'
+        ]);
     }
 
     /**
