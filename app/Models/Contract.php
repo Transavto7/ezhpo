@@ -98,6 +98,18 @@ class Contract extends Model
 //
 //        Service::insert($products);
 
+        // НОВЫЕ УСЛУГИ ИЗ ДОГОВОРОВ ДЛЯ ВОДИЛ И МАШИН
+        FieldPrompt::create([
+            'field' => 'services',
+            'type' => 'car',
+            'name' => 'Услуги новые',
+        ]);
+        FieldPrompt::create([
+            'field' => 'services',
+            'type' => 'driver',
+            'name' => 'Услуги новые',
+        ]);
+
 //        FieldPrompt::create([
 //            'field' => 'contract',
 //            'type' => 'car',
@@ -129,64 +141,64 @@ class Contract extends Model
 //            'name'  => 'Услуги',
 //        ]);
 
-        FieldPrompt::insert([
-            [
-                'type' => 'service',
-                'field' => 'hash_id',
-                'name' => 'ID',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'type' => 'service',
-                'field' => 'name',
-                'name' => 'Название',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'type' => 'service',
-                'field' => 'type_product',
-                'name' => 'Тип',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'type' => 'service',
-                'field' => 'unit',
-                'name' => 'Ед.изм.',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'type' => 'service',
-                'field' => 'price_unit',
-                'name' => 'Стоимость за единицу',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'type' => 'service',
-                'field' => 'type_anketa',
-                'name' => 'Реестр',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'type' => 'service',
-                'field' => 'type_view',
-                'name' => 'Тип осмотра',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ],
-            [
-                'type' => 'service',
-                'field' => 'essence',
-                'name' => 'Сущности',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]
-        ]);
+//        FieldPrompt::insert([
+//            [
+//                'type' => 'service',
+//                'field' => 'hash_id',
+//                'name' => 'ID',
+//                'created_at' => Carbon::now(),
+//                'updated_at' => Carbon::now(),
+//            ],
+//            [
+//                'type' => 'service',
+//                'field' => 'name',
+//                'name' => 'Название',
+//                'created_at' => Carbon::now(),
+//                'updated_at' => Carbon::now(),
+//            ],
+//            [
+//                'type' => 'service',
+//                'field' => 'type_product',
+//                'name' => 'Тип',
+//                'created_at' => Carbon::now(),
+//                'updated_at' => Carbon::now(),
+//            ],
+//            [
+//                'type' => 'service',
+//                'field' => 'unit',
+//                'name' => 'Ед.изм.',
+//                'created_at' => Carbon::now(),
+//                'updated_at' => Carbon::now(),
+//            ],
+//            [
+//                'type' => 'service',
+//                'field' => 'price_unit',
+//                'name' => 'Стоимость за единицу',
+//                'created_at' => Carbon::now(),
+//                'updated_at' => Carbon::now(),
+//            ],
+//            [
+//                'type' => 'service',
+//                'field' => 'type_anketa',
+//                'name' => 'Реестр',
+//                'created_at' => Carbon::now(),
+//                'updated_at' => Carbon::now(),
+//            ],
+//            [
+//                'type' => 'service',
+//                'field' => 'type_view',
+//                'name' => 'Тип осмотра',
+//                'created_at' => Carbon::now(),
+//                'updated_at' => Carbon::now(),
+//            ],
+//            [
+//                'type' => 'service',
+//                'field' => 'essence',
+//                'name' => 'Сущности',
+//                'created_at' => Carbon::now(),
+//                'updated_at' => Carbon::now(),
+//            ]
+//        ]);
 
 //        ini_set('memory_limit', '-1');
 //        ini_set('max_execution_time', 400);

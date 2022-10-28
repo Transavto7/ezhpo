@@ -1405,7 +1405,7 @@ class IndexController extends Controller
             if ($model == 'Company') {
                 $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contracts']);
             } elseif ($model == 'Car' || $model == 'Driver') {
-                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contract']);
+                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contract', 'contract.services']);
             }
 
             $element['elements'] = $MODEL_ELEMENTS;

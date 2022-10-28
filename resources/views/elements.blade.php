@@ -451,9 +451,9 @@
                 <thead>
                 <tr>
                     @foreach ($fieldPrompts as $field)
-                        @if($field->field == 'products_id')
-                            @continue
-                        @endif
+{{--                        @if($field->field == 'products_id')--}}
+{{--                            @continue--}}
+{{--                        @endif--}}
                         @if($field->field == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
                             @continue
                         @endif
@@ -499,9 +499,12 @@
                 @foreach ($elements as $el)
                     <tr>
                         @foreach ($fieldPrompts as $field)
-                            @if($field->field == 'products_id')
-                                @continue
-                            @endif
+                            @php
+                            //dd($el['contract'])
+                            @endphp
+{{--                            @if($field->field == 'products_id')--}}
+{{--                                @continue--}}
+{{--                            @endif--}}
                             @if($field->field == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
                                 @continue
                             @endif
@@ -578,6 +581,17 @@
                                                     </span>
                                                 </h3>
                                             @endforeach
+                                        @elseif ($field->field == 'services' && ( $model === 'Car' || $model === 'Driver'))
+{{--                                            @foreach($el->contract as $contract)--}}
+                                                @foreach($el->contract->services as $service)
+                                                    <h5>
+{{--                                                        badge badge-success--}}
+                                                        <span class="badge badge-success">
+                                                            {{ $service['name']  }}
+                                                        </span>
+                                                    </h5>
+                                                @endforeach
+{{--                                            @endforeach--}}
                                         @elseif ($field->field === 'photo')
                                             @if(Storage::disk('public')->exists($el[$field->field]) && $el[$field->field] !== '<' && $el[$field->field] !== '>')
                                                 <a href="{{ Storage::url($el[$field->field]) }}"
