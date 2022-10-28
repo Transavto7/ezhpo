@@ -982,13 +982,14 @@ class IndexController extends Controller
             // парсим данные
             foreach ($data as $dataKey => $dataItem) {
                 if (is_array($dataItem)) {
-                    if ('contracts') {
+                    if ($dataKey['contracts'] ?? false) {
                         $contracts = $data['contracts'] ?? [];
                         unset($data['contracts']);
                         continue;
                     }
                     if ($dataItem !== null) {
                         $data[$dataKey] = join(',', $dataItem);
+
                     }
                 } else {
                     if (preg_match('/^data:image\/(\w+);base64,/', $dataItem)) {
@@ -1008,9 +1009,7 @@ class IndexController extends Controller
                     }
                 }
             }
-//dd(
-//    $data
-//);
+
             $created = $model::create($data);
 
             if ($model_type == 'Company') {

@@ -155,7 +155,7 @@
                     @endif
                     @if(user()->access('report_service_company_read', 'report_service_company_export'))
                         <li>
-                            <a href="{{ route('report.get', 'journal') }}">
+                            <a href="{{ route('report.get', 'journal_contract') }}">
                                 <i class="fa fa-book"></i>Отчет по услугам компании[Договор]
                             </a>
                         </li>

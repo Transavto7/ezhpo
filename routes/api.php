@@ -22,8 +22,10 @@ Route::get('/companies/find', 'ApiController@companiesList');
 Route::get('/find/{model}', 'ApiController@modelList');
 
 Route::get('reports/journal', 'ReportController@getJournalData')->name('api.reports.journal');
+Route::get('reports/contract/journal', 'ReportControllerContract@getJournalData')->name('api.reports.journal');
 Route::get('reports/journal/export', 'ReportController@exportJournalData')->name('api.reports.journal.export');
-Route::get('reports/getContractsForCompany', 'ReportController@getContractsForCompany')->name('api.reports.journal');
+Route::get('reports/getContractsForCompany', 'ReportControllerContract@getContractsForCompany')->name('api.reports.journal');
+//Route::get('reports/contract/getContractsForCompany', 'ReportControllerContract@getContractsForCompany')->name('api.reports.journal');
 
 
 Route::get('/sync-fields/{model}/{id}', function ($model, $id) {
