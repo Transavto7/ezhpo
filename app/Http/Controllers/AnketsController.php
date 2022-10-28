@@ -307,15 +307,15 @@ class AnketsController extends Controller
         foreach($data as $dK => $dV) {
             $company_id = null;
 
-            switch($dK) {
+            switch ($dK) {
                 case 'driver_id':
 
                     $driver = Driver::where('hash_id', $dV)->first();
 
-                    if($driver) {
-                        $anketa['driver_fio'] = $driver->fio;
-                        $anketa['driver_group_risk'] = $driver->group_risk;
-                        $anketa['driver_gender'] = $driver->gender;
+                    if ($driver) {
+                        $anketa['driver_fio']           = $driver->fio;
+                        $anketa['driver_group_risk']    = $driver->group_risk;
+                        $anketa['driver_gender']        = $driver->gender;
                         $anketa['driver_year_birthday'] = $driver->year_birthday;
 
                         $company_id = $driver->company_id;
@@ -327,7 +327,7 @@ class AnketsController extends Controller
 
                     $car = Car::where('hash_id', $dV)->first();
 
-                    if($car) {
+                    if ($car) {
                         $anketa['car_mark_model'] = $car->mark_model;
                         $anketa['car_gos_number'] = $car->gos_number;
 
@@ -337,20 +337,21 @@ class AnketsController extends Controller
                     break;
             }
 
-            if($company_id) {
+            if ($company_id) {
                 $Company = Company::where('id', $company_id)->first();
 
-                if($Company) {
-                    $anketa['company_id'] = $Company->hash_id;
+                if ($Company) {
+                    $anketa['company_id']   = $Company->hash_id;
                     $anketa['company_name'] = $Company->name;
                 } else {
-                    $anketa['company_id'] = '';
+                    $anketa['company_id']   = '';
                     $anketa['company_name'] = '';
                 }
             }
 
             $timezone      = $user->timezone ?? 3;
-            $diffDateCheck = Carbon::parse($anketa['created_at'])->addHours($timezone)->diffInMinutes($data['date'] ?? null);
+            $diffDateCheck = Carbon::parse($anketa['created_at'])->addHours($timezone)->diffInMinutes($data['date'] ??
+                                                                                                      null);
 
             if ($diffDateCheck <= 60 * 12 && $anketa['date'] ?? null) {
                 $anketa['realy'] = 'да';
@@ -358,8 +359,9 @@ class AnketsController extends Controller
                 $anketa['realy'] = 'нет';
             }
 
-        $anketa[$dK] = $dV;
-        $anketa->save();
+            $anketa[$dK] = $dV;
+            $anketa->save();
+        }
 
 
         // ДОГОВОР СНЕПШОТ update
