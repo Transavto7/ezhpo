@@ -57,28 +57,42 @@
             </div>
         </div>
 
-        <div v-for="i in counter" :key="i">
-            {{ i }}
-            <ReportJournalMedic
-                :ref="'reportsMedic_' + i"
-            />
+        <div v-for="(contract, index) in contracts">
+            <b-card-group v-show="contract.visible_result" class="my-3">
+                <b-card :header="contract.name">
+                    <template #header>
+                        <h3 class="mb-0">{{ contract.name }}</h3>
+                    </template>
+                    <b-card-text>
+                        <ReportJournalMedic
+                            ref="reportsMedic"
+                        />
 
-            <ReportJournalTech
-                :ref="'reportsTech_' + i"
-            />
+                        <ReportJournalTech
+                            ref="reportsTech"
+                        />
 
-            <ReportJournalMedicOther
-                :ref="'reportsMedicOther_' + i"
-            />
+                        <ReportJournalMedicOther
+                            ref="reportsMedicOther"
+                        />
 
-            <ReportJournalTechOther
-                :ref="'reportsTechOther_' + i"
-            />
+                        <ReportJournalTechOther
+                            ref="reportsTechOther"
+                        />
 
-            <ReportJournalOther
-                :ref="'reportsOther_' + i"
-            />
+                        <ReportJournalOther
+                            ref="reportsOther"
+                        />
+                    </b-card-text>
+                </b-card>
+<!--            <div class="card">-->
+<!--                <h5 class="card-header">{{ contracts[i].name }}</h5>-->
+<!--            </div>-->
+<!--            <div class="card-body">-->
+<!--            </div>-->
+            </b-card-group>
         </div>
+
     </div>
 </template>
 
@@ -164,30 +178,28 @@ export default {
         },
         async report() {
             this.loading = true;
-            for (let i = 1; i <= 5; i++){
+            for (let contract_key in this.contracts){
 
             // this.reset();
                 await axios.get('/api/reports/contract/journal', {
                     params: {
                         company_id: this.company_id,
-                        contracts_ids: this.contracts.map((item) => item.id),
+                        // contracts_ids: this.contracts.map((item) => item.id),
+                        contracts_ids: [this.contracts[contract_key].id],
                         month: this.month
                     }
                 }).then(({ data }) => {
-                        console.log(i)
-                        console.log(this.$refs)
-                        console.log(this.$refs['reportsMedic_'+i])
-                        this.$refs.reportsMedic_1.visible(data.medics);
-                        this.$refs['reportsTech_'+i].visible(data.techs);
-                        this.$refs['reportsTechOther_'+i].visible(data.techs_other);
-                        this.$refs['reportsMedicOther_'+i].visible(data.medics_other);
-                        this.$refs['reportsOther_'+i].visible(data.other);
+                        console.log(contract_key)
+                        console.log(this.contracts)
+                        this.contracts[contract_key].visible_result = true;
+                        console.log(this.contracts)
+
+                        this.$refs.reportsMedic[contract_key].visible(data.medics);
+                        this.$refs.reportsTech[contract_key].visible(data.techs);
+                        this.$refs.reportsTechOther[contract_key].visible(data.techs_other);
+                        this.$refs.reportsMedicOther[contract_key].visible(data.medics_other);
+                        this.$refs.reportsOther[contract_key].visible(data.other);
                         return;
-                    // this.$refs.reportsMedic.visible(data.medics);
-                    // this.$refs.reportsTech.visible(data.techs);
-                    // this.$refs.reportsTechOther.visible(data.techs_other);
-                    // this.$refs.reportsMedicOther.visible(data.medics_other);
-                    // this.$refs.reportsOther.visible(data.other);
                 }).finally(() => {
                 });
             }
@@ -196,7 +208,7 @@ export default {
         },
         exportData() {
             this.loadingExport = true;
-            axios.get('/api/reports/journal/export', {
+            axios.get('/api/reports/contract/journal/export', {
                 params: {
                     company_id: this.company_id,
                     month: this.month
