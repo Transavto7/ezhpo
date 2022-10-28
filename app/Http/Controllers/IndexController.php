@@ -1409,7 +1409,8 @@ class IndexController extends Controller
             }
 
             $element['elements'] = $MODEL_ELEMENTS;
-            $fieldsModel = $element['elements']->fillable;
+//            dd($element['elements']);
+//            $fieldsModel = $element['elements']->fillable;
 
             $element['type'] = $type;
             $element['orderBy'] = $orderBy;
@@ -1482,7 +1483,7 @@ class IndexController extends Controller
             }
 
             $element['max'] = isset($element['max']) ? $element['max'] : null;
-            $element['elements_count_all'] = $MODEL_ELEMENTS->all()->count();
+            $element['elements_count_all'] = $MODEL_ELEMENTS->count();
             $element['elements'] = $element['elements']->orderBy($orderKey, $orderBy);
 
             // Автоматическая загрузка справочников
