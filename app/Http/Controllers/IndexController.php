@@ -1160,9 +1160,10 @@ class IndexController extends Controller
 
                         $element->$k = $path;
                     }
-                    else {
-                        if(isset($v) && !$request->hasFile($k)) {
-                            $element[$k] = $v;
+                        else {
+                            if(isset($v) && !$request->hasFile($k)) {
+                                $element[$k] = $v;
+                            }
                         }
                     }
                 }
