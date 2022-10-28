@@ -9,6 +9,7 @@ use App\FieldPrompt;
 use App\Product;
 use App\Req;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Contract extends Model
@@ -33,11 +34,11 @@ class Contract extends Model
     // main contract for company
     public static function mainForCompany($company_id)
     {
-        if($normalCompany = Company::where('hash_id', $company_id)->first()){
+        if ($normalCompany = Company::where('hash_id', $company_id)->first()) {
             return self::where('company_id', $normalCompany->id)
                        ->orderBy("main_for_company", 'DESC')
                        ->first();
-        }else{
+        } else {
             return null;
         }
     }
@@ -107,12 +108,85 @@ class Contract extends Model
 //            'type' => 'driver',
 //            'name' => 'Договор',
 //        ]);
-        FieldPrompt::create([
-            'field' => 'contracts',
-            'type'  => 'company',
-            'name'  => 'Договор',
-        ]);
+//        FieldPrompt::create([
+//            'field' => 'contracts',
+//            'type'  => 'company',
+//            'name'  => 'Договор',
+//        ]);
+//        FieldPrompt::create([
+//            'field' => 'products_id',
+//            'type'  => 'car',
+//            'name'  => 'Договор',
+//        ]);
+//        FieldPrompt::create([
+//            'field' => 'products_id',
+//            'type'  => 'driver',
+//            'name'  => 'Услуги',
+//        ]);
+//        FieldPrompt::create([
+//            'field' => 'products_id',
+//            'type'  => 'company',
+//            'name'  => 'Услуги',
+//        ]);
 
+        FieldPrompt::insert([
+            [
+                'type' => 'service',
+                'field' => 'hash_id',
+                'name' => 'ID',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'type' => 'service',
+                'field' => 'name',
+                'name' => 'Название',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'type' => 'service',
+                'field' => 'type_product',
+                'name' => 'Тип',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'type' => 'service',
+                'field' => 'unit',
+                'name' => 'Ед.изм.',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'type' => 'service',
+                'field' => 'price_unit',
+                'name' => 'Стоимость за единицу',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'type' => 'service',
+                'field' => 'type_anketa',
+                'name' => 'Реестр',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'type' => 'service',
+                'field' => 'type_view',
+                'name' => 'Тип осмотра',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                'type' => 'service',
+                'field' => 'essence',
+                'name' => 'Сущности',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]
+        ]);
 
 //        ini_set('memory_limit', '-1');
 //        ini_set('max_execution_time', 400);

@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcher;
 
@@ -348,24 +349,24 @@ class AnketsController extends Controller
                 }
             }
 
-            if ($anketa->created_at &&
-//                (Carbon::parse($anketa->date) != Carbon::parse($data['date']))
-//                &&
-            ($data['date'] ?? false)) {
-
-                $timezone      = $user->timezone ?? 3;
-                $diffDateCheck = Carbon::parse($anketa->created_at)->addHours($timezone)->diffInMinutes($data['date']);
-
-                if ($diffDateCheck <= 60 * 12 && $anketa['date']) {
-                    $anketa->realy = 'да';
-                } else {
-                    $anketa->realy = 'нет';
-                }
-            }
-
-            $anketa[$dK] = $dV;
         }
 
+        if ($anketa->created_at &&
+            //                (Carbon::parse($anketa->date) != Carbon::parse($data['date']))
+            //                &&
+            ($data['date'] ?? false)) {
+
+            $timezone      = $user->timezone ?? 3;
+            $diffDateCheck = Carbon::parse($anketa->created_at)->addHours($timezone)->diffInMinutes($data['date']);
+
+            if ($diffDateCheck <= 60 * 12 && $anketa['date']) {
+                $anketa->realy = 'да';
+            } else {
+                $anketa->realy = 'нет';
+            }
+        }
+
+        $anketa[$dK] = $dV;
         $anketa->save();
 
 

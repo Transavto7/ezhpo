@@ -470,8 +470,7 @@ class HomeController extends Controller
         $fieldsKeysTypeAnkets = $validTypeAnkets;
 
         $fieldsKeys       = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
-        $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets])
-            ? Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] : [];
+        $fieldsGroupFirst = Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] ?? [];
         $anketsFields     = array_keys($fieldsKeys);
 
         if (auth()->user()->hasRole('client')) {

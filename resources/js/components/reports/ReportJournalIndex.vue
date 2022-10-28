@@ -57,6 +57,9 @@
           </div>
       </div>
 
+      <template v-for="">
+
+      </template>
       <ReportJournalMedic
           ref="reportsMedic"
       />

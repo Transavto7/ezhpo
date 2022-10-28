@@ -8,13 +8,19 @@ class Product extends Model
 {
     use \Illuminate\Database\Eloquent\SoftDeletes;
 
-    protected $table = 'services';
+//    protected $table = 'services';
+    protected $table = 'products';
 
     public $fillable = [
         'hash_id', 'name', 'type_product', 'unit', 'price_unit',
         'type_anketa', 'type_view', 'essence',
         'deleted_id'
     ];
+
+//    public function __construct(array $attributes = [])
+//    {
+//        parent::__construct($attributes);
+//    }
 
     public function deleted_user()
     {

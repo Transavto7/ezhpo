@@ -3,6 +3,7 @@
 use App\Http\Controllers\ContractController;
 use App\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/fix/types', function() {

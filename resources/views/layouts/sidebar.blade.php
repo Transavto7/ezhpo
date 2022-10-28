@@ -153,6 +153,13 @@
                             </a>
                         </li>
                     @endif
+                    @if(user()->access('report_service_company_read', 'report_service_company_export'))
+                        <li>
+                            <a href="{{ route('report.get', 'journal') }}">
+                                <i class="fa fa-book"></i>Отчет по услугам компании[Договор]
+                            </a>
+                        </li>
+                    @endif
 
 
                 </ul>
@@ -186,6 +193,7 @@
                     @endif
                     @if(user()->access('service_read', 'service_create'))
                         <li><a href="{{ route('renderElements', 'Product') }}">Услуги</a></li>
+                        <li><a href="{{ route('renderElements', 'Service') }}">Услуги[Договор]</a></li>
                     @endif
                     @if(user()->access('discount_read', 'discount_create'))
                         <li><a href="{{ route('renderElements', 'Discount') }}">Скидки</a></li>

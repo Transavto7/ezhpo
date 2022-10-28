@@ -4,7 +4,7 @@
 @section('sidebar', 1)
 
 @php
-//dd($elements[0]->toArray());
+//dd($model);
 @endphp
 
 @section('content')
@@ -17,7 +17,7 @@
     </div>
 
     <!-- Добавление элемента -->
-    @if($model !== 'Product')
+    @if($model !== 'Product' && $model !== 'Service')
         <div id="elements-modal-add" role="dialog" aria-labelledby="elements-modal-label" aria-hidden="true"
              class="modal fade text-left">
             <div role="document" class="modal-dialog">
@@ -116,6 +116,9 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
+                    @php
+                    //dump($model);
+                    @endphp
                     <form action="{{ route('addElement', $model) }}" enctype="multipart/form-data" method="POST">
                         @csrf
                         <div class="modal-body">
@@ -248,6 +251,7 @@
             || user()->access('company_create') && $model == 'Company'
             || user()->access('discount_create') && $model == 'Discount'
             || user()->access('service_create') && $model == 'Product'
+            || user()->access('service_create') && $model == 'Service'
             || user()->access('briefings_create') && $model == 'Instr'
             || user()->access('city_create') && $model == 'Town'
             || user()->access('requisites_create') && $model == 'Req'
@@ -263,6 +267,7 @@
             || user()->access('company_delete') && $model == 'Company'
             || user()->access('discount_delete') && $model == 'Discount'
             || user()->access('service_delete') && $model == 'Product'
+            || user()->access('service_delete') && $model == 'Service'
             || user()->access('briefings_delete') && $model == 'Instr'
             || user()->access('city_delete') && $model == 'Town'
             || user()->access('requisites_delete') && $model == 'Req'
@@ -278,6 +283,7 @@
             || user()->access('company_update') && $model == 'Company'
             || user()->access('discount_update') && $model == 'Discount'
             || user()->access('service_update') && $model == 'Product'
+            || user()->access('service_update') && $model == 'Service'
             || user()->access('briefings_update') && $model == 'Instr'
             || user()->access('city_update') && $model == 'Town'
             || user()->access('requisites_update') && $model == 'Req'
@@ -293,6 +299,7 @@
             || user()->access('company_read') && $model == 'Company'
             || user()->access('discount_read') && $model == 'Discount'
             || user()->access('service_read') && $model == 'Product'
+            || user()->access('service_read') && $model == 'Service'
             || user()->access('briefings_read') && $model == 'Instr'
             || user()->access('city_read') && $model == 'Town'
             || user()->access('requisites_read') && $model == 'Req'
@@ -308,6 +315,7 @@
             || user()->access('company_trash_read') && $model == 'Company'
             || user()->access('discount_trash_read') && $model == 'Discount'
             || user()->access('service_trash_read') && $model == 'Product'
+            || user()->access('service_trash_read') && $model == 'Service'
             || user()->access('briefings_trash_read') && $model == 'Instr'
             || user()->access('system_trash') && $model == 'Settings'
             || user()->access('city_trash_read') && $model == 'Town'

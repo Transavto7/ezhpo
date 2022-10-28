@@ -223,13 +223,13 @@ class IndexController extends Controller
                         'type'   => 'select',
                         'values' => 'Models\Contract',
                     ],
-                    //                    'products_id'        => [
-                    //                        'label'      => 'Услуги',
-                    //                        'multiple'   => 1,
-                    //                        'type'       => 'select',
-                    //                        'values'     => 'Product',
-                    //                        'noRequired' => 1,
-                    //                    ],
+                                        'products_id'        => [
+                                            'label'      => 'Услуги',
+                                            'multiple'   => 1,
+                                            'type'       => 'select',
+                                            'values'     => 'Product',
+                                            'noRequired' => 1,
+                                        ],
 
                     //                'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1, 'saveToHistory' => 1],
                     'note'               => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
@@ -313,13 +313,13 @@ class IndexController extends Controller
                         'defaultValue' => 'Не установлено',
                     ],
 
-                    //                    'products_id' => [
-                    //                        'label'      => 'Услуги',
-                    //                        'multiple'   => 1,
-                    //                        'type'       => 'select',
-                    //                        'values'     => 'Product',
-                    //                        'noRequired' => 1,
-                    //                    ],
+                                        'products_id' => [
+                                            'label'      => 'Услуги',
+                                            'multiple'   => 1,
+                                            'type'       => 'select',
+                                            'values'     => 'Product',
+                                            'noRequired' => 1,
+                                        ],
 
                     'trailer'         => [
                         'label'        => 'Прицеп',
@@ -413,16 +413,16 @@ class IndexController extends Controller
                         ],
                     ],
 
-                    //                    'products_id' => [
-                    //                        'label'    => 'Услуги',
-                    //                        'multiple' => 1,
-                    //                        'type'     => 'select',
-                    //                        'values'   => 'Product',
-                    //                        'syncData' => [
-                    //                            ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
-                    //                            ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
-                    //                        ],
-                    //                    ],
+                                        'products_id' => [
+                                            'label'    => 'Услуги',
+                                            'multiple' => 1,
+                                            'type'     => 'select',
+                                            'values'   => 'Product',
+                                            'syncData' => [
+                                                ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
+                                                ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
+                                            ],
+                                        ],
                     'contracts' => [
                         'label'    => 'Договор',
                         'multiple' => 1,
@@ -518,6 +518,58 @@ class IndexController extends Controller
                 'editOnField' => 'name',
 
                 'model'  => 'Product',
+                'fields' => [
+                    'name'         => ['label' => 'Название', 'type' => 'text'],
+                    'type_product' => [
+                        'label'        => 'Тип',
+                        'type'         => 'select',
+                        'values'       => [
+                            'Абонентская оплата'             => 'Абонентская оплата',
+                            'Разовые осмотры'                => 'Разовые осмотры',
+                            'Абонентская плата без реестров' => 'Абонентская плата без реестров',
+                        ],
+                        'defaultValue' => 'Абонентская оплата',
+                    ],
+                    'unit'         => ['label' => 'Ед.изм.', 'type' => 'text'],
+                    'price_unit'   => ['label' => 'Стоимость за единицу', 'type' => 'number'],
+                    'type_anketa'  => [
+                        'label'        => 'Реестр',
+                        'type'         => 'select',
+                        'values'       => [
+                            'bdd'         => 'БДД',
+                            'medic'       => 'Медицинский',
+                            'tech'        => 'Технический',
+                            'pechat_pl'   => 'Печать ПЛ',
+                            'report_cart' => 'Отчеты с карт',
+                        ],
+                        'defaultValue' => 'Не установлено',
+                    ],
+                    'type_view'    => [
+                        'label'        => 'Тип осмотра',
+                        'type'         => 'select',
+                        'values'       => [
+                            'Предрейсовый/Предсменный'   => 'Предрейсовый/Предсменный',
+                            'Послерейсовый/Послесменный' => 'Послерейсовый/Послесменный',
+                            'БДД'                        => 'БДД',
+                            'Отчёты с карт'              => 'Отчёты с карт',
+                            'Учет ПЛ'                    => 'Учет ПЛ',
+                            'Печать ПЛ'                  => 'Печать ПЛ',
+                        ],
+                        'defaultValue' => 'Не установлено',
+                        'multiple'     => 1,
+                    ],
+                    'essence'      => ['label' => 'Сущности', 'type' => 'text', 'noRequired' => 1],
+                ],
+            ],
+
+
+            'Service' => [
+                'title'       => 'Услуги[Договор]',
+                'role'        => 0,
+                'popupTitle'  => 'Услуги',
+                'editOnField' => 'name',
+
+                'model'  => 'Service',
                 'fields' => [
                     'name'         => ['label' => 'Название', 'type' => 'text'],
                     'type_product' => [
@@ -777,6 +829,7 @@ class IndexController extends Controller
     {
         $model_type = $request->type;
 
+//        dd($model_type);
         $model = app("App\\$model_type");
 
         if ($model) {
@@ -955,7 +1008,9 @@ class IndexController extends Controller
                     }
                 }
             }
-
+//dd(
+//    $data
+//);
             $created = $model::create($data);
 
             if ($model_type == 'Company') {
@@ -1142,27 +1197,27 @@ class IndexController extends Controller
                     }
                 }
 
-//                if ($model_text === 'Company') {
-//
-//                    if(isset($element->products_id)) {
-//                        $this->syncDataFunc([
-//                            'model' => 'Driver',
-//                            'fieldFind' => 'company_id',
-//                            'fieldFindId' => $element->id,
-//                            'fieldSync' => 'products_id',
-//                            'fieldSyncValue' => $element->products_id
-//                        ]);
-//
-//                        $this->syncDataFunc([
-//                            'model' => 'Car',
-//                            'fieldFind' => 'company_id',
-//                            'fieldFindId' => $element->id,
-//                            'fieldSync' => 'products_id',
-//                            'fieldSyncValue' => $element->products_id
-//                        ]);
-//                    }
-//
-//                }
+                if ($model_text === 'Company') {
+
+                    if(isset($element->products_id)) {
+                        $this->syncDataFunc([
+                            'model' => 'Driver',
+                            'fieldFind' => 'company_id',
+                            'fieldFindId' => $element->id,
+                            'fieldSync' => 'products_id',
+                            'fieldSyncValue' => $element->products_id
+                        ]);
+
+                        $this->syncDataFunc([
+                            'model' => 'Car',
+                            'fieldFind' => 'company_id',
+                            'fieldFindId' => $element->id,
+                            'fieldSync' => 'products_id',
+                            'fieldSyncValue' => $element->products_id
+                        ]);
+                    }
+
+                }
 
             }
 

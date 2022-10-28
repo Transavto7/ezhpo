@@ -168,10 +168,11 @@ class ApiController extends Controller
 
             $data = $data->where($prop, $val)->get()->first();
 
-            if(isset($data)) {
+            if($data) {
                 $data_exists = $data->count() > 0;
             } else {
                 $data_exists = $data;
+                return ApiController::r(['exists' => $data_exists, 'model' => $model, 'blockedFields' => $blockedFields, 'message' => $data, 'fieldsValues' => $fieldsValues, 'redDates' => $redDates], 1);
             }
 
             $data = $data->toArray();
