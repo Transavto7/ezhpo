@@ -349,22 +349,14 @@ class AnketsController extends Controller
                 }
             }
 
-        }
-
-        if ($anketa->created_at &&
-            //                (Carbon::parse($anketa->date) != Carbon::parse($data['date']))
-            //                &&
-            ($data['date'] ?? false)) {
-
             $timezone      = $user->timezone ?? 3;
-            $diffDateCheck = Carbon::parse($anketa->created_at)->addHours($timezone)->diffInMinutes($data['date']);
+            $diffDateCheck = Carbon::parse($anketa['created_at'])->addHours($timezone)->diffInMinutes($data['date'] ?? null);
 
-            if ($diffDateCheck <= 60 * 12 && $anketa['date']) {
-                $anketa->realy = 'да';
+            if ($diffDateCheck <= 60 * 12 && $anketa['date'] ?? null) {
+                $anketa['realy'] = 'да';
             } else {
-                $anketa->realy = 'нет';
+                $anketa['realy'] = 'нет';
             }
-        }
 
         $anketa[$dK] = $dV;
         $anketa->save();
@@ -645,7 +637,7 @@ class AnketsController extends Controller
                     ->get();
             } else if ($data['type_anketa'] === 'tech' || $data['type_anketa'] === 'vid_pl') {
                 $anketasTech = Anketa::whereIn('car_id', $cars)
-                    ->whereIn('type_anketa', ['tech', 'dop'])
+                    ->where('type_anketa', 'tech')
                     ->where('in_cart', 0)
                     ->orderBy('date', 'desc')
                     ->get();
@@ -1014,11 +1006,12 @@ class AnketsController extends Controller
                  * Генерация номера ПЛ
                  */
                 if(empty($anketa['number_list_road'])) {
-                    if($anketa['type_anketa'] !== 'medic') {
+                    if($anketa['type_anketa'] !== 'medic' && $anketa['date']) {
                         // Генерируем номер ПЛ
                         $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
                         $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
-                        $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id) . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
+                        $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id)
+                            . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
                     }
                 }
 
@@ -1103,17 +1096,13 @@ class AnketsController extends Controller
                 /**
                  * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
                  */
+                $timezone = $user->timezone ?? 3;
+                $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($anketa['date'] ?? null);
 
-                if($anketa['type_anketa'] === 'medic') {
-                    $timezone = $user->timezone ?? 3;
-                    $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($anketa['date']);
-
-                    if($diffDateCheck <= 60*12 && $anketa['date']) {
-                        $anketa['realy'] = 'да';
-                    } else {
-                        $anketa['realy'] = 'нет';
-                    }
-
+                if($diffDateCheck <= 60*12 && ($anketa['date'] ?? null)) {
+                    $anketa['realy'] = 'да';
+                } else {
+                    $anketa['realy'] = 'нет';
                 }
 
                 /**
@@ -1135,87 +1124,9 @@ class AnketsController extends Controller
                 $createdAnketas[] = Arr::only($anketa, $ank->getFillable());
             }
 
-//            dd($createdAnketas);
-
             Anketa::insert($createdAnketas);
             $createdAnketas = Anketa::where('type_anketa', $data['type_anketa'])
                 ->limit(count($createdAnketas))->orderBy('id', 'desc')->get();
-
-
-            // ДОГОВОР СНЕПШОТ create
-            $type_anketa = $data['type_anketa'];
-            if($type_anketa == 'medic'){
-                if($Driver){
-                    Anketa::where('type_anketa', $data['type_anketa'])
-                          ->limit(count($createdAnketas))
-                          ->orderBy('id', 'desc')
-                          ->update([
-                              'contract_id' => $Driver->contract_id
-                          ]);
-                }
-            }
-            if($type_anketa == 'tech'){
-                if($Car){
-                    Anketa::where('type_anketa', $data['type_anketa'])
-                          ->limit(count($createdAnketas))
-                          ->orderBy('id', 'desc')
-                          ->update([
-                              'contract_id' => $Car->contract_id
-                          ]);
-                }
-            }
-
-//            if($type_anketa === 'tech' || $type_anketa === 'medic'){
-//
-//                $anketas = Anketa::with(['car', 'contract','contract_snapshot', 'company', 'driver'])
-//                                ->whereIn('id', $createdAnketas->pluck('id'))
-//                                ->get();
-////dd($createdAnketas);
-//                dd($anketas->toArray());
-//
-//                if($type_anketa === 'tech'){
-//                    $taget_value = 'car';
-//                }
-//                if($type_anketa === 'medic'){
-//                    $taget_value = 'driver';
-//                }
-//                foreach ($anketas as $anketa){
-//
-//                    if($anketa->contract_snapshot->id){
-//                        $anketa->contract_snapshot()->update([
-//                            'anketa_id' => $anketa->id,
-//                            'contract_id' => $anketa->$taget_value->id,
-//
-//                            'time_of_action' => $anketa->$taget_value->time_of_action,
-//                            'sum' => $anketa->$taget_value->sum,
-//
-//                            'company_id' => $anketa->company->id,
-//                            'our_company_id' => $anketa->our_company->id,
-//                            'driver_id' => $anketa->driver->id,
-//                            'car_id' => $anketa->car->id,
-//                        ]);
-//                        $snapshot = $anketa->contract_snapshot;
-//                    }else{
-//                        $snapshot = ContractAnketaSnapshot::create([
-//                            'anketa_id' => $anketa->id,
-//                            'contract_id' => $anketa->$taget_value->id,
-//
-//                            'time_of_action' => $anketa->$taget_value->time_of_action,
-//                            'sum' => $anketa->$taget_value->sum,
-//
-//                            'company_id' => $anketa->company->id,
-//                            'our_company_id' => $anketa->our_company->id,
-//                            'driver_id' => $anketa->driver->id,
-//                            'car_id' => $anketa->car->id,
-//                        ]);
-//                    }
-//                    $anketa->contract_id = $anketa->$taget_value->id;
-//                    $anketa->contract_snapshot_id = $snapshot->id;
-//
-//                    $anketa->save();
-//                }
-//            }
-
 
             $responseData = [
                 'createdId' => $createdAnketas->pluck('id')->toArray(),
@@ -1739,28 +1650,23 @@ class AnketsController extends Controller
                 }
 
                 /**
+                 * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
+                 */
+                $timezone = $user->timezone ?? 3;
+                $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($anketa['date'] ?? null);
+
+                if($diffDateCheck <= 60*12 && $anketa['date'] ?? null) {
+                    $anketa['realy'] = 'да';
+                } else {
+                    $anketa['realy'] = 'нет';
+                }
+                /**
                  * Создаем анкету
                  */
                 $createdAnketa = Anketa::create($anketa);
                 array_push($createdAnketas, $createdAnketa->id);
-                $anketaCreated = Anketa::find($createdAnketa->id);
 
-                /**
-                 * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
-                 */
-                if($createdAnketa->type_anketa === 'medic') {
-                    $timezone = $user->timezone ?? 3;
-                    $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($createdAnketa->date);
 
-                    if($diffDateCheck <= 60*12 && $anketa['date']) {
-                        $anketaCreated->realy = 'да';
-                        $anketaCreated->save();
-                    } else {
-                        $anketaCreated->realy = 'нет';
-                        $anketaCreated->save();
-                    }
-
-                }
 
                 /**
                  * ОТПРАВКА SMS

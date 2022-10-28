@@ -1,6 +1,8 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Facades\Hash;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,5 +45,32 @@ Artisan::command('companies:procedure_pv-fix', function () {
                     'procedure_pv' => 'Фактовый',
                 ]);
     $this->comment('Компани пофикшенс');
+
+})->describe('Display an inspiring quote');
+
+Artisan::command('anketas:fix', function () {
+    $anketas = \App\Anketa::where('created_at', '>=', Carbon::parse('01-07-2022')->startOfDay())
+        ->where('created_at', '<=', Carbon::now())->whereNull('realy')->get();
+
+    $this->comment($anketas->count());
+
+    foreach ($anketas as $anketa){
+        if ($anketa->created_at && $anketa->date) {
+            $date = Carbon::parse($anketa->created_at)->timestamp - Carbon::parse($anketa->date)->timestamp;
+            $date = abs($date) / 60 / 60;
+            if ($date >= 12) {
+                $anketa->realy = 'нет';
+            } else {
+                $anketa->realy = 'да';
+            }
+
+        } else {
+            $anketa->realy = 'нет';
+        }
+
+        $anketa->save();
+    }
+
+    $this->comment('Анкеты пофикшенs');
 
 })->describe('Display an inspiring quote');

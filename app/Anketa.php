@@ -516,7 +516,7 @@ class Anketa extends Model
 
                 'number_list_road'   => 'Номер ПЛ',
                 //'date_number_list_road' => 'Срок действия путевого листа',
-                'odometer'           => 'показания одометра',
+                'odometer'           => 'Показания одометра',
                 'point_reys_control' => 'Отметка о прохождении контроля',
                 'user_name'          => 'ФИО ответственного',
                 'user_eds'           => 'Подпись лица, проводившего контроль',

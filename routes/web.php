@@ -221,7 +221,8 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
     });
 
     Route::post('/elements-import/{type}', 'IndexController@ImportElements')->name('importElements');
-    Route::get('/elements-syncdata/{fieldFindId}/{fieldFind}/{model}/{fieldSync}/{fieldSyncValue?}', 'IndexController@SyncDataElement')->name('syncDataElement');
+    Route::get('/elements-syncdata/{fieldFindId}/{fieldFind}/{model}/{fieldSync}/{fieldSyncValue?}',
+        'IndexController@SyncDataElement')->name('syncDataElement');
 
     Route::prefix('anketa')->group(function () {
         Route::delete('/{id}', 'AnketsController@Delete')->name('forms.delete');

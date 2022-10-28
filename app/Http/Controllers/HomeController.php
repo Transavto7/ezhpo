@@ -324,7 +324,11 @@ class HomeController extends Controller
         if ($validTypeAnkets == 'tech') {
             $anketas = $anketas->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')->select('anketas.*',
                 'cars.type_auto as car_type_auto');
+        } else if ($validTypeAnkets == 'pak') {
+            $anketas = $anketas->leftJoin('points', 'anketas.pv_id', '=', 'points.id')->select('anketas.*',
+                'points.name as pv_id');
         }
+
         /**
          * </Измеряем количество Авто и Водителей (уникальные ID)>
          */
@@ -334,7 +338,8 @@ class HomeController extends Controller
 
             if ($validTypeAnkets == 'tech') {
                 if ($request->get('exportPrikaz')) {
-                    $techs = $anketas->where('type_anketa', 'tech')
+                    $techs = $anketas
+                        ->where('type_anketa', 'tech')
                         ->get();
 
                     return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_to']),
@@ -363,16 +368,11 @@ class HomeController extends Controller
             if ($validTypeAnkets == 'bdd') {
                 if ($request->get('exportPrikaz')) {
                     $bdd = $anketas->where('type_anketa', 'bdd')
-                              ->with([
-                                  'user' => function ($q) {
-                                      $q->select('id', 'role');
-                                  },
-                              ])
-                              ->get()
-                              ->map(function ($q) {
-                                  $q->user_id = User::$userRolesText[$q->user['role']] ?? null;
+                              ->with(['user.roles'])
+                        ->get()
+                        ->map(function ($q) {
+                                $q->user_id = !isset($q->user->roles[0]) ? '' : $q->user->roles[0]->guard_name;
                                   unset($q->user);
-
                                   return $q;
                               });
 

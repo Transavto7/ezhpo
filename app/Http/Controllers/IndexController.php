@@ -387,21 +387,22 @@ class IndexController extends Controller
 
                 'model'  => 'Company',
                 'fields' => [
-                    'name'      => [
+                    'name'    => [
                         'label'                => 'Название компании клиента',
                         'type'                 => 'text',
                         'filterJournalLinkKey' => 'company_id',
                     ],
-                    'note'      => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
-                    'user_id'   => [
+                    'note'    => ['label' => 'Договоренности с клиентом', 'type' => 'text', 'noRequired' => 1],
+                    'comment'    => ['label' => 'Комментарий', 'type' => 'text', 'noRequired' => 1],
+                    'user_id' => [
                         'label'      => 'Ответственный',
                         'type'       => 'select',
                         'values'     => 'User',
                         'noRequired' => 1,
                     ],
-                    'req_id'    => ['label' => 'Реквизиты нашей компании', 'type' => 'select', 'values' => 'Req'],
-                    'pv_id'     => ['label' => 'ПВ', 'type' => 'select', 'values' => 'Point', 'noRequired' => 1],
-                    'town_id'   => [
+                    'req_id'  => ['label' => 'Реквизиты нашей компании', 'type' => 'select', 'values' => 'Req'],
+                    'pv_id'   => ['label' => 'ПВ', 'type' => 'select', 'values' => 'Point', 'noRequired' => 1],
+                    'town_id' => [
                         'label'      => 'Город',
                         'multiple'   => 1,
                         'type'       => 'select',
@@ -715,13 +716,13 @@ class IndexController extends Controller
         $is_api = $request->get('api', 0);
 
         if ($model) {
-//            $model = $this->syncDataFunc([
-//                'model'          => $model_text,
-//                'fieldFind'      => $fieldFind,
-//                'fieldFindId'    => $fieldFindId,
-//                'fieldSync'      => $fieldSync,
-//                'fieldSyncValue' => $fieldSyncValue,
-//            ]);
+            $model = $this->syncDataFunc([
+                'model'          => $model_text,
+                'fieldFind'      => $fieldFind,
+                'fieldFindId'    => $fieldFindId,
+                'fieldSync'      => $fieldSync,
+                'fieldSyncValue' => $fieldSyncValue,
+            ]);
 
             if ($model) {
                 if ( !$is_api) {
@@ -829,7 +830,6 @@ class IndexController extends Controller
     {
         $model_type = $request->type;
 
-//        dd($model_type);
         $model = app("App\\$model_type");
 
         if ($model) {
@@ -923,13 +923,13 @@ class IndexController extends Controller
                      */
 
                     $userData = [
-                        'hash_id'   => $data['hash_id'],
+                        'hash_id'  => $data['hash_id'],
                         'api_token' => Hash::make(date('H:i:s').sha1($data['hash_id'])),
-                        'email'     => mt_rand(100000, 499999).'@ta-7.ru',
-                        'login'     => $data['hash_id'],
-                        'password'  => Hash::make($data['hash_id']),
-                        'name'      => $data['fio'],
-                        'role'      => 3,
+                        'email'    => mt_rand(100000, 499999).'@ta-7.ru',
+                        'login'    => $data['hash_id'],
+                        'password' => Hash::make($data['hash_id']),
+                        'name'     => $data['fio'],
+                        'role'     => 3,
                     ];
 
                     if ($pv_id) {
@@ -1023,14 +1023,14 @@ class IndexController extends Controller
             if ($created) {
                 if ($model_type === 'Company') {
                     $user = User::create([
-                        'hash_id'    => mt_rand(0, 9999).date('s'),
-                        'email'      => $created->hash_id.'-'.mt_rand(100000, 499999).'@ta-7.ru',
-                        'api_token'  => Hash::make(date('H:i:s').sha1($created->hash_id)),
-                        'login'      => '0'.$created->hash_id,
-                        'password'   => '0'.Hash::make($created->hash_id),
-                        'name'       => $created->name,
-                        'role'       => 12,
-                        'company_id' => $created->id,
+                        'hash_id'  => mt_rand(0,9999) . date('s'),
+                        'email'    => $created->hash_id . '-' . mt_rand(100000, 499999).'@ta-7.ru',
+                        'api_token' => Hash::make(date('H:i:s').sha1($created->hash_id)),
+                        'login'    => '0' . $created->hash_id,
+                        'password' => Hash::make('0' .$created->hash_id),
+                        'name'     => $created->name,
+                        'role'     => 12,
+                        'company_id' => $created->id
                     ]);
 
                     $user->roles()->attach(6);
@@ -1042,10 +1042,10 @@ class IndexController extends Controller
         }
     }
 
-    public function RemoveElement(Request $request)
+    public function RemoveElement (Request $request)
     {
         $model = $request->type;
-        $id    = $request->id;
+        $id = $request->id;
         $model = app("App\\$model");
 
         if ($model) {
@@ -1086,15 +1086,15 @@ class IndexController extends Controller
         return redirect($_SERVER['HTTP_REFERER']);
     }
 
-    public function DeleteFileElement(Request $request)
+    public function DeleteFileElement (Request $request)
     {
-        $id         = $request->id;
-        $field      = $request->field;
+        $id = $request->id;
+        $field = $request->field;
         $model_text = $request->model;
 
         $model = app("App\\$model_text");
 
-        if ($model) {
+        if($model) {
             $model = $model->find($id);
 
             Storage::disk('public')->delete($model->$field);
@@ -1103,19 +1103,19 @@ class IndexController extends Controller
             $model->save();
         }
 
-        return redirect($_SERVER['HTTP_REFERER']);
+        return redirect( $_SERVER['HTTP_REFERER'] );
     }
 
-    public function UpdateElement(Request $request)
+    public function UpdateElement (Request $request)
     {
         $model_text = $request->type;
-        $model      = app("App\\$model_text");
-        $id         = $request->id;
+        $model = app("App\\$model_text");
+        $id = $request->id;
 
-        if ($model) {
-            $data         = $request->all();
+        if($model) {
+            $data = $request->all();
             $oldDataModel = [];
-            $element      = $model->find($id);
+            $element = $model->find($id);
 
             unset($data['_token']);
 
@@ -1124,10 +1124,10 @@ class IndexController extends Controller
             }
 
             // Обновляем данные
-            if ($element) {
+            if($element) {
                 // Парсим файлы
-                foreach ($request->allFiles() as $file_key => $file) {
-                    if (isset($data[$file_key]) && !isset($data[$file_key.'_base64'])) {
+                foreach($request->allFiles() as $file_key => $file) {
+                    if(isset($data[$file_key]) && !isset($data[$file_key . '_base64'])) {
                         Storage::disk('public')->delete($element[$file_key]);
 
                         $file_path = Storage::disk('public')->putFile('elements', $file);
@@ -1156,13 +1156,13 @@ class IndexController extends Controller
                             $hash = sha1(time());
                             $path = "elements/$hash.png";
 
-                            $base64_image = Storage::disk('public')->put($path, $base64_image);
+                        $base64_image = Storage::disk('public')->put($path, $base64_image);
 
-                            $element->$k = $path;
-                        } else {
-                            if (isset($v) && !$request->hasFile($k)) {
-                                $element[$k] = $v;
-                            }
+                        $element->$k = $path;
+                    }
+                    else {
+                        if(isset($v) && !$request->hasFile($k)) {
+                            $element[$k] = $v;
                         }
                     }
                 }
@@ -1223,8 +1223,8 @@ class IndexController extends Controller
             /**
              * Пустые поля обновляем
              */
-            foreach ($oldDataModel as $oldDataItemKey => $oldDataItemValue) {
-                if ( !isset($data[$oldDataItemKey]) && $oldDataItemKey == 'note') {
+            foreach($oldDataModel as $oldDataItemKey => $oldDataItemValue) {
+                if(!isset($data[$oldDataItemKey]) && $oldDataItemKey == 'note') {
                     $element[$oldDataItemKey] = '';
                 }
             }
@@ -1392,10 +1392,10 @@ class IndexController extends Controller
 
         $take = $request->get('take', 500);
 
-        if (isset($this->elements[$type])) {
+        if(isset($this->elements[$type])) {
             $element = $this->elements[$type];
 
-            $model          = $element['model'];
+            $model = $element['model'];
             $MODEL_ELEMENTS = app("App\\$model");
 
             $element['elements_count_all'] = $MODEL_ELEMENTS->count();
@@ -1408,17 +1408,17 @@ class IndexController extends Controller
             }
 
             $element['elements'] = $MODEL_ELEMENTS;
+            $fieldsModel = $element['elements']->fillable;
 
-            $element['type']     = $type;
-            $element['orderBy']  = $orderBy;
+            $element['type'] = $type;
+            $element['orderBy'] = $orderBy;
             $element['orderKey'] = $orderKey;
-            $element['take']     = $take;
+            $element['take'] = $take;
 
-            if ($request->get('deleted')) {
+            if($request->get('deleted')){
                 $element['elements'] = $element['elements']->onlyTrashed();
             }
-
-            if ($filter) {
+            if($filter) {
                 $allFilters = $request->all();
                 unset($allFilters['filter']);
                 unset($allFilters['take']);
@@ -1427,15 +1427,15 @@ class IndexController extends Controller
                 unset($allFilters['page']);
                 unset($allFilters['deleted']);
 
-                foreach ($allFilters as $aFk => $aFv) {
-                    if ( !empty($aFv)) {
-                        if (is_array($aFv)) {
+                foreach($allFilters as $aFk => $aFv) {
+                    if(!empty($aFv)) {
+                        if(is_array($aFv)) {
 
-                            if (count($aFv) > 0) {
+                            if(count($aFv) > 0) {
                                 $element['elements'] = $element['elements']->where(function ($q) use ($aFv, $aFk) {
                                     $isId = strpos($aFk, '_id');
 
-                                    foreach ($aFv as $aFvItemKey => $aFvItemValue) {
+                                    foreach($aFv as $aFvItemKey => $aFvItemValue) {
                                         if ($isId && ($aFk === 'town_id' || $aFk === 'products_id')) {
                                             $q = $q->orWhere($aFk, $aFvItemValue)
                                                    ->orWhere($aFk, 'like', "%,$aFvItemValue,%")
@@ -1465,25 +1465,23 @@ class IndexController extends Controller
                                     ]
                                 );
                             } else {
-                                $element['elements'] = $element['elements']->where($aFk, 'LIKE', '%'.trim($aFv).'%');
+                                $element['elements'] = $element['elements']->where($aFk, 'LIKE', '%' . trim($aFv) . '%');
                             }
                         }
                     }
                 }
             }
 
-            if (auth()->user()->hasRole('client')) {
-                if ($model == 'Driver' || $model == 'Car') {
+            if(auth()->user()->hasRole('client')) {
+                if($model == 'Driver' || $model == 'Car') {
                     $element['elements'] = $element['elements']->where('company_id', auth()->user()->company_id);
-                } else {
-                    if ($model == 'Company') {
-                        $element['elements'] = $element['elements']->where('id', auth()->user()->company_id);
-                    }
+                } else if ($model == 'Company') {
+                    $element['elements'] = $element['elements']->where('id', auth()->user()->company_id);
                 }
             }
 
             $element['max'] = isset($element['max']) ? $element['max'] : null;
-//            $element['elements_count_all'] = $MODEL_ELEMENTS->count();
+            $element['elements_count_all'] = $MODEL_ELEMENTS->all()->count();
             $element['elements'] = $element['elements']->orderBy($orderKey, $orderBy);
 
             // Автоматическая загрузка справочников
@@ -1524,22 +1522,22 @@ class IndexController extends Controller
                 $element['otherRoles'] = $roles;
             }
 
-            $element['queryString']  = $queryString;
+            $element['queryString'] = $queryString;
             $element['fieldPrompts'] = FieldPrompt::where('type', strtolower($model))->get();
 
             return view('elements', $element);
         } else {
-            return redirect(route('home'));
+            return redirect( route('home') );
         }
     }
 
     /**
      * Рендер последовательного добавления Клиента
      */
-    public function RenderAddClient(Request $request)
+    public function RenderAddClient (Request $request)
     {
         return view('pages.add_client', [
-            'title' => 'Добавление клиента',
+            'title' => 'Добавление клиента'
         ]);
     }
 
@@ -1551,40 +1549,40 @@ class IndexController extends Controller
     /**
      * Рендер анкет
      */
-    public function RenderForms(Request $request)
+    public function RenderForms (Request $request)
     {
         $user = Auth::user();
 
-        if ( !($type = $request->get('type'))) {
-            if (user()->hasRole('tech')) {
+        if(!($type = $request->get('type'))){
+            if(user()->hasRole('tech')){
                 $type = 'tech';
             }
-            if (user()->hasRole('medic')) {
+            if(user()->hasRole('medic')){
                 $type = 'medic';
             }
-            if (user()->hasRole('manager') || user()->hasRole('engineer_bdd')) {
+            if(user()->hasRole('manager') || user()->hasRole('engineer_bdd')){
                 return redirect()->route('renderElements', 'Company');
             }
-            if (user()->hasRole('operator_sdpo')) {
+            if(user()->hasRole('operator_sdpo')){
                 return redirect()->route('home', 'pak_queue');
             }
 
-            if (user()->hasRole('client')) {
+            if(user()->hasRole('client')){
                 return redirect()->route('home', ['type_ankets' => 'medic']);
             }
-            if ( !$type) {
+            if(!$type){
                 return redirect()->route('index');
             }
         }
 
-        $company_fields                = $this->elements['Driver']['fields']['company_id'];
+        $company_fields = $this->elements['Driver']['fields']['company_id'];
         $company_fields['getFieldKey'] = 'name';
 
         $anketa_key = $type;
 
         // Отображаем данные
         $anketa = $this->ankets[$anketa_key];
-        $point  = Point::getPointText($user->pv_id);
+        $point = Point::getPointText($user->pv_id);
         $points = Point::getAll();
 
         // Конвертация текущего времени Юзера
@@ -1599,20 +1597,20 @@ class IndexController extends Controller
 
         // Дефолтные значения
         $anketa['default_current_date'] = $time;
-        $anketa['default_point']        = $point;
-        $anketa['points']               = $points;
-        $anketa['type_anketa']          = $anketa_key;
-        $anketa['default_pv_id']        = $user->pv_id;
-        $anketa['company_fields']       = $company_fields;
+        $anketa['default_point'] = $point;
+        $anketa['points'] = $points;
+        $anketa['type_anketa'] = $anketa_key;
+        $anketa['default_pv_id'] = $user->pv_id;
+        $anketa['company_fields'] = $company_fields;
 
         $anketa['Driver'] = Driver::class;
-        $anketa['Car']    = Car::class;
+        $anketa['Car'] = Car::class;
 
         // Проверяем выставленный ПВ
-        if (session()->exists('anketa_pv_id')) {
+        if(session()->exists('anketa_pv_id')) {
             $session_pv_id = session('anketa_pv_id');
 
-            if (date('d.m') > $session_pv_id['expired']) {
+            if(date('d.m') > $session_pv_id['expired']) {
                 session()->remove('anketa_pv_id');
             }
         }

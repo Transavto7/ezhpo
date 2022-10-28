@@ -163,26 +163,41 @@ class ApiController extends Controller
 //                return !in_array($item, $deleteImportantFields);
 //            });
 
+
             $fieldsValues = new IndexController();
             $fieldsValues = $fieldsValues->elements[$model]['fields'];
 
             $data = $data->where($prop, $val)->get()->first();
+            if ($_model['model'] == Company::class){
+                if(!user()->access('companies_access_field_where_call')){   //'Кому отправлять СМС при отстранении'
+                    unset($fields['where_call']);
+                    unset($fieldsValues['where_call']);
+                }
+                if(!user()->access('companies_access_field_where_call_name')){  //'Кому звонить при отстранении (имя, должность)
+                    unset($fields['where_call_name']);
+                    unset($fieldsValues['where_call_name']);
+                }
+            }
+
+            $data = $data->where($prop, $val)->get($fields)->first();
 
             if($data) {
                 $data_exists = $data->count() > 0;
+                $data = $data->toArray();
             } else {
                 $data_exists = $data;
                 return ApiController::r(['exists' => $data_exists, 'model' => $model, 'blockedFields' => $blockedFields, 'message' => $data, 'fieldsValues' => $fieldsValues, 'redDates' => $redDates], 1);
             }
 
-            $data = $data->toArray();
+            if ($_model['model'] == Company::class && isset($data['dismissed']) && isset($data['name'])) {
+                $data = [ 'name' => $data['name'], 'dismissed' => $data['dismissed'] ] + Arr::except($data, ['name', 'dismissed']);
+            }
 
             if($dateAnketa) {
                 if(isset($data['id'])) {
                     $redDates = AnketsController::ddateCheck($dateAnketa, $model, $data['id']);
                 }
             }
-
 
             if (isset($data['company_id'])) {
                 if($company = Company::select('name', 'hash_id')->find($data['company_id'])){

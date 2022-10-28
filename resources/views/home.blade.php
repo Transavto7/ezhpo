@@ -481,7 +481,8 @@ $permissionToExportPrikazPL = (
 
                                         <!-- ОЧЕРЕДЬ ОСМОТРОВ -->
                                         @if($type_ankets === 'pak_queue')
-                                            <td class="td-option not-export">
+                                            <td class="td-option not-export d-flex">
+                                                <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm mr-1"><i class="fa fa-search"></i></a>
                                                 <a href="{{ route('changePakQueue', ['admitted' => 'Допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-success"><i class="fa fa-check"></i></a>
                                             </td>
 

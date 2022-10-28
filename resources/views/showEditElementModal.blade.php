@@ -19,6 +19,19 @@
                 @if($k == 'where_call' && !user()->access('companies_access_field_where_call'))
                     @continue
                 @endif
+                @if($k === 'note' && $model === 'Company')
+                        <div class="form-group" data-field="comment">
+                            <label>
+                                {{ $v['label'] }}
+                            </label>
+                            <textarea {{ user()->access('companies_access_field_note') ? '' : 'disabled' }}
+                                   name="note"
+                                   data-label="{{ $v['label'] }}"
+                                   placeholder="{{ $v['label'] }}"
+                                   data-field="Company_note" class="form-control">{{ $el[$k] ?? '' }}</textarea>
+                        </div>
+                    @continue
+                @endif
                 @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
                 @php if ($model === 'Instr' && $k === 'signature') continue; @endphp
 

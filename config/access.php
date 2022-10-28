@@ -614,4 +614,10 @@ return [
         'name'        => 'companies_access_field_where_call_name',
         'description' => 'Компании - ФИО и должность кому звонить при отстранении',
     ],
+
+    //============== Договоренности с клиентом =============//
+    [
+        'name'        => 'companies_access_field_note',
+        'description' => 'Компании - Редактирование договоренности с клиентом',
+    ],
 ];

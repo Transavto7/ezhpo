@@ -81,6 +81,14 @@
 
                             @if($k !== 'id' && !isset($v['hidden']))
                                 @if($model === 'Instr' && $k === 'sort')
+                                        <div class="form-group" data-field="{{ $k }}">
+                                            <label>
+                                                @if($is_required) <b class="text-danger text-bold">*</b> @endif
+
+                                                {{ $v['label'] }}</label>
+
+                                            @include('templates.elements_field')
+                                        </div>
                                     <!-- Сортировка инструктажей доступна админу или инженеру -->
                                     @elseif($model === 'Instr' && $k === 'signature')
                                     @else
