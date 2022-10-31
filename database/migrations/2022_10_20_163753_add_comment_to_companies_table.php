@@ -27,7 +27,6 @@ class AddCommentToCompaniesTable extends Migration
 
     public function addFieldAfter(string $type, string $field, string $name, $fieldAfter) {
         $fields = \App\FieldPrompt::where('type', $type)->get();
-        $output = new ConsoleOutput();
         foreach ($fields as $tableField) {
             if ($fieldAfter === $tableField->field) {
                 \App\FieldPrompt::create([
