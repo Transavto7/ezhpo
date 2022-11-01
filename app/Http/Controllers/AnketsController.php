@@ -7,8 +7,6 @@ use App\Car;
 use App\Company;
 use App\DDates;
 use App\Driver;
-use App\Models\Contract;
-use App\Models\ContractAnketaSnapshot;
 use App\Notify;
 use App\Point;
 use App\Settings;
@@ -17,7 +15,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcher;
 
@@ -140,7 +137,6 @@ class AnketsController extends Controller
             }
         } else if($anketa->type_anketa === 'tech') {
             $anketasTech = Anketa::where('car_id', $anketa->car_id)
-                ->whereIn('type_anketa', ['tech'])
                 ->where('type_anketa', 'tech')
                 ->where('type_view', $anketa->type_view ?? '')
                 ->where('in_cart', 0)
@@ -166,10 +162,19 @@ class AnketsController extends Controller
             return back()->with('error', "Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])");
         }
 
-        if($anketa) {
-            $anketa->result_dop = $result_dop;
-            $anketa->save();
+        if (!$anketa || !$anketa->date || !$anketa->car_id) {
+            return back()->with('error', 'Указаны не полные данные осмотра');
         }
+
+        if($anketa->number_list_road === null && $anketa->type_anketa !== 'medic') {
+            // Генерируем номер ПЛ
+            $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
+            $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
+            $anketa->number_list_road = $anketa->car_id . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
+        }
+
+        $anketa->result_dop = $result_dop;
+        $anketa->save();
 
         return back();
     }
@@ -219,7 +224,6 @@ class AnketsController extends Controller
                 }
             } else if($anketa->type_anketa === 'tech' && (!$anketa->is_dop || $anketa->result_dop != null)) {
                 $anketasTech = Anketa::where('car_id', $data['anketa'][0]['car_id'])
-                    ->whereIn('type_anketa', ['tech', 'dop'])
                     ->where('type_anketa', 'tech')
                     ->where('type_view', $data['anketa'][0]['type_view'] ?? '')
                     ->where('in_cart', 0)
@@ -307,15 +311,15 @@ class AnketsController extends Controller
         foreach($data as $dK => $dV) {
             $company_id = null;
 
-            switch ($dK) {
+            switch($dK) {
                 case 'driver_id':
 
                     $driver = Driver::where('hash_id', $dV)->first();
 
-                    if ($driver) {
-                        $anketa['driver_fio']           = $driver->fio;
-                        $anketa['driver_group_risk']    = $driver->group_risk;
-                        $anketa['driver_gender']        = $driver->gender;
+                    if($driver) {
+                        $anketa['driver_fio'] = $driver->fio;
+                        $anketa['driver_group_risk'] = $driver->group_risk;
+                        $anketa['driver_gender'] = $driver->gender;
                         $anketa['driver_year_birthday'] = $driver->year_birthday;
 
                         $company_id = $driver->company_id;
@@ -327,7 +331,7 @@ class AnketsController extends Controller
 
                     $car = Car::where('hash_id', $dV)->first();
 
-                    if ($car) {
+                    if($car) {
                         $anketa['car_mark_model'] = $car->mark_model;
                         $anketa['car_gos_number'] = $car->gos_number;
 
@@ -337,21 +341,20 @@ class AnketsController extends Controller
                     break;
             }
 
-            if ($company_id) {
+            if($company_id) {
                 $Company = Company::where('id', $company_id)->first();
 
-                if ($Company) {
-                    $anketa['company_id']   = $Company->hash_id;
+                if($Company) {
+                    $anketa['company_id'] = $Company->hash_id;
                     $anketa['company_name'] = $Company->name;
                 } else {
-                    $anketa['company_id']   = '';
+                    $anketa['company_id'] = '';
                     $anketa['company_name'] = '';
                 }
             }
 
             $timezone      = $user->timezone ?? 3;
-            $diffDateCheck = Carbon::parse($anketa['created_at'])->addHours($timezone)->diffInMinutes($data['date'] ??
-                                                                                                      null);
+            $diffDateCheck = Carbon::parse($anketa['created_at'])->addHours($timezone)->diffInMinutes($data['date'] ?? null);
 
             if ($diffDateCheck <= 60 * 12 && $anketa['date'] ?? null) {
                 $anketa['realy'] = 'да';
@@ -360,66 +363,9 @@ class AnketsController extends Controller
             }
 
             $anketa[$dK] = $dV;
-            $anketa->save();
         }
 
-
-        // ДОГОВОР СНЕПШОТ update
-        if($type_anketa == 'medic'){
-            if(isset($driver)){
-                $anketa->update([
-                          'contract_id' => $driver->contract_id
-                      ]);
-            }
-        }
-        if($type_anketa == 'tech'){
-            if(isset($car)){
-                $anketa->update([
-                          'contract_id' => $car->contract_id
-                      ]);
-            }
-        }
-//        $anketa = Anketa::with(['car', 'contract','contract_snapshot', 'company', 'driver'])->find($anketa->id);
-//        if($type_anketa === 'tech' || $type_anketa === 'medic'){
-//            if($type_anketa === 'tech'){
-//                $taget_value = 'car';
-//            }
-//            if($type_anketa === 'medic'){
-//                $taget_value = 'driver';
-//            }
-//            if($anketa->contract_snapshot->id){
-//                $anketa->contract_snapshot()->update([
-//                    'anketa_id' => $anketa->id,
-//                    'contract_id' => $anketa->$taget_value->contract_id ?? null,
-//
-//                    'time_of_action' => $anketa->contract->time_of_action,
-//                    'sum' => $anketa->contract->sum,
-//
-//                    'company_id' => $anketa->company->id,
-//                    'our_company_id' => $anketa->our_company->id,
-//                    'driver_id' => $anketa->driver->id,
-//                    'car_id' => $anketa->car->id,
-//                ]);
-//                $snapshot = $anketa->contract_snapshot;
-//            }else{
-//                $snapshot = ContractAnketaSnapshot::create([
-//                    'anketa_id' => $anketa->id,
-//                    'contract_id' => $anketa->$taget_value->contract_id ?? null,
-//
-//                    'time_of_action' => $anketa->contract->time_of_action,
-//                    'sum' => $anketa->contract->sum,
-//
-//                    'company_id' => $anketa->company->id,
-//                    'our_company_id' => $anketa->our_company->id,
-//                    'driver_id' => $anketa->driver->id,
-//                    'car_id' => $anketa->car->id,
-//                ]);
-//            }
-//            $anketa->contract_id = $anketa->$taget_value->contract_id;
-//            $anketa->contract_snapshot_id = $snapshot->id;
-//
-//            $anketa->save();
-//        }
+        $anketa->save();
 
         if($anketa->connected_hash) {
             $anketaCopy = Anketa::where('connected_hash', $anketa->connected_hash)->where('type_anketa', '!=', $anketa->type_anketa)->first();
@@ -621,7 +567,6 @@ class AnketsController extends Controller
                     ]);
                 }
             }
-
 
             if (isset($data['car_id'])) {
                 $cars[] = $data['car_id'];
@@ -1008,7 +953,7 @@ class AnketsController extends Controller
                  * Генерация номера ПЛ
                  */
                 if(empty($anketa['number_list_road'])) {
-                    if($anketa['type_anketa'] !== 'medic' && $anketa['date']) {
+                    if($anketa['type_anketa'] !== 'medic' && $anketa['date'] && $anketa['car_id']) {
                         // Генерируем номер ПЛ
                         $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
                         $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
