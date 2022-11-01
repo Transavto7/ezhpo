@@ -420,7 +420,8 @@ $(document).ready(function () {
                        }
 
                        if(i === 'contract_id'){
-                           field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${(data['contract']['name'] ? data['contract']['name'] : '').trim()}</textarea>`
+                           console.log(data)
+                           field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${(data[i].contract.name ? data[i].contract.name : '').trim()}</textarea>`
                        }else if(i === 'contracts'){
                            let text_contract = '';
                            data['contracts'].map((item) => {
