@@ -62,18 +62,18 @@
                 </v-select>
             </b-col>
         </b-row>
-        <b-row class="my-1">
-            <b-col sm="3">
-                <label>Статус договора:</label>
-            </b-col>
-            <b-col sm="9">
-                <b-form-checkbox
-                    v-model="contractData.main_for_company"
-                >
-                    Главный
-                </b-form-checkbox>
-            </b-col>
-        </b-row>
+        <!--        <b-row class="my-1">-->
+        <!--            <b-col sm="3">-->
+        <!--                <label>Статус договора:</label>-->
+        <!--            </b-col>-->
+        <!--            <b-col sm="9">-->
+        <!--                <b-form-checkbox-->
+        <!--                    v-model="contractData.main_for_company"-->
+        <!--                >-->
+        <!--                    Главный-->
+        <!--                </b-form-checkbox>-->
+        <!--            </b-col>-->
+        <!--        </b-row>-->
         <b-row class="my-1">
             <b-col sm="3">
                 <label>Услуги:</label>
@@ -123,6 +123,13 @@
 
         <b-row class="text-right my-2">
             <b-col>
+                <b-form-checkbox
+                    v-model="contractData.hard_reset_for_car_and_drivers"
+                >
+                    Перезаписать всех водителей и авто
+                </b-form-checkbox>
+            </b-col>
+            <b-col>
                 <template
                     v-if="contractData.id"
                 >
@@ -155,6 +162,7 @@
 import vSelect from "vue-select";
 import 'vue-select/dist/vue-select.css';
 import Swal2 from "sweetalert2";
+import swal from "sweetalert2";
 
 export default {
     name:       "contract-create",
@@ -181,10 +189,12 @@ export default {
                 sum: null,
                 // driver:      null,
                 // car_id:         null,
-                company:          null,
-                our_company:      null,
-                main_for_company: false, // Главный для компании
-                services:         [],
+                company:     null,
+                our_company: null,
+                // main_for_company: false, // Главный для компании
+                services: [],
+
+                hard_reset_for_car_and_drivers: false,
             },
             oldData:      null,
         }
@@ -224,9 +234,9 @@ export default {
             if (data) {
                 // this.oldData = data
                 this.contractData = Object.assign({}, data)
-                if (this.contractData.main_for_company) {
-                    this.contractData.main_for_company = true
-                }
+                // if (this.contractData.main_for_company) {
+                //     this.contractData.main_for_company = true
+                // }
                 // moment()
                 // this.contractData = data
             } else {
@@ -234,7 +244,22 @@ export default {
             }
         },
 
-        createContract(e) {
+        async createContract(e) {
+            if (this.contractData.hard_reset_for_car_and_drivers) {
+                let res = await swal.fire({
+                    title:              'Подтвердите действие',
+                    text:               'Всем водителям и автомобилям компании будет присвоен данный договор',
+                    confirmButtonText:  'Да',
+                    confirmButtonColor: '#3085d6',
+                    showCloseButton:    true,
+                }).then((modalRes) => {
+                    return modalRes;
+                })
+                if(!res.isConfirmed){
+                    return;
+                }
+            }
+
             e.target.disabled = true
             axios.get(`/contract/create`, {
                 params: {
@@ -267,7 +292,22 @@ export default {
 
                 });
         },
-        updateContract(e) {
+        async updateContract(e) {
+            if (this.contractData.hard_reset_for_car_and_drivers) {
+                let res = await swal.fire({
+                    title:              'Подтвердите действие',
+                    text:               'Всем водителям и автомобилям компании будет присвоен данный договор',
+                    confirmButtonText:  'Да',
+                    confirmButtonColor: '#3085d6',
+                    showCloseButton:    true,
+                }).then((modalRes) => {
+                    return modalRes;
+                })
+                if(!res.isConfirmed){
+                    return;
+                }
+            }
+
             e.target.disabled = true
             axios.post(`/contract/update`, {
                 data_to_save: this.contractData,

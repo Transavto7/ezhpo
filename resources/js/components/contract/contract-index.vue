@@ -162,11 +162,11 @@ export default {
                         key:   "our_company.inn",
                         label: "ИНН нашей компании",
                     },
-                    {
-                        key:      "main_for_company",
-                        sortable: true,
-                        label:    "Главный",
-                    },
+                    // {
+                    //     key:      "main_for_company",
+                    //     sortable: true,
+                    //     label:    "Главный",
+                    // },
                     {
                         key:      "date_of_end",
                         sortable: true,

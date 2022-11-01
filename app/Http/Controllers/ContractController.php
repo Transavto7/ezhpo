@@ -46,7 +46,7 @@ class ContractController extends Controller
             $contracts->orderBy($filters['sortBy'], $filters['sortDesc'] == 'true' ? 'DESC' : 'ASC');
         }
 
-        if($filters['trash'] ?? false){
+        if ($filters['trash'] ?? false) {
             $contracts->onlyTrashed();
         }
         if ($filters['id'] ?? false) {
@@ -78,11 +78,11 @@ class ContractController extends Controller
             $contracts->whereDate('date_of_end', '<=', $filters['date_of_end_end']);
         }
 
-        if (isset($filters['main_for_company'])) {
-            if ($filters['main_for_company'] == 0 || $filters['main_for_company'] == 1) {
-                $contracts->where('main_for_company', $filters['main_for_company']);
-            }
-        }
+//        if (isset($filters['main_for_company'])) {
+//            if ($filters['main_for_company'] == 0 || $filters['main_for_company'] == 1) {
+//                $contracts->where('main_for_company', $filters['main_for_company']);
+//            }
+//        }
 
         $contracts = $contracts->paginate(
             $filters['perPage'],
@@ -104,31 +104,20 @@ class ContractController extends Controller
     public function create(Request $request)
     {
         $data_to_save = json_decode($request->get('data_to_save'), true);
-
+//dd($data_to_save);
         $services = $data_to_save['services'] ?? [];
         unset($data_to_save['services']);
 
         $contract = Contract::create([
-            'name'             => $data_to_save['name'] ?? null,
-            'date_of_end'      => isset($data_to_save['date_of_end']) ? Carbon::parse($data_to_save['date_of_end']) : null,
-            'sum'              => $data_to_save['sum'] ?? null,
-            'company_id'       => $data_to_save['company']['id'] ?? null,
-            'our_company_id'   => $data_to_save['our_company']['id'] ?? null,
-            'main_for_company' => $data_to_save['main_for_company'] ?? 0,
+            'name'           => $data_to_save['name'] ?? null,
+            'date_of_end'    => isset($data_to_save['date_of_end']) ? Carbon::parse($data_to_save['date_of_end'])
+                : null,
+            'sum'            => $data_to_save['sum'] ?? null,
+            'company_id'     => $data_to_save['company']['id'] ?? null,
+            'our_company_id' => $data_to_save['our_company']['id'] ?? null,
+            //            'main_for_company' => $data_to_save['main_for_company'] ?? 0,
         ]);
 
-        if ($data_to_save['company']['id'] ?? false) {
-            Car::where('company_id', $data_to_save['company']['id'])
-               ->whereDoesntHave('contract')
-               ->update([
-                   'contract_id' => $contract->id,
-               ]);
-            Driver::where('company_id', $data_to_save['company']['id'])
-                  ->whereDoesntHave('contract')
-                  ->update([
-                      'contract_id' => $contract->id,
-                  ]);
-        }
 
         $servicesToSync = [];
         foreach ($services as $service) {
@@ -137,6 +126,52 @@ class ContractController extends Controller
 
 
         $contract->services()->sync($servicesToSync);
+
+
+        if ($data_to_save['company']['id'] ?? false) {
+            $services = $contract->services;
+
+            $is_cars_services    = false;
+            $is_drivers_services = false;
+
+            foreach ($services as $service) {
+                if ($service->essence == \App\Service::ESSENCE_DRIVER) {
+                    $is_drivers_services = true;
+                }
+                if ($service->essence == \App\Service::ESSENCE_CAR) {
+                    $is_cars_services = true;
+                }
+                if ($service->essence == \App\Service::ESSENCE_CAR_DRIVER) {
+                    $is_cars_services    = true;
+                    $is_drivers_services = true;
+                }
+
+            }
+
+            if($is_cars_services){
+                $cars_update = Car::where('company_id', $data_to_save['company']['id']);
+
+                // Если жёстко, то не проверяем старые записи в компаниях
+                if ( !(($data_to_save['sum']['hard_reset_for_car_and_drivers'] ?? false) == 'false')) {
+                    $cars_update->whereDoesntHave('contract');
+                }
+
+                $cars_update->update([
+                    'contract_id' => $contract->id,
+                ]);
+            }
+
+            if($is_drivers_services){
+                $drivers_update = Driver::where('company_id', $data_to_save['company']['id']);
+
+                if ( !(($data_to_save['sum']['hard_reset_for_car_and_drivers'] ?? false) == 'false')) {
+                    $drivers_update->whereDoesntHave('contract');
+                }
+                $drivers_update->update([
+                    'contract_id' => $contract->id,
+                ]);
+            }
+        }
 
         return response([
             'status'   => true,
@@ -201,27 +236,61 @@ class ContractController extends Controller
             ];
         }
         $contract->update([
-            'name'             => $data_to_save['name'] ?? null,
-            'date_of_end'      => isset($data_to_save['date_of_end']) ? Carbon::parse($data_to_save['date_of_end']) : null,
-            'sum'              => $data_to_save['sum'] ?? null,
-            'company_id'       => $data_to_save['company']['id'] ?? null,
-            'our_company_id'   => $data_to_save['our_company']['id'] ?? null,
-            'main_for_company' => $data_to_save['main_for_company'] ?? 0,
+            'name'           => $data_to_save['name'] ?? null,
+            'date_of_end'    => isset($data_to_save['date_of_end']) ? Carbon::parse($data_to_save['date_of_end'])
+                : null,
+            'sum'            => $data_to_save['sum'] ?? null,
+            'company_id'     => $data_to_save['company']['id'] ?? null,
+            'our_company_id' => $data_to_save['our_company']['id'] ?? null,
+            //            'main_for_company' => $data_to_save['main_for_company'] ?? 0,
         ]);
 
         $contract->services()->sync($servicesToSync);
 
+
         if ($data_to_save['company']['id'] ?? false) {
-            Car::where('company_id', $data_to_save['company']['id'])
-               ->whereDoesntHave('contract')
-               ->update([
-                   'contract_id' => $contract->id,
-               ]);
-            Driver::where('company_id', $data_to_save['company']['id'])
-                  ->whereDoesntHave('contract')
-                  ->update([
-                      'contract_id' => $contract->id,
-                  ]);
+            $services = $contract->services;
+
+            $is_cars_services    = false;
+            $is_drivers_services = false;
+
+            foreach ($services as $service) {
+                if ($service->essence == \App\Service::ESSENCE_DRIVER) {
+                    $is_drivers_services = true;
+                }
+                if ($service->essence == \App\Service::ESSENCE_CAR) {
+                    $is_cars_services = true;
+                }
+                if ($service->essence == \App\Service::ESSENCE_CAR_DRIVER) {
+                    $is_cars_services    = true;
+                    $is_drivers_services = true;
+                }
+
+            }
+
+            if($is_cars_services){
+                $cars_update = Car::where('company_id', $data_to_save['company']['id']);
+
+                // Если жёстко, то не проверяем старые записи в компаниях
+                if ( !(($data_to_save['sum']['hard_reset_for_car_and_drivers'] ?? false) == 'false')) {
+                    $cars_update->whereDoesntHave('contract');
+                }
+
+                $cars_update->update([
+                    'contract_id' => $contract->id,
+                ]);
+            }
+
+            if($is_drivers_services){
+                $drivers_update = Driver::where('company_id', $data_to_save['company']['id']);
+
+                if ( !(($data_to_save['sum']['hard_reset_for_car_and_drivers'] ?? false) == 'false')) {
+                    $drivers_update->whereDoesntHave('contract');
+                }
+                $drivers_update->update([
+                    'contract_id' => $contract->id,
+                ]);
+            }
         }
 
         return response([
@@ -245,6 +314,7 @@ class ContractController extends Controller
             'contract' => Contract::find($id)->delete(),
         ]);
     }
+
     public function restore($id, Request $request)
     {
         return response([

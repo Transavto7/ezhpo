@@ -71,22 +71,22 @@
                             </v-select>
                         </b-form-group>
                     </div>
-                    <div class="d-flex align-items-center col-lg-3">
-                        <b-form-group label="Главный" v-slot="{ ariaDescribedby }" class="w-100">
-                            <b-form-radio v-model="filters.main_for_company" :aria-describedby="ariaDescribedby"
-                                          name="some-radios"
-                                          :value="null">Все
-                            </b-form-radio>
-                            <b-form-radio v-model="filters.main_for_company" :aria-describedby="ariaDescribedby"
-                                          name="some-radios"
-                                          :value="1">Главный
-                            </b-form-radio>
-                            <b-form-radio v-model="filters.main_for_company" :aria-describedby="ariaDescribedby"
-                                          name="some-radios"
-                                          :value="0">Не главный
-                            </b-form-radio>
-                        </b-form-group>
-                    </div>
+<!--                    <div class="d-flex align-items-center col-lg-3">-->
+<!--                        <b-form-group label="Главный" v-slot="{ ariaDescribedby }" class="w-100">-->
+<!--                            <b-form-radio v-model="filters.main_for_company" :aria-describedby="ariaDescribedby"-->
+<!--                                          name="some-radios"-->
+<!--                                          :value="null">Все-->
+<!--                            </b-form-radio>-->
+<!--                            <b-form-radio v-model="filters.main_for_company" :aria-describedby="ariaDescribedby"-->
+<!--                                          name="some-radios"-->
+<!--                                          :value="1">Главный-->
+<!--                            </b-form-radio>-->
+<!--                            <b-form-radio v-model="filters.main_for_company" :aria-describedby="ariaDescribedby"-->
+<!--                                          name="some-radios"-->
+<!--                                          :value="0">Не главный-->
+<!--                            </b-form-radio>-->
+<!--                        </b-form-group>-->
+<!--                    </div>-->
                     <div class="d-flex align-items-center col-lg-3">
                         <b-form-group label="Время окончания договора от" v-slot="{ ariaDescribedby }" class="w-100">
                             <b-form-datepicker id="date_of_end_start" v-model="filters.date_of_end_start"
@@ -149,7 +149,7 @@ export default {
             filters: {
                 date_of_end_end: null,
                 date_of_end_start: null,
-                main_for_company: null,
+                // main_for_company: null,
                 our_company_id: null,
                 company_id: null,
                 id: null,
@@ -179,7 +179,7 @@ export default {
             this.filters = {
                 date_of_end_end: null,
                 date_of_end_start: null,
-                main_for_company: null,
+                // main_for_company: null,
                 our_company_id: null,
                 company_id: null,
                 id: null,

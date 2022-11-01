@@ -30,9 +30,9 @@
             {{ row.value ? new Date(row.value).toLocaleDateString("ru-RU") : '' }}
         </template>
 
-        <template #cell(main_for_company)="row">
-            {{ row.value ? 'Да' : 'Нет' }}
-        </template>
+<!--        <template #cell(main_for_company)="row">-->
+<!--            {{ row.value ? 'Да' : 'Нет' }}-->
+<!--        </template>-->
 
         <template #cell(buttons)="row">
             <div class="d-flex justify-content-center">

@@ -56,67 +56,6 @@ class ReportControllerContract extends Controller
 
         if (isset($data['filter'])) {
             $period_def = CarbonPeriod::create($date_from, $date_to)->month();
-            $months_def = collect($period_def)->map(function (Carbon $date) {
-                return $date->month;
-            })->toArray();
-
-            switch ($type_report) {
-                /**
-                 * ГРАФИК РАБОТЫ ПВ
-                 */
-                case 'graph_pv':
-
-                    if ($isApi) {
-
-                        $reports = Anketa::whereIn('pv_id', $pv_id)
-                                         ->where('type_anketa', $request->get('type_anketa'))
-                                         ->where('in_cart', 0)
-                                         ->where(function ($q) use ($date_from, $date_to) {
-                                             $q->where(function ($q) use ($date_from, $date_to) {
-                                                 $q->whereNotNull('date')
-                                                   ->whereBetween('date', [
-                                                       $date_from.' '.'00:00:00',
-                                                       $date_to.' '.'23:59:59',
-                                                   ]);
-                                             })->orWhere(function ($q) use ($date_from, $date_to) {
-                                                 $q->whereNull('date')->whereBetween('period_pl', [
-                                                     Carbon::parse($date_from)->format('Y-m'),
-                                                     Carbon::parse($date_to)->format('Y-m'),
-                                                 ]);
-                                             });
-                                         });
-
-                        $reports2 = Anketa::whereIn('pv_id', $pv_id)
-//                            ->where('type_anketa', 'medic')
-                                          ->where('type_anketa', $request->get('type_anketa'))
-                                          ->where('in_cart', 0)
-                                          ->whereBetween("created_at", [
-                                              $date_from." ".'00:00:00',
-                                              $date_to." ".'23:59:59',
-                                          ]);
-
-                        if ($date_from_time && $date_to_time) {
-                            $reports->whereTime('date', '>=', $date_from_time)
-                                    ->whereTime('date', '<=', $date_to_time);
-
-                            $reports2->whereTime('created_at', '>=', $date_from_time)
-                                     ->whereTime('created_at', '<=', $date_to_time);
-                        }
-
-                        $reports  = $reports->get();
-                        $reports2 = $reports2->get();
-//dd(
-//    $reports->toArray(),
-//    $reports2->toArray()
-//);
-                        return [
-                            'reports'  => $reports,
-                            'reports2' => $reports2,
-                        ];
-                    }
-
-                    break;
-            }
         }
 
         return view('pages.reports.all', [
@@ -129,23 +68,12 @@ class ReportControllerContract extends Controller
             'date_from'      => $date_from,
             'date_to'        => $date_to,
             'date_field'     => $date_field,
-            'company_id'     => isset($data['company_id']) ? $data['company_id'] : 0,
-            'pv_id'          => isset($data['pv_id']) ? $data['pv_id'] : 0,
+            'company_id'     => $data['company_id'] ?? 0,
+            'pv_id'          => $data['pv_id'] ?? 0,
             'data'           => $dopData,
         ]);
     }
 
-    public function showJournal(Request $request)
-    {
-        $company = null;
-        if ($request->has('company_id')) {
-            $company = Company::where('hash_id', $request->company_id)->select('id', 'hash_id', 'name')->first();
-        }
-
-        return view('reports.journal.index', [
-            'company' => $company,
-        ]);
-    }
 
     public function exportJournalData(Request $request)
     {

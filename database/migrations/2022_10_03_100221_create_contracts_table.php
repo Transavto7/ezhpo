@@ -21,7 +21,7 @@ class CreateContractsTable extends Migration
             $table->unsignedBigInteger('company_id')->nullable(); //
             $table->unsignedBigInteger('our_company_id')->nullable(); //
 
-            $table->boolean('main_for_company')->default(0); //
+//            $table->boolean('main_for_company')->default(0); //
             $table->date('date_of_end')->nullable(); // vremya deistviya v dnyah
 
 
