@@ -1,6 +1,22 @@
 @extends('layouts.app')
 
-@section('title', $title)
+@section('title')
+    @if($title === 'services')
+        Услуги
+        <span class="
+            start-100
+            translate-middle
+            badge
+            text-white
+            rounded-pill
+            bg-success"
+        >
+        new
+    </span>
+    @else
+        {{ $title }}
+    @endif
+@endsection
 @section('sidebar', 1)
 
 @php
@@ -144,7 +160,6 @@
                                         data-label="Тип"
                                         data-field="Product_type_product"
                                         class="js-chosen"
-                                        style="display: none;"
                                 >
                                     <option value="" selected>Не установлено</option>
                                     @foreach($fields['type_product']['values'] as $nameOfTypeProduct)
@@ -172,8 +187,7 @@
                             <div data-field="type_anketa" class="form-group">
                                 <label><b class="text-danger text-bold">*</b> Реестр</label>
                                 <select name="type_anketa" required="required" data-label="Реестр"
-                                        data-field="Product_type_anketa" class="js-chosen"
-                                        style="display: none;">
+                                        data-field="Product_type_anketa" class="filled-select2 filled-select">
                                     <option value="">Не установлено</option>
                                     <option value="bdd">
                                         БДД
@@ -196,7 +210,7 @@
                                 <label><b class="text-danger text-bold">*</b>Тип осмотра</label>
                                 <select multiple="multiple" name="type_view[]" required="required"
                                         data-label="Тип осмотра" data-field="Product_type_view"
-                                        class="js-chosen" style="display: none;">
+                                        class="filled-select2 filled-select">
                                     <option value="">Не установлено</option>
                                     <option value="Предрейсовый/Предсменный">
                                         Предрейсовый/Предсменный
@@ -219,14 +233,13 @@
                                 </select>
                             </div>
 
-                            <div data-field="essence" class="form-group" style="display: none">
+                            <div data-field="essence" class="form-group">
                                 <label><b class="text-danger text-bold">*</b>Сущности</label>
                                 <select name="essence"
                                         required="required"
                                         data-label="Сущности"
                                         data-field="Product_type_view"
-                                        class="js-chosen"
-                                        style="display: none;"
+                                        class="filled-select2 filled-select"
                                 >
                                     <option value="null">Не установлено</option>
                                     @foreach(\App\Product::$essence as $essenceKey => $essenceName)

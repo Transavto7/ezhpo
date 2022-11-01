@@ -156,7 +156,17 @@
                     @if(user()->access('report_service_company_read', 'report_service_company_export'))
                         <li>
                             <a href="{{ route('report.get', 'journal_contract') }}">
-                                <i class="fa fa-book"></i>Отчет по услугам компании[Договор]
+                                <i class="fa fa-book"></i>Отчет по услугам компании
+                                <span class="
+                                    start-100
+                                    translate-middle
+                                    badge
+                                    text-white
+                                    rounded-pill
+                                    bg-success"
+                                >
+                                    new
+                                </span>
                             </a>
                         </li>
                     @endif
@@ -193,7 +203,18 @@
                     @endif
                     @if(user()->access('service_read', 'service_create'))
                         <li><a href="{{ route('renderElements', 'Product') }}">Услуги</a></li>
-                        <li><a href="{{ route('renderElements', 'Service') }}">Услуги[Договор]</a></li>
+                        <li><a href="{{ route('renderElements', 'Service') }}">
+                                Услуги
+                                <span class="
+                                start-100
+                                translate-middle
+                                badge
+                                text-white
+                                rounded-pill
+                                bg-success">
+                                    new
+                                </span>
+                            </a></li>
                     @endif
                     @if(user()->access('discount_read', 'discount_create'))
                         <li><a href="{{ route('renderElements', 'Discount') }}">Скидки</a></li>

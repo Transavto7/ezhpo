@@ -565,7 +565,7 @@ class IndexController extends Controller
 
 
             'Service' => [
-                'title'       => 'Услуги[Договор]',
+                'title'       => 'Услуги новые',
                 'role'        => 0,
                 'popupTitle'  => 'Услуги',
                 'editOnField' => 'name',

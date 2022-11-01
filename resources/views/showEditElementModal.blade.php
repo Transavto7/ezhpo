@@ -36,13 +36,14 @@
                 @php if ($model === 'Instr' && $k === 'signature') continue; @endphp
 
                 @if($k == 'essence')
-                        <div data-field="essence" class="form-group" @if(($el->type_product ?? '') != 'Абонентская плата без реестров')  style="display: none" @endif>
+                        <div data-field="essence" class="form-group">
                             <label>Сущности</label>
-                            <select name="essence"
-                                    data-label="Сущности"
-                                    data-field="Product_type_view"
-                                    class="js-chosen"
-                                    style="display: none;"
+                            <select
+                                name="essence"
+                                data-label="Сущности"
+                                name="company_name"
+                                class="filled-select2 filled-select"
+                                @if(($el->type_product ?? '') != 'Абонентская плата без реестров')  disabled @endif
                             >
                                 <option value="" selected>Не установлено</option>
                                 @foreach(\App\Product::$essence as $essenceKey => $essenceName)
@@ -102,7 +103,7 @@
                 @endif
 
                 @if($k !== 'id' && !isset($v['hidden']))
-                    <div class="form-group" data-field="{{ $k }}" @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' ))  style="display: none" @endif>
+                    <div class="form-group" data-field="{{ $k }}">
                         <label>
                             @if($is_required) <b class="text-danger text-bold">*</b> @endif
                             {{ $v['label'] }}</label>
@@ -118,12 +119,12 @@
                         @if(isset($v['syncData']) && $model !== 'Company')
                             @foreach($v['syncData'] as $syncData)
                                 <a href="{{ route('syncDataElement', [
-                                                                            'model' => $syncData['model'],
-                                                                            'fieldFind' => $syncData['fieldFind'],
-                                                                            'fieldFindId' => $el['id'],
-                                                                            'fieldSync' => $k,
-                                                                            'fieldSyncValue' => $el[$k]
-                                                                        ]) }}" target="_blank" class="text-info btn-link"><i class="fa fa-spinner"></i> Синхронизация с: {{ $syncData['text'] }}</a>
+                                    'model' => $syncData['model'],
+                                    'fieldFind' => $syncData['fieldFind'],
+                                    'fieldFindId' => $el['id'],
+                                    'fieldSync' => $k,
+                                    'fieldSyncValue' => $el[$k]
+                                ]) }}" target="_blank" class="text-info btn-link"><i class="fa fa-spinner"></i> Синхронизация с: {{ $syncData['text'] }}</a>
                             @endforeach
                         @endif
                     </div>

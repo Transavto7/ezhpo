@@ -74,3 +74,52 @@ Artisan::command('anketas:fix', function () {
     $this->comment('Анкеты пофикшенs');
 
 })->describe('Display an inspiring quote');
+
+Artisan::command('services:create', function () {
+    \App\FieldPrompt::where('type', 'service')->forceDelete();
+
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'hash_id',
+        'name' => 'ID'
+    ]);
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'name',
+        'name' => 'Название'
+    ]);
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'type_product',
+        'name' => 'Тип'
+    ]);
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'unit',
+        'name' => 'Ед.изм.'
+    ]);
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'price_unit',
+        'name' => 'Стоимость за единицу'
+    ]);
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'type_anketa',
+        'name' => 'Реестр'
+    ]);
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'type_view',
+        'name' => 'Тип осмотра'
+    ]);
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'essence',
+        'name' => 'Сущности'
+    ]);
+
+    \App\Service::where('id', '>', -1)->forceDelete();
+    $products = \App\Product::get()->toArray();
+    \App\Service::insert($products);
+});

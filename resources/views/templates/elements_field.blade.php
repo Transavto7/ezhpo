@@ -96,6 +96,7 @@
     //}
     @endphp
     <select
+        @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' )) disabled @endif
         @isset($v['saveToHistory'])
             onchange="addFieldToHistory(event.target.value, '{{ $v['label'] }}');"
         @endisset

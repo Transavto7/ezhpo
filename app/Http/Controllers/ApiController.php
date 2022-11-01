@@ -9,6 +9,7 @@ use App\Req;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class ApiController extends Controller
@@ -142,13 +143,13 @@ class ApiController extends Controller
         if(isset($models[$model]) && !empty($val)) {
             $_model = $models[$model];
             $data = app($_model['model']);
+            $fields = $data->fillable;
 
             if ($_model['model'] == Company::class){
                 $data = $data::with(['contracts']);
             }elseif($_model['model'] == Driver::class || $_model['model'] == Car::class){
                 $data = $data::with(['contract']);
             }
-//            $fields = $data->fillable;
 //            array_push($fields, 'id');
 
             /**
