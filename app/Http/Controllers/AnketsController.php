@@ -1069,16 +1069,16 @@ class AnketsController extends Controller
 
 //                dd();
                 // ДОГОВОР СНЕПШОТ
-                if($anketa['type_anketa'] == 'medic'){
+//                if($anketa['type_anketa'] == 'medic'){
                     if($Driver){
                         $anketa['contract_id'] = $Driver->contract_id;
                     }
-                }
-                if($anketa['type_anketa'] == 'tech'){
+//                }
+//                if($anketa['type_anketa'] == 'tech'){
                     if($Car){
                         $anketa['contract_id'] = $Car->contract_id;
                     }
-                }
+//                }
 
                 $ank = new Anketa();
                 $createdAnketas[] = Arr::only($anketa, $ank->getFillable());
