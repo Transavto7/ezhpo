@@ -18,31 +18,39 @@ class AddCommentToCompaniesTable extends Migration
         });
 
         $this->addFieldAfter('company','comment', 'Комментарий', 'user_id');
-        \App\FieldPrompt::create([
-            'type' => 'company',
-            'field' => 'comment',
-            'name' => 'Комментарий'
-        ]);
-    }
-
-    public function addFieldAfter(string $type, string $field, string $name, $fieldAfter) {
-        $fields = \App\FieldPrompt::where('type', $type)->get();
+        $fields = \App\FieldPrompt::where('type', 'company')->get();
         foreach ($fields as $tableField) {
-            if ($fieldAfter === $tableField->field) {
+            if ($tableField->field === 'user_id') {
+                $dismissed = $fields->where('field', 'dismissed')->first();
+                if ($dismissed) {
+                    \App\FieldPrompt::create([
+                        'type' => $dismissed->type,
+                        'field' => $dismissed->field,
+                        'name' => $dismissed->name,
+                        'content' => $dismissed->content
+                    ]);
+                }
+
                 \App\FieldPrompt::create([
-                    'type' => $type,
-                    'field' => $field,
-                    'name' => $name
+                    'type' => 'company',
+                    'field' => 'comment',
+                    'name' => 'Комментарий'
                 ]);
             }
 
-            \App\FieldPrompt::create([
-                'type' => $tableField->type,
-                'field' => $tableField->field,
-                'name' => $tableField->name
-            ]);
+            if ($tableField->field !== 'dismissed') {
+                \App\FieldPrompt::create([
+                    'type' => $tableField->type,
+                    'field' => $tableField->field,
+                    'name' => $tableField->name
+                ]);
+            }
         }
         \App\FieldPrompt::whereIn('id', $fields->pluck('id'))->forceDelete();
+    }
+
+    public function addFieldAfter(string $type, string $field, string $name, $fieldAfter) {
+
     }
 
     /**
