@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Anketa;
 use App\Car;
 use App\Company;
 use App\Driver;
@@ -98,16 +99,27 @@ class Contract extends Model
 //
 //        Service::insert($products);
 
-        // НОВЫЕ УСЛУГИ ИЗ ДОГОВОРОВ ДЛЯ ВОДИЛ И МАШИН
+        // НОВЫЕ УСЛУГИ ИЗ ДОГОВОРОВ ДЛЯ ВОДИЛ И МАШИН,  MO & TO
+//        FieldPrompt::create([
+//            'field' => 'services',
+//            'type' => 'car',
+//            'name' => 'Услуги новые',
+//        ]);
+//        FieldPrompt::create([
+//            'field' => 'services',
+//            'type' => 'driver',
+//            'name' => 'Услуги новые',
+//        ]);
+
         FieldPrompt::create([
-            'field' => 'services',
-            'type' => 'car',
-            'name' => 'Услуги новые',
+            'field' => 'contract_id',
+            'type'  => 'tech',
+            'name'  => 'Договор',
         ]);
         FieldPrompt::create([
-            'field' => 'services',
-            'type' => 'driver',
-            'name' => 'Услуги новые',
+            'field' => 'contract_id',
+            'type'  => 'medic',
+            'name'  => 'Договор',
         ]);
 
 //        FieldPrompt::create([

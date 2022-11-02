@@ -50,7 +50,7 @@ class ContractController extends Controller
             $contracts->onlyTrashed();
         }
         if ($filters['id'] ?? false) {
-            $contracts->where('id', 'like', "%{$filters['id']}%");
+            $contracts->where('id', $filters['id']);
         }
         if ($filters['name'] ?? false) {
             $contracts->where('name', 'like', "%{$filters['name']}%");
