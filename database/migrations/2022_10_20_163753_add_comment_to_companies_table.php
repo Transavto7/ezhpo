@@ -42,7 +42,8 @@ class AddCommentToCompaniesTable extends Migration
                 \App\FieldPrompt::create([
                     'type' => $tableField->type,
                     'field' => $tableField->field,
-                    'name' => $tableField->name
+                    'name' => $tableField->name,
+                    'content' => $tableField->content
                 ]);
             }
         }
