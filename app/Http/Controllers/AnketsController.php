@@ -162,15 +162,17 @@ class AnketsController extends Controller
             return back()->with('error', "Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])");
         }
 
-        if (!$anketa || !$anketa->date || !$anketa->car_id) {
-            return back()->with('error', 'Указаны не полные данные осмотра');
-        }
+        if ($anketa->type_anketa === 'tech') {
+            if (!$anketa || !$anketa->date || !$anketa->car_id) {
+                return back()->with('error', 'Указаны не полные данные осмотра');
+            }
 
-        if($anketa->number_list_road === null && $anketa->type_anketa !== 'medic') {
-            // Генерируем номер ПЛ
-            $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
-            $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
-            $anketa->number_list_road = $anketa->car_id . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
+            if($anketa->number_list_road === null && $anketa->type_anketa !== 'medic') {
+                // Генерируем номер ПЛ
+                $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
+                $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
+                $anketa->number_list_road = $anketa->car_id . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
+            }
         }
 
         $anketa->result_dop = $result_dop;
