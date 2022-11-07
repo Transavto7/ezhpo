@@ -1348,7 +1348,7 @@ class AnketsController extends Controller
                  */
                 $tonometer = explode('/', $anketa['tonometer']);
                 if($proba_alko === 'Отрицательно' && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
-                    && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38 && $tonometer[0] < 150) {
+                    && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38 && $tonometer[0] < 150 && $tonometer[1] < 100) {
                     $anketa['admitted'] = 'Допущен';
                 } else {
                     $anketa['admitted'] = 'Не допущен';
