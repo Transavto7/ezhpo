@@ -1348,9 +1348,11 @@ class AnketsController extends Controller
                  */
                 $tonometer = explode('/', $anketa['tonometer']);
                 if($proba_alko === 'Отрицательно' && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
-                    && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38 && $tonometer[0] < 150 && $tonometer[1] < 100) {
+                    && $anketa['t_people'] < 38 && $tonometer[0] < 150 && $tonometer[1] < 100) {
+                    $anketa['med_view'] = 'В норме';
                     $anketa['admitted'] = 'Допущен';
                 } else {
+                    $anketa['med_view'] = 'Отстранения';
                     $anketa['admitted'] = 'Не допущен';
                 }
 
@@ -1363,7 +1365,6 @@ class AnketsController extends Controller
                     } else {
                         $anketa['admitted'] = 'Не допущен';
                     }
-
                 }
 
                 if(!empty($d_id) || !empty($c_id) || !empty($anketa['number_list_road'])) {
