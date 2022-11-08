@@ -209,6 +209,10 @@ return [
         'name'        => 'report_schedule_pv_read',
         'description' => 'График работы пунктов выпуска - Просмотр',
     ],
+    [
+        'name'        => 'report_schedule_dynamic_mo',
+        'description' => 'Отчет по количеству медицинских отчетов - Просмотр',
+    ],
 
     //============== Водители =============//
     [

@@ -146,12 +146,19 @@
 
                     @if(user()->access('report_service_company_read', 'report_service_company_export'))
                         <li>
-                            <a href="{{ route('report.get', 'journal') }}">
+                            <a href="{{ route('report.journal') }}">
                                 <i class="fa fa-book"></i>Отчет по услугам компании
                             </a>
                         </li>
                     @endif
 
+                    @if(user()->access('report_schedule_dynamic_mo'))
+                        <li>
+                            <a href="{{ route('report.dynamic.medic') }}">
+                                <i class="fa fa-book"></i>Отчет по количеству медицинских отчетов
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </li>
         @endif

@@ -1,5 +1,5 @@
 @php $default_value = isset($default_value) ? $default_value : ''; @endphp
-@php $uniqueInputId = sha1(time() + rand(999,99999)); @endphp
+@php $uniqueInputId = sha1(time() + rand(999, 99999)); @endphp
 
 @if($v['type'] !== 'select')
     <input

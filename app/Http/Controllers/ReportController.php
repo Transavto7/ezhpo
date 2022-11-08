@@ -8,6 +8,7 @@ use App\Company;
 use App\Discount;
 use App\Driver;
 use App\Exports\ReportJournalExport;
+use App\Point;
 use App\Product;
 use App\Req;
 use Carbon\Carbon;
@@ -140,6 +141,77 @@ class ReportController extends Controller
 
         return view('reports.journal.index', [
             'company' => $company
+        ]);
+    }
+
+    public function getDynamicMedic(Request $request) {
+        $months = [];
+        for ($i = 0; $i < 12; $i++) {
+            $now = Carbon::now();
+            $now->addMonths($i * -1);
+            $months[] = $now->format('F');
+        }
+
+        if ($request->town_id || $request->pv_id) {
+            $date_from = Carbon::now()->addMonths(-11)->firstOfMonth()->startOfDay();
+            $date_to = Carbon::now()->lastOfMonth()->endOfDay();
+            $result = [];
+            $total = [];
+
+            $anketas = Anketa::where('type_anketa', 'medic')->where('in_cart', 0)
+                ->where(function ($q) use ($date_from, $date_to) {
+                    $q->where(function ($q) use ($date_from, $date_to) {
+                        $q->whereNotNull('date')
+                            ->whereBetween('date', [
+                                $date_from,
+                                $date_to,
+                            ]);
+                    })
+                        ->orWhere(function ($q) use ($date_from, $date_to) {
+                            $q->whereNull('date')->whereBetween('period_pl', [
+                                $date_from->format('Y-m'),
+                                $date_to->format('Y-m'),
+                            ]);
+                        });
+                });
+
+                if ($request->town_id) {
+                    $companies = Company::where('town_id', $request->town_id)->pluck('hash_id');
+                    $anketas = $anketas->whereIn('company_id', $companies);
+                }
+
+                if ($request->pv_id) {
+                    $anketas = $anketas->where('pv_id', Point::find($request->pv_id)->name);
+                }
+                $anketas = $anketas->get();
+
+                foreach($anketas->groupBy('company_id') as $company_id => $anketasByCompany) {
+                    $result[$company_id]['name'] = $anketasByCompany->first()->company_name;
+                    for ($i = 0; $i < 12; $i++) {
+                        $date_from = Carbon::now()->addMonths($i * -1)->firstOfMonth()->startOfDay();
+                        $date_to = Carbon::now()->addMonths($i * -1)->lastOfMonth()->startOfDay();
+                        $date = Carbon::now()->addMonths($i * -1);
+
+                         $count = $anketasByCompany
+                           ->whereBetween('date', [
+                                $date_from,
+                                $date_to,
+                            ])->count() +
+                        $anketasByCompany->whereBetween('period_pl', [
+                                $date_from->format('Y-m'),
+                                $date_to->format('Y-m'),
+                            ])->count();
+
+                        $result[$company_id][$date->format('F')] = $count;
+                        $total[$date->format('F')] = $total[$date->format('F')] ?? 0 + $count;
+                    }
+                }
+        }
+
+        return view('reports.dynamic.medic.index', [
+            'months' => $months,
+            'companies' => $result ?? null,
+            'total' => $total ?? null
         ]);
     }
 
