@@ -955,7 +955,7 @@ class AnketsController extends Controller
                  * Генерация номера ПЛ
                  */
                 if(empty($anketa['number_list_road'])) {
-                    if($anketa['type_anketa'] === 'tech' && $anketa['date'] && $anketa['car_id']) {
+                    if($anketa['type_anketa'] === 'tech' && !$anketa['is_dop']) {
                         // Генерируем номер ПЛ
                         $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
                         $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
