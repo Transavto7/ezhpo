@@ -6,6 +6,7 @@ use App\Company;
 use App\Driver;
 use Illuminate\Database\Eloquent\Model;
 
+// archive
 class ContractAnketaSnapshot extends Model
 {
     protected $table = 'contract_anketa_snapshot';

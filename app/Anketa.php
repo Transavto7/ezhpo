@@ -4,15 +4,34 @@ namespace App;
 
 use App\Models\Contract;
 use App\Models\ContractAnketaSnapshot;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Model;
 
 class Anketa extends Model
 {
+    // archive
     public function contract_snapshot()
     {
         return $this->belongsTo(ContractAnketaSnapshot::class, 'contract_snapshot_id', 'id')
                     ->withDefault();
     }
+
+
+    public function services_snapshot()
+    {
+        return $this->belongsToMany(
+            Service::class,
+            'anketa_services_discount_snapshot_contracts',
+            'anketa_id',
+            'service_id',
+            'id',
+            'id'
+        )->withPivot('service_cost');
+//        return $this->belongsTo(ContractAnketaSnapshot::class, 'contract_snapshot_id', 'id')
+//                    ->withDefault();
+    }
+
+
     public function contract()
     {
         return $this->belongsTo(Contract::class, 'contract_id', 'id')

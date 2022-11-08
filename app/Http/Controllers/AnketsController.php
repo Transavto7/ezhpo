@@ -501,7 +501,7 @@ class AnketsController extends Controller
             $createdAnketasDataResponseApi = [];
             $data_anketa = $data['anketa'];
             $errorsAnketa = array();
-            $Driver = Driver::where('hash_id', $d_id)->first();
+            $Driver = Driver::with(['contract.services'])->where('hash_id', $d_id)->first();
             $cars = [];
 
             // Только обычные осмотры валидируем
@@ -597,7 +597,7 @@ class AnketsController extends Controller
                 // ID автомобиля
                 $c_id = $anketa['car_id'] ?? 0;
 
-                $Car = Car::where('hash_id', $c_id)->first();
+                $Car = Car::with(['contract.services'])->where('hash_id', $c_id)->first();
 
                 // Тонометр
                 $tonometer = $anketa['tonometer'] ?? $defaultDatas['tonometer'];
@@ -1070,7 +1070,13 @@ class AnketsController extends Controller
 //                dd();
                 // ДОГОВОР СНЕПШОТ
 //                if($anketa['type_anketa'] == 'medic'){
+//                dd($Driver);
                     if($Driver){
+                        $servicesToSync = [];
+                        foreach ($Driver->contract->services as $service) {
+                            $servicesToSync[$service['id']] = ['service_cost' => $service['price_unit']];
+                        }
+
                         $anketa['contract_id'] = $Driver->contract_id;
                     }
 //                }
@@ -1085,8 +1091,15 @@ class AnketsController extends Controller
             }
 
             Anketa::insert($createdAnketas);
-            $createdAnketas = Anketa::where('type_anketa', $data['type_anketa'])
+            $createdAnketas = Anketa::with(['services_snapshot'])->where('type_anketa', $data['type_anketa'])
                 ->limit(count($createdAnketas))->orderBy('id', 'desc')->get();
+
+            if(isset($servicesToSync)){
+//                dd($createdAnketas->toArray());
+                foreach ($createdAnketas as $createdAnketa){
+                    $createdAnketa->services_snapshot()->sync($servicesToSync);
+                }
+            }
 
             $responseData = [
                 'createdId' => $createdAnketas->pluck('id')->toArray(),
