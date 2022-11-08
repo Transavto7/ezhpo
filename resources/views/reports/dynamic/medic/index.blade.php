@@ -6,7 +6,8 @@
     <div class="card mb-4" style="overflow-x: inherit">
         <h5 class="card-header">Выбор информации</h5>
         <div class="card-body">
-            <form action="{{ route('report.dynamic.medic') }}" method="GET">
+            <form action="{{ route('report.dynamic.medic') }}" method="GET"
+                  onsubmit="document.querySelector('#page-preloader').classList.remove('hide')">
                 <div class="row">
                     <div class="form-group col-lg-3">
                         <label class="mb-1" for="company">Город</label>
