@@ -203,7 +203,7 @@ class ReportController extends Controller
                             ])->count();
 
                         $result[$company_id][$date->format('F')] = $count;
-                        $total[$date->format('F')] = $total[$date->format('F')] ?? 0 + $count;
+                        $total[$date->format('F')] = ($total[$date->format('F')] ?? 0) + $count;
                     }
                 }
         }
