@@ -294,7 +294,7 @@ $permissionToExportPrikazPL = (
                             </li>
                         </ul>
 
-                        <form  onsubmit="document.querySelector('#page-preloader').classList.remove('hide')" action="" method="GET" class="tab-content ankets-form-filter mb-3 pt-3" id="filter-groupsContent">
+                        <form onsubmit="document.querySelector('#page-preloader').classList.remove('hide')" action="" method="GET" class="tab-content ankets-form-filter mb-3 pt-3" id="filter-groupsContent">
                             <div class="text-center">
                                 <img src="{{ asset('images/loader.gif') }}" width="30" class="mb-4" />
                             </div>

@@ -18,27 +18,11 @@ class AddBitrixLinkToCompaniesTable extends Migration
             $table->text('bitrix_link')->after('deleted_at')->nullable();
         });
 
-        $this->addFieldAfter('company','bitrix_link','Ссылка на компанию в Bitrix24', 'document_bdd');
-    }
-
-    public function addFieldAfter(string $type, string $field, string $name, $fieldAfter) {
-        $fields = \App\FieldPrompt::where('type', $type)->get();
-        foreach ($fields as $tableField) {
-            if ($fieldAfter === $tableField->field) {
-                \App\FieldPrompt::create([
-                    'type' => $type,
-                    'field' => $field,
-                    'name' => $name
-                ]);
-            }
-
-            \App\FieldPrompt::create([
-                'type' => $tableField->type,
-                'field' => $tableField->field,
-                'name' => $tableField->name
-            ]);
-        }
-        \App\FieldPrompt::whereIn('id', $fields->pluck('id'))->forceDelete();
+        \App\FieldPrompt::create([
+            'type' => 'company',
+            'field' => 'bitrix_link',
+            'name' => 'Ссылка на компанию в Bitrix24'
+        ]);
     }
 
     /**

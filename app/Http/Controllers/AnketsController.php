@@ -162,15 +162,17 @@ class AnketsController extends Controller
             return back()->with('error', "Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])");
         }
 
-        if (!$anketa || !$anketa->date || !$anketa->car_id) {
-            return back()->with('error', 'Указаны не полные данные осмотра');
-        }
+        if ($anketa->type_anketa === 'tech') {
+            if (!$anketa || !$anketa->date || !$anketa->car_id) {
+                return back()->with('error', 'Указаны не полные данные осмотра');
+            }
 
-        if($anketa->number_list_road === null && $anketa->type_anketa !== 'medic') {
-            // Генерируем номер ПЛ
-            $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
-            $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
-            $anketa->number_list_road = $anketa->car_id . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
+            if($anketa->number_list_road === null && $anketa->type_anketa !== 'medic') {
+                // Генерируем номер ПЛ
+                $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
+                $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
+                $anketa->number_list_road = $anketa->car_id . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
+            }
         }
 
         $anketa->result_dop = $result_dop;
@@ -953,7 +955,7 @@ class AnketsController extends Controller
                  * Генерация номера ПЛ
                  */
                 if(empty($anketa['number_list_road'])) {
-                    if($anketa['type_anketa'] !== 'medic' && $anketa['date'] && $anketa['car_id']) {
+                    if($anketa['type_anketa'] === 'tech' && !$anketa['is_dop']) {
                         // Генерируем номер ПЛ
                         $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
                         $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
@@ -1372,9 +1374,11 @@ class AnketsController extends Controller
                  */
                 $tonometer = explode('/', $anketa['tonometer']);
                 if($proba_alko === 'Отрицательно' && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
-                    && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38 && $tonometer[0] < 150) {
+                    && $anketa['t_people'] < 38 && $tonometer[0] < 150 && $tonometer[1] < 100) {
+                    $anketa['med_view'] = 'В норме';
                     $anketa['admitted'] = 'Допущен';
                 } else {
+                    $anketa['med_view'] = 'Отстранения';
                     $anketa['admitted'] = 'Не допущен';
                 }
 
@@ -1387,7 +1391,6 @@ class AnketsController extends Controller
                     } else {
                         $anketa['admitted'] = 'Не допущен';
                     }
-
                 }
 
                 if(!empty($d_id) || !empty($c_id) || !empty($anketa['number_list_road'])) {
