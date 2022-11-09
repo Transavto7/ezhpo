@@ -20,6 +20,7 @@
 @section('sidebar', 1)
 
 @php
+//dd($fieldPrompts->pluck('name')->toArray());
 //dd($model);
 @endphp
 

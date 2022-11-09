@@ -127,7 +127,6 @@ class ContractController extends Controller
 
         $contract->services()->sync($servicesToSync);
 
-
         if ($data_to_save['company']['id'] ?? false) {
             $services = $contract->services;
 
@@ -152,7 +151,7 @@ class ContractController extends Controller
                 $cars_update = Car::where('company_id', $data_to_save['company']['id']);
 
                 // Если жёстко, то не проверяем старые записи в компаниях
-                if ( !(($data_to_save['sum']['hard_reset_for_car_and_drivers'] ?? false) == 'false')) {
+                if ( !($data_to_save['hard_reset_for_car_and_drivers'] ?? false)) {
                     $cars_update->whereDoesntHave('contract');
                 }
 
@@ -164,7 +163,7 @@ class ContractController extends Controller
             if($is_drivers_services){
                 $drivers_update = Driver::where('company_id', $data_to_save['company']['id']);
 
-                if ( !(($data_to_save['sum']['hard_reset_for_car_and_drivers'] ?? false) == 'false')) {
+                if (!($data_to_save['hard_reset_for_car_and_drivers'] ?? false)) {
                     $drivers_update->whereDoesntHave('contract');
                 }
                 $drivers_update->update([
@@ -247,7 +246,6 @@ class ContractController extends Controller
 
         $contract->services()->sync($servicesToSync);
 
-
         if ($data_to_save['company']['id'] ?? false) {
             $services = $contract->services;
 
@@ -272,7 +270,7 @@ class ContractController extends Controller
                 $cars_update = Car::where('company_id', $data_to_save['company']['id']);
 
                 // Если жёстко, то не проверяем старые записи в компаниях
-                if ( !(($data_to_save['sum']['hard_reset_for_car_and_drivers'] ?? false) == 'false')) {
+                if ( $data_to_save['hard_reset_for_car_and_drivers'] ?? false) {
                     $cars_update->whereDoesntHave('contract');
                 }
 
@@ -284,7 +282,7 @@ class ContractController extends Controller
             if($is_drivers_services){
                 $drivers_update = Driver::where('company_id', $data_to_save['company']['id']);
 
-                if ( !(($data_to_save['sum']['hard_reset_for_car_and_drivers'] ?? false) == 'false')) {
+                if ( $data_to_save['hard_reset_for_car_and_drivers'] ?? false) {
                     $drivers_update->whereDoesntHave('contract');
                 }
                 $drivers_update->update([
