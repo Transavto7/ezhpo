@@ -170,11 +170,11 @@ export default {
         },
 
         reset() {
-            // this.$refs.reportsMedic.hide();
-            // this.$refs.reportsTech.hide();
-            // this.$refs.reportsTechOther.hide();
-            // this.$refs.reportsMedicOther.hide();
-            // this.$refs.reportsOther.hide();
+            this.$refs.reportsMedic.hide();
+            this.$refs.reportsTech.hide();
+            this.$refs.reportsTechOther.hide();
+            this.$refs.reportsMedicOther.hide();
+            this.$refs.reportsOther.hide();
         },
         async report() {
             this.loading = true;
@@ -189,15 +189,21 @@ export default {
                         month: this.month
                     }
                 }).then(({ data }) => {
-                        console.log(contract_key)
-                        console.log(this.contracts)
                         this.contracts[contract_key].visible_result = true;
-                        console.log(this.contracts)
 
+                        this.$refs.reportsMedic[contract_key].hide();
                         this.$refs.reportsMedic[contract_key].visible(data.medics);
+
+                        this.$refs.reportsTech[contract_key].hide();
                         this.$refs.reportsTech[contract_key].visible(data.techs);
+
+                        this.$refs.reportsTechOther[contract_key].hide();
                         this.$refs.reportsTechOther[contract_key].visible(data.techs_other);
+
+                        this.$refs.reportsMedicOther[contract_key].hide();
                         this.$refs.reportsMedicOther[contract_key].visible(data.medics_other);
+
+                        this.$refs.reportsOther[contract_key].hide();
                         this.$refs.reportsOther[contract_key].visible(data.other);
                         return;
                 }).finally(() => {
