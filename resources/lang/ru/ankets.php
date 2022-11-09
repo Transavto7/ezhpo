@@ -4,6 +4,7 @@ return [
     'date_prto' => 'Дата ПРТО',
     'date_bdd' => 'Дата БДД',
     'date_prmo' => 'Дата ПРМО',
+    'date_osago' => 'Дата осаго',
 
     'date_report_driver' => 'Дата снятия отчета с карты водителя',
     'date_techview' => 'Дата техосмотра',
