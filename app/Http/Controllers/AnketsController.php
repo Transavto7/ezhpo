@@ -1378,7 +1378,7 @@ class AnketsController extends Controller
                     $anketa['med_view'] = 'В норме';
                     $anketa['admitted'] = 'Допущен';
                 } else {
-                    $anketa['med_view'] = 'Отстранения';
+                    $anketa['med_view'] = 'Отстранение';
                     $anketa['admitted'] = 'Не допущен';
                 }
 
