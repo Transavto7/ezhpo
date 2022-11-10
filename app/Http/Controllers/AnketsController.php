@@ -437,7 +437,7 @@ class AnketsController extends Controller
         }
     }
 
-    public function AddForm (Request $request, $isApiRoute = false)
+    public function AddForm(Request $request, $isApiRoute = false)
     {
         $user = ($isApiRoute) ? $request->user('api') : Auth::user();
         $sms = new SmsController();
@@ -553,11 +553,11 @@ class AnketsController extends Controller
 
                 // Журнал инструктажей по БДД
                 if($data['type_anketa'] === 'bdd'){
-                    if($data['driver_id']){
+                    if ($data['driver_id']){
                         if(!Driver::where('hash_id', $data['driver_id'])->count()){
                             $errorsAnketa[] = 'Не найден водитель.';
                         }
-                    }else{
+                    } else {
                         $errorsAnketa[] = 'Не указана машина.';
                     }
                 }
@@ -698,7 +698,7 @@ class AnketsController extends Controller
 
                         if($Driver->dismissed === 'Да') {
                             $errMsg = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
-                            array_push($errorsAnketa, $errMsg);
+                            $errorsAnketa[] = $errMsg;
 //                            continue;
                         }
 
@@ -714,28 +714,19 @@ class AnketsController extends Controller
                                 $anketa['company_name'] = $Company->name;
 
                                 if($Company->dismissed === 'Да') {
-                                    $errMsg = 'Компания в черном списке. Необходимо связаться с руководителем!';
-
-                                    array_push($errorsAnketa, $errMsg);
+                                    $errorsAnketa[] = 'Компания в черном списке. Необходимо связаться с руководителем!';
                                     continue;
                                 }
 
                             } else {
-                                $errMsg = "У Водителя не верно указано ID компании";
-
-                                array_push($errorsAnketa, $errMsg);
-
+                                $errorsAnketa[] = 'У Водителя не верно указано ID компании';
                                 $this->savePakForm($anketa, $errMsg);
                                 continue;
                             }
 
                         } else {
-                            $errMsg = "У Водителя не найдена компания";
-
-                            array_push($errorsAnketa, $errMsg);
-
+                            $errorsAnketa[] = 'У Водителя не найдена компания';
                             $this->savePakForm($anketa, $errMsg);
-
                             continue;
                         }
                     }
@@ -870,9 +861,7 @@ class AnketsController extends Controller
                      */
                     if($Car) {
                         if($Car->dismissed === 'Да') {
-                            $errMsg = 'Автомобиль уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
-
-                            array_push($errorsAnketa, $errMsg);
+                            $errorsAnketa[] = 'Автомобиль уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
                         }
                     }
 
@@ -887,17 +876,11 @@ class AnketsController extends Controller
                             $anketa['company_name'] = $Company_Car->name;
 
                             if($Company_Car->dismissed === 'Да') {
-                                $errMsg = 'Компания в черном списке. Необходимо связаться с руководителем!';
-
-                                array_push($errorsAnketa, $errMsg);
-
+                                $errorsAnketa[] = 'Компания в черном списке. Необходимо связаться с руководителем!';
                                 continue;
                             }
                         } else {
-                            $errMsg = "У Автомобиля не найдена компания";
-
-                            array_push($errorsAnketa, $errMsg);
-
+                            $errorsAnketa[] = 'У Автомобиля не найдена компания';
                             $this->savePakForm($anketa, $errMsg);
 
                             continue;
@@ -947,7 +930,7 @@ class AnketsController extends Controller
                         $errMsg = "Найден дубликат осмотра при добавлении (Дата: $anketaDublicate[date])";
                     }
 
-                    array_push($errorsAnketa, $errMsg);
+                    $errorsAnketa[] = $errMsg;
                     continue;
                 }
 
@@ -1103,7 +1086,7 @@ class AnketsController extends Controller
     /**
      * API ROUTES
      */
-    public function ApiAddForm (Request $request)
+    public function ApiAddForm(Request $request)
     {
         $addForm = $this->AddFormTemp($request, true);
 
@@ -1111,7 +1094,7 @@ class AnketsController extends Controller
     }
 
     // Временный метод для фикса СДПО
-    public function AddFormTemp (Request $request, $isApiRoute = false)
+    public function AddFormTemp(Request $request, $isApiRoute = false)
     {
         $user = ($isApiRoute) ? $request->user('api') : Auth::user();
         $sms = new SmsController();
