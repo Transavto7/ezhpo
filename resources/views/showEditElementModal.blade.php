@@ -43,6 +43,7 @@
                                 name="essence"
                                 data-label="Сущности"
                                 class="filled-select2 filled-select"
+                                @if(($el->type_product ?? '') != 'Абонентская плата без реестров')  disabled @endif
                             >
                                 <option value="" selected>Не установлено</option>
                                 @foreach(\App\Product::$essence as $essenceKey => $essenceName)

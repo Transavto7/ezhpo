@@ -1195,7 +1195,7 @@ $(document).ready(function () {
         let selected = field.val()
 
         if(selected === 'Абонентская плата без реестров'){
-            // field.closest('.modal-body').find('select[name=essence]').prop( "disabled", false);
+            field.closest('.modal-body').find('select[name=essence]').prop( "disabled", false);
             field.closest('.modal-body').find('select[name=type_anketa]').prop( "disabled", true);
             field.closest('.modal-body').find('select[name="type_view[]"]').prop( "disabled", true);
 
@@ -1203,11 +1203,11 @@ $(document).ready(function () {
             field.closest('.modal-body').find('select[name=type_anketa]').prop('required', false) // тип осмотра
             field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', false) // Реестр
         }else{
-            // field.closest('.modal-body').find('select[name=essence]').prop( "disabled", true);
+            field.closest('.modal-body').find('select[name=essence]').prop( "disabled", true);
             field.closest('.modal-body').find('select[name="type_view[]"]').prop( "disabled", false);
             field.closest('.modal-body').find('select[name=type_anketa]').prop( "disabled", false);
 
-            // field.closest('.modal-body').find('select[name=essence]').prop('required', false) // тип осмотра
+            field.closest('.modal-body').find('select[name=essence]').prop('required', false) // тип осмотра
             field.closest('.modal-body').find('select[name=type_anketa]').prop('required', true) // тип осмотра
             field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', true) // Реестр
         }
