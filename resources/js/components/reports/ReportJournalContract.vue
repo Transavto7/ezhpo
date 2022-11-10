@@ -61,29 +61,41 @@
             <b-card-group v-show="contract.visible_result" class="my-3">
                 <b-card :header="contract.name">
                     <template #header>
-                        <h3 class="mb-0">{{ contract.name }}</h3>
+<!--                        <h3 class="mb-0">{{ contract.name }}</h3>-->
+                        <b-button  v-b-toggle="'collapse-' + index"  variant="primary">{{ contract.name }}</b-button>
                     </template>
-                    <b-card-text>
-                        <ReportJournalMedic
-                            ref="reportsMedic"
-                        />
+                    <b-collapse :id="'collapse-' + index" class="mt-2">
+                        <b-card>
+                            <b-card-text>
+                                <ReportJournalMedic
+                                    ref="reportsMedic"
+                                />
 
-                        <ReportJournalTech
-                            ref="reportsTech"
-                        />
+                                <ReportJournalTech
+                                    ref="reportsTech"
+                                />
 
-                        <ReportJournalMedicOther
-                            ref="reportsMedicOther"
-                        />
+                                <ReportJournalMedicOther
+                                    ref="reportsMedicOther"
+                                />
 
-                        <ReportJournalTechOther
-                            ref="reportsTechOther"
-                        />
+                                <ReportJournalTechOther
+                                    ref="reportsTechOther"
+                                />
 
-                        <ReportJournalOther
-                            ref="reportsOther"
-                        />
-                    </b-card-text>
+                                <ReportJournalOther
+                                    ref="reportsOther"
+                                />
+                            </b-card-text>
+                        </b-card>
+                        <b-row>
+                            <b-col class="text-right">
+                                <p>
+                                    Итого по договору: {{ contract.sum }}
+                                </p>
+                            </b-col>
+                        </b-row>
+                    </b-collapse>
                 </b-card>
 <!--            <div class="card">-->
 <!--                <h5 class="card-header">{{ contracts[i].name }}</h5>-->
@@ -152,6 +164,43 @@ export default {
         }
     },
     methods: {
+        getTotalContractSum(contract){
+            console.log(contract)
+            let res = 0;
+            // hyli mne pohui, structura dannih by ElliHui
+            for (let type_report in contract){
+                console.log(type_report)
+                if(type_report == 'techs' || type_report == 'medics'){
+                    for (let human_id in contract[type_report]){
+                        for (let type in contract[type_report][human_id].types){
+                            if(contract[type_report][human_id].types[type].sum){
+                                res += contract[type_report][human_id].types[type].sum
+                            }
+                        }
+                    }
+                    continue;
+                }
+                if(type_report == 'medics_other' || type_report == 'techs_other'){
+                    for (let year in contract[type_report]){
+                        for (let human_id in contract[type_report][year].reports){
+                            for (let type in contract[type_report][human_id]){
+                                if(contract[type_report][human_id].types[type].sum){
+                                    res += contract[type_report][human_id].types[type].sum
+                                }
+                            }
+                        }
+                    }
+                    continue;
+                }
+
+                for (let type in contract[type_report]){
+                    for (let totall in contract[type_report][type]){
+                        res += contract[type_report][type][totall]
+                    }
+                }
+            }
+            return res;
+        },
         searchServices() {
             this.loading = true
             this.contracts = [];
@@ -190,6 +239,7 @@ export default {
                     }
                 }).then(({ data }) => {
                         this.contracts[contract_key].visible_result = true;
+                        this.contracts[contract_key].sum = this.getTotalContractSum(data);
 
                         this.$refs.reportsMedic[contract_key].hide();
                         this.$refs.reportsMedic[contract_key].visible(data.medics);
