@@ -1189,11 +1189,11 @@ class IndexController extends Controller
                         $element->type_anketa = null;
                         $element->type_view   = null;
 
-                        if ( !isset($data['essence'])) {
-                            $element->essence = null;
-                        }
+//                        if ( !isset($data['essence'])) {
+//                            $element->essence = null;
+//                        }
                     } else {
-                        $element->essence = null;
+//                        $element->essence = null;
                     }
                 }
 

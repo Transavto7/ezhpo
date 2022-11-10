@@ -34,15 +34,15 @@
                 @endif
                 @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
                 @php if ($model === 'Instr' && $k === 'signature') continue; @endphp
+                @php if ($k == 'essence') continue; @endphp
 
-                @if($k == 'essence')
+                    @if($k == 'unit' && ($model === 'Service' || $model === 'Product'))
                         <div data-field="essence" class="form-group">
                             <label>Сущности</label>
                             <select
                                 name="essence"
                                 data-label="Сущности"
                                 class="filled-select2 filled-select"
-                                @if(($el->type_product ?? '') != 'Абонентская плата без реестров')  disabled @endif
                             >
                                 <option value="" selected>Не установлено</option>
                                 @foreach(\App\Product::$essence as $essenceKey => $essenceName)
@@ -53,8 +53,8 @@
                                 @endforeach
                             </select>
                         </div>
-                    @continue
-                @endif
+                    @endif
+
                 @if($k == 'contracts')
                     @php
                         $contractCollect = collect($el->contracts);
