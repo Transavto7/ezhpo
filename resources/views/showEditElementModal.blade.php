@@ -41,7 +41,6 @@
                             <select
                                 name="essence"
                                 data-label="Сущности"
-                                name="company_name"
                                 class="filled-select2 filled-select"
                                 @if(($el->type_product ?? '') != 'Абонентская плата без реестров')  disabled @endif
                             >

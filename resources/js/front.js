@@ -1169,6 +1169,8 @@ $(document).ready(function () {
     })
     let field = $("*[name=type_product]").chosen()
     field.change(function(e, { selected }){
+        console.log(1)
+        console.log(selected)
         if(selected === 'Абонентская плата без реестров'){
             field.closest('.modal-body').find('select[name=essence]').prop( "disabled", false);
 
@@ -1189,9 +1191,11 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('change', '.filled-select2.filled-select', function(event) {
+    $(document).on('change', '.filled-select2.filled-select.type_product', function(event) {
         const field = $(event.target);
         let selected = field.val()
+        console.log(2)
+        console.log(selected)
 
         if(selected === 'Абонентская плата без реестров'){
             field.closest('.modal-body').find('select[name=essence]').prop( "disabled", false);
