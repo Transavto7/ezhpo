@@ -121,7 +121,7 @@
             </b-col>
         </b-row>
 
-        <b-row class="text-right my-2">
+        <b-row class=" my-2">
             <b-col>
                 <b-form-checkbox
                     v-model="contractData.hard_reset_for_car_and_drivers"
@@ -129,7 +129,7 @@
                     Перезаписать всех водителей и авто
                 </b-form-checkbox>
             </b-col>
-            <b-col>
+            <b-col class="text-right">
                 <template
                     v-if="contractData.id"
                 >

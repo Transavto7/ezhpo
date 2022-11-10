@@ -20,6 +20,7 @@
 @section('sidebar', 1)
 
 @php
+//dd($fieldPrompts->pluck('name')->toArray());
 //dd($model);
 @endphp
 
@@ -169,6 +170,22 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div data-field="essence" class="form-group">
+                                <label><b class="text-danger text-bold">*</b>Сущности</label>
+                                <select name="essence"
+                                        required="required"
+                                        data-label="Сущности"
+                                        data-field="Product_type_view"
+                                        class="filled-select2 filled-select"
+                                >
+                                    <option value="null">Не установлено</option>
+                                    @foreach(\App\Product::$essence as $essenceKey => $essenceName)
+                                        <option value="{{ $essenceKey }}">
+                                            {{ $essenceName }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div data-field="unit" class="form-group">
                                 <label><b class="text-danger text-bold">*</b>
                                     Ед.изм.</label>
@@ -233,22 +250,6 @@
                                 </select>
                             </div>
 
-                            <div data-field="essence" class="form-group">
-                                <label><b class="text-danger text-bold">*</b>Сущности</label>
-                                <select name="essence"
-                                        required="required"
-                                        data-label="Сущности"
-                                        data-field="Product_type_view"
-                                        class="filled-select2 filled-select"
-                                >
-                                    <option value="null">Не установлено</option>
-                                    @foreach(\App\Product::$essence as $essenceKey => $essenceName)
-                                        <option value="{{ $essenceKey }}">
-                                            {{ $essenceName }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-sm btn-success">Добавить</button>

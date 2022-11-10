@@ -1184,16 +1184,16 @@ class IndexController extends Controller
                     }
                 }
 
-                if ($model_text === 'Product') {
+                if ($model_text === 'Product' || $model_text === 'Service') {
                     if ($element->type_product === 'Абонентская плата без реестров') {
                         $element->type_anketa = null;
                         $element->type_view   = null;
 
-                        if ( !isset($data['essence'])) {
-                            $element->essence = null;
-                        }
+//                        if ( !isset($data['essence'])) {
+//                            $element->essence = null;
+//                        }
                     } else {
-                        $element->essence = null;
+//                        $element->essence = null;
                     }
                 }
 
