@@ -481,6 +481,12 @@ class IndexController extends Controller
                         'noRequired' => 1,
                     ],
 
+                    'bitrix_link' => [
+                        'label'      => 'Ссылка на компанию в Bitrix24',
+                        'type'       => 'text',
+                        'noRequired' => 1,
+                    ],
+
                     'document_bdd' => [
                         'label'      => 'Ссылка на таблицу с документами по бдд',
                         'type'       => 'text',
