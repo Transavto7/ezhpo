@@ -193,9 +193,19 @@ export default {
                     continue;
                 }
 
-                for (let type in contract[type_report]){
-                    for (let totall in contract[type_report][type]){
-                        res += contract[type_report][type][totall]
+                if(type_report == 'other'){
+                    for (let type in contract[type_report]){
+                        if(type == 'company'){
+                            for (let totall in contract[type_report][type]){
+                                res += contract[type_report][type][totall]
+                            }
+                            continue;
+                        }
+                        // if(type == 'drivers'){
+                            for (let totall in contract[type_report][type]){
+                                res += contract[type_report][type][totall].sum
+                            }
+                        // }
                     }
                 }
             }
