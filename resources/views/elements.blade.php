@@ -162,7 +162,7 @@
                                         data-field="Product_type_product"
                                         class="js-chosen"
                                 >
-                                    <option value="" selected>Не установлено</option>
+{{--                                    <option value="" selected>Не установлено</option>--}}
                                     @foreach($fields['type_product']['values'] as $nameOfTypeProduct)
                                         <option value="{{ $nameOfTypeProduct }}">
                                             {{ $nameOfTypeProduct }}
@@ -177,6 +177,7 @@
                                         data-label="Сущности"
                                         data-field="Product_type_view"
                                         class="filled-select2 filled-select"
+                                        disabled
                                 >
                                     <option value="null">Не установлено</option>
                                     @foreach(\App\Product::$essence as $essenceKey => $essenceName)
