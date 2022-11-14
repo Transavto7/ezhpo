@@ -14303,6 +14303,10 @@ input {
   line-height: 2;
 }
 
+.page {
+  background: #fff4f4;
+}
+
 .page .text-white {
   color: #fff;
 }
