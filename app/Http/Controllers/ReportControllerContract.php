@@ -749,6 +749,9 @@ class ReportControllerContract extends Controller
                 Product::ESSENCE_DRIVER,
                 Product::ESSENCE_CAR_DRIVER,
             ]) as $service) {
+                if($service->type_product === 'Абонентская плата без реестров'){
+                    continue;
+                }
                 $result['drivers'][] = [
                     'driver_fio' => $driver->fio,
                     'name'       => $service->name,
@@ -761,6 +764,9 @@ class ReportControllerContract extends Controller
 //            $carProdsID = explode(',', $car->products_id);
             $carProdsID = $car->contract->services;
             foreach ($carProdsID->whereIn('essence', [2, 3]) as $service) {
+                if($service->type_product === 'Абонентская плата без реестров'){
+                    continue;
+                }
                 $result['cars'][] = [
                     'gos_number' => $car->gos_number,
                     'type_auto'  => $car->type_auto,
