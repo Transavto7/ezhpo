@@ -104,7 +104,7 @@
 </template>
 
 <script>
-import { getTotalAll, getTotal, getSum, getSumAll, getDiscount, isSync } from "../const/reportsAmount";
+import { getTotalAll, getTotal, getSum, getSumAll, getDiscount, isSync } from "../../const/reportsAmount";
 
 export default {
     name: "ReportJournalTech",

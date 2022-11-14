@@ -54,8 +54,8 @@
 </template>
 
 <script>
-import { months } from '../const/local';
-import { getTotalAll, getTotal } from "../const/reportsAmount";
+import { months } from '../../const/local';
+import { getTotalAll, getTotal } from "../../const/reportsAmount";
 
 export default {
     name: "ReportJournalTechOther",
