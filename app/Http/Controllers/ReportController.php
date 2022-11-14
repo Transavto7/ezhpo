@@ -11,6 +11,7 @@ use App\Exports\ReportJournalExport;
 use App\Point;
 use App\Product;
 use App\Req;
+use App\Town;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Exception;
@@ -144,21 +145,30 @@ class ReportController extends Controller
         ]);
     }
 
+    public function getDynamicTech(Request $request) {
+        return $this->getDynamic($request, 'tech');
+    }
+
     public function getDynamicMedic(Request $request) {
+        return $this->getDynamic($request, 'medic');
+    }
+
+    public function getDynamic(Request $request, $journal) {
         $months = [];
-        for ($i = 0; $i < 12; $i++) {
-            $now = Carbon::now();
-            $now->addMonths($i * -1);
-            $months[] = $now->format('F');
+        $periodStart = Carbon::now()->subMonths(11);
+        $period = CarbonPeriod::create($periodStart, '1 month', Carbon::now());
+        foreach ($period as $month) {
+            $months[] = $month->format('F');
         }
+        $months = array_reverse($months);
 
         if ($request->town_id || $request->pv_id) {
-            $date_from = Carbon::now()->addMonths(-11)->firstOfMonth()->startOfDay();
+            $date_from = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay();
             $date_to = Carbon::now()->lastOfMonth()->endOfDay();
             $result = [];
             $total = [];
 
-            $anketas = Anketa::where('type_anketa', 'medic')->where('in_cart', 0)
+            $anketas = Anketa::where('type_anketa', $journal)->where('in_cart', 0)
                 ->where(function ($q) use ($date_from, $date_to) {
                     $q->where(function ($q) use ($date_from, $date_to) {
                         $q->whereNotNull('date')
@@ -208,10 +218,16 @@ class ReportController extends Controller
                 }
         }
 
+        $towns = Town::get(['id', 'name']);
+        $points = Point::get(['id', 'name', 'pv_id']);
+
         return view('reports.dynamic.medic.index', [
             'months' => $months,
             'companies' => $result ?? null,
-            'total' => $total ?? null
+            'total' => $total ?? null,
+            'towns' => $towns,
+            'points' => $points,
+            'journal' => $journal
         ]);
     }
 
