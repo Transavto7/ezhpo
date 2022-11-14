@@ -438,7 +438,8 @@ $(document).ready(function () {
                            if(data.contract){
                                msg += `
                                <p class="text-small m-0">Договор:</p>`;
-                               msg +=  `
+                               if(data.contract){
+                                   msg +=  `
                                 <ul class="list-group my-2">
                                     <li class="list-group-item">
                                 ${data.contract.name}
@@ -447,9 +448,13 @@ $(document).ready(function () {
                                        msg +=  `<li class="list-group-item">${service.name}</li>`;
                                    })
 
-                                msg +=  `
+                                   msg +=  `
                                 </ul></li>
                                 </ul>`;
+                               }else{
+                                   msg += `
+                               <p class="">-- Отсутвсует</p>`;
+                               }
                            }
 
                            continue;
@@ -459,15 +464,18 @@ $(document).ready(function () {
                                <p class="text-small m-0">Договор:</p>`;
                            msg += `<ul class="list-group my-2">`;
                            data.contracts.map((contract) => {
-                               msg += `
-                                    <li class="list-group-item"><ul class="list-group">${contract.name}`;
-                               contract.services.map((service) => {
+                               if(contract.services){
+
                                    msg += `
+                                    <li class="list-group-item"><ul class="list-group">${contract.name}`;
+                                   contract.services.map((service) => {
+                                       msg += `
                                     <li class="list-group-item">
                                     ${service.name}</li>`;
-                               })
+                                   })
+                                   msg += `</ul></li>`;
+                               }
 
-                               msg += `</ul></li>`;
                            })
                            msg += `</ul>`;
                            continue;
