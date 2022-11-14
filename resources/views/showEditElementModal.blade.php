@@ -38,7 +38,7 @@
 
                     @if($k == 'unit' && ($model === 'Service' || $model === 'Product'))
                         <div data-field="essence" class="form-group">
-                            <label>Сущности</label>
+                            <label><b class="text-danger text-bold">*</b>Сущности</label>
                             <select
                                 name="essence"
                                 data-label="Сущности"
