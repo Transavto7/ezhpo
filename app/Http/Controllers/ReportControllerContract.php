@@ -750,13 +750,12 @@ class ReportControllerContract extends Controller
                 Product::ESSENCE_CAR_DRIVER,
             ]) as $service) {
                 if($service->type_product === 'Абонентская плата без реестров'){
-                    continue;
+                    $result['drivers'][] = [
+                        'driver_fio' => $driver->fio,
+                        'name'       => $service->name,
+                        'sum'        => 1 * $service->pivot->service_cost,
+                    ];
                 }
-                $result['drivers'][] = [
-                    'driver_fio' => $driver->fio,
-                    'name'       => $service->name,
-                    'sum'        => 1 * $service->pivot->service_cost,
-                ];
             }
         }
 
@@ -765,14 +764,13 @@ class ReportControllerContract extends Controller
             $carProdsID = $car->contract->services;
             foreach ($carProdsID->whereIn('essence', [2, 3]) as $service) {
                 if($service->type_product === 'Абонентская плата без реестров'){
-                    continue;
+                    $result['cars'][] = [
+                        'gos_number' => $car->gos_number,
+                        'type_auto'  => $car->type_auto,
+                        'name'       => $service->name,
+                        'sum'        => 1 * $service->pivot->service_cost,
+                    ];
                 }
-                $result['cars'][] = [
-                    'gos_number' => $car->gos_number,
-                    'type_auto'  => $car->type_auto,
-                    'name'       => $service->name,
-                    'sum'        => 1 * $service->pivot->service_cost,
-                ];
             }
         }
 
