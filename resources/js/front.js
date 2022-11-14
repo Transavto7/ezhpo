@@ -444,9 +444,12 @@ $(document).ready(function () {
                                     <li class="list-group-item">
                                 ${data.contract.name}
                                 <ul class="list-group">`;
-                                   data.contract.services.map((service) => {
-                                       msg +=  `<li class="list-group-item">${service.name}</li>`;
-                                   })
+                                   if(data.contract.services){
+
+                                       data.contract.services.map((service) => {
+                                           msg +=  `<li class="list-group-item">${service.name}</li>`;
+                                       })
+                                   }
 
                                    msg +=  `
                                 </ul></li>
