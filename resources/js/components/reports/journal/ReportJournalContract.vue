@@ -303,7 +303,7 @@ export default {
     },
 
     watch:{
-        company_id(val){
+        company(val){
             if(this.company_id == 0){
                 this.loading = true
                 return;

@@ -86,6 +86,7 @@ class ReportControllerContract extends Controller
         $company = Anketa::with('contract')
                          ->where('company_id', $request->id)
                          ->whereNotNull('contract_id')
+                            ->whereHas('contract')
                          ->groupBy('contract_id')
                          ->get()
                          ->pluck('contract')

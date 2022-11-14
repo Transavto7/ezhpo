@@ -336,6 +336,7 @@ class ContractController extends Controller
 
     public function getAvailableForCompany(Request $request)
     {
+//        dd(Contract::where('company_id', $request->company_id)->get()->toArray());
         return response([
             'status'    => true,
             'contracts' => Contract::where('company_id', $request->company_id)->get(),
