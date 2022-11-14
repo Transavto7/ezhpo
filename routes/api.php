@@ -39,7 +39,9 @@ Route::middleware('auth:api')->get('/users/{role}', function (Request $request) 
     ];
 
     if($user->role >= 777 && isset($validRoles[$roleRequest])) {
-        $user = User::where('role', $roleRequest)->get();
+        $user = User::with('roles')->whereHas('roles', function ($q) use ($request) {
+            $q->where('roles.id', 2);
+        })->get();
 
         return response()->json($user);
     }
