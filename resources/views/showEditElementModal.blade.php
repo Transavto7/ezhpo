@@ -43,7 +43,7 @@
                                 name="essence"
                                 data-label="Сущности"
                                 class="filled-select2 filled-select"
-                                @if(($el->type_product ?? '') != 'Абонентская плата без реестров')  disabled @endif
+                                required="required"
                             >
                                 <option value="" selected>Не установлено</option>
                                 @foreach(\App\Product::$essence as $essenceKey => $essenceName)
@@ -77,6 +77,19 @@
                             @endforeach
                         </select>
                     </div>
+                        <div class="">
+                            <ul class="list-group">
+                                @foreach($el->contracts as $contract)
+                                <li class="list-group-item">{{ $contract->name }}
+                                    @foreach($contract->services as $new_service)
+                                        <ul class="list-group">
+                                            <li class="list-group-item">{{ $new_service->name }}</li>
+                                        </ul>
+                                    @endforeach
+                                </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     @continue
                 @endif
                 @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
@@ -98,6 +111,17 @@
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="">
+                        <ul class="list-group">
+                            <li class="list-group-item">{{ $el->contract->name }}
+                            @foreach($el->contract->services as $new_service)
+                                <ul class="list-group">
+                                        <li class="list-group-item">{{ $new_service->name }}</li>
+                                    </ul>
+                                @endforeach
+                            </li>
+                        </ul>
                     </div>
                     @continue
                 @endif

@@ -175,11 +175,11 @@
                                 <select name="essence"
                                         required="required"
                                         data-label="Сущности"
-                                        data-field="Product_type_view"
+                                        data-field="Product_essence"
                                         class="filled-select2 filled-select"
-                                        disabled
+{{--                                        disabled--}}
                                 >
-                                    <option value="null">Не установлено</option>
+                                    <option value="">Не установлено</option>
                                     @foreach(\App\Product::$essence as $essenceKey => $essenceName)
                                         <option value="{{ $essenceKey }}">
                                             {{ $essenceName }}

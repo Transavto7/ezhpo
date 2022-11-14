@@ -967,7 +967,7 @@ class IndexController extends Controller
                         $data['type_anketa'] = null;
                         $data['type_view']   = null;
                     } else {
-                        $data['essence'] = null;
+//                        $data['essence'] = null;
                     }
 
                     break;
@@ -1196,10 +1196,10 @@ class IndexController extends Controller
                         $element->type_view   = null;
 
                         if ( !isset($data['essence'])) {
-                            $element->essence = null;
+//                            $element->essence = null;
                         }
                     } else {
-                        $element->essence = null;
+//                        $element->essence = null;
                     }
                 }
 
@@ -1339,7 +1339,21 @@ class IndexController extends Controller
         $page['model'] = $model;
         $page['id']    = $id;
 
-        $el = app("App\\$model")->find($id);
+
+        if(
+            $model == 'Driver'
+            || $model == 'Car'
+        ){
+            $el = app("App\\$model")
+                ->with(['contract.services'])
+                ->find($id);
+        }elseif($model == 'Company'){
+            $el = app("App\\$model")
+                ->with(['contracts.services'])
+                ->find($id);
+         }else{
+            $el = app("App\\$model")->find($id);
+        }
 
         $page['el'] = $el;
 

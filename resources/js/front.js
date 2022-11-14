@@ -397,15 +397,20 @@ $(document).ready(function () {
 
             $(`#${dbItemId}`).html('<b class="text-info">Загружаем данные...</b>')
 
+            console.log('----------------1')
             console.log(data)
             console.log(fieldsValues)
+            console.log('----------------2')
             /**
              * Вставляем поля
              */
             for(let i in data) {
                 let fvItem = fieldsValues[i]
 
-                if(fvItem) {
+                if(fvItem
+                || i === 'contract'
+                || i === 'contracts'
+                ) {
                    if(i != 'id' && i != 'hash_id') {
                        let field = '',
                            otherHtmlItems = '',
@@ -415,22 +420,57 @@ $(document).ready(function () {
                        if(isBlocked === ''){
                            otherHtmlItems = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
                        }
-                       if(i === 'contract_id' || i === 'contracts'){
-                           fvItem['type'] = 'text';
+                       if(i === 'contract_id'){
+                           // fvItem['type'] = 'text';
+                           continue;
                        }
 
-                       if(i === 'contract_id'){
-                           console.log(data);
+                       if(i === 'products_id'){
+                           // for company
+                           if(fieldsValues.contracts){
+                               fieldsValues.contracts
+                           }
+
+                       }
+
+                       if(i === 'contract'){
+                           // driver & auto
+                           if(data.contract){
+                               msg += `
+                               <p class="text-small m-0">Договор:</p>`;
+                               msg +=  `
+                                <ul class="list-group my-2">
+                                    <li class="list-group-item">
+                                ${data.contract.name}
+                                <ul class="list-group">`;
+                                   data.contract.services.map((service) => {
+                                       msg +=  `<li class="list-group-item">${service.name}</li>`;
+                                   })
+
+                                msg +=  `
+                                </ul></li>
+                                </ul>`;
+                           }
+
                            continue;
-                           field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${(data[i].contract.name ? data[i].contract.name : '').trim()}</textarea>`
-                       }else if(i === 'contracts'){
-                           let text_contract = '';
-                           data['contracts'].map((item) => {
-                               text_contract += item.name + "\n";
+                         }else if(i === 'contracts'){
+                           // copmany
+                           msg += `
+                               <p class="text-small m-0">Договор:</p>`;
+                           msg += `<ul class="list-group my-2">`;
+                           data.contracts.map((contract) => {
+                               msg += `
+                                    <li class="list-group-item"><ul class="list-group">${contract.name}`;
+                               contract.services.map((service) => {
+                                   msg += `
+                                    <li class="list-group-item">
+                                    ${service.name}</li>`;
+                               })
+
+                               msg += `</ul></li>`;
                            })
-
-                           field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${text_contract}</textarea>`
-
+                           msg += `</ul>`;
+                           continue;
                        }else{
                            if(fvItem['type'] === 'select') {
                                await API_CONTROLLER.getFieldHTML({ field: i, model, default_value: encodeURIComponent(data[i]) }).then(response => {
@@ -556,6 +596,11 @@ $(document).ready(function () {
         }
 
 
+        console.log('----------------0')
+        console.log(prop)
+        console.log(model)
+        console.log(val)
+        console.log($('[name="anketa[0][date]"]').val())
         $.ajax({
             url: `/api/check-prop/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
             headers: {'Authorization': 'Bearer ' + API_TOKEN},
@@ -1171,20 +1216,20 @@ $(document).ready(function () {
     field.change(function(e, { selected }){
 
         if(selected === 'Абонентская плата без реестров'){
-            field.closest('.modal-body').find('select[name=essence]').prop("disabled", false);
+            // field.closest('.modal-body').find('select[name=essence]').prop("disabled", false);
 
             field.closest('.modal-body').find('select[name=type_anketa]').prop( "disabled", true);
             field.closest('.modal-body').find('select[name="type_view[]"]').prop( "disabled", true);
 
-            field.closest('.modal-body').find('select[name=essence]').prop('required', true) // тип осмотра
+            // field.closest('.modal-body').find('select[name=essence]').prop('required', true) // тип осмотра
             field.closest('.modal-body').find('select[name=type_anketa]').prop('required', false) // тип осмотра
             field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', false) // Реестр
         }else{
-            field.closest('.modal-body').find('select[name=essence]').prop( "disabled", true);
+            // field.closest('.modal-body').find('select[name=essence]').prop( "disabled", true);
             field.closest('.modal-body').find('select[name=type_anketa]').prop( "disabled", false);
             field.closest('.modal-body').find('select[name="type_view[]"]').prop( "disabled", false);
 
-            field.closest('.modal-body').find('select[name=essence]').prop('required', false) // тип осмотра
+            // field.closest('.modal-body').find('select[name=essence]').prop('required', false) // тип осмотра
             field.closest('.modal-body').find('select[name=type_anketa]').prop('required', true) // тип осмотра
             field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', true) // Реестр
         }
@@ -1195,19 +1240,19 @@ $(document).ready(function () {
         let selected = field.val()
 
         if(selected === 'Абонентская плата без реестров'){
-            field.closest('.modal-body').find('select[name=essence]').prop( "disabled", false);
+            // field.closest('.modal-body').find('select[name=essence]').prop( "disabled", false);
             field.closest('.modal-body').find('select[name=type_anketa]').prop( "disabled", true);
             field.closest('.modal-body').find('select[name="type_view[]"]').prop( "disabled", true);
 
-            field.closest('.modal-body').find('select[name=essence]').prop('required', true) // тип осмотра
+            // field.closest('.modal-body').find('select[name=essence]').prop('required', true) // тип осмотра
             field.closest('.modal-body').find('select[name=type_anketa]').prop('required', false) // тип осмотра
             field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', false) // Реестр
         }else{
-            field.closest('.modal-body').find('select[name=essence]').prop( "disabled", true);
+            // field.closest('.modal-body').find('select[name=essence]').prop( "disabled", true);
             field.closest('.modal-body').find('select[name="type_view[]"]').prop( "disabled", false);
             field.closest('.modal-body').find('select[name=type_anketa]').prop( "disabled", false);
 
-            field.closest('.modal-body').find('select[name=essence]').prop('required', false) // тип осмотра
+            // field.closest('.modal-body').find('select[name=essence]').prop('required', false) // тип осмотра
             field.closest('.modal-body').find('select[name=type_anketa]').prop('required', true) // тип осмотра
             field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', true) // Реестр
         }

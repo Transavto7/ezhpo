@@ -144,11 +144,12 @@ class ApiController extends Controller
             $_model = $models[$model];
             $data = app($_model['model']);
             $fields = $data->fillable;
+            array_push($fields, 'id');
 
             if ($_model['model'] == Company::class){
-                $data = $data::with(['contracts']);
+                $data = $data::with(['contracts.services']);
             }elseif($_model['model'] == Driver::class || $_model['model'] == Car::class){
-                $data = $data::with(['contract']);
+                $data = $data::with(['contract.services']);
             }
 //            array_push($fields, 'id');
 
@@ -168,7 +169,7 @@ class ApiController extends Controller
             $fieldsValues = new IndexController();
             $fieldsValues = $fieldsValues->elements[$model]['fields'];
 
-            $data = $data->where($prop, $val)->get()->first();
+//            $data = $data->where($prop, $val)->get()->first();
             if ($_model['model'] == Company::class){
                 if(!user()->access('companies_access_field_where_call')){   //'Кому отправлять СМС при отстранении'
                     unset($fields['where_call']);
