@@ -14351,6 +14351,10 @@ input {
   border-radius: 50px;
 }
 
+.list-group-item {
+  padding: 0.25rem 0.75rem;
+}
+
 .list-group-item:first-child, .list-group-item:last-child {
   border-radius: 0;
 }

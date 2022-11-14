@@ -80,7 +80,7 @@
                         <div class="">
                             <ul class="list-group">
                                 @foreach($el->contracts as $contract)
-                                <li class="list-group-item">{{ $contract->name }}
+                                <li class="list-group-item"><b>{{ $contract->name }}</b>
                                     @foreach($contract->services as $new_service)
                                         <ul class="list-group">
                                             <li class="list-group-item">{{ $new_service->name }}</li>
@@ -114,7 +114,7 @@
                     </div>
                     <div class="">
                         <ul class="list-group">
-                            <li class="list-group-item">{{ $el->contract->name }}
+                            <li class="list-group-item"><b>{{ $el->contract->name }}</b>
                             @foreach($el->contract->services as $new_service)
                                 <ul class="list-group">
                                         <li class="list-group-item">{{ $new_service->name }}</li>

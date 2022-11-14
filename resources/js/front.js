@@ -420,7 +420,7 @@ $(document).ready(function () {
                        if(isBlocked === ''){
                            otherHtmlItems = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
                        }
-                       if(i === 'contract_id'){
+                       if(i === 'contract_id' ){
                            // fvItem['type'] = 'text';
                            continue;
                        }
@@ -435,29 +435,27 @@ $(document).ready(function () {
 
                        if(i === 'contract'){
                            // driver & auto
-                           if(data.contract){
-                               msg += `
+                           msg += `
                                <p class="text-small m-0">Договор:</p>`;
-                               if(data.contract){
-                                   msg +=  `
-                                <ul class="list-group my-2">
-                                    <li class="list-group-item">
-                                ${data.contract.name}
-                                <ul class="list-group">`;
-                                   if(data.contract.services){
+                           if(data.contract.length != 0){
+                               msg +=  `
+                            <ul class="list-group my-2">
+                                <li class="list-group-item"><b>${data.contract.name}</b>
 
-                                       data.contract.services.map((service) => {
-                                           msg +=  `<li class="list-group-item">${service.name}</li>`;
-                                       })
-                                   }
+                            <ul class="list-group">`;
+                               if(data.contract.services){
 
-                                   msg +=  `
-                                </ul></li>
-                                </ul>`;
-                               }else{
-                                   msg += `
-                               <p class="">-- Отсутвсует</p>`;
+                                   data.contract.services.map((service) => {
+                                       msg +=  `<li class="list-group-item text-small">${service.name}</li>`;
+                                   })
                                }
+
+                               msg +=  `
+                            </ul></li>
+                            </ul>`;
+                           }else{
+                               msg += `
+                               <p class="text-small">-- Отсутствует --</p>`;
                            }
 
                            continue;
@@ -465,22 +463,29 @@ $(document).ready(function () {
                            // copmany
                            msg += `
                                <p class="text-small m-0">Договор:</p>`;
-                           msg += `<ul class="list-group my-2">`;
-                           data.contracts.map((contract) => {
-                               if(contract.services){
+                           if(data.contracts.length != 0){
 
-                                   msg += `
-                                    <li class="list-group-item"><ul class="list-group">${contract.name}`;
-                                   contract.services.map((service) => {
+                               msg += `<ul class="list-group my-2">`;
+                               data.contracts.map((contract) => {
+                                   if(contract.services){
+
                                        msg += `
-                                    <li class="list-group-item">
+                                    <li class="list-group-item"><ul class="list-group"><b>${contract.name}</b>`;
+                                       contract.services.map((service) => {
+                                           msg += `
+                                    <li class="list-group-item text-small">
                                     ${service.name}</li>`;
-                                   })
-                                   msg += `</ul></li>`;
-                               }
+                                       })
+                                       msg += `</ul></li>`;
+                                   }
 
-                           })
-                           msg += `</ul>`;
+                               })
+                               msg += `</ul>`;
+                           }else{
+
+                               msg += `
+                               <p class="text-small">-- Отсутствует --</p>`;
+                           }
                            continue;
                        }else{
                            if(fvItem['type'] === 'select') {
