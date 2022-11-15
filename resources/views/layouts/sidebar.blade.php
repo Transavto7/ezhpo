@@ -179,6 +179,13 @@
                             </a>
                         </li>
                     @endif
+{{--                    @if(user()->access('report_schedule_dynamic_mo'))--}}
+                        <li>
+                            <a href="{{ route('report.company_service') }}">
+                                <i class="fa fa-book"></i>Отчет по услугам компании
+                            </a>
+                        </li>
+{{--                    @endif--}}
                 </ul>
             </li>
         @endif
