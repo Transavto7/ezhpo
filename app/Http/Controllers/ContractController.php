@@ -33,6 +33,13 @@ class ContractController extends Controller
     {
         $contracts = Contract::with(['company', 'our_company', 'services']);
         $filters   = $request->all();
+//        dd(
+//            $filters
+//        );
+        $filters['sortBy'] = $filters['sortBy'] ?? 'id';
+        $filters['sortDesc'] = $filters['sortDesc'] ?? 'true';
+        $filters['perPage'] = $filters['perPage'] ?? 15;
+        $filters['currentPage'] = $filters['currentPage'] ?? 1;
 
         if ($filters['sortBy'] == 'company.name') {
             $contracts->leftJoin('companies', 'company_id', 'companies.id')

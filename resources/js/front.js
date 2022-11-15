@@ -397,10 +397,6 @@ $(document).ready(function () {
 
             $(`#${dbItemId}`).html('<b class="text-info">Загружаем данные...</b>')
 
-            console.log('----------------1')
-            console.log(data)
-            console.log(fieldsValues)
-            console.log('----------------2')
             /**
              * Вставляем поля
              */
@@ -440,7 +436,9 @@ $(document).ready(function () {
                            if(data.contract.length != 0){
                                msg +=  `
                             <ul class="list-group my-2">
-                                <li class="list-group-item"><b>${data.contract.name}</b>
+                                <li class="list-group-item">
+                                <a href="/contract?id=${data.contract.id}" target="_blank">
+                                <b>${data.contract.name}</b></a>
 
                             <ul class="list-group">`;
                                if(data.contract.services){
@@ -470,7 +468,9 @@ $(document).ready(function () {
                                    if(contract.services){
 
                                        msg += `
-                                    <li class="list-group-item"><ul class="list-group"><b>${contract.name}</b>`;
+
+                                    <li class="list-group-item"><ul class="list-group"><a href="/contract?id=${contract.id}" target="_blank">
+                                    <b>${contract.name}</b></a>`;
                                        contract.services.map((service) => {
                                            msg += `
                                     <li class="list-group-item text-small">

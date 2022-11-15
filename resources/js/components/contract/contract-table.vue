@@ -53,6 +53,7 @@
                           class="mr-2"
                           style="border: none"
                           @click="$emit('update_data', row.item)"
+                          v-if="permissions.edit"
                 >
                     <b-icon-pencil></b-icon-pencil>
                 </b-button>
@@ -62,6 +63,7 @@
                           class="mr-2"
                           style="border: none"
                           @click="deleteItem(row.item.id, $event.target)"
+                          v-if="permissions.delete"
                 >
                     <b-icon-trash-fill></b-icon-trash-fill>
                 </b-button>
@@ -77,7 +79,7 @@ import Swal2 from "sweetalert2";
 
 export default {
     name: "contract-table",
-    props: ['table', 'change_sort', 'busy', 'trash'],
+    props: ['table', 'change_sort', 'busy', 'trash', 'permissions'],
     mounted() {
     },
     methods:{

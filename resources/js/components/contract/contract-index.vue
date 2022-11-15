@@ -4,7 +4,8 @@
         <contract-filters
             v-on:change_filters="changeFilters"
             ref="contractFilters"
-            :trash="trash"
+            :trash="filters.trash"
+            :permissions="permissions"
             v-on:create_new="showCreateModal"
             v-on:view_trash_toggle="toggleTrash"
         >
@@ -12,9 +13,11 @@
 
         <!-- table -->
         <contract-table
+            v-show="permissions.read"
             :table="table"
             :busy="busy"
-            :trash="trash"
+            :trash="filters.trash"
+            :permissions="permissions"
             v-on:change_sort="changeSort"
             ref="contractTable"
             v-on:update_data="showCreateModal"
@@ -23,7 +26,8 @@
         </contract-table>
 
         <!-- paginator/ -->
-        <b-row class="w-100 d-flex justify-content-center" v-if="total > 1">
+        <b-row
+            class="w-100 d-flex justify-content-center" v-if="total > 1 && permissions.read">
 <!--            <b-col class="my-1 d-flex justify-content-center">-->
             <b-col class="my-1">
                 <b-form-group
@@ -50,7 +54,9 @@
         </b-row>
 
         <!-- perPage -->
-        <b-row>
+        <b-row
+            v-show="permissions.read"
+        >
             <b-col class="my-1">
                 <b-form-group
                     label="Количество элементов на странице:"
@@ -76,7 +82,9 @@
         </b-row>
 
         <!-- totalRow -->
-        <b-row class="mb-3">
+        <b-row class="mb-3"
+               v-show="permissions.read"
+        >
             <b-col class="my-1">
                 <b-form-group
                     label-class="font-weight-bold pt-0"
@@ -112,6 +120,7 @@
 import Swal2 from "sweetalert2";
 import ContractCreate from "./contract-create";
 import ContractFilters from "./contract-filters";
+import {getParams, addParams} from "../const/params";
 
 export default {
     name:       "contract-index",
@@ -120,9 +129,10 @@ export default {
         ContractCreate,
         ContractFilters,
     },
+    props:['permissions'],
     data() {
         return {
-            trash: 0,
+            // trash: 0,
 
             busy: false,
             user: null,
@@ -185,17 +195,28 @@ export default {
                 sortDesc:    true,
                 currentPage: 1,
                 perPage:     15,
+                trash:     0,
             },
             total:       0,
             pageOptions: [15, 100, 500],
         }
     },
     mounted() {
+        let getData = getParams()
+        for(let param in getData){
+            if(!isNaN(getData[param])){
+                this.filters[param] = Number(getData[param]);
+            }else{
+                this.filters[param] = getData[param];
+            }
+        }
+        this.$refs.contractFilters.setFilters(this.filters)
+
         this.loadData()
     },
     methods: {
         toggleTrash() {
-            this.trash = this.trash ? 0 : 1;
+            this.filters.trash = this.filters.trash ? 0 : 1;
             this.loadData();
         },
         selectPage(page = 1) {
@@ -230,12 +251,14 @@ export default {
             let data = {
                 params: this.filters,
             };
-            data.params.trash = this.trash;
+            // data.params.trash = this.trash;
 
-            console.log(data)
+             addParams(this.filters);
+
+
             axios.get("/contract/index", data)
                 .then(({data}) => {
-                    console.log(data)
+
                     if (data.status) {
                         this.table.items = data.result.contracts
                         this.total = data.result.total;

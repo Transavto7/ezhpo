@@ -587,13 +587,18 @@
                                         @elseif ($field->field === 'essence')
                                             {{ \App\Product::$essence[$el->essence] ?? ''  }}
                                         @elseif ($field->field === 'contract' )
-                                            {{ $el['contract']['name']  }}
+                                            <a href="/contract?id={{ $el['contract']['id'] }}" target="_blank" >
+                                                {{ $el['contract']['name']  }}
+
+                                            </a>
                                         @elseif ( $field->field === 'contracts')
                                             @foreach($el[$field->field] as $contract)
                                                 <h3>
-                                                    <span class="badge badge-success">
-                                                        {{ $contract['name']  }}
-                                                    </span>
+                                                    <a href="/contract?id={{ $contract['id'] }}" target="_blank" >
+                                                        <span class="badge badge-success">
+                                                            {{ $contract['name']  }}
+                                                        </span>
+                                                    </a>
                                                 </h3>
                                             @endforeach
                                         @elseif ($field->field == 'services' && ( $model === 'Car' || $model === 'Driver'))
