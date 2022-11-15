@@ -49,63 +49,52 @@
                         </b-form-group>
                     </b-col>
                 </b-row>
+                <!-- perPage -->
+                <b-row
+                    v-if="permissions.read"
+                >
+                    <b-col md="2" class="my-1">
+                        <b-form-group>
+                            <b-form-select
+                                id="per-page-select"
+                                v-model="filters.perPage"
+                                :options="pageOptions"
+                                size="sm"
+                                @change="selectPerPage"
+                            ></b-form-select>
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <p class="text-success">Найдено записей: <b>{{ total }}</b></p>
             </div>
         </div>
 
-        <!-- perPage -->
-        <b-row
-            v-if="false"
-            v-show="permissions.read"
-        >
-            <b-col class="my-1">
-                <b-form-group
-                    label="Количество элементов на странице:"
-                    label-for="per-page-select"
-                    label-cols-sm="6"
-                    label-cols-md="4"
-                    label-cols-lg="3"
-                    label-align-sm="right"
-                    content-cols="4"
-                    label-size="sm"
-                    class="mb-0"
-                >
-                    <b-form-select
-                        id="per-page-select"
-                        v-model="filters.perPage"
-                        :options="pageOptions"
-                        label-cols="4"
-                        size="sm"
-                        @change="selectPerPage"
-                    ></b-form-select>
-                </b-form-group>
-            </b-col>
-        </b-row>
 
         <!-- totalRow -->
-        <b-row class="mb-3"
-               v-show="permissions.read"
-               v-if="false"
-        >
-            <b-col class="my-1 ">
-                <b-form-group
-                    label-class="font-weight-bold pt-0"
-                    class="mb-0"
-                    disabled
-                >
-                    <b-form-group
-                        label="Всего записей:"
-                        label-for="nested-street"
-                        label-cols="4"
-                        label-cols-sm="3"
-                        content-cols="4"
-                        label-align-sm="right"
-                    >
-                        <b-form-input id="nested-street" v-model="total"></b-form-input>
-                    </b-form-group>
-                </b-form-group>
+        <!--        <b-row class="mb-3"-->
+        <!--               v-show="permissions.read"-->
+        <!--        >-->
+        <!--            <b-col class="my-1 ">-->
+        <!--                <p class="text-success">Найдено записей: <b>{{ total }}</b></p>-->
+        <!--&lt;!&ndash;                <b-form-group&ndash;&gt;-->
+        <!--&lt;!&ndash;                    label-class="font-weight-bold pt-0"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    class="mb-0"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    disabled&ndash;&gt;-->
+        <!--&lt;!&ndash;                >&ndash;&gt;-->
+        <!--&lt;!&ndash;                    <b-form-group&ndash;&gt;-->
+        <!--&lt;!&ndash;                        label="Всего записей:"&ndash;&gt;-->
+        <!--&lt;!&ndash;                        label-for="nested-street"&ndash;&gt;-->
+        <!--&lt;!&ndash;                        label-cols="4"&ndash;&gt;-->
+        <!--&lt;!&ndash;                        label-cols-sm="3"&ndash;&gt;-->
+        <!--&lt;!&ndash;                        content-cols="4"&ndash;&gt;-->
+        <!--&lt;!&ndash;                        label-align-sm="right"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    >&ndash;&gt;-->
+        <!--&lt;!&ndash;                        <b-form-input id="nested-street" v-model="total"></b-form-input>&ndash;&gt;-->
+        <!--&lt;!&ndash;                    </b-form-group>&ndash;&gt;-->
+        <!--&lt;!&ndash;                </b-form-group>&ndash;&gt;-->
 
-            </b-col>
-        </b-row>
+        <!--            </b-col>-->
+        <!--        </b-row>-->
 
 
         <!-- create/update contracts -->
@@ -130,7 +119,7 @@ export default {
         ContractCreate,
         ContractFilters,
     },
-    props:['permissions'],
+    props:      ['permissions'],
     data() {
         return {
             // trash: 0,
@@ -196,7 +185,7 @@ export default {
                 sortDesc:    true,
                 currentPage: 1,
                 perPage:     15,
-                trash:     0,
+                trash:       0,
             },
             total:       0,
             pageOptions: [15, 100, 500],
@@ -204,14 +193,15 @@ export default {
     },
     mounted() {
         let getData = getParams()
-        for(let param in getData){
-            if(!isNaN(getData[param])){
+        for (let param in getData) {
+            if (!isNaN(getData[param])) {
                 this.filters[param] = Number(getData[param]);
-            }else{
+            } else {
                 this.filters[param] = getData[param];
             }
         }
         this.$refs.contractFilters.setFilters(this.filters)
+
 
         this.loadData()
     },
@@ -254,7 +244,7 @@ export default {
             };
             // data.params.trash = this.trash;
 
-             addParams(this.filters);
+            addParams(this.filters);
 
 
             axios.get("/contract/index", data)
