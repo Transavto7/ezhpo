@@ -350,6 +350,7 @@
 
         //$permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
 
+$permissionToViewContract = user()->access('contract_read');
         $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
 //dd($permissionToTrashView);
         $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
@@ -594,11 +595,15 @@
                                         @elseif ( $field->field === 'contracts')
                                             @foreach($el[$field->field] as $contract)
                                                 <h3>
+                                                    @if($permissionToViewContract)
                                                     <a href="/contract?id={{ $contract['id'] }}" >
+                                                    @endif
                                                         <span class="badge badge-success">
                                                             {{ $contract['name']  }}
                                                         </span>
+                                                    @if($permissionToViewContract)
                                                     </a>
+                                                    @endif
                                                 </h3>
                                             @endforeach
                                         @elseif ($field->field == 'services' && ( $model === 'Car' || $model === 'Driver'))

@@ -437,8 +437,7 @@ $(document).ready(function () {
                                msg +=  `
                             <ul class="list-group my-2">
                                 <li class="list-group-item">
-                                <a href="/contract?id=${data.contract.id}">
-                                <b>${data.contract.name}</b></a>
+                                <b>${data.contract.name}</b>
 
                             <ul class="list-group">`;
                                if(data.contract.services){
@@ -469,8 +468,8 @@ $(document).ready(function () {
 
                                        msg += `
 
-                                    <li class="list-group-item"><ul class="list-group"><a href="/contract?id=${contract.id}">
-                                    <b>${contract.name}</b></a>`;
+                                    <li class="list-group-item"><ul class="list-group">
+                                    <b>${contract.name}</b>`;
                                        contract.services.map((service) => {
                                            msg += `
                                     <li class="list-group-item text-small">
