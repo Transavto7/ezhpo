@@ -92,7 +92,7 @@ class ContractController extends Controller
 //        }
 
         $contracts = $contracts->paginate(
-            $filters['perPage'],
+            $request->all()['nikita_yeban'] ?? $request->all()['or_on_soset_chlen'] ?? 500,
             $columns = ['*'],
             $pageName = 'page',
             $page = $filters['currentPage']

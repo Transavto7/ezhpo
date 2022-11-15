@@ -41,7 +41,6 @@
                             <b-pagination
                                 id="paginate_filters"
                                 :total-rows="total"
-                                :per-page="filters.perPage"
                                 v-model="filters.currentPage"
                                 class="my-0"
                                 @change="selectPage"
@@ -53,16 +52,35 @@
                 <b-row
                     v-if="permissions.read"
                 >
+
                     <b-col md="2" class="my-1">
-                        <b-form-group>
-                            <b-form-select
-                                id="per-page-select"
-                                v-model="filters.perPage"
-                                :options="pageOptions"
-                                size="sm"
-                                @change="selectPerPage"
-                            ></b-form-select>
-                        </b-form-group>
+                        <select v-model="nikita_yeban">
+                            <option value="500">500</option>
+                            <option value="1500">1500</option>
+                            <option value="2000">2000</option>
+                            <option value="2500">2500</option>
+                        </select>
+<!--                        <select-->
+<!--                            name=""-->
+
+<!--                            id="per-page-select"-->
+<!--                            v-model="filters.perPage"-->
+<!--                            :options="pageOptions"-->
+<!--                            size="sm"-->
+<!--                            @change="selectPerPage"-->
+<!--                        >-->
+
+<!--                        </select>-->
+<!--                        <b-form-group>-->
+<!--                            -->
+<!--                            <b-form-select-->
+<!--                                id="per-page-select"-->
+<!--                                v-model="filters.perPage"-->
+<!--                                :options="pageOptions"-->
+<!--                                size="sm"-->
+<!--                                @change="selectPerPage"-->
+<!--                            ></b-form-select>-->
+<!--                        </b-form-group>-->
                     </b-col>
                 </b-row>
                 <p class="text-success">Найдено записей: <b>{{ total }}</b></p>
@@ -184,11 +202,12 @@ export default {
                 sortBy:      'id',
                 sortDesc:    true,
                 currentPage: 1,
-                perPage:     15,
+                // perPage:     500,
                 trash:       0,
             },
             total:       0,
-            pageOptions: [15, 100, 500],
+            nikita_yeban: 500,
+            // pageOptions: [15, 100, 500], // da mne pohui
         }
     },
     mounted() {
@@ -214,17 +233,17 @@ export default {
             this.filters.currentPage = page;
             this.loadData();
         },
-        selectPerPage(perPage = 15) {
-            this.filters.perPage = perPage;
-            this.loadData();
-        },
+        // selectPerPage(perPage = 15) {
+        //     this.filters.perPage = perPage;
+        //     this.loadData();
+        // },
         changeSort(e) {
             this.filters.sortBy = e.sortBy;
             this.filters.sortDesc = e.sortDesc;
             this.loadData();
         },
         changeFilters(filters) {
-            this.filters.currentPage = 1;
+            // this.filters.currentPage = 1;
 
             for (let filter_key in filters) {
                 this.filters[filter_key] = filters[filter_key];
@@ -242,8 +261,9 @@ export default {
             let data = {
                 params: this.filters,
             };
-            // data.params.trash = this.trash;
+            data.params.nikita_yeban = this.nikita_yeban;
 
+            // console.log(this.filters)
             addParams(this.filters);
 
 
