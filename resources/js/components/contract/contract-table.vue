@@ -26,6 +26,11 @@
                 </span>
             </h2>
         </template>
+        <template #cell(company)="row">
+            <a :href="'/elements/Company?filter=1&id=' + row.value.id" target="_blank">
+                {{ row.value.name }}
+            </a>
+        </template>
         <template #cell(date_of_end)="row">
             {{ row.value ? new Date(row.value).toLocaleDateString("ru-RU") : '' }}
         </template>

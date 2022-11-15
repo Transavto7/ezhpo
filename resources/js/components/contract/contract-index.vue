@@ -155,7 +155,7 @@ export default {
                         label: "Услуги",
                     },
                     {
-                        key:      "company.name",
+                        key:      "company",
                         sortable: true,
                         label:    "Компания",
                     },
