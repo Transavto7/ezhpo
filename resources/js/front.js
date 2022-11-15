@@ -437,7 +437,7 @@ $(document).ready(function () {
                                msg +=  `
                             <ul class="list-group my-2">
                                 <li class="list-group-item">
-                                <a href="/contract?id=${data.contract.id}" target="_blank">
+                                <a href="/contract?id=${data.contract.id}">
                                 <b>${data.contract.name}</b></a>
 
                             <ul class="list-group">`;
@@ -469,7 +469,7 @@ $(document).ready(function () {
 
                                        msg += `
 
-                                    <li class="list-group-item"><ul class="list-group"><a href="/contract?id=${contract.id}" target="_blank">
+                                    <li class="list-group-item"><ul class="list-group"><a href="/contract?id=${contract.id}">
                                     <b>${contract.name}</b></a>`;
                                        contract.services.map((service) => {
                                            msg += `

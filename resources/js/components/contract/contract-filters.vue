@@ -1,5 +1,5 @@
 <template>
-    <div class="">
+    <div class="my-2">
         <b-row>
             <b-col class="d-flex align-items-center col-lg-3">
                 <b-button class="m-1" variant="success" @click="$emit('create_new')">Создать</b-button>

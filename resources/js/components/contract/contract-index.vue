@@ -11,50 +11,50 @@
         >
         </contract-filters>
 
-        <!-- table -->
-        <contract-table
-            v-show="permissions.read"
-            :table="table"
-            :busy="busy"
-            :trash="filters.trash"
-            :permissions="permissions"
-            v-on:change_sort="changeSort"
-            ref="contractTable"
-            v-on:update_data="showCreateModal"
-            v-on:success="loadData"
-        >
-        </contract-table>
 
-        <!-- paginator/ -->
-        <b-row
-            class="w-100 d-flex justify-content-center" v-if="total > 1 && permissions.read">
-<!--            <b-col class="my-1 d-flex justify-content-center">-->
-            <b-col class="my-1">
-                <b-form-group
-                    label="Выберите страницу:"
-                    label-for="paginate_filters"
-                    label-cols-sm="6"
-                    label-cols-md="4"
-                    label-cols-lg="3"
-                    label-align-sm="right"
-                    content-cols="4"
-                    label-size="sm"
-                    class="mb-0"
+        <div class="card">
+
+            <div class="card-body pt-0">
+                <!-- table -->
+                <contract-table
+                    v-show="permissions.read"
+                    :table="table"
+                    :busy="busy"
+                    :trash="filters.trash"
+                    :permissions="permissions"
+                    v-on:change_sort="changeSort"
+                    ref="contractTable"
+                    v-on:update_data="showCreateModal"
+                    v-on:success="loadData"
                 >
-                    <b-pagination
-                        id="paginate_filters"
-                        :total-rows="total"
-                        :per-page="filters.perPage"
-                        v-model="filters.currentPage"
-                        class="my-0 mx-2"
-                        @change="selectPage"
-                    />
-                </b-form-group>
-            </b-col>
-        </b-row>
+                </contract-table>
+
+                <!-- paginator/ -->
+                <b-row
+                    class="w-100 d-flex justify-content-start" v-if="total > 1 && permissions.read">
+                    <!--            <b-col class="my-1 d-flex justify-content-center">-->
+                    <b-col class="my-1 d-flex justify-content-start">
+                        <b-form-group
+                            label-size="sm"
+                            class="mb-0"
+                        >
+                            <b-pagination
+                                id="paginate_filters"
+                                :total-rows="total"
+                                :per-page="filters.perPage"
+                                v-model="filters.currentPage"
+                                class="my-0"
+                                @change="selectPage"
+                            />
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+            </div>
+        </div>
 
         <!-- perPage -->
         <b-row
+            v-if="false"
             v-show="permissions.read"
         >
             <b-col class="my-1">
@@ -84,8 +84,9 @@
         <!-- totalRow -->
         <b-row class="mb-3"
                v-show="permissions.read"
+               v-if="false"
         >
-            <b-col class="my-1">
+            <b-col class="my-1 ">
                 <b-form-group
                     label-class="font-weight-bold pt-0"
                     class="mb-0"
