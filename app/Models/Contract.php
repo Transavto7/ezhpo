@@ -429,7 +429,7 @@ class Contract extends Model
 
     }
 
-    public function test_one(){
+    public static function test_one(){
         $com = Company::with(['drivers', 'cars'])
                ->whereHashId(254761045)
                 ->first();
