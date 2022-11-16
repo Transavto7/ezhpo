@@ -1,6 +1,11 @@
 <?php
 
+use App\Car;
+use App\Company;
+use App\Driver;
 use App\Http\Controllers\ContractController;
+use App\Models\Contract;
+use App\Models\Service;
 use App\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;

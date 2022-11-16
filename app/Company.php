@@ -42,6 +42,10 @@ class Company extends Model
     {
         return $this->hasMany(Car::class, 'company_id', 'id');
     }
+    public function drivers()
+    {
+        return $this->hasMany(Driver::class, 'company_id', 'id');
+    }
 
     public function delete()
     {

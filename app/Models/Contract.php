@@ -232,52 +232,198 @@ class Contract extends Model
 //        ini_set('max_execution_time', 400);
 //        set_time_limit(400);
 //
-//        $companies = Company::whereNotNull('products_id')
-//                            ->get(['id', 'products_id']);
-//        $services = Service::get();
-//
-//        $comp_products_arr = [];
-//        foreach ($companies as $company){
-//            $services_item = explode(',', $company->products_id);
-//            $res = [];
-//            foreach ($services_item as $item){
-//                if($tar = $services->where('id', $item)->first()){
-//                    $res[$tar->id] =  ['service_cost' => $tar->price_unit];
-////                        [$tar->id => ['service_cost' => $tar->price_unit]];
-//                }
-//            }
-//
-//            $comp_products_arr[$company->id] = $res;
-//        }
-////        dd($comp_products_arr);
-//        foreach ($comp_products_arr as $company_id => $services_item){
-//            if(!$services_item){
+
+        $drivers = Company::with(['drivers', 'cars'])
+                          ->get();
+        dd();
+
+
+        $companies = Company::whereNotNull('products_id')
+                            ->get(['id', 'products_id']);
+
+        $services = Service::get();
+
+        $comp_products_arr = [];
+
+        foreach ($companies as $company) {
+            $services_item = explode(',', $company->products_id);
+            $res           = [];
+            foreach ($services_item as $item) {
+                if ($tar = $services->where('id', $item)->first()) {
+                    $res[$tar->id] = ['service_cost' => $tar->price_unit];
+//                        [$tar->id => ['service_cost' => $tar->price_unit]];
+                }
+            }
+
+            $comp_products_arr[$company->id] = $res;
+        }
+//        dd($comp_products_arr);
+        foreach ($comp_products_arr as $company_id => $services_item) {
+            if ( !$services_item) {
+                continue;
+            }
+//            if(!(($services_item['pr_id'] ?? false) && ($services_item['sync'] ?? false))){
 //                continue;
 //            }
-////            if(!(($services_item['pr_id'] ?? false) && ($services_item['sync'] ?? false))){
-////                continue;
-////            }
-//            if($contract = Contract::where('company_id', $company_id)->first()){
-//                $contract->services()->sync($services_item);
-//                continue;
-//            }
-//            $contract = Contract::create([
-//                'name' => "Договор $company_id",
-//                'company_id' => $company_id
-//            ]);
-//
-//            $contract->services()->sync($services_item);
-//
-//            Driver::where('company_id', $company_id)->update([
-//                'contract_id' => $contract->id
-//            ]);
-//            Car::where('company_id', $company_id)->update([
-//                'contract_id' => $contract->id
-//            ]);
-//        }
+            if ($contract = Contract::where('company_id', $company_id)->first()) {
+                $contract->services()->sync($services_item);
+                continue;
+            }
+            $contract = Contract::create([
+                'name'       => "Договор $company_id",
+                'company_id' => $company_id,
+            ]);
+
+            $contract->services()->sync($services_item);
+
+            Driver::where('company_id', $company_id)->update([
+                'contract_id' => $contract->id,
+            ]);
+            Car::where('company_id', $company_id)->update([
+                'contract_id' => $contract->id,
+            ]);
+        }
 
 
         return true;
+    }
+
+
+    public static function deleteOld()
+    {
+
+        //=================DELETE
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS = 0');
+        Contract::truncate();
+        Anketa::whereNotNull('contract_id')->update([
+            'contract_id' => null,
+        ]);
+
+        Driver::query()->update([
+            'contract_id' => null,
+        ]);
+        \Illuminate\Support\Facades\DB::table('contract_service')->truncate();
+        Car::query()->update([
+            'contract_id' => null,
+        ]);
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS = 1');
+        return 1;
+
+        //==================DELETE
+    }
+    public static function init_companies(){
+
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', '-1');
+        set_time_limit(7200);
+//
+        $companies = Company::with(['drivers', 'cars'])
+//    ->orderBy('id', 'DESC')
+//    ->whereHashId(635839)
+                            ->get()
+                            ->map(function ($q){
+                                $arr = [];
+                                foreach ($q->drivers as &$driver){
+                                    $driver->products_id = explode(',', $driver->products_id);
+                                    $driver->products_id = array_map(function ($q){
+                                        return intval($q);
+                                    }, $driver->products_id);
+
+                                    $arr = $driver->products_id;
+                                    asort($arr);
+                                    $driver->products_id = $arr;
+
+                                    $driver->key_for_group = implode('_', $arr);
+                                }
+                                foreach ($q->cars as &$car){
+                                    $car->products_id = explode(',', $car->products_id);
+                                    $car->products_id = array_map(function ($q){
+                                        return intval($q);
+                                    }, $car->products_id);
+                                    $arr = $car->products_id;
+                                    asort($arr);
+                                    $car->products_id = $arr;
+                                    $car->key_for_group = implode('_', $arr);
+                                }
+
+                                return $q;
+                            });
+        $services = Product::get();
+
+        foreach ($companies as $company){
+            $services_id = [];
+            foreach ($company->drivers->groupBy('key_for_group') as $key_group => $drivers_for_company_group){
+
+                if(!$drivers_for_company_group[0]){
+                    continue;
+                }
+                $services_id = $drivers_for_company_group[0]->products_id;
+                $res = [];
+                foreach ($services_id as $service_id){
+                    if($tar = $services->where('id', $service_id)->first()){
+                        $res[$tar->id] =  ['service_cost' => $tar->price_unit];
+                    }
+                }
+                $comp_products_arr = $res;
+
+                $contract = Contract::create([
+                    'name' => "Договор $company->id $key_group",
+                    'company_id' => $company->id
+                ]);
+                $contract->services()->sync($comp_products_arr);
+
+                Driver::whereIn('id', $drivers_for_company_group->pluck('id'))
+                      ->update([
+                    'contract_id' => $contract->id
+                ]);
+
+                Anketa::where('type_anketa', [
+                    'tech',
+                    'bdd',
+                    'report_cart',
+                ])->whereIn('driver_id', $drivers_for_company_group->pluck('id'))
+                  ->update([
+                    'contract_id' => $contract->id
+                ]);
+            }
+
+            $services_id = [];
+            foreach ($company->cars->groupBy('key_for_group') as $key_group => $cars_for_company_group){
+
+                if(!$cars_for_company_group[0]){
+                    continue;
+                }
+                $services_id = $cars_for_company_group[0]->products_id;
+                $res = [];
+                foreach ($services_id as $service_id){
+                    if($tar = $services->where('id', $service_id)->first()){
+                        $res[$tar->id] =  ['service_cost' => $tar->price_unit];
+                    }
+                }
+                $comp_products_arr = $res;
+
+                $contract = Contract::create([
+                    'name' => "Договор $company->id $key_group",
+                    'company_id' => $company->id
+                ]);
+                $contract->services()->sync($comp_products_arr);
+
+                Car::whereIn('id', $cars_for_company_group->pluck('id'))
+                   ->update([
+                    'contract_id' => $contract->id
+                ]);
+
+                Anketa::where('type_anketa', 'tech')
+                      ->whereIn('car_id', $cars_for_company_group->pluck('id'))
+                      ->update([
+                    'contract_id' => $contract->id
+                ]);
+            }
+
+
+        }
+        return 1;
+
     }
 
 }
