@@ -147,6 +147,7 @@ class ReportControllerContract extends Controller
             'report_cart',
             'pechat_pl',
         ])
+                        ->whereHas('contract')
                         ->whereIn('anketas.contract_id', $this->contracts_ids)
                         ->with([// 'services_snapshot',
                                 'driver',
@@ -311,6 +312,7 @@ class ReportControllerContract extends Controller
                             'car',
                             'contract.services',
                     ])
+                    ->whereHas('contract')
                     ->where(function ($query) use ($company) { // ohyenno..
                         $query->where('anketas.company_id', $company->hash_id)
                               ->orWhere('anketas.company_name', $company->name);
@@ -421,6 +423,7 @@ class ReportControllerContract extends Controller
                 'driver',
                     'contract.services',
             ])
+            ->whereHas('contract')
             ->where(function ($query) use ($company) {
                              $query->where('anketas.company_id', $company->hash_id)
                                    ->orWhere('anketas.company_name', $company->name);
@@ -573,6 +576,7 @@ class ReportControllerContract extends Controller
                 'car',
                 'contract.services',
             ])
+            ->whereHas('contract')
                          ->where(function ($query) use ($company) {
                              $query->where('anketas.company_id', $company->hash_id)
                                    ->orWhere('anketas.company_name', $company->name);
