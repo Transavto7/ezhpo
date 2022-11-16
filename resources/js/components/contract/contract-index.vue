@@ -41,7 +41,9 @@
                             <b-pagination
                                 id="paginate_filters"
                                 :total-rows="total"
+                                :per-page="nikita_yeban"
                                 v-model="filters.currentPage"
+
                                 class="my-0"
                                 @change="selectPage"
                             />
@@ -258,14 +260,14 @@ export default {
 
         loadData() {
             this.busy = true
-            let data = {
-                params: this.filters,
-            };
-            data.params.nikita_yeban = this.nikita_yeban;
 
             // console.log(this.filters)
             addParams(this.filters);
 
+            let data = {
+                params: Object.assign({}, this.filters),
+            };
+            data.params.nikita_yeban = this.nikita_yeban;
 
             axios.get("/contract/index", data)
                 .then(({data}) => {
