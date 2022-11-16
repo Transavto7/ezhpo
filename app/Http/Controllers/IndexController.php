@@ -394,6 +394,18 @@ class IndexController extends Controller
                     ],
                     'note'    => ['label' => 'Договоренности с клиентом', 'type' => 'text', 'noRequired' => 1],
                     'comment'    => ['label' => 'Комментарий', 'type' => 'text', 'noRequired' => 1],
+                    'procedure_pv' => [
+                        'label'        => 'Порядок выпуска',
+                        'type'         => 'select',
+                        'values'       => [
+                            'Наперед без дат'  => 'Наперед без дат',
+                            'Наперёд с датами' => 'Наперёд с датами',
+                            'Задним числом'    => 'Задним числом',
+                            'Фактовый'         => 'Фактовый',
+                        ],
+                        'defaultValue' => 'Фактовый',
+                        'noRequired'   => 1,
+                    ],
                     'user_id' => [
                         'label'      => 'Ответственный',
                         'type'       => 'select',
@@ -447,19 +459,8 @@ class IndexController extends Controller
                         'noRequired' => 1,
                     ],
 
+
                     'inn'          => ['label' => 'ИНН', 'type' => 'text', 'noRequired' => 1],
-                    'procedure_pv' => [
-                        'label'        => 'Порядок выпуска',
-                        'type'         => 'select',
-                        'values'       => [
-                            'Наперед без дат'  => 'Наперед без дат',
-                            'Наперёд с датами' => 'Наперёд с датами',
-                            'Задним числом'    => 'Задним числом',
-                            'Фактовый'         => 'Фактовый',
-                        ],
-                        'defaultValue' => 'Фактовый',
-                        'noRequired'   => 1,
-                    ],
 
                     'dismissed' => [
                         'label'        => 'Временная блокировка',
