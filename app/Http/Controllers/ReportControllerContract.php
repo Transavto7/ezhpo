@@ -259,15 +259,15 @@ class ReportControllerContract extends Controller
                 }
             }
             foreach ($medics
-                         ->pluck('type_view')
-                         ->unique() as $type_view
+                         ->pluck('type_anketa')
+                         ->unique() as $type_anketa
             ) {
 
-                $total_for_type_view                                    = $medics->where('type_view', $type_view)
+                $total_for_type_view                                    = $medics->where('type_anketa', $type_anketa)
                                                                                  ->count();
-                $result[$driver->hash_id]['types'][$type_view]['total'] = $total_for_type_view;
+                $result[$driver->hash_id]['types'][$type_anketa]['total'] = $total_for_type_view;
 
-                $type_explode = explode('/', $type_view);
+                $type_explode = explode('/', $type_anketa);
 
                 foreach ($servicesForMedics as $service) {
                     $service->price = $service->pivot->service_cost;
@@ -280,17 +280,17 @@ class ReportControllerContract extends Controller
                                 $service->price                                            = $service->pivot->service_cost
                                                                                              - ($service->pivot->service_cost
                                                                                                 * $disSum / 100);
-                                $result[$driver->hash_id]['types'][$type_view]['discount'] = 1 * $disSum;
+                                $result[$driver->hash_id]['types'][$type_anketa]['discount'] = 1 * $disSum;
                             }
                         }
                     }
-                    $result[$driver->hash_id]['types'][$type_view]['sync'] = in_array($service->id,
+                    $result[$driver->hash_id]['types'][$type_anketa]['sync'] = in_array($service->id,
                         explode(',', $company->products_id));
 
                     if ($service->type_product === 'Разовые осмотры') {
-                        $result[$driver->hash_id]['types'][$type_view]['sum'] = $service->price * $total_for_type_view;
+                        $result[$driver->hash_id]['types'][$type_anketa]['sum'] = $service->price * $total_for_type_view;
                     } else {
-                        $result[$driver->hash_id]['types'][$type_view]['sum'] = $service->price;
+                        $result[$driver->hash_id]['types'][$type_anketa]['sum'] = $service->price;
                     }
                 }
             }
