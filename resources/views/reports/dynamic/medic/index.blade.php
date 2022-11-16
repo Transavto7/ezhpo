@@ -51,7 +51,7 @@
             </div>
         @elseif (request()->get('pv_id') || request()->get('town_id'))
             <div class="alert alert-secondary" role="alert">
-                Медосмотры не найдены
+                Осмотры не найдены
             </div>
         @endif
     </report-dynamic-index>
