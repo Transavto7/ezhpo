@@ -39,6 +39,7 @@
                         @endforeach
 
                         <tr>
+                            <td width="50"></td>
                             <td width="100"></td>
                             <td width="250">Всего</td>
                             @foreach($months as $month)
@@ -51,7 +52,7 @@
             </div>
         @elseif (request()->get('pv_id') || request()->get('town_id'))
             <div class="alert alert-secondary" role="alert">
-                Медосмотры не найдены
+                Осмотры не найдены
             </div>
         @endif
     </report-dynamic-index>
