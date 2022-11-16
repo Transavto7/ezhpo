@@ -86,7 +86,7 @@ class ReportControllerContract extends Controller
         $company = Anketa::with('contract')
                          ->where('company_id', $request->id)
                          ->whereNotNull('contract_id')
-                            ->whereHas('contract')
+                         ->whereHas('contract')
                          ->groupBy('contract_id')
                          ->get()
                          ->pluck('contract')
@@ -211,8 +211,10 @@ class ReportControllerContract extends Controller
                          ->unique() as $type_view
             ) {
 
-                $total_for_type_view                                    = $medics->where('type_view', $type_view)
-                                                                                 ->count();
+                $total_for_type_view = $medics->where('type_view', $type_view)
+                                              ->where('driver_id', $driver->hash_id)
+                                              ->count();
+
                 $result[$driver->hash_id]['types'][$type_view]['total'] = $total_for_type_view;
 
                 $type_explode = explode('/', $type_view);
@@ -418,13 +420,13 @@ class ReportControllerContract extends Controller
     {
         $reports = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart', 'pechat_pl'])
 //                         ->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
-            ->whereIn('contract_id', $this->contracts_ids)
-            ->with([
-                'driver',
-                    'contract.services',
-            ])
-            ->whereHas('contract')
-            ->where(function ($query) use ($company) {
+                         ->whereIn('contract_id', $this->contracts_ids)
+                         ->with([
+                             'driver',
+                             'contract.services',
+                         ])
+                         ->whereHas('contract')
+                         ->where(function ($query) use ($company) {
                              $query->where('anketas.company_id', $company->hash_id)
                                    ->orWhere('anketas.company_name', $company->name);
                          })
@@ -571,12 +573,12 @@ class ReportControllerContract extends Controller
     {
         $reports = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'type_anketa', 'pechat_pl'])
 //                         ->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')
-            ->whereIn('contract_id', $this->contracts_ids)
-            ->with([
-                'car',
-                'contract.services',
-            ])
-            ->whereHas('contract')
+                         ->whereIn('contract_id', $this->contracts_ids)
+                         ->with([
+                             'car',
+                             'contract.services',
+                         ])
+                         ->whereHas('contract')
                          ->where(function ($query) use ($company) {
                              $query->where('anketas.company_id', $company->hash_id)
                                    ->orWhere('anketas.company_name', $company->name);
@@ -754,7 +756,7 @@ class ReportControllerContract extends Controller
                 Product::ESSENCE_DRIVER,
                 Product::ESSENCE_CAR_DRIVER,
             ]) as $service) {
-                if($service->type_product === 'Абонентская плата без реестров'){
+                if ($service->type_product === 'Абонентская плата без реестров') {
                     $result['drivers'][] = [
                         'driver_fio' => $driver->fio,
                         'name'       => $service->name,
@@ -768,7 +770,7 @@ class ReportControllerContract extends Controller
 //            $carProdsID = explode(',', $car->products_id);
             $carProdsID = $car->contract->services;
             foreach ($carProdsID->whereIn('essence', [2, 3]) as $service) {
-                if($service->type_product === 'Абонентская плата без реестров'){
+                if ($service->type_product === 'Абонентская плата без реестров') {
                     $result['cars'][] = [
                         'gos_number' => $car->gos_number,
                         'type_auto'  => $car->type_auto,
