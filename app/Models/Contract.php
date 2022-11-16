@@ -367,7 +367,7 @@ class Contract extends Model
                 $comp_products_arr = $res;
 
                 $contract = Contract::create([
-                    'name' => "Договор $company->id $key_group",
+                    'name' => "Договор $company->id $key_group Водители",
                     'company_id' => $company->id
                 ]);
                 $contract->services()->sync($comp_products_arr);
@@ -405,7 +405,7 @@ class Contract extends Model
                 $comp_products_arr = $res;
 
                 $contract = Contract::create([
-                    'name' => "Договор $company->id $key_group",
+                    'name' => "Договор $company->id $key_group Автомобили",
                     'company_id' => $company->id
                 ]);
                 $contract->services()->sync($comp_products_arr);
