@@ -440,7 +440,7 @@ class Contract extends Model
                     'bdd',
                     'report_cart',
                 ])
-                  ->where('created_at', '>', Carbon::now()->subMonths(3))
+                  ->where('created_at', '>', Carbon::now()->subMonths(4))
                   ->where('driver_id', $driver->id)
                   ->update([
                       'contract_id' => $driver->contract_id
@@ -448,7 +448,7 @@ class Contract extends Model
         }
         foreach ($com->cars as $car){
             Anketa::where('type_anketa', 'tech')
-                  ->where('created_at', '>', Carbon::now()->subMonths(3))
+                  ->where('created_at', '>', Carbon::now()->subMonths(4))
                   ->where('car_id', $car->id)
                   ->update([
                       'contract_id' => $car->contract_id
