@@ -435,7 +435,7 @@ class Contract extends Model
                 ->first();
 
         foreach ($com->drivers as $driver){
-            Anketa::where('type_anketa', [
+            Anketa::whereIn('type_anketa', [
                     'medic',
                     'bdd',
                     'report_cart',
