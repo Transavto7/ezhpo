@@ -14,8 +14,8 @@ class Company extends Model
         'hash_id', 'name',
         'note', 'comment',
         'user_id', 'req_id',
-        'pv_id', 'town_id', 'products_id', 'where_call', 'where_call_name', 'inn',
-        'procedure_pv',
+        'pv_id', 'town_id', 'products_id', 'where_call', 'where_call_name', 'procedure_pv','inn',
+
         'dismissed',
         'has_actived_prev_month',
         'bitrix_link',
