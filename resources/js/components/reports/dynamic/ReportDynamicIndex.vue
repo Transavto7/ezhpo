@@ -19,12 +19,8 @@
                         <div class="form-group col-lg-3">
                             <label class="mb-1" for="company">Город</label>
                             <select
-                                model="Town"
                                 ref="towns"
-                                field-key="id"
-                                field="name"
                                 name="town_id"
-                                data-field="Town_town_id"
                                 class="filled-select2 filled-select"
                                 data-allow-clear="true"
                             >
@@ -42,12 +38,8 @@
                         <div class="form-group col-lg-3">
                             <label class="mb-1" for="company">Пункт выпуска</label>
                             <select
-                                model="Point"
                                 ref="points"
-                                field-key="id"
-                                field="name"
                                 name="pv_id"
-                                data-field="Point_pv_id"
                                 class="filled-select2 filled-select"
                                 data-allow-clear="true"
                             >
@@ -101,7 +93,7 @@ export default {
             const selected = $(event.currentTarget).find("option:selected");
             this.selectedTown = Number(selected.val());
             this.pointList = this.points.filter(point => {
-                return point.pv_id === this.selectedTown || !this.selectedTown;
+                return  Number(point.pv_id) === this.selectedTown || !this.selectedTown;
             });
         },
     }
