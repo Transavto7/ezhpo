@@ -441,7 +441,7 @@ class IndexController extends Controller
                     ],
 
                     'dismissed' => [
-                        'label'        => 'Черный список',
+                        'label'        => 'Временная блокировка',
                         'type'         => 'select',
                         'values'       => [
                             'Нет' => 'Нет',
