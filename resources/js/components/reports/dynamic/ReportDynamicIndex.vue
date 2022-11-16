@@ -26,6 +26,7 @@
                                 name="town_id"
                                 data-field="Town_town_id"
                                 class="filled-select2 filled-select"
+                                data-allow-clear="true"
                             >
                                 <option value="">Не установлено</option>
                                 <option v-for="item in towns"
@@ -48,13 +49,14 @@
                                 name="pv_id"
                                 data-field="Point_pv_id"
                                 class="filled-select2 filled-select"
+                                data-allow-clear="true"
                             >
                                 <option value="">Не установлено</option>
-                                <option v-for="item in points"
+                                <option v-for="item in pointList"
                                         :key="item.id"
                                         :value="item.id"
                                         :selected="item.id === Number(point)"
-                                        v-if="!(selectedTown && selectedTown !== item.pv_id)"
+                                        v-if="!item.hide"
                                 >
                                     {{ item.name }}
                                 </option>
@@ -83,10 +85,12 @@ export default {
     data() {
         return {
             selectedTown: null,
-            journal: 'medic'
+            journal: 'medic',
+            pointList: []
         }
     },
     mounted() {
+        this.pointList = this.points;
         this.selectedTown = this.town;
         this.journal = this.type;
         console.log(this.type);
@@ -95,7 +99,10 @@ export default {
     methods: {
         selectTown(event) {
             const selected = $(event.currentTarget).find("option:selected");
-            this.selectedTown = selected.val();
+            this.selectedTown = Number(selected.val());
+            this.pointList = this.points.filter(point => {
+                return point.pv_id === this.selectedTown || !this.selectedTown;
+            });
         },
     }
 }
