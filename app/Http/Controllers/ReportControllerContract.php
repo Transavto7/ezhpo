@@ -196,7 +196,7 @@ class ReportControllerContract extends Controller
 //            $driver_id  = $driver->hash_id;
 //            $driver_fio = $driver->fio;
 
-            $result[$driver->hash_id]['driver_fio'] = $driver->name;
+            $result[$driver->hash_id]['driver_fio'] = $driver->fio;
             $result[$driver->hash_id]['pv_id']      = $medics
                 ->where('car_id', $driver->hash_id)
                 ->pluck('pv_id')
@@ -477,7 +477,7 @@ class ReportControllerContract extends Controller
 
             $result[$key]['year']                                      = $date->year;
             $result[$key]['month']                                     = $date->month;
-            $result[$key]['reports'][$report->driver_id]['driver_fio'] = $report->driver->name;
+            $result[$key]['reports'][$report->driver_id]['driver_fio'] = $report->driver->fio;
             $result[$key]['reports'][$report->driver_id]['pv_id']      = implode('; ',
                 array_unique($reports->where('driver_id', $report->driver_id)->pluck('pv_id')->toArray()));
 
