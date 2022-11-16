@@ -36,12 +36,17 @@ Artisan::command('init:contracts', function () {
 
 Artisan::command('contract:first', function () {
     if(\App\Models\Contract::deleteOld()){
-        $this->comment('Всё удалено ');
+        $this->comment('Всё удалено');
     }
 })->describe('Display an inspiring quote');
 
 Artisan::command('contract:second', function () {
     if(\App\Models\Contract::init_companies()){
+        $this->comment('Связано');
+    }
+})->describe('Display an inspiring quote');
+Artisan::command('contract:test', function () {
+    if(\App\Models\Contract::test_one()){
         $this->comment('Связано');
     }
 })->describe('Display an inspiring quote');

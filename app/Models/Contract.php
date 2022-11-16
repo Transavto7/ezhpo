@@ -377,14 +377,16 @@ class Contract extends Model
                     'contract_id' => $contract->id
                 ]);
 
-                Anketa::where('type_anketa', [
-                    'tech',
-                    'bdd',
-                    'report_cart',
-                ])->whereIn('driver_id', $drivers_for_company_group->pluck('id'))
-                  ->update([
-                    'contract_id' => $contract->id
-                ]);
+//                Anketa::where('type_anketa', [
+//                    'tech',
+//                    'bdd',
+//                    'report_cart',
+//                ])
+//                      ->where('created_at', '>', Carbon::now()->subMonths(1))
+//                  ->whereIn('driver_id', $drivers_for_company_group->pluck('id'))
+//                  ->update([
+//                    'contract_id' => $contract->id
+//                ]);
             }
 
             $services_id = [];
@@ -413,17 +415,41 @@ class Contract extends Model
                     'contract_id' => $contract->id
                 ]);
 
-                Anketa::where('type_anketa', 'tech')
-                      ->whereIn('car_id', $cars_for_company_group->pluck('id'))
-                      ->update([
-                    'contract_id' => $contract->id
-                ]);
+//                Anketa::where('type_anketa', 'tech')
+//                      ->where('created_at', '>', Carbon::now()->subMonths(1))
+//                      ->whereIn('car_id', $cars_for_company_group->pluck('id'))
+//                      ->update([
+//                    'contract_id' => $contract->id
+//                ]);
             }
 
 
         }
         return 1;
 
+    }
+
+    public function test_one(){
+        $com = Company::with(['drivers', 'cars'])
+               ->whereHashId(254761045)
+                ->first();
+
+        foreach ($com->drivers as $driver){
+            Anketa::where('type_anketa', 'tech')
+                  ->where('created_at', '>', Carbon::now()->subMonths(3))
+                  ->where('driver_id', $driver->id)
+                  ->update([
+                      'contract_id' => $driver->contract_id
+                  ]);
+        }
+        foreach ($com->cars as $car){
+            Anketa::where('type_anketa', 'tech')
+                  ->where('created_at', '>', Carbon::now()->subMonths(3))
+                  ->where('car_id', $car->id)
+                  ->update([
+                      'contract_id' => $car->contract_id
+                  ]);
+        }
     }
 
 }
