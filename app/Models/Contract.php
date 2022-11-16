@@ -111,14 +111,29 @@ class Contract extends Model
 //            'name' => 'Услуги новые',
 //        ]);
 
+//        FieldPrompt::create([
+//            'field' => 'contract_id',
+//            'type'  => 'tech',
+//            'name'  => 'Договор',
+//        ]);
+//        FieldPrompt::create([
+//            'field' => 'contract_id',
+//            'type'  => 'medic',
+//            'name'  => 'Договор',
+//        ]);
         FieldPrompt::create([
             'field' => 'contract_id',
-            'type'  => 'tech',
+            'type'  => 'bdd',
             'name'  => 'Договор',
         ]);
         FieldPrompt::create([
             'field' => 'contract_id',
-            'type'  => 'medic',
+            'type'  => 'pechat_pl',
+            'name'  => 'Договор',
+        ]);
+        FieldPrompt::create([
+            'field' => 'contract_id',
+            'type'  => 'report_cart',
             'name'  => 'Договор',
         ]);
 
@@ -152,7 +167,8 @@ class Contract extends Model
 //            'type'  => 'company',
 //            'name'  => 'Услуги',
 //        ]);
-
+//        FieldPrompt::whereName('ankets.service')
+//                   ->delete();
 //        FieldPrompt::insert([
 //            [
 //                'type' => 'service',
