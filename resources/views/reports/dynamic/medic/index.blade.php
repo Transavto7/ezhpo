@@ -17,6 +17,7 @@
                     <table id="reports-table-1" class="table table-striped table-sm">
                         <thead>
                         <tr>
+                            <th class="text-center" width="50">№</th>
                             <th class="text-center" width="100">ID</th>
                             <th>Компания</th>
                             @foreach($months as $month)
@@ -25,8 +26,10 @@
                         </tr>
                         </thead>
                         <tbody>
+                        @php $number = 0 @endphp
                         @foreach($companies as $company_id => $info)
                             <tr>
+                                <td class="text-center" width="50">{{ ++$number }}</td>
                                 <td width="100">{{ $company_id }}</td>
                                 <td width="250">{{ $info['name'] }}</td>
                                 @foreach($months as $month)
