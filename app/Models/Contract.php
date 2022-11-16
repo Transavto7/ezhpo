@@ -450,6 +450,7 @@ class Contract extends Model
                       'contract_id' => $car->contract_id
                   ]);
         }
+        return 1;
     }
 
 }
