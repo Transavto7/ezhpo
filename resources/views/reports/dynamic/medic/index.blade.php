@@ -39,6 +39,7 @@
                         @endforeach
 
                         <tr>
+                            <td width="50"></td>
                             <td width="100"></td>
                             <td width="250">Всего</td>
                             @foreach($months as $month)
