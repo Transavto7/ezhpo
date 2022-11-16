@@ -156,6 +156,9 @@
                         <li>
                             <a href="{{ route('report.dynamic.medic') }}">
                                 <i class="fa fa-book"></i>Отчет по количеству осмотров
+                                <span class="start-100 translate-middle badge text-white rounded-pill bg-success">
+                                    new
+                                </span>
                             </a>
                         </li>
                     @endif
