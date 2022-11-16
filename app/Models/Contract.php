@@ -435,7 +435,11 @@ class Contract extends Model
                 ->first();
 
         foreach ($com->drivers as $driver){
-            Anketa::where('type_anketa', 'tech')
+            Anketa::where('type_anketa', [
+                    'medic',
+                    'bdd',
+                    'report_cart',
+                ])
                   ->where('created_at', '>', Carbon::now()->subMonths(3))
                   ->where('driver_id', $driver->id)
                   ->update([
