@@ -444,6 +444,7 @@ class AnketsController extends Controller
 
         $data = $request->all();
         $d_id = $request->get('driver_id', 0); // Driver
+
         $pv_id = $request->get('pv_id', 0);
 
         function mt_rand_float($min, $max, $countZero = '0') {
@@ -503,8 +504,9 @@ class AnketsController extends Controller
             $createdAnketasDataResponseApi = [];
             $data_anketa = $data['anketa'];
             $errorsAnketa = array();
-            $Driver = Driver::with(['contract.services'])->where('hash_id', $d_id)->first();
+
             $cars = [];
+            $drivers = [];
 
             // Только обычные осмотры валидируем
             if(($data['is_dop'] ?? 0) != 1){
@@ -573,13 +575,17 @@ class AnketsController extends Controller
             if (isset($data['car_id'])) {
                 $cars[] = $data['car_id'];
             }
+            if (isset($data['driver_id'])) {
+                $drivers[] = $data['driver_id'];
+            }
 
             foreach ($data_anketa as $anketa) {
                 $cars[] = $anketa['car_id'] ?? 0;
+                $drivers[] = $anketa['driver_id'] ?? 0;
             }
 
             if ($data['type_anketa'] === 'medic' || $data['type_anketa'] === 'pak') {
-                $anketasMedic = Anketa::where('driver_id', $d_id)
+                $anketasMedic = Anketa::whereIn('driver_id', $drivers)
                     ->where('type_anketa', 'medic')
                     ->where('in_cart', 0)
                     ->orderBy('date', 'desc')
@@ -598,8 +604,10 @@ class AnketsController extends Controller
 
                 // ID автомобиля
                 $c_id = $anketa['car_id'] ?? 0;
+                $d_id = $anketa['driver_id'] ?? 0;
 
                 $Car = Car::with(['contract.services'])->where('hash_id', $c_id)->first();
+                $Driver = Driver::with(['contract.services'])->where('hash_id', $d_id)->first();
 
                 // Тонометр
                 $tonometer = $anketa['tonometer'] ?? $defaultDatas['tonometer'];

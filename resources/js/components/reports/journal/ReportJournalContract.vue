@@ -25,15 +25,24 @@
                     </div>
                     <div class="form-group col-lg-3">
                         <label class="mb-1" for="contract">Договор</label>
-                        <v-select
+                        <multiselect
+                            :multiple="true"
                             v-model="contracts"
                             :options="contracts_options"
-                            key="id"
+                            :close-on-select="false"
+                            :clear-on-select="false"
+                            :preserve-search="true"
+                            placeholder="Выберите договор"
                             label="name"
-                            multiple
-                            class="is-invalid"
+                            track-by="name"
+                            :preselect-first="true"
+                            selectLabel="Enter чтобы выбрать"
+                            deselectLabel="Enter чтобы отменить"
+                            selectedLabel="Выбрано"
                         >
-                        </v-select>
+<!--                            <span slot="noResult">По договорам компании осмотров не проводилось</span>-->
+                            <span slot="noOptions">По договорам компании осмотров не проводилось</span>
+                        </multiselect>
                     </div>
                     <div class="form-group col-lg-2">
                         <label class="mb-1" for="date_from">Период:</label>

@@ -416,34 +416,34 @@ $(document).ready(function () {
                        if(isBlocked === ''){
                            otherHtmlItems = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
                        }
-                       if(i === 'contract_id' ){
+                       if(i === 'contract_id' || i === 'contract' || i === 'contracts'){
                            // fvItem['type'] = 'text';
                            continue;
                        }
 
                        if(i === 'products_id'){
                            // for company
-                           if(fieldsValues.contracts){
-                               fieldsValues.contracts
-                           }
+                           // if(fieldsValues.contracts){
+                           //     fieldsValues.contracts
+                           // }
 
                        }
 
-                       if(i === 'contract'){
+                       if(i === 'products_id' && data.contract){
                            // driver & auto
                            msg += `
                                <p class="text-small m-0">Договор:</p>`;
                            if(data.contract.length != 0){
                                msg +=  `
                             <ul class="list-group my-2">
-                                <li class="list-group-item">
+                                <li style="padding: 0;" class="text-small list-group-item list-group-item-action list-group-item-success">
                                 <b>${data.contract.name}</b>
 
                             <ul class="list-group">`;
                                if(data.contract.services){
 
                                    data.contract.services.map((service) => {
-                                       msg +=  `<li class="list-group-item text-small">${service.name}</li>`;
+                                       msg +=  `<li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">${service.name}</li>`;
                                    })
                                }
 
@@ -455,8 +455,8 @@ $(document).ready(function () {
                                <p class="text-small">-- Отсутствует --</p>`;
                            }
 
-                           continue;
-                         }else if(i === 'contracts'){
+                           // continue;
+                         }else if(i === 'products_id' && data.contracts){
                            // copmany
                            msg += `
                                <p class="text-small m-0">Договор:</p>`;
@@ -468,11 +468,11 @@ $(document).ready(function () {
 
                                        msg += `
 
-                                    <li class="list-group-item"><ul class="list-group">
+                                    <li style="padding: 0;" class=" text-small list-group-item list-group-item-action list-group-item-success"><ul class="list-group">
                                     <b>${contract.name}</b>`;
                                        contract.services.map((service) => {
                                            msg += `
-                                    <li class="list-group-item text-small">
+                                    <li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">
                                     ${service.name}</li>`;
                                        })
                                        msg += `</ul></li>`;
@@ -485,8 +485,9 @@ $(document).ready(function () {
                                msg += `
                                <p class="text-small">-- Отсутствует --</p>`;
                            }
-                           continue;
-                       }else{
+                           // continue;
+                       }
+                       // else{
                            if(fvItem['type'] === 'select') {
                                await API_CONTROLLER.getFieldHTML({ field: i, model, default_value: encodeURIComponent(data[i]) }).then(response => {
                                    field = response.data
@@ -504,7 +505,7 @@ $(document).ready(function () {
                                    field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${data[i] ? data[i] : ''}' name="${i}" />`
                                }
                            }
-                       }
+                       // }
 
                        msg += `
                         <p style="${i === 'dismissed' ? data[i].toUpperCase() === 'ДА' ? 'color: red; font-weight: bold;' : '' : ''}" data-field-card="${model}_${i}" class="text-small m-0">${fvItem.label}:<br/>

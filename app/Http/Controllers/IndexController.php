@@ -224,7 +224,7 @@ class IndexController extends Controller
                         'values' => 'Models\Contract',
                     ],
                                         'products_id'        => [
-                                            'label'      => 'Услуги',
+                                            'label'      => 'Услуги[старые]',
                                             'multiple'   => 1,
                                             'type'       => 'select',
                                             'values'     => 'Product',
@@ -314,7 +314,7 @@ class IndexController extends Controller
                     ],
 
                                         'products_id' => [
-                                            'label'      => 'Услуги',
+                                            'label'      => 'Услуги[старые]',
                                             'multiple'   => 1,
                                             'type'       => 'select',
                                             'values'     => 'Product',
@@ -425,17 +425,6 @@ class IndexController extends Controller
                             ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
                         ],
                     ],
-
-                                        'products_id' => [
-                                            'label'    => 'Услуги',
-                                            'multiple' => 1,
-                                            'type'     => 'select',
-                                            'values'   => 'Product',
-                                            'syncData' => [
-                                                ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
-                                                ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
-                                            ],
-                                        ],
                     'contracts' => [
                         'label'    => 'Договор',
                         'multiple' => 1,
@@ -445,6 +434,18 @@ class IndexController extends Controller
                         //                            ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
                         //                            ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
                         //                        ],
+                    ],
+
+                    'products_id' => [
+                        'label'    => 'Услуги [старые]',
+                        'multiple' => 1,
+                        'noRequired' => 1,
+                        'type'     => 'select',
+                        'values'   => 'Product',
+                        'syncData' => [
+                            ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
+                            ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
+                        ],
                     ],
 
                     'where_call'      => [
@@ -460,7 +461,7 @@ class IndexController extends Controller
                     ],
 
 
-                    'inn'          => ['label' => 'ИНН', 'type' => 'text', 'noRequired' => 1],
+                    'inn'          => ['label' => 'ИНН', 'type' => 'text'],
 
                     'dismissed' => [
                         'label'        => 'Временная блокировка',
