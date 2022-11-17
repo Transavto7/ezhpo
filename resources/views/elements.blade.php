@@ -531,6 +531,8 @@
                                             {{ app('App\Product')->getName($el->products_id) }}
                                         @elseif ($field->field === 'essence')
                                             {{ \App\Product::$essence[$el->essence] ?? ''  }}
+                                        @elseif ($field->field === 'document_bdd' || $field->field === 'bitrix_link')
+                                            <a href="{{ $el[$field->field] }}">{{ $el[$field->field] }}</a>
                                         @elseif ($field->field === 'photo')
                                             @if(Storage::disk('public')->exists($el[$field->field]) && $el[$field->field] !== '<' && $el[$field->field] !== '>')
                                                 <a href="{{ Storage::url($el[$field->field]) }}"

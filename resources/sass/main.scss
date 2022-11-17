@@ -3519,6 +3519,12 @@ body {
     max-width: 250px;
   }
 
+@media (max-width: 400px) {
+    .card-img-top {
+        max-width: 200px;
+    }
+}
+
   .custom-file-label::after {
       content: "Обзор";
       cursor: pointer;
@@ -3541,6 +3547,16 @@ body {
 
   .card-deck .card {
     margin-bottom: 15px;
+  }
+
+  .form-profile-link {
+    background-color: #e9ecef;
+    width: 100%;
+    font-size: 0.8rem;
+    height: calc(1.8rem + 2px);
+    border: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
   }
 
   @media (min-width: 576px) {
