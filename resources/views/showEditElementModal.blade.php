@@ -93,10 +93,10 @@
                         <div class="">
                             <ul class="list-group">
                                 @foreach($el->contracts as $contract)
-                                <li class="list-group-item"><b>{{ $contract->name }}</b>
+                                <li style="padding: 0;" class=" text-small list-group-item list-group-item-action list-group-item-success"><b>{{ $contract->name }}</b>
                                     @foreach($contract->services as $new_service)
                                         <ul class="list-group">
-                                            <li class="list-group-item">{{ $new_service->name }}</li>
+                                            <li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">{{ $new_service->name }}</li>
                                         </ul>
                                     @endforeach
                                 </li>
@@ -127,16 +127,16 @@
                     </div>
                     <div class="">
                         <ul class="list-group">
-                            <li class="list-group-item"><b>{{ $el->contract->name }}</b>
+                            <li style="padding: 0;" class=" text-small list-group-item list-group-item-action list-group-item-success"><b>{{ $el->contract->name }}</b>
                             @foreach($el->contract->services as $new_service)
                                 <ul class="list-group">
-                                        <li class="list-group-item">{{ $new_service->name }}</li>
+                                        <li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">{{ $new_service->name }}</li>
                                     </ul>
                                 @endforeach
                             </li>
                         </ul>
                     </div>
-                    @continue
+                    @continue`
                 @endif
 
                 @if($k !== 'id' && !isset($v['hidden']))
