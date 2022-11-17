@@ -478,6 +478,10 @@ $permissionToViewContract = user()->access('contract_read');
                         @endif
                         <th data-key="{{ $field->field }}">
                             <span class="user-select-none"
+                                  @if($field->field == 'comment')
+                                      style="width: 200px;"
+                                  @endif
+                                  @if ($field->content)
                               @if ($field->content)
                                   data-toggle="tooltip"
                                   data-html="true"

@@ -460,7 +460,6 @@ class IndexController extends Controller
                         'noRequired' => 1,
                     ],
 
-
                     'inn'          => ['label' => 'ИНН', 'type' => 'text'],
 
                     'dismissed' => [
@@ -1083,7 +1082,7 @@ class IndexController extends Controller
         $id      = $request->id;
         $company = Company::find($id);
 
-        if ( !$company->products_id) {
+        if(!$company->products_id){
             return redirect($_SERVER['HTTP_REFERER']);
         }
 
@@ -1379,28 +1378,28 @@ class IndexController extends Controller
     /**
      * Рендер просмотра вкладок CRM
      */
-    public function RenderElements(Request $request)
+    public function RenderElements (Request $request)
     {
         $user = Auth::user();
         $type = $request->type;
 
         $queryString = '';
-        $oKey        = 'orderKey';
-        $oBy         = 'orderBy';
+        $oKey = 'orderKey';
+        $oBy = 'orderBy';
 
         // ОПЕРАТОР ПАК & КОМПАНИИ
 //        if($user->role === 4 && $type === 'Company') {
 //            return back();
 //        }
 
-        foreach ($_GET as $getK => $getV) {
-            if ($getK !== $oKey && $getK !== $oBy) {
-                if (is_array($getV)) {
-                    foreach ($getV as $getVkey => $getVvalue) {
-                        $queryString .= '&'.$getK."[$getVkey]".'='.$getVvalue;
+        foreach($_GET as $getK => $getV) {
+            if($getK !== $oKey && $getK !== $oBy) {
+                if(is_array($getV)) {
+                    foreach($getV as $getVkey => $getVvalue) {
+                        $queryString .= '&' . $getK . "[$getVkey]" . '=' . $getVvalue;
                     }
                 } else {
-                    $queryString .= '&'.$getK.'='.$getV;
+                    $queryString .= '&' . $getK . '=' . $getV;
                 }
 
             }
@@ -1410,8 +1409,8 @@ class IndexController extends Controller
          * Сортировка
          */
         $orderKey = $request->get($oKey, 'created_at');
-        $orderBy  = $request->get($oBy, 'DESC');
-        $filter   = $request->get('filter', 0);
+        $orderBy = $request->get($oBy, 'DESC');
+        $filter = $request->get('filter', 0);
 
         $take = $request->get('take', 500);
 
@@ -1485,8 +1484,8 @@ class IndexController extends Controller
                             if ($aFk == 'date_of_employment') {
                                 $element['elements'] = $element['elements']->whereBetween($aFk, [
                                         Carbon::parse($aFv)->startOfDay(),
-                                        Carbon::parse($aFv)->endOfDay(),
-                                    ]
+                                        Carbon::parse($aFv)->endOfDay()
+                                        ]
                                 );
                             } else {
                                 $element['elements'] = $element['elements']->where($aFk, 'LIKE', '%' . trim($aFv) . '%');
