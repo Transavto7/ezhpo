@@ -247,7 +247,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
     });
 
     Route::prefix('report')->group(function () {
-        Route::get('journal_contract', 'ReportController@ShowJournalContract')->name('report.journal');
+        Route::get('journal_contract', 'ReportController@ShowJournalContract')->name('report.journal_contract');
         Route::get('journal', 'ReportController@ShowJournal')->name('report.journal');
 //        Route::get('journal', 'ReportController@showJournal')->name('report.journal');
         Route::get('dynamic/medic', 'ReportController@getDynamicMedic')->name('report.dynamic.medic');
