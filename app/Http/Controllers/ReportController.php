@@ -217,7 +217,7 @@ class ReportController extends Controller
                                 $date_from,
                                 $date_to,
                             ])->count() +
-                        $anketasByCompany->whereBetween('period_pl', [
+                        $anketasByCompany->where('date', null)->whereBetween('period_pl', [
                                 $date_from->format('Y-m'),
                                 $date_to->format('Y-m'),
                             ])->count();

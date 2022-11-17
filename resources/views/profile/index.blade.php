@@ -15,8 +15,8 @@
 <div class="row d-flex justify-content-center">
     <!-- Form Elements -->
 
-    <div class="col-10">
-        <div class="card p-2 py-5 driver-card  overflow-hidden">
+    <div class="col-12 col-lg-10">
+        <div class="card p-2 py-0 py-lg-5 driver-card overflow-hidden">
             <form action="{{ route('updateProfile') }}" enctype="multipart/form-data" method="POST" class="form-horizontal">
                 @csrf
                 <div style="display: none;" id="croppie-blockPHOTO"
@@ -137,14 +137,19 @@
                         @endif
 
                         @if ($user->hasRole('client'))
-                            <div class="input-group mb-3 d-flex align-items-center">
+                            <div class="input-group mb-3 d-flex align-items-center flex-nowrap">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" style="line-height: 1.3">Ссылка на таблицу с документами БДД:</span>
                                 </div>
-                                <input value="{{ $user->company->document_bdd ?? 'Отсутствует' }}" disabled type="text"
-                                       class="form-control p-3 fw-bold" aria-label="Default"
-                                       aria-describedby="inputGroup-sizing-default">
-                            </div>
+                                @if($user->company->document_bdd)
+                                    <a href="{{ $user->company->document_bdd }}" class="form-profile-link pl-3">
+                                        {{ $user->company->document_bdd }}
+                                    </a>
+                                @else
+                                    <div class="form-profile-link pl-3">
+                                        Отсутствует
+                                    </div>
+                                @endif
                         @endif
                     </div>
                 </div>

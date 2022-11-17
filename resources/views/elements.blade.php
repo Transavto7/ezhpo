@@ -471,9 +471,9 @@ $permissionToViewContract = user()->access('contract_read');
                 <thead>
                 <tr>
                     @foreach ($fieldPrompts as $field)
-{{--                        @if($field->field == 'products_id')--}}
-{{--                            @continue--}}
-{{--                        @endif--}}
+                        @if($field->field == 'products_id' && user()->hasRole('client'))
+                            @continue
+                        @endif
                         @if($field->field == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
                             @continue
                         @endif
@@ -485,7 +485,7 @@ $permissionToViewContract = user()->access('contract_read');
                                   @if($field->field == 'comment')
                                       style="width: 200px;"
                                   @endif
-                                @if ($field->content)
+                                  @if ($field->content)
                                   data-toggle="tooltip"
                                   data-html="true"
                                   data-trigger="click hover"
@@ -624,6 +624,8 @@ $permissionToViewContract = user()->access('contract_read');
                                                     </h5>
                                                 @endforeach
 {{--                                            @endforeach--}}
+                                        @elseif ($field->field === 'document_bdd' || $field->field === 'bitrix_link')
+                                            <a href="{{ $el[$field->field] }}">{{ $el[$field->field] }}</a>
                                         @elseif ($field->field === 'photo')
                                             @if(Storage::disk('public')->exists($el[$field->field]) && $el[$field->field] !== '<' && $el[$field->field] !== '>')
                                                 <a href="{{ Storage::url($el[$field->field]) }}"
