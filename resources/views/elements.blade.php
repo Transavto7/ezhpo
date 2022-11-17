@@ -61,25 +61,27 @@
                             @if($k == 'where_call' && !user()->access('companies_access_field_where_call'))
                                 @continue
                             @endif
-                                @if($k == 'contracts')
-                                    <div data-field="contracts" class="form-group">
-                                        <label>Договор</label>
-                                        <select name="contracts[]"
-                                                data-label="Договоры"
-                                                class="js-chosen"
-                                                style="display: none;"
-                                                multiple="multiple"
-                                        >
-                                            <option value="">Не установлено</option>
-                                            @foreach(\App\Models\Contract::whereNull('company_id')->get(['id', 'name']) as $contract)
-                                                <option value="{{ $contract->id }}">
-                                                    {{ $contract->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    @continue
-                                @endif
+
+                            @if($k == 'contracts')
+                                <div data-field="contracts" class="form-group">
+                                    <label>Договор</label>
+                                    <select name="contracts[]"
+                                            data-label="Договоры"
+                                            class="js-chosen"
+                                            style="display: none;"
+                                            multiple="multiple"
+                                    >
+                                        <option value="">Не установлено</option>
+                                        @foreach(\App\Models\Contract::whereNull('company_id')->get(['id', 'name']) as $contract)
+                                            <option value="{{ $contract->id }}">
+                                                {{ $contract->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @continue
+                            @endif
+
                             @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
                                 <div data-field="contract" class="form-group">
                                     <label>Договор</label>
@@ -93,7 +95,9 @@
                                 </div>
                                 @continue
                             @endif
+
                             @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
+
                             @php $default_value = isset($v['defaultValue']) ? $v['defaultValue'] : '' @endphp
 
                             @if($k !== 'id' && !isset($v['hidden']))
@@ -119,7 +123,7 @@
                                         </div>
                                     @endif
                                 @endif
-                            @endforeach
+                        @endforeach
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-sm btn-success">Добавить</button>
@@ -481,8 +485,7 @@ $permissionToViewContract = user()->access('contract_read');
                                   @if($field->field == 'comment')
                                       style="width: 200px;"
                                   @endif
-                                  @if ($field->content)
-                              @if ($field->content)
+                                @if ($field->content)
                                   data-toggle="tooltip"
                                   data-html="true"
                                   data-trigger="click hover"
