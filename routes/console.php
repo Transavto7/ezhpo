@@ -40,8 +40,8 @@ Artisan::command('contract:first', function () {
     }
 })->describe('Display an inspiring quote');
 
-Artisan::command('contract:second', function () {
-    if(\App\Models\Contract::init_companies()){
+Artisan::command('contract:second {limit}', function ($limit) {
+    if(\App\Models\Contract::init_companies($limit)){
         $this->comment('Связано');
     }
 })->describe('Display an inspiring quote');

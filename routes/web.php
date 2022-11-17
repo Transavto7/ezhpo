@@ -45,6 +45,14 @@ Route::get('/show-edit-element-modal/{model}/{id}', 'IndexController@ShowEditMod
  * API-маршруты
  */
 
+
+//dd(
+//    \App\Anketa::query()->selectRaw('count(id) as count')
+//);
+
+
+
+
 // Сброс пункта выпуска
 Route::get('/api/pv-reset/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', 'ApiController@ResetAllPV')->name('api.resetpv');
 Route::get('/api/getField/{model}/{field}/{default_value?}', 'IndexController@GetFieldHTML');

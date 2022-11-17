@@ -307,25 +307,28 @@ class Contract extends Model
             'contract_id' => null,
         ]);
         \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS = 1');
+
         return 1;
 
         //==================DELETE
     }
-    public static function init_companies(){
+
+    public static function init_companies($limit)
+    {
 
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', '-1');
         set_time_limit(7200);
 //
         $companies = Company::with(['drivers', 'cars'])
-//    ->orderBy('id', 'DESC')
-//    ->whereHashId(635839)
+                            ->whereDoesntHave('contracts')
+                            ->limit($limit)
                             ->get()
-                            ->map(function ($q){
+                            ->map(function ($q) {
                                 $arr = [];
-                                foreach ($q->drivers as &$driver){
+                                foreach ($q->drivers as &$driver) {
                                     $driver->products_id = explode(',', $driver->products_id);
-                                    $driver->products_id = array_map(function ($q){
+                                    $driver->products_id = array_map(function ($q) {
                                         return intval($q);
                                     }, $driver->products_id);
 
@@ -335,125 +338,128 @@ class Contract extends Model
 
                                     $driver->key_for_group = implode('_', $arr);
                                 }
-                                foreach ($q->cars as &$car){
+                                foreach ($q->cars as &$car) {
                                     $car->products_id = explode(',', $car->products_id);
-                                    $car->products_id = array_map(function ($q){
+                                    $car->products_id = array_map(function ($q) {
                                         return intval($q);
                                     }, $car->products_id);
-                                    $arr = $car->products_id;
+                                    $arr              = $car->products_id;
                                     asort($arr);
-                                    $car->products_id = $arr;
+                                    $car->products_id   = $arr;
                                     $car->key_for_group = implode('_', $arr);
                                 }
 
                                 return $q;
                             });
-        $services = Product::get();
+        $services  = Product::get();
 
-        foreach ($companies as $company){
+        foreach ($companies as $company) {
             $services_id = [];
-            foreach ($company->drivers->groupBy('key_for_group') as $key_group => $drivers_for_company_group){
+            foreach ($company->drivers->groupBy('key_for_group') as $key_group => $drivers_for_company_group) {
 
-                if(!$drivers_for_company_group[0]){
+                if ( !$drivers_for_company_group[0]) {
                     continue;
                 }
                 $services_id = $drivers_for_company_group[0]->products_id;
-                $res = [];
-                foreach ($services_id as $service_id){
-                    if($tar = $services->where('id', $service_id)->first()){
-                        $res[$tar->id] =  ['service_cost' => $tar->price_unit];
+                $res         = [];
+                foreach ($services_id as $service_id) {
+                    if ($tar = $services->where('id', $service_id)->first()) {
+                        $res[$tar->id] = ['service_cost' => $tar->price_unit];
                     }
                 }
                 $comp_products_arr = $res;
 
                 $contract = Contract::create([
-                    'name' => "Договор $company->id $key_group Водители",
-                    'company_id' => $company->id
+                    'name'       => "Договор $company->id $key_group Водители",
+                    'company_id' => $company->id,
                 ]);
                 $contract->services()->sync($comp_products_arr);
 
                 Driver::whereIn('id', $drivers_for_company_group->pluck('id'))
                       ->update([
-                    'contract_id' => $contract->id
-                ]);
+                          'contract_id' => $contract->id,
+                      ]);
 
-//                Anketa::where('type_anketa', [
-//                    'tech',
-//                    'bdd',
-//                    'report_cart',
-//                ])
-//                      ->where('created_at', '>', Carbon::now()->subMonths(1))
-//                  ->whereIn('driver_id', $drivers_for_company_group->pluck('id'))
-//                  ->update([
-//                    'contract_id' => $contract->id
-//                ]);
+                Anketa::whereIn('type_anketa', [
+                    'medic',
+                    'bdd',
+                    'report_cart',
+                ])
+                      ->where('created_at', '>', Carbon::now()->subMonths(10))
+                      ->whereIn('driver_id', $drivers_for_company_group->pluck('hash_id'))
+                      ->update([
+                          'contract_id' => $contract->id,
+                      ]);
             }
 
             $services_id = [];
-            foreach ($company->cars->groupBy('key_for_group') as $key_group => $cars_for_company_group){
+            foreach ($company->cars->groupBy('key_for_group') as $key_group => $cars_for_company_group) {
 
-                if(!$cars_for_company_group[0]){
+                if ( !$cars_for_company_group[0]) {
                     continue;
                 }
                 $services_id = $cars_for_company_group[0]->products_id;
-                $res = [];
-                foreach ($services_id as $service_id){
-                    if($tar = $services->where('id', $service_id)->first()){
-                        $res[$tar->id] =  ['service_cost' => $tar->price_unit];
+                $res         = [];
+                foreach ($services_id as $service_id) {
+                    if ($tar = $services->where('id', $service_id)->first()) {
+                        $res[$tar->id] = ['service_cost' => $tar->price_unit];
                     }
                 }
                 $comp_products_arr = $res;
 
                 $contract = Contract::create([
-                    'name' => "Договор $company->id $key_group Автомобили",
-                    'company_id' => $company->id
+                    'name'       => "Договор $company->id $key_group Автомобили",
+                    'company_id' => $company->id,
                 ]);
                 $contract->services()->sync($comp_products_arr);
 
                 Car::whereIn('id', $cars_for_company_group->pluck('id'))
                    ->update([
-                    'contract_id' => $contract->id
-                ]);
+                       'contract_id' => $contract->id,
+                   ]);
 
-//                Anketa::where('type_anketa', 'tech')
-//                      ->where('created_at', '>', Carbon::now()->subMonths(1))
-//                      ->whereIn('car_id', $cars_for_company_group->pluck('id'))
-//                      ->update([
-//                    'contract_id' => $contract->id
-//                ]);
+                Anketa::where('type_anketa', 'tech')
+                      ->where('created_at', '>', Carbon::now()->subMonths(10))
+                      ->whereIn('car_id', $cars_for_company_group->pluck('hash_id'))
+                      ->update([
+                          'contract_id' => $contract->id,
+                      ]);
             }
 
 
         }
+
         return 1;
 
     }
 
-    public static function test_one(){
+    public static function test_one()
+    {
         $com = Company::with(['drivers', 'cars'])
-               ->whereHashId(254761045)
-                ->first();
+                      ->whereHashId(254761045)
+                      ->first();
 
-        foreach ($com->drivers as $driver){
+        foreach ($com->drivers as $driver) {
             Anketa::whereIn('type_anketa', [
-                    'medic',
-                    'bdd',
-                    'report_cart',
-                ])
-                  ->where('created_at', '>', Carbon::now()->subMonths(4))
+                'medic',
+                'bdd',
+                'report_cart',
+            ])
+                  ->where('created_at', '>', Carbon::now()->subMonths(10))
                   ->where('driver_id', $driver->id)
                   ->update([
-                      'contract_id' => $driver->contract_id
+                      'contract_id' => $driver->contract_id,
                   ]);
         }
-        foreach ($com->cars as $car){
+        foreach ($com->cars as $car) {
             Anketa::where('type_anketa', 'tech')
                   ->where('created_at', '>', Carbon::now()->subMonths(4))
                   ->where('car_id', $car->id)
                   ->update([
-                      'contract_id' => $car->contract_id
+                      'contract_id' => $car->contract_id,
                   ]);
         }
+
         return 1;
     }
 
