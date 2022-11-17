@@ -19,7 +19,7 @@
                 @if($k == 'where_call' && !user()->access('companies_access_field_where_call'))
                     @continue
                 @endif
-                @if($k === 'note' && $model === 'Company')
+                @if(($k === 'note') && $model === 'Company')
                         <div class="form-group" data-field="comment">
                             <label>
                                 {{ $v['label'] }}
@@ -29,6 +29,19 @@
                                    data-label="{{ $v['label'] }}"
                                    placeholder="{{ $v['label'] }}"
                                    data-field="Company_note" class="form-control">{{ $el[$k] ?? '' }}</textarea>
+                        </div>
+                    @continue
+                @endif
+                @if(( $k === 'comment') && $model === 'Company')
+                        <div class="form-group" data-field="comment">
+                            <label>
+                                {{ $v['label'] }}
+                            </label>
+                            <textarea
+                                   name="comment"
+                                   data-label="{{ $v['label'] }}"
+                                   placeholder="{{ $v['label'] }}"
+                                   data-field="Company_comment" class="form-control">{{ $el[$k] ?? '' }}</textarea>
                         </div>
                     @continue
                 @endif

@@ -424,12 +424,15 @@
                         @endif
                         <th data-key="{{ $field->field }}">
                             <span class="user-select-none"
+                                  @if($field->field == 'comment')
+                                      style="width: 200px;"
+                                  @endif
                                   @if ($field->content)
                                   data-toggle="tooltip"
                                   data-html="true"
                                   data-trigger="click hover"
                                   title="{{ $field->content }}"
-                                @endif
+                               @endif
                             >
                                 {{ $field->name }}
                             </span>

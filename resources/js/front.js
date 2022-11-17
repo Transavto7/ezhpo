@@ -416,7 +416,7 @@ $(document).ready(function () {
                                 field = response.data
                             })
                         } else {
-                           if(i === 'note') {
+                           if(i === 'note' || i === 'comment') {
                                field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${(data[i] ? data[i] : '').trim()}</textarea>`
                            } else if(i === 'photo') {
                                otherHtmlItems = ''
