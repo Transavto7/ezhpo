@@ -1131,7 +1131,7 @@ class IndexController extends Controller
              * Пустые поля обновляем
              */
             foreach($oldDataModel as $oldDataItemKey => $oldDataItemValue) {
-                if(!isset($data[$oldDataItemKey]) && $oldDataItemKey == 'note') {
+                if(!isset($data[$oldDataItemKey]) && ($oldDataItemKey == 'note' || $oldDataItemKey == 'document_bdd')) {
                     $element[$oldDataItemKey] = '';
                 }
             }
