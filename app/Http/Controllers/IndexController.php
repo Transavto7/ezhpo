@@ -438,7 +438,7 @@ class IndexController extends Controller
                         'noRequired' => 1,
                     ],
 
-                    'inn'          => ['label' => 'ИНН', 'type' => 'text', 'noRequired' => 1],
+                    'inn'          => ['label' => 'ИНН', 'type' => 'text'],
 
                     'dismissed' => [
                         'label'        => 'Временная блокировка',
