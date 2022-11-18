@@ -604,7 +604,7 @@ class AnketsController extends Controller
 
                 // ID автомобиля
                 $c_id = $anketa['car_id'] ?? 0;
-                $d_id = $anketa['driver_id'] ?? 0;
+                $d_id = $anketa['driver_id'] ?? $d_id;
 
                 $Car = Car::with(['contract.services'])->where('hash_id', $c_id)->first();
                 $Driver = Driver::with(['contract.services'])->where('hash_id', $d_id)->first();
