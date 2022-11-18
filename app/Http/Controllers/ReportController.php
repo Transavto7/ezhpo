@@ -188,8 +188,8 @@ class ReportController extends Controller
                 if ($request->pv_id) {
                     $anketas = $anketas->where('pv_id', Point::find($request->pv_id)->name);
                 } else if ($request->town_id) {
-                    $companies = Company::where('town_id', $request->town_id)->pluck('hash_id');
-                    $anketas = $anketas->whereIn('company_id', $companies);
+                    $points = Point::where('pv_id', $request->town_id)->pluck('name');
+                    $anketas = $anketas->whereIn('pv_id', $points);
                 }
 
                 $anketas = $anketas->get();

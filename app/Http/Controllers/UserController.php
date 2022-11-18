@@ -259,7 +259,6 @@ class UserController extends Controller
 
     public function fetchCompanies(Request $request)
     {
-
         $search = $request->get("query", "");
 
         $companies = Company::whereRaw("LOWER(name) LIKE '%{$search}%'")
