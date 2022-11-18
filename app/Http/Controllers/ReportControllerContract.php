@@ -83,21 +83,37 @@ class ReportControllerContract extends Controller
     // поиск услуг для компании Отчет по услугам компании
     public function getContractsForCompany(Request $request)
     {
-        $company = Anketa::with('contract')
-                         ->where('company_id', $request->id)
-//                         ->whereNotNull('contract_id')
-                         ->whereHas('contract')
-                         ->groupBy('contract_id')
-                         ->get()
-                         ->pluck('contract')
-                         ->map(function ($q) {
-                             return [
-                                 'name' => $q->name,
-                                 'id'   => $q->id,
-                             ];
-                         });
+//        $company = Anketa::with('contract')
+//                         ->where('company_id', $request->id)
+////                         ->whereNotNull('contract_id')
+//                         ->whereHas('contract')
+//                         ->groupBy('contract_id')
+//                         ->get()
+//                         ->pluck('contract')
+//                         ->map(function ($q) {
+//                             return [
+//                                 'name' => $q->name,
+//                                 'id'   => $q->id,
+//                             ];
+//                         });
 
-        return response($company);
+
+//        return response($company);
+
+        $contracts = Company::with(['contracts'])
+                            ->where('hash_id', $request->id)
+                            ->get()
+                            ->pluck('contracts')
+                            ->flatten()
+                            ->map(function ($q) {
+                                return [
+                                    'name' => $q->name,
+                                    'id'   => $q->id,
+                                ];
+                            });
+
+
+        return response($contracts);
     }
 
     public function getJournalData(Request $request)
