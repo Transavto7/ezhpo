@@ -296,7 +296,7 @@ class ReportControllerContract extends Controller
             }
 
             $result[$driver->hash_id]['types']['is_dop']['total'] = $medics->where('type_anketa', 'medic')
-                                                                           ->where('car_id', $driver->hash_id)
+                                                                           ->where('driver_id', $driver->hash_id)
                                                                            ->where('result_dop', null)
                                                                            ->where('is_dop', 1)
                                                                            ->count();
