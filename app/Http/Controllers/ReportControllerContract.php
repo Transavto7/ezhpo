@@ -197,6 +197,7 @@ class ReportControllerContract extends Controller
             ->pluck('driver')
             ->keyBy('id')
             ->values();
+        $drivers->push(new Driver);
 
         $types_view = $medics
             ->pluck('type_view')
