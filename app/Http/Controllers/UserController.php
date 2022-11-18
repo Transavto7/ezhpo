@@ -260,7 +260,7 @@ class UserController extends Controller
     public function fetchCompanies(Request $request)
     {
 
-        $search = mb_strtolower($request->get("query", ""));
+        $search = $request->get("query", "");
 
         $companies = Company::whereRaw("LOWER(name) LIKE '%{$search}%'")
                             ->limit(50)
