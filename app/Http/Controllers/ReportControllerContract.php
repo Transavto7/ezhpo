@@ -276,6 +276,7 @@ class ReportControllerContract extends Controller
                 }
             }
             foreach ($medics
+                         ->where('type_anketa','!=', 'medic')
                          ->pluck('type_anketa')
                          ->unique() as $type_anketa
             ) {

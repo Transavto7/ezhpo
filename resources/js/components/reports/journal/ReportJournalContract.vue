@@ -178,7 +178,6 @@ export default {
             let res = 0;
             // hyli mne pohui, structura dannih by ElliHui
             for (let type_report in contract){
-                console.log(type_report)
                 if(type_report == 'techs' || type_report == 'medics'){
                     for (let human_id in contract[type_report]){
                         for (let type in contract[type_report][human_id].types){
@@ -187,6 +186,8 @@ export default {
                             }
                         }
                     }
+                    // console.log(type_report)
+                    // console.log(res)
                     continue;
                 }
                 if(type_report == 'medics_other' || type_report == 'techs_other'){
@@ -199,6 +200,8 @@ export default {
                             }
                         }
                     }
+                    // console.log(type_report)
+                    // console.log(res)
                     continue;
                 }
 
@@ -208,11 +211,17 @@ export default {
                             for (let totall in contract[type_report][type]){
                                 res += contract[type_report][type][totall]
                             }
+                            // console.log(type)
+                            // console.log(type_report)
+                            // console.log(contract[type_report][type][totall])
                             continue;
                         }
                         // if(type == 'drivers'){
                             for (let totall in contract[type_report][type]){
                                 res += contract[type_report][type][totall].sum
+                                // console.log(type)
+                                // console.log(type_report)
+                                // console.log(contract[type_report][type][totall].sum)
                             }
                         // }
                     }
