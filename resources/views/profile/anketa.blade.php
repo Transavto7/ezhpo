@@ -152,7 +152,7 @@
                         @csrf
 
                         @if(isset($anketa_route) && $id)
-                            <input type="hidden" name="REFERER" value="{{ $_SERVER['HTTP_REFERER'] }}">
+                            <input type="hidden" name="REFERER" value="{{ url()->previous() }}">
                         @endif
 
                         @include($anketa_view)
