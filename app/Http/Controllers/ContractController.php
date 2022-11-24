@@ -167,8 +167,8 @@ class ContractController extends Controller
 
 
         $contract->services()->sync($servicesToSync);
-        $contract->cars()->sync($data_to_save['cars']);
-        $contract->drivers()->sync($data_to_save['drivers']);
+        $contract->cars()->sync($data_to_save['cars'] ?? []);
+        $contract->drivers()->sync($data_to_save['drivers'] ?? []);
 
 
         return response([
@@ -275,8 +275,8 @@ class ContractController extends Controller
         ]);
 
         $contract->services()->sync($servicesToSync);
-        $contract->cars()->sync($data_to_save['cars']);
-        $contract->drivers()->sync($data_to_save['drivers']);
+        $contract->cars()->sync($data_to_save['cars'] ?? []);
+        $contract->drivers()->sync($data_to_save['drivers'] ?? []);
 
         return response([
             'status'   => true,
