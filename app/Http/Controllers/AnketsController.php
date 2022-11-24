@@ -25,7 +25,7 @@ class AnketsController extends Controller
         $id = $request->id;
 
         if(Anketa::find($id)->delete()) {
-            return redirect($_SERVER['HTTP_REFERER']);
+            return redirect(url()->previous());
         }
 
         return abort(403);
@@ -43,7 +43,7 @@ class AnketsController extends Controller
             $anketa->deleted_at = \Carbon\Carbon::now();
 
             if($anketa->save()) {
-                return redirect($_SERVER['HTTP_REFERER']);
+                return redirect(url()->previous());
             }
         }
 
