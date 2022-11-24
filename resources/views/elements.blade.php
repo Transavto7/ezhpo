@@ -175,9 +175,8 @@
                                 </select>
                             </div>
                             <div data-field="essence" class="form-group">
-                                <label><b class="text-danger text-bold">*</b>Сущности</label>
+                                <label>Сущности</label>
                                 <select name="essence"
-                                        required="required"
                                         data-label="Сущности"
                                         data-field="Product_essence"
                                         class="filled-select2 filled-select"
