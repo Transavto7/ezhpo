@@ -1432,9 +1432,9 @@ class IndexController extends Controller
 
 //            $fieldsModel = $MODEL_ELEMENTS->fillable;
             if ($model == 'Company') {
-                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contracts']);
+                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contracts.services']);
             } elseif ($model == 'Car' || $model == 'Driver') {
-                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contracts', 'contracts.services']);
+                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contracts.services']);
             }
 
             $element['elements'] = $MODEL_ELEMENTS;

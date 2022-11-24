@@ -437,7 +437,7 @@ $(document).ready(function () {
                                msg +=  `
                             <ul class="list-group my-2">
                                 <li style="padding: 0;" class="text-small list-group-item list-group-item-action list-group-item-success">
-                                <b>${data.contract.name}</b>
+                                <b>${data.contract.name_with_dates}</b>
 
                             <ul class="list-group">`;
                                if(data.contract.services){
@@ -469,7 +469,7 @@ $(document).ready(function () {
                                        msg += `
 
                                     <li style="padding: 0;" class=" text-small list-group-item list-group-item-action list-group-item-success"><ul class="list-group">
-                                    <b>${contract.name}</b>`;
+                                    <b>${contract.name_with_dates}</b>`;
                                        contract.services.map((service) => {
                                            msg += `
                                     <li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">

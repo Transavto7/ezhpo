@@ -613,7 +613,7 @@ $permissionToViewContract = user()->access('contract_read');
                                                     @endif
                                                 </h3>
                                             @endforeach
-                                        @elseif ($field->field == 'services' && ( $model === 'Car' || $model === 'Driver'))
+                                        @elseif ($field->field == 'services' && ( $model === 'Car' || $model === 'Driver' || $model === 'Company'))
                                             @foreach($el->contracts as $contract)
                                                 @foreach($contract->services as $service)
                                                     <h5>

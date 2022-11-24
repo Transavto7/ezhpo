@@ -20,6 +20,8 @@ class Contract extends Model
 
     protected $table = 'contracts';
 
+    protected $appends = ['name_with_dates'];
+
     protected $casts
         = [
             'date_of_end'   => 'datetime', // :d.m.Y
@@ -27,6 +29,15 @@ class Contract extends Model
         ];
 
     protected $guarded = [];
+
+    public function getNameWithDatesAttribute(){
+        return $this->name
+               . ' с: ' .
+               ($this->date_of_start ? $this->date_of_start->format('d-m-Y') : '' )
+               . ' по: ' .
+               ($this->date_of_end ? $this->date_of_end->format('d-m-Y') : '');
+    }
+
 
     public static $types
         = [
