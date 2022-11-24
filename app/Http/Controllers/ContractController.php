@@ -123,7 +123,7 @@ class ContractController extends Controller
             && ($date_of_start = isset($data_to_save['date_of_start']) ? Carbon::parse($data_to_save['date_of_start'])
                 : null)
         ) {
-            $contract = Contract::whereNotBetween(
+            $contractQWE = Contract::whereNotBetween(
                 'date_of_end', [
                 $date_of_start,
                 $date_of_end,
@@ -136,7 +136,7 @@ class ContractController extends Controller
                                 ->where('main_for_company', 1)
                                 ->whereCompanyId($company_id)
                                 ->first();
-            if($contract){
+            if($contractQWE){
                 return response([
                     'status' => false,
                     'message' => [
@@ -232,7 +232,7 @@ class ContractController extends Controller
             && ($date_of_start = isset($data_to_save['date_of_start']) ? Carbon::parse($data_to_save['date_of_start'])
                 : null)
         ) {
-            $contract = Contract::whereNotBetween(
+            $contractQWE = Contract::whereNotBetween(
                 'date_of_end', [
                 $date_of_start,
                 $date_of_end,
@@ -245,7 +245,7 @@ class ContractController extends Controller
                                 ->where('main_for_company', 1)
                                 ->whereCompanyId($company_id)
                                 ->first();
-            if($contract){
+            if($contractQWE){
                 return response([
                     'status' => false,
                     'message' => 'Не возможно установить главный договор, так как на данный интервал у данной компании есть главный договор'
