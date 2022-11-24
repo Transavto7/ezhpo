@@ -1064,19 +1064,19 @@ class AnketsController extends Controller
                 // ДОГОВОР СНЕПШОТ
 //                if($anketa['type_anketa'] == 'medic'){
 //                dd($Driver);
-                    if($Driver){
-                        $servicesToSync = [];
-                        foreach ($Driver->contract->services as $service) {
-                            $servicesToSync[$service['id']] = ['service_cost' => $service['price_unit']];
-                        }
-
-                        $anketa['contract_id'] = $Driver->contract_id;
-                    }
-//                }
-//                if($anketa['type_anketa'] == 'tech'){
-                    if($Car){
-                        $anketa['contract_id'] = $Car->contract_id;
-                    }
+//                    if($Driver){
+//                        $servicesToSync = [];
+//                        foreach ($Driver->contract->services as $service) {
+//                            $servicesToSync[$service['id']] = ['service_cost' => $service['price_unit']];
+//                        }
+//
+//                        $anketa['contract_id'] = $Driver->contract_id;
+//                    }
+////                }
+////                if($anketa['type_anketa'] == 'tech'){
+//                    if($Car){
+//                        $anketa['contract_id'] = $Car->contract_id;
+//                    }
 //                }
 
                 $ank = new Anketa();

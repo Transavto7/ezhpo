@@ -28,11 +28,21 @@ class Driver extends Model
         'date_of_employment' => 'datetime'
     ];
 
-    public function contract()
+    public function contracts()
     {
-        return $this->belongsTo(Contract::class, 'contract_id', 'id')
-                    ->withDefault();
+        return $this->belongsToMany(
+            Contract::class,
+            'driver_contact_pivot',
+            'driver_id',
+            'contract_id'
+        );
     }
+
+//    public function contract()
+//    {
+//        return $this->belongsTo(Contract::class, 'contract_id', 'id')
+//                    ->withDefault();
+//    }
 
     public function deleted_user()
     {

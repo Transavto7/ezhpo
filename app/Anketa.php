@@ -32,11 +32,17 @@ class Anketa extends Model
     }
 
 
-    public function contract()
-    {
-        return $this->belongsTo(Contract::class, 'contract_id', 'id')
-                    ->withDefault();
-    }
+//    public function contract()
+//    {
+////        return $this->belongsTo(Contract::class, 'contract_id', 'id')
+////                    ->withDefault();
+//        return $this->hasOne(
+//            Contract::class,
+//            'contract_id',
+//            'id'
+//        )
+//                    ->withDefault();
+//    }
 
     public function our_company()
     {

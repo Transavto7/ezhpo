@@ -25,6 +25,7 @@
                     v-on:change_sort="changeSort"
                     ref="contractTable"
                     v-on:update_data="showCreateModal"
+                    v-on:clone_data="showCloneModal"
                     v-on:success="loadData"
                 >
                 </contract-table>
@@ -57,6 +58,7 @@
 
                     <b-col md="2" class="my-1">
                         <select v-model="nikita_yeban">
+                            <option value="20">20</option>
                             <option value="500">500</option>
                             <option value="1500">1500</option>
                             <option value="2000">2000</option>
@@ -208,7 +210,7 @@ export default {
                 trash:       0,
             },
             total:       0,
-            nikita_yeban: 500,
+            nikita_yeban: 20,
             // pageOptions: [15, 100, 500], // da mne pohui
         }
     },
@@ -256,6 +258,10 @@ export default {
 
         showCreateModal(data = null) {
             this.$refs.contractCreate.open(data)
+        },
+
+        showCloneModal(data = null) {
+            this.$refs.contractCreate.open(data, true)
         },
 
         loadData() {

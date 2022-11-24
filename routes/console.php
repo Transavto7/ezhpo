@@ -45,9 +45,9 @@ Artisan::command('contract:second {limit}', function ($limit) {
         $this->comment('Связано');
     }
 })->describe('Display an inspiring quote');
-Artisan::command('contract:test', function () {
+Artisan::command('contract:third', function () {
     if(\App\Models\Contract::test_one()){
-        $this->comment('Связано');
+        $this->comment('Связано nakonec to');
     }
 })->describe('Display an inspiring quote');
 

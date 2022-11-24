@@ -21,7 +21,7 @@
 
 @php
 //dd($fieldPrompts->pluck('name')->toArray());
-//dd($model);
+//dd($elements->getCollection()->toArray());
 @endphp
 
 @section('content')
@@ -63,36 +63,36 @@
                             @endif
 
                             @if($k == 'contracts')
-                                <div data-field="contracts" class="form-group">
-                                    <label>Договор</label>
-                                    <select name="contracts[]"
-                                            data-label="Договоры"
-                                            class="js-chosen"
-                                            style="display: none;"
-                                            multiple="multiple"
-                                    >
-                                        <option value="">Не установлено</option>
-                                        @foreach(\App\Models\Contract::whereNull('company_id')->get(['id', 'name']) as $contract)
-                                            <option value="{{ $contract->id }}">
-                                                {{ $contract->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+{{--                                <div data-field="contracts" class="form-group">--}}
+{{--                                    <label>Договор</label>--}}
+{{--                                    <select name="contracts[]"--}}
+{{--                                            data-label="Договоры"--}}
+{{--                                            class="js-chosen"--}}
+{{--                                            style="display: none;"--}}
+{{--                                            multiple="multiple"--}}
+{{--                                    >--}}
+{{--                                        <option value="">Не установлено</option>--}}
+{{--                                        @foreach(\App\Models\Contract::whereNull('company_id')->get(['id', 'name']) as $contract)--}}
+{{--                                            <option value="{{ $contract->id }}">--}}
+{{--                                                {{ $contract->name }}--}}
+{{--                                            </option>--}}
+{{--                                        @endforeach--}}
+{{--                                    </select>--}}
+{{--                                </div>--}}
                                 @continue
                             @endif
 
                             @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
-                                <div data-field="contract" class="form-group">
-                                    <label>Договор</label>
-                                    <select name="contract_id"
-                                            class="form-control"
-                                            data-label="Договор"
-                                            id="select_for_contract_driver_car"
-                                    >
-                                        <option value="" selected>Не установлено</option>
-                                    </select>
-                                </div>
+{{--                                <div data-field="contract" class="form-group">--}}
+{{--                                    <label>Договор</label>--}}
+{{--                                    <select name="contract_id"--}}
+{{--                                            class="form-control"--}}
+{{--                                            data-label="Договор"--}}
+{{--                                            id="select_for_contract_driver_car"--}}
+{{--                                    >--}}
+{{--                                        <option value="" selected>Не установлено</option>--}}
+{{--                                    </select>--}}
+{{--                                </div>--}}
                                 @continue
                             @endif
 
@@ -614,8 +614,8 @@ $permissionToViewContract = user()->access('contract_read');
                                                 </h3>
                                             @endforeach
                                         @elseif ($field->field == 'services' && ( $model === 'Car' || $model === 'Driver'))
-{{--                                            @foreach($el->contract as $contract)--}}
-                                                @foreach($el->contract->services as $service)
+                                            @foreach($el->contracts as $contract)
+                                                @foreach($contract->services as $service)
                                                     <h5>
 {{--                                                        badge badge-success--}}
                                                         <span class="badge badge-success">
@@ -623,7 +623,7 @@ $permissionToViewContract = user()->access('contract_read');
                                                         </span>
                                                     </h5>
                                                 @endforeach
-{{--                                            @endforeach--}}
+                                            @endforeach
                                         @elseif ($field->field === 'document_bdd' || $field->field === 'bitrix_link')
                                             <a href="{{ $el[$field->field] }}">{{ $el[$field->field] }}</a>
                                         @elseif ($field->field === 'photo')

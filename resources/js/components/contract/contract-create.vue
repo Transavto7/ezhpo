@@ -1,7 +1,7 @@
 <template>
     <b-modal
         v-model="show"
-        title="Создание Договора"
+        :title="contractData.id ? 'Редактирование Договора' : 'Создание договора'"
         size="lg"
         hide-footer
     >
@@ -15,6 +15,17 @@
         </b-row>
         <b-row class="my-1">
             <b-col sm="3">
+                <label>Дата начала:</label>
+            </b-col>
+            <b-col sm="9">
+                <b-form-datepicker id="date_of_start-datepicker" v-model="contractData.date_of_start"
+                                   class="mb-2"></b-form-datepicker>
+                <!--                <b-form-input v-model="contractData.date_of_end"-->
+                <!--                              placeholder="Введите длительность действия в днях"></b-form-input>-->
+            </b-col>
+        </b-row>
+        <b-row class="my-1">
+            <b-col sm="3">
                 <label>Дата завершения:</label>
             </b-col>
             <b-col sm="9">
@@ -24,14 +35,14 @@
                 <!--                              placeholder="Введите длительность действия в днях"></b-form-input>-->
             </b-col>
         </b-row>
-        <b-row class="my-1">
-            <b-col sm="3">
-                <label>Сумма договора:</label>
-            </b-col>
-            <b-col sm="9">
-                <b-form-input v-model="contractData.sum" placeholder="Введите сумму договора"></b-form-input>
-            </b-col>
-        </b-row>
+<!--        <b-row class="my-1">-->
+<!--            <b-col sm="3">-->
+<!--                <label>Сумма договора:</label>-->
+<!--            </b-col>-->
+<!--            <b-col sm="9">-->
+<!--                <b-form-input v-model="contractData.sum" placeholder="Введите сумму договора"></b-form-input>-->
+<!--            </b-col>-->
+<!--        </b-row>-->
         <b-row class="my-1">
             <b-col sm="3">
                 <label>Компания:</label>
@@ -62,18 +73,18 @@
                 </v-select>
             </b-col>
         </b-row>
-        <!--        <b-row class="my-1">-->
-        <!--            <b-col sm="3">-->
-        <!--                <label>Статус договора:</label>-->
-        <!--            </b-col>-->
-        <!--            <b-col sm="9">-->
-        <!--                <b-form-checkbox-->
-        <!--                    v-model="contractData.main_for_company"-->
-        <!--                >-->
-        <!--                    Главный-->
-        <!--                </b-form-checkbox>-->
-        <!--            </b-col>-->
-        <!--        </b-row>-->
+        <b-row class="my-1">
+            <b-col sm="3">
+                <label>Статус договора:</label>
+            </b-col>
+            <b-col sm="9">
+                <b-form-checkbox
+                    v-model="contractData.main_for_company"
+                >
+                    Главный
+                </b-form-checkbox>
+            </b-col>
+        </b-row>
         <b-row class="my-1">
             <b-col sm="3">
                 <label>Услуги:</label>
@@ -121,14 +132,98 @@
             </b-col>
         </b-row>
 
+        <div>
+            <b-button
+                class="collapsed"
+                :aria-expanded="driversCarsVisible ? 'true' : 'false'"
+                aria-controls="collapse-driversCarsVisible"
+                @click="driversCarsVisible = !driversCarsVisible"
+            >
+                {{ carsVisible ? 'Скрыть настройки водителей и машин' : 'Раскрыть настройки водителей и машин' }}
+            </b-button>
+            <b-collapse id="collapse-driversCarsVisible" v-model="driversCarsVisible" class="mt-2">
+                <b-card>
+                    <b-button
+                        class="collapsed"
+                        :aria-expanded="driversVisible ? 'true' : 'false'"
+                        aria-controls="collapse-driversVisible"
+                        @click="driversVisible = !driversVisible"
+                    >
+                        {{ driversVisible ? 'Скрыть водителей' : 'Раскрыть водителей' }}
+                    </b-button>
+                    <b-collapse id="collapse-driversVisible" v-model="driversVisible" class="mt-2">
+                        <b-card>
+                            <b-form-group v-slot="{ ariaDescribedby }">
+                                <b-form-checkbox-group
+                                    :aria-describedby="ariaDescribedby"
+                                    name="flavour-2"
+                                    v-model="contractData.drivers"
+                                >
+                                    <b-row>
+                                        <div class="box" style="height: 200px;">
+                                            <div v-for="(dataDriver, index) in drivers_of_company">
+                                                <b-col>
+                                                    <b-form-checkbox
+                                                        :value="dataDriver.id"
+                                                        :key="index"
+                                                    >
+                                                        {{ dataDriver.fio }}
+                                                    </b-form-checkbox>
+                                                </b-col>
+                                            </div>
+                                        </div>
+                                    </b-row>
+                                </b-form-checkbox-group>
+                            </b-form-group>
+                        </b-card>
+                    </b-collapse>
+                    <b-button
+                        class="collapsed"
+                        :aria-expanded="carsVisible ? 'true' : 'false'"
+                        aria-controls="collapse-carsVisible"
+                        @click="carsVisible = !carsVisible"
+                    >
+                        {{ carsVisible ? 'Скрыть машины' : 'Раскрыть машины' }}
+                    </b-button>
+                    <b-collapse id="collapse-carsVisible" v-model="carsVisible" class="mt-2">
+                        <b-card>
+
+                            <b-form-group v-slot="{ ariaDescribedby }">
+                                <b-form-checkbox-group
+                                    :aria-describedby="ariaDescribedby"
+                                    name="flavour-2"
+                                    v-model="contractData.cars"
+                                >
+                                    <b-row>
+                                        <div class="box" style="height: 200px;">
+                                            <div v-for="(dataCar, index) in cars_of_company">
+                                                <b-col>
+                                                    <b-form-checkbox
+                                                        :value="dataCar.id"
+                                                        :key="index"
+                                                    >
+                                                        {{ dataCar.gos_number }}
+                                                    </b-form-checkbox>
+                                                </b-col>
+                                            </div>
+                                        </div>
+                                    </b-row>
+                                </b-form-checkbox-group>
+                            </b-form-group>
+                        </b-card>
+                    </b-collapse>
+                </b-card>
+            </b-collapse>
+        </div>
+
         <b-row class=" my-2">
-            <b-col>
-                <b-form-checkbox
-                    v-model="contractData.hard_reset_for_car_and_drivers"
-                >
-                    Перезаписать всех водителей и авто
-                </b-form-checkbox>
-            </b-col>
+<!--            <b-col>-->
+<!--                <b-form-checkbox-->
+<!--                    v-model="contractData.hard_reset_for_car_and_drivers"-->
+<!--                >-->
+<!--                    Перезаписать всех водителей и авто-->
+<!--                </b-form-checkbox>-->
+<!--            </b-col>-->
             <b-col class="text-right">
                 <template
                     v-if="contractData.id"
@@ -184,29 +279,56 @@ export default {
             contractData: {
                 id:          null,
                 name:        null,
+                date_of_start: 0,
                 date_of_end: 0,
                 // type: null,
-                sum: null,
+                // sum: null,
                 // driver:      null,
                 // car_id:         null,
                 company:     null,
                 our_company: null,
-                // main_for_company: false, // Главный для компании
+                main_for_company: false, // Главный для компании
                 services: [],
 
                 hard_reset_for_car_and_drivers: false,
             },
             oldData:      null,
+
+            driversCarsVisible: false,
+            driversVisible: false,
+            carsVisible: false,
+
+            cars_of_company: [],
+            drivers_of_company: [],
+
         }
     },
     mounted() {
     },
     methods: {
+        loadDrivers(){
+            this.drivers_of_company = []
+            if(this.contractData.company_id){
+                axios.post(`/contract/getDriversByCompany/` + this.contractData.company_id).then(({data}) => this.drivers_of_company = data)
+                    .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
+            }
+        },
+
+        loadCars(){
+            this.cars_of_company = []
+            if(this.contractData.company_id){
+                axios.post(`/contract/getCarsByCompany/` + this.contractData.company_id).then(({data}) => this.cars_of_company = data)
+                    .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
+            }
+        },
+
         hideModal() {
             // this.contractData = this.oldData;
             this.show = false
         },
-        async open(data = null) {
+        async open(data = null, isClone = false) {
+
+
             if (!this.companies.length) {
                 axios.get(`/v-search/companies`).then(({data}) => this.companies = data)
                     .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
@@ -234,14 +356,30 @@ export default {
             if (data) {
                 // this.oldData = data
                 this.contractData = Object.assign({}, data)
-                // if (this.contractData.main_for_company) {
-                //     this.contractData.main_for_company = true
-                // }
+                if (this.contractData.main_for_company) {
+                    this.contractData.main_for_company = true
+                }
+                if(this.contractData.cars.length){
+                    this.contractData.cars = this.contractData.cars.map((item) =>{
+                        return item.id
+                    })
+                }
+                if(this.contractData.drivers.length){
+                    this.contractData.drivers = this.contractData.drivers.map((item) =>{
+                        return item.id
+                    })
+                }
+                if(isClone){
+                    this.contractData.id = null;
+                }
                 // moment()
                 // this.contractData = data
             } else {
                 this.contractData = {}
             }
+
+            this.loadDrivers()
+            this.loadCars()
         },
 
         async createContract(e) {

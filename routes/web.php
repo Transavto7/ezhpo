@@ -100,7 +100,6 @@ Route::prefix('snippet')->group(function () {
     });
 });
 
-
 Route::middleware(['auth'])->group(function () {
 
 
@@ -129,6 +128,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}', 'ContractController@destroy');
 
         Route::get('/getTypes', 'ContractController@getTypes');
+
+
+        Route::post('/getCarsByCompany/{id}', 'ContractController@getCarsByCompany');
+        Route::post('/getDriversByCompany/{id}', 'ContractController@getDriversByCompany');
 
         Route::post('/getAvailableForCompany', 'ContractController@getAvailableForCompany');
     });
@@ -214,7 +217,9 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
     Route::get('/elements/{type}', 'IndexController@RenderElements')->name('renderElements');
 });
 
-
+//dd(
+//    Driver::wherHashId(206055)->fist
+//);
 /**
  * Элементы CRM
  */

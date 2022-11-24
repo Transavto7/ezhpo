@@ -58,8 +58,19 @@
                                   variant="outline-primary"
                                   class="mr-2"
                                   style="border: none"
+                                  @click="$emit('clone_data', row.item)"
+                                  v-if="permissions.edit && permissions.create"
+                                  title="Клонировать"
+                        >
+                            <b-icon-download></b-icon-download>
+                        </b-button>
+                        <b-button size="sm"
+                                  variant="outline-primary"
+                                  class="mr-2"
+                                  style="border: none"
                                   @click="$emit('update_data', row.item)"
                                   v-if="permissions.edit"
+                                  title="Редактировать"
                         >
                             <b-icon-pencil></b-icon-pencil>
                         </b-button>
@@ -70,6 +81,7 @@
                                   style="border: none"
                                   @click="deleteItem(row.item.id, $event.target)"
                                   v-if="permissions.delete"
+                                  title="Удалить"
                         >
                             <b-icon-trash-fill></b-icon-trash-fill>
                         </b-button>

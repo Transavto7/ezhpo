@@ -73,23 +73,23 @@
                     @php
                         $contractCollect = collect($el->contracts);
                     @endphp
-                    <div data-field="contracts" class="form-group">
-                        <label>Договор</label>
-                        <select name="contracts[]"
-                                data-label="Договоры"
-                                class="js-chosen"
-                                style="display: none;"
-                                multiple="multiple"
-                        >
+{{--                    <div data-field="contracts" class="form-group">--}}
+{{--                        <label>Договор</label>--}}
+{{--                        <select name="contracts[]"--}}
+{{--                                data-label="Договоры"--}}
+{{--                                class="js-chosen"--}}
+{{--                                style="display: none;"--}}
+{{--                                multiple="multiple"--}}
+{{--                        >--}}
 {{--                            <option value=""  @if(!$contractCollect->count()) selected @endif>Не установлено</option>--}}
-                            @foreach(\App\Models\Contract::whereNull('company_id')->orWhere('company_id', $el->id)->get(['id', 'name']) as $contract)
-                                <option value="{{ $contract->id }}"
-                                        @if ($contractCollect->where('id', $contract->id)->first()) selected @endif>
-                                    {{ $contract->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+{{--                            @foreach(\App\Models\Contract::whereNull('company_id')->orWhere('company_id', $el->id)->get(['id', 'name']) as $contract)--}}
+{{--                                <option value="{{ $contract->id }}"--}}
+{{--                                        @if ($contractCollect->where('id', $contract->id)->first()) selected @endif>--}}
+{{--                                    {{ $contract->name }}--}}
+{{--                                </option>--}}
+{{--                            @endforeach--}}
+{{--                        </select>--}}
+{{--                    </div>--}}
                         <div class="">
                             <ul class="list-group">
                                 @foreach($el->contracts as $contract)
@@ -109,33 +109,35 @@
                         @php
                             $contractCollect = \App\Models\Contract::where('company_id', $el->company_id)->get(['id', 'name']);
                         @endphp
-                    <div data-field="contract" class="form-group">
-                        <label>Договор</label>
-                        <select name="contract_id"
-                                class="form-control"
-                                data-label="Договор"
-                                id="select_for_contract_driver_car"
-                        >
-                            <option value="" @if(!$el->contract_id) selected @endif>Не установлено</option>
-                            @foreach($contractCollect as $contract)
-                                <option value="{{ $contract->id }}"
-                                        @if ($contract->id == $el->contract_id) selected @endif>
-                                    {{ $contract->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="">
-                        <ul class="list-group">
-                            <li style="padding: 0;" class=" text-small list-group-item list-group-item-action list-group-item-success"><b>{{ $el->contract->name }}</b>
-                            @foreach($el->contract->services as $new_service)
-                                <ul class="list-group">
-                                        <li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">{{ $new_service->name }}</li>
-                                    </ul>
+{{--                    <div data-field="contract" class="form-group">--}}
+{{--                        <label>Договор</label>--}}
+{{--                        <select name="contract_id"--}}
+{{--                                class="form-control"--}}
+{{--                                data-label="Договор"--}}
+{{--                                id="select_for_contract_driver_car"--}}
+{{--                        >--}}
+{{--                            <option value="" @if(!$el->contract_id) selected @endif>Не установлено</option>--}}
+{{--                            @foreach($contractCollect as $contract)--}}
+{{--                                <option value="{{ $contract->id }}"--}}
+{{--                                        @if ($contract->id == $el->contract_id) selected @endif>--}}
+{{--                                    {{ $contract->name }}--}}
+{{--                                </option>--}}
+{{--                            @endforeach--}}
+{{--                        </select>--}}
+{{--                    </div>--}}
+                        <div class="">
+                            <ul class="list-group">
+                                @foreach($el->contracts as $contract)
+                                    <li style="padding: 0;" class=" text-small list-group-item list-group-item-action list-group-item-success"><b>{{ $contract->name }}</b>
+                                        @foreach($contract->services as $new_service)
+                                            <ul class="list-group">
+                                                <li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">{{ $new_service->name }}</li>
+                                            </ul>
+                                        @endforeach
+                                    </li>
                                 @endforeach
-                            </li>
-                        </ul>
-                    </div>
+                            </ul>
+                        </div>
                     @continue`
                 @endif
 

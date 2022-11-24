@@ -1019,12 +1019,12 @@ class IndexController extends Controller
 
             $created = $model::create($data);
 
-            if ($model_type == 'Company') {
-                if ( !empty($contracts)) {
-                    Contract::whereIn('id', $contracts)
-                            ->update(['company_id' => $created->id]);
-                }
-            }
+//            if ($model_type == 'Company') {
+//                if ( !empty($contracts)) {
+//                    Contract::whereIn('id', $contracts)
+//                            ->update(['company_id' => $created->id]);
+//                }
+//            }
 
 
             if ($created) {
@@ -1056,10 +1056,10 @@ class IndexController extends Controller
         $model = app("App\\$model");
 
         if ($model) {
-            if($model instanceof Company){
-                Car::where('company_id', $model->id)->update(['contract_id' => null]);
-                Driver::where('company_id', $model->id)->update(['contract_id' => null]);
-            }
+//            if($model instanceof Company){
+//                Car::where('company_id', $model->id)->update(['contract_id' => null]);
+//                Driver::where('company_id', $model->id)->update(['contract_id' => null]);
+//            }
 
             if ($request->get('undo')) {
                 $model::withTrashed()->find($id)->restore();
@@ -1120,9 +1120,9 @@ class IndexController extends Controller
         $id = $request->id;
 
         if($model) {
-            $data = $request->all();
+            $data         = $request->all();
             $oldDataModel = [];
-            $element = $model->find($id);
+            $element      = $model->find($id);
 
             unset($data['_token']);
 
@@ -1131,10 +1131,10 @@ class IndexController extends Controller
             }
 
             // Обновляем данные
-            if($element) {
+            if ($element) {
                 // Парсим файлы
-                foreach($request->allFiles() as $file_key => $file) {
-                    if(isset($data[$file_key]) && !isset($data[$file_key . '_base64'])) {
+                foreach ($request->allFiles() as $file_key => $file) {
+                    if (isset($data[$file_key]) && !isset($data[$file_key.'_base64'])) {
                         Storage::disk('public')->delete($element[$file_key]);
 
                         $file_path = Storage::disk('public')->putFile('elements', $file);
@@ -1163,12 +1163,11 @@ class IndexController extends Controller
                             $hash = sha1(time());
                             $path = "elements/$hash.png";
 
-                        $base64_image = Storage::disk('public')->put($path, $base64_image);
+                            $base64_image = Storage::disk('public')->put($path, $base64_image);
 
-                        $element->$k = $path;
-                    }
-                        else {
-                            if(isset($v) && !$request->hasFile($k)) {
+                            $element->$k = $path;
+                        } else {
+                            if (isset($v) && !$request->hasFile($k)) {
                                 $element[$k] = $v;
                             }
                         }
@@ -1206,20 +1205,20 @@ class IndexController extends Controller
 
                 if ($model_text === 'Company') {
 
-                    if(isset($element->products_id)) {
+                    if (isset($element->products_id)) {
                         $this->syncDataFunc([
-                            'model' => 'Driver',
-                            'fieldFind' => 'company_id',
-                            'fieldFindId' => $element->id,
-                            'fieldSync' => 'products_id',
+                            'model'          => 'Driver',
+                            'fieldFind'      => 'company_id',
+                            'fieldFindId'    => $element->id,
+                            'fieldSync'      => 'products_id',
                             'fieldSyncValue' => $element->products_id
                         ]);
 
                         $this->syncDataFunc([
-                            'model' => 'Car',
-                            'fieldFind' => 'company_id',
-                            'fieldFindId' => $element->id,
-                            'fieldSync' => 'products_id',
+                            'model'          => 'Car',
+                            'fieldFind'      => 'company_id',
+                            'fieldFindId'    => $element->id,
+                            'fieldSync'      => 'products_id',
                             'fieldSyncValue' => $element->products_id
                         ]);
                     }
@@ -1231,104 +1230,108 @@ class IndexController extends Controller
             /**
              * Пустые поля обновляем
              */
-            foreach($oldDataModel as $oldDataItemKey => $oldDataItemValue) {
-                if(!isset($data[$oldDataItemKey]) && ($oldDataItemKey == 'note' || $oldDataItemKey == 'document_bdd')) {
+            foreach ($oldDataModel as $oldDataItemKey => $oldDataItemValue) {
+                if ( !isset($data[$oldDataItemKey])
+                     && ($oldDataItemKey == 'note'
+                         || $oldDataItemKey == 'document_bdd')) {
                     $element[$oldDataItemKey] = '';
                 }
             }
-
-            if ($element->save()) {
-                // company with sync
-                if ($model_text == 'Company') {
-                    Contract::where('company_id', $element->id)
-                            ->update(['company_id' => null]);
-
-                    Contract::whereIn('id', $data['contracts'] ?? [])
-                            ->update(['company_id' => $element->id]);
-
-                    if($mainContract = Contract::mainForCompany($element->id)){
-
-                        Car::where('company_id', $element->id)
-                           ->where(function ($q){
-                               $q->whereDoesntHave('contract')
-                                 ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
-                           })
-                           ->update([
-                               'contract_id' => $mainContract->id ?? null
-                           ]);
-
-                        Driver::where('company_id', $element->id)
-                              ->where(function ($q){
-                                  $q->whereDoesntHave('contract')
-                                    ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
-                              })
-                              ->update([
-                                  'contract_id' => $mainContract->id ?? null
-                              ]);
-                    }else{
-                        Car::where('company_id', $element->id)
-                           ->where(function ($q){
-                               $q->whereDoesntHave('contract')
-                                 ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
-                           })
-                           ->update([
-                               'contract_id' => null
-                           ]);
-
-                        Driver::where('company_id', $element->id)
-                              ->where(function ($q){
-                                  $q->whereDoesntHave('contract')
-                                    ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
-                              })
-                              ->update([
-                                  'contract_id' => null
-                              ]);
-                    }
-                }
-                // (driver && car) =>
-                if ($model_text == 'Driver') {
-                    if(
-                        $data['company_id'] != $element->company_id
-                        && !$data['contract_id']
-                    ){
-                        if($mainContract = Contract::mainForCompany($data['company_id'])){
-                            Driver::where('id', $element->id)->update([
-                                'contract_id' => $mainContract->id ?? null
-                            ]);
-                        }else{
-                            Driver::where('id', $element->id)->update([
-                                'contract_id' => null
-                            ]);
-                        }
-                    }else{
-                        Driver::where('id', $element->id)->update([
-                            'contract_id' => $data['contract_id'] ?? null
-                        ]);
-                    }
-                }
-                if ($model_text == 'Car') {
-                    if(
-                        $data['company_id'] != $element->company_id
-                        && !$data['contract_id']
-                    ){
-                        if($mainContract = Contract::mainForCompany($data['company_id'])){
-                            Car::where('id', $element->id)->update([
-                                'contract_id' => $mainContract->id ?? null
-                            ]);
-                        }else{
-                            Car::where('id', $element->id)->update([
-                                'contract_id' => null
-                            ]);
-                        }
-                    }else{
-                        Car::where('id', $element->id)->update([
-                            'contract_id' => $data['contract_id'] ?? null
-                        ]);
-                    }
-                }
-                return redirect($_SERVER['HTTP_REFERER']);
-            }
         }
+
+        $element->save();
+//            if ($element->save()) {
+//                // company with sync
+//                if ($model_text == 'Company') {
+////                    Contract::where('company_id', $element->id)
+////                            ->update(['company_id' => null]);
+////
+////                    Contract::whereIn('id', $data['contracts'] ?? [])
+////                            ->update(['company_id' => $element->id]);
+//
+////                    if($mainContract = Contract::mainForCompany($element->id)){
+//
+////                        Car::where('company_id', $element->id)
+////                           ->where(function ($q){
+////                               $q->whereDoesntHave('contract')
+////                                 ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+////                           })
+////                           ->update([
+////                               'contract_id' => $mainContract->id ?? null
+////                           ]);
+//
+////                        Driver::where('company_id', $element->id)
+////                              ->where(function ($q){
+////                                  $q->whereDoesntHave('contract')
+////                                    ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+////                              })
+////                              ->update([
+////                                  'contract_id' => $mainContract->id ?? null
+////                              ]);
+////                    }else{
+////                        Car::where('company_id', $element->id)
+////                           ->where(function ($q){
+////                               $q->whereDoesntHave('contract')
+////                                 ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+////                           })
+////                           ->update([
+////                               'contract_id' => null
+////                           ]);
+////
+////                        Driver::where('company_id', $element->id)
+////                              ->where(function ($q){
+////                                  $q->whereDoesntHave('contract')
+////                                    ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+////                              })
+////                              ->update([
+////                                  'contract_id' => null
+////                              ]);
+////                    }
+////                }
+//                // (driver && car) =>
+//                if ($model_text == 'Driver') {
+//                    if(
+//                        $data['company_id'] != $element->company_id
+//                        && !$data['contract_id']
+//                    ){
+//                        if($mainContract = Contract::mainForCompany($data['company_id'])){
+//                            Driver::where('id', $element->id)->update([
+//                                'contract_id' => $mainContract->id ?? null
+//                            ]);
+//                        }else{
+//                            Driver::where('id', $element->id)->update([
+//                                'contract_id' => null
+//                            ]);
+//                        }
+//                    }else{
+//                        Driver::where('id', $element->id)->update([
+//                            'contract_id' => $data['contract_id'] ?? null
+//                        ]);
+//                    }
+//                }
+//                if ($model_text == 'Car') {
+//                    if(
+//                        $data['company_id'] != $element->company_id
+//                        && !$data['contract_id']
+//                    ){
+//                        if($mainContract = Contract::mainForCompany($data['company_id'])){
+//                            Car::where('id', $element->id)->update([
+//                                'contract_id' => $mainContract->id ?? null
+//                            ]);
+//                        }else{
+//                            Car::where('id', $element->id)->update([
+//                                'contract_id' => null
+//                            ]);
+//                        }
+//                    }else{
+//                        Car::where('id', $element->id)->update([
+//                            'contract_id' => $data['contract_id'] ?? null
+//                        ]);
+//                    }
+//                }
+//                return redirect($_SERVER['HTTP_REFERER']);
+//            }
+//        }
 
         return abort(500);
     }
@@ -1346,7 +1349,7 @@ class IndexController extends Controller
             || $model == 'Car'
         ){
             $el = app("App\\$model")
-                ->with(['contract.services'])
+                ->with(['contracts.services'])
                 ->find($id);
         }elseif($model == 'Company'){
             $el = app("App\\$model")
@@ -1426,7 +1429,7 @@ class IndexController extends Controller
             if ($model == 'Company') {
                 $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contracts']);
             } elseif ($model == 'Car' || $model == 'Driver') {
-                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contract', 'contract.services']);
+                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contracts', 'contracts.services']);
             }
 
             $element['elements'] = $MODEL_ELEMENTS;
