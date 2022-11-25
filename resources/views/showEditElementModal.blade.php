@@ -128,7 +128,7 @@ if($model === 'Driver'){
                         )
                     <div data-field="contract" class="form-group">
                         <label>Договор</label>
-                        <select name="contract_ids"
+                        <select name="contract_ids[]"
                                 data-label="Договор"
                                 id="select_for_contract_driver_car"
                                 class="js-chosen"
