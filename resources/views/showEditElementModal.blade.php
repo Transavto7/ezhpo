@@ -105,7 +105,10 @@
                         </div>
                     @continue
                 @endif
-                @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
+                @if($k == 'contract_id' && (
+                        $model == 'Driver'
+                        ||
+                        $model == 'Car'))
                         @php
                             $contractCollect = \App\Models\Contract::where('company_id', $el->company_id)->get(['id', 'name']);
 //                            $class = ''
@@ -118,6 +121,11 @@ if($model === 'Driver'){
 
 }
                         @endphp
+                    @if(
+                           ( $model == 'Driver' && user()->access('contract_edit_driver'))
+                        ||
+                        ($model == 'Car' && user()->access('contract_edit_car'))
+                        )
                     <div data-field="contract" class="form-group">
                         <label>Договор</label>
                         <select name="contract_ids"
@@ -137,6 +145,7 @@ if($model === 'Driver'){
                             @endforeach
                         </select>
                     </div>
+                    @endif
                         <div class="">
                             <ul class="list-group">
                                 @foreach($el->contracts as $contract)
