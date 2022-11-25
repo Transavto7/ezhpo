@@ -250,10 +250,10 @@ class ReportControllerContract extends Controller
 
                         $services = $services->services;
                     } else {
-                        $services = [];
+                        $services = collect();
                     }
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             } else {
                 if ($services = $medic->driver
@@ -270,7 +270,7 @@ class ReportControllerContract extends Controller
                                ->first()) {
                     $services = $services->services;
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             }
 
@@ -438,10 +438,10 @@ class ReportControllerContract extends Controller
 
                         $services = $services->services;
                     } else {
-                        $services = [];
+                        $services = collect();
                     }
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             } else {
                 if ($services = $tech->car
@@ -458,7 +458,7 @@ class ReportControllerContract extends Controller
                                ->first()) {
                     $services = $services->services;
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             }
             foreach ($services as $service) {
@@ -619,10 +619,10 @@ class ReportControllerContract extends Controller
 
                         $services = $services->services;
                     } else {
-                        $services = [];
+                        $services = collect();
                     }
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             } else {
                 if ($services = $report->driver
@@ -639,7 +639,7 @@ class ReportControllerContract extends Controller
                                ->first()) {
                     $services = $services->services;
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             }
 
@@ -825,10 +825,10 @@ class ReportControllerContract extends Controller
 
                         $services = $services->services;
                     } else {
-                        $services = [];
+                        $services = collect();
                     }
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             } else {
                 if ($services = $report->car
@@ -845,7 +845,7 @@ class ReportControllerContract extends Controller
                                ->first()) {
                     $services = $services->services;
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             }
 
