@@ -1162,7 +1162,7 @@ class IndexController extends Controller
                 foreach ($data as $k => $v) {
                     $oldDataModel[$k] = $element[$k];
 
-                    if ($k === 'contracts' || $k === 'contract_id') {
+                    if ($k === 'contracts' || $k === 'contract_id' || $k === 'contract_ids') {
                         continue;
                     }
 
@@ -1254,7 +1254,12 @@ class IndexController extends Controller
             }
         }
 
-        $element->save();
+        if($element->save()){
+            if($model_text == 'Driver' || $model_text == 'Car'){
+                $element->contracts()->sync($data['contract_ids']);
+            }
+        }
+
 
         return redirect($_SERVER['HTTP_REFERER']);
 //            if ($element->save()) {

@@ -108,23 +108,35 @@
                 @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
                         @php
                             $contractCollect = \App\Models\Contract::where('company_id', $el->company_id)->get(['id', 'name']);
+//                            $class = ''
+if($model === 'Car'){
+                                $contractForFuckingDriverORCAR = \App\Car::with('contracts')->find($el->id);
+
+}
+if($model === 'Driver'){
+                                $contractForFuckingDriverORCAR = \App\Driver::with('contracts')->find($el->id);
+
+}
                         @endphp
-{{--                    <div data-field="contract" class="form-group">--}}
-{{--                        <label>Договор</label>--}}
-{{--                        <select name="contract_id"--}}
-{{--                                class="form-control"--}}
-{{--                                data-label="Договор"--}}
-{{--                                id="select_for_contract_driver_car"--}}
-{{--                        >--}}
+                    <div data-field="contract" class="form-group">
+                        <label>Договор</label>
+                        <select name="contract_ids"
+                                data-label="Договор"
+                                id="select_for_contract_driver_car"
+                                class="js-chosen"
+                                style="display: none;"
+                                multiple="multiple"
+                        >
 {{--                            <option value="" @if(!$el->contract_id) selected @endif>Не установлено</option>--}}
-{{--                            @foreach($contractCollect as $contract)--}}
-{{--                                <option value="{{ $contract->id }}"--}}
-{{--                                        @if ($contract->id == $el->contract_id) selected @endif>--}}
-{{--                                    {{ $contract->name }}--}}
-{{--                                </option>--}}
-{{--                            @endforeach--}}
-{{--                        </select>--}}
-{{--                    </div>--}}
+                            @foreach($contractCollect as $contract)
+                                <option value="{{ $contract->id }}"
+                                        @if($contractForFuckingDriverORCAR->contracts->where('id', $contract->id)->first()) selected @endif
+                                >
+                                    {{ $contract->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                         <div class="">
                             <ul class="list-group">
                                 @foreach($el->contracts as $contract)

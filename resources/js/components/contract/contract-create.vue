@@ -384,6 +384,8 @@ export default {
                     .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
             }
 
+            this.company_id = {}
+
             this.show = true
             if (data) {
                 // this.oldData = data
