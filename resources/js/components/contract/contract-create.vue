@@ -177,7 +177,7 @@
                                     v-model="contractData.drivers"
                                 >
                                     <b-row>
-                                        <div class="box" style="height: 200px;">
+                                        <div class="box">
                                             <div v-for="(dataDriver, index) in drivers_of_company">
                                                 <b-col>
                                                     <b-form-checkbox
@@ -212,7 +212,7 @@
                                     v-model="contractData.cars"
                                 >
                                     <b-row>
-                                        <div class="box" style="height: 200px;">
+                                        <div class="box">
                                             <div v-for="(dataCar, index) in cars_of_company">
                                                 <b-col>
                                                     <b-form-checkbox
@@ -324,7 +324,7 @@ export default {
     },
     watch: {
         company_id(val){
-            this.contractData.company_id = val
+            this.contractData.company = val
             this.loadDrivers(true)
             this.loadCars(true)
         }
@@ -337,8 +337,8 @@ export default {
                 this.contractData.cars = [];
             }
             this.drivers_of_company = []
-            if(this.contractData.company_id){
-                axios.post(`/contract/getDriversByCompany/` + this.contractData.company_id).then(({data}) => this.drivers_of_company = data)
+            if(this.contractData.company){
+                axios.post(`/contract/getDriversByCompany/` + this.contractData.company.id).then(({data}) => this.drivers_of_company = data)
                     .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
             }
         },
@@ -348,8 +348,8 @@ export default {
                 this.contractData.cars = [];
             }
             this.cars_of_company = []
-            if(this.contractData.company_id){
-                axios.post(`/contract/getCarsByCompany/` + this.contractData.company_id).then(({data}) => this.cars_of_company = data)
+            if(this.contractData.company){
+                axios.post(`/contract/getCarsByCompany/` + this.contractData.company.id).then(({data}) => this.cars_of_company = data)
                     .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
             }
         },
@@ -401,7 +401,7 @@ export default {
                         return item.id
                     })
                 }
-                this.company_id = this.contractData.company_id
+                this.company_id = this.contractData.company
                 if(isClone){
                     this.contractData.id = null;
                 }

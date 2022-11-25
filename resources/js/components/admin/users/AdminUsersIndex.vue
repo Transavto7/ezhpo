@@ -652,7 +652,7 @@ export default {
     flex-wrap: wrap;
     flex-direction: column;
     width: 500px;
-    height: 400px;
+    max-height: 400px;
     align-content: space-between;
 }
 

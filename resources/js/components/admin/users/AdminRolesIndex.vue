@@ -371,14 +371,14 @@ export default {
 </script>
 
 <style scoped>
-.box {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    width: 500px;
-    height: 400px;
-    align-content: space-between;
-}
+/*.box {*/
+/*    display: flex;*/
+/*    flex-wrap: wrap;*/
+/*    flex-direction: column;*/
+/*    width: 500px;*/
+/*    height: 400px;*/
+/*    align-content: space-between;*/
+/*}*/
 .modal-dialog.modal-xl {
     max-width: 90%;
     margin: 1.75rem auto;

@@ -1047,6 +1047,16 @@ class IndexController extends Controller
                     ]);
 
                     $user->roles()->attach(6);
+                }else if($model_type === 'Car' || $model_type === 'Driver'){
+
+                    if($created->company_id){
+                        $contracts_ids = Contract::where('company_id', $created->company_id)
+                            ->forDate(Carbon::now())
+                            ->main()
+                            ->get(['id']);
+
+                        $created->contracts()->sync($contracts_ids->pluck('id'));
+                    }
                 }
 
                 return redirect($_SERVER['HTTP_REFERER']);
