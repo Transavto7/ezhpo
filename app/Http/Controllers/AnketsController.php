@@ -606,8 +606,8 @@ class AnketsController extends Controller
                 $c_id = $anketa['car_id'] ?? 0;
                 $d_id = $anketa['driver_id'] ?? $d_id;
 
-                $Car = Car::with(['contract.services'])->where('hash_id', $c_id)->first();
-                $Driver = Driver::with(['contract.services'])->where('hash_id', $d_id)->first();
+                $Car = Car::where('hash_id', $c_id)->first();
+                $Driver = Driver::where('hash_id', $d_id)->first();
 
                 // Тонометр
                 $tonometer = $anketa['tonometer'] ?? $defaultDatas['tonometer'];

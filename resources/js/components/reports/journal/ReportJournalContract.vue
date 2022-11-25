@@ -255,10 +255,12 @@ export default {
         },
         async report() {
             this.loading = true;
+            let fuckerCounterInAssMazzarettoEbletoTotalCountDickInHerAss = this.contracts.length
+            let fuckerCounterInAssMazzarettoEbleto = 0;
             for (let contract_key in this.contracts){
 
             // this.reset();
-                await axios.get('/api/reports/contract/journal', {
+                axios.get('/api/reports/contract/journal', {
                     params: {
                         company_id: this.company_id,
                         // contracts_ids: this.contracts.map((item) => item.id),
@@ -266,6 +268,7 @@ export default {
                         month: this.month
                     }
                 }).then(({ data }) => {
+                        fuckerCounterInAssMazzarettoEbleto++;
                         this.contracts[contract_key].visible_result = true;
                         this.contracts[contract_key].sum = this.getTotalContractSum(data);
 
@@ -283,12 +286,15 @@ export default {
 
                         this.$refs.reportsOther[contract_key].hide();
                         this.$refs.reportsOther[contract_key].visible(data.other);
-                        return;
+                        if(fuckerCounterInAssMazzarettoEbleto === fuckerCounterInAssMazzarettoEbletoTotalCountDickInHerAss){
+                            this.loading = false;
+
+                        }
                 }).finally(() => {
                 });
             }
 
-            this.loading = false;
+            // this.loading = false;
         },
         exportData() {
             this.loadingExport = true;

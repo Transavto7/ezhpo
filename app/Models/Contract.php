@@ -32,9 +32,9 @@ class Contract extends Model
 
     public function getNameWithDatesAttribute(){
         return $this->name
-               . ' с: ' .
+               . " \nс: " .
                ($this->date_of_start ? $this->date_of_start->format('d-m-Y') : '' )
-               . ' по: ' .
+               . " \nпо: " .
                ($this->date_of_end ? $this->date_of_end->format('d-m-Y') : '');
     }
 
@@ -45,9 +45,9 @@ class Contract extends Model
             2 => 'Разовая',
         ];
 
-    public function scopeActive($query)
+    public function scopeMain($query)
     {
-        return $query->where("ACTIVE", "Y");
+        return $query->where("main_for_company", 1);
     }
 
     /**
@@ -60,8 +60,8 @@ class Contract extends Model
      */
     public function scopeForDate(Builder $query, Carbon $date)
     {
-        return $query->whereDate("date_of_end", '<', $date)
-                     ->whereDate("date_of_start", '>', $date);
+        return $query->whereDate("date_of_end", '>', $date)
+                     ->whereDate("date_of_start", '<', $date);
     }
 
     public function drivers()

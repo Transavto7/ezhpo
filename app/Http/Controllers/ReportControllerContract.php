@@ -119,6 +119,7 @@ class ReportControllerContract extends Controller
 
     public function getJournalData(Request $request)
     {
+        $this->start = microtime(true);
         $company             = $request->company_id;
         $this->contracts_ids = $request->contracts_ids ?? [];
 
@@ -157,6 +158,9 @@ class ReportControllerContract extends Controller
 
     public function getJournalMedic($company, $date_from, $date_to, $services, $discounts)
     {
+//        dump(
+//            round(microtime(true) - $this->start, 4)
+//        );
         // ->whereIn('anketas.contract_id', $this->contracts_ids)
         $medics = Anketa::whereIn('type_anketa', [
             'medic',
@@ -168,16 +172,16 @@ class ReportControllerContract extends Controller
                                 'driver.contracts.services',
                                 'driver.company.contracts.services',
                         ])
-                        ->whereHas('driver.contracts', function ($q) {
-                            $q->whereIn('contracts.id', $this->contracts_ids);
-                        })
-                        ->whereHas('driver.company.contracts', function ($q) {
-                            $q->whereIn('contracts.id', $this->contracts_ids);
-                        })
+//                        ->whereHas('driver.contracts', function ($q) {
+//                            $q->whereIn('contracts.id', $this->contracts_ids);
+//                        })
+//                        ->whereHas('driver.company.contracts', function ($q) {
+//                            $q->whereIn('contracts.id', $this->contracts_ids);
+//                        })
                         ->where(function ($query) use ($company) {
-                            $query->where('company_id', $company->hash_id)
-                                  ->orWhere('company_name', $company->name);
-                        })
+                $query->where('company_id', $company->hash_id)
+                      ->orWhere('company_name', $company->name);
+            })
                         ->where('in_cart', 0)
                         ->where(function ($q) use ($date_from, $date_to) {
                             $q->where(function ($q) use ($date_from, $date_to) {
@@ -196,6 +200,9 @@ class ReportControllerContract extends Controller
                         })
                         ->get();
 
+//        dump(
+//            round(microtime(true) - $this->start, 4)
+//        );
         $result = [];
 
         $type_views_eblan_mazaretto = [];
@@ -230,40 +237,40 @@ class ReportControllerContract extends Controller
             if ($medic->driver) {
                 if ($medic->driver->contracts) {
                     if ($services = $medic->driver
-                        ->contracts
-                        ->where(
-                            'date_of_end', '>',
-                            ($medic->date ?? Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
-                        )
-                        ->where(
-                            'date_of_start', '<',
-                            ($medic->date ?? Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
-                        )
-                        ->first()) {
+                        ->contracts->whereIn('id', $this->contracts_ids)
+                                   ->where(
+                                       'date_of_end', '>',
+                                       ($medic->date ?? Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+                                   )
+                                   ->where(
+                                       'date_of_start', '<',
+                                       ($medic->date ?? Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+                                   )
+                                   ->first()) {
 
                         $services = $services->services;
                     } else {
-                        $services = [];
+                        $services = collect();
                     }
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             } else {
                 if ($services = $medic->driver
                     ->company
-                    ->contracts
-                    ->where(
-                        'date_of_end', '>',
-                        ($medic->date ?? Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
-                    )
-                    ->where(
-                        'date_of_start', '<',
-                        ($medic->date ?? Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
-                    )
-                    ->first()) {
+                    ->contracts->whereIn('id', $this->contracts_ids)
+                               ->where(
+                                   'date_of_end', '>',
+                                   ($medic->date ?? Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+                               )
+                               ->where(
+                                   'date_of_start', '<',
+                                   ($medic->date ?? Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+                               )
+                               ->first()) {
                     $services = $services->services;
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             }
 
@@ -323,43 +330,51 @@ class ReportControllerContract extends Controller
 
     public function getJournalTechs($company, $date_from, $date_to, $products, $discounts)
     {
+//        dump(
+//            round(microtime(true) - $this->start, 4)
+//        );
+//        dump(
+//            round(microtime(true) - $this->start, 4)
+//        );
         $techs
-            = Anketa::where('type_anketa', 'tech')
+                = Anketa::where('type_anketa', 'tech')
 //                    ->whereIn('contract_id', $this->contracts_ids)
-                    ->with([
+                        ->with([
                 'car.contracts.services',
                 'car.company.contracts.services',
             ])
-                    ->whereHas('car.contracts', function ($q) {
-                        $q->whereIn('contracts.id', $this->contracts_ids);
-                    })
-                    ->whereHas('car.company.contracts', function ($q) {
-                        $q->whereIn('contracts.id', $this->contracts_ids);
-                    })
-                    ->where(function ($query) use ($company) {
-                        $query->where('anketas.company_id', $company->hash_id)
-                              ->orWhere('anketas.company_name', $company->name);
-                    })
-                    ->where('anketas.in_cart', 0)
-                    ->where(function ($q) use ($date_from, $date_to) {
-                        $q->where(function ($q) use ($date_from, $date_to) {
-                            $q->whereNotNull('anketas.date')
-                              ->whereBetween('anketas.date', [
-                                  $date_from,
-                                  $date_to,
-                              ]);
+                        ->whereHas('car.contracts', function ($q) {
+                            $q->whereIn('contracts.id', $this->contracts_ids);
                         })
-                          ->orWhere(function ($q) use ($date_from, $date_to) {
-                              $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
-                                  $date_from->format('Y-m'),
-                                  $date_to->format('Y-m'),
-                              ]);
-                          });
-                    })
-                    ->get();
-
+                        ->whereHas('car.company.contracts', function ($q) {
+                            $q->whereIn('contracts.id', $this->contracts_ids);
+                        })
+                        ->where(function ($query) use ($company) {
+                            $query->where('anketas.company_id', $company->hash_id)
+                                  ->orWhere('anketas.company_name', $company->name);
+                        })
+                        ->where('anketas.in_cart', 0)
+                        ->where(function ($q) use ($date_from, $date_to) {
+                            $q->where(function ($q) use ($date_from, $date_to) {
+                                $q->whereNotNull('anketas.date')
+                                  ->whereBetween('anketas.date', [
+                                      $date_from,
+                                      $date_to,
+                                  ]);
+                            })
+                              ->orWhere(function ($q) use ($date_from, $date_to) {
+                                  $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
+                                      $date_from->format('Y-m'),
+                                      $date_to->format('Y-m'),
+                                  ]);
+                              });
+                        })
+                        ->get();
         $result = [];
 
+//        dump(
+//            round(microtime(true) - $this->start, 4)
+//        );
 //        $cars = $techs
 //            ->pluck('car')
 //            ->keyBy('id')
@@ -410,40 +425,40 @@ class ReportControllerContract extends Controller
             if ($tech->car) {
                 if ($tech->car->contracts) {
                     if ($services = $tech->car
-                        ->contracts
-                        ->where(
-                            'date_of_end', '>',
-                            ($tech->date ?? Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
-                        )
-                        ->where(
-                            'date_of_start', '<',
-                            ($tech->date ?? Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
-                        )
-                        ->first()) {
+                        ->contracts->whereIn('id', $this->contracts_ids)
+                                   ->where(
+                                       'date_of_end', '>',
+                                       ($tech->date ?? Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
+                                   )
+                                   ->where(
+                                       'date_of_start', '<',
+                                       ($tech->date ?? Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
+                                   )
+                                   ->first()) {
 
                         $services = $services->services;
                     } else {
-                        $services = [];
+                        $services = collect();
                     }
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             } else {
                 if ($services = $tech->car
                     ->company
-                    ->contracts
-                    ->where(
-                        'date_of_end', '>',
-                        ($tech->date ?? Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
-                    )
-                    ->where(
-                        'date_of_start', '<',
-                        ($tech->date ?? Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
-                    )
-                    ->first()) {
+                    ->contracts->whereIn('id', $this->contracts_ids)
+                               ->where(
+                                   'date_of_end', '>',
+                                   ($tech->date ?? Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
+                               )
+                               ->where(
+                                   'date_of_start', '<',
+                                   ($tech->date ?? Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
+                               )
+                               ->first()) {
                     $services = $services->services;
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             }
             foreach ($services as $service) {
@@ -497,6 +512,10 @@ class ReportControllerContract extends Controller
 
     public function getJournalMedicsOther($company, $date_from, $date_to, $products, $discounts)
     {
+//        dump(
+//            round(microtime(true) - $this->start, 4)
+//        );
+
         $reports = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart', 'pechat_pl'])
 //                         ->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
 //                         ->whereIn('contract_id', $this->contracts_ids)
@@ -509,16 +528,16 @@ class ReportControllerContract extends Controller
                                  'driver.contracts.services',
                                  'driver.company.contracts.services',
             ])
-                         ->whereHas('driver.contracts', function ($q) {
-                             $q->whereIn('contracts.id', $this->contracts_ids);
-                         })
-                         ->whereHas('driver.company.contracts', function ($q) {
-                             $q->whereIn('contracts.id', $this->contracts_ids);
-                         })
+//                         ->whereHas('driver.contracts', function ($q) {
+//                             $q->whereIn('contracts.id', $this->contracts_ids);
+//                         })
+//                         ->whereHas('driver.company.contracts', function ($q) {
+//                             $q->whereIn('contracts.id', $this->contracts_ids);
+//                         })
                          ->where(function ($query) use ($company) {
-                             $query->where('anketas.company_id', $company->hash_id)
-                                   ->orWhere('anketas.company_name', $company->name);
-                         })
+                $query->where('anketas.company_id', $company->hash_id)
+                      ->orWhere('anketas.company_name', $company->name);
+            })
                          ->where('in_cart', 0)
                          ->whereBetween('anketas.created_at', [
                              $date_from,
@@ -541,6 +560,9 @@ class ReportControllerContract extends Controller
                          })
                          ->get();
 
+//        dump(
+//            round(microtime(true) - $this->start, 4)
+//        );
         $result = [];
 
 
@@ -584,40 +606,40 @@ class ReportControllerContract extends Controller
             if ($report->driver) {
                 if ($report->driver->contracts) {
                     if ($services = $report->driver
-                        ->contracts
-                        ->where(
-                            'date_of_end', '<',
-                            ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                        )
-                        ->where(
-                            'date_of_start', '>',
-                            ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                        )
-                        ->first()) {
+                        ->contracts->whereIn('id', $this->contracts_ids)
+                                   ->where(
+                                       'date_of_end', '<',
+                                       ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                   )
+                                   ->where(
+                                       'date_of_start', '>',
+                                       ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                   )
+                                   ->first()) {
 
                         $services = $services->services;
                     } else {
-                        $services = [];
+                        $services = collect();
                     }
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             } else {
                 if ($services = $report->driver
                     ->company
-                    ->contracts
-                    ->where(
-                        'date_of_end', '<',
-                        ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                    )
-                    ->where(
-                        'date_of_start', '>',
-                        ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                    )
-                    ->first()) {
+                    ->contracts->whereIn('id', $this->contracts_ids)
+                               ->where(
+                                   'date_of_end', '<',
+                                   ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                               )
+                               ->where(
+                                   'date_of_start', '>',
+                                   ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                               )
+                               ->first()) {
                     $services = $services->services;
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             }
 
@@ -695,6 +717,9 @@ class ReportControllerContract extends Controller
 
     public function getJournalTechsOther($company, $date_from, $date_to, $products, $discounts)
     {
+//        dump(
+//            round(microtime(true) - $this->start, 4)
+//        );
         $reports = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'type_anketa', 'pechat_pl'])
 //                         ->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')
 //                         ->whereIn('contract_id', $this->contracts_ids)
@@ -707,16 +732,16 @@ class ReportControllerContract extends Controller
                 'driver.contracts.services',
                 'driver.company.contracts.services',
             ])
-                         ->whereHas('car.contracts', function ($q) {
-                             $q->whereIn('contracts.id', $this->contracts_ids);
-                         })
-                         ->whereHas('car.company.contracts', function ($q) {
-                             $q->whereIn('contracts.id', $this->contracts_ids);
-                         })
+//                         ->whereHas('car.contracts', function ($q) {
+//                             $q->whereIn('contracts.id', $this->contracts_ids);
+//                         })
+//                         ->whereHas('car.company.contracts', function ($q) {
+//                             $q->whereIn('contracts.id', $this->contracts_ids);
+//                         })
                          ->where(function ($query) use ($company) {
-                             $query->where('anketas.company_id', $company->hash_id)
-                                   ->orWhere('anketas.company_name', $company->name);
-                         })
+                $query->where('anketas.company_id', $company->hash_id)
+                      ->orWhere('anketas.company_name', $company->name);
+            })
                          ->where('in_cart', 0)
                          ->whereBetween('anketas.created_at', [
                              $date_from,
@@ -739,20 +764,23 @@ class ReportControllerContract extends Controller
                          })
                          ->get();
 
+//        dd(
+//            round(microtime(true) - $this->start, 4)
+//        );
         $result = [];
 
-        $cars_services = Car::with(['contract', 'contract.services'])
-                            ->where('company_id', $company->id)
-                            ->whereIn('contract_id', $this->contracts_ids)
-                            ->get();
+//        $cars_services = Car::with(['contract', 'contract.services'])
+//                            ->where('company_id', $company->id)
+//                            ->whereIn('contract_id', $this->contracts_ids)
+//                            ->get();
 
 
         $companyProdsID = $company
-            ->contracts
-            ->pluck('services')
-            ->flatten()
-            ->pluck('id')
-            ->toArray();
+            ->contracts->whereIn('id', $this->contracts_ids)
+                       ->pluck('services')
+                       ->flatten()
+                       ->pluck('id')
+                       ->toArray();
 
         foreach ($reports as $report) {
             try {
@@ -784,40 +812,40 @@ class ReportControllerContract extends Controller
             if ($report->car) {
                 if ($report->car->contracts) {
                     if ($services = $report->car
-                        ->contracts
-                        ->where(
-                            'date_of_end', '>',
-                            ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                        )
-                        ->where(
-                            'date_of_start', '<',
-                            ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                        )
-                        ->first()) {
+                        ->contracts->whereIn('id', $this->contracts_ids)
+                                   ->where(
+                                       'date_of_end', '>',
+                                       ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                   )
+                                   ->where(
+                                       'date_of_start', '<',
+                                       ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                   )
+                                   ->first()) {
 
                         $services = $services->services;
                     } else {
-                        $services = [];
+                        $services = collect();
                     }
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             } else {
                 if ($services = $report->car
                     ->company
-                    ->contracts
-                    ->where(
-                        'date_of_end', '>',
-                        ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                    )
-                    ->where(
-                        'date_of_start', '<',
-                        ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                    )
-                    ->first()) {
+                    ->contracts->whereIn('id', $this->contracts_ids)
+                               ->where(
+                                   'date_of_end', '>',
+                                   ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                               )
+                               ->where(
+                                   'date_of_start', '<',
+                                   ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                               )
+                               ->first()) {
                     $services = $services->services;
                 } else {
-                    $services = [];
+                    $services = collect();
                 }
             }
 
@@ -910,16 +938,16 @@ class ReportControllerContract extends Controller
         $services = $services->where('type_product', 'Абонентская плата без реестров');
 
         $drivers = Driver::with(['contracts.services'])
-                         ->whereHas('contracts', function ($q) {
-                             $q->whereIn('contracts.id', $this->contracts_ids);
-                         })
+//                         ->whereHas('contracts', function ($q) {
+//                             $q->whereIn('contracts.id', $this->contracts_ids);
+//                         })
                          ->where('company_id', $company->id)
                          ->get();
 
         $cars = Car::with(['contracts.services'])
-                   ->whereHas('contracts', function ($q) {
-                       $q->whereIn('contracts.id', $this->contracts_ids);
-                   })
+//                   ->whereHas('contracts', function ($q) {
+//                       $q->whereIn('contracts.id', $this->contracts_ids);
+//                   })
                    ->where('company_id', $company->id)
                    ->get();
 
@@ -929,7 +957,7 @@ class ReportControllerContract extends Controller
 
         foreach ($drivers as $driver) {
 //            $driverProdsID = explode(',', $driver->products_id);
-            $driverProdsID = $driver->contracts->pluck('services');
+            $driverProdsID = $driver->contracts->whereIn('id', $this->contracts_ids)->pluck('services');
             foreach ($driverProdsID->whereIn('essence', [
                 Product::ESSENCE_DRIVER,
                 Product::ESSENCE_CAR_DRIVER,
@@ -946,7 +974,7 @@ class ReportControllerContract extends Controller
 
         foreach ($cars as $car) {
 //            $carProdsID = explode(',', $car->products_id);
-            $carProdsID = $car->contracts->pluck('services');
+            $carProdsID = $car->contracts->whereIn('id', $this->contracts_ids)->pluck('services');
             foreach ($carProdsID->whereIn('essence', [2, 3]) as $service) {
                 if ($service->type_product === 'Абонентская плата без реестров') {
                     $result['cars'][] = [
