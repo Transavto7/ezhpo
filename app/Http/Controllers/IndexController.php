@@ -1256,7 +1256,7 @@ class IndexController extends Controller
 
         if($element->save()){
             if($model_text == 'Driver' || $model_text == 'Car'){
-                $element->contracts()->sync($data['contract_ids']);
+                $element->contracts()->sync($data['contract_ids'] ?? []);
             }
         }
 
