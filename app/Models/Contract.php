@@ -32,9 +32,9 @@ class Contract extends Model
 
     public function getNameWithDatesAttribute(){
         return $this->name
-               . ' с: ' .
+               . " \nс: " .
                ($this->date_of_start ? $this->date_of_start->format('d-m-Y') : '' )
-               . ' по: ' .
+               . " \nпо: " .
                ($this->date_of_end ? $this->date_of_end->format('d-m-Y') : '');
     }
 

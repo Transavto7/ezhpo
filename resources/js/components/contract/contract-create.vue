@@ -48,14 +48,31 @@
                 <label>Компания:</label>
             </b-col>
             <b-col sm="9">
-                <v-select
-                    v-model="contractData.company"
+<!--                <v-select-->
+<!--                    v-model="contractData.company"-->
+<!--                    :options="companies"-->
+<!--                    key="id"-->
+<!--                    label="name"-->
+<!--                    @search="searchCompanies"-->
+<!--                    v-on:change="loadDrivers"-->
+<!--                >-->
+<!--                </v-select>-->
+                <multiselect
+                    v-model="company_id"
+                    @select="(company) => contractData.company_id = company.hash_id"
+                    @search-change="searchCompanies"
                     :options="companies"
-                    key="id"
+                    :searchable="true"
+                    :close-on-select="true"
+                    :show-labels="false"
+                    placeholder="Выберите компанию"
                     label="name"
-                    @search="searchCompanies"
+                    track-by="id"
+                    class="is-invalid"
                 >
-                </v-select>
+                    <span slot="noResult">Результатов не найдено</span>
+                    <span slot="noOptions">Список пуст</span>
+                </multiselect>
             </b-col>
         </b-row>
         <b-row class="my-1">
@@ -301,12 +318,24 @@ export default {
             cars_of_company: [],
             drivers_of_company: [],
 
+            company_id: [],
+
         }
     },
-    mounted() {
+    watch: {
+        company_id(val){
+            this.contractData.company_id = val
+            this.loadDrivers(true)
+            this.loadCars(true)
+        }
+    },
+    mounted(loadCars) {
     },
     methods: {
-        loadDrivers(){
+        loadDrivers(is_new = false){
+            if(is_new){
+                this.contractData.cars = [];
+            }
             this.drivers_of_company = []
             if(this.contractData.company_id){
                 axios.post(`/contract/getDriversByCompany/` + this.contractData.company_id).then(({data}) => this.drivers_of_company = data)
@@ -314,7 +343,10 @@ export default {
             }
         },
 
-        loadCars(){
+        loadCars(is_new = false){
+            if(is_new){
+                this.contractData.cars = [];
+            }
             this.cars_of_company = []
             if(this.contractData.company_id){
                 axios.post(`/contract/getCarsByCompany/` + this.contractData.company_id).then(({data}) => this.cars_of_company = data)
@@ -369,6 +401,7 @@ export default {
                         return item.id
                     })
                 }
+                this.company_id = this.contractData.company_id
                 if(isClone){
                     this.contractData.id = null;
                 }
@@ -581,36 +614,6 @@ export default {
         },
     },
 
-    watch: {
-        // contractData(val){
-        //     if(this.contractData.id){
-        //         let newValue = null
-        //         console.log(this.contractData.services)
-        //         this.contractData.services = this.contractData.services.filter((item) => {
-        //             console.log(item)
-        //             if(!item.pivot){
-        //                 console.log('=NAHUI')
-        //                 newValue = {
-        //                     id: item.id,
-        //                     name: item.name,
-        //                     pivot: {
-        //                         service_id: item.id,
-        //                         contract_id: this.contractData.id,
-        //                         service_cost: item.price_unit
-        //                     },
-        //                 }
-        //                 return false;
-        //             }
-        //             return true;
-        //         });
-        //         console.log(this.contractData.services)
-        //         console.log(newValue)
-        //         if(newValue){
-        //             this.contractData.services = this.contractData.services.push(newValue)
-        //         }
-        //     }
-        // }
-    },
 }
 </script>
 
