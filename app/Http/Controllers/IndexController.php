@@ -113,7 +113,7 @@ class IndexController extends Controller
                             'time_skzi'           => 'Срок действия СКЗИ (автомобиль)',
                             'time_card_driver'    => 'Срок действия карты водителя (водитель)',
                             'date_osago'          => 'Дата осаго (автомобиль)',
-                            'date_driver_license' => 'Срок действия водительского удостоверения (автомобиль)',
+                            'date_driver_license' => 'Срок действия водительского удостоверения (водитель)',
                         ],
                     ],
                     'days'       => ['label' => 'Кол-во дней', 'type' => 'number'],
