@@ -509,8 +509,8 @@ export default {
                 });
         },
 
-        searchCompanies(value, loading) {
-            loading(true);
+        searchCompanies(value = '') {
+            // loading(true);
 
             this.companies = [];
             axios
@@ -521,12 +521,12 @@ export default {
                 })
                 .then(({data}) => {
                     this.companies = data;
-                    loading(false);
+                    // loading(false);
                 })
                 .catch((err) => {
                     //Ошибка
                     Swal2.fire('Ошибка!', '', 'warning');
-                    loading(false);
+                    // loading(false);
                 });
         },
         searchOurCompanies(value, loading) {
