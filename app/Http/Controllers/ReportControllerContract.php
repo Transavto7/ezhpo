@@ -170,7 +170,7 @@ class ReportControllerContract extends Controller
         ])
                         ->with([// 'services_snapshot',
                                 'driver.contracts.services',
-                                'driver.company.contracts.services',
+                                'company.contracts.services',
                         ])
 //                        ->whereHas('driver.contracts', function ($q) {
 //                            $q->whereIn('contracts.id', $this->contracts_ids);
@@ -178,6 +178,14 @@ class ReportControllerContract extends Controller
 //                        ->whereHas('driver.company.contracts', function ($q) {
 //                            $q->whereIn('contracts.id', $this->contracts_ids);
 //                        })
+            ->where(function ($q){
+                $q->whereHas('driver.contracts', function ($q) {
+                    $q->whereIn('contracts.id', $this->contracts_ids);
+                })
+                  ->orWhereHas('company.contracts', function ($q) {
+                      $q->whereIn('contracts.id', $this->contracts_ids);
+                  });
+            })
                         ->where(function ($query) use ($company) {
                 $query->where('company_id', $company->hash_id)
                       ->orWhere('company_name', $company->name);
@@ -234,8 +242,8 @@ class ReportControllerContract extends Controller
             }
 
 
-            if ($medic->driver) {
-                if ($medic->driver->contracts) {
+            if ($medic->driver->id) {
+                if ($medic->driver->contracts->isNotEmpty()) {
                     if ($services = $medic->driver
                         ->contracts->whereIn('id', $this->contracts_ids)
                                    ->where(
@@ -256,8 +264,7 @@ class ReportControllerContract extends Controller
                     $services = collect();
                 }
             } else {
-                if ($services = $medic->driver
-                    ->company
+                if ($services = $medic->company
                     ->contracts->whereIn('id', $this->contracts_ids)
                                ->where(
                                    'date_of_end', '>',
@@ -330,24 +337,19 @@ class ReportControllerContract extends Controller
 
     public function getJournalTechs($company, $date_from, $date_to, $products, $discounts)
     {
-//        dump(
-//            round(microtime(true) - $this->start, 4)
-//        );
-//        dump(
-//            round(microtime(true) - $this->start, 4)
-//        );
         $techs
                 = Anketa::where('type_anketa', 'tech')
-//                    ->whereIn('contract_id', $this->contracts_ids)
                         ->with([
                 'car.contracts.services',
-                'car.company.contracts.services',
+                'company.contracts.services',
             ])
-                        ->whereHas('car.contracts', function ($q) {
-                            $q->whereIn('contracts.id', $this->contracts_ids);
-                        })
-                        ->whereHas('car.company.contracts', function ($q) {
-                            $q->whereIn('contracts.id', $this->contracts_ids);
+                        ->where(function ($q){
+                            $q->whereHas('car.contracts', function ($q) {
+                                $q->whereIn('contracts.id', $this->contracts_ids);
+                            })
+                              ->orWhereHas('company.contracts', function ($q) {
+                                  $q->whereIn('contracts.id', $this->contracts_ids);
+                              });
                         })
                         ->where(function ($query) use ($company) {
                             $query->where('anketas.company_id', $company->hash_id)
@@ -371,26 +373,6 @@ class ReportControllerContract extends Controller
                         })
                         ->get();
         $result = [];
-
-//        dump(
-//            round(microtime(true) - $this->start, 4)
-//        );
-//        $cars = $techs
-//            ->pluck('car')
-//            ->keyBy('id')
-//            ->values();
-
-//        $types_view = $techs
-//            ->pluck('type_view')
-//            ->unique();
-
-//        $servicesForTech = $techs
-//            ->pluck('contract')
-//            ->pluck('services')
-//            ->flatten()
-//            ->keyBy('id')
-//            ->values();
-
 
         $type_views_eblan_mazaretto = [];
 
@@ -422,8 +404,8 @@ class ReportControllerContract extends Controller
                 $result[$tech->car->hash_id]['types'][$tech->type_view]['total'] = 1;
             }
 
-            if ($tech->car) {
-                if ($tech->car->contracts) {
+            if ($tech->car->id) {
+                if ($tech->car->contracts->isNotEmpty()) {
                     if ($services = $tech->car
                         ->contracts->whereIn('id', $this->contracts_ids)
                                    ->where(
@@ -444,8 +426,7 @@ class ReportControllerContract extends Controller
                     $services = collect();
                 }
             } else {
-                if ($services = $tech->car
-                    ->company
+                if ($services = $tech->company
                     ->contracts->whereIn('id', $this->contracts_ids)
                                ->where(
                                    'date_of_end', '>',
@@ -526,7 +507,7 @@ class ReportControllerContract extends Controller
 //                         ->whereHas('contract')
                          ->with([// 'services_snapshot',
                                  'driver.contracts.services',
-                                 'driver.company.contracts.services',
+                                 'company.contracts.services',
             ])
 //                         ->whereHas('driver.contracts', function ($q) {
 //                             $q->whereIn('contracts.id', $this->contracts_ids);
@@ -534,6 +515,14 @@ class ReportControllerContract extends Controller
 //                         ->whereHas('driver.company.contracts', function ($q) {
 //                             $q->whereIn('contracts.id', $this->contracts_ids);
 //                         })
+            ->where(function ($q){
+                $q->whereHas('driver.contracts', function ($q) {
+                    $q->whereIn('contracts.id', $this->contracts_ids);
+                })
+                  ->orWhereHas('company.contracts', function ($q) {
+                      $q->whereIn('contracts.id', $this->contracts_ids);
+                  });
+            })
                          ->where(function ($query) use ($company) {
                 $query->where('anketas.company_id', $company->hash_id)
                       ->orWhere('anketas.company_name', $company->name);
@@ -603,8 +592,8 @@ class ReportControllerContract extends Controller
                     = ($result[$key]['reports'][$report->driver_id]['types']['is_dop']['total'] ?? 0) + 1;
             }
 
-            if ($report->driver) {
-                if ($report->driver->contracts) {
+            if ($report->driver->id) {
+                if ($report->driver->contracts->isNotEmpty()) {
                     if ($services = $report->driver
                         ->contracts->whereIn('id', $this->contracts_ids)
                                    ->where(
@@ -625,8 +614,7 @@ class ReportControllerContract extends Controller
                     $services = collect();
                 }
             } else {
-                if ($services = $report->driver
-                    ->company
+                if ($services = $report->company
                     ->contracts->whereIn('id', $this->contracts_ids)
                                ->where(
                                    'date_of_end', '<',
@@ -730,8 +718,16 @@ class ReportControllerContract extends Controller
 //                         ->whereHas('contract')
                          ->with([
                 'driver.contracts.services',
-                'driver.company.contracts.services',
+                'company.contracts.services',
             ])
+                         ->where(function ($q){
+                             $q->whereHas('driver.contracts', function ($q) {
+                                 $q->whereIn('contracts.id', $this->contracts_ids);
+                             })
+                               ->orWhereHas('company.contracts', function ($q) {
+                                   $q->whereIn('contracts.id', $this->contracts_ids);
+                               });
+                         })
 //                         ->whereHas('car.contracts', function ($q) {
 //                             $q->whereIn('contracts.id', $this->contracts_ids);
 //                         })
@@ -809,8 +805,8 @@ class ReportControllerContract extends Controller
                     = ($result[$key]['reports'][$report->car_id]['types']['is_dop']['total'] ?? 0) + 1;
             }
 
-            if ($report->car) {
-                if ($report->car->contracts) {
+            if ($report->car->id) {
+                if ($report->car->contracts->isNotEmpty()) {
                     if ($services = $report->car
                         ->contracts->whereIn('id', $this->contracts_ids)
                                    ->where(
@@ -831,8 +827,7 @@ class ReportControllerContract extends Controller
                     $services = collect();
                 }
             } else {
-                if ($services = $report->car
-                    ->company
+                if ($services = $report->company
                     ->contracts->whereIn('id', $this->contracts_ids)
                                ->where(
                                    'date_of_end', '>',
