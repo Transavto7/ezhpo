@@ -77,7 +77,7 @@ class Contract extends Model
     public function cars()
     {
         return $this->belongsToMany(
-            Driver::class,
+            Car::class,
             'car_contact_pivot',
             'contract_id',
             'car_id'
