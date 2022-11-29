@@ -178,14 +178,14 @@ class ReportControllerContract extends Controller
 //                        ->whereHas('driver.company.contracts', function ($q) {
 //                            $q->whereIn('contracts.id', $this->contracts_ids);
 //                        })
-            ->where(function ($q){
-                $q->whereHas('driver.contracts', function ($q) {
-                    $q->whereIn('contracts.id', $this->contracts_ids);
-                })
-                  ->orWhereHas('company.contracts', function ($q) {
-                      $q->whereIn('contracts.id', $this->contracts_ids);
-                  });
-            })
+//            ->where(function ($q){
+//                $q->whereHas('driver.contracts', function ($q) {
+//                    $q->whereIn('contracts.id', $this->contracts_ids);
+//                })
+//                  ->orWhereHas('company.contracts', function ($q) {
+//                      $q->whereIn('contracts.id', $this->contracts_ids);
+//                  });
+//            })
                         ->where(function ($query) use ($company) {
                 $query->where('company_id', $company->hash_id)
                       ->orWhere('company_name', $company->name);
@@ -340,21 +340,21 @@ class ReportControllerContract extends Controller
         $techs
                 = Anketa::where('type_anketa', 'tech')
                         ->with([
-                'car.contracts.services',
-                'company.contracts.services',
-            ])
-                        ->where(function ($q){
-                            $q->whereHas('car.contracts', function ($q) {
-                                $q->whereIn('contracts.id', $this->contracts_ids);
-                            })
-                              ->orWhereHas('company.contracts', function ($q) {
-                                  $q->whereIn('contracts.id', $this->contracts_ids);
-                              });
-                        })
+                            'car.contracts.services',
+                            'company.contracts.services',
+                        ])
+//                        ->where(function ($q){
+//                            $q->whereHas('car.contracts', function ($q) {
+//                                $q->whereIn('contracts.id', $this->contracts_ids);
+//                            })
+//                              ->orWhereHas('company.contracts', function ($q) {
+//                                  $q->whereIn('contracts.id', $this->contracts_ids);
+//                              });
+//                        })
                         ->where(function ($query) use ($company) {
-                            $query->where('anketas.company_id', $company->hash_id)
-                                  ->orWhere('anketas.company_name', $company->name);
-                        })
+                $query->where('anketas.company_id', $company->hash_id)
+                      ->orWhere('anketas.company_name', $company->name);
+            })
                         ->where('anketas.in_cart', 0)
                         ->where(function ($q) use ($date_from, $date_to) {
                             $q->where(function ($q) use ($date_from, $date_to) {
@@ -515,14 +515,14 @@ class ReportControllerContract extends Controller
 //                         ->whereHas('driver.company.contracts', function ($q) {
 //                             $q->whereIn('contracts.id', $this->contracts_ids);
 //                         })
-            ->where(function ($q){
-                $q->whereHas('driver.contracts', function ($q) {
-                    $q->whereIn('contracts.id', $this->contracts_ids);
-                })
-                  ->orWhereHas('company.contracts', function ($q) {
-                      $q->whereIn('contracts.id', $this->contracts_ids);
-                  });
-            })
+//            ->where(function ($q){
+//                $q->whereHas('driver.contracts', function ($q) {
+//                    $q->whereIn('contracts.id', $this->contracts_ids);
+//                })
+//                  ->orWhereHas('company.contracts', function ($q) {
+//                      $q->whereIn('contracts.id', $this->contracts_ids);
+//                  });
+//            })
                          ->where(function ($query) use ($company) {
                 $query->where('anketas.company_id', $company->hash_id)
                       ->orWhere('anketas.company_name', $company->name);
@@ -720,14 +720,14 @@ class ReportControllerContract extends Controller
                 'driver.contracts.services',
                 'company.contracts.services',
             ])
-                         ->where(function ($q){
-                             $q->whereHas('driver.contracts', function ($q) {
-                                 $q->whereIn('contracts.id', $this->contracts_ids);
-                             })
-                               ->orWhereHas('company.contracts', function ($q) {
-                                   $q->whereIn('contracts.id', $this->contracts_ids);
-                               });
-                         })
+//                         ->where(function ($q){
+//                             $q->whereHas('driver.contracts', function ($q) {
+//                                 $q->whereIn('contracts.id', $this->contracts_ids);
+//                             })
+//                               ->orWhereHas('company.contracts', function ($q) {
+//                                   $q->whereIn('contracts.id', $this->contracts_ids);
+//                               });
+//                         })
 //                         ->whereHas('car.contracts', function ($q) {
 //                             $q->whereIn('contracts.id', $this->contracts_ids);
 //                         })
