@@ -334,7 +334,7 @@ export default {
     methods: {
         loadDrivers(is_new = false){
             if(is_new){
-                this.contractData.cars = [];
+                // this.contractData.drivers = [];
             }
             this.drivers_of_company = []
             if(this.contractData.company){
@@ -345,8 +345,9 @@ export default {
 
         loadCars(is_new = false){
             if(is_new){
-                this.contractData.cars = [];
+                // this.contractData.cars = [];
             }
+
             this.cars_of_company = []
             if(this.contractData.company){
                 axios.post(`/contract/getCarsByCompany/` + this.contractData.company.id).then(({data}) => this.cars_of_company = data)
@@ -386,10 +387,12 @@ export default {
 
             this.company_id = {}
 
+            // console.log(data)
             this.show = true
             if (data) {
                 // this.oldData = data
                 this.contractData = Object.assign({}, data)
+                // console.log(this.contractData.cars.length)
                 if (this.contractData.main_for_company) {
                     this.contractData.main_for_company = true
                 }
@@ -398,6 +401,7 @@ export default {
                         return item.id
                     })
                 }
+                // console.log(this.contractData.cars)
                 if(this.contractData.drivers.length){
                     this.contractData.drivers = this.contractData.drivers.map((item) =>{
                         return item.id

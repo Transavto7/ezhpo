@@ -119,7 +119,7 @@ class ReportControllerContract extends Controller
 
     public function getJournalData(Request $request)
     {
-        $this->start = microtime(true);
+        $this->start         = microtime(true);
         $company             = $request->company_id;
         $this->contracts_ids = $request->contracts_ids ?? [];
 
@@ -187,8 +187,9 @@ class ReportControllerContract extends Controller
 //                  });
 //            })
                         ->where(function ($query) use ($company) {
-                $query->where('company_id', $company->hash_id)
-                      ->orWhere('company_name', $company->name);
+                $query->where('company_id',
+                    $company->hash_id)//                      ->orWhere('company_name', $company->name)
+                ;
             })
                         ->where('in_cart', 0)
                         ->where(function ($q) use ($date_from, $date_to) {
@@ -217,15 +218,40 @@ class ReportControllerContract extends Controller
 //dd(
 //    $medics->pluck('type_view')->unique()
 //);
+//        dd(
+//            $medics->where('type_view', 'Предрейсовый')->where('driver_id',389251)->toArray()
+//        );
         foreach ($medics as $medic) {
-            if ( !($type_views_eblan_mazaretto[$medic->type_view.$medic->driver->hash_id] ?? false)) {
+            if ( !($type_views_eblan_mazaretto[$medic->type_view.$medic->type_anketa.$medic->driver->hash_id] ??
+                   false)) {
                 $total_for_type_view
-                    = $type_views_eblan_mazaretto[$medic->type_view.$medic->driver->hash_id]
+                    = $type_views_eblan_mazaretto[$medic->type_view.$medic->type_anketa.$medic->driver->hash_id]
                     = $medics->where(
                     'type_view', $medic->type_view
                 )->where('driver_id', $medic->driver->hash_id)->count();
             }
 
+            $total_for_type_view = $type_views_eblan_mazaretto[$medic->type_view.$medic->type_anketa
+                                                               .$medic->driver->hash_id];
+
+            if ($medic->is_dop && $medic->result_dop == null) {
+                $result[$medic->driver->hash_id]['types']['is_dop']['total'] =
+                    ($result[$medic->driver->hash_id]['types']['is_dop']['total'] ?? 0) + 1;
+            }
+
+            if ($medic->type_anketa == 'medic') {
+                if ($result[$medic->driver->hash_id]['types'][$medic->type_view]['total'] ?? false) {
+                    $result[$medic->driver->hash_id]['types'][$medic->type_view]['total'] += 1;
+                } else {
+                    $result[$medic->driver->hash_id]['types'][$medic->type_view]['total'] = 1;
+                }
+            } else {
+                if ($result[$medic->driver->hash_id]['types'][$medic->type_anketa]['total'] ?? false) {
+                    $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['total'] += 1;
+                } else {
+                    $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['total'] = 1;
+                }
+            }
             $result[$medic->driver->hash_id]['driver_fio'] = $medic->driver->fio;
             if ( !($result[$medic->driver->hash_id]['pv_id'] ?? false)) {
                 $result[$medic->driver->hash_id]['pv_id'] = $medics
@@ -235,12 +261,6 @@ class ReportControllerContract extends Controller
                     ->implode('; ');
             }
 
-            if ($result[$medic->driver->hash_id]['types'][$medic->type_view]['total'] ?? false) {
-                $result[$medic->driver->hash_id]['types'][$medic->type_view]['total'] += 1;
-            } else {
-                $result[$medic->driver->hash_id]['types'][$medic->type_view]['total'] = 1;
-            }
-
 
             if ($medic->driver->id) {
                 if ($medic->driver->contracts->isNotEmpty()) {
@@ -248,11 +268,13 @@ class ReportControllerContract extends Controller
                         ->contracts->whereIn('id', $this->contracts_ids)
                                    ->where(
                                        'date_of_end', '>',
-                                       ($medic->date ?? Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+                                       ($medic->date ??
+                                        Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
                                    )
                                    ->where(
                                        'date_of_start', '<',
-                                       ($medic->date ?? Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+                                       ($medic->date ??
+                                        Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
                                    )
                                    ->first()) {
 
@@ -282,10 +304,17 @@ class ReportControllerContract extends Controller
             }
 
 
+//            if ($medic->type_anketa == 'pechat_pl'){
+//                dd(
+//                    $medic->driver->id,
+//                    $medic->toArray(),
+//                    $services->pluck('type_anketa')->toArray()
+//                );
+//            }
             foreach ($services as $service) {
                 $service->price = $service->pivot->service_cost;
 
-                if($medic->type_anketa !== $service->type_anketa){
+                if ($medic->type_anketa !== $service->type_anketa) {
                     continue;
                 }
 
@@ -294,21 +323,35 @@ class ReportControllerContract extends Controller
                     foreach ($discountsForTech as $discount) {
                         $disSum = $discount->getDiscount($total_for_type_view);
                         if ($disSum) {
-                            $service->price                                                          = $service->pivot->service_cost
-                                                                                                       - ($service->pivot->service_cost
-                                                                                                          * $disSum
-                                                                                                          / 100);
+                            $service->price = $service->pivot->service_cost
+                                              - ($service->pivot->service_cost
+                                                 * $disSum
+                                                 / 100);
+
                             $result[$medic->driver->hash_id]['types'][$medic->type_view]['discount'] = 1 * $disSum;
                         }
                     }
                 }
-                $result[$medic->driver->hash_id]['types'][$medic->type_view]['sync'] = in_array($service->id,
-                    explode(',', $company->products_id));
+                if($medic->type_anketa == 'medic'){
+                    $result[$medic->driver->hash_id]['types'][$medic->type_view]['sync'] = in_array($service->id,
+                        explode(',', $company->products_id));
+                }else{
+                    $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['sync'] = in_array($service->id,
+                        explode(',', $company->products_id));
+                }
 
                 $vt           = $service->type_view;
                 $type_explode = explode('/', $medic->type_view);
 
-                if($medic->type_anketa == 'medic'){
+                if ($medic->type_anketa == 'medic') {
+//                    if($medic->driver->hash_id){
+
+//                        dump(
+//                            $medic->id,
+//                            $medic->type_view,
+//                            $medic->driver->hash_id
+//                        );
+//                    }
                     foreach ($type_explode as $mini_type) {
                         if (strpos($vt, $mini_type) !== false) {
                             if ($service->type_product === 'Разовые осмотры') {
@@ -319,12 +362,13 @@ class ReportControllerContract extends Controller
                             }
                         }
                     }
-                }else{
-                    $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['sync'] =
-                        in_array($service->id, explode(',', $company->products_id));
+                } else {
+                    $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['sync']
+                        = in_array($service->id, explode(',', $company->products_id));
 
                     if ($service->type_product === 'Разовые осмотры') {
-                        $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['sum'] = $service->price * $total_for_type_view;
+                        $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['sum'] = $service->price
+                                                                                                * $total_for_type_view;
                     } else {
                         $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['sum'] = $service->price;
                     }
@@ -410,11 +454,13 @@ class ReportControllerContract extends Controller
                         ->contracts->whereIn('id', $this->contracts_ids)
                                    ->where(
                                        'date_of_end', '>',
-                                       ($tech->date ?? Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
+                                       ($tech->date ??
+                                        Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
                                    )
                                    ->where(
                                        'date_of_start', '<',
-                                       ($tech->date ?? Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
+                                       ($tech->date ??
+                                        Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
                                    )
                                    ->first()) {
 
@@ -443,7 +489,7 @@ class ReportControllerContract extends Controller
                 }
             }
             foreach ($services as $service) {
-                if($tech->type_anketa !== $service->type_anketa){
+                if ($tech->type_anketa !== $service->type_anketa) {
                     continue;
                 }
 
@@ -598,11 +644,13 @@ class ReportControllerContract extends Controller
                         ->contracts->whereIn('id', $this->contracts_ids)
                                    ->where(
                                        'date_of_end', '<',
-                                       ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                       ($report->date ??
+                                        Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                    )
                                    ->where(
                                        'date_of_start', '>',
-                                       ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                       ($report->date ??
+                                        Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                    )
                                    ->first()) {
 
@@ -618,11 +666,13 @@ class ReportControllerContract extends Controller
                     ->contracts->whereIn('id', $this->contracts_ids)
                                ->where(
                                    'date_of_end', '<',
-                                   ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                   ($report->date ??
+                                    Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                )
                                ->where(
                                    'date_of_start', '>',
-                                   ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                   ($report->date ??
+                                    Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                )
                                ->first()) {
                     $services = $services->services;
@@ -636,7 +686,7 @@ class ReportControllerContract extends Controller
 
             if ($services->count() > 0) {
                 foreach ($services as $service) {
-                    if($report->type_anketa !== $service->type_anketa){
+                    if ($report->type_anketa !== $service->type_anketa) {
                         continue;
                     }
 
@@ -811,11 +861,13 @@ class ReportControllerContract extends Controller
                         ->contracts->whereIn('id', $this->contracts_ids)
                                    ->where(
                                        'date_of_end', '>',
-                                       ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                       ($report->date ??
+                                        Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                    )
                                    ->where(
                                        'date_of_start', '<',
-                                       ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                       ($report->date ??
+                                        Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                    )
                                    ->first()) {
 
@@ -831,11 +883,13 @@ class ReportControllerContract extends Controller
                     ->contracts->whereIn('id', $this->contracts_ids)
                                ->where(
                                    'date_of_end', '>',
-                                   ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                   ($report->date ??
+                                    Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                )
                                ->where(
                                    'date_of_start', '<',
-                                   ($report->date ?? Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                   ($report->date ??
+                                    Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                )
                                ->first()) {
                     $services = $services->services;
@@ -868,7 +922,7 @@ class ReportControllerContract extends Controller
 
             if ($services->count() > 0) {
                 foreach ($services as $service) {
-                    if($report->type_anketa !== $service->type_anketa){
+                    if ($report->type_anketa !== $service->type_anketa) {
                         continue;
                     }
 
