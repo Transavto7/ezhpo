@@ -67,7 +67,8 @@ class ContractController extends Controller
         }
         if ($filters['service_id'] ?? false) {
             $contracts->whereHas('services', function ($q) use ($filters) {
-                $q->where('services.id', $filters['service_id']);
+                // Я сам не знаю, как это работает
+                $q->where('contract_service.service_id', $filters['service_id']);
             });
         }
         if ($filters['company_id'] ?? false) {
