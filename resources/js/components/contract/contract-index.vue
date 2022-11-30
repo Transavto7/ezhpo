@@ -190,6 +190,11 @@ export default {
                     //     label:    "Главный",
                     // },
                     {
+                        key:      "date_of_start",
+                        sortable: true,
+                        label:    "Время начала договора",
+                    },
+                    {
                         key:      "date_of_end",
                         sortable: true,
                         label:    "Время окончания договора",

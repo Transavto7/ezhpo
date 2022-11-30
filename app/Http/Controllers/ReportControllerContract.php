@@ -298,6 +298,7 @@ class ReportControllerContract extends Controller
                                    ($medic->date ?  Carbon::parse($medic->date)->addDay()->format('Y-m-d') :
                                        Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
                                )
+                                ->where("main_for_company", 1)
                                ->first()) {
                     $services = $services->services;
                 } else {
@@ -513,6 +514,7 @@ class ReportControllerContract extends Controller
                                    ($tech->date ?  Carbon::parse($tech->date)->addDay()->format('Y-m-d') :
                                        Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
                                )
+                               ->where("main_for_company", 1)
                                ->first()) {
                     $services = $services->services;
                 } else {
@@ -705,6 +707,7 @@ class ReportControllerContract extends Controller
                                    ($report->date ??
                                     Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                )
+                               ->where("main_for_company", 1)
                                ->first()) {
                     $services = $services->services;
                 } else {
@@ -922,6 +925,7 @@ class ReportControllerContract extends Controller
                                    ($report->date ?  Carbon::parse($report->date)->addDay()->format('Y-m-d') :
                                        Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                )
+                               ->where("main_for_company", 1)
                                ->first()) {
                     $services = $services->services;
                 } else {

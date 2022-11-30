@@ -32,6 +32,9 @@
                     {{ row.value.name }}
                 </a>
             </template>
+            <template #cell(date_of_start)="row">
+                {{ row.value ? new Date(row.value).toLocaleDateString("ru-RU") : '' }}
+            </template>
             <template #cell(date_of_end)="row">
                 {{ row.value ? new Date(row.value).toLocaleDateString("ru-RU") : '' }}
             </template>
