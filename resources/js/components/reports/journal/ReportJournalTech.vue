@@ -89,7 +89,7 @@
                         </td>
 
                         <td class="text-center" width="150">
-                            {{ getTotalAll('is_dop') }}
+                            {{ getTotalAll(reports,'is_dop') }}
                         </td>
                     </tr>
                     </tbody>

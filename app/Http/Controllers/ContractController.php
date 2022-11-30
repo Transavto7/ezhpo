@@ -41,7 +41,7 @@ class ContractController extends Controller
         $filters['perPage']     = $filters['perPage'] ?? 15;
         $filters['currentPage'] = $filters['currentPage'] ?? 1;
 
-        if ($filters['sortBy'] == 'company.name') {
+        if ($filters['sortBy'] == 'company') {
             $contracts->leftJoin('companies', 'company_id', 'companies.id')
                       ->orderBy('companies.name',
                           ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC')

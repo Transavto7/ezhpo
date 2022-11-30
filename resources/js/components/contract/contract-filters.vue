@@ -71,7 +71,7 @@
                                 label="name"
                                 @search="searchOurCompanies"
                                 placeholder="Выберите нашу компанию"
-                                :reduce="item => item.id"
+                                :reduce="our_companies => our_companies.id"
                             >
                             </v-select>
                         </b-form-group>
