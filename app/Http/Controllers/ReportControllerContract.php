@@ -267,14 +267,14 @@ class ReportControllerContract extends Controller
                     if ($services = $medic->driver
                         ->contracts->whereIn('id', $this->contracts_ids)
                                    ->where(
-                                       'date_of_end', '>',
-                                       ($medic->date ??
-                                        Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+                                       'date_of_end', '>=',
+                                       ($medic->date ?  Carbon::parse($medic->date)->subDay()->format('Y-m-d') :
+                                           Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
                                    )
                                    ->where(
-                                       'date_of_start', '<',
-                                       ($medic->date ??
-                                        Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+                                       'date_of_start', '<=',
+                                       ($medic->date ?  Carbon::parse($medic->date)->addDay()->format('Y-m-d') :
+                                           Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
                                    )
                                    ->first()) {
 
@@ -289,12 +289,14 @@ class ReportControllerContract extends Controller
                 if ($services = $medic->company
                     ->contracts->whereIn('id', $this->contracts_ids)
                                ->where(
-                                   'date_of_end', '>',
-                                   ($medic->date ?? Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+                                   'date_of_end', '>=',
+                                   ($medic->date ?  Carbon::parse($medic->date)->subDay()->format('Y-m-d') :
+                                       Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
                                )
                                ->where(
-                                   'date_of_start', '<',
-                                   ($medic->date ?? Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+                                   'date_of_start', '<=',
+                                   ($medic->date ?  Carbon::parse($medic->date)->addDay()->format('Y-m-d') :
+                                       Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
                                )
                                ->first()) {
                     $services = $services->services;
@@ -303,6 +305,33 @@ class ReportControllerContract extends Controller
                 }
             }
 
+//            if ($medic->type_anketa == 'pechat_pl') {
+//                if ($medic->driver->hash_id == 139794) {
+//
+//                    dd(
+//                        $medic->id,
+//                        $medic->type_view,
+//                        $medic->driver->hash_id,
+//                        $medic->driver->contracts->whereIn('id', $this->contracts_ids)
+//                                                 ->where(
+//                                                     'date_of_end', '>=',
+//                                                     ($medic->date ?  Carbon::parse($medic->date)->subDay()->format('Y-m-d') :
+//                                                      Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+//                                                 )
+//                                                 ->where(
+//                                                     'date_of_start', '<=',
+//                                                     ($medic->date ?  Carbon::parse($medic->date)->addDay()->format('Y-m-d') :
+//                                                      Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+//                                                 )
+//                       ->toArray(),
+//                        $services->toArray(),
+//                        $medic->driver->contracts->toArray(),
+//                        $medic->date,
+//                        ($medic->date ?  Carbon::parse($medic->date)->subDay()->format('Y-m-d') :
+//                            Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+//                    );
+//                }
+//            }
 
 //            if ($medic->type_anketa == 'pechat_pl'){
 //                dd(
@@ -375,7 +404,7 @@ class ReportControllerContract extends Controller
                 }
             }
         }
-
+//dd($result);
         return $result;
     }
 
@@ -454,13 +483,13 @@ class ReportControllerContract extends Controller
                         ->contracts->whereIn('id', $this->contracts_ids)
                                    ->where(
                                        'date_of_end', '>',
-                                       ($tech->date ??
-                                        Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
+                                       ($tech->date ?  Carbon::parse($tech->date)->subDay()->format('Y-m-d') :
+                                           Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
                                    )
                                    ->where(
                                        'date_of_start', '<',
-                                       ($tech->date ??
-                                        Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
+                                       ($tech->date ?  Carbon::parse($tech->date)->addDay()->format('Y-m-d') :
+                                           Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
                                    )
                                    ->first()) {
 
@@ -476,11 +505,13 @@ class ReportControllerContract extends Controller
                     ->contracts->whereIn('id', $this->contracts_ids)
                                ->where(
                                    'date_of_end', '>',
-                                   ($tech->date ?? Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
+                                   ($tech->date ?  Carbon::parse($tech->date)->subDay()->format('Y-m-d') :
+                                       Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
                                )
                                ->where(
                                    'date_of_start', '<',
-                                   ($tech->date ?? Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
+                                   ($tech->date ?  Carbon::parse($tech->date)->addDay()->format('Y-m-d') :
+                                       Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
                                )
                                ->first()) {
                     $services = $services->services;
@@ -644,13 +675,13 @@ class ReportControllerContract extends Controller
                         ->contracts->whereIn('id', $this->contracts_ids)
                                    ->where(
                                        'date_of_end', '<',
-                                       ($report->date ??
-                                        Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                       ($report->date ?  Carbon::parse($report->date)->subDay()->format('Y-m-d') :
+                                           Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                    )
                                    ->where(
                                        'date_of_start', '>',
-                                       ($report->date ??
-                                        Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                       ($report->date ?  Carbon::parse($report->date)->addDay()->format('Y-m-d') :
+                                           Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                    )
                                    ->first()) {
 
@@ -861,13 +892,13 @@ class ReportControllerContract extends Controller
                         ->contracts->whereIn('id', $this->contracts_ids)
                                    ->where(
                                        'date_of_end', '>',
-                                       ($report->date ??
-                                        Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                       ($report->date ?  Carbon::parse($report->date)->subDay()->format('Y-m-d') :
+                                           Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                    )
                                    ->where(
                                        'date_of_start', '<',
-                                       ($report->date ??
-                                        Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                       ($report->date ?  Carbon::parse($report->date)->addDay()->format('Y-m-d') :
+                                           Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                    )
                                    ->first()) {
 
@@ -883,13 +914,13 @@ class ReportControllerContract extends Controller
                     ->contracts->whereIn('id', $this->contracts_ids)
                                ->where(
                                    'date_of_end', '>',
-                                   ($report->date ??
-                                    Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                   ($report->date ?  Carbon::parse($report->date)->subDay()->format('Y-m-d') :
+                                       Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                )
                                ->where(
                                    'date_of_start', '<',
-                                   ($report->date ??
-                                    Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                                   ($report->date ?  Carbon::parse($report->date)->addDay()->format('Y-m-d') :
+                                       Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
                                )
                                ->first()) {
                     $services = $services->services;

@@ -43,14 +43,17 @@ class ContractController extends Controller
 
         if ($filters['sortBy'] == 'company.name') {
             $contracts->leftJoin('companies', 'company_id', 'companies.id')
-                      ->orderBy('companies.name', ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC')
+                      ->orderBy('companies.name',
+                          ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC')
                       ->select('contracts.*');
         } elseif ($filters['sortBy'] == 'our_company.name') {
             $contracts->leftJoin('reqs', 'our_company_id', 'reqs.id')
-                      ->orderBy('reqs.name', ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC')
+                      ->orderBy('reqs.name',
+                          ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC')
                       ->select('contracts.*');
         } else {
-            $contracts->orderBy($filters['sortBy'], ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC');
+            $contracts->orderBy($filters['sortBy'],
+                ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC');
         }
 
         if ($filters['trash'] ?? false) {
@@ -128,20 +131,20 @@ class ContractController extends Controller
                 $date_of_start,
                 $date_of_end,
             ])
-                                ->whereNotBetween(
-                                    'date_of_end', [
-                                    $date_of_start,
-                                    $date_of_end,
-                                ])
-                                ->where('main_for_company', 1)
-                                ->whereCompanyId($company_id)
-                                ->first();
-            if($contractQWE){
+                                   ->whereNotBetween(
+                                       'date_of_end', [
+                                       $date_of_start,
+                                       $date_of_end,
+                                   ])
+                                   ->where('main_for_company', 1)
+                                   ->whereCompanyId($company_id)
+                                   ->first();
+            if ($contractQWE) {
                 return response([
-                    'status' => false,
+                    'status'  => false,
                     'message' => [
-                        'Не возможно установить главный договор, так как на данный интервал у данной компании есть главный договор'
-                    ]
+                        'Не возможно установить главный договор, так как на данный интервал у данной компании есть главный договор',
+                    ],
                 ]);
             }
         }
@@ -237,18 +240,18 @@ class ContractController extends Controller
                 $date_of_start,
                 $date_of_end,
             ])
-                                ->whereNotBetween(
-                                    'date_of_end', [
-                                    $date_of_start,
-                                    $date_of_end,
-                                ])
-                                ->where('main_for_company', 1)
-                                ->whereCompanyId($company_id)
-                                ->first();
-            if($contractQWE){
+                                   ->whereNotBetween(
+                                       'date_of_end', [
+                                       $date_of_start,
+                                       $date_of_end,
+                                   ])
+                                   ->where('main_for_company', 1)
+                                   ->whereCompanyId($company_id)
+                                   ->first();
+            if ($contractQWE) {
                 return response([
-                    'status' => false,
-                    'message' => 'Не возможно установить главный договор, так как на данный интервал у данной компании есть главный договор'
+                    'status'  => false,
+                    'message' => 'Не возможно установить главный договор, так как на данный интервал у данной компании есть главный договор',
                 ]);
             }
         }
