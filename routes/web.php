@@ -1,7 +1,13 @@
 <?php
 
+use App\Car;
+use App\Company;
+use App\Driver;
 use App\Http\Controllers\ContractController;
+use App\Models\Contract;
+use App\Models\Service;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -39,6 +45,14 @@ Route::get('/show-edit-element-modal/{model}/{id}', 'IndexController@ShowEditMod
 /**
  * API-маршруты
  */
+
+
+//dd(
+//    \App\Anketa::query()->selectRaw('count(id) as count')
+//);
+
+
+
 
 // Сброс пункта выпуска
 Route::get('/api/pv-reset/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', 'ApiController@ResetAllPV')->name('api.resetpv');
@@ -87,7 +101,6 @@ Route::prefix('snippet')->group(function () {
     });
 });
 
-
 Route::middleware(['auth'])->group(function () {
 
 
@@ -116,6 +129,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}', 'ContractController@destroy');
 
         Route::get('/getTypes', 'ContractController@getTypes');
+
+
+        Route::post('/getCarsByCompany/{id}', 'ContractController@getCarsByCompany');
+        Route::post('/getDriversByCompany/{id}', 'ContractController@getDriversByCompany');
 
         Route::post('/getAvailableForCompany', 'ContractController@getAvailableForCompany');
     });
@@ -201,7 +218,9 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
     Route::get('/elements/{type}', 'IndexController@RenderElements')->name('renderElements');
 });
 
-
+//dd(
+//    Driver::wherHashId(206055)->fist
+//);
 /**
  * Элементы CRM
  */
@@ -234,8 +253,9 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
     });
 
     Route::prefix('report')->group(function () {
-        Route::get('journal_contract', 'ReportController@ShowJournalContract')->name('report.journal');
+        Route::get('journal_contract', 'ReportController@ShowJournalContract')->name('report.journal_contract');
 //        Route::get('journal_contract', 'ReportController@ShowJournalContract')->name('company_service');
+        Route::get('journal', 'ReportController@ShowJournal')->name('report.journal');
         Route::get('journal',[
             \App\Http\Controllers\Reports\CompanyServicesRefactoring::class, 'index'
             ])->name('report.company_service');

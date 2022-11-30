@@ -4,99 +4,119 @@
         <contract-filters
             v-on:change_filters="changeFilters"
             ref="contractFilters"
-            :trash="trash"
+            :trash="filters.trash"
+            :permissions="permissions"
             v-on:create_new="showCreateModal"
             v-on:view_trash_toggle="toggleTrash"
         >
         </contract-filters>
 
-        <!-- table -->
-        <contract-table
-            :table="table"
-            :busy="busy"
-            :trash="trash"
-            v-on:change_sort="changeSort"
-            ref="contractTable"
-            v-on:update_data="showCreateModal"
-            v-on:success="loadData"
-        >
-        </contract-table>
 
-        <!-- paginator/ -->
-        <b-row class="w-100 d-flex justify-content-center" v-if="total > 1">
-<!--            <b-col class="my-1 d-flex justify-content-center">-->
-            <b-col class="my-1">
-                <b-form-group
-                    label="Выберите страницу:"
-                    label-for="paginate_filters"
-                    label-cols-sm="6"
-                    label-cols-md="4"
-                    label-cols-lg="3"
-                    label-align-sm="right"
-                    content-cols="4"
-                    label-size="sm"
-                    class="mb-0"
-                >
-                    <b-pagination
-                        id="paginate_filters"
-                        :total-rows="total"
-                        :per-page="filters.perPage"
-                        v-model="filters.currentPage"
-                        class="my-0 mx-2"
-                        @change="selectPage"
-                    />
-                </b-form-group>
-            </b-col>
-        </b-row>
+        <div class="card">
 
-        <!-- perPage -->
-        <b-row>
-            <b-col class="my-1">
-                <b-form-group
-                    label="Количество элементов на странице:"
-                    label-for="per-page-select"
-                    label-cols-sm="6"
-                    label-cols-md="4"
-                    label-cols-lg="3"
-                    label-align-sm="right"
-                    content-cols="4"
-                    label-size="sm"
-                    class="mb-0"
+            <div class="card-body pt-0">
+                <!-- table -->
+                <contract-table
+                    v-show="permissions.read"
+                    :table="table"
+                    :busy="busy"
+                    :trash="filters.trash"
+                    :permissions="permissions"
+                    v-on:change_sort="changeSort"
+                    ref="contractTable"
+                    v-on:update_data="showCreateModal"
+                    v-on:clone_data="showCloneModal"
+                    v-on:success="loadData"
                 >
-                    <b-form-select
-                        id="per-page-select"
-                        v-model="filters.perPage"
-                        :options="pageOptions"
-                        label-cols="4"
-                        size="sm"
-                        @change="selectPerPage"
-                    ></b-form-select>
-                </b-form-group>
-            </b-col>
-        </b-row>
+                </contract-table>
+
+                <!-- paginator/ -->
+                <b-row
+                    class="w-100 d-flex justify-content-start" v-if="total > 1 && permissions.read">
+                    <!--            <b-col class="my-1 d-flex justify-content-center">-->
+                    <b-col class="my-1 d-flex justify-content-start">
+                        <b-form-group
+                            label-size="sm"
+                            class="mb-0"
+                        >
+                            <b-pagination
+                                id="paginate_filters"
+                                :total-rows="total"
+                                :per-page="nikita_yeban"
+                                v-model="filters.currentPage"
+
+                                class="my-0"
+                                @change="selectPage"
+                            />
+                        </b-form-group>
+                    </b-col>
+                </b-row>
+                <!-- perPage -->
+                <b-row
+                    v-if="permissions.read"
+                >
+
+                    <b-col md="2" class="my-1">
+                        <select v-model="nikita_yeban">
+                            <option value="20">20</option>
+                            <option value="500">500</option>
+                            <option value="1500">1500</option>
+                            <option value="2000">2000</option>
+                            <option value="2500">2500</option>
+                        </select>
+<!--                        <select-->
+<!--                            name=""-->
+
+<!--                            id="per-page-select"-->
+<!--                            v-model="filters.perPage"-->
+<!--                            :options="pageOptions"-->
+<!--                            size="sm"-->
+<!--                            @change="selectPerPage"-->
+<!--                        >-->
+
+<!--                        </select>-->
+<!--                        <b-form-group>-->
+<!--                            -->
+<!--                            <b-form-select-->
+<!--                                id="per-page-select"-->
+<!--                                v-model="filters.perPage"-->
+<!--                                :options="pageOptions"-->
+<!--                                size="sm"-->
+<!--                                @change="selectPerPage"-->
+<!--                            ></b-form-select>-->
+<!--                        </b-form-group>-->
+                    </b-col>
+                </b-row>
+                <p class="text-success">Найдено записей: <b>{{ total }}</b></p>
+            </div>
+        </div>
+
 
         <!-- totalRow -->
-        <b-row class="mb-3">
-            <b-col class="my-1">
-                <b-form-group
-                    label-class="font-weight-bold pt-0"
-                    class="mb-0"
-                    disabled
-                >
-                    <b-form-group
-                        label="Всего записей:"
-                        label-for="nested-street"
-                        label-cols="4"
-                        label-cols-sm="3"
-                        content-cols="4"
-                        label-align-sm="right"
-                    >
-                        <b-form-input id="nested-street" v-model="total"></b-form-input>
-                    </b-form-group>
-                </b-form-group>
+        <!--        <b-row class="mb-3"-->
+        <!--               v-show="permissions.read"-->
+        <!--        >-->
+        <!--            <b-col class="my-1 ">-->
+        <!--                <p class="text-success">Найдено записей: <b>{{ total }}</b></p>-->
+        <!--&lt;!&ndash;                <b-form-group&ndash;&gt;-->
+        <!--&lt;!&ndash;                    label-class="font-weight-bold pt-0"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    class="mb-0"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    disabled&ndash;&gt;-->
+        <!--&lt;!&ndash;                >&ndash;&gt;-->
+        <!--&lt;!&ndash;                    <b-form-group&ndash;&gt;-->
+        <!--&lt;!&ndash;                        label="Всего записей:"&ndash;&gt;-->
+        <!--&lt;!&ndash;                        label-for="nested-street"&ndash;&gt;-->
+        <!--&lt;!&ndash;                        label-cols="4"&ndash;&gt;-->
+        <!--&lt;!&ndash;                        label-cols-sm="3"&ndash;&gt;-->
+        <!--&lt;!&ndash;                        content-cols="4"&ndash;&gt;-->
+        <!--&lt;!&ndash;                        label-align-sm="right"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    >&ndash;&gt;-->
+        <!--&lt;!&ndash;                        <b-form-input id="nested-street" v-model="total"></b-form-input>&ndash;&gt;-->
+        <!--&lt;!&ndash;                    </b-form-group>&ndash;&gt;-->
+        <!--&lt;!&ndash;                </b-form-group>&ndash;&gt;-->
 
-            </b-col>
-        </b-row>
+        <!--            </b-col>-->
+        <!--        </b-row>-->
 
 
         <!-- create/update contracts -->
@@ -112,6 +132,7 @@
 import Swal2 from "sweetalert2";
 import ContractCreate from "./contract-create";
 import ContractFilters from "./contract-filters";
+import {getParams, addParams} from "../const/params";
 
 export default {
     name:       "contract-index",
@@ -120,9 +141,10 @@ export default {
         ContractCreate,
         ContractFilters,
     },
+    props:      ['permissions'],
     data() {
         return {
-            trash: 0,
+            // trash: 0,
 
             busy: false,
             user: null,
@@ -145,7 +167,7 @@ export default {
                         label: "Услуги",
                     },
                     {
-                        key:      "company.name",
+                        key:      "company",
                         sortable: true,
                         label:    "Компания",
                     },
@@ -168,6 +190,11 @@ export default {
                     //     label:    "Главный",
                     // },
                     {
+                        key:      "date_of_start",
+                        sortable: true,
+                        label:    "Время начала договора",
+                    },
+                    {
                         key:      "date_of_end",
                         sortable: true,
                         label:    "Время окончания договора",
@@ -184,35 +211,48 @@ export default {
                 sortBy:      'id',
                 sortDesc:    true,
                 currentPage: 1,
-                perPage:     15,
+                // perPage:     500,
+                trash:       0,
             },
             total:       0,
-            pageOptions: [15, 100, 500],
+            nikita_yeban: 20,
+            // pageOptions: [15, 100, 500], // da mne pohui
         }
     },
     mounted() {
+        let getData = getParams()
+        for (let param in getData) {
+            if (!isNaN(getData[param])) {
+                this.filters[param] = Number(getData[param]);
+            } else {
+                this.filters[param] = getData[param];
+            }
+        }
+        this.$refs.contractFilters.setFilters(this.filters)
+
+
         this.loadData()
     },
     methods: {
         toggleTrash() {
-            this.trash = this.trash ? 0 : 1;
+            this.filters.trash = this.filters.trash ? 0 : 1;
             this.loadData();
         },
         selectPage(page = 1) {
             this.filters.currentPage = page;
             this.loadData();
         },
-        selectPerPage(perPage = 15) {
-            this.filters.perPage = perPage;
-            this.loadData();
-        },
+        // selectPerPage(perPage = 15) {
+        //     this.filters.perPage = perPage;
+        //     this.loadData();
+        // },
         changeSort(e) {
             this.filters.sortBy = e.sortBy;
             this.filters.sortDesc = e.sortDesc;
             this.loadData();
         },
         changeFilters(filters) {
-            this.filters.currentPage = 1;
+            // this.filters.currentPage = 1;
 
             for (let filter_key in filters) {
                 this.filters[filter_key] = filters[filter_key];
@@ -225,17 +265,24 @@ export default {
             this.$refs.contractCreate.open(data)
         },
 
+        showCloneModal(data = null) {
+            this.$refs.contractCreate.open(data, true)
+        },
+
         loadData() {
             this.busy = true
-            let data = {
-                params: this.filters,
-            };
-            data.params.trash = this.trash;
 
-            console.log(data)
+            // console.log(this.filters)
+            addParams(this.filters);
+
+            let data = {
+                params: Object.assign({}, this.filters),
+            };
+            data.params.nikita_yeban = this.nikita_yeban;
+
             axios.get("/contract/index", data)
                 .then(({data}) => {
-                    console.log(data)
+
                     if (data.status) {
                         this.table.items = data.result.contracts
                         this.total = data.result.total;

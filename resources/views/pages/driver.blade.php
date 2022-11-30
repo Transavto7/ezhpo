@@ -52,7 +52,7 @@
                             </a>
                         </div>
                         <div class="col my-2">
-                            <a class="text-decoration-none" style="width: 100%" target="_blank" href="https://transavto7.ru/contacts">
+                            <a class="text-decoration-none" style="width: 100%" target="_blank" href="https://yandex.by/maps/?from=mapframe&ll=43.662012%2C51.791297&mode=usermaps&source=mapframe&um=constructor%3A27f0bd72aff1be7aff79d70a3f1eab80fb8e07e4733db1dd9569d30a425f6d1b&utm_source=share&z=5">
                                 <div class="menu_link_driver">
                                     Карта пунктов выпуска Трансавто-7
                                 </div>

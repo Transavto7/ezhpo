@@ -27,11 +27,30 @@ class Car extends Model
                     ->withDefault();
     }
 
-    public function contract()
+//    public function contracts()
+//    {
+//        return $this->hasMany(
+//            Contract::class,
+//            'company_id',
+//            'id'
+//        );
+//    }
+
+    public function contracts()
     {
-        return $this->belongsTo(Contract::class, 'contract_id', 'id')
-                    ->withDefault();
+        return $this->belongsToMany(
+            Contract::class,
+            'car_contact_pivot',
+            'car_id',
+            'contract_id'
+        );
     }
+
+//    public function contract()
+//    {
+//        return $this->belongsTo(Contract::class, 'contract_id', 'id')
+//                    ->withDefault();
+//    }
     // sorry for name
     public function company()
     {

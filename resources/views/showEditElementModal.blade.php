@@ -19,7 +19,7 @@
                 @if($k == 'where_call' && !user()->access('companies_access_field_where_call'))
                     @continue
                 @endif
-                @if($k === 'note' && $model === 'Company')
+                @if(($k === 'note') && $model === 'Company')
                         <div class="form-group" data-field="comment">
                             <label>
                                 {{ $v['label'] }}
@@ -29,6 +29,19 @@
                                    data-label="{{ $v['label'] }}"
                                    placeholder="{{ $v['label'] }}"
                                    data-field="Company_note" class="form-control">{{ $el[$k] ?? '' }}</textarea>
+                        </div>
+                    @continue
+                @endif
+                @if(( $k === 'comment') && $model === 'Company')
+                        <div class="form-group" data-field="comment">
+                            <label>
+                                {{ $v['label'] }}
+                            </label>
+                            <textarea
+                                   name="comment"
+                                   data-label="{{ $v['label'] }}"
+                                   placeholder="{{ $v['label'] }}"
+                                   data-field="Company_comment" class="form-control">{{ $el[$k] ?? '' }}</textarea>
                         </div>
                     @continue
                 @endif
@@ -60,30 +73,30 @@
                     @php
                         $contractCollect = collect($el->contracts);
                     @endphp
-                    <div data-field="contracts" class="form-group">
-                        <label>Договор</label>
-                        <select name="contracts[]"
-                                data-label="Договоры"
-                                class="js-chosen"
-                                style="display: none;"
-                                multiple="multiple"
-                        >
+{{--                    <div data-field="contracts" class="form-group">--}}
+{{--                        <label>Договор</label>--}}
+{{--                        <select name="contracts[]"--}}
+{{--                                data-label="Договоры"--}}
+{{--                                class="js-chosen"--}}
+{{--                                style="display: none;"--}}
+{{--                                multiple="multiple"--}}
+{{--                        >--}}
 {{--                            <option value=""  @if(!$contractCollect->count()) selected @endif>Не установлено</option>--}}
-                            @foreach(\App\Models\Contract::whereNull('company_id')->orWhere('company_id', $el->id)->get(['id', 'name']) as $contract)
-                                <option value="{{ $contract->id }}"
-                                        @if ($contractCollect->where('id', $contract->id)->first()) selected @endif>
-                                    {{ $contract->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+{{--                            @foreach(\App\Models\Contract::whereNull('company_id')->orWhere('company_id', $el->id)->get(['id', 'name']) as $contract)--}}
+{{--                                <option value="{{ $contract->id }}"--}}
+{{--                                        @if ($contractCollect->where('id', $contract->id)->first()) selected @endif>--}}
+{{--                                    {{ $contract->name }}--}}
+{{--                                </option>--}}
+{{--                            @endforeach--}}
+{{--                        </select>--}}
+{{--                    </div>--}}
                         <div class="">
                             <ul class="list-group">
                                 @foreach($el->contracts as $contract)
-                                <li class="list-group-item"><b>{{ $contract->name }}</b>
+                                <li style="padding: 0;" class=" text-small list-group-item list-group-item-action list-group-item-success"><b>{{ $contract->name }}</b>
                                     @foreach($contract->services as $new_service)
                                         <ul class="list-group">
-                                            <li class="list-group-item">{{ $new_service->name }}</li>
+                                            <li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">{{ $new_service->name }}</li>
                                         </ul>
                                     @endforeach
                                 </li>
@@ -92,38 +105,61 @@
                         </div>
                     @continue
                 @endif
-                @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
+                @if($k == 'contract_id' && (
+                        $model == 'Driver'
+                        ||
+                        $model == 'Car'))
                         @php
                             $contractCollect = \App\Models\Contract::where('company_id', $el->company_id)->get(['id', 'name']);
+//                            $class = ''
+if($model === 'Car'){
+                                $contractForFuckingDriverORCAR = \App\Car::with('contracts')->find($el->id);
+
+}
+if($model === 'Driver'){
+                                $contractForFuckingDriverORCAR = \App\Driver::with('contracts')->find($el->id);
+
+}
                         @endphp
+                    @if(
+                           ( $model == 'Driver' && user()->access('contract_edit_driver'))
+                        ||
+                        ($model == 'Car' && user()->access('contract_edit_car'))
+                        )
                     <div data-field="contract" class="form-group">
                         <label>Договор</label>
-                        <select name="contract_id"
-                                class="form-control"
+                        <select name="contract_ids[]"
                                 data-label="Договор"
                                 id="select_for_contract_driver_car"
+                                class="js-chosen"
+                                style="display: none;"
+                                multiple="multiple"
                         >
-                            <option value="" @if(!$el->contract_id) selected @endif>Не установлено</option>
+{{--                            <option value="" @if(!$el->contract_id) selected @endif>Не установлено</option>--}}
                             @foreach($contractCollect as $contract)
                                 <option value="{{ $contract->id }}"
-                                        @if ($contract->id == $el->contract_id) selected @endif>
+                                        @if($contractForFuckingDriverORCAR->contracts->where('id', $contract->id)->first()) selected @endif
+                                >
                                     {{ $contract->name }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="">
-                        <ul class="list-group">
-                            <li class="list-group-item"><b>{{ $el->contract->name }}</b>
-                            @foreach($el->contract->services as $new_service)
-                                <ul class="list-group">
-                                        <li class="list-group-item">{{ $new_service->name }}</li>
-                                    </ul>
+                    @endif
+                        <div class="">
+                            <ul class="list-group">
+                                @foreach($el->contracts as $contract)
+                                    <li style="padding: 0;" class=" text-small list-group-item list-group-item-action list-group-item-success"><b>{{ $contract->name }}</b>
+                                        @foreach($contract->services as $new_service)
+                                            <ul class="list-group">
+                                                <li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">{{ $new_service->name }}</li>
+                                            </ul>
+                                        @endforeach
+                                    </li>
                                 @endforeach
-                            </li>
-                        </ul>
-                    </div>
-                    @continue
+                            </ul>
+                        </div>
+                    @continue`
                 @endif
 
                 @if($k !== 'id' && !isset($v['hidden']))

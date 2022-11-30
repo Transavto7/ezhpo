@@ -25,15 +25,24 @@
                     </div>
                     <div class="form-group col-lg-3">
                         <label class="mb-1" for="contract">Договор</label>
-                        <v-select
+                        <multiselect
+                            :multiple="true"
                             v-model="contracts"
                             :options="contracts_options"
-                            key="id"
+                            :close-on-select="false"
+                            :clear-on-select="false"
+                            :preserve-search="true"
+                            placeholder="Выберите договор"
                             label="name"
-                            multiple
-                            class="is-invalid"
+                            track-by="name"
+                            :preselect-first="true"
+                            selectLabel="Enter чтобы выбрать"
+                            deselectLabel="Enter чтобы отменить"
+                            selectedLabel="Выбрано"
                         >
-                        </v-select>
+<!--                            <span slot="noResult">По договорам компании осмотров не проводилось</span>-->
+                            <span slot="noOptions">По договорам компании осмотров не проводилось</span>
+                        </multiselect>
                     </div>
                     <div class="form-group col-lg-2">
                         <label class="mb-1" for="date_from">Период:</label>
@@ -169,7 +178,6 @@ export default {
             let res = 0;
             // hyli mne pohui, structura dannih by ElliHui
             for (let type_report in contract){
-                console.log(type_report)
                 if(type_report == 'techs' || type_report == 'medics'){
                     for (let human_id in contract[type_report]){
                         for (let type in contract[type_report][human_id].types){
@@ -178,6 +186,8 @@ export default {
                             }
                         }
                     }
+                    // console.log(type_report)
+                    // console.log(res)
                     continue;
                 }
                 if(type_report == 'medics_other' || type_report == 'techs_other'){
@@ -190,6 +200,8 @@ export default {
                             }
                         }
                     }
+                    // console.log(type_report)
+                    // console.log(res)
                     continue;
                 }
 
@@ -199,11 +211,17 @@ export default {
                             for (let totall in contract[type_report][type]){
                                 res += contract[type_report][type][totall]
                             }
+                            // console.log(type)
+                            // console.log(type_report)
+                            // console.log(contract[type_report][type][totall])
                             continue;
                         }
                         // if(type == 'drivers'){
                             for (let totall in contract[type_report][type]){
                                 res += contract[type_report][type][totall].sum
+                                // console.log(type)
+                                // console.log(type_report)
+                                // console.log(contract[type_report][type][totall].sum)
                             }
                         // }
                     }
@@ -237,10 +255,12 @@ export default {
         },
         async report() {
             this.loading = true;
+            let fuckerCounterInAssMazzarettoEbletoTotalCountDickInHerAss = this.contracts.length
+            let fuckerCounterInAssMazzarettoEbleto = 0;
             for (let contract_key in this.contracts){
 
             // this.reset();
-                await axios.get('/api/reports/contract/journal', {
+                axios.get('/api/reports/contract/journal', {
                     params: {
                         company_id: this.company_id,
                         // contracts_ids: this.contracts.map((item) => item.id),
@@ -248,6 +268,7 @@ export default {
                         month: this.month
                     }
                 }).then(({ data }) => {
+                        fuckerCounterInAssMazzarettoEbleto++;
                         this.contracts[contract_key].visible_result = true;
                         this.contracts[contract_key].sum = this.getTotalContractSum(data);
 
@@ -265,12 +286,15 @@ export default {
 
                         this.$refs.reportsOther[contract_key].hide();
                         this.$refs.reportsOther[contract_key].visible(data.other);
-                        return;
+                        if(fuckerCounterInAssMazzarettoEbleto === fuckerCounterInAssMazzarettoEbletoTotalCountDickInHerAss){
+                            this.loading = false;
+
+                        }
                 }).finally(() => {
                 });
             }
 
-            this.loading = false;
+            // this.loading = false;
         },
         exportData() {
             this.loadingExport = true;

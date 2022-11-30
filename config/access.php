@@ -601,6 +601,14 @@ return [
         'description' => 'Договор - Редактирование',
     ],
     [
+        'name'       => 'contract_edit_car',
+        'description' => 'Договор - Редактирование в карточке автомобиля',
+    ],
+    [
+        'name'       => 'contract_edit_driver',
+        'description' => 'Договор - Редактирование в карточке водителя',
+    ],
+    [
         'name'       => 'contract_delete',
         'description' => 'Договор - Удаление',
     ],

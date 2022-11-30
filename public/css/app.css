@@ -14651,8 +14651,8 @@ nav.side-navbar.shrinked .sidebar-header .title {
 */
 nav.navbar {
   background: #2f333e;
-  padding-top: 15px;
-  padding-bottom: 15px;
+  padding-top: 0px;
+  padding-bottom: 0px;
   color: #fff;
   position: relative;
   border-radius: 0;
@@ -17326,6 +17326,11 @@ a > code {
   max-width: 250px;
 }
 
+@media (max-width: 400px) {
+  .card-img-top {
+    max-width: 200px;
+  }
+}
 .custom-file-label::after {
   content: "Обзор";
   cursor: pointer;
@@ -17348,6 +17353,16 @@ a > code {
 
 .card-deck .card {
   margin-bottom: 15px;
+}
+
+.form-profile-link {
+  background-color: #e9ecef;
+  width: 100%;
+  font-size: 0.8rem;
+  height: calc(1.8rem + 2px);
+  border: 1px solid #dee2e6;
+  display: flex;
+  align-items: center;
 }
 
 @media (min-width: 576px) {

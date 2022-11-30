@@ -34,7 +34,7 @@ class VSelect
                    ->orWhere('hash_id', 'like', "%$query%")
                    ->orWhere('inn', 'like', "%$query%")
                    ->selectRaw("CONCAT(name, ' [h_ID:', hash_id, '][ИНН:', COALESCE(inn, ''), ']') as name, id")
-                   ->limit(10)
+//                   ->limit(10)
                    ->get()
         );
     }

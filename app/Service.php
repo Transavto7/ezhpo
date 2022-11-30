@@ -8,8 +8,8 @@ class Service extends Model
 {
     use \Illuminate\Database\Eloquent\SoftDeletes;
 
-    protected $table = 'services';
-//    protected $table = 'products';
+//    protected $table = 'services';
+    protected $table = 'products';
 
     public $fillable = [
         'hash_id', 'name', 'type_product', 'unit', 'price_unit',

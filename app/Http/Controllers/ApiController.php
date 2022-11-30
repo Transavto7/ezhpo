@@ -149,7 +149,7 @@ class ApiController extends Controller
             if ($_model['model'] == Company::class){
                 $data = $data::with(['contracts.services']);
             }elseif($_model['model'] == Driver::class || $_model['model'] == Car::class){
-                $data = $data::with(['contract.services']);
+                $data = $data::with(['contracts.services']);
             }
 //            array_push($fields, 'id');
 
@@ -181,7 +181,9 @@ class ApiController extends Controller
                 }
             }
 
-            $data = $data->where($prop, $val)->get($fields)->first();
+            $data = $data->where($prop, $val)
+                         ->get($fields)
+                         ->first();
 
             if($data) {
                 $data_exists = $data->count() > 0;

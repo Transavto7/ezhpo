@@ -196,29 +196,28 @@ class ReportController extends Controller
                         });
                 });
 
-                if ($request->town_id) {
-                    $companies = Company::where('town_id', $request->town_id)->pluck('hash_id');
-                    $anketas = $anketas->whereIn('company_id', $companies);
-                }
-
                 if ($request->pv_id) {
                     $anketas = $anketas->where('pv_id', Point::find($request->pv_id)->name);
+                } else if ($request->town_id) {
+                    $points = Point::where('pv_id', $request->town_id)->pluck('name');
+                    $anketas = $anketas->whereIn('pv_id', $points);
                 }
+
                 $anketas = $anketas->get();
 
                 foreach($anketas->groupBy('company_id') as $company_id => $anketasByCompany) {
                     $result[$company_id]['name'] = $anketasByCompany->first()->company_name;
                     for ($i = 0; $i < 12; $i++) {
-                        $date_from = Carbon::now()->addMonths($i * -1)->firstOfMonth()->startOfDay();
-                        $date_to = Carbon::now()->addMonths($i * -1)->lastOfMonth()->startOfDay();
-                        $date = Carbon::now()->addMonths($i * -1);
+                        $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
+                        $date_to = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay();
+                        $date = Carbon::now()->subMonths($i);
 
                          $count = $anketasByCompany
                            ->whereBetween('date', [
                                 $date_from,
                                 $date_to,
                             ])->count() +
-                        $anketasByCompany->whereBetween('period_pl', [
+                        $anketasByCompany->where('date', null)->whereBetween('period_pl', [
                                 $date_from->format('Y-m'),
                                 $date_to->format('Y-m'),
                             ])->count();

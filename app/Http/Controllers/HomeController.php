@@ -15,6 +15,7 @@ use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -399,7 +400,9 @@ class HomeController extends Controller
 
         }
         $table = $orderKey === 'car_type_auto' ? '' : 'anketas.';
-
+//        dd(
+//            $anketas->toSql(), $typeAnkets
+//        );
         $anketas = ($filter_activated || $typeAnkets === 'pak_queue')
             ? $anketas->orderBy($table . $orderKey, $orderBy)->paginate($take) : [];
 

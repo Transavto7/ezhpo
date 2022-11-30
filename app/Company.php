@@ -12,10 +12,10 @@ class Company extends Model
 
     public $fillable = [
         'hash_id', 'name',
-        'note', 'comment',
+        'note', 'comment','procedure_pv',
         'user_id', 'req_id',
         'pv_id', 'town_id', 'products_id', 'where_call', 'where_call_name', 'inn',
-        'procedure_pv',
+
         'dismissed',
         'has_actived_prev_month',
         'bitrix_link',
@@ -41,6 +41,10 @@ class Company extends Model
     public function cars()
     {
         return $this->hasMany(Car::class, 'company_id', 'id');
+    }
+    public function drivers()
+    {
+        return $this->hasMany(Driver::class, 'company_id', 'id');
     }
 
     public function delete()

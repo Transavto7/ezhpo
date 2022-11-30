@@ -1,16 +1,21 @@
 <template>
-    <div class="">
+    <div class="my-2">
         <b-row>
             <b-col class="d-flex align-items-center col-lg-3">
                 <b-button class="m-1" variant="success" @click="$emit('create_new')">Создать</b-button>
-                <b-button class="m-1" variant="warning" @click="$emit('view_trash_toggle')">
+                <b-button class="m-1" variant="warning"
+                          @click="$emit('view_trash_toggle')"
+                          v-if="permissions.trash && permissions.read"
+                >
                     {{ trash ? 'Назад' : 'Корзина' }}
                     <i v-if="!trash" class="fa fa-trash"></i>
                 </b-button>
             </b-col>
         </b-row>
 
-        <div class="card" style="overflow-x: inherit">
+        <div class="card" style="overflow-x: inherit"
+             v-if="permissions.read"
+        >
             <div class="card-body">
                 <div class="row">
                     <div class="d-flex align-items-center col-lg-3">
@@ -66,7 +71,7 @@
                                 label="name"
                                 @search="searchOurCompanies"
                                 placeholder="Выберите нашу компанию"
-                                :reduce="item => item.id"
+                                :reduce="our_companies => our_companies.id"
                             >
                             </v-select>
                         </b-form-group>
@@ -138,7 +143,7 @@ import Swal2 from "sweetalert2";
 
 export default {
     name: "contract-filters",
-    props: ['trash'],
+    props: ['trash', 'permissions'],
     components: {
         vSelect,
         Swal2,
@@ -187,6 +192,11 @@ export default {
                 service_id: null,
             };
             this.$emit('change_filters', this.filters);
+        },
+        setFilters(newFilters){
+            for(let param in newFilters){
+                this.filters[param] = newFilters[param]
+            }
         },
         searchCompanies(value, loading) {
             loading(true);

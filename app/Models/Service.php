@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Service extends Model
 {
     use \Illuminate\Database\Eloquent\SoftDeletes;
-    protected $table = 'services';
+//    protected $table = 'services';
+    protected $table = 'products';
 
     protected $guarded = [];
 

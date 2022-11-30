@@ -105,14 +105,15 @@ class IndexController extends Controller
                         'label'  => 'Поле даты проверки',
                         'type'   => 'select',
                         'values' => [
-                            'date_bdd'           => 'Дата БДД (водитель)',
-                            'date_prmo'          => 'Дата ПРМО (водитель)',
-                            'date_prto'          => 'Дата ПРТО (автомобиль)',
-                            'date_report_driver' => 'Дата снятия отчета с карты водителя (водитель)',
-                            'date_techview'      => 'Дата техосмотра (автомобиль)',
-                            'time_skzi'          => 'Срок действия СКЗИ (автомобиль)',
-                            'time_card_driver'   => 'Срок действия карты водителя (водитель)',
-                            'date_osago'         => 'Дата осаго (автомобиль)',
+                            'date_bdd'            => 'Дата БДД (водитель)',
+                            'date_prmo'           => 'Дата ПРМО (водитель)',
+                            'date_prto'           => 'Дата ПРТО (автомобиль)',
+                            'date_report_driver'  => 'Дата снятия отчета с карты водителя (водитель)',
+                            'date_techview'       => 'Дата техосмотра (автомобиль)',
+                            'time_skzi'           => 'Срок действия СКЗИ (автомобиль)',
+                            'time_card_driver'    => 'Срок действия карты водителя (водитель)',
+                            'date_osago'          => 'Дата осаго (автомобиль)',
+                            'date_driver_license' => 'Срок действия водительского удостоверения (водитель)',
                         ],
                     ],
                     'days'       => ['label' => 'Кол-во дней', 'type' => 'number'],
@@ -224,7 +225,7 @@ class IndexController extends Controller
                         'values' => 'Models\Contract',
                     ],
                                         'products_id'        => [
-                                            'label'      => 'Услуги',
+                                            'label'      => 'Услуги[старые]',
                                             'multiple'   => 1,
                                             'type'       => 'select',
                                             'values'     => 'Product',
@@ -247,6 +248,11 @@ class IndexController extends Controller
                     ],
                     'date_bdd'           => ['label' => 'Дата БДД', 'type' => 'date', 'noRequired' => 1],
                     'date_prmo'          => ['label' => 'Дата ПРМО', 'type' => 'date', 'noRequired' => 1],
+                    'date_driver_license'=> [
+                        'label' => 'Срок действия водительского удостоверения',
+                        'type' => 'date',
+                        'noRequired' => 1
+                    ],
                     'date_report_driver' => [
                         'label'      => 'Дата снятия отчета с карты водителя',
                         'type'       => 'date',
@@ -314,7 +320,7 @@ class IndexController extends Controller
                     ],
 
                                         'products_id' => [
-                                            'label'      => 'Услуги',
+                                            'label'      => 'Услуги[старые]',
                                             'multiple'   => 1,
                                             'type'       => 'select',
                                             'values'     => 'Product',
@@ -394,6 +400,18 @@ class IndexController extends Controller
                     ],
                     'note'    => ['label' => 'Договоренности с клиентом', 'type' => 'text', 'noRequired' => 1],
                     'comment'    => ['label' => 'Комментарий', 'type' => 'text', 'noRequired' => 1],
+                    'procedure_pv' => [
+                        'label'        => 'Порядок выпуска',
+                        'type'         => 'select',
+                        'values'       => [
+                            'Наперед без дат'  => 'Наперед без дат',
+                            'Наперёд с датами' => 'Наперёд с датами',
+                            'Задним числом'    => 'Задним числом',
+                            'Фактовый'         => 'Фактовый',
+                        ],
+                        'defaultValue' => 'Фактовый',
+                        'noRequired'   => 1,
+                    ],
                     'user_id' => [
                         'label'      => 'Ответственный',
                         'type'       => 'select',
@@ -413,17 +431,6 @@ class IndexController extends Controller
                             ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
                         ],
                     ],
-
-                                        'products_id' => [
-                                            'label'    => 'Услуги',
-                                            'multiple' => 1,
-                                            'type'     => 'select',
-                                            'values'   => 'Product',
-                                            'syncData' => [
-                                                ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
-                                                ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
-                                            ],
-                                        ],
                     'contracts' => [
                         'label'    => 'Договор',
                         'multiple' => 1,
@@ -433,6 +440,18 @@ class IndexController extends Controller
                         //                            ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
                         //                            ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
                         //                        ],
+                    ],
+
+                    'products_id' => [
+                        'label'    => 'Услуги [старые]',
+                        'multiple' => 1,
+                        'noRequired' => 1,
+                        'type'     => 'select',
+                        'values'   => 'Product',
+                        'syncData' => [
+                            ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
+                            ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
+                        ],
                     ],
 
                     'where_call'      => [
@@ -447,22 +466,10 @@ class IndexController extends Controller
                         'noRequired' => 1,
                     ],
 
-                    'inn'          => ['label' => 'ИНН', 'type' => 'text', 'noRequired' => 1],
-                    'procedure_pv' => [
-                        'label'        => 'Порядок выпуска',
-                        'type'         => 'select',
-                        'values'       => [
-                            'Наперед без дат'  => 'Наперед без дат',
-                            'Наперёд с датами' => 'Наперёд с датами',
-                            'Задним числом'    => 'Задним числом',
-                            'Фактовый'         => 'Фактовый',
-                        ],
-                        'defaultValue' => 'Фактовый',
-                        'noRequired'   => 1,
-                    ],
+                    'inn'          => ['label' => 'ИНН', 'type' => 'text'],
 
                     'dismissed' => [
-                        'label'        => 'Черный список',
+                        'label'        => 'Временная блокировка',
                         'type'         => 'select',
                         'values'       => [
                             'Нет' => 'Нет',
@@ -1018,12 +1025,12 @@ class IndexController extends Controller
 
             $created = $model::create($data);
 
-            if ($model_type == 'Company') {
-                if ( !empty($contracts)) {
-                    Contract::whereIn('id', $contracts)
-                            ->update(['company_id' => $created->id]);
-                }
-            }
+//            if ($model_type == 'Company') {
+//                if ( !empty($contracts)) {
+//                    Contract::whereIn('id', $contracts)
+//                            ->update(['company_id' => $created->id]);
+//                }
+//            }
 
 
             if ($created) {
@@ -1040,6 +1047,15 @@ class IndexController extends Controller
                     ]);
 
                     $user->roles()->attach(6);
+                }else if($model_type === 'Car' || $model_type === 'Driver'){
+                    if($created->company_id){
+                        $contracts_ids = Contract::where('company_id', $created->company_id)
+                            ->forDate(Carbon::now())
+                            ->main()
+                            ->get(['id']);
+
+                        $created->contracts()->sync($contracts_ids->pluck('id'));
+                    }
                 }
 
                 return redirect($_SERVER['HTTP_REFERER']);
@@ -1055,10 +1071,10 @@ class IndexController extends Controller
         $model = app("App\\$model");
 
         if ($model) {
-            if($model instanceof Company){
-                Car::where('company_id', $model->id)->update(['contract_id' => null]);
-                Driver::where('company_id', $model->id)->update(['contract_id' => null]);
-            }
+//            if($model instanceof Company){
+//                Car::where('company_id', $model->id)->update(['contract_id' => null]);
+//                Driver::where('company_id', $model->id)->update(['contract_id' => null]);
+//            }
 
             if ($request->get('undo')) {
                 $model::withTrashed()->find($id)->restore();
@@ -1081,7 +1097,7 @@ class IndexController extends Controller
         $id      = $request->id;
         $company = Company::find($id);
 
-        if ( !$company->products_id) {
+        if(!$company->products_id){
             return redirect($_SERVER['HTTP_REFERER']);
         }
 
@@ -1119,9 +1135,9 @@ class IndexController extends Controller
         $id = $request->id;
 
         if($model) {
-            $data = $request->all();
+            $data         = $request->all();
             $oldDataModel = [];
-            $element = $model->find($id);
+            $element      = $model->find($id);
 
             unset($data['_token']);
 
@@ -1130,10 +1146,10 @@ class IndexController extends Controller
             }
 
             // Обновляем данные
-            if($element) {
+            if ($element) {
                 // Парсим файлы
-                foreach($request->allFiles() as $file_key => $file) {
-                    if(isset($data[$file_key]) && !isset($data[$file_key . '_base64'])) {
+                foreach ($request->allFiles() as $file_key => $file) {
+                    if (isset($data[$file_key]) && !isset($data[$file_key.'_base64'])) {
                         Storage::disk('public')->delete($element[$file_key]);
 
                         $file_path = Storage::disk('public')->putFile('elements', $file);
@@ -1146,7 +1162,7 @@ class IndexController extends Controller
                 foreach ($data as $k => $v) {
                     $oldDataModel[$k] = $element[$k];
 
-                    if ($k === 'contracts' || $k === 'contract_id') {
+                    if ($k === 'contracts' || $k === 'contract_id' || $k === 'contract_ids') {
                         continue;
                     }
 
@@ -1162,12 +1178,11 @@ class IndexController extends Controller
                             $hash = sha1(time());
                             $path = "elements/$hash.png";
 
-                        $base64_image = Storage::disk('public')->put($path, $base64_image);
+                            $base64_image = Storage::disk('public')->put($path, $base64_image);
 
-                        $element->$k = $path;
-                    }
-                        else {
-                            if(isset($v) && !$request->hasFile($k)) {
+                            $element->$k = $path;
+                        } else {
+                            if (isset($v) && !$request->hasFile($k)) {
                                 $element[$k] = $v;
                             }
                         }
@@ -1205,20 +1220,20 @@ class IndexController extends Controller
 
                 if ($model_text === 'Company') {
 
-                    if(isset($element->products_id)) {
+                    if (isset($element->products_id)) {
                         $this->syncDataFunc([
-                            'model' => 'Driver',
-                            'fieldFind' => 'company_id',
-                            'fieldFindId' => $element->id,
-                            'fieldSync' => 'products_id',
+                            'model'          => 'Driver',
+                            'fieldFind'      => 'company_id',
+                            'fieldFindId'    => $element->id,
+                            'fieldSync'      => 'products_id',
                             'fieldSyncValue' => $element->products_id
                         ]);
 
                         $this->syncDataFunc([
-                            'model' => 'Car',
-                            'fieldFind' => 'company_id',
-                            'fieldFindId' => $element->id,
-                            'fieldSync' => 'products_id',
+                            'model'          => 'Car',
+                            'fieldFind'      => 'company_id',
+                            'fieldFindId'    => $element->id,
+                            'fieldSync'      => 'products_id',
                             'fieldSyncValue' => $element->products_id
                         ]);
                     }
@@ -1228,106 +1243,117 @@ class IndexController extends Controller
             }
 
             /**
-             * Пустые поля обновляем
+             * Пустые поля обновляем (На самом деле нет)
              */
-            foreach($oldDataModel as $oldDataItemKey => $oldDataItemValue) {
-                if(!isset($data[$oldDataItemKey]) && $oldDataItemKey == 'note') {
+            foreach ($oldDataModel as $oldDataItemKey => $oldDataItemValue) {
+                if ( !isset($data[$oldDataItemKey])
+                     && ($oldDataItemKey == 'note'
+                         || $oldDataItemKey == 'document_bdd')) {
                     $element[$oldDataItemKey] = '';
                 }
             }
+        }
 
-            if ($element->save()) {
-                // company with sync
-                if ($model_text == 'Company') {
-                    Contract::where('company_id', $element->id)
-                            ->update(['company_id' => null]);
-
-                    Contract::whereIn('id', $data['contracts'] ?? [])
-                            ->update(['company_id' => $element->id]);
-
-                    if($mainContract = Contract::mainForCompany($element->id)){
-
-                        Car::where('company_id', $element->id)
-                           ->where(function ($q){
-                               $q->whereDoesntHave('contract')
-                                 ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
-                           })
-                           ->update([
-                               'contract_id' => $mainContract->id ?? null
-                           ]);
-
-                        Driver::where('company_id', $element->id)
-                              ->where(function ($q){
-                                  $q->whereDoesntHave('contract')
-                                    ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
-                              })
-                              ->update([
-                                  'contract_id' => $mainContract->id ?? null
-                              ]);
-                    }else{
-                        Car::where('company_id', $element->id)
-                           ->where(function ($q){
-                               $q->whereDoesntHave('contract')
-                                 ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
-                           })
-                           ->update([
-                               'contract_id' => null
-                           ]);
-
-                        Driver::where('company_id', $element->id)
-                              ->where(function ($q){
-                                  $q->whereDoesntHave('contract')
-                                    ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
-                              })
-                              ->update([
-                                  'contract_id' => null
-                              ]);
-                    }
-                }
-                // (driver && car) =>
-                if ($model_text == 'Driver') {
-                    if(
-                        $data['company_id'] != $element->company_id
-                        && !$data['contract_id']
-                    ){
-                        if($mainContract = Contract::mainForCompany($data['company_id'])){
-                            Driver::where('id', $element->id)->update([
-                                'contract_id' => $mainContract->id ?? null
-                            ]);
-                        }else{
-                            Driver::where('id', $element->id)->update([
-                                'contract_id' => null
-                            ]);
-                        }
-                    }else{
-                        Driver::where('id', $element->id)->update([
-                            'contract_id' => $data['contract_id'] ?? null
-                        ]);
-                    }
-                }
-                if ($model_text == 'Car') {
-                    if(
-                        $data['company_id'] != $element->company_id
-                        && !$data['contract_id']
-                    ){
-                        if($mainContract = Contract::mainForCompany($data['company_id'])){
-                            Car::where('id', $element->id)->update([
-                                'contract_id' => $mainContract->id ?? null
-                            ]);
-                        }else{
-                            Car::where('id', $element->id)->update([
-                                'contract_id' => null
-                            ]);
-                        }
-                    }else{
-                        Car::where('id', $element->id)->update([
-                            'contract_id' => $data['contract_id'] ?? null
-                        ]);
-                    }
-                }
-                return redirect($_SERVER['HTTP_REFERER']);
+        if($element->save()){
+            if($model_text == 'Driver' || $model_text == 'Car'){
+                $element->contracts()->sync($data['contract_ids'] ?? []);
             }
         }
+
+
+        return redirect($_SERVER['HTTP_REFERER']);
+//            if ($element->save()) {
+//                // company with sync
+//                if ($model_text == 'Company') {
+////                    Contract::where('company_id', $element->id)
+////                            ->update(['company_id' => null]);
+////
+////                    Contract::whereIn('id', $data['contracts'] ?? [])
+////                            ->update(['company_id' => $element->id]);
+//
+////                    if($mainContract = Contract::mainForCompany($element->id)){
+//
+////                        Car::where('company_id', $element->id)
+////                           ->where(function ($q){
+////                               $q->whereDoesntHave('contract')
+////                                 ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+////                           })
+////                           ->update([
+////                               'contract_id' => $mainContract->id ?? null
+////                           ]);
+//
+////                        Driver::where('company_id', $element->id)
+////                              ->where(function ($q){
+////                                  $q->whereDoesntHave('contract')
+////                                    ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+////                              })
+////                              ->update([
+////                                  'contract_id' => $mainContract->id ?? null
+////                              ]);
+////                    }else{
+////                        Car::where('company_id', $element->id)
+////                           ->where(function ($q){
+////                               $q->whereDoesntHave('contract')
+////                                 ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+////                           })
+////                           ->update([
+////                               'contract_id' => null
+////                           ]);
+////
+////                        Driver::where('company_id', $element->id)
+////                              ->where(function ($q){
+////                                  $q->whereDoesntHave('contract')
+////                                    ->orWhereNotIn('contract_id', $data['contracts'] ?? []);
+////                              })
+////                              ->update([
+////                                  'contract_id' => null
+////                              ]);
+////                    }
+////                }
+//                // (driver && car) =>
+//                if ($model_text == 'Driver') {
+//                    if(
+//                        $data['company_id'] != $element->company_id
+//                        && !$data['contract_id']
+//                    ){
+//                        if($mainContract = Contract::mainForCompany($data['company_id'])){
+//                            Driver::where('id', $element->id)->update([
+//                                'contract_id' => $mainContract->id ?? null
+//                            ]);
+//                        }else{
+//                            Driver::where('id', $element->id)->update([
+//                                'contract_id' => null
+//                            ]);
+//                        }
+//                    }else{
+//                        Driver::where('id', $element->id)->update([
+//                            'contract_id' => $data['contract_id'] ?? null
+//                        ]);
+//                    }
+//                }
+//                if ($model_text == 'Car') {
+//                    if(
+//                        $data['company_id'] != $element->company_id
+//                        && !$data['contract_id']
+//                    ){
+//                        if($mainContract = Contract::mainForCompany($data['company_id'])){
+//                            Car::where('id', $element->id)->update([
+//                                'contract_id' => $mainContract->id ?? null
+//                            ]);
+//                        }else{
+//                            Car::where('id', $element->id)->update([
+//                                'contract_id' => null
+//                            ]);
+//                        }
+//                    }else{
+//                        Car::where('id', $element->id)->update([
+//                            'contract_id' => $data['contract_id'] ?? null
+//                        ]);
+//                    }
+//                }
+//                return redirect($_SERVER['HTTP_REFERER']);
+//            }
+//        }
 
         return abort(500);
     }
@@ -1345,7 +1371,7 @@ class IndexController extends Controller
             || $model == 'Car'
         ){
             $el = app("App\\$model")
-                ->with(['contract.services'])
+                ->with(['contracts.services'])
                 ->find($id);
         }elseif($model == 'Company'){
             $el = app("App\\$model")
@@ -1377,28 +1403,28 @@ class IndexController extends Controller
     /**
      * Рендер просмотра вкладок CRM
      */
-    public function RenderElements(Request $request)
+    public function RenderElements (Request $request)
     {
         $user = Auth::user();
         $type = $request->type;
 
         $queryString = '';
-        $oKey        = 'orderKey';
-        $oBy         = 'orderBy';
+        $oKey = 'orderKey';
+        $oBy = 'orderBy';
 
         // ОПЕРАТОР ПАК & КОМПАНИИ
 //        if($user->role === 4 && $type === 'Company') {
 //            return back();
 //        }
 
-        foreach ($_GET as $getK => $getV) {
-            if ($getK !== $oKey && $getK !== $oBy) {
-                if (is_array($getV)) {
-                    foreach ($getV as $getVkey => $getVvalue) {
-                        $queryString .= '&'.$getK."[$getVkey]".'='.$getVvalue;
+        foreach($_GET as $getK => $getV) {
+            if($getK !== $oKey && $getK !== $oBy) {
+                if(is_array($getV)) {
+                    foreach($getV as $getVkey => $getVvalue) {
+                        $queryString .= '&' . $getK . "[$getVkey]" . '=' . $getVvalue;
                     }
                 } else {
-                    $queryString .= '&'.$getK.'='.$getV;
+                    $queryString .= '&' . $getK . '=' . $getV;
                 }
 
             }
@@ -1408,8 +1434,8 @@ class IndexController extends Controller
          * Сортировка
          */
         $orderKey = $request->get($oKey, 'created_at');
-        $orderBy  = $request->get($oBy, 'DESC');
-        $filter   = $request->get('filter', 0);
+        $orderBy = $request->get($oBy, 'DESC');
+        $filter = $request->get('filter', 0);
 
         $take = $request->get('take', 500);
 
@@ -1423,9 +1449,9 @@ class IndexController extends Controller
 
 //            $fieldsModel = $MODEL_ELEMENTS->fillable;
             if ($model == 'Company') {
-                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contracts']);
+                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contracts.services']);
             } elseif ($model == 'Car' || $model == 'Driver') {
-                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contract', 'contract.services']);
+                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contracts.services']);
             }
 
             $element['elements'] = $MODEL_ELEMENTS;
@@ -1483,8 +1509,8 @@ class IndexController extends Controller
                             if ($aFk == 'date_of_employment') {
                                 $element['elements'] = $element['elements']->whereBetween($aFk, [
                                         Carbon::parse($aFv)->startOfDay(),
-                                        Carbon::parse($aFv)->endOfDay(),
-                                    ]
+                                        Carbon::parse($aFv)->endOfDay()
+                                        ]
                                 );
                             } else {
                                 $element['elements'] = $element['elements']->where($aFk, 'LIKE', '%' . trim($aFv) . '%');

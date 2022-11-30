@@ -34,6 +34,23 @@ Artisan::command('init:contracts', function () {
     }
 })->describe('Display an inspiring quote');
 
+Artisan::command('contract:first', function () {
+    if(\App\Models\Contract::deleteOld()){
+        $this->comment('Всё удалено');
+    }
+})->describe('Display an inspiring quote');
+
+Artisan::command('contract:second {limit}', function ($limit) {
+    if(\App\Models\Contract::init_companies($limit)){
+        $this->comment('Связано');
+    }
+})->describe('Display an inspiring quote');
+Artisan::command('contract:third', function () {
+    if(\App\Models\Contract::test_one()){
+        $this->comment('Связано nakonec to');
+    }
+})->describe('Display an inspiring quote');
+
 Artisan::command('companies:procedure_pv-fix', function () {
     \App\Company::whereNotIn('procedure_pv', [
         'Наперед без дат',
