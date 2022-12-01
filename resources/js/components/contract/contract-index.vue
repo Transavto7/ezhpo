@@ -42,7 +42,7 @@
                             <b-pagination
                                 id="paginate_filters"
                                 :total-rows="total"
-                                :per-page="nikita_yeban"
+                                :per-page="mazaretto_yeban"
                                 v-model="filters.currentPage"
 
                                 class="my-0"
@@ -57,7 +57,7 @@
                 >
 
                     <b-col md="2" class="my-1">
-                        <select v-model="nikita_yeban">
+                        <select v-model="mazaretto_yeban">
                             <option value="20">20</option>
                             <option value="500">500</option>
                             <option value="1500">1500</option>
@@ -215,7 +215,7 @@ export default {
                 trash:       0,
             },
             total:       0,
-            nikita_yeban: 20,
+            mazaretto_yeban: 20,
             // pageOptions: [15, 100, 500], // da mne pohui
         }
     },
@@ -278,7 +278,7 @@ export default {
             let data = {
                 params: Object.assign({}, this.filters),
             };
-            data.params.nikita_yeban = this.nikita_yeban;
+            data.params.mazaretto_yeban = this.mazaretto_yeban;
 
             axios.get("/contract/index", data)
                 .then(({data}) => {

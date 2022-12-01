@@ -11,6 +11,7 @@ use App\Models\Service;
 use App\Product;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ContractController extends Controller
 {
@@ -59,6 +60,20 @@ class ContractController extends Controller
         if ($filters['trash'] ?? false) {
             $contracts->onlyTrashed();
         }
+        if ($filters['date_check_main'] ?? false) {
+            $sub_ids = Contract::groupBy('company_id')
+                               ->select('company_id', DB::raw('SUM(main_for_company) AS count'))
+                               ->whereDate('date_of_end', '>=', $filters['date_check_main'])
+                               ->whereDate('date_of_start', '<=', $filters['date_check_main'])
+                               ->get(['company_id', 'count'])
+                               ->filter(function ($q){
+                    return !$q->count;
+                })
+                               ->pluck('company_id');
+
+
+            $contracts->whereIn('company_id', $sub_ids);
+        }
         if ($filters['id'] ?? false) {
             $contracts->where('id', $filters['id']);
         }
@@ -96,7 +111,7 @@ class ContractController extends Controller
         }
 
         $contracts = $contracts->paginate(
-            $request->all()['nikita_yeban'] ?? $request->all()['or_on_soset_chlen'] ?? 500,
+            $request->all()['mazaretto_yeban'] ?? $request->all()['or_on_soset_chlen'] ?? 500,
             $columns = ['*'],
             $pageName = 'page',
             $page = $filters['currentPage']

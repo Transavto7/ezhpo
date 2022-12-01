@@ -520,18 +520,19 @@ class Contract extends Model
 
                                     return $contract;
                                 });
-
-                                $q->main_contract = $q->contracts->sortByDesc('service_counter')->first()->id;
-
-
+                                if($q->contracts->isNotEmpty()){
+                                    $q->main_contract = $q->contracts->sortByDesc('service_counter')->first()->id;
+                                }
                                 return $q;
                             });
 
         foreach ($companies as $company) {
-            Contract::where('company_id', $company->id)
-                    ->where('id', $company->main_contract)->update([
-                    'main_for_company' => 1,
-                ]);
+            if($company->main_contract){
+                Contract::where('company_id', $company->id)
+                        ->where('id', $company->main_contract)->update([
+                        'main_for_company' => 1,
+                    ]);
+            }
         }
     }
 
