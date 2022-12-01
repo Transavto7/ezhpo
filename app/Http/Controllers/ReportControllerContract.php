@@ -545,9 +545,6 @@ class ReportControllerContract extends Controller
 
                 foreach ($type_explode as $mini_type) {
                     if (strpos($vt, $mini_type) !== false) {
-                        $result[$tech->car->hash_id]['types'][$tech->type_view]['sync'] = in_array($service->id,
-                            explode(',', $company->products_id));
-
                         if ($service->type_product === 'Разовые осмотры') {
                             $result[$tech->car->hash_id]['types'][$tech->type_view]['sum'] = $service->price
                                                                                              * $total_for_type_view;

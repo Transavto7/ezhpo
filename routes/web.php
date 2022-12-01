@@ -253,10 +253,13 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
     });
 
     Route::prefix('report')->group(function () {
+        Route::get('/getContractsForCompany_v2',[
+            \App\Http\Controllers\Reports\CompanyServicesRefactoring::class, 'getContractsForCompany'
+        ]);
         Route::get('journal_contract', 'ReportController@ShowJournalContract')->name('report.journal_contract');
 //        Route::get('journal_contract', 'ReportController@ShowJournalContract')->name('company_service');
         Route::get('journal', 'ReportController@ShowJournal')->name('report.journal');
-        Route::get('journal',[
+        Route::get('journal_new',[
             \App\Http\Controllers\Reports\CompanyServicesRefactoring::class, 'index'
             ])->name('report.company_service');
         Route::get('contract/journal_v2',[
@@ -264,9 +267,6 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
             ]);
         Route::get('contract/export/journal_v2',[
             \App\Http\Controllers\Reports\CompanyServicesRefactoring::class, 'export'
-            ]);
-        Route::get('getContractsForCompany_v2',[
-            \App\Http\Controllers\Reports\CompanyServicesRefactoring::class, 'getContractsForCompany'
             ]);
 //        Route::get('journal', 'ReportController@showJournal')->name('report.journal');
         Route::get('dynamic/medic', 'ReportController@getDynamicMedic')->name('report.dynamic.medic');

@@ -27,6 +27,11 @@ class Product extends Model
         return $this->belongsTo(User::class, 'deleted_id', 'id')
                     ->withDefault();
     }
+    public function discount()
+    {
+        return $this->hasOne(Discount::class, 'products_id', 'id')
+                    ->withDefault();
+    }
 
     public function delete()
     {

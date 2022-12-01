@@ -9,17 +9,40 @@ class Car extends Model
 {
     use \Illuminate\Database\Eloquent\SoftDeletes;
 
-    public $fillable = [
-        'hash_id',
-        //'old_id',
-        'gos_number', 'mark_model', 'type_auto', 'products_id', 'trailer', 'company_id',
-        'count_pl', 'note', 'procedure_pv', 'date_prto', 'date_techview',
-        'time_skzi', 'date_osago',
-        'town_id', 'dismissed',
-        'autosync_fields',
-        'contract_id',
-        'deleted_id'
-    ];
+    public $fillable
+        = [
+            'hash_id',
+            //'old_id',
+            'gos_number',
+            'mark_model',
+            'type_auto',
+            'products_id',
+            'trailer',
+            'company_id',
+            'count_pl',
+            'note',
+            'procedure_pv',
+            'date_prto',
+            'date_techview',
+            'time_skzi',
+            'date_osago',
+            'town_id',
+            'dismissed',
+            'autosync_fields',
+            'contract_id',
+            'deleted_id',
+        ];
+
+    public function inspections_tech()
+    {
+        return $this->hasMany(
+            Anketa::class,
+            'car_id',
+            'hash_id'
+        )
+                    ->where('type_anketa', 'medic');
+    }
+
 
     public function deleted_user()
     {
@@ -61,14 +84,16 @@ class Car extends Model
     {
         $this->deleted_id = user()->id;
         $this->save();
+
         return parent::delete();
     }
 
-    public function getAutoSyncFieldsFromHashId ($hash_id) {
+    public function getAutoSyncFieldsFromHashId($hash_id)
+    {
         $element = self::where('hash_id', $hash_id)->first();
 
-        if($element) {
-            if($element->autosync_fields) {
+        if ($element) {
+            if ($element->autosync_fields) {
                 return explode(',', $element->autosync_fields);
             }
         }
@@ -76,11 +101,12 @@ class Car extends Model
         return [];
     }
 
-    public static function getAutoSyncFields ($hash_id) {
+    public static function getAutoSyncFields($hash_id)
+    {
         $element = self::where('hash_id', $hash_id)->first();
 
-        if($element) {
-            if($element->autosync_fields) {
+        if ($element) {
+            if ($element->autosync_fields) {
                 return explode(',', $element->autosync_fields);
             }
         }
@@ -88,28 +114,29 @@ class Car extends Model
         return [];
     }
 
-    public static function calcServices ($hash_id, $type_anketa = '', $type_view = '', $count = 0) {
+    public static function calcServices($hash_id, $type_anketa = '', $type_view = '', $count = 0)
+    {
         $element = self::where('hash_id', $hash_id)->first();
-        $data = '';
+        $data    = '';
 
-        if($element) {
-            if(isset($element->products_id)) {
-                $data = [];
+        if ($element) {
+            if (isset($element->products_id)) {
+                $data     = [];
                 $services = explode(',', $element->products_id);
 
                 $services = Product::whereIn('id', $services)
-                    ->where('type_anketa', $type_anketa)
-                    ->where('type_view', 'LIKE', "%$type_view%")->get();
+                                   ->where('type_anketa', $type_anketa)
+                                   ->where('type_view', 'LIKE', "%$type_view%")->get();
 
-                foreach($services as $serviceKey => $service) {
+                foreach ($services as $serviceKey => $service) {
                     $discounts = Discount::where('products_id', $service->id)->get();
 
-                    if($discounts->count()) {
-                        foreach($discounts as $discount) {
-                            eval('$is_discount_valid = ' . $count . $discount->trigger . $discount->porog . ';');
+                    if ($discounts->count()) {
+                        foreach ($discounts as $discount) {
+                            eval('$is_discount_valid = '.$count.$discount->trigger.$discount->porog.';');
 
-                            if($is_discount_valid) {
-                                $disc = ($service->price_unit * $discount->discount) / 100;
+                            if ($is_discount_valid) {
+                                $disc   = ($service->price_unit * $discount->discount) / 100;
                                 $p_unit = $service->price_unit;
 
                                 $services[$serviceKey]->price_unit = $p_unit - $disc;
@@ -118,12 +145,14 @@ class Car extends Model
                     }
                 }
 
-                if(count($services)) {
-                    $data['summ'] = $services->sum('price_unit') . '₽';
-                } else if(!isset($element->products_id)) {
-                    $data['summ'] = "<span class='text-red'>Услуги не указаны</span>";
+                if (count($services)) {
+                    $data['summ'] = $services->sum('price_unit').'₽';
                 } else {
-                    $data['summ'] = "<span class='text-red'>Услуги не найдены</span>";
+                    if ( !isset($element->products_id)) {
+                        $data['summ'] = "<span class='text-red'>Услуги не указаны</span>";
+                    } else {
+                        $data['summ'] = "<span class='text-red'>Услуги не найдены</span>";
+                    }
                 }
 
                 return "<div><b>$data[summ]</b></div>";
@@ -135,15 +164,17 @@ class Car extends Model
         return $data;
     }
 
-    public static function getAll () {
+    public static function getAll()
+    {
         return self::all();
     }
 
     // Получение пункта выпуска
-    public static function getName ($id = 0) {
+    public static function getName($id = 0)
+    {
         $car = Car::where('hash_id', $id)->first();
 
-        if($car) {
+        if ($car) {
             $car = $car->gos_number;
         } else {
             $car = '';
