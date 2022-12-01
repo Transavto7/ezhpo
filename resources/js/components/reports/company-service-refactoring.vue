@@ -27,20 +27,6 @@
                     </div>
                     <div class="form-group col-lg-3">
                         <label class="mb-1" for="company">Договор</label>
-<!--                        <multiselect-->
-<!--                            v-model="contracts"-->
-<!--                            :options="contracts_options"-->
-<!--                            :searchable="true"-->
-<!--                            :close-on-select="false"-->
-<!--                            :show-labels="false"-->
-<!--                            placeholder="Выберите договор"-->
-<!--                            label="name"-->
-<!--                            class="is-invalid"-->
-<!--                            :multiple="true"-->
-<!--                        >-->
-<!--                            <span slot="noResult">Результатов не найдено</span>-->
-<!--                            <span slot="noOptions">Список пуст</span>-->
-<!--                        </multiselect>-->
                         <multiselect
                             v-model="contracts"
                             :options="contracts_options"
@@ -56,12 +42,7 @@
                             deselectLabel="Enter чтобы отменить"
                             selectedLabel="Выбрано"
                         >
-                            <template v-slot:no-result>
-                                Список пуст
-                            </template>
-<!--                            <template slot="selection" slot-scope="{ values, search, isOpen }">-->
-<!--                                <span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">{{ values.length }} options selected</span>-->
-<!--                            </template>-->
+                            <span slot="noResult">Результатов не найдено</span>
                         </multiselect>
                     </div>
                     <div class="form-group col-lg-2">
@@ -76,14 +57,65 @@
                             <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                             Сформировать отчет
                         </button>
-                        <button v-if="permissions.export" type="submit" @click="exportData" class="btn btn-info" :disabled="loadingExport">
-                            <span v-if="loadingExport" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            Экспортировать
-                        </button>
                         <a href="?" class="btn btn-danger">Сбросить</a>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="card" v-for="(contract, index) in result">
+            <div class="card-header">
+                <b-button  v-b-toggle="'collapse-' + index" variant="primary">{{ contract.name }}</b-button>
+            </div>
+
+            <b-collapse :id="'collapse-' + index" class="mt-2">
+                <b-card v-for="inspection_group in contract.inspections">
+                    <div class="card">
+                        <div class="card-header">
+                            {{ inspection_group.name }}
+                        </div>
+                        <div class="card-body" v-for="car_or_driver in inspection_group.data">
+                            <b-row>
+                                <b-col cols="3">
+                                    <h4>{{ car_or_driver.gos_number || car_or_driver.fio }}</h4>
+                                </b-col>
+                                <b-col cols="9">
+                                    <b-row>
+                                        <b-col cols="4" v-for="type in car_or_driver.types">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    {{ type.name }}
+                                                </div>
+                                                <div class="card-body">
+                                                    <p>Количество: {{ type.count }}</p>
+                                                    <b-table
+                                                        hover
+                                                        bordered
+                                                        :items="type.services"
+                                                        :fields="[{
+                                                            key: 'name',
+                                                            label: 'Название'
+                                                        },{
+                                                            key: 'price',
+                                                            label: 'Цена'
+                                                        }]"
+                                                    >
+                                                        <template #cell(price)="row">
+                                                            {{ row.value }} <span class="text-red">({{ row.item.discount }})%</span>
+                                                        </template>
+                                                    </b-table>
+                                                </div>
+                                            </div>
+                                        </b-col>
+                                    </b-row>
+                                </b-col>
+                            </b-row>
+                        </div>
+                    </div>
+
+                </b-card>
+            </b-collapse>
+
         </div>
 
     </div>
@@ -91,14 +123,11 @@
 </template>
 
 <script>
-import vSelect from "vue-select";
+
+import Swal2 from "sweetalert2";
 
 export default {
     name: "company-service-refactoring",
-
-    components: {
-        vSelect
-    },
 
     data() {
         return {
@@ -118,14 +147,14 @@ export default {
                 create: true,
 
             },
+
+            result: [],
         }
     },
     methods:{
-
         async getReport() {
             this.loading = true;
 
-                // this.reset();
             await axios.get('/report/contract/journal_v2', {
                 params: {
                     company_id: this.company_id,
@@ -135,29 +164,16 @@ export default {
                     month: this.month
                 }
             }).then(({ data }) => {
-                console.log(data)
+                if(data.status){
+                    this.result = data.result
+                }else{
+                    Swal2.fire({
+                        icon: 'error',
+                        text: 'Ошибка!'
+                    })
+                }
             }).finally(() => {
                 this.loading = false;
-            });
-        },
-
-        exportData() {
-            this.loadingExport = true;
-            axios.get('/report/contract/export/journal_v2', {
-                params: {
-                    company_id: this.company_id,
-                    month: this.month
-                },
-                responseType: 'blob'
-            }).then(({ data }) => {
-                const url = window.URL.createObjectURL(new Blob([data]));
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', 'export.xlsx'); //or any other extension
-                document.body.appendChild(link);
-                link.click();
-            }).finally(() => {
-                this.loadingExport = false;
             });
         },
         searchCompany(query = '') {

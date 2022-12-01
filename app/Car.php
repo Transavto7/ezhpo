@@ -40,7 +40,7 @@ class Car extends Model
             'car_id',
             'hash_id'
         )
-                    ->where('type_anketa', 'medic');
+                    ->where('type_anketa', 'tech');
     }
 
 

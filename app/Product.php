@@ -30,7 +30,8 @@ class Product extends Model
     public function discount()
     {
         return $this->hasOne(Discount::class, 'products_id', 'id')
-                    ->withDefault();
+//                    ->withDefault()
+            ;
     }
 
     public function delete()

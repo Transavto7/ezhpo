@@ -20,7 +20,7 @@ class Anketa extends Model
     public function services_snapshot()
     {
         return $this->belongsToMany(
-            Service::class,
+            Product::class,
             'anketa_services_discount_snapshot_contracts',
             'anketa_id',
             'service_id',

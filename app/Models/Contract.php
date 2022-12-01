@@ -123,7 +123,7 @@ class Contract extends Model
     public function services()
     {
         return $this->belongsToMany(
-            Service::class,
+            Product::class,
             'contract_service',
             'contract_id',
             'service_id',

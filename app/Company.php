@@ -38,6 +38,32 @@ class Company extends Model
         );
     }
 
+    public function inspections_tech()
+    {
+        return $this->hasMany(Anketa::class, 'company_id', 'id')
+                    ->where('type_anketa', 'tech');
+    }
+    public function inspections_medic()
+    {
+        return $this->hasMany(Anketa::class, 'company_id', 'id')
+                    ->where('type_anketa', 'medic');
+    }
+    public function inspections_pechat_pl()
+    {
+        return $this->hasMany(Anketa::class, 'company_id', 'id')
+                    ->where('type_anketa', 'pechat_pl');
+    }
+    public function inspections_bdd()
+    {
+        return $this->hasMany(Anketa::class, 'company_id', 'id')
+                    ->where('type_anketa', 'bdd');
+    }
+    public function inspections_report_cart()
+    {
+        return $this->hasMany(Anketa::class, 'company_id', 'id')
+                    ->where('type_anketa', 'report_cart');
+    }
+
     public function cars()
     {
         return $this->hasMany(Car::class, 'company_id', 'id');

@@ -6,6 +6,7 @@ use App\Car;
 use App\Company;
 use App\Driver;
 use App\Models\Service;
+use App\Product;
 use App\Req;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -116,7 +117,7 @@ class VSelect
         $query = $request->get("query", "");
 
         return response(
-            Service::where('name', 'like', "%$query%")
+            Product::where('name', 'like', "%$query%")
                    ->orWhere('hash_id', 'like', "%$query%")
                    ->selectRaw("CONCAT(name, ' [', hash_id, ']') as name, id, price_unit")
                    ->limit(10)
