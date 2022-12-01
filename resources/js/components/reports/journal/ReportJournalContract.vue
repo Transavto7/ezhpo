@@ -288,7 +288,14 @@ export default {
                         this.$refs.reportsOther[contract_key].visible(data.other);
                         if(fuckerCounterInAssMazzarettoEbleto === fuckerCounterInAssMazzarettoEbletoTotalCountDickInHerAss){
                             this.loading = false;
+                        }
 
+                        if(data.message.length){
+                            Swal2.fire({
+                                icon: 'error',
+                                title: 'Упсс...',
+                                text: data.message,
+                            })
                         }
                 }).finally(() => {
                 });

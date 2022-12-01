@@ -115,6 +115,17 @@
                         </b-form-group>
                     </div>
                     <div class="d-flex align-items-center col-lg-3">
+                        <b-form-group label="Проверить главный договор" v-slot="{ ariaDescribedby }" class="w-100">
+                            <b-form-datepicker id="date_check_main" v-model="filters.date_check_main"
+                                               placeholder="Укажите дату"
+                                               reset-button
+                                               close-button
+                                               label-reset-button="Сбросить"
+                                               label-close-button="Закрыть"
+                                               class="mb-2"></b-form-datepicker>
+                        </b-form-group>
+                    </div>
+                    <div class="d-flex align-items-center col-lg-3">
                         <b-button
                             variant="info"
                             @click="search"
@@ -184,6 +195,7 @@ export default {
             this.filters = {
                 date_of_end_end: null,
                 date_of_end_start: null,
+                date_check_main: null,
                 // main_for_company: null,
                 our_company_id: null,
                 company_id: null,
