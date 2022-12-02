@@ -429,7 +429,7 @@ class ReportControllerContract extends Controller
             }
         }
 
-//dd($result);
+
         return $result;
     }
 

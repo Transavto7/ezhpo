@@ -28,6 +28,12 @@ Route::get('reports/contract/journal/export', 'ReportController@exportJournalDat
 Route::get('reports/getContractsForCompany', 'ReportControllerContract@getContractsForCompany')->name('api.reports.journal');
 //Route::get('reports/contract/getContractsForCompany', 'ReportControllerContract@getContractsForCompany')->name('api.reports.journal');
 
+Route::get('reports/contract/journal_v2',[
+    \App\Http\Controllers\ReportContractRefactoringController::class, 'getReport'
+]);
+Route::get('reports/contract/export/journal_v2',[
+    \App\Http\Controllers\ReportContractRefactoringController::class, 'export'
+]);
 
 Route::get('/sync-fields/{model}/{id}', function ($model, $id) {
     $data = app("App\\$model")->getAutoSyncFieldsFromHashId($id);
