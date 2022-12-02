@@ -520,27 +520,7 @@ return [
         'name'        => 'date_control_trash',
         'description' => 'Контроль дат - Корзина',
     ],
-    //============== История изменения полей =============//
-    [
-        'name'        => 'story_field_create',
-        'description' => 'История изменения полей - Создание',
-    ],
-    [
-        'name'        => 'story_field_read',
-        'description' => 'История изменения полей - Просмотр',
-    ],
-    [
-        'name'        => 'story_field_update',
-        'description' => 'История изменения полей - Редактирование',
-    ],
-    [
-        'name'        => 'story_field_delete',
-        'description' => 'История изменения полей - Удаление',
-    ],
-    [
-        'name'        => 'story_field_trash',
-        'description' => 'История изменения полей - Корзина',
-    ],
+
     //============== Реквизиты нашей компании =============//
     [
         'name'        => 'requisites_create',
