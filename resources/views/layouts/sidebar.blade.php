@@ -289,10 +289,6 @@
                         <li><a href="{{ route('renderElements', 'DDates') }}">Контроль дат</a></li>
                     @endif
 
-                    @if(user()->access('story_field_read', 'story_field_create'))
-                        <li><a href="{{ route('renderElements', 'FieldHistory') }}">История изменения полей</a>
-                        </li>
-                    @endif
 
                     @if(user()->access('requisites_read', 'requisites_create'))
                         <li><a href="{{ route('renderElements', 'Req') }}">Реквизиты нашей компании</a></li>

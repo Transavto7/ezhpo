@@ -126,21 +126,6 @@ class IndexController extends Controller
                 ],
             ],
 
-            'FieldHistory' => [
-                'title'       => 'История изменения полей',
-                'role'        => 777,
-                'popupTitle'  => 'Истории изменения полей',
-                'editOnField' => 'value',
-
-                'model'  => 'FieldHistory',
-                'fields' => [
-                    'user_id'    => ['label' => 'Пользователь', 'type' => 'select', 'values' => 'User'],
-                    'value'      => ['label' => 'Значение', 'type' => 'text'],
-                    'field'      => ['label' => 'Поле', 'type' => 'text'],
-                    'created_at' => ['label' => 'Дата', 'type' => 'date'],
-                ],
-            ],
-
             'Settings' => [
                 'title'       => 'Настройки системы',
                 'role'        => 777,
@@ -1542,7 +1527,6 @@ class IndexController extends Controller
                 'Instr',
                 'Town',
                 'Point',
-                'FieldHistory',
                 'Req',
             ];
 
