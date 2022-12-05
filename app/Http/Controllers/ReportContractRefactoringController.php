@@ -279,20 +279,26 @@ class ReportContractRefactoringController extends Controller
         }
 
         foreach ($result as $driver_id => $fcn_info){
-            foreach ($fcn_info['types'] as $type_key => $type_info){
+            foreach (($fcn_info['types'] ?? []) as $type_key => $type_info){
                 if($result[$driver_id]['types'][$type_key]['services'] ?? false){
-                    $result[$driver_id]['types'][$type_key]['services'] = collect($result[$driver_id]['types'][$type_key]['services'])
+
+                    $result[$driver_id]['types'][$type_key]['services']
+                        = collect($result[$driver_id]['types'][$type_key]['services'])
                         ->groupBy('id')
-                        ->map(function ($group){
+                        ->map(function ($group) {
                             return [
                                 'id'       => $group->first()['id'],
                                 'name'     => $group->first()['name'],
                                 'discount' => round($group->first()['discount'] ?? 0),
-                                'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0) / 100),
+                                'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
+                                                                               / 100),
                                 'count'    => $group->count(),
                             ];
                         })
                         ->values();
+                    if ($fist = $result[$driver_id]['types'][$type_key]['services']->first()) {
+                        $result[$driver_id]['types'][$type_key]['count'] = $fist['count'];
+                    }
                 }
             }
         }
@@ -480,6 +486,9 @@ class ReportContractRefactoringController extends Controller
                             ];
                         })
                         ->values();
+                    if ($fist = $result[$car_id]['types'][$type_key]['services']->first()) {
+                        $result[$car_id]['types'][$type_key]['count'] = $fist['count'];
+                    }
                 }
             }
         }
@@ -653,6 +662,12 @@ class ReportContractRefactoringController extends Controller
                                     $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['discount']
                                         = $service->discount;
                                 }
+                                $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['services'][] = [
+                                    'sum'      => $result[$report->driver_id]['types'][$report->type_view]['sum'] ?? '',
+                                    'discount' => $result[$report->driver_id]['types'][$report->type_view]['discount'] ?? '',
+                                    'name'     => $service->name ?? '',
+                                    'id'       => $service->id ?? ''
+                                ];
                             }
                         }
                     } else {
@@ -672,9 +687,16 @@ class ReportContractRefactoringController extends Controller
                                 $result[$key]['reports'][$report->driver_id]['types'][$service->type_anketa]['discount']
                                     = $service->discount;
                             }
+                            $result[$key]['reports'][$report->driver_id]['types'][$report->type_anketa]['services'][] = [
+                                'sum'      => $result[$report->driver_id]['types'][$report->type_anketa]['sum'] ?? '',
+                                'discount' => $result[$report->driver_id]['types'][$report->type_anketa]['discount'] ?? '',
+                                'name'     => $service->name ?? '',
+                                'id'       => $service->id ?? ''
+                            ];
                         }
                     }
 
+                }
 
 //                    $result[$key]['reports'][$report->driver_id]['types'][($report->type_anketa === 'medic') ? $report->type_view : $report->type_anketa]['services'][] = [
 //                        'sum'      => $result[$report->driver->hash_id]['types'][($report->type_anketa === 'medic') ? $report->type_view : $report->type_anketa]['sum'] ?? '',
@@ -682,30 +704,36 @@ class ReportContractRefactoringController extends Controller
 //                        'name'     => $service->name ?? '',
 //                        'id'       => $service->id ?? '',
 //                    ];
-                }
+//                }
             }
         }
 
-//        foreach ($result as $key => $period_info){
-//            foreach ($period_info['reports'] as $driver_id => $fcn_info){
-//                foreach ($fcn_info['types'] as $type_key => $type_info){
-//                    if($result[$key][$driver_id]['types'][$type_key]['services'] ?? false){
-//                        $result[$key][$driver_id]['types'][$type_key]['services'] = collect($result[$driver_id]['types'][$type_key]['services'])
-//                            ->groupBy('id')
-//                            ->map(function ($group){
-//                                return [
-//                                    'id'       => $group->first()['id'],
-//                                    'name'     => $group->first()['name'],
-//                                    'discount' => $group->first()['discount'],
-//                                    'price'    => $group->first()['sum'],
-//                                    'count'    => $group->count(),
-//                                ];
-//                            })
-//                            ->values();
-//                    }
-//                }
-//            }
-//        }
+        foreach ($result as $key => $period_info){
+            foreach ($period_info['reports'] as $driver_id => $fcn_info){
+                foreach ($fcn_info['types'] as $type_key => $type_info){
+                    if($result[$key]['reports'][$driver_id]['types'][$type_key]['services'] ?? false){
+                        $result[$key]['reports'][$driver_id]['types'][$type_key]['services'] = collect($result[$key]['reports'][$driver_id]['types'][$type_key]['services'])
+                            ->groupBy('id')
+                            ->map(function ($group){
+                                return [
+                                    'id'       => $group->first()['id'],
+                                    'name'     => $group->first()['name'],
+                                    'discount' => $group->first()['discount'],
+                                    'price'    => $group->first()['sum'],
+                                    'count'    => $group->count(),
+                                ];
+                            })
+                            ->values();
+                        if ($fist = $result[$key]['reports'][$driver_id]['types'][$type_key]['services']->first()) {
+                            $result[$driver_id]['types'][$type_key]['count'] = $fist['count'];
+                        }
+                    }
+//                    dd(
+//                        $driver_id
+//                    );
+                }
+            }
+        }
 //        dd($result);
         return array_reverse($result);
     }
@@ -878,10 +906,41 @@ class ReportContractRefactoringController extends Controller
                             }
                         }
                     }
+
+                    $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['services'][] = [
+                        'sum'      => $result[$report->car_id]['types'][$report->type_view]['sum'] ?? '',
+                        'discount' => $result[$report->car_id]['types'][$report->type_view]['discount'] ?? '',
+                        'name'     => $service->name ?? '',
+                        'id'       => $service->id ?? ''
+                    ];
                 }
             }
         }
 
+
+        foreach ($result as $key => $period_info){
+            foreach ($period_info['reports'] as $car_id => $fcn_info){
+                foreach ($fcn_info['types'] as $type_key => $type_info){
+                    if($result[$key]['reports'][$car_id]['types'][$type_key]['services'] ?? false){
+                        $result[$key]['reports'][$car_id]['types'][$type_key]['services'] = collect($result[$key]['reports'][$car_id]['types'][$type_key]['services'])
+                            ->groupBy('id')
+                            ->map(function ($group){
+                                return [
+                                    'id'       => $group->first()['id'],
+                                    'name'     => $group->first()['name'],
+                                    'discount' => $group->first()['discount'],
+                                    'price'    => $group->first()['sum'],
+                                    'count'    => $group->count(),
+                                ];
+                            })
+                            ->values();
+                        if ($fist = $result[$key]['reports'][$car_id]['types'][$type_key]['services']->first()) {
+                            $result[$key]['reports'][$car_id]['types'][$type_key]['count'] = $fist['count'];
+                        }
+                    }
+                }
+            }
+        }
         return array_reverse($result);
     }
 
