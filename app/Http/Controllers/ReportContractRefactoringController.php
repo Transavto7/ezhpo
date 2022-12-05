@@ -511,7 +511,8 @@ class ReportContractRefactoringController extends Controller
                                 'id'       => $group->first()['id'],
                                 'name'     => $group->first()['name'],
                                 'discount' => round($group->first()['discount']),
-                                'price'    => $group->first()['sum'] * 100 / $group->first()['discount'],
+                                'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
+                                                                               / 100),
                                 'count'    => $group->count(),
                                 'type' => $type_key
                             ]);
@@ -519,7 +520,8 @@ class ReportContractRefactoringController extends Controller
                                 'id'       => $group->first()['id'],
                                 'name'     => $group->first()['name'],
                                 'discount' => round($group->first()['discount']),
-                                'price'    => $group->first()['sum'] * 100 / $group->first()['discount'],
+                                'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
+                                                                               / 100),
                                 'count'    => $group->count(),
                                 'type' => $type_key
                             ];
