@@ -274,12 +274,13 @@ class ReportContractRefactoringController extends Controller
                     'id'       => $service->id ?? '',
                 ];
             }
-
-
         }
 
         $service_counter = 0;
         $service_price = 0;
+
+        $services_for_artem = collect();
+
         foreach ($result as $driver_id => $fcn_info){
             foreach (($fcn_info['types'] ?? []) as $type_key => $type_info){
                 if($result[$driver_id]['types'][$type_key]['services'] ?? false){
@@ -287,7 +288,17 @@ class ReportContractRefactoringController extends Controller
                     $result[$driver_id]['types'][$type_key]['services']
                         = collect($result[$driver_id]['types'][$type_key]['services'])
                         ->groupBy('id')
-                        ->map(function ($group) {
+                        ->map(function ($group) use($type_key, &$services_for_artem) {
+                            $services_for_artem->push([
+                                'id'       => $group->first()['id'],
+                                'name'     => $group->first()['name'],
+                                'discount' => round($group->first()['discount'] ?? 0),
+                                'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
+                                                                               / 100),
+                                'count'    => $group->count(),
+
+                                'type' => $type_key
+                            ]);
                             return [
                                 'id'       => $group->first()['id'],
                                 'name'     => $group->first()['name'],
@@ -295,6 +306,8 @@ class ReportContractRefactoringController extends Controller
                                 'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
                                                                                / 100),
                                 'count'    => $group->count(),
+
+                                'type' => $type_key
                             ];
                         })
                         ->values();
@@ -314,6 +327,7 @@ class ReportContractRefactoringController extends Controller
         $result['services'] = [
             'count' => $service_counter,
             'price' => $service_price,
+            'services_for_artem' => $services_for_artem
         ];
 
         return $result;
@@ -486,18 +500,28 @@ class ReportContractRefactoringController extends Controller
 
         $service_counter = 0;
         $service_price = 0;
+        $services_for_artem = collect();
         foreach ($result as $car_id => $fcn_info){
             foreach ($fcn_info['types'] as $type_key => $type_info){
                 if($result[$car_id]['types'][$type_key]['services'] ?? false){
                     $result[$car_id]['types'][$type_key]['services'] = collect($result[$car_id]['types'][$type_key]['services'])
                         ->groupBy('id')
-                        ->map(function ($group){
+                        ->map(function ($group) use($type_key, &$services_for_artem) {
+                            $services_for_artem->push([
+                                'id'       => $group->first()['id'],
+                                'name'     => $group->first()['name'],
+                                'discount' => round($group->first()['discount']),
+                                'price'    => $group->first()['sum'] * 100 / $group->first()['discount'],
+                                'count'    => $group->count(),
+                                'type' => $type_key
+                            ]);
                             return [
                                 'id'       => $group->first()['id'],
                                 'name'     => $group->first()['name'],
                                 'discount' => round($group->first()['discount']),
                                 'price'    => $group->first()['sum'] * 100 / $group->first()['discount'],
                                 'count'    => $group->count(),
+                                'type' => $type_key
                             ];
                         })
                         ->values();
@@ -516,6 +540,7 @@ class ReportContractRefactoringController extends Controller
         $result['services'] = [
             'count' => $service_counter,
             'price' => $service_price,
+            'services_for_artem' => $services_for_artem
         ];
 
         return $result;
@@ -734,13 +759,24 @@ class ReportContractRefactoringController extends Controller
 
         $service_counter = 0;
         $service_price = 0;
+        $services_for_artem = collect();
         foreach ($result as $key => $period_info){
             foreach ($period_info['reports'] as $driver_id => $fcn_info){
                 foreach ($fcn_info['types'] as $type_key => $type_info){
                     if($result[$key]['reports'][$driver_id]['types'][$type_key]['services'] ?? false){
                         $result[$key]['reports'][$driver_id]['types'][$type_key]['services'] = collect($result[$key]['reports'][$driver_id]['types'][$type_key]['services'])
                             ->groupBy('id')
-                            ->map(function ($group){
+                            ->map(function ($group) use($type_key, &$services_for_artem){
+                                $services_for_artem->push([
+                                    'id'       => $group->first()['id'],
+                                    'name'     => $group->first()['name'],
+                                    'discount' => round($group->first()['discount'] ?? 0),
+                                    'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
+                                                                                   / 100),
+                                    'count'    => $group->count(),
+
+                                    'type' => $type_key
+                                ]);
                                 return [
                                     'id'       => $group->first()['id'],
                                     'name'     => $group->first()['name'],
@@ -748,6 +784,7 @@ class ReportContractRefactoringController extends Controller
                                     'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
                                                                                    / 100),
                                     'count'    => $group->count(),
+                                    'type' => $type_key
                                 ];
                             })
                             ->values();
@@ -769,6 +806,7 @@ class ReportContractRefactoringController extends Controller
         $result['services'] = [
             'count' => $service_counter,
             'price' => $service_price,
+            'services_for_artem' => $services_for_artem
         ];
 //        dd($result);
         return array_reverse($result);
@@ -956,13 +994,24 @@ class ReportContractRefactoringController extends Controller
 
         $service_counter = 0;
         $service_price = 0;
+        $services_for_artem = collect();
         foreach ($result as $key => $period_info){
             foreach ($period_info['reports'] as $car_id => $fcn_info){
                 foreach ($fcn_info['types'] as $type_key => $type_info){
                     if($result[$key]['reports'][$car_id]['types'][$type_key]['services'] ?? false){
                         $result[$key]['reports'][$car_id]['types'][$type_key]['services'] = collect($result[$key]['reports'][$car_id]['types'][$type_key]['services'])
                             ->groupBy('id')
-                            ->map(function ($group){
+                            ->map(function ($group) use($type_key, &$services_for_artem) {
+                                $services_for_artem->push([
+                                    'id'       => $group->first()['id'],
+                                    'name'     => $group->first()['name'],
+                                    'discount' => round($group->first()['discount'] ?? 0),
+                                    'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
+                                                                                   / 100),
+                                    'count'    => $group->count(),
+
+                                    'type' => $type_key
+                                ]);
                                 return [
                                     'id'       => $group->first()['id'],
                                     'name'     => $group->first()['name'],
@@ -970,6 +1019,7 @@ class ReportContractRefactoringController extends Controller
                                     'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
                                                                                    / 100),
                                     'count'    => $group->count(),
+                                    'type' => $type_key
                                 ];
                             })
                             ->values();
@@ -988,6 +1038,7 @@ class ReportContractRefactoringController extends Controller
         $result['services'] = [
             'count' => $service_counter,
             'price' => $service_price,
+            'services_for_artem' => $services_for_artem
         ];
         return array_reverse($result);
     }
