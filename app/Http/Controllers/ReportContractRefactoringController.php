@@ -268,8 +268,8 @@ class ReportContractRefactoringController extends Controller
                 }
 
                 $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['services'][] = [
-                    'sum'      => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['sum'] ?? '',
-                    'discount' => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['discount'] ?? '',
+                    'sum'      => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['sum'] ?? 0,
+                    'discount' => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['discount'] ?? 0,
                     'name'     => $service->name ?? '',
                     'id'       => $service->id ?? '',
                 ];
@@ -278,6 +278,8 @@ class ReportContractRefactoringController extends Controller
 
         }
 
+        $service_counter = 0;
+        $service_price = 0;
         foreach ($result as $driver_id => $fcn_info){
             foreach (($fcn_info['types'] ?? []) as $type_key => $type_info){
                 if($result[$driver_id]['types'][$type_key]['services'] ?? false){
@@ -298,10 +300,21 @@ class ReportContractRefactoringController extends Controller
                         ->values();
                     if ($fist = $result[$driver_id]['types'][$type_key]['services']->first()) {
                         $result[$driver_id]['types'][$type_key]['count'] = $fist['count'];
+                        $service_counter += $fist['count'];
+                        $service_price += $fist['price'];
                     }
                 }
             }
         }
+
+
+        $data = $result;
+        $result = [];
+        $result['data'] = $data;
+        $result['services'] = [
+            'count' => $service_counter,
+            'price' => $service_price,
+        ];
 
         return $result;
     }
@@ -455,8 +468,8 @@ class ReportContractRefactoringController extends Controller
                     }
                 }
                 $result[$tech->car->hash_id]['types'][$tech->type_view]['services'][] = [
-                    'sum'      => $result[$tech->car->hash_id]['types'][$tech->type_view]['sum'] ?? '',
-                    'discount' => $result[$tech->car->hash_id]['types'][$tech->type_view]['discount'] ?? '',
+                    'sum'      => $result[$tech->car->hash_id]['types'][$tech->type_view]['sum'] ?? 0,
+                    'discount' => $result[$tech->car->hash_id]['types'][$tech->type_view]['discount'] ?? 0,
                     'name'     => $service->name ?? '',
                     'id'       => $service->id ?? ''
                 ];
@@ -471,6 +484,8 @@ class ReportContractRefactoringController extends Controller
 
         }
 
+        $service_counter = 0;
+        $service_price = 0;
         foreach ($result as $car_id => $fcn_info){
             foreach ($fcn_info['types'] as $type_key => $type_info){
                 if($result[$car_id]['types'][$type_key]['services'] ?? false){
@@ -488,11 +503,20 @@ class ReportContractRefactoringController extends Controller
                         ->values();
                     if ($fist = $result[$car_id]['types'][$type_key]['services']->first()) {
                         $result[$car_id]['types'][$type_key]['count'] = $fist['count'];
+                        $service_counter += $fist['count'];
+                        $service_price += $fist['price'];
                     }
                 }
             }
         }
 
+        $data = $result;
+        $result = [];
+        $result['data'] = $data;
+        $result['services'] = [
+            'count' => $service_counter,
+            'price' => $service_price,
+        ];
 
         return $result;
     }
@@ -663,8 +687,8 @@ class ReportContractRefactoringController extends Controller
                                         = $service->discount;
                                 }
                                 $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['services'][] = [
-                                    'sum'      => $result[$report->driver_id]['types'][$report->type_view]['sum'] ?? '',
-                                    'discount' => $result[$report->driver_id]['types'][$report->type_view]['discount'] ?? '',
+                                    'sum'      => $result[$report->driver_id]['types'][$report->type_view]['sum'] ?? 0,
+                                    'discount' => $result[$report->driver_id]['types'][$report->type_view]['discount'] ?? 0,
                                     'name'     => $service->name ?? '',
                                     'id'       => $service->id ?? ''
                                 ];
@@ -688,8 +712,8 @@ class ReportContractRefactoringController extends Controller
                                     = $service->discount;
                             }
                             $result[$key]['reports'][$report->driver_id]['types'][$report->type_anketa]['services'][] = [
-                                'sum'      => $result[$report->driver_id]['types'][$report->type_anketa]['sum'] ?? '',
-                                'discount' => $result[$report->driver_id]['types'][$report->type_anketa]['discount'] ?? '',
+                                'sum'      => $result[$report->driver_id]['types'][$report->type_anketa]['sum'] ?? 0,
+                                'discount' => $result[$report->driver_id]['types'][$report->type_anketa]['discount'] ?? 0,
                                 'name'     => $service->name ?? '',
                                 'id'       => $service->id ?? ''
                             ];
@@ -698,7 +722,7 @@ class ReportContractRefactoringController extends Controller
 
                 }
 
-//                    $result[$key]['reports'][$report->driver_id]['types'][($report->type_anketa === 'medic') ? $report->type_view : $report->type_anketa]['services'][] = [
+//                    $result[$key]['reports'][$report->driver_id]['types'][($report->type_anketa === 'medic') ? $report->type_view : $report->type_anketa]['s0 = [
 //                        'sum'      => $result[$report->driver->hash_id]['types'][($report->type_anketa === 'medic') ? $report->type_view : $report->type_anketa]['sum'] ?? '',
 //                        'discount' => $result[$report->driver->hash_id]['types'][($report->type_anketa === 'medic') ? $report->type_view : $report->type_anketa]['discount'] ?? '',
 //                        'name'     => $service->name ?? '',
@@ -708,6 +732,8 @@ class ReportContractRefactoringController extends Controller
             }
         }
 
+        $service_counter = 0;
+        $service_price = 0;
         foreach ($result as $key => $period_info){
             foreach ($period_info['reports'] as $driver_id => $fcn_info){
                 foreach ($fcn_info['types'] as $type_key => $type_info){
@@ -719,13 +745,16 @@ class ReportContractRefactoringController extends Controller
                                     'id'       => $group->first()['id'],
                                     'name'     => $group->first()['name'],
                                     'discount' => $group->first()['discount'],
-                                    'price'    => $group->first()['sum'],
+                                    'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
+                                                                                   / 100),
                                     'count'    => $group->count(),
                                 ];
                             })
                             ->values();
                         if ($fist = $result[$key]['reports'][$driver_id]['types'][$type_key]['services']->first()) {
                             $result[$driver_id]['types'][$type_key]['count'] = $fist['count'];
+                            $service_counter += $fist['count'];
+                            $service_price += $fist['price'];
                         }
                     }
 //                    dd(
@@ -734,6 +763,13 @@ class ReportContractRefactoringController extends Controller
                 }
             }
         }
+        $data = $result;
+        $result = [];
+        $result['data'] = $data;
+        $result['services'] = [
+            'count' => $service_counter,
+            'price' => $service_price,
+        ];
 //        dd($result);
         return array_reverse($result);
     }
@@ -908,8 +944,8 @@ class ReportContractRefactoringController extends Controller
                     }
 
                     $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['services'][] = [
-                        'sum'      => $result[$report->car_id]['types'][$report->type_view]['sum'] ?? '',
-                        'discount' => $result[$report->car_id]['types'][$report->type_view]['discount'] ?? '',
+                        'sum'      => $result[$report->car_id]['types'][$report->type_view]['sum'] ?? 0,
+                        'discount' => $result[$report->car_id]['types'][$report->type_view]['discount'] ?? 0,
                         'name'     => $service->name ?? '',
                         'id'       => $service->id ?? ''
                     ];
@@ -918,6 +954,8 @@ class ReportContractRefactoringController extends Controller
         }
 
 
+        $service_counter = 0;
+        $service_price = 0;
         foreach ($result as $key => $period_info){
             foreach ($period_info['reports'] as $car_id => $fcn_info){
                 foreach ($fcn_info['types'] as $type_key => $type_info){
@@ -929,18 +967,28 @@ class ReportContractRefactoringController extends Controller
                                     'id'       => $group->first()['id'],
                                     'name'     => $group->first()['name'],
                                     'discount' => $group->first()['discount'],
-                                    'price'    => $group->first()['sum'],
+                                    'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
+                                                                                   / 100),
                                     'count'    => $group->count(),
                                 ];
                             })
                             ->values();
                         if ($fist = $result[$key]['reports'][$car_id]['types'][$type_key]['services']->first()) {
                             $result[$key]['reports'][$car_id]['types'][$type_key]['count'] = $fist['count'];
+                            $service_counter += $fist['count'];
+                            $service_price += $fist['price'];
                         }
                     }
                 }
             }
         }
+        $data = $result;
+        $result = [];
+        $result['data'] = $data;
+        $result['services'] = [
+            'count' => $service_counter,
+            'price' => $service_price,
+        ];
         return array_reverse($result);
     }
 
