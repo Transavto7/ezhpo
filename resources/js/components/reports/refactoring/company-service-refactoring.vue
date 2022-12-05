@@ -64,50 +64,39 @@
         </div>
 
         <div v-for="(contract, index) in contracts">
-            <b-card-group v-show="contract.visible_result" class="my-3">
-                <b-card :header="contract.name">
-                    <template #header>
-                        <b-button  v-b-toggle="'collapse-' + index"  variant="primary">{{ contract.name }}</b-button>
-                    </template>
+            <div v-show="contract.visible_result" class="my-3">
+                <b-button class="mb-2" v-b-toggle="'collapse-' + index"  variant="primary">{{ contract.name }}</b-button>
                     <b-collapse :id="'collapse-' + index" class="mt-2">
                         <b-card>
-                            <b-card-text>
-                                <ReportJournalMedic
-                                    ref="reportsMedic"
-                                />
-
-                                <ReportJournalTech
-                                    ref="reportsTech"
-                                />
-
-                                <ReportJournalMedicOther
-                                    ref="reportsMedicOther"
-                                />
-
-                                <ReportJournalTechOther
-                                    ref="reportsTechOther"
-                                />
-
-                                <ReportJournalOther
-                                    ref="reportsOther"
-                                />
-                            </b-card-text>
+                            <ReportJournalMedic
+                                ref="reportsMedic"
+                            />
+                            <ReportJournalTech
+                                class="mt-5"
+                                ref="reportsTech"
+                            />
+                            <ReportJournalMedicOther
+                                class="mt-5"
+                                ref="reportsMedicOther"
+                            />
+                            <ReportJournalTechOther
+                                class="mt-5"
+                                ref="reportsTechOther"
+                            />
+                            <ReportJournalOther
+                                class="mt-5"
+                                ref="reportsOther"
+                            />
+                            <b-row class="mt-5">
+                                <b-col class="text-right">
+                                    <p>
+                                        Итого по договору: {{ contract.sum }}
+                                    </p>
+                                </b-col>
+                            </b-row>
                         </b-card>
-                        <b-row>
-                            <b-col class="text-right">
-                                <p>
-                                    Итого по договору: {{ contract.sum }}
-                                </p>
-                            </b-col>
-                        </b-row>
                     </b-collapse>
-                </b-card>
-                <!--            <div class="card">-->
-                <!--                <h5 class="card-header">{{ contracts[i].name }}</h5>-->
-                <!--            </div>-->
-                <!--            <div class="card-body">-->
-                <!--            </div>-->
-            </b-card-group>
+            </div>
         </div>
 
     </div>
@@ -117,9 +106,9 @@
 <script>
 
 import Swal2 from "sweetalert2";
-import ReportJournalTechOther from '../journal/ReportJournalOther'
-import ReportJournalOther from '../journal/ReportJournalOther'
-import ReportJournalMedicOther from '../journal/ReportJournalMedicOther'
+import ReportJournalTechOther from './ReportJournalTechOther'
+import ReportJournalOther from './ReportJournalOther'
+import ReportJournalMedicOther from './ReportJournalMedicOther'
 import ReportJournalMedic from './ReportJournalMedic'
 import ReportJournalTech from './ReportJournalTech'
 export default {
@@ -160,13 +149,11 @@ export default {
             this.loading = true;
             let fuckerCounterInAssMazzarettoEbletoTotalCountDickInHerAss = this.contracts.length
             let fuckerCounterInAssMazzarettoEbleto = 0;
-            for (let contract_key in this.contracts) {
 
-                // this.reset();
+            for (let contract_key in this.contracts) {
                 axios.get('/api/reports/contract/journal_v2', {
                     params: {
                         company_id: this.company_id,
-                        // contracts_ids: this.contracts.map((item) => item.id),
                         contracts_ids: [this.contracts[contract_key].id],
                         month:         this.month
                     }
@@ -229,6 +216,62 @@ export default {
                 this.loading = false
             });
         },
+        getTotalContractSum(contract){
+            console.log(contract)
+            let res = 0;
+            // hyli mne pohui, structura dannih by ElliHui
+            for (let type_report in contract){
+                if(type_report == 'techs' || type_report == 'medics'){
+                    for (let human_id in contract[type_report]){
+                        for (let type in contract[type_report][human_id].types){
+                            if(contract[type_report][human_id].types[type].sum){
+                                res += contract[type_report][human_id].types[type].sum
+                            }
+                        }
+                    }
+                    // console.log(type_report)
+                    // console.log(res)
+                    continue;
+                }
+                if(type_report == 'medics_other' || type_report == 'techs_other'){
+                    for (let year in contract[type_report]){
+                        for (let human_id in contract[type_report][year].reports){
+                            for (let type in contract[type_report][human_id]){
+                                if(contract[type_report][human_id].types[type].sum){
+                                    res += contract[type_report][human_id].types[type].sum
+                                }
+                            }
+                        }
+                    }
+                    // console.log(type_report)
+                    // console.log(res)
+                    continue;
+                }
+
+                if(type_report == 'other'){
+                    for (let type in contract[type_report]){
+                        if(type == 'company'){
+                            for (let totall in contract[type_report][type]){
+                                res += contract[type_report][type][totall]
+                            }
+                            // console.log(type)
+                            // console.log(type_report)
+                            // console.log(contract[type_report][type][totall])
+                            continue;
+                        }
+                        // if(type == 'drivers'){
+                        for (let totall in contract[type_report][type]){
+                            res += contract[type_report][type][totall].sum
+                            // console.log(type)
+                            // console.log(type_report)
+                            // console.log(contract[type_report][type][totall].sum)
+                        }
+                        // }
+                    }
+                }
+            }
+            return res;
+        },
     },
     mounted() {
         this.searchCompany();
@@ -248,6 +291,7 @@ export default {
 
             this.report();
         }
+
     },
     watch:{
         company(val){
