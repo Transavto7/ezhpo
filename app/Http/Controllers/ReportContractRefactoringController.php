@@ -327,7 +327,7 @@ class ReportContractRefactoringController extends Controller
         $result['services'] = [
             'count' => $service_counter,
             'price' => $service_price,
-            'services_for_artem' => $services_for_artem
+            'services_for_artem' => $services_for_artem->groupBy('type')
         ];
 
         return $result;
@@ -540,7 +540,7 @@ class ReportContractRefactoringController extends Controller
         $result['services'] = [
             'count' => $service_counter,
             'price' => $service_price,
-            'services_for_artem' => $services_for_artem
+            'services_for_artem' => $services_for_artem->groupBy('type')
         ];
 
         return $result;
@@ -806,7 +806,7 @@ class ReportContractRefactoringController extends Controller
         $result['services'] = [
             'count' => $service_counter,
             'price' => $service_price,
-            'services_for_artem' => $services_for_artem
+            'services_for_artem' => $services_for_artem->groupBy('type')
         ];
 //        dd($result);
         return array_reverse($result);
@@ -1038,7 +1038,7 @@ class ReportContractRefactoringController extends Controller
         $result['services'] = [
             'count' => $service_counter,
             'price' => $service_price,
-            'services_for_artem' => $services_for_artem
+            'services_for_artem' => $services_for_artem->groupBy('type')
         ];
         return array_reverse($result);
     }
