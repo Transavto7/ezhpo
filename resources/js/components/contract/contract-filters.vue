@@ -93,7 +93,7 @@
 <!--                        </b-form-group>-->
 <!--                    </div>-->
                     <div class="d-flex align-items-center col-lg-3">
-                        <b-form-group label="Время окончания договора от" v-slot="{ ariaDescribedby }" class="w-100">
+                        <b-form-group label="Дата окончания договора от" v-slot="{ ariaDescribedby }" class="w-100">
                             <b-form-datepicker id="date_of_end_start" v-model="filters.date_of_end_start"
                                                placeholder="Укажите дату"
                                                reset-button
@@ -104,7 +104,7 @@
                         </b-form-group>
                     </div>
                     <div class="d-flex align-items-center col-lg-3">
-                        <b-form-group label="Время окончания договора до" v-slot="{ ariaDescribedby }" class="w-100">
+                        <b-form-group label="Дата окончания договора до" v-slot="{ ariaDescribedby }" class="w-100">
                             <b-form-datepicker id="date_of_end_end" v-model="filters.date_of_end_end"
                                                placeholder="Укажите дату"
                                                reset-button

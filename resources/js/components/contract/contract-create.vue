@@ -213,16 +213,16 @@
                         {{ carsVisible ? 'Скрыть машины' : 'Раскрыть машины' }}
                     </b-button>
                     <b-collapse id="collapse-carsVisible" v-model="carsVisible" class="mt-2">
-                        <b-row class="my-1">
-                            <b-col>
-                                <b-form-checkbox
-                                    v-model="allCarsSelected"
-                                >
-                                    Выбрать все
-                                </b-form-checkbox>
-                            </b-col>
-                        </b-row>
                         <b-card>
+                            <b-row class="my-1">
+                                <b-col>
+                                    <b-form-checkbox
+                                        v-model="allCarsSelected"
+                                    >
+                                        Выбрать все
+                                    </b-form-checkbox>
+                                </b-col>
+                            </b-row>
 
                             <b-form-group v-slot="{ ariaDescribedby }">
                                 <b-form-checkbox-group
