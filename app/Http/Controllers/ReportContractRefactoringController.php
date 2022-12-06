@@ -139,6 +139,7 @@ class ReportContractRefactoringController extends Controller
         $result = [];
 
         $type_views_eblan_mazaretto = [];
+        $total_dop_ebat = 0;
 
         foreach ($medics as $medic) {
             if ( !($type_views_eblan_mazaretto[$medic->type_view.$medic->type_anketa.$medic->driver->hash_id] ??
@@ -155,6 +156,8 @@ class ReportContractRefactoringController extends Controller
             if ($medic->is_dop && $medic->result_dop == null) {
                 $result[$medic->driver->hash_id]['types']['is_dop']['total']
                     = ($result[$medic->driver->hash_id]['types']['is_dop']['total'] ?? 0) + 1;
+
+                $total_dop_ebat++;
             }
 
             $result[$medic->driver->hash_id]['driver_fio'] = $medic->driver->fio;
@@ -327,7 +330,12 @@ class ReportContractRefactoringController extends Controller
         $result['services'] = [
             'count' => $service_counter,
             'price' => $service_price,
-            'services_for_artem' => $services_for_artem->groupBy('type')
+            'services_for_artem' => $services_for_artem
+                ->push([
+                    'count' => $total_dop_ebat,
+                    'type' => 'is_dop',
+                ])
+                ->groupBy('type')
         ];
 
         return $result;
@@ -363,7 +371,7 @@ class ReportContractRefactoringController extends Controller
                         })
                         ->get();
         $result = [];
-
+        $total_dop_ebat = 0;
         $type_views_eblan_mazaretto = [];
 
         $services_fuck = collect();
@@ -496,6 +504,8 @@ class ReportContractRefactoringController extends Controller
                                                                              ->where('is_dop', 1)
                                                                              ->count();
 
+            $total_dop_ebat += $result[$tech->car->hash_id]['types']['is_dop']['total'];
+
         }
 
         $service_counter = 0;
@@ -542,7 +552,12 @@ class ReportContractRefactoringController extends Controller
         $result['services'] = [
             'count' => $service_counter,
             'price' => $service_price,
-            'services_for_artem' => $services_for_artem->groupBy('type')
+            'services_for_artem' => $services_for_artem
+                ->push([
+                    'count' => $total_dop_ebat,
+                    'type' => 'is_dop',
+                ])
+                ->groupBy('type')
         ];
 
         return $result;
@@ -582,6 +597,7 @@ class ReportContractRefactoringController extends Controller
                          ->get();
 
         $result = [];
+        $total_dop_ebat = 0;
 
 
         $companyProdsID = $company
@@ -619,6 +635,7 @@ class ReportContractRefactoringController extends Controller
             if ($report->is_dop && $report->result_dop == null) {
                 $result[$key]['reports'][$report->driver_id]['types']['is_dop']['total']
                     = ($result[$key]['reports'][$report->driver_id]['types']['is_dop']['total'] ?? 0) + 1;
+                $total_dop_ebat++;
             }
 
             if ($report->driver->id) {
@@ -808,7 +825,11 @@ class ReportContractRefactoringController extends Controller
         $result['services'] = [
             'count' => $service_counter,
             'price' => $service_price,
-            'services_for_artem' => $services_for_artem->groupBy('type')
+            'services_for_artem' => $services_for_artem
+                ->push([
+                    'count' => $total_dop_ebat,
+                    'type' => 'is_dop',
+                ])->groupBy('type')
         ];
 //        dd($result);
         return array_reverse($result);
@@ -848,6 +869,7 @@ class ReportContractRefactoringController extends Controller
                          ->get();
 
         $result = [];
+        $total_dop_ebat = 0;
 
         $companyProdsID = $company
             ->contracts->whereIn('id', $this->contracts_ids)
@@ -881,6 +903,7 @@ class ReportContractRefactoringController extends Controller
             if ($report->is_dop && $report->result_dop == null) {
                 $result[$key]['reports'][$report->car_id]['types']['is_dop']['total']
                     = ($result[$key]['reports'][$report->car_id]['types']['is_dop']['total'] ?? 0) + 1;
+                $total_dop_ebat++;
             }
 
             if ($report->car->id) {
@@ -910,7 +933,7 @@ class ReportContractRefactoringController extends Controller
                 } else {
                     $services = collect();
                 }
-            } else {
+            } else {// ФИЛЬТР ДАТЫ ПЕРЕДЕЛАТЬ ЛОЛ НАДО
                 if ($services = $report->company
                     ->contracts->whereIn('id', $this->contracts_ids)
                                ->where(
@@ -1040,7 +1063,11 @@ class ReportContractRefactoringController extends Controller
         $result['services'] = [
             'count' => $service_counter,
             'price' => $service_price,
-            'services_for_artem' => $services_for_artem->groupBy('type')
+            'services_for_artem' => $services_for_artem
+                ->push([
+                'count' => $total_dop_ebat,
+                'type' => 'is_dop',
+            ])->groupBy('type')
         ];
         return array_reverse($result);
     }
