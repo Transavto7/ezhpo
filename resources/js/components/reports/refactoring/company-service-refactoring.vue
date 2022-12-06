@@ -60,8 +60,25 @@
                         <a href="?" class="btn btn-danger">Сбросить</a>
                     </div>
                 </div>
+                <b-row v-if="company">
+                    <b-col>
+                        <span>
+                            Отчёт сформирован по:
+                        </span>
+                        <b-button
+                            variant="danger"
+                            :href="'/elements/Company?filter=1&id=' + company.id"
+                            target="_blank"
+                        >
+                            {{ company.name }}
+                        </b-button>
+                    </b-col>
+                </b-row>
             </div>
         </div>
+
+
+
 
         <div v-for="(contract, index) in contracts">
             <div v-show="contract.visible_result" class="my-3">
