@@ -1334,8 +1334,22 @@ class AnketsController extends Controller
                     && $anketa['t_people'] < 38 && $tonometer[0] < 150 && $tonometer[1] < 100) {
                     $anketa['med_view'] = 'В норме';
                     $anketa['admitted'] = 'Допущен';
+
+                    //ПРОВЕРЯЕМ СТАТУС для поля "Заключение" - от ПАК
+                    if (isset($anketa['sleep_status']) && $anketa['sleep_status'] !== 'Да') {
+                        $anketa['admitted'] = 'Не допущен';
+                        $anketa['med_view'] = 'Отстранение';
+                    }
+                    if (isset($anketa['people_status']) && $anketa['people_status'] !== 'Да') {
+                        $anketa['admitted'] = 'Не допущен';
+                        $anketa['med_view'] = 'Отстранение';
+                    }
+                    if (isset($anketa['alcometer_result']) && $anketa['alcometer_result'] > 0) {
+                        $anketa['admitted'] = 'Не допущен';
+                        $anketa['med_view'] = 'Отстранение';
+                    }
                 } else {
-                    $anketa['med_view'] = 'Отстранения';
+                    $anketa['med_view'] = 'Отстранение';
                     $anketa['admitted'] = 'Не допущен';
                 }
 
