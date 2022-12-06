@@ -168,7 +168,7 @@ class ReportContractRefactoringController extends Controller
             $result[$medic->driver->hash_id]['driver_fio'] = $medic->driver->fio;
             if ( !($result[$medic->driver->hash_id]['pv_id'] ?? false)) {
                 $result[$medic->driver->hash_id]['pv_id'] = $medics
-                    ->where('car_id', $medic->driver->hash_id)
+                    ->where('driver_id', $medic->driver->hash_id)
                     ->pluck('pv_id')
                     ->unique()
                     ->implode('; ');
@@ -275,12 +275,38 @@ class ReportContractRefactoringController extends Controller
                     }
                 }
 
-                if($flagEbat?? false){
+//                "Предрейсовый/Предсменный"
+                if($medic->type_view === "Предрейсовый/Предсменный"){
+                    dump($service->toArray(), $total_for_type_view,$medic->type_anketa, $result);
+                }
+//                if($medic->type_anketa === 'pechat_pl'){
+//                    dd(
+//                        $medic->toArray(),
+//                        $service->toArray(),
+//                        $medic->type_anketa,
+//                        $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['sum'],
+//                        [
+//                            'sum'      => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['sum'] ?? 0,
+//                            'discount' => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['discount'] ?? 0,
+//                            'name'     => $service->name ?? '',
+//                            'id'       => $service->id ?? '',
+//                        ],
+//                        $flagEbat,[
+//                            'sum'      => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['sum'] ?? 0,
+//                            'discount' => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['discount'] ?? 0,
+//                            'name'     => $service->name ?? '',
+//                            'id'       => $service->id ?? '',
+//                        ]
+//                    );
+//                }
+
+                if($flagEbat ?? false){
                     $result[$medic->driver->hash_id]['types']['is_dop']['services'][] = [
                         'sum'      => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['sum'] ?? 0,
                         'discount' => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['discount'] ?? 0,
                         'name'     => $service->name ?? '',
                         'id'       => $service->id ?? '',
+                        'type_anketa'       => $service->type_anketa ?? '',
                     ];
                 }else{
                     $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['services'][] = [
@@ -288,6 +314,7 @@ class ReportContractRefactoringController extends Controller
                         'discount' => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['discount'] ?? 0,
                         'name'     => $service->name ?? '',
                         'id'       => $service->id ?? '',
+                        'type_anketa'       => $service->type_anketa ?? '',
                     ];
                 }
             }
@@ -306,12 +333,19 @@ class ReportContractRefactoringController extends Controller
                         = collect($result[$driver_id]['types'][$type_key]['services'])
                         ->groupBy('id')
                         ->map(function ($group) use($type_key, &$services_for_artem) {
+
+                            if($type_key === "Предрейсовый/Предсменный"){
+                                dd(
+                                    $group->first()
+                                );
+                            }
+
                             $services_for_artem->push([
                                 'id'       => $group->first()['id'],
                                 'name'     => $group->first()['name'],
                                 'discount' => round($group->first()['discount'] ?? 0),
-                                'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
-                                                                               / 100),
+                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+                                                                               / 100) - 1)),
                                 'count'    => $group->count(),
 
                                 'type' => $type_key
@@ -320,8 +354,8 @@ class ReportContractRefactoringController extends Controller
                                 'id'       => $group->first()['id'],
                                 'name'     => $group->first()['name'],
                                 'discount' => round($group->first()['discount'] ?? 0),
-                                'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
-                                                                               / 100),
+                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+                                                                               / 100) - 1)),
                                 'count'    => $group->count(),
 
                                 'type' => $type_key
@@ -337,7 +371,10 @@ class ReportContractRefactoringController extends Controller
             }
         }
 
-
+//dd(
+//    $result[167148]['types']['pechat_pl']['services']->toArray()
+//
+//);
         $data = $result;
         $result = [];
         $result['data'] = $data;
@@ -351,7 +388,9 @@ class ReportContractRefactoringController extends Controller
 //                ])
                 ->groupBy('type')
         ];
-
+dd(
+    $result
+);
         return $result;
     }
 
@@ -535,8 +574,8 @@ class ReportContractRefactoringController extends Controller
                                 'id'       => $group->first()['id'],
                                 'name'     => $group->first()['name'],
                                 'discount' => round($group->first()['discount']),
-                                'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
-                                                                               / 100),
+                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+                                                                               / 100) - 1)),
                                 'count'    => $group->count(),
                                 'type' => $type_key
                             ]);
@@ -544,8 +583,8 @@ class ReportContractRefactoringController extends Controller
                                 'id'       => $group->first()['id'],
                                 'name'     => $group->first()['name'],
                                 'discount' => round($group->first()['discount']),
-                                'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
-                                                                               / 100),
+                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+                                                                               / 100) - 1)),
                                 'count'    => $group->count(),
                                 'type' => $type_key
                             ];
@@ -824,8 +863,8 @@ class ReportContractRefactoringController extends Controller
                                     'id'       => $group->first()['id'],
                                     'name'     => $group->first()['name'],
                                     'discount' => round($group->first()['discount'] ?? 0),
-                                    'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
-                                                                                   / 100),
+                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+                                                                               / 100) - 1)),
                                     'count'    => $group->count(),
 
                                     'type' => $type_key
@@ -834,8 +873,8 @@ class ReportContractRefactoringController extends Controller
                                     'id'       => $group->first()['id'],
                                     'name'     => $group->first()['name'],
                                     'discount' => $group->first()['discount'],
-                                    'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
-                                                                                   / 100),
+                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+                                                                               / 100) - 1)),
                                     'count'    => $group->count(),
                                     'type' => $type_key
                                 ];
@@ -1077,8 +1116,8 @@ class ReportContractRefactoringController extends Controller
                                     'id'       => $group->first()['id'],
                                     'name'     => $group->first()['name'],
                                     'discount' => round($group->first()['discount'] ?? 0),
-                                    'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
-                                                                                   / 100),
+                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+                                                                               / 100) - 1)),
                                     'count'    => $group->count(),
 
                                     'type' => $type_key
@@ -1087,8 +1126,8 @@ class ReportContractRefactoringController extends Controller
                                     'id'       => $group->first()['id'],
                                     'name'     => $group->first()['name'],
                                     'discount' => $group->first()['discount'],
-                                    'price'    => ($group->first()['sum'] ?? 0) * (intval($group->first()['discount'] ?? 0)
-                                                                                   / 100),
+                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+                                                                               / 100) - 1)),
                                     'count'    => $group->count(),
                                     'type' => $type_key
                                 ];

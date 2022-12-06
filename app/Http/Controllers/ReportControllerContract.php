@@ -270,7 +270,7 @@ class ReportControllerContract extends Controller
             $result[$medic->driver->hash_id]['driver_fio'] = $medic->driver->fio;
             if ( !($result[$medic->driver->hash_id]['pv_id'] ?? false)) {
                 $result[$medic->driver->hash_id]['pv_id'] = $medics
-                    ->where('car_id', $medic->driver->hash_id)
+                    ->where('driver_id', $medic->driver->hash_id)
                     ->pluck('pv_id')
                     ->unique()
                     ->implode('; ');

@@ -346,7 +346,10 @@ export default {
     },
     watch: {
         company_id(val){
-            this.contractData.company = val
+            if(val.id){
+                this.contractData.company = val
+            }
+
             this.loadDrivers(true)
             this.loadCars(true)
         },
@@ -376,6 +379,7 @@ export default {
             if(is_new){
                 // this.contractData.drivers = [];
             }
+
             this.drivers_of_company = []
             if(this.contractData.company){
                 axios.post(`/contract/getDriversByCompany/` + this.contractData.company.id).then(({data}) => this.drivers_of_company = data)
@@ -387,7 +391,7 @@ export default {
             if(is_new){
                 // this.contractData.cars = [];
             }
-
+            console.log(this.contractData.company)
             this.cars_of_company = []
             if(this.contractData.company){
                 axios.post(`/contract/getCarsByCompany/` + this.contractData.company.id).then(({data}) => this.cars_of_company = data)
