@@ -142,6 +142,7 @@ class ReportContractRefactoringController extends Controller
         $total_dop_ebat = 0;
 
         foreach ($medics as $medic) {
+            $flagEbat = false;
             if ( !($type_views_eblan_mazaretto[$medic->type_view.$medic->type_anketa.$medic->driver->hash_id] ??
                    false)) {
                 $type_views_eblan_mazaretto[$medic->type_view.$medic->type_anketa.$medic->driver->hash_id]
@@ -158,6 +159,10 @@ class ReportContractRefactoringController extends Controller
                     = ($result[$medic->driver->hash_id]['types']['is_dop']['total'] ?? 0) + 1;
 
                 $total_dop_ebat++;
+                $flagEbat = true;
+//                dd(
+//                    $medic->toArray()
+//                );
             }
 
             $result[$medic->driver->hash_id]['driver_fio'] = $medic->driver->fio;
@@ -270,12 +275,21 @@ class ReportContractRefactoringController extends Controller
                     }
                 }
 
-                $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['services'][] = [
-                    'sum'      => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['sum'] ?? 0,
-                    'discount' => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['discount'] ?? 0,
-                    'name'     => $service->name ?? '',
-                    'id'       => $service->id ?? '',
-                ];
+                if($flagEbat?? false){
+                    $result[$medic->driver->hash_id]['types']['is_dop']['services'][] = [
+                        'sum'      => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['sum'] ?? 0,
+                        'discount' => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['discount'] ?? 0,
+                        'name'     => $service->name ?? '',
+                        'id'       => $service->id ?? '',
+                    ];
+                }else{
+                    $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['services'][] = [
+                        'sum'      => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['sum'] ?? 0,
+                        'discount' => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['discount'] ?? 0,
+                        'name'     => $service->name ?? '',
+                        'id'       => $service->id ?? '',
+                    ];
+                }
             }
         }
 
@@ -331,10 +345,10 @@ class ReportContractRefactoringController extends Controller
             'count' => $service_counter,
             'price' => $service_price,
             'services_for_artem' => $services_for_artem
-                ->push([
-                    'count' => $total_dop_ebat,
-                    'type' => 'is_dop',
-                ])
+//                ->push([
+//                    'count' => $total_dop_ebat,
+//                    'type' => 'is_dop',
+//                ])
                 ->groupBy('type')
         ];
 
@@ -608,6 +622,7 @@ class ReportContractRefactoringController extends Controller
             ->toArray();
 
         foreach ($reports as $report) {
+            $flagEbat = false;
             try {
                 if ($report->period_pl) {
                     $date = Carbon::parse($report->period_pl);
@@ -636,6 +651,7 @@ class ReportContractRefactoringController extends Controller
                 $result[$key]['reports'][$report->driver_id]['types']['is_dop']['total']
                     = ($result[$key]['reports'][$report->driver_id]['types']['is_dop']['total'] ?? 0) + 1;
                 $total_dop_ebat++;
+                $flagEbat = true;
             }
 
             if ($report->driver->id) {
@@ -730,12 +746,21 @@ class ReportContractRefactoringController extends Controller
                                     $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['discount']
                                         = $service->discount;
                                 }
-                                $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['services'][] = [
-                                    'sum'      => $result[$report->driver_id]['types'][$report->type_view]['sum'] ?? 0,
-                                    'discount' => $result[$report->driver_id]['types'][$report->type_view]['discount'] ?? 0,
-                                    'name'     => $service->name ?? '',
-                                    'id'       => $service->id ?? ''
-                                ];
+                                if($flagEbat?? false){
+                                    $result[$key]['reports'][$report->driver_id]['types']['is_dop']['services'][] = [
+                                        'sum'      => $result[$report->driver_id]['types'][$report->type_view]['sum'] ?? 0,
+                                        'discount' => $result[$report->driver_id]['types'][$report->type_view]['discount'] ?? 0,
+                                        'name'     => $service->name ?? '',
+                                        'id'       => $service->id ?? ''
+                                    ];
+                                }else{
+                                    $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['services'][] = [
+                                        'sum'      => $result[$report->driver_id]['types'][$report->type_view]['sum'] ?? 0,
+                                        'discount' => $result[$report->driver_id]['types'][$report->type_view]['discount'] ?? 0,
+                                        'name'     => $service->name ?? '',
+                                        'id'       => $service->id ?? ''
+                                    ];
+                                }
                             }
                         }
                     } else {
@@ -755,12 +780,21 @@ class ReportContractRefactoringController extends Controller
                                 $result[$key]['reports'][$report->driver_id]['types'][$service->type_anketa]['discount']
                                     = $service->discount;
                             }
-                            $result[$key]['reports'][$report->driver_id]['types'][$report->type_anketa]['services'][] = [
-                                'sum'      => $result[$report->driver_id]['types'][$report->type_anketa]['sum'] ?? 0,
-                                'discount' => $result[$report->driver_id]['types'][$report->type_anketa]['discount'] ?? 0,
-                                'name'     => $service->name ?? '',
-                                'id'       => $service->id ?? ''
-                            ];
+                            if($flagEbat?? false){
+                                $result[$key]['reports'][$report->driver_id]['types']['is_dop']['services'][] = [
+                                    'sum'      => $result[$report->driver_id]['types'][$report->type_anketa]['sum'] ?? 0,
+                                    'discount' => $result[$report->driver_id]['types'][$report->type_anketa]['discount'] ?? 0,
+                                    'name'     => $service->name ?? '',
+                                    'id'       => $service->id ?? ''
+                                ];
+                            }else{
+                                $result[$key]['reports'][$report->driver_id]['types'][$report->type_anketa]['services'][] = [
+                                    'sum'      => $result[$report->driver_id]['types'][$report->type_anketa]['sum'] ?? 0,
+                                    'discount' => $result[$report->driver_id]['types'][$report->type_anketa]['discount'] ?? 0,
+                                    'name'     => $service->name ?? '',
+                                    'id'       => $service->id ?? ''
+                                ];
+                            }
                         }
                     }
 
@@ -826,10 +860,11 @@ class ReportContractRefactoringController extends Controller
             'count' => $service_counter,
             'price' => $service_price,
             'services_for_artem' => $services_for_artem
-                ->push([
-                    'count' => $total_dop_ebat,
-                    'type' => 'is_dop',
-                ])->groupBy('type')
+//                ->push([
+//                    'count' => $total_dop_ebat,
+//                    'type' => 'is_dop',
+//                ])
+                ->groupBy('type')
         ];
 //        dd($result);
         return array_reverse($result);
@@ -879,6 +914,7 @@ class ReportContractRefactoringController extends Controller
                        ->toArray();
 
         foreach ($reports as $report) {
+            $flagEbat = false;
             try {
                 if ($report->period_pl) {
                     $date = Carbon::parse($report->period_pl);
@@ -904,6 +940,7 @@ class ReportContractRefactoringController extends Controller
                 $result[$key]['reports'][$report->car_id]['types']['is_dop']['total']
                     = ($result[$key]['reports'][$report->car_id]['types']['is_dop']['total'] ?? 0) + 1;
                 $total_dop_ebat++;
+                $flagEbat = true;
             }
 
             if ($report->car->id) {
@@ -1006,12 +1043,21 @@ class ReportContractRefactoringController extends Controller
                         }
                     }
 
-                    $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['services'][] = [
-                        'sum'      => $result[$report->car_id]['types'][$report->type_view]['sum'] ?? 0,
-                        'discount' => $result[$report->car_id]['types'][$report->type_view]['discount'] ?? 0,
-                        'name'     => $service->name ?? '',
-                        'id'       => $service->id ?? ''
-                    ];
+                    if($flagEbat?? false){
+                        $result[$key]['reports'][$report->car_id]['types']['is_dop']['services'][] = [
+                            'sum'      => $result[$report->car_id]['types'][$report->type_view]['sum'] ?? 0,
+                            'discount' => $result[$report->car_id]['types'][$report->type_view]['discount'] ?? 0,
+                            'name'     => $service->name ?? '',
+                            'id'       => $service->id ?? ''
+                        ];
+                    }else{
+                        $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['services'][] = [
+                            'sum'      => $result[$report->car_id]['types'][$report->type_view]['sum'] ?? 0,
+                            'discount' => $result[$report->car_id]['types'][$report->type_view]['discount'] ?? 0,
+                            'name'     => $service->name ?? '',
+                            'id'       => $service->id ?? ''
+                        ];
+                    }
                 }
             }
         }
@@ -1064,10 +1110,11 @@ class ReportContractRefactoringController extends Controller
             'count' => $service_counter,
             'price' => $service_price,
             'services_for_artem' => $services_for_artem
-                ->push([
-                'count' => $total_dop_ebat,
-                'type' => 'is_dop',
-            ])->groupBy('type')
+//                ->push([
+//                'count' => $total_dop_ebat,
+//                'type' => 'is_dop',
+//            ])
+                ->groupBy('type')
         ];
         return array_reverse($result);
     }
