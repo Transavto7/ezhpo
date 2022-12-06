@@ -201,8 +201,8 @@ class HomeController extends Controller
                 }
                 // если ключ date, и date или TO_date не пустые
                 if ($fk == 'date' && ($filter_params['date'] || $filter_params['TO_date'])) {
-                    $date_from = Carbon::parse($fv)->startOfDay() ?? Carbon::now()->subYears(2);
-                    $date_to   = Carbon::parse($filter_params['TO_date'])->endOfDay() ?? Carbon::now();
+                    $date_from = $fv ? Carbon::parse($fv)->startOfDay() : Carbon::now()->subYears(10);
+                    $date_to   = $filter_params['TO_date'] ? Carbon::parse($filter_params['TO_date'])->endOfDay() : Carbon::now()->addYears(10);
 
                     $anketas = $anketas->where(function ($q) use ($date_from, $date_to) {
                         $q->where(function ($q) use ($date_from, $date_to) {

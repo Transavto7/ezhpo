@@ -170,6 +170,16 @@
                     </b-button>
                     <b-collapse id="collapse-driversVisible" v-model="driversVisible" class="mt-2">
                         <b-card>
+                            <b-row class="my-1">
+                                <b-col>
+                                    <b-form-checkbox
+                                        v-model="allDriversSelected"
+                                    >
+                                        Выбрать все
+                                    </b-form-checkbox>
+                                </b-col>
+                            </b-row>
+
                             <b-form-group v-slot="{ ariaDescribedby }">
                                 <b-form-checkbox-group
                                     :aria-describedby="ariaDescribedby"
@@ -203,6 +213,15 @@
                         {{ carsVisible ? 'Скрыть машины' : 'Раскрыть машины' }}
                     </b-button>
                     <b-collapse id="collapse-carsVisible" v-model="carsVisible" class="mt-2">
+                        <b-row class="my-1">
+                            <b-col>
+                                <b-form-checkbox
+                                    v-model="allCarsSelected"
+                                >
+                                    Выбрать все
+                                </b-form-checkbox>
+                            </b-col>
+                        </b-row>
                         <b-card>
 
                             <b-form-group v-slot="{ ariaDescribedby }">
@@ -320,6 +339,9 @@ export default {
 
             company_id: [],
 
+            allDriversSelected: false,
+            allCarsSelected: false,
+
         }
     },
     watch: {
@@ -327,6 +349,24 @@ export default {
             this.contractData.company = val
             this.loadDrivers(true)
             this.loadCars(true)
+        },
+        allDriversSelected(){
+            this.contractData.drivers = [];
+
+            if (this.allDriversSelected) {
+                for (let driver in this.drivers_of_company) {
+                    this.contractData.drivers.push(this.drivers_of_company[driver].id.toString());
+                }
+            }
+        },
+        allCarsSelected(){
+            this.contractData.cars = [];
+
+            if (this.allCarsSelected) {
+                for (let car in this.cars_of_company) {
+                    this.contractData.cars.push(this.cars_of_company[car].id.toString());
+                }
+            }
         }
     },
     mounted(loadCars) {
@@ -372,18 +412,14 @@ export default {
                         this.typeOptions = data;
                     })
                     .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
-                // await axios.get(`/v-search/drivers`)
-                //     .then(({data}) => {
-                //         this.drivers = data;
-                //     })
-                //     .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
-                // await axios.get(`/v-search/cars`)
-                //     .then(({data}) => this.cars = data)
-                //     .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
+
                 await axios.get(`/v-search/services`)
                     .then(({data}) => this.products = data)
                     .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
             }
+
+            this.allDriversSelected = false;
+            this.allCarsSelected = false;
 
             this.company_id = {}
 

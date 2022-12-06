@@ -259,13 +259,6 @@ return [
             'days' => 'Кол-во дней',
             'action' => 'Действие',
         ],
-        'fieldhistory' => [
-            'hash_id' => 'ID',
-            'user_id' => 'Пользователь',
-            'value' => 'Значение',
-            'field' => 'Поле',
-            'created_at' => 'Дата',
-        ],
         'pak_sdpo' => [
             'hash_id' => 'ID',
             'api_token' => 'Токен',

@@ -282,7 +282,6 @@
             || user()->access('city_create') && $model == 'Town'
             || user()->access('requisites_create') && $model == 'Req'
             || user()->access('date_control_create') && $model == 'DDates'
-            || user()->access('story_field_create') && $model == 'FieldHistory'
             || user()->access('pv_create') && $model == 'Point'
             || (($model == 'Car' || $model == 'Driver' || $model == 'Company') && user()->access('client_create'))
         ) && !request()->get('deleted');
@@ -299,7 +298,6 @@
             || user()->access('requisites_delete') && $model == 'Req'
             || user()->access('date_control_delete') && $model == 'DDates'
             || user()->access('system_delete') && $model == 'Settings'
-            || user()->access('story_field_delete') && $model == 'FieldHistory'
             || user()->access('pv_delete') && $model == 'Point'
         ) && !request()->get('deleted');
 
@@ -315,7 +313,6 @@
             || user()->access('requisites_update') && $model == 'Req'
             || user()->access('date_control_update') && $model == 'DDates'
             || user()->access('system_update') && $model == 'Settings'
-            || user()->access('story_field_update') && $model == 'FieldHistory'
             || user()->access('pv_update') && $model == 'Point'
         ) && !request()->get('deleted');
 
@@ -331,7 +328,6 @@
             || user()->access('requisites_read') && $model == 'Req'
             || user()->access('date_control_read') && $model == 'DDates'
             || user()->access('system_read') && $model == 'Settings'
-            || user()->access('story_field_read') && $model == 'FieldHistory'
             || user()->access('pv_read') && $model == 'Point'
         );
 
@@ -345,7 +341,6 @@
             || user()->access('briefings_trash_read') && $model == 'Instr'
             || user()->access('system_trash') && $model == 'Settings'
             || user()->access('city_trash_read') && $model == 'Town'
-            || user()->access('story_field_trash') && $model == 'FieldHistory'
             || user()->access('date_control_trash') && $model == 'DDates'
             || user()->access('requisites_trash_read') && $model == 'Req'
             || user()->access('pv_trash_read') && $model == 'Point'

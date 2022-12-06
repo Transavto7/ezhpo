@@ -163,6 +163,10 @@ export default {
                         label:    "Название",
                     },
                     {
+                        key:      "main_for_company",
+                        label:    "Главный",
+                    },
+                    {
                         key:   "services",
                         label: "Услуги",
                     },
