@@ -1,69 +1,86 @@
 <template>
     <div class="report-group">
         <div class="report__title">
-            <span>Техосмотры за период</span>
+            Техосмотры за период
             {{ reports.data.length === 0 ? 'не найдены' : '' }}
         </div>
 
-        <div class="report__item mt-3" v-for="(car, car_id) in reports.data" :key="car_id" v-if="reports.data.length !== 0">
-            <div class="report__name">
-                <span class="text-muted">{{ car_id }}</span>
-                {{ car.car_gos_number }}
-                <span class="text-muted">{{ car.type_auto }}</span>
-            </div>
-            <div class="report__pvs mt-1">{{ car.pv_id || 'Пункты выпуска не найдены' }}</div>
-            <div class="report__cards">
-                <div class="report__card" v-for="(type, type_name) in car.types" :key="type_name">
-                    <div class="report__card-title">
-                        {{ getName(type_name) }}
-                    </div>
-
-                    <div class="report__card-item" v-for="(service, index) in type.services" :key="index">
-                        <div class="report__card-item-name">
-                            {{ service.name }}
+        <div v-if="reports.data.length !== 0">
+            <div class="report__item mt-3"
+                 v-for="(car, car_id) in reports.data"
+                 :key="car_id"
+            >
+                <div class="report__name">
+                    <span class="text-muted">{{ car_id }}</span>
+                    {{ car.car_gos_number }}
+                    <span class="text-muted">{{ car.type_auto }}</span>
+                </div>
+                <div class="report__pvs mt-1">{{ car.pv_id || 'Пункты выпуска не найдены' }}</div>
+                <div class="report__cards">
+                    <div class="report__card"
+                         v-if="type.count > 0 || type.total > 0"
+                         v-for="(type, type_name) in car.types"
+                         :key="type_name"
+                    >
+                        <div class="report__card-title">
+                            {{ getName(type_name) }}
                         </div>
 
-                        <div class="report__card-item-price">
-                            {{ service.price }}
-                            <span v-if="service.discount">{{ service.discount }}%</span>
-                        </div>
-                    </div>
+                        <div class="report__card-item"
+                             v-for="(service, index) in type.services"
+                             v-if="type_name !== 'is_dop'"
+                             :key="index"
+                        >
+                            <div class="report__card-item-name">
+                                {{ service.name }}
+                            </div>
 
-                    <div class="report__footer">
-                        <span>Всего осмотров: {{ type.count || type.total || 0 }}</span>
-                        <span v-if="type.sum">Общая стоимость: {{ type.sum }}</span>
+                            <div class="report__card-item-price">
+                                {{ service.price }}
+                                <span v-if="service.discount">{{ service.discount }}%</span>
+                            </div>
+                        </div>
+
+                        <div class="report__footer">
+                            <span>Всего осмотров: {{ type.count || type.total  }}</span>
+                            <span v-if="type.sum">Общая стоимость: {{ type.sum }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="report__item mt-3">
-            <div class="report__name">
-                Всего
-                <span>Кол-во: {{ reports.services.count || 0 }}</span>
-                <span>Стоимость: {{ reports.services.price || 0 }}</span>
-            </div>
-            <div class="report__cards">
-                <div class="report__card" v-for="(services, type_name) in reports.services.services_for_artem">
-                    <div class="report__card-title">
-                        {{ getName(services[0].type) }}
-                    </div>
-
-                    <div class="report__card-item" v-for="(service, index) in services" :key="index">
-                        <div class="report__card-item-name">
-                            {{ service.name }}
-                            <span>кол-во {{ service.count || 0 }}</span>
+            <div class="report__item mt-3">
+                <div class="report__name">
+                    Всего
+                    <span>Кол-во: {{ reports.services.count || 0 }}</span>
+                    <span>Стоимость: {{ reports.services.price || 0 }}</span>
+                </div>
+                <div class="report__cards">
+                    <div class="report__card" v-for="(services, type_name) in reports.services.services_for_artem">
+                        <div class="report__card-title">
+                            {{ getName(services[0].type) }}
                         </div>
 
-                        <div class="report__card-item-price">
-                            {{ service.price }}
-                            <span v-if="service.discount">{{ service.discount }}%</span>
-                        </div>
-                    </div>
+                        <div class="report__card-item"
+                             v-if="type_name !== 'is_dop'"
+                             v-for="(service, index) in services"
+                             :key="index"
+                        >
+                            <div class="report__card-item-name">
+                                {{ service.name }}
+                                <span>кол-во {{ service.count || 0 }}</span>
+                            </div>
 
-                    <div class="report__footer">
-                        <span>Всего осмотров: {{ services.reduce((sum, service) => { return sum + service.count }, 0) }}</span>
-                        <span>Общая стоимость: {{ services.reduce((sum, service) => { return sum + service.count }, 0) }}</span>
+                            <div class="report__card-item-price">
+                                {{ service.price }}
+                                <span v-if="service.discount">{{ service.discount }}%</span>
+                            </div>
+                        </div>
+
+                        <div class="report__footer">
+                            <span>Всего осмотров: {{ services.reduce((sum, service) => { return sum + service.count }, 0) }}</span>
+                            <span v-if="type_name !== 'is_dop'">Общая стоимость: {{ services.reduce((sum, service) => { return sum + service.price }, 0) }}</span>
+                        </div>
                     </div>
                 </div>
             </div>

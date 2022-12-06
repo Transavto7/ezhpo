@@ -186,6 +186,16 @@
                         <li>
                             <a href="{{ route('report.company_service') }}">
                                 <i class="fa fa-book"></i>Отчет по услугам компании
+                                <span class="
+                                    start-100
+                                    translate-middle
+                                    badge
+                                    text-white
+                                    rounded-pill
+                                    bg-success"
+                                >
+                                    view
+                                </span>
                             </a>
                         </li>
 {{--                    @endif--}}
