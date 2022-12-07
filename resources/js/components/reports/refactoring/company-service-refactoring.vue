@@ -240,56 +240,56 @@ export default {
             // for (let type_report in contract){
             //     type_report.services
             // }
-            // for (let type_report in contract){
-            //     if(type_report == 'techs' || type_report == 'medics'){
-            //         for (let human_id in contract[type_report]){
-            //             for (let type in contract[type_report][human_id].types){
-            //                 if(contract[type_report][human_id].types[type].sum){
-            //                     res += contract[type_report][human_id].types[type].sum
-            //                 }
-            //             }
-            //         }
-            //         // console.log(type_report)
-            //         // console.log(res)
-            //         continue;
-            //     }
-            //     if(type_report == 'medics_other' || type_report == 'techs_other'){
-            //         for (let year in contract[type_report]){
-            //             for (let human_id in contract[type_report][year].reports){
-            //                 for (let type in contract[type_report][human_id]){
-            //                     if(contract[type_report][human_id].types[type].sum){
-            //                         res += contract[type_report][human_id].types[type].sum
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //         // console.log(type_report)
-            //         // console.log(res)
-            //         continue;
-            //     }
-            //
-            //     if(type_report == 'other'){
-            //         for (let type in contract[type_report]){
-            //             if(type == 'company'){
-            //                 for (let totall in contract[type_report][type]){
-            //                     res += contract[type_report][type][totall]
-            //                 }
-            //                 // console.log(type)
-            //                 // console.log(type_report)
-            //                 // console.log(contract[type_report][type][totall])
-            //                 continue;
-            //             }
-            //             // if(type == 'drivers'){
-            //             for (let totall in contract[type_report][type]){
-            //                 res += contract[type_report][type][totall].sum
-            //                 // console.log(type)
-            //                 // console.log(type_report)
-            //                 // console.log(contract[type_report][type][totall].sum)
-            //             }
-            //             // }
-            //         }
-            //     }
-            // }
+            for (let type_report in contract){
+                if(type_report == 'techs' || type_report == 'medics'){
+                    for (let human_id in contract[type_report]){
+                        for (let type in contract[type_report][human_id].types){
+                            if(contract[type_report][human_id].types[type].sum){
+                                res += contract[type_report][human_id].types[type].sum
+                            }
+                        }
+                    }
+                    // console.log(type_report)
+                    // console.log(res)
+                    continue;
+                }
+                if(type_report == 'medics_other' || type_report == 'techs_other'){
+                    for (let year in contract[type_report]){
+                        for (let human_id in contract[type_report][year].reports){
+                            for (let type in contract[type_report][human_id]){
+                                if(contract[type_report][human_id].types[type].sum){
+                                    res += contract[type_report][human_id].types[type].sum
+                                }
+                            }
+                        }
+                    }
+                    // console.log(type_report)
+                    // console.log(res)
+                    continue;
+                }
+
+                if(type_report == 'other'){
+                    for (let type in contract[type_report]){
+                        if(type == 'company'){
+                            for (let totall in contract[type_report][type]){
+                                res += contract[type_report][type][totall]
+                            }
+                            // console.log(type)
+                            // console.log(type_report)
+                            // console.log(contract[type_report][type][totall])
+                            continue;
+                        }
+                        // if(type == 'drivers'){
+                        for (let totall in contract[type_report][type]){
+                            res += contract[type_report][type][totall].sum
+                            // console.log(type)
+                            // console.log(type_report)
+                            // console.log(contract[type_report][type][totall].sum)
+                        }
+                        // }
+                    }
+                }
+            }
             console.log(res)
             return res;
         },
