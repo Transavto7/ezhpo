@@ -170,7 +170,7 @@
                     </b-button>
                     <b-collapse id="collapse-driversVisible" v-model="driversVisible" class="mt-2">
                         <b-card>
-                            <b-row class="my-1">
+                            <b-row class="my-1" v-if="drivers_of_company.length">
                                 <b-col>
                                     <b-form-checkbox
                                         v-model="allDriversSelected"
@@ -183,7 +183,8 @@
                             <b-form-group v-slot="{ ariaDescribedby }">
                                 <b-form-checkbox-group
                                     :aria-describedby="ariaDescribedby"
-                                    name="flavour-2"
+                                    name="flavour-2"contractData
+                                    ref="drivers_list_of_company"
                                     v-model="contractData.drivers"
                                 >
                                     <b-row>
@@ -194,6 +195,7 @@
                                                         :value="dataDriver.id"
                                                         :key="index"
                                                     >
+                                                        {{ dataDriver }}
                                                         {{ dataDriver.fio }}
                                                     </b-form-checkbox>
                                                 </b-col>
@@ -214,7 +216,7 @@
                     </b-button>
                     <b-collapse id="collapse-carsVisible" v-model="carsVisible" class="mt-2">
                         <b-card>
-                            <b-row class="my-1">
+                            <b-row class="my-1" v-if="cars_of_company.length">
                                 <b-col>
                                     <b-form-checkbox
                                         v-model="allCarsSelected"
@@ -325,6 +327,8 @@ export default {
                 our_company: null,
                 main_for_company: false, // Главный для компании
                 services: [],
+                drivers: [],
+                cars: [],
 
                 hard_reset_for_car_and_drivers: false,
             },
@@ -346,8 +350,10 @@ export default {
     },
     watch: {
         company_id(val){
-            if(val.id){
+            if(val?.id){
                 this.contractData.company = val
+            }else{
+                this.contractData.company = null
             }
 
             this.loadDrivers(true)
@@ -356,11 +362,15 @@ export default {
         allDriversSelected(){
             this.contractData.drivers = [];
 
+            console.log(1111111111)
+            console.log(this.allDriversSelected)
             if (this.allDriversSelected) {
                 for (let driver in this.drivers_of_company) {
-                    this.contractData.drivers.push(this.drivers_of_company[driver].id.toString());
+                    console.log(this.drivers_of_company[driver])
+                    this.contractData.drivers.push(this.drivers_of_company[driver].id);
                 }
             }
+            // this.$refs.drivers_list_of_company.$forceUpdate();
         },
         allCarsSelected(){
             this.contractData.cars = [];
@@ -454,7 +464,10 @@ export default {
                 // moment()
                 // this.contractData = data
             } else {
-                this.contractData = {}
+                this.contractData = {
+                    drivers: [],
+                    cars: [],
+                }
             }
 
             this.loadDrivers()
