@@ -242,6 +242,7 @@ export default {
             // }
             for (let type_report in contract){
                 if(type_report == 'techs' || type_report == 'medics'){
+                    console.log(contract[type_report].data)
                     for (let human_id in contract[type_report].data){
                         for (let type in contract[type_report].data[human_id].types){
                             if(contract[type_report].data[human_id].types[type].sum){
@@ -255,6 +256,7 @@ export default {
                 }
                 if(type_report == 'medics_other' || type_report == 'techs_other'){
                     for (let year in contract[type_report].data){
+                        console.log(contract[type_report].data)
                         for (let human_id in contract[type_report].data[year].reports){
                             for (let type in contract[type_report].data[human_id]){
                                 if(contract[type_report].data[human_id].types[type].sum){
@@ -270,6 +272,7 @@ export default {
 
                 if(type_report == 'other'){
                     for (let type in contract[type_report].data){
+                        console.log(contract[type_report].data)
                         if(type == 'company'){
                             for (let totall in contract[type_report].data[type]){
                                 res += contract[type_report].data[type][totall]
