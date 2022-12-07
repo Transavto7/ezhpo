@@ -334,11 +334,11 @@ class ReportContractRefactoringController extends Controller
                         ->groupBy('id')
                         ->map(function ($group) use($type_key, &$services_for_artem) {
 
-                            if($type_key === "Предрейсовый/Предсменный"){
-                                dd(
-                                    $group->first()
-                                );
-                            }
+//                            if($type_key === "Предрейсовый/Предсменный"){
+//                                dd(
+//                                    $group->first()
+//                                );
+//                            }
 
                             $services_for_artem->push([
                                 'id'       => $group->first()['id'],
@@ -388,9 +388,9 @@ class ReportContractRefactoringController extends Controller
 //                ])
                 ->groupBy('type')
         ];
-dd(
-    $result
-);
+//dd(
+//    $result
+//);
         return $result;
     }
 
