@@ -276,9 +276,9 @@ class ReportContractRefactoringController extends Controller
                 }
 
 //                "Предрейсовый/Предсменный"
-                if($medic->type_view === "Предрейсовый/Предсменный"){
-                    dump($service->toArray(), $total_for_type_view,$medic->type_anketa, $result);
-                }
+//                if($medic->type_view === "Предрейсовый/Предсменный"){
+//                    dump($service->toArray(), $total_for_type_view,$medic->type_anketa, $result);
+//                }
 //                if($medic->type_anketa === 'pechat_pl'){
 //                    dd(
 //                        $medic->toArray(),
