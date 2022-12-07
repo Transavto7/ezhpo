@@ -195,7 +195,6 @@
                                                         :value="dataDriver.id"
                                                         :key="index"
                                                     >
-                                                        {{ dataDriver }}
                                                         {{ dataDriver.fio }}
                                                     </b-form-checkbox>
                                                 </b-col>
