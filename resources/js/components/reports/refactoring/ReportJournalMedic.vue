@@ -13,7 +13,7 @@
                     <span class="text-muted">{{ driver_id }}</span> {{ driver.driver_fio }}
                 </div>
                 <div class="report__pvs mt-1">{{ driver.pv_id || 'Пункты выпуска не найдены' }}</div>
-                <div class="report__cards">
+                <div class="report__cards medic">
                     <div class="report__card"
                          v-if="type.count > 0 || type.total > 0"
                          v-for="(type, type_name) in driver.types"
