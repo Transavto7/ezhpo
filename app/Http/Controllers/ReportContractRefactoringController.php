@@ -315,6 +315,7 @@ class ReportContractRefactoringController extends Controller
                         'id'       => $service->id ?? '',
                         'type_anketa'       => $service->type_anketa ?? '',
                         'type_view'       => $service->type_view ?? '',
+                        'type_key'       => $service->type_anketa === 'medic' ? $medic->type_view : $medic->type_anketa,
                     ];
                 }else{
                     $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['services'][] = [
@@ -324,6 +325,7 @@ class ReportContractRefactoringController extends Controller
                         'id'       => $service->id ?? '',
                         'type_anketa'       => $service->type_anketa ?? '',
                         'type_view'       => $service->type_view ?? '',
+                        'type_key'       => $service->type_anketa === 'medic' ? $medic->type_view : $medic->type_anketa,
                     ];
                 }
             }
@@ -334,61 +336,92 @@ class ReportContractRefactoringController extends Controller
 
         $services_for_artem = collect();
 
+        $temp_collection_service = collect();
+
+
         foreach ($result as $driver_id => $fcn_info){
             foreach (($fcn_info['types'] ?? []) as $type_key => $type_info){
                 if($result[$driver_id]['types'][$type_key]['services'] ?? false){
-
+                    $temp_collection_service->push($result[$driver_id]['types'][$type_key]['services']);
                     $result[$driver_id]['types'][$type_key]['services']
                         = collect($result[$driver_id]['types'][$type_key]['services'])
-                        ->groupBy('type_key')
+                        ->groupBy('id')
                         ->map(function ($group) use($type_key, &$services_for_artem) {
 
-                            $services_for_artem->push([
-                                'id'       => $group->first()['id'],
-                                'name'     => $group->first()['name'],
-                                'discount' => round($group->first()['discount'] ?? 0),
-                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
-                                                                                  / 100) - 1)),
-                                //                                'count'    => $group->count(),
+//                            $services_for_artem->push([
+//                                'id'       => $group->first()['id'],
+//                                'name'     => $group->first()['name'],
+//                                'discount' => round($group->first()['discount'] ?? 0),
+//                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ??
+//                                                                                         0)
+//                                                                                  / 100) - 1)),
+//                                'count'    => $group->count(),
+//
+//                                'type'        => $type_key,
+//                                'type_anketa' => $group->first()['type_anketa'],
+//                            ]);
 
-                                'type' => $type_key,
-                                'type_anketa' => $group->first()['type_anketa'],
-                            ]);
                             return [
                                 'id'       => $group->first()['id'],
                                 'name'     => $group->first()['name'],
                                 'discount' => round($group->first()['discount'] ?? 0),
-                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ??
+                                                                                         0)
                                                                                   / 100) - 1)),
-                                //                                'count'    => $group->count(),
+                                'count'    => $group->count(),
 
-                                'type' => $type_key,
+                                'type'        => $type_key,
                                 'type_anketa' => $group->first()['type_anketa'],
                             ];
                         })
                         ->values();
                     if ($fist = $result[$driver_id]['types'][$type_key]['services']->first()) {
-//                        $result[$driver_id]['types'][$type_key]['count'] = $fist['count'];
-//                        dd(
-//                            $type_views_eblan_mazaretto, $type_key, $fist['type_anketa'], $fist['type']
-//                        );
-//                        dd(
-//                            $fist
-//                        );
                         $service_counter += $result[$driver_id]['types'][$type_key]['count'] ?? 0 ;
                         $service_price += $fist['price'];
                     }
                 }
             }
         }
+//dd(
+//    $temp_collection_service->toArray()
+//);
+        $temp_collection_service->flatten(1)
+                                ->groupBy('type_key')
+                                ->map(function ($group, $index) use($services_for_artem) {
+
+//                $group = $group;
+                                    $services_for_artem->push([
+                                        'id'       => $group->first()['id'],
+                                        'name'     => $group->first()['name'],
+                                        'discount' => round($group->first()['discount'] ?? 0),
+                                        'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ??
+                                                                                                 0)
+                                                                                          / 100) - 1)),
+                                        'count'    => $group->count(),
+
+                                        'type'        => $index,
+                                        //                    'type_anketa' => $group->first()['type_anketa'],
+                                    ]);
+
+                                    return [
+                                        'id'       => $group->first()['id'],
+                                        'name'     => $group->first()['name'],
+                                        'discount' => round($group->first()['discount'] ?? 0),
+                                        'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ??
+                                                                                                 0)
+                                                                                          / 100) - 1)),
+                                        'count'    => $group->count(),
+
+                                        'type'        => $index,
+                                        'type_anketa' => $group->first()['type_anketa'],
+                                    ];
+                                })
+                                ->values();
 //dd(123);
 //dd(
 //    $result[167148]['types']['pechat_pl']['services']->toArray()
 //
 //);
-//        dd(
-//            $result
-//        );
         $data = $result;
         $result = [];
         $result['data'] = $data;
@@ -402,6 +435,9 @@ class ReportContractRefactoringController extends Controller
 //                ])
                 ->groupBy('type')
         ];
+//        dd(
+//            $result
+//        );
 //        dd(
 //            $result
 //        );
@@ -565,7 +601,8 @@ class ReportContractRefactoringController extends Controller
                     'sum'      => $result[$tech->car->hash_id]['types'][$tech->type_view]['sum'] ?? 0,
                     'discount' => $result[$tech->car->hash_id]['types'][$tech->type_view]['discount'] ?? 0,
                     'name'     => $service->name ?? '',
-                    'id'       => $service->id ?? ''
+                    'id'       => $service->id ?? '',
+                    'type_key'       => $tech->type_view,
                 ];
             }
 
@@ -582,22 +619,25 @@ class ReportContractRefactoringController extends Controller
 
         $service_counter = 0;
         $service_price = 0;
+        $temp_collection_service = collect();
         $services_for_artem = collect();
+
         foreach ($result as $car_id => $fcn_info){
             foreach ($fcn_info['types'] as $type_key => $type_info){
                 if($result[$car_id]['types'][$type_key]['services'] ?? false){
+                    $temp_collection_service->push($result[$car_id]['types'][$type_key]['services']);
                     $result[$car_id]['types'][$type_key]['services'] = collect($result[$car_id]['types'][$type_key]['services'])
                         ->groupBy('id')
                         ->map(function ($group) use($type_key, &$services_for_artem) {
-                            $services_for_artem->push([
-                                'id'       => $group->first()['id'],
-                                'name'     => $group->first()['name'],
-                                'discount' => round($group->first()['discount']),
-                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
-                                                                                  / 100) - 1)),
-                                'count'    => $group->count(),
-                                'type' => $type_key
-                            ]);
+//                            $services_for_artem->push([
+//                                'id'       => $group->first()['id'],
+//                                'name'     => $group->first()['name'],
+//                                'discount' => round($group->first()['discount']),
+//                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+//                                                                                  / 100) - 1)),
+//                                'count'    => $group->count(),
+//                                'type' => $type_key
+//                            ]);
                             return [
                                 'id'       => $group->first()['id'],
                                 'name'     => $group->first()['name'],
@@ -617,7 +657,26 @@ class ReportContractRefactoringController extends Controller
                 }
             }
         }
+//dd(
+//    $temp_collection_service->toArray()
+//);
+        $temp_collection_service->flatten(1)
+                                ->groupBy('type_key')
+                                ->map(function ($group, $index) use($services_for_artem) {
 
+                                    $services_for_artem->push([
+                                        'id'       => $group->first()['id'],
+                                        'name'     => $group->first()['name'],
+                                        'discount' => round($group->first()['discount'] ?? 0),
+                                        'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ??
+                                                                                                 0)
+                                                                                          / 100) - 1)),
+                                        'count'    => $group->count(),
+
+                                        'type'        => $index,
+                                        //                                        'type_anketa' => $group->first()['type_anketa'],
+                                    ]);
+                                });
         $data = $result;
         $result = [];
         $result['data'] = $data;
@@ -808,14 +867,16 @@ class ReportContractRefactoringController extends Controller
                                         'sum'      => $result[$report->driver_id]['types'][$report->type_view]['sum'] ?? 0,
                                         'discount' => $result[$report->driver_id]['types'][$report->type_view]['discount'] ?? 0,
                                         'name'     => $service->name ?? '',
-                                        'id'       => $service->id ?? ''
+                                        'id'       => $service->id ?? '',
+                                        'type_key'       => $report->type_view,
                                     ];
                                 }else{
                                     $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['services'][] = [
                                         'sum'      => $result[$report->driver_id]['types'][$report->type_view]['sum'] ?? 0,
                                         'discount' => $result[$report->driver_id]['types'][$report->type_view]['discount'] ?? 0,
                                         'name'     => $service->name ?? '',
-                                        'id'       => $service->id ?? ''
+                                        'id'       => $service->id ?? '',
+                                        'type_key'       => $report->type_view,
                                     ];
                                 }
                             }
@@ -842,6 +903,7 @@ class ReportContractRefactoringController extends Controller
                                     'sum'      => $result[$report->driver_id]['types'][$report->type_anketa]['sum'] ?? 0,
                                     'discount' => $result[$report->driver_id]['types'][$report->type_anketa]['discount'] ?? 0,
                                     'name'     => $service->name ?? '',
+                                    'type_key'       => $report->type_anketa,
                                     'id'       => $service->id ?? ''
                                 ];
                             }else{
@@ -849,6 +911,7 @@ class ReportContractRefactoringController extends Controller
                                     'sum'      => $result[$report->driver_id]['types'][$report->type_anketa]['sum'] ?? 0,
                                     'discount' => $result[$report->driver_id]['types'][$report->type_anketa]['discount'] ?? 0,
                                     'name'     => $service->name ?? '',
+                                    'type_key'       => $report->type_anketa,
                                     'id'       => $service->id ?? ''
                                 ];
                             }
@@ -869,24 +932,26 @@ class ReportContractRefactoringController extends Controller
 
         $service_counter = 0;
         $service_price = 0;
+        $temp_collection_service = collect();
         $services_for_artem = collect();
         foreach ($result as $key => $period_info){
             foreach ($period_info['reports'] as $driver_id => $fcn_info){
                 foreach ($fcn_info['types'] as $type_key => $type_info){
                     if($result[$key]['reports'][$driver_id]['types'][$type_key]['services'] ?? false){
+                        $temp_collection_service->push($result[$key]['reports'][$driver_id]['types'][$type_key]['services']);
                         $result[$key]['reports'][$driver_id]['types'][$type_key]['services'] = collect($result[$key]['reports'][$driver_id]['types'][$type_key]['services'])
                             ->groupBy('id')
                             ->map(function ($group) use($type_key, &$services_for_artem){
-                                $services_for_artem->push([
-                                    'id'       => $group->first()['id'],
-                                    'name'     => $group->first()['name'],
-                                    'discount' => round($group->first()['discount'] ?? 0),
-                                    'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
-                                                                                      / 100) - 1)),
-                                    'count'    => $group->count(),
-
-                                    'type' => $type_key
-                                ]);
+//                                $services_for_artem->push([
+//                                    'id'       => $group->first()['id'],
+//                                    'name'     => $group->first()['name'],
+//                                    'discount' => round($group->first()['discount'] ?? 0),
+//                                    'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+//                                                                                      / 100) - 1)),
+//                                    'count'    => $group->count(),
+//
+//                                    'type' => $type_key
+//                                ]);
                                 return [
                                     'id'       => $group->first()['id'],
                                     'name'     => $group->first()['name'],
@@ -910,6 +975,25 @@ class ReportContractRefactoringController extends Controller
                 }
             }
         }
+        $temp_collection_service->flatten(1)
+                                ->groupBy('type_key')
+                                ->map(function ($group, $index) use(&$services_for_artem) {
+
+//                $group = $group;
+                                    $services_for_artem->push([
+                                        'id'       => $group->first()['id'],
+                                        'name'     => $group->first()['name'],
+                                        'discount' => round($group->first()['discount'] ?? 0),
+                                        'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ??
+                                                                                                 0)
+                                                                                          / 100) - 1)),
+                                        'count'    => $group->count(),
+
+                                        'type'        => $index,
+                                        //                                        'type_anketa' => $group->first()['type_anketa'],
+                                    ]);
+                                })
+                                ->values();
         $data = $result;
         $result = [];
         $result['data'] = $data;
@@ -971,6 +1055,55 @@ class ReportContractRefactoringController extends Controller
                        ->toArray();
 
         foreach ($reports as $report) {
+            if ($report->car->id) {
+                if ($services = $report->car
+                    ->contracts->whereIn('id', $this->contracts_ids)
+                               ->where(
+                                   'date_of_end', '>',
+                                   ($report->date
+                                       ? Carbon::parse($report->date)->subDay()->format('Y-m-d')
+                                       :
+                                       Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                               )
+                               ->where(
+                                   'date_of_start', '<',
+                                   ($report->date
+                                       ? Carbon::parse($report->date)->addDay()->format('Y-m-d')
+                                       :
+                                       Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                               )
+                               ->first()) {
+
+                    $services = $services->services;
+                } else {
+                    continue;
+                }
+            } else {
+                if ($services = $report->company
+                    ->contracts->whereIn('id', $this->contracts_ids)
+                               ->where(
+                                   'date_of_end', '>',
+                                   ($report->date
+                                       ? Carbon::parse($report->date)->subDay()->format('Y-m-d')
+                                       :
+                                       Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                               )
+                               ->where(
+                                   'date_of_start', '<',
+                                   ($report->date
+                                       ? Carbon::parse($report->date)->addDay()->format('Y-m-d')
+                                       :
+                                       Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                               )
+                               ->where("main_for_company", 1)
+                               ->first()) {
+                    $services = $services->services;
+                } else {
+                    continue;
+                }
+            }
+
+
             $flagEbat = false;
             try {
                 if ($report->period_pl) {
@@ -1000,57 +1133,6 @@ class ReportContractRefactoringController extends Controller
                 $flagEbat = true;
             }
 
-            if ($report->car->id) {
-                if ($report->car->contracts->isNotEmpty()) {
-                    if ($services = $report->car
-                        ->contracts->whereIn('id', $this->contracts_ids)
-                                   ->where(
-                                       'date_of_end', '>',
-                                       ($report->date
-                                           ? Carbon::parse($report->date)->subDay()->format('Y-m-d')
-                                           :
-                                           Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                                   )
-                                   ->where(
-                                       'date_of_start', '<',
-                                       ($report->date
-                                           ? Carbon::parse($report->date)->addDay()->format('Y-m-d')
-                                           :
-                                           Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                                   )
-                                   ->first()) {
-
-                        $services = $services->services;
-                    } else {
-                        $services = collect();
-                    }
-                } else {
-                    $services = collect();
-                }
-            } else {// ФИЛЬТР ДАТЫ ПЕРЕДЕЛАТЬ ЛОЛ НАДО
-                if ($services = $report->company
-                    ->contracts->whereIn('id', $this->contracts_ids)
-                               ->where(
-                                   'date_of_end', '>',
-                                   ($report->date
-                                       ? Carbon::parse($report->date)->subDay()->format('Y-m-d')
-                                       :
-                                       Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                               )
-                               ->where(
-                                   'date_of_start', '<',
-                                   ($report->date
-                                       ? Carbon::parse($report->date)->addDay()->format('Y-m-d')
-                                       :
-                                       Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                               )
-                               ->where("main_for_company", 1)
-                               ->first()) {
-                    $services = $services->services;
-                } else {
-                    $services = collect();
-                }
-            }
 
             $types = explode('/', $report->type_view);
 //            $prods = $services;
@@ -1105,12 +1187,14 @@ class ReportContractRefactoringController extends Controller
                             'sum'      => $result[$report->car_id]['types'][$report->type_view]['sum'] ?? 0,
                             'discount' => $result[$report->car_id]['types'][$report->type_view]['discount'] ?? 0,
                             'name'     => $service->name ?? '',
+                            'type_key'       => $report->type_view,
                             'id'       => $service->id ?? ''
                         ];
                     }else{
                         $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['services'][] = [
                             'sum'      => $result[$report->car_id]['types'][$report->type_view]['sum'] ?? 0,
                             'discount' => $result[$report->car_id]['types'][$report->type_view]['discount'] ?? 0,
+                            'type_key'       => $report->type_view,
                             'name'     => $service->name ?? '',
                             'id'       => $service->id ?? ''
                         ];
@@ -1122,24 +1206,26 @@ class ReportContractRefactoringController extends Controller
 
         $service_counter = 0;
         $service_price = 0;
+        $temp_collection_service = collect();
         $services_for_artem = collect();
         foreach ($result as $key => $period_info){
             foreach ($period_info['reports'] as $car_id => $fcn_info){
                 foreach ($fcn_info['types'] as $type_key => $type_info){
                     if($result[$key]['reports'][$car_id]['types'][$type_key]['services'] ?? false){
+                        $temp_collection_service->push($result[$key]['reports'][$car_id]['types'][$type_key]['services']);
                         $result[$key]['reports'][$car_id]['types'][$type_key]['services'] = collect($result[$key]['reports'][$car_id]['types'][$type_key]['services'])
                             ->groupBy('id')
                             ->map(function ($group) use($type_key, &$services_for_artem) {
-                                $services_for_artem->push([
-                                    'id'       => $group->first()['id'],
-                                    'name'     => $group->first()['name'],
-                                    'discount' => round($group->first()['discount'] ?? 0),
-                                    'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
-                                                                                      / 100) - 1)),
-                                    'count'    => $group->count(),
-
-                                    'type' => $type_key
-                                ]);
+//                                $services_for_artem->push([
+//                                    'id'       => $group->first()['id'],
+//                                    'name'     => $group->first()['name'],
+//                                    'discount' => round($group->first()['discount'] ?? 0),
+//                                    'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+//                                                                                      / 100) - 1)),
+//                                    'count'    => $group->count(),
+//
+//                                    'type' => $type_key
+//                                ]);
                                 return [
                                     'id'       => $group->first()['id'],
                                     'name'     => $group->first()['name'],
@@ -1160,6 +1246,25 @@ class ReportContractRefactoringController extends Controller
                 }
             }
         }
+        $temp_collection_service->flatten(1)
+                                ->groupBy('type_key')
+                                ->map(function ($group, $index) use( &$services_for_artem) {
+
+//                $group = $group;
+                                    $services_for_artem->push([
+                                        'id'       => $group->first()['id'],
+                                        'name'     => $group->first()['name'],
+                                        'discount' => round($group->first()['discount'] ?? 0),
+                                        'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ??
+                                                                                                 0)
+                                                                                          / 100) - 1)),
+                                        'count'    => $group->count(),
+
+                                        'type'        => $index,
+                                        //                                        'type_anketa' => $group->first()['type_anketa'],
+                                    ]);
+                                })
+                                ->values();
         $data = $result;
         $result = [];
         $result['data'] = $data;
