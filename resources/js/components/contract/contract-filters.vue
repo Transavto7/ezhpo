@@ -76,6 +76,27 @@
                             </v-select>
                         </b-form-group>
                     </div>
+                    <div class="d-flex align-items-center col-lg-3">
+                        <b-form-group label="Главный" v-slot="{ ariaDescribedby }" class="w-100">
+<!--                            <v-select-->
+<!--                                v-model="filters.main_for_company"-->
+<!--                                :options=""-->
+<!--                                key="key"-->
+<!--                            >-->
+<!--                            </v-select>-->
+                            <b-form-select v-model="filters.main_for_company" :options="[{
+                                    value: null,
+                                    text: '----',
+                                },{
+                                    value: 0,
+                                    text: 'Нет',
+                                },{
+                                    value: 1,
+                                    text: 'Да',
+                                }]">
+                            </b-form-select>
+                        </b-form-group>
+                    </div>
 <!--                    <div class="d-flex align-items-center col-lg-3">-->
 <!--                        <b-form-group label="Главный" v-slot="{ ariaDescribedby }" class="w-100">-->
 <!--                            <b-form-radio v-model="filters.main_for_company" :aria-describedby="ariaDescribedby"-->
@@ -106,6 +127,28 @@
                     <div class="d-flex align-items-center col-lg-3">
                         <b-form-group label="Дата окончания договора до" v-slot="{ ariaDescribedby }" class="w-100">
                             <b-form-datepicker id="date_of_end_end" v-model="filters.date_of_end_end"
+                                               placeholder="Укажите дату"
+                                               reset-button
+                                               close-button
+                                               label-reset-button="Сбросить"
+                                               label-close-button="Закрыть"
+                                               class="mb-2"></b-form-datepicker>
+                        </b-form-group>
+                    </div>
+                    <div class="d-flex align-items-center col-lg-3">
+                        <b-form-group label="Дата создания от" v-slot="{ ariaDescribedby }" class="w-100">
+                            <b-form-datepicker id="created_at_start" v-model="filters.created_at_start"
+                                               placeholder="Укажите дату"
+                                               reset-button
+                                               close-button
+                                               label-reset-button="Сбросить"
+                                               label-close-button="Закрыть"
+                                               class="mb-2"></b-form-datepicker>
+                        </b-form-group>
+                    </div>
+                    <div class="d-flex align-items-center col-lg-3">
+                        <b-form-group label="Дата создания до" v-slot="{ ariaDescribedby }" class="w-100">
+                            <b-form-datepicker id="created_at_end" v-model="filters.created_at_end"
                                                placeholder="Укажите дату"
                                                reset-button
                                                close-button
@@ -165,8 +208,11 @@ export default {
             filters: {
                 date_of_end_end: null,
                 date_of_end_start: null,
+                created_at_start: null,
+                created_at_end: null,
                 // main_for_company: null,
                 our_company_id: null,
+                main_for_company: null,
                 company_id: null,
                 id: null,
                 name: null,
@@ -195,9 +241,12 @@ export default {
             this.filters = {
                 date_of_end_end: null,
                 date_of_end_start: null,
+                created_at_start: null,
+                created_at_end: null,
                 date_check_main: null,
                 // main_for_company: null,
                 our_company_id: null,
+                main_for_company: null,
                 company_id: null,
                 id: null,
                 name: null,

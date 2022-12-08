@@ -138,10 +138,75 @@ class ReportContractRefactoringController extends Controller
 
         $result = [];
 
+//        dd(
+//            $medics->where('type_anketa', 'medic')->where('driver_id', 389251)->pluck('type_view')->toArray()
+//        );
         $type_views_eblan_mazaretto = [];
         $total_dop_ebat = 0;
 
         foreach ($medics as $medic) {
+            if ($medic->driver->id) {
+                if ($services = $medic->driver
+                    ->contracts->whereIn('id', $this->contracts_ids)
+                               ->where(
+                                   'date_of_end', '>=',
+                                   ($medic->date
+                                       ? Carbon::parse($medic->date)->subDay()->format('Y-m-d')
+                                       :
+                                       Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+                               )
+                               ->where(
+                                   'date_of_start', '<=',
+                                   ($medic->date
+                                       ? Carbon::parse($medic->date)->addDay()->format('Y-m-d')
+                                       :
+                                       Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+                               )
+                               ->first()) {
+
+                    $services = $services->services;
+                } else {
+                    continue;
+                }
+            } else {
+                if ($services = $medic->company
+                    ->contracts->whereIn('id', $this->contracts_ids)
+                               ->where(
+                                   'date_of_end', '>=',
+                                   ($medic->date
+                                       ? Carbon::parse($medic->date)->subDay()->format('Y-m-d')
+                                       :
+                                       Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+                               )
+                               ->where(
+                                   'date_of_start', '<=',
+                                   ($medic->date
+                                       ? Carbon::parse($medic->date)->addDay()->format('Y-m-d')
+                                       :
+                                       Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
+                               )
+                               ->where("main_for_company", 1)
+                               ->first()) {
+                    $services = $services->services;
+                } else {
+                    continue;
+                }
+            }
+            if($medic->type_anketa === 'medic'){
+                if($result[$medic->driver->hash_id]['types'][$medic->type_view]['count'] ?? false){
+                    $result[$medic->driver->hash_id]['types'][$medic->type_view]['count'] = $result[$medic->driver->hash_id]['types'][$medic->type_view]['count'] + 1;
+                }else{
+                    $result[$medic->driver->hash_id]['types'][$medic->type_view]['count'] = 1;
+                }
+            }else{
+                if($result[$medic->driver->hash_id]['types'][$medic->type_anketa]['count'] ?? false){
+                    $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['count'] = $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['count'] + 1;
+                }else{
+                    $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['count'] = 1;
+                }
+            }
+
+
             $flagEbat = false;
             if ( !($type_views_eblan_mazaretto[$medic->type_view.$medic->type_anketa.$medic->driver->hash_id] ??
                    false)) {
@@ -149,7 +214,19 @@ class ReportContractRefactoringController extends Controller
                     = $medics->where('type_view', $medic->type_view)
                              ->where('driver_id', $medic->driver->hash_id)
                              ->count();
+//                if($medic->driver_id == 139794){
+//                    dd(
+//                        $type_views_eblan_mazaretto,
+//                        $medic->driver->hash_id,
+//                        $medic->type_view.$medic->type_anketa.$medic->driver->hash_id
+//                    );
+//                }
             }
+//            if($medic->driver_id == 139794){
+//                dd(
+//                    $type_views_eblan_mazaretto
+//                );
+//            }
 
             $total_for_type_view = $type_views_eblan_mazaretto[$medic->type_view.$medic->type_anketa
                                                                .$medic->driver->hash_id];
@@ -174,57 +251,7 @@ class ReportContractRefactoringController extends Controller
                     ->implode('; ');
             }
 
-            if ($medic->driver->id) {
-                if ($medic->driver->contracts->isNotEmpty()) {
-                    if ($services = $medic->driver
-                        ->contracts->whereIn('id', $this->contracts_ids)
-                                   ->where(
-                                       'date_of_end', '>=',
-                                       ($medic->date
-                                           ? Carbon::parse($medic->date)->subDay()->format('Y-m-d')
-                                           :
-                                           Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
-                                   )
-                                   ->where(
-                                       'date_of_start', '<=',
-                                       ($medic->date
-                                           ? Carbon::parse($medic->date)->addDay()->format('Y-m-d')
-                                           :
-                                           Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
-                                   )
-                                   ->first()) {
 
-                        $services = $services->services;
-                    } else {
-                        $services = collect();
-                    }
-                } else {
-                    $services = collect();
-                }
-            } else {
-                if ($services = $medic->company
-                    ->contracts->whereIn('id', $this->contracts_ids)
-                               ->where(
-                                   'date_of_end', '>=',
-                                   ($medic->date
-                                       ? Carbon::parse($medic->date)->subDay()->format('Y-m-d')
-                                       :
-                                       Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
-                               )
-                               ->where(
-                                   'date_of_start', '<=',
-                                   ($medic->date
-                                       ? Carbon::parse($medic->date)->addDay()->format('Y-m-d')
-                                       :
-                                       Carbon::createFromFormat('Y-m', $medic->period_pl)->startOfMonth())
-                               )
-                               ->where("main_for_company", 1)
-                               ->first()) {
-                    $services = $services->services;
-                } else {
-                    $services = collect();
-                }
-            }
 
             $services_fuck = collect();
 
@@ -252,6 +279,10 @@ class ReportContractRefactoringController extends Controller
                 $vt           = $service->type_view;
                 $type_explode = explode('/', $medic->type_view);
 
+//                if($medic->type_view === 'Предрейсовый/Предсменный' && $medic->driver->hash_id == 139794){
+//                    dump($medic->toArray());
+//                }
+
                 if ($medic->type_anketa == 'medic') {
                     foreach ($type_explode as $mini_type) {
                         if (strpos($vt, $mini_type) !== false) {
@@ -275,30 +306,6 @@ class ReportContractRefactoringController extends Controller
                     }
                 }
 
-//                "Предрейсовый/Предсменный"
-//                if($medic->type_view === "Предрейсовый/Предсменный"){
-//                    dump($service->toArray(), $total_for_type_view,$medic->type_anketa, $result);
-//                }
-//                if($medic->type_anketa === 'pechat_pl'){
-//                    dd(
-//                        $medic->toArray(),
-//                        $service->toArray(),
-//                        $medic->type_anketa,
-//                        $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['sum'],
-//                        [
-//                            'sum'      => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['sum'] ?? 0,
-//                            'discount' => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['discount'] ?? 0,
-//                            'name'     => $service->name ?? '',
-//                            'id'       => $service->id ?? '',
-//                        ],
-//                        $flagEbat,[
-//                            'sum'      => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['sum'] ?? 0,
-//                            'discount' => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['discount'] ?? 0,
-//                            'name'     => $service->name ?? '',
-//                            'id'       => $service->id ?? '',
-//                        ]
-//                    );
-//                }
 
                 if($flagEbat ?? false){
                     $result[$medic->driver->hash_id]['types']['is_dop']['services'][] = [
@@ -307,6 +314,7 @@ class ReportContractRefactoringController extends Controller
                         'name'     => $service->name ?? '',
                         'id'       => $service->id ?? '',
                         'type_anketa'       => $service->type_anketa ?? '',
+                        'type_view'       => $service->type_view ?? '',
                     ];
                 }else{
                     $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['services'][] = [
@@ -315,6 +323,7 @@ class ReportContractRefactoringController extends Controller
                         'name'     => $service->name ?? '',
                         'id'       => $service->id ?? '',
                         'type_anketa'       => $service->type_anketa ?? '',
+                        'type_view'       => $service->type_view ?? '',
                     ];
                 }
             }
@@ -331,50 +340,55 @@ class ReportContractRefactoringController extends Controller
 
                     $result[$driver_id]['types'][$type_key]['services']
                         = collect($result[$driver_id]['types'][$type_key]['services'])
-                        ->groupBy('id')
+                        ->groupBy('type_key')
                         ->map(function ($group) use($type_key, &$services_for_artem) {
-
-//                            if($type_key === "Предрейсовый/Предсменный"){
-//                                dd(
-//                                    $group->first()
-//                                );
-//                            }
 
                             $services_for_artem->push([
                                 'id'       => $group->first()['id'],
                                 'name'     => $group->first()['name'],
                                 'discount' => round($group->first()['discount'] ?? 0),
                                 'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
-                                                                               / 100) - 1)),
-                                'count'    => $group->count(),
+                                                                                  / 100) - 1)),
+                                //                                'count'    => $group->count(),
 
-                                'type' => $type_key
+                                'type' => $type_key,
+                                'type_anketa' => $group->first()['type_anketa'],
                             ]);
                             return [
                                 'id'       => $group->first()['id'],
                                 'name'     => $group->first()['name'],
                                 'discount' => round($group->first()['discount'] ?? 0),
                                 'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
-                                                                               / 100) - 1)),
-                                'count'    => $group->count(),
+                                                                                  / 100) - 1)),
+                                //                                'count'    => $group->count(),
 
-                                'type' => $type_key
+                                'type' => $type_key,
+                                'type_anketa' => $group->first()['type_anketa'],
                             ];
                         })
                         ->values();
                     if ($fist = $result[$driver_id]['types'][$type_key]['services']->first()) {
-                        $result[$driver_id]['types'][$type_key]['count'] = $fist['count'];
-                        $service_counter += $fist['count'];
+//                        $result[$driver_id]['types'][$type_key]['count'] = $fist['count'];
+//                        dd(
+//                            $type_views_eblan_mazaretto, $type_key, $fist['type_anketa'], $fist['type']
+//                        );
+//                        dd(
+//                            $fist
+//                        );
+                        $service_counter += $result[$driver_id]['types'][$type_key]['count'] ?? 0 ;
                         $service_price += $fist['price'];
                     }
                 }
             }
         }
-
+//dd(123);
 //dd(
 //    $result[167148]['types']['pechat_pl']['services']->toArray()
 //
 //);
+//        dd(
+//            $result
+//        );
         $data = $result;
         $result = [];
         $result['data'] = $data;
@@ -388,41 +402,41 @@ class ReportContractRefactoringController extends Controller
 //                ])
                 ->groupBy('type')
         ];
-//dd(
-//    $result
-//);
+//        dd(
+//            $result
+//        );
         return $result;
     }
 
     public function getJournalTechs($company, $date_from, $date_to, $products, $discounts)
     {
         $techs
-                = Anketa::where('type_anketa', 'tech')
-                        ->with([
-                            'car.contracts.services',
-                            'company.contracts.services',
-                        ])
-                        ->where(function ($query) use ($company) {
-                            $query->where('anketas.company_id', $company->hash_id)
-                                  ->orWhere('anketas.company_name', $company->name);
-                        })
-                        ->where('anketas.in_cart', 0)
-                        ->where(function ($q) use ($date_from, $date_to) {
-                            $q->where(function ($q) use ($date_from, $date_to) {
-                                $q->whereNotNull('anketas.date')
-                                  ->whereBetween('anketas.date', [
-                                      $date_from,
-                                      $date_to,
-                                  ]);
-                            })
-                              ->orWhere(function ($q) use ($date_from, $date_to) {
-                                  $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
-                                      $date_from->format('Y-m'),
-                                      $date_to->format('Y-m'),
-                                  ]);
-                              });
-                        })
-                        ->get();
+                                    = Anketa::where('type_anketa', 'tech')
+                                            ->with([
+                                                'car.contracts.services',
+                                                'company.contracts.services',
+                                            ])
+                                            ->where(function ($query) use ($company) {
+                                                $query->where('anketas.company_id', $company->hash_id)
+                                                      ->orWhere('anketas.company_name', $company->name);
+                                            })
+                                            ->where('anketas.in_cart', 0)
+                                            ->where(function ($q) use ($date_from, $date_to) {
+                                                $q->where(function ($q) use ($date_from, $date_to) {
+                                                    $q->whereNotNull('anketas.date')
+                                                      ->whereBetween('anketas.date', [
+                                                          $date_from,
+                                                          $date_to,
+                                                      ]);
+                                                })
+                                                  ->orWhere(function ($q) use ($date_from, $date_to) {
+                                                      $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
+                                                          $date_from->format('Y-m'),
+                                                          $date_to->format('Y-m'),
+                                                      ]);
+                                                  });
+                                            })
+                                            ->get();
         $result = [];
         $total_dop_ebat = 0;
         $type_views_eblan_mazaretto = [];
@@ -430,59 +444,28 @@ class ReportContractRefactoringController extends Controller
         $services_fuck = collect();
 
         foreach ($techs as $tech) {
-            // без комментариев
-            if ( !($type_views_eblan_mazaretto[$tech->type_view.$tech->car->hash_id] ?? false)) {
-                $total_for_type_view
-                    = $type_views_eblan_mazaretto[$tech->type_view.$tech->car->hash_id]
-                    = $techs->where(
-                    'type_view', $tech->type_view
-                )->where('car_id', $tech->car->hash_id)->count();
-            }
-
-
-            $result[$tech->car->hash_id]['car_gos_number'] = $tech->car->gos_number;
-            $result[$tech->car->hash_id]['type_auto']      = $tech->car->type_auto;
-
-            if ( !($result[$tech->car->hash_id]['pv_id'] ?? false)) {
-                $result[$tech->car->hash_id]['pv_id'] = $techs
-                    ->where('car_id', $tech->car->hash_id)
-                    ->pluck('pv_id')
-                    ->unique()
-                    ->implode('; ');
-            }
-
-            if ($result[$tech->car->hash_id]['types'][$tech->type_view]['total'] ?? false) {
-                $result[$tech->car->hash_id]['types'][$tech->type_view]['total'] += 1;
-            } else {
-                $result[$tech->car->hash_id]['types'][$tech->type_view]['total'] = 1;
-            }
-
             if ($tech->car->id) {
-                if ($tech->car->contracts->isNotEmpty()) {
-                    if ($services = $tech->car
-                        ->contracts->whereIn('id', $this->contracts_ids)
-                                   ->where(
-                                       'date_of_end', '>',
-                                       ($tech->date
-                                           ? Carbon::parse($tech->date)->subDay()->format('Y-m-d')
-                                           :
-                                           Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
-                                   )
-                                   ->where(
-                                       'date_of_start', '<',
-                                       ($tech->date
-                                           ? Carbon::parse($tech->date)->addDay()->format('Y-m-d')
-                                           :
-                                           Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
-                                   )
-                                   ->first()) {
+                if ($services = $tech->car
+                    ->contracts->whereIn('id', $this->contracts_ids)
+                               ->where(
+                                   'date_of_end', '>',
+                                   ($tech->date
+                                       ? Carbon::parse($tech->date)->subDay()->format('Y-m-d')
+                                       :
+                                       Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
+                               )
+                               ->where(
+                                   'date_of_start', '<',
+                                   ($tech->date
+                                       ? Carbon::parse($tech->date)->addDay()->format('Y-m-d')
+                                       :
+                                       Carbon::createFromFormat('Y-m', $tech->period_pl)->startOfMonth())
+                               )
+                               ->first()) {
 
-                        $services = $services->services;
-                    } else {
-                        $services = collect();
-                    }
+                    $services = $services->services;
                 } else {
-                    $services = collect();
+                    continue;
                 }
             } else {
                 if ($services = $tech->company
@@ -505,9 +488,45 @@ class ReportContractRefactoringController extends Controller
                                ->first()) {
                     $services = $services->services;
                 } else {
-                    $services = collect();
+                    continue;
                 }
             }
+            if($result[$tech->car->hash_id]['types'][$tech->type_view]['count'] ?? false){
+                $result[$tech->car->hash_id]['types'][$tech->type_view]['count'] = $result[$tech->car->hash_id]['types'][$tech->type_view]['count'] + 1;
+            }else{
+                $result[$tech->car->hash_id]['types'][$tech->type_view]['count'] = 1;
+            }
+
+            if ($result[$tech->car->hash_id]['types'][$tech->type_view]['total'] ?? false) {
+                $result[$tech->car->hash_id]['types'][$tech->type_view]['total'] += 1;
+            } else {
+                $result[$tech->car->hash_id]['types'][$tech->type_view]['total'] = 1;
+            }
+
+
+
+            // без комментариев
+            if ( !($type_views_eblan_mazaretto[$tech->type_view.$tech->car->hash_id] ?? false)) {
+                $total_for_type_view
+                    = $type_views_eblan_mazaretto[$tech->type_view.$tech->car->hash_id]
+                    = $techs->where(
+                    'type_view', $tech->type_view
+                )->where('car_id', $tech->car->hash_id)->count();
+            }
+
+
+            $result[$tech->car->hash_id]['car_gos_number'] = $tech->car->gos_number;
+            $result[$tech->car->hash_id]['type_auto']      = $tech->car->type_auto;
+
+            if ( !($result[$tech->car->hash_id]['pv_id'] ?? false)) {
+                $result[$tech->car->hash_id]['pv_id'] = $techs
+                    ->where('car_id', $tech->car->hash_id)
+                    ->pluck('pv_id')
+                    ->unique()
+                    ->implode('; ');
+            }
+
+
 
 
             foreach ($services as $service) {
@@ -575,7 +594,7 @@ class ReportContractRefactoringController extends Controller
                                 'name'     => $group->first()['name'],
                                 'discount' => round($group->first()['discount']),
                                 'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
-                                                                               / 100) - 1)),
+                                                                                  / 100) - 1)),
                                 'count'    => $group->count(),
                                 'type' => $type_key
                             ]);
@@ -584,7 +603,7 @@ class ReportContractRefactoringController extends Controller
                                 'name'     => $group->first()['name'],
                                 'discount' => round($group->first()['discount']),
                                 'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
-                                                                               / 100) - 1)),
+                                                                                  / 100) - 1)),
                                 'count'    => $group->count(),
                                 'type' => $type_key
                             ];
@@ -661,6 +680,53 @@ class ReportContractRefactoringController extends Controller
             ->toArray();
 
         foreach ($reports as $report) {
+//            if($report->driver->contracts->whereIn('id', $this->contracts_ids)->isEmpty()){
+//                continue;
+//            }
+            if($report->driver->id){
+                if ($services = $report->driver
+                    ->contracts->whereIn('id', $this->contracts_ids)
+                               ->where(
+                                   'date_of_end', '<',
+                                   ($report->date
+                                       ? Carbon::parse($report->date)->subDay()->format('Y-m-d')
+                                       :
+                                       Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                               )
+                               ->where(
+                                   'date_of_start', '>',
+                                   ($report->date
+                                       ? Carbon::parse($report->date)->addDay()->format('Y-m-d')
+                                       :
+                                       Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                               )
+                               ->first()) {
+                    $services = $services->services;
+                }else{
+                    continue;
+                }
+            } else {
+                if ($services = $report->company
+                    ->contracts->whereIn('id', $this->contracts_ids)
+                               ->where(
+                                   'date_of_end', '<',
+                                   ($report->date ??
+                                    Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                               )
+                               ->where(
+                                   'date_of_start', '>',
+                                   ($report->date ??
+                                    Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
+                               )
+                               ->where("main_for_company", 1)
+                               ->first()) {
+                    $services = $services->services;
+                } else {
+                    continue;
+//                    $services = collect();
+                }
+            }
+
             $flagEbat = false;
             try {
                 if ($report->period_pl) {
@@ -691,54 +757,6 @@ class ReportContractRefactoringController extends Controller
                     = ($result[$key]['reports'][$report->driver_id]['types']['is_dop']['total'] ?? 0) + 1;
                 $total_dop_ebat++;
                 $flagEbat = true;
-            }
-
-            if ($report->driver->id) {
-                if ($report->driver->contracts->isNotEmpty()) {
-                    if ($services = $report->driver
-                        ->contracts->whereIn('id', $this->contracts_ids)
-                                   ->where(
-                                       'date_of_end', '<',
-                                       ($report->date
-                                           ? Carbon::parse($report->date)->subDay()->format('Y-m-d')
-                                           :
-                                           Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                                   )
-                                   ->where(
-                                       'date_of_start', '>',
-                                       ($report->date
-                                           ? Carbon::parse($report->date)->addDay()->format('Y-m-d')
-                                           :
-                                           Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                                   )
-                                   ->first()) {
-
-                        $services = $services->services;
-                    } else {
-                        $services = collect();
-                    }
-                } else {
-                    $services = collect();
-                }
-            } else {
-                if ($services = $report->company
-                    ->contracts->whereIn('id', $this->contracts_ids)
-                               ->where(
-                                   'date_of_end', '<',
-                                   ($report->date ??
-                                    Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                               )
-                               ->where(
-                                   'date_of_start', '>',
-                                   ($report->date ??
-                                    Carbon::createFromFormat('Y-m', $report->period_pl)->startOfMonth())
-                               )
-                               ->where("main_for_company", 1)
-                               ->first()) {
-                    $services = $services->services;
-                } else {
-                    $services = collect();
-                }
             }
 
 
@@ -863,8 +881,8 @@ class ReportContractRefactoringController extends Controller
                                     'id'       => $group->first()['id'],
                                     'name'     => $group->first()['name'],
                                     'discount' => round($group->first()['discount'] ?? 0),
-                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
-                                                                               / 100) - 1)),
+                                    'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+                                                                                      / 100) - 1)),
                                     'count'    => $group->count(),
 
                                     'type' => $type_key
@@ -873,8 +891,8 @@ class ReportContractRefactoringController extends Controller
                                     'id'       => $group->first()['id'],
                                     'name'     => $group->first()['name'],
                                     'discount' => $group->first()['discount'],
-                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
-                                                                               / 100) - 1)),
+                                    'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+                                                                                      / 100) - 1)),
                                     'count'    => $group->count(),
                                     'type' => $type_key
                                 ];
@@ -1116,8 +1134,8 @@ class ReportContractRefactoringController extends Controller
                                     'id'       => $group->first()['id'],
                                     'name'     => $group->first()['name'],
                                     'discount' => round($group->first()['discount'] ?? 0),
-                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
-                                                                               / 100) - 1)),
+                                    'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+                                                                                      / 100) - 1)),
                                     'count'    => $group->count(),
 
                                     'type' => $type_key
@@ -1126,8 +1144,8 @@ class ReportContractRefactoringController extends Controller
                                     'id'       => $group->first()['id'],
                                     'name'     => $group->first()['name'],
                                     'discount' => $group->first()['discount'],
-                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
-                                                                               / 100) - 1)),
+                                    'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
+                                                                                      / 100) - 1)),
                                     'count'    => $group->count(),
                                     'type' => $type_key
                                 ];

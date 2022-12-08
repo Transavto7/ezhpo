@@ -196,12 +196,17 @@ export default {
                     {
                         key:      "date_of_start",
                         sortable: true,
-                        label:    "Время начала договора",
+                        label:    "Дата начала договора",
                     },
                     {
                         key:      "date_of_end",
                         sortable: true,
-                        label:    "Время окончания договора",
+                        label:    "Дата окончания договора",
+                    },
+                    {
+                        key:      "created_at",
+                        sortable: true,
+                        label:    "Дата создания",
                     },
                     {
                         key:   "buttons",

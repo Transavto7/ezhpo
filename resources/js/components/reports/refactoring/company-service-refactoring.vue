@@ -159,6 +159,8 @@ export default {
             },
 
             result: [],
+
+            temporary: [],
         }
     },
     methods:{
@@ -167,7 +169,8 @@ export default {
             let fuckerCounterInAssMazzarettoEbletoTotalCountDickInHerAss = this.contracts.length
             let fuckerCounterInAssMazzarettoEbleto = 0;
 
-            for (let contract_key in this.contracts) {
+            this.contracts.forEach((contract, contract_key) => {
+
                 axios.get('/api/reports/contract/journal_v2', {
                     params: {
                         company_id: this.company_id,
@@ -175,6 +178,8 @@ export default {
                         month:         this.month
                     }
                 }).then(({data}) => {
+                    console.log('==========================')
+                    console.log(data)
                     this.contracts[contract_key].visible_result = true;
                     this.contracts[contract_key].sum = this.getTotalContractSum(data);
 
@@ -206,7 +211,54 @@ export default {
                         this.loading = false;
                     }
                 });
-            }
+            })
+
+
+            // for (let contract_key in this.contracts) {
+            //     // this.temporary = [];
+            //     // this.temporary[this.contracts[contract_key].id] = contract_key;
+            //
+            //     axios.get('/api/reports/contract/journal_v2', {
+            //         params: {
+            //             company_id: this.company_id,
+            //             contracts_ids: [this.contracts[contract_key].id],
+            //             month:         this.month
+            //         }
+            //     }).then(({data}) => {
+            //         console.log('==========================')
+            //         console.log(data)
+            //         this.contracts[contract_key].visible_result = true;
+            //         this.contracts[contract_key].sum = this.getTotalContractSum(data);
+            //
+            //         this.$refs.reportsMedic[contract_key].hide();
+            //         this.$refs.reportsMedic[contract_key].visible(data.medics);
+            //
+            //         this.$refs.reportsTech[contract_key].hide();
+            //         this.$refs.reportsTech[contract_key].visible(data.techs);
+            //
+            //         this.$refs.reportsTechOther[contract_key].hide();
+            //         this.$refs.reportsTechOther[contract_key].visible(data.techs_other);
+            //
+            //         this.$refs.reportsMedicOther[contract_key].hide();
+            //         this.$refs.reportsMedicOther[contract_key].visible(data.medics_other);
+            //
+            //         this.$refs.reportsOther[contract_key].hide();
+            //         this.$refs.reportsOther[contract_key].visible(data.other);
+            //
+            //         if (data.message.length) {
+            //             Swal2.fire({
+            //                 icon:  'error',
+            //                 title: 'Упсс...',
+            //                 text:  data.message,
+            //             })
+            //         }
+            //     }).finally(() => {
+            //         fuckerCounterInAssMazzarettoEbleto++;
+            //         if (fuckerCounterInAssMazzarettoEbleto === fuckerCounterInAssMazzarettoEbletoTotalCountDickInHerAss) {
+            //             this.loading = false;
+            //         }
+            //     });
+            // }
         },
         searchCompany(query = '') {
             axios.get('/api/companies/find', {
@@ -234,7 +286,6 @@ export default {
             });
         },
         getTotalContractSum(contract){
-            console.log(contract)
             let res = 0;
 
             // for (let type_report in contract){
@@ -242,7 +293,6 @@ export default {
             // }
             for (let type_report in contract){
                 if(type_report == 'techs' || type_report == 'medics'){
-                    console.log(contract[type_report].data)
                     for (let human_id in contract[type_report].data){
                         for (let type in contract[type_report].data[human_id].types){
                             if(contract[type_report].data[human_id].types[type].sum){
@@ -256,7 +306,6 @@ export default {
                 }
                 if(type_report == 'medics_other' || type_report == 'techs_other'){
                     for (let year in contract[type_report].data){
-                        console.log(contract[type_report].data)
                         for (let human_id in contract[type_report].data[year].reports){
                             for (let type in contract[type_report].data[human_id]){
                                 if(contract[type_report].data[human_id].types[type].sum){
@@ -272,7 +321,6 @@ export default {
 
                 if(type_report == 'other'){
                     for (let type in contract[type_report].data){
-                        console.log(contract[type_report].data)
                         if(type == 'company'){
                             for (let totall in contract[type_report].data[type]){
                                 res += contract[type_report].data[type][totall]
@@ -293,7 +341,6 @@ export default {
                     }
                 }
             }
-            console.log(res)
             return res;
         },
     },

@@ -183,7 +183,7 @@
                             <b-form-group v-slot="{ ariaDescribedby }">
                                 <b-form-checkbox-group
                                     :aria-describedby="ariaDescribedby"
-                                    name="flavour-2"contractData
+                                    name="flavour-2"
                                     ref="drivers_list_of_company"
                                     v-model="contractData.drivers"
                                 >

@@ -77,6 +77,11 @@ class ContractController extends Controller
         if ($filters['id'] ?? false) {
             $contracts->where('id', $filters['id']);
         }
+
+        if ($filters['main_for_company'] ?? false) {
+            $contracts->where('main_for_company', $filters['main_for_company']);
+        }
+
         if ($filters['name'] ?? false) {
             $contracts->where('name', 'like', "%{$filters['name']}%");
         }
@@ -102,6 +107,12 @@ class ContractController extends Controller
         }
         if ($filters['date_of_end_end'] ?? false) {
             $contracts->whereDate('date_of_end', '<=', $filters['date_of_end_end']);
+        }
+        if ($filters['created_at_start'] ?? false) {
+            $contracts->whereDate('created_at', '>=', $filters['created_at_start']);
+        }
+        if ($filters['created_at_end'] ?? false) {
+            $contracts->whereDate('created_at', '<=', $filters['created_at_end']);
         }
 
         if (isset($filters['main_for_company'])) {
