@@ -53,7 +53,10 @@
                     <span>Стоимость: {{ reports.services.price || 0 }}</span>
                 </div>
                 <div class="report__cards">
-                    <div class="report__card" v-for="(services, type_name) in reports.services.services_for_artem">
+                    <div class="report__card"
+                         v-for="(services, type_name) in reports.services.services_for_artem"
+                         v-if="getTotalCount(services) > 0"
+                    >
                         <div class="report__card-title">
                             {{ getName(type_name) }}
                         </div>
@@ -71,8 +74,8 @@
                         </div>
 
                         <div class="report__footer">
-                            <span>Всего осмотров: {{ services.reduce((sum, service) => { return sum + service.count }, 0) }}</span>
-                            <span  v-if="type_name !== 'is_dop'">Общая стоимость: {{ services.reduce((sum, service) => { return sum + service.price }, 0) }}</span>
+                            <span>Всего осмотров: {{ getTotalCount(services) }}</span>
+                            <span  v-if="type_name !== 'is_dop'">Общая стоимость: {{ getTotalPrice(services) }}</span>
                         </div>
                     </div>
                 </div>
@@ -113,6 +116,12 @@ export default {
         hide() {
             this.reports = false;
             this.show = false;
+        },
+        getTotalCount(services) {
+            return services.reduce((sum, service) => { return sum + service.count }, 0)
+        },
+        getTotalPrice(services) {
+           return services.reduce((sum, service) => { return sum + service.price }, 0)
         }
     }
 }
