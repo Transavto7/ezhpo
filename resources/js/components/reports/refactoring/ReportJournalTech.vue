@@ -36,14 +36,14 @@
                             </div>
 
                             <div class="report__card-item-price">
-                                {{ service.price }}
+                                {{ service.price }}₽
                                 <span v-if="service.discount">{{ service.discount }}%</span>
                             </div>
                         </div>
 
                         <div class="report__footer">
                             <span>Всего осмотров: {{ type.count || type.total  }}</span>
-                            <span v-if="type.sum">Общая стоимость: {{ type.sum }}</span>
+                            <span v-if="type.sum">Общая стоимость: {{ type.sum }}₽</span>
                         </div>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                 <div class="report__name">
                     Всего
                     <span>Кол-во: {{ reports.services.count || 0 }}</span>
-                    <span>Стоимость: {{ reports.services.price || 0 }}</span>
+                    <span>Стоимость: {{ reports.services.price || 0 }}₽</span>
                 </div>
                 <div class="report__cards">
                     <div class="report__card"
@@ -75,14 +75,14 @@
                             </div>
 
                             <div class="report__card-item-price">
-                                {{ service.price }}
+                                {{ service.price }}₽
                                 <span v-if="service.discount">{{ service.discount }}%</span>
                             </div>
                         </div>
 
                         <div class="report__footer">
                             <span>Всего осмотров: {{ getTotalCount(services) }}</span>
-                            <span v-if="type_name !== 'is_dop'">Общая стоимость: {{ getTotalPrice(services) }}</span>
+                            <span v-if="type_name !== 'is_dop'">Общая стоимость: {{ getTotalPrice(services) }}₽</span>
                         </div>
                     </div>
                 </div>

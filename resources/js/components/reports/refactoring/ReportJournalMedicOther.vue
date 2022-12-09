@@ -26,7 +26,7 @@
                             </div>
 
                             <div class="report__footer">
-                                <span>Всего осмотров: {{ type.count || type.total || 0 }}</span>
+                                <span>Всего осмотров: {{ type.count || type.total || 0 }}₽</span>
                             </div>
                         </div>
                     </div>

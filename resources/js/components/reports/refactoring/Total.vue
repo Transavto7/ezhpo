@@ -4,7 +4,7 @@
     <b-row class="mt-5">
         <b-col class="text-right">
             <p>
-                Итого по договору: {{ data }}
+                Итого по договору: {{ data }}₽
             </p>
         </b-col>
     </b-row>
