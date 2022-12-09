@@ -122,6 +122,7 @@ export default {
         },
         getTotalPrice(services) {
            return services.reduce((sum, service) => {
+               console.log(service)
                if(service.type_product === 'Разовые осмотры'){
                    return sum + (service.price * service.count)
                }else{
