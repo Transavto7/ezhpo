@@ -104,13 +104,11 @@
                                 class="mt-5"
                                 ref="reportsOther"
                             />
-                            <b-row class="mt-5">
-                                <b-col class="text-right">
-                                    <p>
-                                        Итого по договору: {{ contract.sum }}
-                                    </p>
-                                </b-col>
-                            </b-row>
+                            <Total
+                                ref="total"
+                            >
+
+                            </Total>
                         </b-card>
                     </b-collapse>
             </div>
@@ -128,6 +126,7 @@ import ReportJournalOther from './ReportJournalOther'
 import ReportJournalMedicOther from './ReportJournalMedicOther'
 import ReportJournalMedic from './ReportJournalMedic'
 import ReportJournalTech from './ReportJournalTech'
+import Total from "./Total";
 export default {
     name: "company-service-refactoring",
 
@@ -136,6 +135,7 @@ export default {
         ReportJournalOther,
         ReportJournalMedic,
         ReportJournalTech,
+        Total,
         ReportJournalMedicOther
     },
 
@@ -181,7 +181,6 @@ export default {
                     console.log('==========================')
                     console.log(data)
                     this.contracts[contract_key].visible_result = true;
-                    this.contracts[contract_key].sum = this.getTotalContractSum(data);
 
                     this.$refs.reportsMedic[contract_key].hide();
                     this.$refs.reportsMedic[contract_key].visible(data.medics);
@@ -198,7 +197,9 @@ export default {
                     this.$refs.reportsOther[contract_key].hide();
                     this.$refs.reportsOther[contract_key].visible(data.other);
 
-                    if (data.message.length) {
+                    this.$refs.total[contract_key].open(data);
+
+                    if (data.message.length && contract_key === 0) {
                         Swal2.fire({
                             icon:  'error',
                             title: 'Упсс...',
@@ -287,69 +288,14 @@ export default {
         },
         getTotalContractSum(contract){
             let res = 0;
-
-            for (let type_report in contract){
-                for (let service in contract[type_report].services){
-                    res += service.price
+            for (let contract_key in contract){
+                if(contract_key === 'other' || contract_key === 'message'){
+                    continue;
                 }
+                res += contract[contract_key].services.price
+
             }
-
-            // getTotalCount(services) {
-            //     return services.reduce((sum, service) => { return sum + service.count }, 0)
-            // },
-
-            // for ()
-
-            // for (let type_report in contract){
-            //     if(type_report == 'techs' || type_report == 'medics'){
-            //         for (let human_id in contract[type_report].data){
-            //             for (let type in contract[type_report].data[human_id].types){
-            //                 if(contract[type_report].data[human_id].types[type].sum){
-            //                     res += contract[type_report].data[human_id].types[type].sum
-            //                 }
-            //             }
-            //         }
-            //         // console.log(type_report)
-            //         // console.log(res)
-            //         continue;
-            //     }
-            //     if(type_report == 'medics_other' || type_report == 'techs_other'){
-            //         for (let year in contract[type_report].data){
-            //             for (let human_id in contract[type_report].data[year].reports){
-            //                 for (let type in contract[type_report].data[human_id]){
-            //                     if(contract[type_report].data[human_id].types[type].sum){
-            //                         res += contract[type_report].data[human_id].types[type].sum
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //         // console.log(type_report)
-            //         // console.log(res)
-            //         continue;
-            //     }
-            //
-            //     if(type_report == 'other'){
-            //         for (let type in contract[type_report].data){
-            //             if(type == 'company'){
-            //                 for (let totall in contract[type_report].data[type]){
-            //                     res += contract[type_report].data[type][totall]
-            //                 }
-            //                 // console.log(type)
-            //                 // console.log(type_report)
-            //                 // console.log(contract[type_report][type][totall])
-            //                 continue;
-            //             }
-            //             // if(type == 'drivers'){
-            //             for (let totall in contract[type_report].data[type]){
-            //                 res += contract[type_report].data[type][totall].sum
-            //                 // console.log(type)
-            //                 // console.log(type_report)
-            //                 // console.log(contract[type_report][type][totall].sum)
-            //             }
-            //             // }
-            //         }
-            //     }
-            // }
+            console.log(res)
             return res;
         },
     },
