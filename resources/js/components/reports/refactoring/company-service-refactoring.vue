@@ -182,9 +182,11 @@ export default {
             let fuckerCounterInAssMazzarettoEbletoTotalCountDickInHerAss = this.contracts.length
             let fuckerCounterInAssMazzarettoEbleto = 0;
 
-            for (let contract_key in this.contracts){
+            this.contracts.forEach( (contract, contract_key) => {
 
-                let data = await axios.get('/api/reports/contract/journal_v2', {
+            // for (let contract_key in this.contracts){
+
+                let data = axios.get('/api/reports/contract/journal_v2', {
                     params: {
                         company_id: this.company_id,
                         contracts_ids: [this.contracts[contract_key].id],
@@ -245,10 +247,9 @@ export default {
                         this.loading = false;
                     }
                 });
-            }
-            // this.contracts.forEach( (contract, contract_key) => {
+            // }
 
-            // })
+            })
 
 
             // for (let contract_key in this.contracts) {
