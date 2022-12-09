@@ -289,7 +289,7 @@ export default {
             let res = 0;
 
             for (let type_report in contract){
-                for (let service in type_report.services){
+                for (let service in contract[type_report].services){
                     res += service.price
                 }
             }
