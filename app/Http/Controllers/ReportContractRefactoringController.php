@@ -106,6 +106,22 @@ class ReportContractRefactoringController extends Controller
         ];
     }
 
+    /**
+     * Знаю, что ты это читаешь, Артём
+     * Мне похуй на названия переменных
+     * И то что тут говнокод тоже похуй
+     * Если будут вопросы, то я всегда на связи
+     * tg: @idi_na_hui
+     *
+     * @param $company
+     * @param $date_from
+     * @param $date_to
+     * @param $services
+     * @param $discounts
+     *
+     * @return array
+     *
+     */
     public function getJournalMedic($company, $date_from, $date_to, $services, $discounts)
     {
         $medics = Anketa::whereIn('type_anketa', [
@@ -649,7 +665,7 @@ class ReportContractRefactoringController extends Controller
                                         'discount' => round($group->first()['discount'] ?? 0),
                                         'price'    => (-(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ??
                                                                                                   0)
-                                                                                           / 100) - 1))) * ($group->first()['type_product'] === 'Разовые осмотры' ? $group->count() : 1),
+                                                                                           / 100) - 1))),
                                         'count'    => $group->count(),
 
                                         'type'        => $index,
