@@ -22,7 +22,7 @@ class CreateContractServiceTable extends Migration
             $table->integer('service_cost');
 
             $table->foreign('contract_id')->references('id')->on('contracts');
-            $table->foreign('service_id')->references('id')->on('services');
+            $table->foreign('service_id')->references('id')->on('products');
         });
     }
 

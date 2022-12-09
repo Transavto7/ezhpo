@@ -361,8 +361,6 @@ export default {
         allDriversSelected(){
             this.contractData.drivers = [];
 
-            console.log(1111111111)
-            console.log(this.allDriversSelected)
             if (this.allDriversSelected) {
                 for (let driver in this.drivers_of_company) {
                     console.log(this.drivers_of_company[driver])
@@ -540,7 +538,6 @@ export default {
             e.target.disabled = true
             axios.post(`/contract/update`, {
                 data_to_save: this.contractData,
-                _method:      'PUT',
             })
                 .then(({data}) => {
                     if (data.status) {
@@ -555,11 +552,12 @@ export default {
                             solid:         true,
                         });
                     } else {
-                        Swal2.fire('Ошибка!', '', 'warning')
+                        Swal2.fire('Ошибки!', '', 'warning')
                     }
                 })
                 .catch((err) => {
-                    Swal2.fire('Ошибка!', '', 'warning');
+                    Swal2.fire('Ошибкии!', '', 'warning');
+                    console.log(err)
                 })
                 .finally(() => {
                     e.target.disabled = false

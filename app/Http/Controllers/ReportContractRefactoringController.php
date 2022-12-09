@@ -93,7 +93,7 @@ class ReportContractRefactoringController extends Controller
         }
 
 
-        $services  = Service::all();
+        $services  = Product::all();
         $discounts = Discount::all();
 
         return [
@@ -904,6 +904,7 @@ class ReportContractRefactoringController extends Controller
                                         'price'    => $service->pivot->service_cost,
                                         'discount' => $result[$report->driver_id]['types'][$report->type_view]['discount']
                                                       ?? 0,
+                                        'type_product' => $service->type_product,
                                         'name'     => $service->name ?? '',
                                         'id'       => $service->id ?? '',
                                         'type_key' => $report->type_view,
@@ -916,6 +917,7 @@ class ReportContractRefactoringController extends Controller
                                         'price'    => $service->pivot->service_cost,
                                         'discount' => $result[$report->driver_id]['types'][$report->type_view]['discount']
                                                       ?? 0,
+                                        'type_product' => $service->type_product,
                                         'name'     => $service->name ?? '',
                                         'id'       => $service->id ?? '',
                                         'type_key' => $report->type_view,
@@ -947,6 +949,7 @@ class ReportContractRefactoringController extends Controller
                                     'price'    => $service->pivot->service_cost,
                                     'discount' => $result[$report->driver_id]['types'][$report->type_anketa]['discount']
                                                   ?? 0,
+                                    'type_product' => $service->type_product,
                                     'name'     => $service->name ?? '',
                                     'type_key' => $report->type_anketa,
                                     'id'       => $service->id ?? '',
@@ -959,6 +962,7 @@ class ReportContractRefactoringController extends Controller
                                     'price'    => $service->pivot->service_cost,
                                     'discount' => $result[$report->driver_id]['types'][$report->type_anketa]['discount']
                                                   ?? 0,
+                                    'type_product' => $service->type_product,
                                     'name'     => $service->name ?? '',
                                     'type_key' => $report->type_anketa,
                                     'id'       => $service->id ?? '',
@@ -1238,6 +1242,7 @@ class ReportContractRefactoringController extends Controller
                             'price'    => $service->pivot->service_cost,
                             'discount' => $result[$report->car_id]['types'][$report->type_view]['discount'] ?? 0,
                             'name'     => $service->name ?? '',
+                            'type_product' => $service->type_product,
                             'type_key' => $report->type_view,
                             'id'       => $service->id ?? '',
                         ];
@@ -1247,6 +1252,7 @@ class ReportContractRefactoringController extends Controller
                             'price'    => $service->pivot->service_cost,
                             'discount' => $result[$report->car_id]['types'][$report->type_view]['discount'] ?? 0,
                             'type_key' => $report->type_view,
+                            'type_product' => $service->type_product,
                             'name'     => $service->name ?? '',
                             'id'       => $service->id ?? '',
                         ];

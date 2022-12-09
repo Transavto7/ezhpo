@@ -26,8 +26,13 @@ export default {
         open(data){
             this.repor = data
             for (let contract_key in data){
-                if(contract_key === 'other' || contract_key === 'message'){
+                if( contract_key === 'message'){
                     continue;
+                }
+                if(contract_key === 'other'){
+                    for(let ser in data[contract_key].company){
+                        this.data += data[contract_key].company[ser]
+                    }
                 }
                 this.data += data[contract_key].services.price
 

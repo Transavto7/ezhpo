@@ -87,7 +87,6 @@ class ContractController extends Controller
         }
         if ($filters['service_id'] ?? false) {
             $contracts->whereHas('services', function ($q) use ($filters) {
-                // Я сам не знаю, как это работает
                 $q->where('contract_service.service_id', $filters['service_id']);
             });
         }
@@ -245,6 +244,9 @@ class ContractController extends Controller
 
     public function update(Request $request)
     {
+//        var_dump($request->all());
+//        var_dump(123);
+//        die();
         $data_to_save = $request->post('data_to_save');
 
         if ( !$contract = Contract::find($data_to_save['id'])) {
@@ -292,6 +294,8 @@ class ContractController extends Controller
                 'service_cost' => $service['pivot']['service_cost'] ?? $service['price_unit'],
             ];
         }
+//        var_dump($servicesToSync);
+//        die();
         $contract->update([
             'name'             => $data_to_save['name'] ?? null,
             'date_of_start'    => isset($data_to_save['date_of_start']) ? Carbon::parse($data_to_save['date_of_start'])
@@ -304,6 +308,7 @@ class ContractController extends Controller
             'main_for_company' => $data_to_save['main_for_company'] ?? 0,
         ]);
 
+//        $contract->services()->sync([]);
         $contract->services()->sync($servicesToSync);
         $contract->cars()->sync($data_to_save['cars'] ?? []);
         $contract->drivers()->sync($data_to_save['drivers'] ?? []);

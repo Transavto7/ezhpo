@@ -122,7 +122,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/getOne', 'ContractController@getOne');
 
-        Route::put('/update', 'ContractController@update');
+        Route::post('/update', 'ContractController@update');
 
         Route::get('/create', 'ContractController@create');
 

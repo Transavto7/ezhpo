@@ -293,7 +293,7 @@ class Contract extends Model
         $companies = Company::whereNotNull('products_id')
                             ->get(['id', 'products_id']);
 
-        $services = Service::get();
+        $services = Product::get();
 
         $comp_products_arr = [];
 

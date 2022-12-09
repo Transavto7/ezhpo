@@ -158,7 +158,7 @@ class ReportControllerContract extends Controller
         }
 
 
-        $services  = Service::all();
+        $services  = Product::all();
         $discounts = Discount::all();
 
         return [
