@@ -169,9 +169,9 @@ export default {
             let fuckerCounterInAssMazzarettoEbletoTotalCountDickInHerAss = this.contracts.length
             let fuckerCounterInAssMazzarettoEbleto = 0;
 
-            this.contracts.forEach((contract, contract_key) => {
+            this.contracts.forEach(async (contract, contract_key) => {
 
-                axios.get('/api/reports/contract/journal_v2', {
+                await axios.get('/api/reports/contract/journal_v2', {
                     params: {
                         company_id: this.company_id,
                         contracts_ids: [this.contracts[contract_key].id],
