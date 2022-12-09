@@ -121,7 +121,7 @@ export default {
             return services.reduce((sum, service) => { return sum + service.count }, 0)
         },
         getTotalPrice(services) {
-           return services.reduce((sum, service) => { return sum + service.price }, 0)
+           return services.reduce((sum, service) => { return sum + (service.price * service.count) }, 0)
         }
     }
 }

@@ -22,6 +22,9 @@ use Maatwebsite\Excel\Facades\Excel;
 // без комментариев
 class ReportContractRefactoringController extends Controller
 {
+    public $total_sum_for_contract = 0;
+
+
     public $reports
         = [
             'journal' => 'Отчет по услугам компании[Договор]',
@@ -138,9 +141,6 @@ class ReportContractRefactoringController extends Controller
 
         $result = [];
 
-//        dd(
-//            $medics->where('type_anketa', 'medic')->where('driver_id', 389251)->pluck('type_view')->toArray()
-//        );
         $type_views_eblan_mazaretto = [];
         $total_dop_ebat = 0;
 
@@ -251,13 +251,13 @@ class ReportContractRefactoringController extends Controller
                     ->implode('; ');
             }
 
+            $disSum = 0;
 
 
             $services_fuck = collect();
 
             foreach ($services as $service) {
                 $service->price = $service->pivot->service_cost;
-
                 if ($medic->type_anketa !== $service->type_anketa) {
                     continue;
                 }
@@ -279,18 +279,14 @@ class ReportContractRefactoringController extends Controller
                 $vt           = $service->type_view;
                 $type_explode = explode('/', $medic->type_view);
 
-//                if($medic->type_view === 'Предрейсовый/Предсменный' && $medic->driver->hash_id == 139794){
-//                    dump($medic->toArray());
-//                }
 
                 if ($medic->type_anketa == 'medic') {
                     foreach ($type_explode as $mini_type) {
                         if (strpos($vt, $mini_type) !== false) {
                             if ($service->type_product === 'Разовые осмотры') {
-                                $result[$medic->driver->hash_id]['types'][$medic->type_view]['sum'] = $service->price
-                                                                                                      * $total_for_type_view;
+                                $result[$medic->driver->hash_id]['types'][$medic->type_view]['sum'] = $service->pivot->service_cost *(1- ($disSum / 100)) * $total_for_type_view;
                             } else {
-                                $result[$medic->driver->hash_id]['types'][$medic->type_view]['sum'] = $service->price;
+                                $result[$medic->driver->hash_id]['types'][$medic->type_view]['sum'] = $service->pivot->service_cost  *(1- ($disSum / 100));
                             }
                         }
                     }
@@ -299,38 +295,50 @@ class ReportContractRefactoringController extends Controller
                         = in_array($service->id, explode(',', $company->products_id));
 
                     if ($service->type_product === 'Разовые осмотры') {
-                        $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['sum'] = $service->price
-                                                                                                * $total_for_type_view;
+                        $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['sum'] = $service->pivot->service_cost *(1- ($disSum / 100)) * $total_for_type_view;
                     } else {
-                        $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['sum'] = $service->price;
+                        $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['sum'] = $service->pivot->service_cost *(1- ($disSum / 100));
                     }
                 }
 
+//                if($medic->type_view === 'Предрейсовый/Предсменный' && $medic->driver->hash_id){
+//                    dd(
+//                        $result,
+//                        $service->pivot->service_cost,
+//                        $disSum
+//                    );
+//                }
 
                 if($flagEbat ?? false){
                     $result[$medic->driver->hash_id]['types']['is_dop']['services'][] = [
                         'sum'      => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['sum'] ?? 0,
+                        'price'      => $service->pivot->service_cost,
                         'discount' => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['discount'] ?? 0,
                         'name'     => $service->name ?? '',
                         'id'       => $service->id ?? '',
                         'type_anketa'       => $service->type_anketa ?? '',
                         'type_view'       => $service->type_view ?? '',
                         'type_key'       => $service->type_anketa === 'medic' ? $medic->type_view : $medic->type_anketa,
+                        'type_product'       => $service->type_product,
                     ];
                 }else{
                     $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['services'][] = [
                         'sum'      => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['sum'] ?? 0,
                         'discount' => $result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic') ? $medic->type_view : $medic->type_anketa]['discount'] ?? 0,
+                        'price'      => $service->pivot->service_cost,
                         'name'     => $service->name ?? '',
                         'id'       => $service->id ?? '',
                         'type_anketa'       => $service->type_anketa ?? '',
                         'type_view'       => $service->type_view ?? '',
                         'type_key'       => $service->type_anketa === 'medic' ? $medic->type_view : $medic->type_anketa,
+                        'type_product'       => $service->type_product,
                     ];
                 }
             }
         }
-
+//dd(
+//    $result
+//);
         $service_counter = 0;
         $service_price = 0;
 
@@ -347,27 +355,20 @@ class ReportContractRefactoringController extends Controller
                         = collect($result[$driver_id]['types'][$type_key]['services'])
                         ->groupBy('id')
                         ->map(function ($group) use($type_key, &$services_for_artem) {
-
-//                            $services_for_artem->push([
-//                                'id'       => $group->first()['id'],
-//                                'name'     => $group->first()['name'],
-//                                'discount' => round($group->first()['discount'] ?? 0),
-//                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ??
-//                                                                                         0)
-//                                                                                  / 100) - 1)),
-//                                'count'    => $group->count(),
-//
-//                                'type'        => $type_key,
-//                                'type_anketa' => $group->first()['type_anketa'],
-//                            ]);
-
+//dd(
+//    $group->sum()
+//);
+//                            if($group->type_view === 'Предрейсовый/Предсменный'){
+//                                dd(
+//                                    $group,
+//                                    $group
+//                                );
+//                            }
                             return [
                                 'id'       => $group->first()['id'],
                                 'name'     => $group->first()['name'],
                                 'discount' => round($group->first()['discount'] ?? 0),
-                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ??
-                                                                                         0)
-                                                                                  / 100) - 1)),
+                                'price'    => $group->first()['price'] * (1 - ($group->first()['discount'] / 100)),
                                 'count'    => $group->count(),
 
                                 'type'        => $type_key,
@@ -382,46 +383,32 @@ class ReportContractRefactoringController extends Controller
                 }
             }
         }
+
 //dd(
 //    $temp_collection_service->toArray()
 //);
         $temp_collection_service->flatten(1)
                                 ->groupBy('type_key')
                                 ->map(function ($group, $index) use($services_for_artem) {
-
+//dd($group
+//);
 //                $group = $group;
                                     $services_for_artem->push([
                                         'id'       => $group->first()['id'],
                                         'name'     => $group->first()['name'],
                                         'discount' => round($group->first()['discount'] ?? 0),
-                                        'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ??
-                                                                                                 0)
-                                                                                          / 100) - 1)),
+                                        'price'    => $group->first()['price'] * (1 - ($group->first()['discount'] / 100)) * $group->count(),
                                         'count'    => $group->count(),
 
                                         'type'        => $index,
-                                        //                    'type_anketa' => $group->first()['type_anketa'],
                                     ]);
 
-                                    return [
-                                        'id'       => $group->first()['id'],
-                                        'name'     => $group->first()['name'],
-                                        'discount' => round($group->first()['discount'] ?? 0),
-                                        'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ??
-                                                                                                 0)
-                                                                                          / 100) - 1)),
-                                        'count'    => $group->count(),
-
-                                        'type'        => $index,
-                                        'type_anketa' => $group->first()['type_anketa'],
-                                    ];
                                 })
                                 ->values();
-//dd(123);
-//dd(
-//    $result[167148]['types']['pechat_pl']['services']->toArray()
-//
-//);
+//        dd(
+//            $services_for_artem->toArray()
+//        );
+
         $data = $result;
         $result = [];
         $result['data'] = $data;
@@ -590,10 +577,10 @@ class ReportContractRefactoringController extends Controller
                 foreach ($type_explode as $mini_type) {
                     if (strpos($vt, $mini_type) !== false) {
                         if ($service->type_product === 'Разовые осмотры') {
-                            $result[$tech->car->hash_id]['types'][$tech->type_view]['sum'] = $service->price
+                            $result[$tech->car->hash_id]['types'][$tech->type_view]['sum'] = $service->pivot->service_cost
                                                                                              * $total_for_type_view;
                         } else {
-                            $result[$tech->car->hash_id]['types'][$tech->type_view]['sum'] = $service->price;
+                            $result[$tech->car->hash_id]['types'][$tech->type_view]['sum'] = $service->pivot->service_cost;
                         }
                     }
                 }
@@ -603,6 +590,7 @@ class ReportContractRefactoringController extends Controller
                     'name'     => $service->name ?? '',
                     'id'       => $service->id ?? '',
                     'type_key'       => $tech->type_view,
+                    'type_product'       => $service->type_product,
                 ];
             }
 
@@ -629,15 +617,7 @@ class ReportContractRefactoringController extends Controller
                     $result[$car_id]['types'][$type_key]['services'] = collect($result[$car_id]['types'][$type_key]['services'])
                         ->groupBy('id')
                         ->map(function ($group) use($type_key, &$services_for_artem) {
-//                            $services_for_artem->push([
-//                                'id'       => $group->first()['id'],
-//                                'name'     => $group->first()['name'],
-//                                'discount' => round($group->first()['discount']),
-//                                'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
-//                                                                                  / 100) - 1)),
-//                                'count'    => $group->count(),
-//                                'type' => $type_key
-//                            ]);
+
                             return [
                                 'id'       => $group->first()['id'],
                                 'name'     => $group->first()['name'],
@@ -645,7 +625,7 @@ class ReportContractRefactoringController extends Controller
                                 'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ?? 0)
                                                                                   / 100) - 1)),
                                 'count'    => $group->count(),
-                                'type' => $type_key
+                                'type' => $type_key,
                             ];
                         })
                         ->values();
@@ -657,9 +637,7 @@ class ReportContractRefactoringController extends Controller
                 }
             }
         }
-//dd(
-//    $temp_collection_service->toArray()
-//);
+
         $temp_collection_service->flatten(1)
                                 ->groupBy('type_key')
                                 ->map(function ($group, $index) use($services_for_artem) {
@@ -668,13 +646,12 @@ class ReportContractRefactoringController extends Controller
                                         'id'       => $group->first()['id'],
                                         'name'     => $group->first()['name'],
                                         'discount' => round($group->first()['discount'] ?? 0),
-                                        'price'    => -(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ??
-                                                                                                 0)
-                                                                                          / 100) - 1)),
+                                        'price'    => (-(($group->first()['sum'] ?? 0) * ((intval($group->first()['discount'] ??
+                                                                                                  0)
+                                                                                           / 100) - 1))) * ($group->first()['type_product'] === 'Разовые осмотры' ? $group->count() : 1),
                                         'count'    => $group->count(),
 
                                         'type'        => $index,
-                                        //                                        'type_anketa' => $group->first()['type_anketa'],
                                     ]);
                                 });
         $data = $result;
@@ -852,10 +829,10 @@ class ReportContractRefactoringController extends Controller
 
                                 if ($service->type_product === 'Разовые осмотры') {
                                     $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['sum']
-                                        = $service->price * $total;
+                                        = $service->pivot->service_cost * $total;
                                 } else {
                                     $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['sum']
-                                        = $service->price;
+                                        = $service->pivot->service_cost;
                                 }
 
                                 if ($service->discount) {
@@ -888,10 +865,10 @@ class ReportContractRefactoringController extends Controller
 
                             if ($service->type_product === 'Разовые осмотры') {
                                 $result[$key]['reports'][$report->driver_id]['types'][$service->type_anketa]['sum']
-                                    = $service->price * $total;
+                                    = $service->pivot->service_cost * $total;
                             } else {
                                 $result[$key]['reports'][$report->driver_id]['types'][$service->type_anketa]['sum']
-                                    = $service->price;
+                                    = $service->pivot->service_cost;
                             }
 
                             if ($service->discount) {
@@ -1168,10 +1145,10 @@ class ReportContractRefactoringController extends Controller
 
                                 if ($service->type_product === 'Разовые осмотры') {
                                     $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['sum']
-                                        = $service->price * $total;
+                                        = $service->pivot->service_cost * $total;
                                 } else {
                                     $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['sum']
-                                        = $service->price;
+                                        = $service->pivot->service_cost;
                                 }
 
                                 if ($service->discount) {
