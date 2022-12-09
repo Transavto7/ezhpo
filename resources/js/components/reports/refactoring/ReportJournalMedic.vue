@@ -52,8 +52,8 @@
                     <span>Кол-во: {{ reports.services.count || 0 }}</span>
                     <span>Стоимость: {{ reports.services.price || 0 }}₽</span>
                 </div>
-                <div class="report__cards">
-                    <div class="report__card medic"
+                <div class="report__cards medic">
+                    <div class="report__card"
                          v-for="(services, type_name) in reports.services.services_for_artem"
                          v-if="getTotalCount(services) > 0"
                     >
