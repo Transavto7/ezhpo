@@ -232,19 +232,7 @@ class ReportContractRefactoringController extends Controller
                     = $medics->where('type_view', $medic->type_view)
                              ->where('driver_id', $medic->driver->hash_id)
                              ->count();
-//                if($medic->driver_id == 139794){
-//                    dd(
-//                        $type_views_eblan_mazaretto,
-//                        $medic->driver->hash_id,
-//                        $medic->type_view.$medic->type_anketa.$medic->driver->hash_id
-//                    );
-//                }
             }
-//            if($medic->driver_id == 139794){
-//                dd(
-//                    $type_views_eblan_mazaretto
-//                );
-//            }
 
             $total_for_type_view = $type_views_eblan_mazaretto[$medic->type_view.$medic->type_anketa
                                                                .$medic->driver->hash_id];
@@ -255,9 +243,6 @@ class ReportContractRefactoringController extends Controller
 
                 $total_dop_ebat++;
                 $flagEbat = true;
-//                dd(
-//                    $medic->toArray()
-//                );
             }
 
             $result[$medic->driver->hash_id]['driver_fio'] = $medic->driver->fio;
@@ -321,6 +306,10 @@ class ReportContractRefactoringController extends Controller
                         $result[$medic->driver->hash_id]['types'][$medic->type_anketa]['sum']
                             = $service->pivot->service_cost * (1 - ($disSum / 100));
                     }
+                }
+                if(!($result[$medic->driver->hash_id]['types'][($medic->type_anketa === 'medic')
+                    ? $medic->type_view : $medic->type_anketa]['sum'] ?? false)){
+                    continue;
                 }
 
 //                if($medic->type_view === 'Предрейсовый/Предсменный' && $medic->driver->hash_id){
@@ -627,6 +616,13 @@ class ReportContractRefactoringController extends Controller
                         }
                     }
                 }
+
+                if(!($result[$tech->car->hash_id]['types'][$tech->type_view]['sum'] ?? false)){
+                    continue;
+                }
+
+
+
                 $result[$tech->car->hash_id]['types'][$tech->type_view]['services'][] = [
                     'sum'          => $result[$tech->car->hash_id]['types'][$tech->type_view]['sum'] ?? 0,
                     'price'        => $service->pivot->service_cost,
