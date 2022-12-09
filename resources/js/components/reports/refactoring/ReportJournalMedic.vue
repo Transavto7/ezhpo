@@ -121,7 +121,13 @@ export default {
             return services.reduce((sum, service) => { return sum + service.count }, 0)
         },
         getTotalPrice(services) {
-           return services.reduce((sum, service) => { return sum + (service.price * service.count) }, 0)
+           return services.reduce((sum, service) => {
+               if(service.type_product === 'Разовые осмотры'){
+                   return sum + (service.price * service.count)
+               }else{
+                   return sum + service.price
+               }
+           }, 0)
         }
     }
 }

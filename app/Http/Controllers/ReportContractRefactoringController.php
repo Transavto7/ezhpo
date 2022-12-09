@@ -401,6 +401,7 @@ class ReportContractRefactoringController extends Controller
                                         'count'    => $group->count(),
 
                                         'type'        => $index,
+                                        'type_product'        => $group->first()['type_product'],
                                     ]);
 
                                 })

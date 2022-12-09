@@ -18041,6 +18041,12 @@ main.blue {
   border-radius: 10px;
 }
 
+.report__item {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  border-radius: 15px;
+}
+
 .report__name {
   display: flex;
   align-items: center;
@@ -18065,7 +18071,10 @@ main.blue {
   gap: 10px;
   margin-top: 20px;
   font-size: 15px;
-  margin-bottom: 50px;
+}
+
+.report__cards.medic .report__card {
+  background-color: rgba(220, 53, 69, 0.3);
 }
 
 .report__card {
