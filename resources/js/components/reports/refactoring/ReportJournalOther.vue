@@ -73,23 +73,24 @@
 <script>
 export default {
     name: "ReportJournalOther",
+    props:['data'],
     data() {
         return {
             show: false,
-            data: false
+            // data: false
         }
     },
     methods: {
-        visible(data, show = true) {
-            if (data.length === undefined || data.length > 0) {
-                this.data = data;
-            }
-            this.show = show;
-        },
-        hide() {
-            this.data = false;
-            this.show = false;
-        },
+        // visible(data, show = true) {
+        //     if (data.length === undefined || data.length > 0) {
+        //         this.data = data;
+        //     }
+        //     this.show = show;
+        // },
+        // hide() {
+        //     this.data = false;
+        //     this.show = false;
+        // },
         getTotal(item) {
             let sum = 0;
             for (let key in item) {

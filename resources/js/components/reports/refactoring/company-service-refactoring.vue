@@ -78,34 +78,38 @@
         </div>
 
 
-
-
         <div v-for="(contract, index) in contracts">
-            <div v-show="contract.visible_result" class="my-3">
+            <div v-if="contract.visible_result" class="my-3">
                 <b-button class="mb-2" v-b-toggle="'collapse-' + index"  variant="primary">{{ contract.name }}</b-button>
                     <b-collapse :id="'collapse-' + index" class="mt-2">
                         <b-card>
                             <ReportJournalMedic
+                                :reports="contract.medics"
                                 ref="reportsMedic"
                             />
                             <ReportJournalTech
                                 class="mt-5"
+                                :reports="contract.tech"
                                 ref="reportsTech"
                             />
                             <ReportJournalMedicOther
                                 class="mt-5"
+                                :reports="contract.medicsOther"
                                 ref="reportsMedicOther"
                             />
                             <ReportJournalTechOther
                                 class="mt-5"
+                                :reports="contract.techOther"
                                 ref="reportsTechOther"
                             />
                             <ReportJournalOther
                                 class="mt-5"
+                                :data="contract.other"
                                 ref="reportsOther"
                             />
                             <Total
                                 ref="total"
+                                :data="contract.total"
                             >
 
                             </Total>
@@ -113,6 +117,9 @@
                     </b-collapse>
             </div>
         </div>
+
+
+
 
     </div>
 </div>
@@ -127,6 +134,10 @@ import ReportJournalMedicOther from './ReportJournalMedicOther'
 import ReportJournalMedic from './ReportJournalMedic'
 import ReportJournalTech from './ReportJournalTech'
 import Total from "./Total";
+import EbalVRotJs from "./EbalVRotJs";
+import fcn_name from "./fcn_name";
+
+
 export default {
     name: "company-service-refactoring",
 
@@ -136,6 +147,8 @@ export default {
         ReportJournalMedic,
         ReportJournalTech,
         Total,
+        EbalVRotJs,
+        fcn_name,
         ReportJournalMedicOther
     },
 
@@ -169,9 +182,9 @@ export default {
             let fuckerCounterInAssMazzarettoEbletoTotalCountDickInHerAss = this.contracts.length
             let fuckerCounterInAssMazzarettoEbleto = 0;
 
-            this.contracts.forEach(async (contract, contract_key) => {
+            for (let contract_key in this.contracts){
 
-                await axios.get('/api/reports/contract/journal_v2', {
+                let data = await axios.get('/api/reports/contract/journal_v2', {
                     params: {
                         company_id: this.company_id,
                         contracts_ids: [this.contracts[contract_key].id],
@@ -180,24 +193,44 @@ export default {
                 }).then(({data}) => {
                     console.log('==========================')
                     console.log(data)
+                    // console.log(contract_key)
+
+
+                    this.contracts[contract_key].total = data;
+                    this.contracts[contract_key].medics = data.medics;
+                    this.contracts[contract_key].tech = data.techs;
+                    this.contracts[contract_key].medics_other = data.medics;
+                    this.contracts[contract_key].techs_other = data.techs_other;
+                    this.contracts[contract_key].other = data.other;
+
+                    // if (data.medics.length === undefined || data.medics.length > 0) {
+                    // }else{
+                    //     this.contracts[contract_key].medics = [];
+                    // }
+
                     this.contracts[contract_key].visible_result = true;
 
-                    this.$refs.reportsMedic[contract_key].hide();
-                    this.$refs.reportsMedic[contract_key].visible(data.medics);
+                    // this.contracts[contract_key].tech = data.techs;
+                    // this.contracts[contract_key].medicsOther = data.medics_other;
+                    // this.contracts[contract_key].techOther = data.techs_other;
+                    // this.contracts[contract_key].other = data.other;
+                    // this.$refs.total[contract_key].open(data);
 
-                    this.$refs.reportsTech[contract_key].hide();
-                    this.$refs.reportsTech[contract_key].visible(data.techs);
+                    // this.$refs.reportsMedic[contract_key].hide();
+                    // this.$refs.reportsMedic[contract_key].visible(data.medics);
 
-                    this.$refs.reportsTechOther[contract_key].hide();
-                    this.$refs.reportsTechOther[contract_key].visible(data.techs_other);
+                    // this.$refs.reportsTech[contract_key].hide();
+                    // this.$refs.reportsTech[contract_key].visible(data.techs);
+                    //
+                    // this.$refs.reportsTechOther[contract_key].hide();
+                    // this.$refs.reportsTechOther[contract_key].visible(data.techs_other);
+                    //
+                    // this.$refs.reportsMedicOther[contract_key].hide();
+                    // this.$refs.reportsMedicOther[contract_key].visible(data.medics_other);
+                    //
+                    // this.$refs.reportsOther[contract_key].hide();
+                    // this.$refs.reportsOther[contract_key].visible(data.other);
 
-                    this.$refs.reportsMedicOther[contract_key].hide();
-                    this.$refs.reportsMedicOther[contract_key].visible(data.medics_other);
-
-                    this.$refs.reportsOther[contract_key].hide();
-                    this.$refs.reportsOther[contract_key].visible(data.other);
-
-                    this.$refs.total[contract_key].open(data);
 
                     if (data.message.length && contract_key === 0) {
                         Swal2.fire({
@@ -212,7 +245,10 @@ export default {
                         this.loading = false;
                     }
                 });
-            })
+            }
+            // this.contracts.forEach( (contract, contract_key) => {
+
+            // })
 
 
             // for (let contract_key in this.contracts) {

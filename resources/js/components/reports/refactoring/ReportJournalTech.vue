@@ -94,9 +94,10 @@
 <script>
 export default {
     name: "ReportJournalTech",
+    props:['reports'],
     data() {
         return {
-            reports: false,
+            // reports: false,
             show: false,
         }
     },
@@ -114,16 +115,16 @@ export default {
 
             return key;
         },
-        visible(reports, show = true) {
-            if (reports.length === undefined || reports.length > 0) {
-                this.reports = reports;
-            }
-            this.show = show;
-        },
-        hide() {
-            this.reports = false;
-            this.show = false;
-        },
+        // visible(reports, show = true) {
+        //     if (reports.length === undefined || reports.length > 0) {
+        //         this.reports = reports;
+        //     }
+        //     this.show = show;
+        // },
+        // hide() {
+        //     this.reports = false;
+        //     this.show = false;
+        // },
         getTotalCount(services) {
             return services.reduce((sum, service) => { return sum + service.count }, 0)
         },

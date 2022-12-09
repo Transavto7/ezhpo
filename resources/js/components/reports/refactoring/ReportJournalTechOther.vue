@@ -43,9 +43,10 @@ import { months } from "../../const/local";
 
 export default {
     name: "ReportJournalTechOther",
+    props:['reports'],
     data() {
         return {
-            reports: false,
+            // reports: false,
             show: false,
             months,
         }
@@ -64,16 +65,16 @@ export default {
 
             return key;
         },
-        visible(reports, show = true) {
-            if (reports.length === undefined || reports.length > 0) {
-                this.reports = reports;
-            }
-            this.show = show;
-        },
-        hide() {
-            this.reports = false;
-            this.show = false;
-        }
+        // visible(reports, show = true) {
+        //     if (reports.length === undefined || reports.length > 0) {
+        //         this.reports = reports;
+        //     }
+        //     this.show = show;
+        // },
+        // hide() {
+        //     this.reports = false;
+        //     this.show = false;
+        // }
     }
 }
 </script>
