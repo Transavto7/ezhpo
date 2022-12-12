@@ -123,10 +123,19 @@ export default {
         },
         getTotalPrice(services) {
            return services.reduce((sum, service) => {
-               console.log(service)
+               // console.log(service)
+               // console.log(this.reports)
+               // console.log(this.reports.data)
+               let data = this.reports.data
+               // console.log(Object.keys(data))
+               // console.log(Object.keys(data).length)
                if(service.type_product === 'Разовые осмотры'){
                    return sum + (service.price * service.count)
-               }else{
+               }else
+                   if(service.type_product === 'Абонентская оплата'){
+                       return Object.keys(data).length * service.price
+                   } else
+               {
                    return sum + service.price
                }
            }, 0)

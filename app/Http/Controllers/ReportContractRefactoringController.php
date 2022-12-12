@@ -349,6 +349,7 @@ class ReportContractRefactoringController extends Controller
                         'type_view'    => $service->type_view ?? '',
                         'type_key'     => $service->type_anketa === 'medic' ? $medic->type_view : $medic->type_anketa,
                         'type_product' => $service->type_product,
+                        'driver_id' => $medic->driver_id,
                     ];
                 }
             }
@@ -390,6 +391,7 @@ class ReportContractRefactoringController extends Controller
 
                                 'type'        => $type_key,
                                 'type_anketa' => $group->first()['type_anketa'],
+                                'driver_id' => $group->first()['driver_id'] ?? null,
                             ];
                         })
                         ->values();
@@ -407,6 +409,9 @@ class ReportContractRefactoringController extends Controller
         $temp_collection_service->flatten(1)
                                 ->groupBy('type_key')
                                 ->map(function ($group, $index) use ($services_for_artem) {
+//                                    dd(
+//                                        $group
+//                                    );
 //dd($group
 //);
 //                $group = $group;
@@ -420,6 +425,7 @@ class ReportContractRefactoringController extends Controller
 
                                         'type'         => $index,
                                         'type_product' => $group->first()['type_product'],
+                                        'driver_id' => $group->first()['driver_id'] ?? null,
                                     ]);
 
                                 })
@@ -429,10 +435,17 @@ class ReportContractRefactoringController extends Controller
 //        );
 
         $service_price = 0;
-        $services_for_artem->map(function ($q) use (&$service_price){
+//        dd(
+//            $services_for_artem->toArray()
+//        );
+        $flag_abon_plata_service_id = [];
+        $services_for_artem->map(function ($q) use (&$service_price, $services_for_artem, &$flag_abon_plata_service_id, $medics){
             if($q['type_product'] === 'Разовые осмотры'){
                 $service_price += $q['count'] * $q['price'];
-            }else{
+            }else if($q['type_product'] === 'Абонентская оплата' && !in_array($q['id'], $flag_abon_plata_service_id)){
+                $flag_abon_plata_service_id[] = $q['id'];
+                $service_price += $q['price'] * $medics->groupBy('driver_id')->count();
+            } else {
                 $service_price += $q['price'];
             }
 
@@ -451,9 +464,6 @@ class ReportContractRefactoringController extends Controller
                 ])
                 ->groupBy('type'),
         ];
-//        dd(
-//            $result
-//        );
 //        dd(
 //            $result
 //        );
