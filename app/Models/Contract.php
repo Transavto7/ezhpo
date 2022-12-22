@@ -22,8 +22,7 @@ class Contract extends Model
 
     protected $appends = ['name_with_dates'];
 
-    protected $casts
-        = [
+    protected $casts = [
             'date_of_end'   => 'datetime', // :d.m.Y
             'date_of_start' => 'datetime', // :d.m.Y
         ];
@@ -39,8 +38,7 @@ class Contract extends Model
     }
 
 
-    public static $types
-        = [
+    public static $types = [
             1 => 'Абонентская плата',
             2 => 'Разовая',
         ];

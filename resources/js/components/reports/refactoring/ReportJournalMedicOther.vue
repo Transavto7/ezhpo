@@ -9,12 +9,14 @@
             <div class="report__name">
                 <span class="text-muted">{{ data.year }}</span> {{ months[data.month] }}
             </div>
-            <div class="card m-3 p-2">
+            <div class="card p-2" style="border-radius: 10px">
                 <div v-for="(driver, driver_id) in data.reports" :key="driver_id">
-                    <div class="report__name">
-                        <span class="text-muted">{{ driver_id }}</span> {{ driver.driver_fio }}
+                    <div class="report__item-title">
+                        <div class="report__name">
+                            <span class="text-muted">{{ driver_id || 'Неизвестный водитель' }}</span> {{ driver.driver_fio }}
+                        </div>
+                        <div class="report__pvs mt-1">{{ driver.pv_id || 'Пункты выпуска не найдены' }}</div>
                     </div>
-                    <div class="report__pvs mt-1">{{ driver.pv_id || 'Пункты выпуска не найдены' }}</div>
                     <div class="report__cards">
                         <div class="report__card"
                              v-for="(type, type_name) in driver.types"

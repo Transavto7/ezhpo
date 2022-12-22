@@ -6,16 +6,20 @@
         </div>
 
         <div v-if="reports.data.length !== 0">
-            <div class="report__item mt-3"
+            <div class="report__item mt-2"
                  v-for="(car, car_id) in reports.data"
                  :key="car_id"
             >
-                <div class="report__name">
-                    <span class="text-muted">{{ car_id }}</span>
-                    {{ car.car_gos_number }}
-                    <span class="text-muted">{{ car.type_auto }}</span>
+                <div class="report__item-title">
+                    <div class="report__name">
+                        <div>
+                            <span class="text-muted">{{ car_id || 'Неизвестный автомобиль' }}</span>
+                            <span class="text-muted" v-if="car.type_auto">{{ car.type_auto }}</span>
+                        </div>
+                        {{ car.car_gos_number }}
+                        <div class="report__pvs mt-1">{{ car.pv_id || 'Пункты выпуска не найдены' }}</div>
+                    </div>
                 </div>
-                <div class="report__pvs mt-1">{{ car.pv_id || 'Пункты выпуска не найдены' }}</div>
                 <div class="report__cards">
                     <div class="report__card"
                          v-if="type.count > 0 || type.total > 0"
@@ -49,11 +53,13 @@
                 </div>
             </div>
 
-            <div class="report__item mt-3">
-                <div class="report__name">
-                    Всего
-                    <span>Кол-во: {{ reports.services.count || 0 }}</span>
-                    <span>Стоимость: {{ reports.services.price || 0 }}₽</span>
+            <div class="report__item mt-2">
+                <div class="report__item-title">
+                    <div class="report__name">
+                        Всего
+                        <span>Кол-во: {{ reports.services.count || 0 }}</span>
+                        <span>Стоимость: {{ reports.services.price || 0 }}₽</span>
+                    </div>
                 </div>
                 <div class="report__cards">
                     <div class="report__card"

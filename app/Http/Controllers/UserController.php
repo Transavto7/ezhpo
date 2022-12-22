@@ -24,9 +24,7 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        // ebat' ya query builder
         $users = User::with(['roles'  => function ($q) use ($request) {
-//            $q->orderBy('guard_name', (($request->get('sortDesc') == 'true') && ($request->get('sortBy') == 'roles')) ? 'DESC' : 'ASC');
         }, 'pv', 'company'])
                      ->where(function ($query) use ($request) {
                          $query->whereDoesntHave('roles')
@@ -68,7 +66,7 @@ class UserController extends Controller
                 $q->where('id', $role);
             });
         }
-//dd($users->limit(3)->get()->toArray());
+
         if ($request->get('api')) {
             $res = $users->paginate();
             $secondRes = $users->get()->sortBy;
@@ -81,8 +79,6 @@ class UserController extends Controller
         }
 
         $fields = FieldPrompt::where('type', 'users')->get();
-
-//        dd($fields->toArray());
 
         return view('admin.users_v2.index')
             ->with([

@@ -22,7 +22,19 @@ class ContractController extends Controller
 
     public function view()
     {
-        return view('contract.index');
+        $permissions = [
+            'create' => user()->access('contract_create'),
+            'trash' => user()->access('contract_trash'),
+            'read' => user()->access('contract_read'),
+            'delete' => user()->access('contract_delete'),
+            'edit' => user()->access('contract_edit'),
+        ];
+        $fields = FieldPrompt::where('type', 'contracts')->get();
+
+        return view('contract.index', [
+            'permissions' => $permissions,
+            'fields' => $fields
+        ]);
     }
 
     /**
@@ -34,9 +46,6 @@ class ContractController extends Controller
     {
         $contracts = Contract::with(['company', 'our_company', 'services', 'drivers', 'cars']);
         $filters   = $request->all();
-//        dd(
-//            $filters
-//        );
         $filters['sortBy']      = $filters['sortBy'] ?? 'id';
         $filters['sortDesc']    = $filters['sortDesc'] ?? 'true';
         $filters['perPage']     = $filters['perPage'] ?? 15;
@@ -113,6 +122,12 @@ class ContractController extends Controller
         if ($filters['created_at_end'] ?? false) {
             $contracts->whereDate('created_at', '<=', $filters['created_at_end']);
         }
+        if ($filters['date_of_start'] ?? false) {
+            $contracts->whereDate('date_of_start', '>=', $filters['date_of_start']);
+        }
+        if ($filters['date_of_end'] ?? false) {
+            $contracts->whereDate('date_of_end', '<=', $filters['date_of_end']);
+        }
 
         if (isset($filters['main_for_company'])) {
             if ($filters['main_for_company'] == 0 || $filters['main_for_company'] == 1) {
@@ -140,7 +155,6 @@ class ContractController extends Controller
     public function create(Request $request)
     {
         $data_to_save = json_decode($request->get('data_to_save'), true);
-//dd($data_to_save);
         $services = $data_to_save['services'] ?? [];
         unset($data_to_save['services']);
 
@@ -156,15 +170,14 @@ class ContractController extends Controller
                 'date_of_end', [
                 $date_of_start,
                 $date_of_end,
-            ])
-                                   ->whereNotBetween(
-                                       'date_of_end', [
-                                       $date_of_start,
-                                       $date_of_end,
-                                   ])
-                                   ->where('main_for_company', 1)
-                                   ->whereCompanyId($company_id)
-                                   ->first();
+            ])->whereNotBetween(
+                   'date_of_end', [
+                   $date_of_start,
+                   $date_of_end,
+               ])
+               ->where('main_for_company', 1)
+               ->whereCompanyId($company_id)
+               ->first();
             if ($contractQWE) {
                 return response([
                     'status'  => false,
@@ -175,33 +188,26 @@ class ContractController extends Controller
             }
         }
 
-
         $contract = Contract::create([
-            'name'             => $data_to_save['name'] ?? null,
-            'date_of_end'      => isset($data_to_save['date_of_end']) ? Carbon::parse($data_to_save['date_of_end'])
-                : null,
-            'date_of_start'    => isset($data_to_save['date_of_start']) ? Carbon::parse($data_to_save['date_of_start'])
-                : null,
-            //            'sum'            => $data_to_save['sum'] ?? null,
-            'company_id'       => $data_to_save['company']['id'] ?? null,
-            'our_company_id'   => $data_to_save['our_company']['id'] ?? null,
+            'name' => $data_to_save['name'] ?? null,
+            'date_of_end' => isset($data_to_save['date_of_end']) ? Carbon::parse($data_to_save['date_of_end']) : null,
+            'date_of_start' => isset($data_to_save['date_of_start']) ? Carbon::parse($data_to_save['date_of_start']) : null,
+            'company_id' => $data_to_save['company']['id'] ?? null,
+            'our_company_id' => $data_to_save['our_company']['id'] ?? null,
             'main_for_company' => $data_to_save['main_for_company'] ?? 0,
         ]);
-
 
         $servicesToSync = [];
         foreach ($services as $service) {
             $servicesToSync[$service['id']] = ['service_cost' => $service['price_unit']];
         }
 
-
         $contract->services()->sync($servicesToSync);
         $contract->cars()->sync($data_to_save['cars'] ?? []);
         $contract->drivers()->sync($data_to_save['drivers'] ?? []);
 
-
         return response([
-            'status'   => true,
+            'status' => true,
             'contract' => $contract,
         ]);
     }
@@ -244,9 +250,6 @@ class ContractController extends Controller
 
     public function update(Request $request)
     {
-//        var_dump($request->all());
-//        var_dump(123);
-//        die();
         $data_to_save = $request->post('data_to_save');
 
         if ( !$contract = Contract::find($data_to_save['id'])) {
@@ -268,15 +271,14 @@ class ContractController extends Controller
                 'date_of_end', [
                 $date_of_start,
                 $date_of_end,
-            ])
-                                   ->whereNotBetween(
-                                       'date_of_end', [
-                                       $date_of_start,
-                                       $date_of_end,
-                                   ])
-                                   ->where('main_for_company', 1)
-                                   ->whereCompanyId($company_id)
-                                   ->first();
+            ])->whereNotBetween(
+                   'date_of_end', [
+                   $date_of_start,
+                   $date_of_end,
+               ])
+               ->where('main_for_company', 1)
+               ->whereCompanyId($company_id)
+               ->first();
             if ($contractQWE) {
                 return response([
                     'status'  => false,
@@ -294,21 +296,19 @@ class ContractController extends Controller
                 'service_cost' => $service['pivot']['service_cost'] ?? $service['price_unit'],
             ];
         }
-//        var_dump($servicesToSync);
-//        die();
+
         $contract->update([
             'name'             => $data_to_save['name'] ?? null,
             'date_of_start'    => isset($data_to_save['date_of_start']) ? Carbon::parse($data_to_save['date_of_start'])
                 : null,
             'date_of_end'      => isset($data_to_save['date_of_end']) ? Carbon::parse($data_to_save['date_of_end'])
                 : null,
-            //            'sum'            => $data_to_save['sum'] ?? null,
             'company_id'       => $data_to_save['company']['id'] ?? null,
             'our_company_id'   => $data_to_save['our_company']['id'] ?? null,
             'main_for_company' => $data_to_save['main_for_company'] ?? 0,
+            'finished' => $data_to_save['finished'] ?? 0,
         ]);
 
-//        $contract->services()->sync([]);
         $contract->services()->sync($servicesToSync);
         $contract->cars()->sync($data_to_save['cars'] ?? []);
         $contract->drivers()->sync($data_to_save['drivers'] ?? []);

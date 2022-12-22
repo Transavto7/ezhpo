@@ -43,5 +43,6 @@ return [
     'discount' => 'Скидки',
     'pak_sdpo' => 'Пак СДПО',
     'req' => 'Реквизиты компании',
-    'field_prompts' => 'Подсказки полей'
+    'field_prompts' => 'Подсказки полей',
+    'contracts' => 'Договоры'
 ];

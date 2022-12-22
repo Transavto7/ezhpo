@@ -18043,19 +18043,26 @@ main.blue {
 
 .report__item {
   background-color: rgba(0, 0, 0, 0.05);
-  padding: 20px;
+  padding: 10px 10px;
   border-radius: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.report__item-title {
+  width: 230px;
 }
 
 .report__name {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: start;
+  gap: 5px;
 }
 
 .report__name span {
   font-size: 12px;
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.1);
   padding: 2px 10px;
   border-radius: 10px;
 }
@@ -18068,9 +18075,8 @@ main.blue {
 .report__cards {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 20px;
-  font-size: 15px;
+  gap: 5px;
+  font-size: 14px;
 }
 
 .report__cards.medic .report__card {
@@ -18079,7 +18085,7 @@ main.blue {
 
 .report__card {
   background-color: rgba(33, 150, 243, 0.5);
-  padding: 10px 10px;
+  padding: 5px;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -18088,7 +18094,7 @@ main.blue {
 }
 
 .report__card-title {
-  font-weight: 500;
+  font-weight: 600;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
@@ -18104,6 +18110,7 @@ main.blue {
   display: flex;
   align-items: center;
   max-width: 200px;
+  overflow: hidden;
   gap: 5px;
 }
 
@@ -18117,13 +18124,13 @@ main.blue {
 }
 
 .report__footer {
-  padding-top: 10px;
+  padding-top: 5px;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 5px;
   margin-top: auto;
 }
 

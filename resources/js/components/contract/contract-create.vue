@@ -20,8 +20,6 @@
             <b-col sm="9">
                 <b-form-datepicker id="date_of_start-datepicker" v-model="contractData.date_of_start"
                                    class="mb-2"></b-form-datepicker>
-                <!--                <b-form-input v-model="contractData.date_of_end"-->
-                <!--                              placeholder="Введите длительность действия в днях"></b-form-input>-->
             </b-col>
         </b-row>
         <b-row class="my-1">
@@ -31,32 +29,13 @@
             <b-col sm="9">
                 <b-form-datepicker id="date_of_end-datepicker" v-model="contractData.date_of_end"
                                    class="mb-2"></b-form-datepicker>
-                <!--                <b-form-input v-model="contractData.date_of_end"-->
-                <!--                              placeholder="Введите длительность действия в днях"></b-form-input>-->
             </b-col>
         </b-row>
-<!--        <b-row class="my-1">-->
-<!--            <b-col sm="3">-->
-<!--                <label>Сумма договора:</label>-->
-<!--            </b-col>-->
-<!--            <b-col sm="9">-->
-<!--                <b-form-input v-model="contractData.sum" placeholder="Введите сумму договора"></b-form-input>-->
-<!--            </b-col>-->
-<!--        </b-row>-->
         <b-row class="my-1">
             <b-col sm="3">
                 <label>Компания:</label>
             </b-col>
             <b-col sm="9">
-<!--                <v-select-->
-<!--                    v-model="contractData.company"-->
-<!--                    :options="companies"-->
-<!--                    key="id"-->
-<!--                    label="name"-->
-<!--                    @search="searchCompanies"-->
-<!--                    v-on:change="loadDrivers"-->
-<!--                >-->
-<!--                </v-select>-->
                 <multiselect
                     v-model="company_id"
                     @select="(company) => contractData.company_id = company.hash_id"
@@ -99,6 +78,11 @@
                     v-model="contractData.main_for_company"
                 >
                     Главный
+                </b-form-checkbox>
+                <b-form-checkbox
+                    v-model="contractData.finished"
+                >
+                    Завершен
                 </b-form-checkbox>
             </b-col>
         </b-row>
@@ -254,13 +238,6 @@
         </div>
 
         <b-row class=" my-2">
-<!--            <b-col>-->
-<!--                <b-form-checkbox-->
-<!--                    v-model="contractData.hard_reset_for_car_and_drivers"-->
-<!--                >-->
-<!--                    Перезаписать всех водителей и авто-->
-<!--                </b-form-checkbox>-->
-<!--            </b-col>-->
             <b-col class="text-right">
                 <template
                     v-if="contractData.id"
@@ -280,8 +257,6 @@
 
                 <b-button variant="danger" @click="hideModal">Закрыть</b-button>
             </b-col>
-            <!--                <b-col>-->
-            <!--                </b-col>-->
         </b-row>
 
 
@@ -305,11 +280,8 @@ export default {
     data() {
         return {
             show: false,
-            // v-selects
             companies:     [],
             our_companies: [],
-            // cars:        [],
-            // drivers:     [],
             typeOptions: [],
             products:    [],
 
@@ -318,13 +290,10 @@ export default {
                 name:        null,
                 date_of_start: 0,
                 date_of_end: 0,
-                // type: null,
-                // sum: null,
-                // driver:      null,
-                // car_id:         null,
                 company:     null,
                 our_company: null,
                 main_for_company: false, // Главный для компании
+                finished: false,
                 services: [],
                 drivers: [],
                 cars: [],
@@ -367,7 +336,6 @@ export default {
                     this.contractData.drivers.push(this.drivers_of_company[driver].id);
                 }
             }
-            // this.$refs.drivers_list_of_company.$forceUpdate();
         },
         allCarsSelected(){
             this.contractData.cars = [];
@@ -434,32 +402,34 @@ export default {
 
             this.company_id = {}
 
-            // console.log(data)
             this.show = true
             if (data) {
-                // this.oldData = data
                 this.contractData = Object.assign({}, data)
-                // console.log(this.contractData.cars.length)
-                if (this.contractData.main_for_company) {
+
+                if (Number(this.contractData.main_for_company)) {
                     this.contractData.main_for_company = true
                 }
+
+                if (Number(this.contractData.finished)) {
+                    this.contractData.finished = true
+                }
+
                 if(this.contractData.cars.length){
                     this.contractData.cars = this.contractData.cars.map((item) =>{
                         return item.id
                     })
                 }
-                // console.log(this.contractData.cars)
+
                 if(this.contractData.drivers.length){
                     this.contractData.drivers = this.contractData.drivers.map((item) =>{
                         return item.id
                     })
                 }
+
                 this.company_id = this.contractData.company
                 if(isClone){
                     this.contractData.id = null;
                 }
-                // moment()
-                // this.contractData = data
             } else {
                 this.contractData = {
                     drivers: [],

@@ -78,12 +78,6 @@
                     </div>
                     <div class="d-flex align-items-center col-lg-3">
                         <b-form-group label="Главный" v-slot="{ ariaDescribedby }" class="w-100">
-<!--                            <v-select-->
-<!--                                v-model="filters.main_for_company"-->
-<!--                                :options=""-->
-<!--                                key="key"-->
-<!--                            >-->
-<!--                            </v-select>-->
                             <b-form-select v-model="filters.main_for_company" :options="[{
                                     value: null,
                                     text: '----',
@@ -97,22 +91,6 @@
                             </b-form-select>
                         </b-form-group>
                     </div>
-<!--                    <div class="d-flex align-items-center col-lg-3">-->
-<!--                        <b-form-group label="Главный" v-slot="{ ariaDescribedby }" class="w-100">-->
-<!--                            <b-form-radio v-model="filters.main_for_company" :aria-describedby="ariaDescribedby"-->
-<!--                                          name="some-radios"-->
-<!--                                          :value="null">Все-->
-<!--                            </b-form-radio>-->
-<!--                            <b-form-radio v-model="filters.main_for_company" :aria-describedby="ariaDescribedby"-->
-<!--                                          name="some-radios"-->
-<!--                                          :value="1">Главный-->
-<!--                            </b-form-radio>-->
-<!--                            <b-form-radio v-model="filters.main_for_company" :aria-describedby="ariaDescribedby"-->
-<!--                                          name="some-radios"-->
-<!--                                          :value="0">Не главный-->
-<!--                            </b-form-radio>-->
-<!--                        </b-form-group>-->
-<!--                    </div>-->
                     <div class="d-flex align-items-center col-lg-3">
                         <b-form-group label="Дата окончания договора от" v-slot="{ ariaDescribedby }" class="w-100">
                             <b-form-datepicker id="date_of_end_start" v-model="filters.date_of_end_start"
@@ -149,6 +127,28 @@
                     <div class="d-flex align-items-center col-lg-3">
                         <b-form-group label="Дата создания до" v-slot="{ ariaDescribedby }" class="w-100">
                             <b-form-datepicker id="created_at_end" v-model="filters.created_at_end"
+                                               placeholder="Укажите дату"
+                                               reset-button
+                                               close-button
+                                               label-reset-button="Сбросить"
+                                               label-close-button="Закрыть"
+                                               class="mb-2"></b-form-datepicker>
+                        </b-form-group>
+                    </div>
+                    <div class="d-flex align-items-center col-lg-3">
+                        <b-form-group label="Дата начала от" v-slot="{ ariaDescribedby }" class="w-100">
+                            <b-form-datepicker id="date_of_start" v-model="filters.date_of_start"
+                                               placeholder="Укажите дату"
+                                               reset-button
+                                               close-button
+                                               label-reset-button="Сбросить"
+                                               label-close-button="Закрыть"
+                                               class="mb-2"></b-form-datepicker>
+                        </b-form-group>
+                    </div>
+                    <div class="d-flex align-items-center col-lg-3">
+                        <b-form-group label="Дата начала до" v-slot="{ ariaDescribedby }" class="w-100">
+                            <b-form-datepicker id="date_of_end" v-model="filters.date_of_end"
                                                placeholder="Укажите дату"
                                                reset-button
                                                close-button
@@ -261,9 +261,6 @@ export default {
         },
         searchCompanies(value, loading) {
             loading(true);
-
-            // this.companies = [];
-            // this.companies.fil
             axios
                 .get(`/v-search/companies`, {
                     params: {

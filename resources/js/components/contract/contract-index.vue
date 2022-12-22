@@ -42,7 +42,7 @@
                             <b-pagination
                                 id="paginate_filters"
                                 :total-rows="total"
-                                :per-page="mazaretto_yeban"
+                                :per-page="perPage"
                                 v-model="filters.currentPage"
 
                                 class="my-0"
@@ -57,67 +57,18 @@
                 >
 
                     <b-col md="2" class="my-1">
-                        <select v-model="mazaretto_yeban">
+                        <select @change="loadData" v-model="perPage">
                             <option value="20">20</option>
                             <option value="500">500</option>
                             <option value="1500">1500</option>
                             <option value="2000">2000</option>
                             <option value="2500">2500</option>
                         </select>
-<!--                        <select-->
-<!--                            name=""-->
-
-<!--                            id="per-page-select"-->
-<!--                            v-model="filters.perPage"-->
-<!--                            :options="pageOptions"-->
-<!--                            size="sm"-->
-<!--                            @change="selectPerPage"-->
-<!--                        >-->
-
-<!--                        </select>-->
-<!--                        <b-form-group>-->
-<!--                            -->
-<!--                            <b-form-select-->
-<!--                                id="per-page-select"-->
-<!--                                v-model="filters.perPage"-->
-<!--                                :options="pageOptions"-->
-<!--                                size="sm"-->
-<!--                                @change="selectPerPage"-->
-<!--                            ></b-form-select>-->
-<!--                        </b-form-group>-->
                     </b-col>
                 </b-row>
                 <p class="text-success">Найдено записей: <b>{{ total }}</b></p>
             </div>
         </div>
-
-
-        <!-- totalRow -->
-        <!--        <b-row class="mb-3"-->
-        <!--               v-show="permissions.read"-->
-        <!--        >-->
-        <!--            <b-col class="my-1 ">-->
-        <!--                <p class="text-success">Найдено записей: <b>{{ total }}</b></p>-->
-        <!--&lt;!&ndash;                <b-form-group&ndash;&gt;-->
-        <!--&lt;!&ndash;                    label-class="font-weight-bold pt-0"&ndash;&gt;-->
-        <!--&lt;!&ndash;                    class="mb-0"&ndash;&gt;-->
-        <!--&lt;!&ndash;                    disabled&ndash;&gt;-->
-        <!--&lt;!&ndash;                >&ndash;&gt;-->
-        <!--&lt;!&ndash;                    <b-form-group&ndash;&gt;-->
-        <!--&lt;!&ndash;                        label="Всего записей:"&ndash;&gt;-->
-        <!--&lt;!&ndash;                        label-for="nested-street"&ndash;&gt;-->
-        <!--&lt;!&ndash;                        label-cols="4"&ndash;&gt;-->
-        <!--&lt;!&ndash;                        label-cols-sm="3"&ndash;&gt;-->
-        <!--&lt;!&ndash;                        content-cols="4"&ndash;&gt;-->
-        <!--&lt;!&ndash;                        label-align-sm="right"&ndash;&gt;-->
-        <!--&lt;!&ndash;                    >&ndash;&gt;-->
-        <!--&lt;!&ndash;                        <b-form-input id="nested-street" v-model="total"></b-form-input>&ndash;&gt;-->
-        <!--&lt;!&ndash;                    </b-form-group>&ndash;&gt;-->
-        <!--&lt;!&ndash;                </b-form-group>&ndash;&gt;-->
-
-        <!--            </b-col>-->
-        <!--        </b-row>-->
-
 
         <!-- create/update contracts -->
         <contract-create
@@ -135,100 +86,51 @@ import ContractFilters from "./contract-filters";
 import {getParams, addParams} from "../const/params";
 
 export default {
-    name:       "contract-index",
+    name: "contract-index",
     components: {
         Swal2,
         ContractCreate,
         ContractFilters,
     },
-    props:      ['permissions'],
+    props: ['permissions', 'fields'],
     data() {
         return {
-            // trash: 0,
-
             busy: false,
             user: null,
 
             table: {
-                items:  [],
-                fields: [
-                    {
-                        key:      "id",
-                        sortable: true,
-                        label:    "ID",
-                    },
-                    {
-                        key:      "name",
-                        sortable: true,
-                        label:    "Название",
-                    },
-                    {
-                        key:      "main_for_company",
-                        label:    "Главный",
-                    },
-                    {
-                        key:   "services",
-                        label: "Услуги",
-                    },
-                    {
-                        key:      "company",
-                        sortable: true,
-                        label:    "Компания",
-                    },
-                    {
-                        key:   "company.inn",
-                        label: "ИНН",
-                    },
-                    {
-                        key:      "our_company.name",
-                        sortable: true,
-                        label:    "Наша компания",
-                    },
-                    {
-                        key:   "our_company.inn",
-                        label: "ИНН нашей компании",
-                    },
-                    // {
-                    //     key:      "main_for_company",
-                    //     sortable: true,
-                    //     label:    "Главный",
-                    // },
-                    {
-                        key:      "date_of_start",
-                        sortable: true,
-                        label:    "Дата начала договора",
-                    },
-                    {
-                        key:      "date_of_end",
-                        sortable: true,
-                        label:    "Дата окончания договора",
-                    },
-                    {
-                        key:      "created_at",
-                        sortable: true,
-                        label:    "Дата создания",
-                    },
-                    {
-                        key:   "buttons",
-                        label: "#",
-                        class: "text-center",
-                    },
-                ],
+                items: [],
+                fields: [ ],
             },
 
             filters:     {
-                sortBy:      'id',
-                sortDesc:    true,
+                sortBy: 'id',
+                sortDesc: true,
                 currentPage: 1,
-                // perPage:     500,
-                trash:       0,
+                trash: 0,
             },
-            total:       0,
-            mazaretto_yeban: 20,
-            // pageOptions: [15, 100, 500], // da mne pohui
+            total: 0,
+            perPage: 20,
         }
     },
     mounted() {
+        console.log(this.table.fields);
+        this.fields.forEach(field =>{
+            this.table.fields.push({
+                'key': field.field,
+                'label': field.name,
+                'sortable': true,
+                'thAttr': {
+                    'data-toggle': 'tooltip',
+                    'data-html': true,
+                    'data-trigger': 'hover',
+                    'data-placement': 'top',
+                    title: field.content,
+                }
+            });
+        });
+        this.table.fields.push({ key: "buttons", label: "#", class: "text-center" });
+
         let getData = getParams()
         for (let param in getData) {
             if (!isNaN(getData[param])) {
@@ -251,18 +153,12 @@ export default {
             this.filters.currentPage = page;
             this.loadData();
         },
-        // selectPerPage(perPage = 15) {
-        //     this.filters.perPage = perPage;
-        //     this.loadData();
-        // },
         changeSort(e) {
             this.filters.sortBy = e.sortBy;
             this.filters.sortDesc = e.sortDesc;
             this.loadData();
         },
         changeFilters(filters) {
-            // this.filters.currentPage = 1;
-
             for (let filter_key in filters) {
                 this.filters[filter_key] = filters[filter_key];
             }
@@ -280,14 +176,12 @@ export default {
 
         loadData() {
             this.busy = true
-
-            // console.log(this.filters)
             addParams(this.filters);
 
             let data = {
                 params: Object.assign({}, this.filters),
             };
-            data.params.mazaretto_yeban = this.mazaretto_yeban;
+            data.params.perPage = this.perPage;
 
             axios.get("/contract/index", data)
                 .then(({data}) => {
@@ -305,8 +199,6 @@ export default {
                     Swal2.fire({title: "Неизвестная ошибка", icon: "error"});
                 }).finally(() => this.busy = false);
         },
-
-
     },
 }
 </script>
