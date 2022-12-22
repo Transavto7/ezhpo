@@ -129,4 +129,9 @@ Route::middleware('auth:api')->group(function () {
 
 Route::middleware('auth:api')->prefix('sdpo')->name('sdpo')->group(function () {
     Route::post('/anketa', 'Api\SdpoController@createAnketa');
+    Route::get('/pv', 'Api\SdpoController@getPoint');
+    Route::get('sdpo/medics', 'Api\SdpoController@getMedics');
 });
+
+Route::get('sdpo/check', 'Api\SdpoController@checkConnaction');
+
