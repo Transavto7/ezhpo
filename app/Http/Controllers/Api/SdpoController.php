@@ -30,7 +30,8 @@ class SdpoController extends Controller
         }
 
         if ($request->user_id) {
-            if (!User::find($request->user_id)) {
+            $user = User::find($request->user_id);
+            if (!$user) {
                 return response()->json(['message' => 'Пользователь с таким ID не найден!'], 401);
             }
         }
@@ -64,6 +65,14 @@ class SdpoController extends Controller
 
         if ($driver->year_birthday !== '' && $driver->year_birthday !== '0000-00-00') {
             $medic['driver_year_birthday'] = $driver->year_birthday;
+        }
+
+        if ($request->photo) {
+            $medic['photos'] = $request->photo;
+        }
+
+        if ($request->video) {
+            $medic['videos'] = $request->video;
         }
 
         date_default_timezone_set('UTC');
@@ -116,5 +125,33 @@ class SdpoController extends Controller
         }
 
         return response()->json($anketa);
+    }
+
+    /*
+     * Check connection sdpo
+     */
+    public function checkConnaction(Request $request) {
+        return "true";
+    }
+
+    /*
+     * Get PV name by user
+     */
+    public function getPoint(Request $request) {
+        $user = $request->user('api');
+        return $user->pv->name;
+    }
+
+    /*
+     * return all medics
+     */
+    public function getMedics(Request $request) {
+        $users = User::with('roles', 'pv:id,name,pv_id', 'pv.town:id,name')->whereHas('roles', function ($q) use ($request) {
+            $q->where('roles.id', 2);
+        })->select('id', 'name', 'pv_id')->get();
+
+        $users = $users->groupBy(['pv.town.name', 'pv.name']);
+
+        return $users;
     }
 }
