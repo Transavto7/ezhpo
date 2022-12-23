@@ -50,7 +50,20 @@
         window.addEventListener("load", function(event) {
             const preloader = document.querySelector('#page-preloader');
             preloader.classList.add('hide');
+
+            const mobileDownload = document.querySelector('.mobile-download');
+            if (isAndroid() && mobileDownload) {
+                mobileDownload.querySelector('.close').addEventListener('click', () => {
+                    mobileDownload.style.display = 'none';
+                });
+                mobileDownload.style.display = 'flex';
+            }
         });
+
+        function isAndroid() {
+            const ua = navigator.userAgent.toLowerCase();
+            return ua.indexOf("android") > -1;
+        }
     </script>
 
     @yield('custom-styles')
@@ -78,6 +91,18 @@
 
             @guest
                 @yield('content')
+
+                @if(file_exists(public_path('TransAvto7.apk')))
+                        <div class="mobile-download" style="display: none">
+                            <button class="close">
+                                <i class="fa fa-close"></i>
+                            </button>
+                            <a href="/TransAvto7.apk" class="link">
+                                Скачать наше приложение
+                                <span>Нажмите для начала загрузки</span>
+                            </a>
+                        </div>
+                @endif
             @endguest
 
             @auth
