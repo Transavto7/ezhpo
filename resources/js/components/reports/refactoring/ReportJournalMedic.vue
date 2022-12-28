@@ -28,11 +28,11 @@
 
                         <div class="report__card-item"
                              v-if="type_name !== 'is_dop'"
-                             v-for="(service, index) in type.services"
-                             :key="index"
+                             v-for="(service, service_name) in type.services"
+                             :key="service_name"
                         >
                             <div class="report__card-item-name">
-                                {{ service.name }}
+                                {{ service_name }}
                             </div>
 
                             <div class="report__card-item-price">
@@ -42,8 +42,12 @@
                         </div>
 
                         <div class="report__footer">
-                            <span>Всего осмотров: {{ type.count || type.total || 0 }}</span>
-                            <span v-if="type.sum">Общая стоимость: {{ type.sum }}₽</span>
+                            <span v-b-tooltip.hover title="все / несогласованные">
+                                Всего осмотров:
+                                {{ type.count || type.total || 0 }}
+                                {{ type.count_dop ? '/ ' + type.count_dop : '' }}
+                            </span>
+                            <span v-if="type.price">Общая стоимость: {{ type.price }}₽</span>
                         </div>
                     </div>
                 </div>
@@ -53,35 +57,37 @@
                 <div class="report__item-title">
                     <div class="report__name">
                         Всего
-                        <span>Кол-во: {{ reports.services.count || 0 }}</span>
-                        <span>Стоимость: {{ reports.services.price || 0 }}₽</span>
+                        <span v-b-tooltip.hover title="всего водителей">Кол-во: {{ reports.total.drivers_count || 0 }}</span>
+                        <span>Стоимость: {{ reports.total.price || 0 }}₽</span>
                     </div>
                 </div>
 
                 <div class="report__cards medic">
                     <div class="report__card"
-                         v-for="(services, type_name) in reports.services.services_for_artem"
-                         v-if="getTotalCount(services) > 0"
+                         v-for="(type, type_name) in reports.total.types"
                     >
                         <div class="report__card-title">
                             {{ getName(type_name) }}
                         </div>
 
-                        <div class="report__card-item" v-if="type_name !== 'is_dop'" v-for="(service, index) in services" :key="index">
+                        <div class="report__card-item" v-for="(service, service_name) in type.services" :key="service_name">
                             <div class="report__card-item-name">
-                                {{ service.name }}
+                                {{ service_name }}
                                 <span>кол-во: {{ service.count || 0 }}</span>
                             </div>
 
                             <div class="report__card-item-price">
                                 {{ service.price }}₽
-                                <span v-if="service.discount">{{ service.discount }}%</span>
                             </div>
                         </div>
 
                         <div class="report__footer">
-                            <span>Всего осмотров: {{ getTotalCount(services) }}</span>
-                            <span  v-if="type_name !== 'is_dop'">Общая стоимость: {{ getTotalPrice(services) }}₽</span>
+                            <span v-b-tooltip.hover title="все / несогласованные">
+                                Всего осмотров:
+                                {{ type.count || type.total || 0 }}
+                                {{ type.count_dop ? '/ ' + type.count_dop : '' }}
+                            </span>
+                            <span  v-if="type.price">Общая стоимость: {{ type.price }}₽</span>
                         </div>
                     </div>
                 </div>
@@ -114,27 +120,12 @@ export default {
 
             return key;
         },
-        // visible(reports, show = true) {
-        //     if (reports.length === undefined || reports.length > 0) {
-        //         this.reports = reports;
-        //     }
-        //     this.show = show;
-        // },
-        // hide() {
-        //     this.reports = false;
-        //     this.show = false;
-        // },
         getTotalCount(services) {
             return services.reduce((sum, service) => { return sum + service.count }, 0)
         },
         getTotalPrice(services) {
            return services.reduce((sum, service) => {
-               // console.log(service)
-               // console.log(this.reports)
-               // console.log(this.reports.data)
                let data = this.reports.data
-               // console.log(Object.keys(data))
-               // console.log(Object.keys(data).length)
                if(service.type_product === 'Разовые осмотры'){
                    return sum + (service.price * service.count)
                }else

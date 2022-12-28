@@ -22,7 +22,6 @@
                 </div>
                 <div class="report__cards">
                     <div class="report__card"
-                         v-if="type.count > 0 || type.total > 0"
                          v-for="(type, type_name) in car.types"
                          :key="type_name"
                     >
@@ -31,12 +30,11 @@
                         </div>
 
                         <div class="report__card-item"
-                             v-for="(service, index) in type.services"
-                             v-if="type_name !== 'is_dop'"
-                             :key="index"
+                             v-for="(service, service_name) in type.services"
+                             :key="service_name"
                         >
                             <div class="report__card-item-name">
-                                {{ service.name }}
+                                {{ service_name }}
                             </div>
 
                             <div class="report__card-item-price">
@@ -46,8 +44,12 @@
                         </div>
 
                         <div class="report__footer">
-                            <span>Всего осмотров: {{ type.count || type.total  }}</span>
-                            <span v-if="type.sum">Общая стоимость: {{ type.sum }}₽</span>
+                            <span v-b-tooltip.hover title="все / несогласованные">
+                                Всего осмотров:
+                                {{ type.count || type.total || 0 }}
+                                {{ type.count_dop ? '/ ' + type.count_dop : '' }}
+                            </span>
+                            <span v-if="type.price">Общая стоимость: {{ type.price }}₽</span>
                         </div>
                     </div>
                 </div>
@@ -57,38 +59,39 @@
                 <div class="report__item-title">
                     <div class="report__name">
                         Всего
-                        <span>Кол-во: {{ reports.services.count || 0 }}</span>
-                        <span>Стоимость: {{ reports.services.price || 0 }}₽</span>
+                        <span v-b-tooltip.hover title="всего автомобилей">Кол-во: {{ reports.total.cars_count || 0 }}</span>
+                        <span>Стоимость: {{ reports.total.price || 0 }}₽</span>
                     </div>
                 </div>
                 <div class="report__cards">
                     <div class="report__card"
-                         v-for="(services, type_name) in reports.services.services_for_artem"
-                         v-if="getTotalCount(services) > 0"
+                         v-for="(type, type_name) in reports.total.types"
                     >
                         <div class="report__card-title">
-                            {{ getName(services[0].type) }}
+                            {{ getName(type_name) }}
                         </div>
 
                         <div class="report__card-item"
-                             v-if="type_name !== 'is_dop'"
-                             v-for="(service, index) in services"
-                             :key="index"
+                             v-for="(service, service_name) in type.services"
+                             :key="service_name"
                         >
                             <div class="report__card-item-name">
-                                {{ service.name }}
+                                {{ service_name }}
                                 <span>кол-во {{ service.count || 0 }}</span>
                             </div>
 
                             <div class="report__card-item-price">
                                 {{ service.price }}₽
-                                <span v-if="service.discount">{{ service.discount }}%</span>
                             </div>
                         </div>
 
                         <div class="report__footer">
-                            <span>Всего осмотров: {{ getTotalCount(services) }}</span>
-                            <span v-if="type_name !== 'is_dop'">Общая стоимость: {{ getTotalPrice(services) }}₽</span>
+                            <span v-b-tooltip.hover title="все / несогласованные">
+                                Всего осмотров:
+                                {{ type.count || type.total || 0 }}
+                                {{ type.count_dop ? '/ ' + type.count_dop : '' }}
+                            </span>
+                            <span v-if="type_name !== 'is_dop'">Общая стоимость: {{ type.price }}₽</span>
                         </div>
                     </div>
                 </div>

@@ -938,6 +938,7 @@ $(document).ready(function () {
     // ------------------------------------------------------ //
 
     $('[data-toggle="tooltip"]').tooltip()
+    $("[rel='tooltip'], .tooltip").tooltip();
 
     // ------------------------------------------------------- //
     // Adding fade effect to dropdowns

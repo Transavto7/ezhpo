@@ -94,12 +94,12 @@
                             />
                             <ReportJournalMedicOther
                                 class="mt-5"
-                                :reports="contract.medicsOther"
+                                :reports="contract.medics_other"
                                 ref="reportsMedicOther"
                             />
                             <ReportJournalTechOther
                                 class="mt-5"
-                                :reports="contract.techOther"
+                                :reports="contract.techs_other"
                                 ref="reportsTechOther"
                             />
                             <ReportJournalOther
@@ -134,8 +134,6 @@ import ReportJournalMedicOther from './ReportJournalMedicOther'
 import ReportJournalMedic from './ReportJournalMedic'
 import ReportJournalTech from './ReportJournalTech'
 import Total from "./Total";
-import EbalVRotJs from "./EbalVRotJs";
-import fcn_name from "./fcn_name";
 
 
 export default {
@@ -147,8 +145,6 @@ export default {
         ReportJournalMedic,
         ReportJournalTech,
         Total,
-        EbalVRotJs,
-        fcn_name,
         ReportJournalMedicOther
     },
 
@@ -201,7 +197,7 @@ export default {
                     this.contracts[contract_key].total = data;
                     this.contracts[contract_key].medics = data.medics;
                     this.contracts[contract_key].tech = data.techs;
-                    this.contracts[contract_key].medics_other = data.medics;
+                    this.contracts[contract_key].medics_other = data.medics_other;
                     this.contracts[contract_key].techs_other = data.techs_other;
                     this.contracts[contract_key].other = data.other;
 
