@@ -205,6 +205,10 @@ class ReportContractRefactoringController extends Controller
                     ->first();
             }
 
+            if (!$services) {
+                continue;
+            }
+
             $services = $services->services;
 
             foreach (['Предрейсовый/Предсменный', 'Послерейсовый/Послесменный'] as $type_view) {
@@ -376,6 +380,10 @@ class ReportContractRefactoringController extends Controller
                     ->first();
             }
 
+            if (!$services) {
+                continue;
+            }
+
             $services = $services->services;
 
             foreach (['Предрейсовый/Предсменный', 'Послерейсовый/Послесменный'] as $type_view) {
@@ -470,6 +478,10 @@ class ReportContractRefactoringController extends Controller
                     ->where('date_of_start', '<=', $this->date_from)
                     ->where("main_for_company", 1)
                     ->first();
+            }
+
+            if (!$services) {
+                continue;
             }
 
             if (!$services) {
@@ -641,6 +653,10 @@ class ReportContractRefactoringController extends Controller
                     ->where('date_of_start', '<=', $this->date_from)
                     ->where("main_for_company", 1)
                     ->first();
+            }
+
+            if (!$services) {
+                continue;
             }
 
             $services = $services->services;
