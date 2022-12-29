@@ -216,7 +216,8 @@ class ReportContractRefactoringController extends Controller
                 $count = $result[$driver_id]['types'][$type_view]['count'] ?? 0;
                 if ($count == 0) continue;
 
-                foreach ($services as $service) {
+                foreach ($services->where('type_anketa', 'medic')
+                             ->where('type_view', $type_view) as $service) {
                     $this->useDiscount($service, $count);
 
                     if ($service->type_product === 'Разовые осмотры') {
@@ -249,7 +250,7 @@ class ReportContractRefactoringController extends Controller
                 $count = $result[$driver_id]['types'][$type_anketa]['count'] ?? 0;
                 if ($count == 0) continue;
 
-                foreach ($services as $service) {
+                foreach ($services->where('type_anketa', $type_anketa) as $service) {
                     $this->useDiscount($service, $count);
 
                     if ($service->type_product === 'Разовые осмотры') {
@@ -391,7 +392,8 @@ class ReportContractRefactoringController extends Controller
                 $count = $result[$car_id]['types'][$type_view]['count'] ?? 0;
                 if ($count == 0) continue;
 
-                foreach ($services as $service) {
+                foreach ($services->where('type_anketa', 'medic')
+                         ->where('type_view', $type_view) as $service) {
                     $this->useDiscount($service, $count);
                     if ($service->type_product === 'Разовые осмотры') {
                         $service->price = $service->price * $count;
@@ -533,7 +535,8 @@ class ReportContractRefactoringController extends Controller
                 $count = $result[$key][$driver_id]['types'][$type_view]['count'] ?? 0;
                 if ($count == 0) continue;
 
-                foreach ($services as $service) {
+                foreach ($services->where('type_anketa', 'medic')
+                             ->where('type_view', $type_view) as $service) {
                     $this->useDiscount($service, $count);
 
                     if ($service->type_product === 'Разовые осмотры') {
@@ -566,7 +569,7 @@ class ReportContractRefactoringController extends Controller
                 $count = $result[$key][$driver_id]['types'][$type_anketa]['count'] ?? 0;
                 if ($count == 0) continue;
 
-                foreach ($services as $service) {
+                foreach ($services->where('type_anketa', $type_anketa) as $service) {
                     $this->useDiscount($service, $count);
 
                     if ($service->type_product === 'Разовые осмотры') {
@@ -704,7 +707,7 @@ class ReportContractRefactoringController extends Controller
                 $count = $result[$key][$car_id]['types'][$type_view]['count'] ?? 0;
                 if ($count == 0) continue;
 
-                foreach ($services as $service) {
+                foreach ($services->where('type_view', $type_view) as $service) {
                     $this->useDiscount($service, $count);
                     if ($service->type_product === 'Разовые осмотры') {
                         $service->price = $service->price * $count;
