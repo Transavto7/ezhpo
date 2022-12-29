@@ -9,7 +9,7 @@
             <div class="report__item mt-3" v-for="(data, year) in reports.data" :key="year">
                 <div class="report__item-title">
                     <div class="report__name">
-                        <span class="text-muted">{{ data.year }}</span> {{ months[data.month] }}
+                        <span class="text-muted">{{ data.year }}</span> {{ months[data.month - 1] }}
                     </div>
                 </div>
                 <div class="card p-2" style="border-radius: 10px">

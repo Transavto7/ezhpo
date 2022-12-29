@@ -186,7 +186,8 @@ class ReportContractRefactoringController extends Controller
         foreach ($medics->groupBy('driver.hash_id') as $driver_id => $inspections) {
             $total['drivers_count'] += 1;
             if ($driver_id) {
-                $result[$inspections->first()->driver->hash_id]['pv_id'] = $medics
+                $result[$driver_id]['driver_fio'] = $inspections->first()->driver->fio;
+                $result[$driver_id]['pv_id'] = $medics
                     ->where('driver_id', $inspections->first()->driver->hash_id)
                     ->pluck('pv_id')
                     ->unique()

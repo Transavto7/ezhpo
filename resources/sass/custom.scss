@@ -590,6 +590,7 @@ main.blue {
     border-radius: 15px;
     display: flex;
     gap: 10px;
+    align-items: start;
 }
 
 .report__item-title {
@@ -621,6 +622,7 @@ main.blue {
     flex-wrap: wrap;
     gap: 5px;
     font-size: 14px;
+    align-items: start;
 }
 
 .report__cards.medic {
