@@ -153,6 +153,10 @@ class ReportController extends Controller
         return $this->getDynamic($request, 'medic');
     }
 
+    public function getDynamicAll(Request $request) {
+        return $this->getDynamic($request, 'all');
+    }
+
     public function getDynamic(Request $request, $journal) {
         $months = [];
         $periodStart = Carbon::now()->subMonths(11);
@@ -168,7 +172,13 @@ class ReportController extends Controller
             $result = [];
             $total = [];
 
-            $anketas = Anketa::where('type_anketa', $journal)->where('in_cart', 0)
+            if ($journal != 'all') {
+                $anketas = Anketa::where('type_anketa', $journal);
+            } else {
+                $anketas = Anketa::whereIn('type_anketa', ['medic', 'tech']);
+            }
+
+            $anketas = $anketas->where('in_cart', 0)
                 ->where(function ($q) use ($date_from, $date_to) {
                     $q->where(function ($q) use ($date_from, $date_to) {
                         $q->whereNotNull('date')

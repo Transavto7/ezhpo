@@ -1,6 +1,7 @@
 <?php
 
 use App\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
@@ -200,6 +201,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
         Route::get('journal', 'ReportController@showJournal')->name('report.journal');
         Route::get('dynamic/medic', 'ReportController@getDynamicMedic')->name('report.dynamic.medic');
         Route::get('dynamic/tech', 'ReportController@getDynamicTech')->name('report.dynamic.tech');
+        Route::get('dynamic/all', 'ReportController@getDynamicAll')->name('report.dynamic.tech');
         Route::get('{type_report}', 'ReportController@GetReport')->name('report.get');
     });
 
@@ -233,4 +235,3 @@ Route::middleware(['auth'])->group(function () {
 
 // Маршруты авторизации
 Auth::routes();
-

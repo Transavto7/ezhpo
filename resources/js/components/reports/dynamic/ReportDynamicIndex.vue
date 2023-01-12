@@ -5,11 +5,16 @@
                 Выбор информации
 
                 <div class="d-flex align-items-center">
-                    <span class="pr-2 font-weight-normal">{{ journal === 'tech' ? 'Техосмотры' : 'Медосмотры' }}</span>
-                    <label class="switch d-flex align-items-center">
-                        <input v-model="journal" true-value="tech" false-value="medic" type="checkbox">
-                        <span class="slider round"></span>
-                    </label>
+                  <select v-model="journal" @change="changeJournalType">
+                    <option value="tech">Техосмотры</option>
+                    <option value="medic">Медосмотры</option>
+                    <option value="all">Оба</option>
+                  </select>
+<!--                    <span class="pr-2 font-weight-normal">{{ journal === 'tech' ? 'Техосмотры' : 'Медосмотры' }}</span>-->
+<!--                    <label class="switch d-flex align-items-center">-->
+<!--                        <input v-model="journal" true-value="tech" false-value="medic" type="checkbox">-->
+<!--                        <span class="slider round"></span>-->
+<!--                    </label>-->
                 </div>
             </h5>
             <div class="card-body">
@@ -89,6 +94,9 @@ export default {
         $(this.$refs.towns).on("change", this.selectTown);
     },
     methods: {
+        changeJournalType() {
+          window.location = `/report/dynamic/${this.journal}?town_id=${this.selectedTown}&pv_id=${this.point}`
+        },
         selectTown(event) {
             const selected = $(event.currentTarget).find("option:selected");
             this.selectedTown = Number(selected.val());
