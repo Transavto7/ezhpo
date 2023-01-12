@@ -8,6 +8,7 @@ import Vue2Editor from "vue2-editor";
 import "bootstrap-vue/dist/bootstrap-vue.css"
 import Toast, { POSITION } from "vue-toastification";
 import "vue-toastification/dist/index.css";
+import ChartJs from "chartjs";
 
 Vue.use(BootstrapVue)
 Vue.use(BootstrapVueIcons)
