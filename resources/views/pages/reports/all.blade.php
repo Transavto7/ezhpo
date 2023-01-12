@@ -63,9 +63,9 @@
                         @endswitch
 
                         @php
-                            $pre_month = (date('m')-1);
-                            $date_from_field = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . '01';
-                            $date_to_field = date('Y') . '-' . ($pre_month <= 9 ? '0' . $pre_month : $pre_month) . '-' . cal_days_in_month(CAL_GREGORIAN, $pre_month, date('Y'));
+                            $pre_month = \Illuminate\Support\Carbon::now()->subMonths();
+                            $date_from_field = $pre_month->startOfMonth()->format('Y-m-d');
+                            $date_to_field = $pre_month->endOfMonth()->format('Y-m-d');
                         @endphp
 
                         <div class="col-md-2">

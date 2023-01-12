@@ -121,11 +121,7 @@ if($model === 'Driver'){
 
 }
                         @endphp
-                    @if(
-                           ( $model == 'Driver' && user()->access('contract_edit_driver'))
-                        ||
-                        ($model == 'Car' && user()->access('contract_edit_car'))
-                        )
+                    @if(( $model == 'Driver' && user()->access('contract_edit_driver')) || ($model == 'Car' && user()->access('contract_edit_car')) )
                     <div data-field="contract" class="form-group">
                         <label>Договор</label>
                         <select name="contract_ids[]"
