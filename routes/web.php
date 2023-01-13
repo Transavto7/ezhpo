@@ -46,14 +46,6 @@ Route::get('/show-edit-element-modal/{model}/{id}', 'IndexController@ShowEditMod
  * API-маршруты
  */
 
-
-//dd(
-//    \App\Anketa::query()->selectRaw('count(id) as count')
-//);
-
-
-
-
 // Сброс пункта выпуска
 Route::get('/api/pv-reset/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', 'ApiController@ResetAllPV')->name('api.resetpv');
 Route::get('/api/getField/{model}/{field}/{default_value?}', 'IndexController@GetFieldHTML');
@@ -218,9 +210,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
     Route::get('/elements/{type}', 'IndexController@RenderElements')->name('renderElements');
 });
 
-//dd(
-//    Driver::wherHashId(206055)->fist
-//);
+
 /**
  * Элементы CRM
  */
@@ -265,6 +255,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
 //        Route::get('journal', 'ReportController@showJournal')->name('report.journal');
         Route::get('dynamic/medic', 'ReportController@getDynamicMedic')->name('report.dynamic.medic');
         Route::get('dynamic/tech', 'ReportController@getDynamicTech')->name('report.dynamic.tech');
+        Route::get('dynamic/all', 'ReportController@getDynamicAll')->name('report.dynamic.all');
         Route::get('{type_report}', 'ReportController@GetReport')->name('report.get');
     });
 

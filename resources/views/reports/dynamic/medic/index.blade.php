@@ -8,7 +8,9 @@
         :points='JSON.parse(`@json($points)`)'
         town="{{ request()->get('town_id') }}"
         point="{{ request()->get('pv_id') }}"
+        order="{{ request()->get('order_by') ?? 'execute' }}"
         type="{{ $journal }}"
+        :infos='JSON.parse(`@json($total)`)'
     >
         @if($companies)
             <div class="card">
@@ -55,5 +57,6 @@
                 Осмотры не найдены
             </div>
         @endif
+        <canvas id="chart"></canvas>
     </report-dynamic-index>
 @endsection

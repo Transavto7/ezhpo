@@ -10,6 +10,7 @@ import Toast, { POSITION } from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import vSelect from "vue-select";
 import 'vue-select/dist/vue-select.css';
+import ChartJs from "chartjs";
 
 Vue.use(BootstrapVue)
 Vue.use(BootstrapVueIcons)
