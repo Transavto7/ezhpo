@@ -159,7 +159,6 @@ class ReportController extends Controller
 
     public function getDynamic(Request $request, $journal) {
         $months = [];
-        $res = [];
         $periodStart = Carbon::now()->subMonths(11);
         $period = CarbonPeriod::create($periodStart, '1 month', Carbon::now());
         $orderBy = $request->order_by;
@@ -177,14 +176,13 @@ class ReportController extends Controller
             if ($journal != 'all') {
                 $anketas = Anketa::where('type_anketa', $journal);
             } else {
-                $anketas = Anketa::whereIn('type_anketa', ['medic', 'tech']);
-                $res[] = 1;
+                $anketas = Anketa::whereRaw("`type_anketa` in ('medic', 'tech')");
             }
 
             $anketas = $anketas->where('in_cart', 0);
 
             if ($orderBy == 'execute') {
-                $anketas = $anketas->where(function ($q) use ($date_from, $date_to, $orderBy, $res) {
+                $anketas = $anketas->where(function ($q) use ($date_from, $date_to, $orderBy) {
                     $q->where(function ($q) use ($date_from, $date_to) {
                         $q->whereNotNull('date')
                           ->whereBetween('date', [
@@ -200,8 +198,10 @@ class ReportController extends Controller
                       });
                 });
             } else {
-                $res[] = 2;
-                $anketas = $anketas->whereBetween('created_at', [$date_from, $date_to]);
+                $anketas = $anketas->where(function($q) use ($date_from, $date_to) {
+                    $q->where('created_at', '>=', $date_from)
+                        ->orWhere('created_at', '<=', $date_to);
+                });
             }
 
             if ($request->pv_id) {
@@ -240,6 +240,8 @@ class ReportController extends Controller
             }
         }
 
+
+
         $towns = Town::get(['id', 'name']);
         $points = Point::get(['id', 'name', 'pv_id']);
 
@@ -256,7 +258,7 @@ class ReportController extends Controller
             'towns' => $towns,
             'points' => $points,
             'journal' => $journal,
-            'totalStr' => $totalStr
+            'totalstr' => $totalStr
         ]);
     }
 

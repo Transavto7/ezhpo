@@ -201,7 +201,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
         Route::get('journal', 'ReportController@showJournal')->name('report.journal');
         Route::get('dynamic/medic', 'ReportController@getDynamicMedic')->name('report.dynamic.medic');
         Route::get('dynamic/tech', 'ReportController@getDynamicTech')->name('report.dynamic.tech');
-        Route::get('dynamic/all', 'ReportController@getDynamicAll')->name('report.dynamic.tech');
+        Route::get('dynamic/all', 'ReportController@getDynamicAll')->name('report.dynamic.all');
         Route::get('{type_report}', 'ReportController@GetReport')->name('report.get');
     });
 

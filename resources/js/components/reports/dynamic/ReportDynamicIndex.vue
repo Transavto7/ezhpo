@@ -8,7 +8,7 @@
                   <select v-model="journal" @change="changeJournalType">
                     <option value="tech">Техосмотры</option>
                     <option value="medic">Медосмотры</option>
-                    <option value="all">Оба</option>
+                    <option value="all">Все</option>
                   </select>
                 </div>
             </h5>
@@ -88,7 +88,7 @@
 <script>
 export default {
     name: "ReportDynamicIndex",
-    props: ['towns', 'points', 'town', 'point', 'type', 'order'],
+    props: ['towns', 'points', 'town', 'point', 'type', 'order', 'infos'],
     data() {
         return {
             selectedTown: null,
@@ -105,6 +105,29 @@ export default {
         this.orderBy = this.order;
         console.log(this.type);
         $(this.$refs.towns).on("change", this.selectTown);
+
+        var ctx = document.getElementById('chart').getContext('2d');
+        var chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Январь', 'Декабрь', "Ноябрь", "Октябрь", "Сентябрь", "Август", "Июль", "Июнь", "Май", "Апрель", "Март", "Февраль"],
+            datasets: [{
+              label: 'Количество проведённых осмотров',
+              backgroundColor: 'rgb(196, 219, 231)',
+              borderColor: 'rgb(23,66,231)',
+              minBarLength: 1,
+              borderWidth: 1,
+              data: Object.values(this.infos)
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          },
+        })
     },
     methods: {
         changeJournalType() {

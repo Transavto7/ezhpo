@@ -10,6 +10,7 @@
         point="{{ request()->get('pv_id') }}"
         order="{{ request()->get('order_by') ?? 'execute' }}"
         type="{{ $journal }}"
+        :infos='JSON.parse(`@json($total)`)'
     >
         @if($companies)
             <div class="card">
@@ -58,20 +59,4 @@
         @endif
         <canvas id="chart"></canvas>
     </report-dynamic-index>
-    <script type="application/javascript">
-        var ctx = document.getElementById('chart').getContext('2d');
-        var chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Январь', 'Декабрь', "Ноябрь", "Октябрь", "Сентябрь", "Август", "Июль", "Июнь", "Май", "Апрель", "Март", "Февраль"],
-                datasets: [{
-                    label: 'Количество проведённых осмотров',
-                    backgroundColor: 'rgb(255,99,132)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    data: [{{$totalStr}}]
-                }]
-            },
-            options: {}
-        })
-    </script>
 @endsection
