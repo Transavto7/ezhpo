@@ -245,11 +245,13 @@ class ReportController extends Controller
         $towns = Town::get(['id', 'name']);
         $points = Point::get(['id', 'name', 'pv_id']);
 
-        $totalStr = "";
-        foreach ($total as $sum) {
-            $totalStr .= "$sum, ";
+        if (isset($total)) {
+            $totalStr = "";
+            foreach ($total as $sum) {
+                $totalStr .= "$sum, ";
+            }
+            $totalStr = rtrim($totalStr, ",");
         }
-        $totalStr = rtrim($totalStr, ",");
 
         return view('reports.dynamic.medic.index', [
             'months' => $months,
@@ -258,7 +260,7 @@ class ReportController extends Controller
             'towns' => $towns,
             'points' => $points,
             'journal' => $journal,
-            'totalstr' => $totalStr
+            'totalstr' => $totalStr ?? ''
         ]);
     }
 
