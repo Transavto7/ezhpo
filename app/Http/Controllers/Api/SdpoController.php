@@ -101,11 +101,28 @@ class SdpoController extends Controller
         if ($proba_alko === 'Положительно' || $test_narko === 'Положительно'
             || $medic['med_view'] !== 'В норме' || $medic['t_people'] >= 38 || $ton[0] >= 150) {
             $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранения';
         }
-        if ($request->sleep_status && $request->people_status && $request->alcometer_result) {
-            if($request->sleep_status === 'Нет' && $request->people_status === 'Нет' && $request->alcometer_result > 0) {
-                $admitted = 'Не допущен';
-            }
+
+        if ($request->sleep_status && $request->sleep_status === 'Нет') {
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранения';
+        }
+
+        if ($request->people_status && $request->people_status === 'Нет') {
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранения';
+        }
+
+        if ($request->people_status && $request->people_status === 'Нет') {
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранения';
+        }
+
+        $alcometer = (double) $request->alcometer_result;
+        if ($alcometer > 0) {
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранения';
         }
 
         if ($request->type_anketa === 'pak_queue') {
@@ -115,7 +132,6 @@ class SdpoController extends Controller
         }
 
         $medic['admitted'] = $admitted ?? 'Допущен';
-
         $anketa = Anketa::create($medic);
 
         // ОТПРАВКА SMS
