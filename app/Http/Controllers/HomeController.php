@@ -127,7 +127,6 @@ class HomeController extends Controller
          * Выбор полей
          */
         $fieldsKeysTypeAnkets = $validTypeAnkets;
-
         $fieldsKeys       = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
         $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets])
             ? Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] : [];

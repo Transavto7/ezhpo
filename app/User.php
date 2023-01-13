@@ -191,7 +191,7 @@ class User extends Authenticatable
 
     public static $userRolesKeys
         = [
-            '0'   => '',
+            '0'   => 'medic',
             '1'   => 'tech',
             '2'   => 'medic',
             '4'   => 'pak_queue',
