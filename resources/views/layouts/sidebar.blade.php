@@ -11,7 +11,7 @@
             <article>
                 @foreach(user()->roles as $role)
                     <h3>
-                        <span class="badge badge-success">
+                        <span class="badge badge-success text-wrap">
                             {{ $role->guard_name }}
                         </span>
                     </h3>
@@ -153,32 +153,11 @@
                             </a>
                         </li>
                     @endif
-                    @if(user()->access('report_service_company_read', 'report_service_company_export'))
-                        <li>
-                            <a href="{{ route('report.journal_contract') }}">
-                                <i class="fa fa-book"></i>Отчет по услугам компании
-                                <span class="
-                                    start-100
-                                    translate-middle
-                                    badge
-                                    text-white
-                                    rounded-pill
-                                    bg-success"
-                                >
-                                    new
-                                </span>
-                            </a>
-                        </li>
-                    @endif
-
 
                     @if(user()->access('report_schedule_dynamic_mo'))
                         <li>
                             <a href="{{ route('report.dynamic.medic') }}">
                                 <i class="fa fa-book"></i>Отчет по количеству осмотров
-                                <span class="start-100 translate-middle badge text-white rounded-pill bg-success">
-                                    new
-                                </span>
                             </a>
                         </li>
                     @endif
@@ -194,7 +173,7 @@
                                     rounded-pill
                                     bg-success"
                                 >
-                                    view
+                                    new
                                 </span>
                             </a>
                         </li>

@@ -373,14 +373,10 @@ class Contract extends Model
         $companies = Company::with(['drivers', 'cars'])
                             ->whereDoesntHave('contracts')
                             ->limit($limit)
-//                            ->whereHashId(346632844)
                             ->get()
                             ->map(function ($q) {
                                 $arr          = [];
                                 $cars_drivers = $q->drivers->merge($q->cars);
-//                                dd(
-//                                    $cars_drivers->toArray()
-//                                );
 
                                 foreach ($cars_drivers as &$driver_or_car) {
                                     $driver_or_car->products_id = explode(',', $driver_or_car->products_id);
@@ -394,19 +390,7 @@ class Contract extends Model
 
                                     $driver_or_car->key_for_group = implode('_', $arr);
                                 }
-//                                return $driver_or_car;
-//                                foreach ($q->cars as &$car) {
-//                                    $car->products_id = explode(',', $car->products_id);
-//                                    $car->products_id = array_map(function ($q) {
-//                                        return intval($q);
-//                                    }, $car->products_id);
-//                                    $arr              = $car->products_id;
-//                                    asort($arr);
-//                                    $car->products_id   = $arr;
-//                                    $car->key_for_group = implode('_', $arr);
-//                                }
                                 $q->car_or_driver = $cars_drivers;
-
                                 return $q;
                             });
         $services  = Product::get();

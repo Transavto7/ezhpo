@@ -256,7 +256,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
         Route::get('/getContractsForCompany_v2',[
             \App\Http\Controllers\ReportContractRefactoringController::class, 'getContractsForCompany'
         ]);
-        Route::get('journal_contract', 'ReportController@ShowJournalContract')->name('report.journal_contract');
+//        Route::get('journal_contract', 'ReportController@ShowJournalContract')->name('report.journal_contract');
 //        Route::get('journal_contract', 'ReportController@ShowJournalContract')->name('company_service');
         Route::get('journal', 'ReportController@ShowJournal')->name('report.journal');
         Route::get('journal_new',[

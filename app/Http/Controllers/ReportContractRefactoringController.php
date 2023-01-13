@@ -185,14 +185,10 @@ class ReportContractRefactoringController extends Controller
 
         foreach ($medics->groupBy('driver.hash_id') as $driver_id => $inspections) {
             $total['drivers_count'] += 1;
+            $result[$driver_id]['pv_id'] = $inspections->pluck('pv_id')->unique()->implode('; ');
+
             if ($driver_id) {
                 $result[$driver_id]['driver_fio'] = $inspections->first()->driver->fio;
-                $result[$driver_id]['pv_id'] = $medics
-                    ->where('driver_id', $inspections->first()->driver->hash_id)
-                    ->pluck('pv_id')
-                    ->unique()
-                    ->implode('; ');
-
                 $services = $inspections->first()->driver->contracts->whereIn('id', $this->contracts_ids)
                     ->where('date_of_end', '>=', $this->date_to)
                     ->where('date_of_start', '<=', $this->date_from)
@@ -217,7 +213,9 @@ class ReportContractRefactoringController extends Controller
                 if ($count == 0) continue;
 
                 foreach ($services->where('type_anketa', 'medic')
-                             ->where('type_view', $type_view) as $service) {
+                             ->filter(function ($item) use ($type_view) {
+                                 return false !== stristr($item->type_view, $type_view);
+                             }) as $service) {
                     $this->useDiscount($service, $count);
 
                     if ($service->type_product === 'Разовые осмотры') {
@@ -359,14 +357,11 @@ class ReportContractRefactoringController extends Controller
 
         foreach ($techs->groupBy('car.hash_id') as $car_id => $inspections) {
             $total['cars_count'] += 1;
+            $result[$car_id]['pv_id'] = $inspections->pluck('pv_id')->unique()->implode('; ');
+
             if ($car_id) {
                 $result[$car_id]['car_gos_number'] = $inspections->first()->car->gos_number;
                 $result[$car_id]['type_auto'] = $inspections->first()->car->type_auto;
-                $result[$car_id]['pv_id'] = $techs
-                    ->where('car_id', $car_id)
-                    ->pluck('pv_id')
-                    ->unique()
-                    ->implode('; ');
 
                 $services = $inspections->first()->car
                     ->contracts->whereIn('id', $this->contracts_ids)
@@ -392,8 +387,10 @@ class ReportContractRefactoringController extends Controller
                 $count = $result[$car_id]['types'][$type_view]['count'] ?? 0;
                 if ($count == 0) continue;
 
-                foreach ($services->where('type_anketa', 'medic')
-                         ->where('type_view', $type_view) as $service) {
+                foreach ($services->where('type_anketa', 'tech')
+                             ->filter(function ($item) use ($type_view) {
+                                 return false !== stristr($item->type_view, $type_view);
+                             }) as $service) {
                     $this->useDiscount($service, $count);
                     if ($service->type_product === 'Разовые осмотры') {
                         $service->price = $service->price * $count;
@@ -506,10 +503,9 @@ class ReportContractRefactoringController extends Controller
                 $key = $date->year . '-' . $date->month;
                 $result[$key]['year'] = $date->year;
                 $result[$key]['month'] = $date->month;
+                $result[$key]['reports'][$driver_id]['pv_id'] = $inspections->pluck('pv_id')->unique()->implode('; ');
                 if ($driver_id) {
                     $result[$key]['reports'][$driver_id]['driver_fio'] = $inspections->first()->driver->fio;
-                    $result[$key]['reports'][$driver_id]['pv_id'] = implode('; ',
-                        array_unique($reports->where('driver_id', $driver_id)->pluck('pv_id')->toArray()));
                 }
 
                 if (!isset($total['types'][$report->type_view]['count'])) {
@@ -536,7 +532,9 @@ class ReportContractRefactoringController extends Controller
                 if ($count == 0) continue;
 
                 foreach ($services->where('type_anketa', 'medic')
-                             ->where('type_view', $type_view) as $service) {
+                             ->filter(function ($item) use ($type_view) {
+                                 return false !== stristr($item->type_view, $type_view);
+                             }) as $service) {
                     $this->useDiscount($service, $count);
 
                     if ($service->type_product === 'Разовые осмотры') {
@@ -681,8 +679,7 @@ class ReportContractRefactoringController extends Controller
                 $result[$key]['month'] = $date->month;
                 $result[$key]['reports'][$car_id]['car_gos_number'] = $report->car->gos_number;
                 $result[$key]['reports'][$car_id]['type_auto'] = $report->car->type_auto;
-                $result[$key]['reports'][$car_id]['pv_id'] = implode('; ',
-                    array_unique($reports->where('car_id', $car_id)->pluck('pv_id')->toArray()));
+                $result[$key]['reports'][$car_id]['pv_id'] = $inspections->pluck('pv_id')->unique()->implode('; ');
 
                 if (!isset($total['types'][$report->type_view]['count'])) {
                     $total['types'][$report->type_view]['count'] = 0;
@@ -707,7 +704,10 @@ class ReportContractRefactoringController extends Controller
                 $count = $result[$key][$car_id]['types'][$type_view]['count'] ?? 0;
                 if ($count == 0) continue;
 
-                foreach ($services->where('type_view', $type_view) as $service) {
+                foreach ($services->where('type_anketa', 'tech')
+                             ->filter(function ($item) use ($type_view) {
+                                 return false !== stristr($item->type_view, $type_view);
+                             }) as $service) {
                     $this->useDiscount($service, $count);
                     if ($service->type_product === 'Разовые осмотры') {
                         $service->price = $service->price * $count;
