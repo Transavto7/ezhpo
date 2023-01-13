@@ -5,11 +5,11 @@
                 Выбор информации
 
                 <div class="d-flex align-items-center">
-                    <span class="pr-2 font-weight-normal">{{ journal === 'tech' ? 'Техосмотры' : 'Медосмотры' }}</span>
-                    <label class="switch d-flex align-items-center">
-                        <input v-model="journal" true-value="tech" false-value="medic" type="checkbox">
-                        <span class="slider round"></span>
-                    </label>
+                  <select v-model="journal" @change="changeJournalType">
+                    <option value="tech">Техосмотры</option>
+                    <option value="medic">Медосмотры</option>
+                    <option value="all">Все</option>
+                  </select>
                 </div>
             </h5>
             <div class="card-body">
@@ -54,6 +54,21 @@
                                 </option>
                             </select>
                         </div>
+
+                        <div class="form-group col-lg-3">
+                          <label class="mb-1" for="company">Построение</label>
+                          <select
+                              ref="order"
+                              name="order_by"
+                              class="filled-select2 filled-select"
+                              data-allow-clear="false"
+                              v-model="orderBy"
+                              @change="changeJournalType"
+                          >
+                            <option value="execute">По дате осмотра</option>
+                            <option value="created">По дате создания</option>
+                          </select>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-lg-12">
@@ -73,22 +88,51 @@
 <script>
 export default {
     name: "ReportDynamicIndex",
-    props: ['towns', 'points', 'town', 'point', 'type'],
+    props: ['towns', 'points', 'town', 'point', 'type', 'order', 'infos'],
     data() {
         return {
             selectedTown: null,
             journal: 'medic',
-            pointList: []
+            pointList: [],
+            //Дата осмотра - execute, дата создания - created.
+            orderBy: 'execute'
         }
     },
     mounted() {
         this.pointList = this.points;
         this.selectedTown = this.town;
         this.journal = this.type;
+        this.orderBy = this.order;
         console.log(this.type);
         $(this.$refs.towns).on("change", this.selectTown);
+
+        var ctx = document.getElementById('chart').getContext('2d');
+        var chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Январь', 'Декабрь', "Ноябрь", "Октябрь", "Сентябрь", "Август", "Июль", "Июнь", "Май", "Апрель", "Март", "Февраль"],
+            datasets: [{
+              label: 'Количество проведённых осмотров',
+              backgroundColor: 'rgb(196, 219, 231)',
+              borderColor: 'rgb(23,66,231)',
+              minBarLength: 1,
+              borderWidth: 1,
+              data: Object.values(this.infos)
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          },
+        })
     },
     methods: {
+        changeJournalType() {
+          window.location = `/report/dynamic/${this.journal}?town_id=${this.selectedTown}&pv_id=${this.point}&order_by=${this.orderBy}`
+        },
         selectTown(event) {
             const selected = $(event.currentTarget).find("option:selected");
             this.selectedTown = Number(selected.val());
@@ -98,6 +142,7 @@ export default {
         },
     }
 }
+
 </script>
 
 <style scoped>

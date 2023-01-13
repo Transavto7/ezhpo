@@ -65,7 +65,6 @@
             return ua.indexOf("android") > -1;
         }
     </script>
-
     @yield('custom-styles')
 </head>
 <body>
