@@ -5,7 +5,7 @@
                 Выбор информации
 
                 <div class="d-flex align-items-center">
-                  <select v-model="journal" @change="changeJournalType">
+                  <select v-model="journal" @change="submitForm">
                     <option value="tech">Техосмотры</option>
                     <option value="medic">Медосмотры</option>
                     <option value="all">Все</option>
@@ -21,8 +21,10 @@
                             <select
                                 ref="towns"
                                 name="town_id"
+                                id="town_selector"
                                 class="filled-select2 filled-select"
                                 data-allow-clear="true"
+                                multiple
                             >
                                 <option value="">Не установлено</option>
                                 <option v-for="item in towns"
@@ -40,14 +42,16 @@
                             <select
                                 ref="points"
                                 name="pv_id"
+                                id="point_selector"
                                 class="filled-select2 filled-select"
                                 data-allow-clear="true"
+                                multiple
                             >
                                 <option value="">Не установлено</option>
                                 <option v-for="item in pointList"
                                         :key="item.id"
                                         :value="item.id"
-                                        :selected="item.id === Number(point)"
+                                        :selected="item.id === Number(point) || selectedPoints.includes(item.id)"
                                         v-if="!item.hide"
                                 >
                                     {{ item.name }}
@@ -63,16 +67,16 @@
                               class="filled-select2 filled-select"
                               data-allow-clear="false"
                               v-model="orderBy"
-                              @change="changeJournalType"
                           >
                             <option value="execute">По дате осмотра</option>
                             <option value="created">По дате создания</option>
                           </select>
                         </div>
                     </div>
-                    <div class="row">
+
+                    <div class="row" id="make-report-block">
                         <div class="form-group col-lg-12">
-                            <button class="btn btn-info">
+                            <button class="btn btn-info" type="button" v-on:click="submitForm">
                                 Сформировать отчет
                             </button>
                         </div>
@@ -95,51 +99,101 @@ export default {
             journal: 'medic',
             pointList: [],
             //Дата осмотра - execute, дата создания - created.
-            orderBy: 'execute'
+            orderBy: 'execute',
+            selectedTowns: [],
+            selectedPoints: [],
+            selectedTownsAsString: '',
+            selectedPvAsString: '',
+            selectedPoint: 0
         }
     },
     mounted() {
-        this.pointList = this.points;
         this.selectedTown = this.town;
         this.journal = this.type;
         this.orderBy = this.order;
-        console.log(this.type);
         $(this.$refs.towns).on("change", this.selectTown);
+        $(this.$refs.points).on("change", this.selectPoint);
 
-        var ctx = document.getElementById('chart').getContext('2d');
-        var chart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: ['Январь', 'Декабрь', "Ноябрь", "Октябрь", "Сентябрь", "Август", "Июль", "Июнь", "Май", "Апрель", "Март", "Февраль"],
-            datasets: [{
-              label: 'Количество проведённых осмотров',
-              backgroundColor: 'rgb(196, 219, 231)',
-              borderColor: 'rgb(23,66,231)',
-              minBarLength: 1,
-              borderWidth: 1,
-              data: Object.values(this.infos)
-            }]
-          },
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true
-              }
+        var _sTown = this.town;
+        if (this.selectedTown != null) {
+          $("#town_selector").children('option').each(function (i, e) {
+            if (_sTown.split(',').includes(e.value)) {
+              e.selected = true;
             }
-          },
-        })
+          });
+          $(this.$refs.towns).trigger("change");
+
+          //_sPoints - выделенные пункты.
+          var _sPoints = this.point.split(',').map(e => Number(e)),
+              points = this.points.filter(function (p) {
+                //Если пункт был выбран - выделить.
+                //Если пункт принадлежит городу, то включаем в список.
+                if (_sTown.includes(p.pv_id)) {
+                  return true;
+                }
+              });
+        }
+        this.pointList = points;
+        this.selectedPoints = _sPoints;
+
+        if (this.infos !== null) {
+          var ctx = document.getElementById('chart').getContext('2d');
+          var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ['Январь', 'Декабрь', "Ноябрь", "Октябрь", "Сентябрь", "Август", "Июль", "Июнь", "Май", "Апрель", "Март", "Февраль"],
+              datasets: [{
+                label: 'Количество проведённых осмотров',
+                backgroundColor: 'rgb(196, 219, 231)',
+                borderColor: 'rgb(23,66,231)',
+                minBarLength: 1,
+                borderWidth: 1,
+                data: Object.values(this.infos)
+              }]
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            },
+          })
+        }
     },
     methods: {
-        changeJournalType() {
-          window.location = `/report/dynamic/${this.journal}?town_id=${this.selectedTown}&pv_id=${this.point}&order_by=${this.orderBy}`
-        },
         selectTown(event) {
-            const selected = $(event.currentTarget).find("option:selected");
-            this.selectedTown = Number(selected.val());
-            this.pointList = this.points.filter(point => {
-                return  Number(point.pv_id) === this.selectedTown || !this.selectedTown;
+            const selected = $(event.currentTarget).val();
+            let converterArray = selected.map(point => Number(point));
+
+            this.selectedTowns = selected;
+            this.pointList = this.points.filter(function (point) {
+                  return converterArray.includes(point.pv_id);
             });
         },
+        selectPoint(event) {
+          const selected = $(event.currentTarget).val();
+          let converterArray = selected.map(point => Number(point));
+
+          this.selectedPoints = converterArray;
+        },
+        getAvailablePoints() {
+          var selectedTown = this.selectedTown,
+              pointSelects = document.querySelectorAll('select.select-points'),
+              pointsList = this.points,
+              points = [],
+              result = [];
+
+          pointSelects.forEach(function (e, i) { points.push(e.value) })
+          result = pointsList.filter((p) => !points.includes(p.id) && p.pv_id == selectedTown);
+
+          return result;
+        },
+        submitForm() {
+          this.selectedTownsAsString = this.selectedTowns;
+          this.selectedPvAsString = this.selectedPoints;
+          window.location = `/report/dynamic/${this.journal}?town_id=${this.selectedTownsAsString}&pv_id=${this.selectedPvAsString}&order_by=${this.orderBy}`;
+        }
     }
 }
 
