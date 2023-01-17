@@ -117,6 +117,9 @@ export default {
         var _sTown = this.town;
         if (this.selectedTown != null) {
           $("#town_selector").children('option').each(function (i, e) {
+            if (e.value == '' || e.value == 'Не установлено') {
+              return;
+            }
             if (_sTown.split(',').includes(e.value)) {
               e.selected = true;
             }
