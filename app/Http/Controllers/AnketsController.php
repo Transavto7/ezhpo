@@ -61,7 +61,7 @@ class AnketsController extends Controller
             $data[$f] = $anketa[$f];
         }
 
-        $point = Point::getPointText($anketa->pv_id);
+        $point = $anketa->pv_id;
         $points = Point::getAll();
 
         $iController = new IndexController();

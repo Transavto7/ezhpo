@@ -19,7 +19,11 @@
                             @endphp
                             <option
                                     @if(session()->has('anketa_pv_id'))
-                                        @if($child->id == session('anketa_pv_id')['value'])
+                                        @if ($default_point === $child->name)
+                                            selected
+                                        @endif
+
+                                        @if($default_point === '' && $child->id == session('anketa_pv_id')['value'])
                                             selected
                                         @endif
                                     @elseif($default_pv_id)
