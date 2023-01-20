@@ -274,7 +274,7 @@ class ReportController extends Controller
 
                     $whereCase .= " and `created_at` >= date(\"$date_from\") and `created_at` <= date(\"$date_to\")";
                     $subSelectCase = "select count(`anketas`.`id`) as `$monthName`, `company_id` as `company`, `companies`.`name` as `name` from `anketas` ";
-                    $subSelectCase .= "left join `companies` WHERE `companies`.`id` = `anketas`.`company_id` ";
+                    $subSelectCase .= "left join `companies` on `companies`.`id` = `anketas`.`company_id` ";
                     $subSelectCase .= $whereCase . " group by `company_id`";
 
                     $responseFromDB = DB::select($subSelectCase);
