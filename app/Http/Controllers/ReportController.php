@@ -263,6 +263,8 @@ class ReportController extends Controller
                 $result[$company_id]['name'] = $anketasByCompany->first()->company_name;
                 for ($i = 0; $i < 12; $i++) {
                     $date = Carbon::now()->subMonths($i);
+                    $date_from = $date->firstOfMonth()->startOfDay();
+                    $date_to = $date->lastOfMonth()->endofDay();
 
                     if ($orderBy == 'execute') {
                         $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
@@ -278,9 +280,6 @@ class ReportController extends Controller
                                      $date_to->format('Y-m'),
                                  ])->count();
                     } else {
-                        $date_from = Carbon::now()->subMonths(12)->firstOfMonth()->startOfDay();
-                        $date_to = Carbon::now()->lastOfMonth()->endOfDay();
-
                         $count = $anketasByCompany->whereBetween('created_at', [$date_from, $date_to])->count();
                     }
 
