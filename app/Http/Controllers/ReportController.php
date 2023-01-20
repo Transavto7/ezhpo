@@ -228,7 +228,7 @@ class ReportController extends Controller
                     $anketas = $anketas->where('pv_id', Point::find($request->pv_id)->name);
                 }
             } elseif ($town_id) {
-                if (is_array($town_id)) {
+                if (str_contains($town_id, ',')) {
                     $points = Point::whereRaw("pv_id in ($town_id)")->pluck('name');
                 } else {
                     $points = Point::where('pv_id', $request->town_id)->pluck('name');
@@ -259,7 +259,7 @@ class ReportController extends Controller
                                      $date_to->format('Y-m'),
                                  ])->count();
                     } else {
-                        $count = $anketasByCompany->whereBetween('created_at', [$date_from, $date_to])->count();
+                        $count = $anketasByCompany->whereBetween('created_at', [$date_from->format('Y-m'), $date_to->format('Y-m')])->count();
                     }
 
                     $result[$company_id][$date->format('F')] = $count;
