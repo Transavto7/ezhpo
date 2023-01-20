@@ -1520,7 +1520,6 @@ class IndexController extends Controller
 
         // Отображаем данные
         $anketa = $this->ankets[$anketa_key];
-        $point = Point::getPointText($user->pv_id);
         $points = Point::getAll();
 
         // Конвертация текущего времени Юзера
@@ -1535,7 +1534,6 @@ class IndexController extends Controller
 
         // Дефолтные значения
         $anketa['default_current_date'] = $time;
-        $anketa['default_point'] = $point;
         $anketa['points'] = $points;
         $anketa['type_anketa'] = $anketa_key;
         $anketa['default_pv_id'] = $user->pv_id;

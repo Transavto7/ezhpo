@@ -12,25 +12,22 @@
                     <optgroup label="{{ $point['name'] }}">
                         @foreach($point['pvs'] as $child)
                             @php
-                                if(is_array($child)){
+                                if(is_array($child)) {
                                 $child = (object)$child;
                                 dd($child);
                             }
                             @endphp
                             <option
-                                    @if(session()->has('anketa_pv_id'))
-                                        @if ($default_point === $child->name)
-                                            selected
-                                        @endif
-
-                                        @if($default_point === '' && $child->id == session('anketa_pv_id')['value'])
-                                            selected
-                                        @endif
-                                    @elseif($default_pv_id)
-                                        {{ $default_pv_id === $child->name || $default_pv_id === $child->id ? 'selected' : '' }}
+                                @if ($default_point === $child->name)
+                                    selected
+                                @elseif(session()->has('anketa_pv_id'))
+                                    @if($default_point === '' && $child->id == session('anketa_pv_id')['value'])
+                                        selected
                                     @endif
+                                @elseif($default_pv_id)
+                                    {{ $default_pv_id === $child->name || $default_pv_id === $child->id ? 'selected' : '' }}
+                                @endif
                                 value="{{ $child->id }}">
-
                                 — {{ $child->name }}</option>
                         @endforeach
                     </optgroup>
