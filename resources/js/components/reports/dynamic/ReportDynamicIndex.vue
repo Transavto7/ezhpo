@@ -63,7 +63,7 @@
                           <label class="mb-1" for="company">Построение</label>
                           <select
                               ref="order"
-                              name="order_by"
+                              id="order_by"
                               class="filled-select2 filled-select"
                               data-allow-clear="false"
                               v-model="orderBy"
@@ -117,6 +117,9 @@ export default {
         var _sTown = this.town;
         if (this.selectedTown != null) {
           $("#town_selector").children('option').each(function (i, e) {
+            if (e.value == '' || e.value == 'Не установлено') {
+              return;
+            }
             if (_sTown.split(',').includes(e.value)) {
               e.selected = true;
             }
@@ -192,6 +195,8 @@ export default {
         submitForm() {
           this.selectedTownsAsString = this.selectedTowns;
           this.selectedPvAsString = this.selectedPoints;
+          this.orderBy = $("select#order_by").val();
+
           window.location = `/report/dynamic/${this.journal}?town_id=${this.selectedTownsAsString}&pv_id=${this.selectedPvAsString}&order_by=${this.orderBy}`;
         }
     }

@@ -170,33 +170,13 @@ class ReportController extends Controller
 
     public function getDynamic(Request $request, $journal) {
         //dd($request->all());
-        if ($request->pv_id) {
-            $pv_id = $request->pv_id;
-            if (str_contains($pv_id, ',')) {
-                $pvIdArray = [];
-                foreach (explode(',', $pv_id) as $currentId) {
-                    $pvIdArray[] = $currentId;
-                }
-                $pv_id = $pvIdArray;
-            }
-        } else {
-            $pv_id = false;
-        }
-        if ($request->town_id) {
-            $town_id = $request->town_id;
-            if (str_contains($town_id, ',')) {
-                $townIdArray = [];
-                foreach (explode(',', $town_id) as $currentId) {
-                    $townIdArray[] = $currentId;
-                }
-                $town_id = $townIdArray;
-            }
-        }
-
+        $pv_id = $request->pv_id;
+        $town_id = $request->town_id;
         $months = [];
         $periodStart = Carbon::now()->subMonths(11);
         $period = CarbonPeriod::create($periodStart, '1 month', Carbon::now());
         $orderBy = $request->order_by;
+
         foreach ($period as $month) {
             $months[] = $month->format('F');
         }
@@ -204,19 +184,19 @@ class ReportController extends Controller
 
         if ($request->town_id || $request->pv_id) {
             $date_from = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay();
-            $date_to = Carbon::now()->lastOfMonth()->endOfDay();
-            $result = [];
-            $total = [];
-
-            if ($journal != 'all') {
-                $anketas = Anketa::where('type_anketa', $journal);
-            } else {
-                $anketas = Anketa::whereRaw("`type_anketa` in ('medic', 'tech')");
-            }
-
-            $anketas = $anketas->where('in_cart', 0);
+            $date_to   = Carbon::now()->lastOfMonth()->endOfDay();
+            $result    = [];
+            $total     = [];
 
             if ($orderBy == 'execute') {
+                if ($journal != 'all') {
+                    $anketas = Anketa::where('type_anketa', $journal);
+                } else {
+                    $anketas = Anketa::whereRaw("`type_anketa` in ('medic', 'tech')");
+                }
+
+                $anketas = $anketas->where('in_cart', 0);
+
                 $anketas = $anketas->where(function ($q) use ($date_from, $date_to, $orderBy) {
                     $q->where(function ($q) use ($date_from, $date_to) {
                         $q->whereNotNull('date')
@@ -232,56 +212,89 @@ class ReportController extends Controller
                           ]);
                       });
                 });
-            } else {
-                $anketas = $anketas->where(function($q) use ($date_from, $date_to) {
-                    $q->where('created_at', '>=', $date_from)
-                        ->orWhere('created_at', '<=', $date_to);
-                });
-            }
 
-            if ($pv_id) {
-                if (is_array($pv_id)) {
-                    $anketas = $anketas->where(function ($q) use ($pv_id) {
-                       $pointsNames = Point::whereIn('id', $pv_id)->pluck('name');
-                       $q->whereIn('pv_id', $pointsNames);
-                    });
-                } else {
-                    $anketas = $anketas->where('pv_id', Point::find($request->pv_id)->name);
+                if ($pv_id) {
+                    if (str_contains($pv_id, ',')) {
+                        $anketas = $anketas->where(function ($q) use ($pv_id) {
+                            $pointsNames = Point::whereRaw("pv_id in ($pv_id)")->pluck('name');
+                            $q->whereIn('pv_id', $pointsNames);
+                        });
+                    } else {
+                        $anketas = $anketas->where('pv_id', Point::find($pv_id)->name);
+                    }
+                } elseif ($town_id) {
+                    if (str_contains($town_id, ',')) {
+                        $points = Point::whereRaw("pv_id in ($town_id)")->pluck('name');
+                    } else {
+                        $points = Point::where('pv_id', $town_id)->pluck('name');
+                    }
+                    $anketas = $anketas->whereIn("pv_id", $points);
                 }
-            } elseif ($town_id) {
-                if (is_array($town_id)) {
-                    $points = Point::whereIn('pv_id', $town_id)->pluck('name');
-                } else {
-                    $points = Point::where('pv_id', $request->town_id)->pluck('name');
+
+                $anketas = $anketas->get();
+
+                foreach ($anketas->groupBy('company_id') as $company_id => $anketasByCompany) {
+                        $result[$company_id]['name'] = $anketasByCompany->first()->company_name;
+                        for ($i = 0 ; $i < 12 ; $i++) {
+                            $date      = Carbon::now()->subMonths($i);
+                            $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
+                            $date_to   = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay();
+
+                            $count = $anketasByCompany
+                                         ->whereBetween('date', [
+                                             $date_from,
+                                             $date_to,
+                                         ])->count() +
+                                     $anketasByCompany->where('date', null)->whereBetween('period_pl', [
+                                         $date_from->format('Y-m'),
+                                         $date_to->format('Y-m'),
+                                     ])->count();
+
+                            $result[$company_id][$date->format('F')] = $count;
+                            $total[$date->format('F')]               = ($total[$date->format('F')] ?? 0) + $count;
+                        }
+                    }
+            } elseif ($orderBy == 'created') {
+                $whereCase = "where ";
+                $whereCase .= $journal == "all"
+                    ? "type_anketa = 'medic' or type_anketa = 'tech'"
+                    : "type_anketa = '$journal'";
+
+                $whereCase .= " and `in_cart` = 0 ";
+
+                if ($pv_id) {
+                    if (str_contains($pv_id, ',')) {
+                        $pointsNames = "\"" . implode("\",\"", Point::whereRaw("pv_id in ($pv_id)")->pluck('name')->toArray()) . "\" ";
+                        $whereCase .= " and `pv_id` in ($pointsNames) ";
+                    } else {
+                        $pointName = Point::find($pv_id)->name;
+                        $whereCase .= " and `pv_id` = \"$pointName\" ";
+                    }
+                } elseif ($town_id) {
+                    if (str_contains($town_id, ',')) {
+                        $points = " and `pv_id` in(\"" . implode("\",\"", Point::whereRaw("pv_id in ($town_id)")->pluck('name')) . "\") ";
+                    } else {
+                        $points = " and `pv_id` = \"" . Point::where('pv_id', $town_id)->pluck('name') . "\" ";
+                    }
+                    $whereCase .= $points;
                 }
-                $anketas = $anketas->whereIn('pv_id', $points);
-            }
 
-            $anketas = $anketas->get();
-
-            foreach($anketas->groupBy('company_id') as $company_id => $anketasByCompany) {
-                $result[$company_id]['name'] = $anketasByCompany->first()->company_name;
                 for ($i = 0; $i < 12; $i++) {
                     $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
-                    $date_to = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay();
-                    $date = Carbon::now()->subMonths($i);
+                    $date_to   = Carbon::now()->subMonths($i)->lastOfMonth()->startOfDay();
+                    $monthName = Carbon::now()->subMonths($i)->format("F");
 
-                    if ($orderBy == 'execute') {
-                        $count = $anketasByCompany
-                                     ->whereBetween('date', [
-                                         $date_from,
-                                         $date_to,
-                                     ])->count() +
-                                 $anketasByCompany->where('date', null)->whereBetween('period_pl', [
-                                     $date_from->format('Y-m'),
-                                     $date_to->format('Y-m'),
-                                 ])->count();
-                    } else {
-                        $count = $anketasByCompany->whereBetween('created_at', [$date_from, $date_to])->count();
+                    $whereCase .= " and `created_at` >= date(\"$date_from\") and `created_at` <= date(\"$date_to\")";
+                    $subSelectCase = "select count(`id`) as `$monthName`, `company_id` as `company` from `anketas` ";
+                    $subSelectCase .= $whereCase . " group by `company_id`";
+
+                    $responseFromDB = DB::select($subSelectCase);
+
+                    foreach ($responseFromDB as $response) {
+                        $response = json_decode(json_encode($response), true);
+                        $result[$response["company"]][$monthName] = $response[$monthName];
+                        $total[$monthName] = ($total[$monthName] ?? 0) + $response[$monthName];
                     }
-
-                    $result[$company_id][$date->format('F')] = $count;
-                    $total[$date->format('F')] = ($total[$date->format('F')] ?? 0) + $count;
                 }
             }
         }
