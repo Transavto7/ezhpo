@@ -18,7 +18,7 @@
                             }
                             @endphp
                             <option
-                                @if ($default_point === $child->name)
+                                @if (isset($default_point) && $default_point === $child->name)
                                     selected
                                 @elseif(session()->has('anketa_pv_id'))
                                     @if($default_point === '' && $child->id == session('anketa_pv_id')['value'])
