@@ -272,7 +272,7 @@ class ReportController extends Controller
                     $date_to   = Carbon::now()->subMonths($i)->lastOfMonth()->startOfDay();
                     $monthName = Carbon::now()->subMonths($i)->format("F");
 
-                    $whereCase .= " and `created_at` >= date(\"$date_from\") and `created_at` <= date(\"$date_to\")";
+                    $whereCase .= " and `anketas`.`created_at` >= date(\"$date_from\") and `anketas`.`created_at` <= date(\"$date_to\")";
                     $subSelectCase = "select count(`anketas`.`id`) as `$monthName`, `company_id` as `company`, `companies`.`name` as `name` from `anketas` ";
                     $subSelectCase .= "left join `companies` on `companies`.`id` = `anketas`.`company_id` ";
                     $subSelectCase .= $whereCase . " group by `company_id`";
