@@ -262,10 +262,11 @@ class ReportController extends Controller
             foreach($anketas->groupBy('company_id') as $company_id => $anketasByCompany) {
                 $result[$company_id]['name'] = $anketasByCompany->first()->company_name;
                 for ($i = 0; $i < 12; $i++) {
+                    $date = Carbon::now()->subMonths($i);
+
                     if ($orderBy == 'execute') {
                         $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
                         $date_to = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay();
-                        $date = Carbon::now()->subMonths($i);
 
                         $count = $anketasByCompany
                                      ->whereBetween('date', [
