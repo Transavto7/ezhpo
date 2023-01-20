@@ -250,7 +250,6 @@ class ReportController extends Controller
                     : "type_anketa = '$journal'";
 
                 $whereCase .= " and `in_cart` = 0 ";
-
                 if ($pv_id) {
                     if (str_contains($pv_id, ',')) {
                         $pointsNames = "\"" . implode("\",\"", Point::whereRaw("pv_id in ($pv_id)")->pluck('name')->toArray()) . "\" ";
