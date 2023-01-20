@@ -449,8 +449,8 @@ class AnketsController extends Controller
 
         function mt_rand_float($min, $max, $countZero = '0') {
             $countZero = +('1'.$countZero);
-            $min = floor($min*$countZero);
-            $max = floor($max*$countZero);
+            $min = floor($min * $countZero);
+            $max = floor($max * $countZero);
             $rand = mt_rand($min, $max) / $countZero;
             return $rand;
         }
