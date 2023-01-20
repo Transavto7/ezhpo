@@ -498,7 +498,7 @@ class AnketsController extends Controller
         }
 
         // Анкета
-        if(isset($data['anketa'])) {
+        if (isset($data['anketa'])) {
             // Клонируем анкету
             $createdAnketas = [];
             $createdAnketasDataResponseApi = [];
@@ -1024,6 +1024,10 @@ class AnketsController extends Controller
                     } else {
                         $anketa['flag_pak'] = 'СДПО А';
                     }
+                }
+
+                if ($anketa['type_anketa'] === 'tech' && $is_dop) {
+                    $anketa['point_reys_control'] = 'Пройден';
                 }
 
                 /**
