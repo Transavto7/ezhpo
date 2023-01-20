@@ -170,29 +170,8 @@ class ReportController extends Controller
 
     public function getDynamic(Request $request, $journal) {
         //dd($request->all());
-        if ($request->pv_id) {
-            $pv_id = $request->pv_id;
-            if (str_contains($pv_id, ',')) {
-                $pvIdArray = [];
-                foreach (explode(',', $pv_id) as $currentId) {
-                    $pvIdArray[] = $currentId;
-                }
-                $pv_id = $pvIdArray;
-            }
-        } else {
-            $pv_id = false;
-        }
-        if ($request->town_id) {
-            $town_id = $request->town_id;
-            if (str_contains($town_id, ',')) {
-                $townIdArray = [];
-                foreach (explode(',', $town_id) as $currentId) {
-                    $townIdArray[] = $currentId;
-                }
-                $town_id = $townIdArray;
-            }
-        }
-
+        $pv_id = $request->pv_id;
+        $town_id = $request->town_id;
         $months = [];
         $periodStart = Carbon::now()->subMonths(11);
         $period = CarbonPeriod::create($periodStart, '1 month', Carbon::now());
@@ -240,9 +219,9 @@ class ReportController extends Controller
             }
 
             if ($pv_id) {
-                if (is_array($pv_id)) {
+                if (str_contains($pv_id, ',')) {
                     $anketas = $anketas->where(function ($q) use ($pv_id) {
-                       $pointsNames = Point::whereIn('id', $pv_id)->pluck('name');
+                       $pointsNames = Point::whereRaw("pv_id in ($pv_id)")->pluck('name');
                        $q->whereIn('pv_id', $pointsNames);
                     });
                 } else {
@@ -250,11 +229,11 @@ class ReportController extends Controller
                 }
             } elseif ($town_id) {
                 if (is_array($town_id)) {
-                    $points = Point::whereIn('pv_id', $town_id)->pluck('name');
+                    $points = Point::whereRaw("pv_id in ($town_id)")->pluck('name');
                 } else {
                     $points = Point::where('pv_id', $request->town_id)->pluck('name');
                 }
-                $anketas = $anketas->whereIn('pv_id', $points);
+                $anketas = $anketas->whereIn("pv_id", $points);
             }
 
             $anketas = $anketas->get();
