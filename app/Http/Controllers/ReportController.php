@@ -253,16 +253,16 @@ class ReportController extends Controller
                 if ($pv_id) {
                     if (str_contains($pv_id, ',')) {
                         $pointsNames = "\"" . implode("\",\"", Point::whereRaw("pv_id in ($pv_id)")->pluck('name')->toArray()) . "\" ";
-                        $whereCase .= " and `pv_id` in ($pointsNames) ";
+                        $whereCase .= " and `anketas`.`pv_id` in ($pointsNames) ";
                     } else {
                         $pointName = Point::find($pv_id)->name;
-                        $whereCase .= " and `pv_id` = \"$pointName\" ";
+                        $whereCase .= " and `anketas`.`pv_id` = \"$pointName\" ";
                     }
                 } elseif ($town_id) {
                     if (str_contains($town_id, ',')) {
-                        $points = " and `pv_id` in(\"" . implode("\",\"", Point::whereRaw("pv_id in ($town_id)")->pluck('name')) . "\") ";
+                        $points = " and `anketas`.`pv_id` in(\"" . implode("\",\"", Point::whereRaw("pv_id in ($town_id)")->pluck('name')) . "\") ";
                     } else {
-                        $points = " and `pv_id` = \"" . Point::where('pv_id', $town_id)->pluck('name') . "\" ";
+                        $points = " and `anketas`.`pv_id` = \"" . Point::where('pv_id', $town_id)->pluck('name') . "\" ";
                     }
                     $whereCase .= $points;
                 }
