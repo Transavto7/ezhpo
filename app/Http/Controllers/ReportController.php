@@ -281,6 +281,7 @@ class ReportController extends Controller
 
                     foreach ($responseFromDB as $response) {
                         $response = json_decode(json_encode($response), true);
+                        $result[$response["company"]]["name"] = $response["name"];
                         $result[$response["company"]][$monthName] = $response[$monthName];
                         $total[$monthName] = ($total[$monthName] ?? 0) + $response[$monthName];
                     }
