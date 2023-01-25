@@ -185,13 +185,18 @@ class HomeController extends Controller
         // Фильтр
         if (count($filter_params) > 0 && $filter_activated) {
             foreach ($filter_params as $fk => &$fv) {
-                if ($fk == 'straight_company_id') {
-                    continue;
-                }
                 if (isset($filter_params["company_id"]) && isset($filter_params["straight_company_id"])) {
                     if ($fk == 'company_id') {
                         $fv = array_merge($filter_params["straight_company_id"], $filter_params[$fk]);
                         unset($filter_params["straight_company_id"]);
+                    }
+                } elseif (isset($filter_params["company_id"])) {
+                    if ($fk == 'company_id') {
+                        $fv = $filter_params["company_id"];
+                    }
+                } elseif (isset($filter_params["straight_company_id"])) {
+                    if ($fk == 'straight_company_id') {
+                        $filter_params['company_id'] = $fk;
                     }
                 }
                 if (isset($filter_params["driver_fio"]) && isset($filter_params["driver_id"])) {
