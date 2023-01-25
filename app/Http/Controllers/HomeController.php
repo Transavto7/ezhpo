@@ -184,10 +184,6 @@ class HomeController extends Controller
 
         // Фильтр
         if (count($filter_params) > 0 && $filter_activated) {
-<<<<<<< HEAD
-            foreach ($filter_params as $fk => $fv) {
-
-=======
             foreach ($filter_params as $fk => &$fv) {
                 if ($fk == 'straight_company_id') {
                     continue;
@@ -204,7 +200,7 @@ class HomeController extends Controller
                         unset($filter_params["driver_id"]);
                     }
                 }
->>>>>>> 4b24bc0f3508755353c47c10a587fd0e5e57de4c
+
                 if ($fk == 'hour_from' && $fv) {
                     $anketas->whereTime('date', '>=', $fv.':00');
                     continue;
@@ -303,10 +299,7 @@ class HomeController extends Controller
                         if ($fk === 'car_type_auto') {
                             $anketas = $anketas->whereIn('cars.type_auto', $fv);
                         } else {
-<<<<<<< HEAD
-=======
                             if ($fk === 'straight_company_id') continue;
->>>>>>> 4b24bc0f3508755353c47c10a587fd0e5e57de4c
                             $anketas = $anketas->where('anketas.' . $fk, 'LIKE', '%'.$fv.'%');
                         }
                     }
