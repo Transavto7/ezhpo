@@ -186,6 +186,7 @@ class HomeController extends Controller
         if (count($filter_params) > 0 && $filter_activated) {
             foreach ($filter_params as $fk => &$fv) {
                 if (isset($filter_params["company_id"]) && isset($filter_params["straight_company_id"])) {
+                    //dd($filter_params["company_id"]);
                     if ($fk == 'company_id') {
                         $fv = array_merge($filter_params["straight_company_id"], $filter_params[$fk]);
                         unset($filter_params["straight_company_id"]);
@@ -196,7 +197,7 @@ class HomeController extends Controller
                     }
                 } elseif (isset($filter_params["straight_company_id"])) {
                     if ($fk == 'straight_company_id') {
-                        $filter_params['company_id'] = $fk;
+                        $filter_params['company_id'] = $fv;
                     }
                 }
                 if (isset($filter_params["driver_fio"]) && isset($filter_params["driver_id"])) {
@@ -335,18 +336,18 @@ class HomeController extends Controller
             $anketasCountCompany = $anketasTrigger->count('company_id');
 
             return response()->json([
-                'anketasCountDrivers' => $anketasCountDrivers,
-                'anketasCountCars'    => $anketasCountCars,
-                'anketasCountCompany' => $anketasCountCompany,
-            ]);
+                                        'anketasCountDrivers' => $anketasCountDrivers,
+                                        'anketasCountCars'    => $anketasCountCars,
+                                        'anketasCountCompany' => $anketasCountCompany,
+                                    ]);
         }
 
         if ($validTypeAnkets == 'tech') {
             $anketas = $anketas->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')->select('anketas.*',
-                'cars.type_auto as car_type_auto');
+                                                                                                 'cars.type_auto as car_type_auto');
         } else if ($validTypeAnkets == 'pak') {
             $anketas = $anketas->leftJoin('points', 'anketas.pv_id', '=', 'points.id')->select('anketas.*',
-                'points.name as pv_id');
+                                                                                               'points.name as pv_id');
         }
 
         /**
@@ -363,47 +364,47 @@ class HomeController extends Controller
                         ->get();
 
                     return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_to']),
-                        'ЭЖ ПРТО.xlsx');
+                                           'ЭЖ ПРТО.xlsx');
                 }
 
                 if ($request->get('exportPrikazPL')) {
                     $techs = $anketas->where('type_anketa', 'tech')
-                        ->get();
+                                     ->get();
 
                     return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_pl']),
-                        'ЭЖ учета ПЛ.xlsx');
+                                           'ЭЖ учета ПЛ.xlsx');
                 }
             }
 
             if ($validTypeAnkets == 'medic') {
                 if ($request->get('exportPrikaz')) {
                     $medic = $anketas->where('type_anketa', 'medic')
-                        ->get();
+                                     ->get();
 
                     return Excel::download(new AnketasExport($medic, Anketa::$fieldsKeys['medic_export_pl']),
-                        'ЭЖ ПРМО.xlsx');
+                                           'ЭЖ ПРМО.xlsx');
                 }
             }
 
             if ($validTypeAnkets == 'bdd') {
                 if ($request->get('exportPrikaz')) {
                     $bdd = $anketas->where('type_anketa', 'bdd')
-                              ->with(['user.roles'])
-                        ->get()
-                        ->map(function ($q) {
-                                $q->user_id = !isset($q->user->roles[0]) ? '' : $q->user->roles[0]->guard_name;
-                                  unset($q->user);
-                                  return $q;
-                              });
+                                   ->with(['user.roles'])
+                                   ->get()
+                                   ->map(function ($q) {
+                                       $q->user_id = !isset($q->user->roles[0]) ? '' : $q->user->roles[0]->guard_name;
+                                       unset($q->user);
+                                       return $q;
+                                   });
 
                     return Excel::download(new AnketasExport($bdd, Anketa::$fieldsKeys['bdd_export_prikaz']),
-                        'ЭЖ инструктажей БДД.xlsx');
+                                           'ЭЖ инструктажей БДД.xlsx');
                 }
             }
 
             return Excel::download(new AnketasExport($anketas->where('type_anketa', $validTypeAnkets)
-                ->get(), Anketa::$fieldsKeys[$validTypeAnkets]),
-                'ЭЖ.xlsx');
+                                                             ->get(), Anketa::$fieldsKeys[$validTypeAnkets]),
+                                   'ЭЖ.xlsx');
         }
 
 
