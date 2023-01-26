@@ -200,12 +200,16 @@ class HomeController extends Controller
                         $filter_params['company_id'] = $fv;
                     }
                 }
-                if (isset($filter_params["driver_fio"]) && isset($filter_params["driver_id"])) {
+
+                if (isset($filter_params["driver_id"]) && isset($filter_params["driver_fio"])) {
                     if ($fk == 'driver_fio') {
-                        $fv = array_merge($filter_params[$fk], $filter_params["driver_id"]);
+                        $anketas = $anketas->whereIn("driver_id", $filter_params["driver_id"])
+                                           ->orWhereIn("driver_fio", $filter_params["driver_fio"]);
+                        unset($filter_params["driver_fio"]);
                         unset($filter_params["driver_id"]);
                     }
                 }
+
                 if ($fk == 'hour_from' && $fv) {
                     $anketas->whereTime('date', '>=', $fv.':00');
                     continue;

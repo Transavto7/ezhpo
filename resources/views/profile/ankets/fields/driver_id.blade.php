@@ -3,7 +3,7 @@
         'type' => 'select',
         'values' => 'Driver',
         'getField' => 'hash_id',
-        'getFieldKey' => 'fio',
+        'getFieldKey' => 'hash_id',
         'multiple' => 1
     ],
     'model' => $type_ankets,
