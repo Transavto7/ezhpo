@@ -56,7 +56,8 @@ class ApiController extends Controller
 
     public function companiesList(Request $request) {
         return Company::where('name', 'like', '%' . $request->search . '%')
-            ->select('hash_id', 'name', 'id')->limit(100)->get();
+            ->orWhere('hash_id', 'like', '%' . $request->search . '%')
+            ->select('hash_id', DB::raw("concat('[', hash_id, '] ', name) as `name`"), 'id')->limit(100)->get();
     }
 
     // Обновляем все пункты выпуска

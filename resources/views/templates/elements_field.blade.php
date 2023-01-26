@@ -63,7 +63,7 @@
         class="filled-select2 filled-select"
     >
         <option selected value="{{ user()->company->name }}">
-            {{ user()->company->name }}
+            [{{ user()->company->hash_id }}] {{ user()->company->name }}
         </option>
     </select>
 
@@ -79,7 +79,7 @@
         class="filled-select2 filled-select"
     >
         <option selected value="{{ user()->company->hash_id }}">
-            {{ user()->company->name }}
+            [{{ user()->company->hash_id }}] {{ user()->company->name }}
         </option>
     </select>
 
@@ -138,18 +138,30 @@
                 <option
                     @if(in_array($optionV, $default_value) || in_array($optionK, $default_value)) selected @endif
                 value="{{ $optionK }}">
-                    {{ $optionV }}
+                @if (in_array($k, ['company_id', 'driver_fio', 'name', 'company_name']))
+                    [{{ $optionK }}] {{ $optionV }}
+                @else
+                   {{ $optionV }}
+                @endif
                 </option>
             @endforeach
         @else
             @foreach(app("App\\" . $v['values'])::whereIn($key, $default_value)->get() as $option)
                 <option selected value="{{ $option[$key] }}">
+                  @if (in_array($k, ['company_id', 'driver_fio', 'name', 'company_name']))
+                    [{{ $option["hash_id"] }}] {{ $option[$value] }}
+                  @else
                     {{ $option[$value] }}
+                  @endif
                 </option>
             @endforeach
             @foreach(app("App\\" . $v['values'])::whereNotIn($key, $default_value)->limit(100)->get() as $option)
                 <option value="{{ $option[$key] }}">
+                  @if (in_array($k, ['company_id', 'driver_fio', 'name', 'company_name']))
+                    [{{ $option["hash_id"] }}] {{ $option[$value] }}
+                  @else
                     {{ $option[$value] }}
+                  @endif
                 </option>
             @endforeach
         @endif

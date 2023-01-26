@@ -175,6 +175,7 @@ class IndexController extends Controller
                     //'old_id' => ['label' => 'Старый ID', 'type' => 'number', 'noRequired' => 1],
                     'photo'         => ['label' => 'Фото', 'type' => 'file', 'resize' => 1, 'noRequired' => 1],
                     'fio'           => ['label' => 'ФИО', 'type' => 'text'],
+                    'hash_id'       => ['label' => 'ID водителя', 'type' => 'text'],
                     'year_birthday' => ['label' => 'Дата рождения', 'type' => 'date', 'noRequired' => 1],
                     'phone'         => [
                         'label'      => 'Телефон',
@@ -290,6 +291,7 @@ class IndexController extends Controller
                 'model'  => 'Car',
                 'fields' => [
                     //'old_id' => ['label' => 'Старый ID', 'type' => 'number', 'noRequired' => 1],
+                    'hash_id' => ['label' => 'ID автомобиля', 'type' => 'text'],
                     'gos_number' => ['label' => 'Гос.номер', 'type' => 'text'],
                     'mark_model' => ['label' => 'Марка и модель', 'type' => 'text'],
                     'type_auto'  => [

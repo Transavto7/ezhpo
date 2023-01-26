@@ -339,7 +339,7 @@ export default {
         this.month = now.getFullYear() + '-'+ months;
 
         if (this.client_company) {
-            this.companies.push(this.client_company);
+            this.companies.push(this.client_company.name);
             this.company = this.client_company;
             this.company_id = this.client_company.hash_id;
             this.client = true;

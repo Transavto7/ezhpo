@@ -107,7 +107,7 @@
                                                 @if($is_required) <b class="text-danger text-bold">*</b> @endif
 
                                                 {{ $v['label'] }}</label>
-
+@if ($v['label'] == 'ФИО') dd($v); @endif
                                             @include('templates.elements_field')
                                         </div>
                                     <!-- Сортировка инструктажей доступна админу или инженеру -->

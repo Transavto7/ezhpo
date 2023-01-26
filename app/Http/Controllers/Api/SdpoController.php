@@ -170,4 +170,20 @@ class SdpoController extends Controller
 
         return $users;
     }
+
+    /*
+    * return driver by id
+    */
+    public function getDriver(Request $request, $id) {
+        $driver = Driver::where('hash_id', $id)->select('hash_id', 'fio')->first();
+        return $driver;
+    }
+
+    /*
+    * return all drivers
+    */
+    public function getDrivers(Request $request) {
+        $drivers = Driver::select('hash_id', 'fio')->get();
+        return $drivers;
+    }
 }
