@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Car;
 use App\Company;
+use App\Driver;
 use App\Req;
 use App\User;
 use Carbon\Carbon;
@@ -25,7 +27,7 @@ class ApiController extends Controller
             $key = $request->key;
         }
 
-        $query = app("App\\" . $model)::where(DB::raw("LOWER($field)"),
+        $query = app("App\\" . $model)::where(DB::raw("($field)"),
             'like', '%' . $request->search . '%');
 
         if ($model === 'User') {
@@ -54,7 +56,7 @@ class ApiController extends Controller
 
     public function companiesList(Request $request) {
         return Company::where('name', 'like', '%' . $request->search . '%')
-            ->select('hash_id', 'name')->limit(100)->get();
+            ->select('hash_id', 'name', 'id')->limit(100)->get();
     }
 
     // Обновляем все пункты выпуска
@@ -129,7 +131,9 @@ class ApiController extends Controller
         $blockedFields = [
             'old_id', 'req_id', 'inn',
             'date_bdd',
-            'date_report_driver'
+            'date_report_driver',
+            'contracts',
+            'contract_id'
         ];
 
         $deleteImportantFields = [
@@ -142,6 +146,13 @@ class ApiController extends Controller
             $fields = $data->fillable;
             array_push($fields, 'id');
 
+            if ($_model['model'] == Company::class){
+                $data = $data::with(['contracts.services']);
+            }elseif($_model['model'] == Driver::class || $_model['model'] == Car::class){
+                $data = $data::with(['contracts.services']);
+            }
+//            array_push($fields, 'id');
+
             /**
              * Контроль дат
              */
@@ -150,14 +161,15 @@ class ApiController extends Controller
             /**
              * Фильтрация полей
              */
-            $fields = array_filter($fields, function ($item) use ($deleteImportantFields) {
-                return !in_array($item, $deleteImportantFields);
-            });
+//            $fields = array_filter($fields, function ($item) use ($deleteImportantFields) {
+//                return !in_array($item, $deleteImportantFields);
+//            });
 
 
             $fieldsValues = new IndexController();
             $fieldsValues = $fieldsValues->elements[$model]['fields'];
 
+//            $data = $data->where($prop, $val)->get()->first();
             if ($_model['model'] == Company::class){
                 if(!user()->access('companies_access_field_where_call')){   //'Кому отправлять СМС при отстранении'
                     unset($fields['where_call']);
@@ -169,13 +181,16 @@ class ApiController extends Controller
                 }
             }
 
-            $data = $data->where($prop, $val)->get($fields)->first();
+            $data = $data->where($prop, $val)
+                         ->get($fields)
+                         ->first();
 
-            if(isset($data)) {
+            if($data) {
                 $data_exists = $data->count() > 0;
                 $data = $data->toArray();
             } else {
                 $data_exists = $data;
+                return ApiController::r(['exists' => $data_exists, 'model' => $model, 'blockedFields' => $blockedFields, 'message' => $data, 'fieldsValues' => $fieldsValues, 'redDates' => $redDates], 1);
             }
 
             if ($_model['model'] == Company::class && isset($data['dismissed']) && isset($data['name'])) {

@@ -1,8 +1,15 @@
 <?php
 
+use App\Car;
+use App\Company;
+use App\Driver;
+use App\Http\Controllers\ContractController;
+use App\Models\Contract;
+use App\Models\Service;
 use App\User;
-use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/fix/types', function() {
@@ -87,6 +94,44 @@ Route::prefix('snippet')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+
+
+    Route::prefix('v-search')->group(function () {
+        Route::get('/companies', '\App\Helpers\VSelect@companies');
+        Route::get('/cars', '\App\Helpers\VSelect@cars');
+        Route::get('/drivers', '\App\Helpers\VSelect@drivers');
+        Route::get('/services', '\App\Helpers\VSelect@services');
+        Route::get('/our_companies', '\App\Helpers\VSelect@our_companies');
+    });
+
+
+    Route::prefix('contract')->group(function () {
+        Route::get('/', 'ContractController@view');
+
+        Route::put('/restore/{id}', 'ContractController@restore');
+
+        Route::get('/index', 'ContractController@index');
+
+        Route::get('/getOne', 'ContractController@getOne');
+
+        Route::post('/update', 'ContractController@update');
+
+        Route::get('/create', 'ContractController@create');
+
+        Route::delete('/{id}', 'ContractController@destroy');
+
+        Route::get('/getTypes', 'ContractController@getTypes');
+
+
+        Route::post('/getCarsByCompany/{id}', 'ContractController@getCarsByCompany');
+        Route::post('/getDriversByCompany/{id}', 'ContractController@getDriversByCompany');
+
+        Route::post('/getAvailableForCompany', 'ContractController@getAvailableForCompany');
+    });
+
+
+
+
     Route::get('driver-dashboard', function () {
         return view('pages.driver');
     })->name('page.driver');
@@ -198,7 +243,16 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
     });
 
     Route::prefix('report')->group(function () {
-        Route::get('journal', 'ReportController@showJournal')->name('report.journal');
+        Route::get('/getContractsForCompany_v2',[
+            \App\Http\Controllers\ReportContractRefactoringController::class, 'getContractsForCompany'
+        ]);
+//        Route::get('journal_contract', 'ReportController@ShowJournalContract')->name('report.journal_contract');
+//        Route::get('journal_contract', 'ReportController@ShowJournalContract')->name('company_service');
+        Route::get('journal', 'ReportController@ShowJournal')->name('report.journal');
+        Route::get('journal_new',[
+            \App\Http\Controllers\ReportContractRefactoringController::class, 'index'
+            ])->name('report.company_service');
+//        Route::get('journal', 'ReportController@showJournal')->name('report.journal');
         Route::get('dynamic/medic', 'ReportController@getDynamicMedic')->name('report.dynamic.medic');
         Route::get('dynamic/tech', 'ReportController@getDynamicTech')->name('report.dynamic.tech');
         Route::get('dynamic/all', 'ReportController@getDynamicAll')->name('report.dynamic.all');
@@ -235,3 +289,4 @@ Route::middleware(['auth'])->group(function () {
 
 // Маршруты авторизации
 Auth::routes();
+

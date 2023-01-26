@@ -41,11 +41,11 @@
                     {{ $user->blocked ? 'Да' : 'Нет' }}
                 @elseif($field->field === 'roles')
                         @foreach($user->roles as $role)
-                            <h5>
+                            <h2>
                             <span class="badge badge-success">
                                 {{ $role['guard_name'] }}
                             </span>
-                            </h5>
+                            </h2>
                         @endforeach
                 @else
                     {{ $user[$field->field] }}

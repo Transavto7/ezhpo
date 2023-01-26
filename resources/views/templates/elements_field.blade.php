@@ -89,7 +89,19 @@
         $key = $v['getFieldKey'] ?? 'id';
         $value = $v['getField'] ?? 'name';
     @endphp
+    @php
+    //if($v['label'] == 'Компания'){
+    //        dd($v, app("App\\" . $v['values'])::whereIn($key, $default_value)->get()->toArray(), $key, $default_value);
+//
+    //}
+    //dump($el ?? '');
+          // if(($el->type_product ?? '') != 'Абонентская плата без реестров' && ($k == 'essence' )):
+          //      dd(123);
+          // endif;
+    @endphp
     <select
+        @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' )) disabled @endif
+        @if(($el->type_product ?? '') != 'Абонентская плата без реестров' && ($k == 'essence' )) disabled @endif
         @isset($v['saveToHistory'])
             onchange="addFieldToHistory(event.target.value, '{{ $v['label'] }}');"
         @endisset
@@ -115,7 +127,7 @@
         {{ $is_required }}
         data-label="{{ $v['label'] ?? $k }}"
         data-field="{{ $model }}_{{ $k }}"
-        class="filled-select2 filled-select"
+        class="filled-select2 filled-select @if($k === 'type_product') {{ 'type_product' }} @endif"
         data-allow-clear=true
     >
         {{-- disabled selected --}}

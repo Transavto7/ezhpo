@@ -9,10 +9,12 @@
     <div class="sidebar-header d-flex align-items-center">
         <div class="title">
             <article>
-                @foreach(user()->roles()->get() as $role)
-                    <div class="badge badge-rounded bg-green">
-                        {{ $role->guard_name }}
-                    </div>
+                @foreach(user()->roles as $role)
+                    <h3>
+                        <span class="badge badge-success text-wrap">
+                            {{ $role->guard_name }}
+                        </span>
+                    </h3>
                 @endforeach
             </article>
         </div>
@@ -156,27 +158,56 @@
                         <li>
                             <a href="{{ route('report.dynamic.medic') }}">
                                 <i class="fa fa-book"></i>Отчет по количеству осмотров
-                                <span class="start-100 translate-middle badge text-white rounded-pill bg-success">
+                            </a>
+                        </li>
+                    @endif
+{{--                    @if(user()->access('report_schedule_dynamic_mo'))--}}
+                        <li>
+                            <a href="{{ route('report.company_service') }}">
+                                <i class="fa fa-book"></i>Отчет по услугам компании
+                                <span class="
+                                    start-100
+                                    translate-middle
+                                    badge
+                                    text-white
+                                    rounded-pill
+                                    bg-success"
+                                >
                                     new
                                 </span>
                             </a>
                         </li>
-                    @endif
+{{--                    @endif--}}
                 </ul>
             </li>
         @endif
 
         @if(user()->access('drivers_read', 'cars_read', 'company_read', 'service_read', 'discount_read', 'briefings_read', 'drivers_create'
-, 'cars_create'
-, 'company_create'
-, 'service_create'
-, 'discount_create'
-, 'briefings_create'))
+, 'cars_create', 'company_create'
+, 'service_create', 'discount_create'
+, 'briefings_create','contract_read', 'contract_create'))
             <li>
                 <a href="#" data-btn-collapse="#phoenic" role="button"> <i
                         class="icon-interface-windows"></i>CRM</a>
                 <ul id="phoenic" class="collapse list-unstyle">
 
+                    @if(user()->access('contract_read', 'contract_create'))
+                        <li>
+                            <a href="/contract">
+                                Договор
+                                <span class="
+                                    start-100
+                                    translate-middle
+                                    badge
+                                    text-white
+                                    rounded-pill
+                                    bg-success"
+                                >
+                                    new
+                                </span>
+                            </a>
+                        </li>
+                    @endif
                     @if(user()->access('drivers_read', 'drivers_create'))
                         <li><a href="{{ route('renderElements', 'Driver') }}">Водители</a></li>
                     @endif
@@ -188,6 +219,18 @@
                     @endif
                     @if(user()->access('service_read', 'service_create'))
                         <li><a href="{{ route('renderElements', 'Product') }}">Услуги</a></li>
+{{--                        <li><a href="{{ route('renderElements', 'Service') }}">--}}
+{{--                                Услуги--}}
+{{--                                <span class="--}}
+{{--                                start-100--}}
+{{--                                translate-middle--}}
+{{--                                badge--}}
+{{--                                text-white--}}
+{{--                                rounded-pill--}}
+{{--                                bg-success">--}}
+{{--                                    new--}}
+{{--                                </span>--}}
+{{--                            </a></li>--}}
                     @endif
                     @if(user()->access('discount_read', 'discount_create'))
                         <li><a href="{{ route('renderElements', 'Discount') }}">Скидки</a></li>

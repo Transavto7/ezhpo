@@ -1,10 +1,29 @@
 @extends('layouts.app')
 
-@section('title', $title)
+@section('title')
+    @if($title === 'services')
+        Услуги
+        <span class="
+            start-100
+            translate-middle
+            badge
+            text-white
+            rounded-pill
+            bg-success"
+        >
+        new
+    </span>
+    @else
+        {{ $title }}
+    @endif
+@endsection
 @section('sidebar', 1)
-@php
 
+@php
+//dd($fieldPrompts->pluck('name')->toArray());
+//dd($elements->getCollection()->toArray());
 @endphp
+
 @section('content')
     <!-- Модалка для редактирования см front.js  -->
     <div class="modal fade editor-modal" id="modalEditor" role="dialog" aria-hidden="true">
@@ -15,7 +34,7 @@
     </div>
 
     <!-- Добавление элемента -->
-    @if($model !== 'Product')
+    @if($model !== 'Product' && $model !== 'Service')
         <div id="elements-modal-add" role="dialog" aria-labelledby="elements-modal-label" aria-hidden="true"
              class="modal fade text-left">
             <div role="document" class="modal-dialog">
@@ -42,7 +61,43 @@
                             @if($k == 'where_call' && !user()->access('companies_access_field_where_call'))
                                 @continue
                             @endif
+
+                            @if($k == 'contracts')
+{{--                                <div data-field="contracts" class="form-group">--}}
+{{--                                    <label>Договор</label>--}}
+{{--                                    <select name="contracts[]"--}}
+{{--                                            data-label="Договоры"--}}
+{{--                                            class="js-chosen"--}}
+{{--                                            style="display: none;"--}}
+{{--                                            multiple="multiple"--}}
+{{--                                    >--}}
+{{--                                        <option value="">Не установлено</option>--}}
+{{--                                        @foreach(\App\Models\Contract::whereNull('company_id')->get(['id', 'name']) as $contract)--}}
+{{--                                            <option value="{{ $contract->id }}">--}}
+{{--                                                {{ $contract->name }}--}}
+{{--                                            </option>--}}
+{{--                                        @endforeach--}}
+{{--                                    </select>--}}
+{{--                                </div>--}}
+                                @continue
+                            @endif
+
+                            @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
+{{--                                <div data-field="contract" class="form-group">--}}
+{{--                                    <label>Договор</label>--}}
+{{--                                    <select name="contract_id"--}}
+{{--                                            class="form-control"--}}
+{{--                                            data-label="Договор"--}}
+{{--                                            id="select_for_contract_driver_car"--}}
+{{--                                    >--}}
+{{--                                        <option value="" selected>Не установлено</option>--}}
+{{--                                    </select>--}}
+{{--                                </div>--}}
+                                @continue
+                            @endif
+
                             @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
+
                             @php $default_value = isset($v['defaultValue']) ? $v['defaultValue'] : '' @endphp
 
                             @if($k !== 'id' && !isset($v['hidden']))
@@ -68,7 +123,7 @@
                                         </div>
                                     @endif
                                 @endif
-                            @endforeach
+                        @endforeach
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-sm btn-success">Добавить</button>
@@ -90,6 +145,9 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
+                    @php
+                    //dump($model);
+                    @endphp
                     <form action="{{ route('addElement', $model) }}" enctype="multipart/form-data" method="POST">
                         @csrf
                         <div class="modal-body">
@@ -107,12 +165,27 @@
                                         data-label="Тип"
                                         data-field="Product_type_product"
                                         class="js-chosen"
-                                        style="display: none;"
                                 >
-                                    <option value="" selected>Не установлено</option>
+{{--                                    <option value="" selected>Не установлено</option>--}}
                                     @foreach($fields['type_product']['values'] as $nameOfTypeProduct)
                                         <option value="{{ $nameOfTypeProduct }}">
                                             {{ $nameOfTypeProduct }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div data-field="essence" class="form-group">
+                                <label>Сущности</label>
+                                <select name="essence"
+                                        data-label="Сущности"
+                                        data-field="Product_essence"
+                                        class="filled-select2 filled-select"
+{{--                                        disabled--}}
+                                >
+                                    <option value="">Не установлено</option>
+                                    @foreach(\App\Product::$essence as $essenceKey => $essenceName)
+                                        <option value="{{ $essenceKey }}">
+                                            {{ $essenceName }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -135,8 +208,7 @@
                             <div data-field="type_anketa" class="form-group">
                                 <label><b class="text-danger text-bold">*</b> Реестр</label>
                                 <select name="type_anketa" required="required" data-label="Реестр"
-                                        data-field="Product_type_anketa" class="js-chosen"
-                                        style="display: none;">
+                                        data-field="Product_type_anketa" class="filled-select2 filled-select">
                                     <option value="">Не установлено</option>
                                     <option value="bdd">
                                         БДД
@@ -159,7 +231,7 @@
                                 <label><b class="text-danger text-bold">*</b>Тип осмотра</label>
                                 <select multiple="multiple" name="type_view[]" required="required"
                                         data-label="Тип осмотра" data-field="Product_type_view"
-                                        class="js-chosen" style="display: none;">
+                                        class="filled-select2 filled-select">
                                     <option value="">Не установлено</option>
                                     <option value="Предрейсовый/Предсменный">
                                         Предрейсовый/Предсменный
@@ -182,23 +254,6 @@
                                 </select>
                             </div>
 
-                            <div data-field="essence" class="form-group" style="display: none">
-                                <label><b class="text-danger text-bold">*</b>Сущности</label>
-                                <select name="essence"
-                                        required="required"
-                                        data-label="Сущности"
-                                        data-field="Product_type_view"
-                                        class="js-chosen"
-                                        style="display: none;"
-                                >
-                                    <option value="null">Не установлено</option>
-                                    @foreach(\App\Product::$essence as $essenceKey => $essenceName)
-                                        <option value="{{ $essenceKey }}">
-                                            {{ $essenceName }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-sm btn-success">Добавить</button>
@@ -222,6 +277,7 @@
             || user()->access('company_create') && $model == 'Company'
             || user()->access('discount_create') && $model == 'Discount'
             || user()->access('service_create') && $model == 'Product'
+            || user()->access('service_create') && $model == 'Service'
             || user()->access('briefings_create') && $model == 'Instr'
             || user()->access('city_create') && $model == 'Town'
             || user()->access('requisites_create') && $model == 'Req'
@@ -236,6 +292,7 @@
             || user()->access('company_delete') && $model == 'Company'
             || user()->access('discount_delete') && $model == 'Discount'
             || user()->access('service_delete') && $model == 'Product'
+            || user()->access('service_delete') && $model == 'Service'
             || user()->access('briefings_delete') && $model == 'Instr'
             || user()->access('city_delete') && $model == 'Town'
             || user()->access('requisites_delete') && $model == 'Req'
@@ -250,6 +307,7 @@
             || user()->access('company_update') && $model == 'Company'
             || user()->access('discount_update') && $model == 'Discount'
             || user()->access('service_update') && $model == 'Product'
+            || user()->access('service_update') && $model == 'Service'
             || user()->access('briefings_update') && $model == 'Instr'
             || user()->access('city_update') && $model == 'Town'
             || user()->access('requisites_update') && $model == 'Req'
@@ -264,6 +322,7 @@
             || user()->access('company_read') && $model == 'Company'
             || user()->access('discount_read') && $model == 'Discount'
             || user()->access('service_read') && $model == 'Product'
+            || user()->access('service_read') && $model == 'Service'
             || user()->access('briefings_read') && $model == 'Instr'
             || user()->access('city_read') && $model == 'Town'
             || user()->access('requisites_read') && $model == 'Req'
@@ -278,6 +337,7 @@
             || user()->access('company_trash_read') && $model == 'Company'
             || user()->access('discount_trash_read') && $model == 'Discount'
             || user()->access('service_trash_read') && $model == 'Product'
+            || user()->access('service_trash_read') && $model == 'Service'
             || user()->access('briefings_trash_read') && $model == 'Instr'
             || user()->access('system_trash') && $model == 'Settings'
             || user()->access('city_trash_read') && $model == 'Town'
@@ -286,6 +346,9 @@
             || user()->access('pv_trash_read') && $model == 'Point'
         );
 
+        //$permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
+
+$permissionToViewContract = user()->access('contract_read');
         $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
 //dd($permissionToTrashView);
         $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
@@ -305,13 +368,13 @@
                 @endif
 
                 @if($permissionToView)
-                    @if(!(count($elements) >= $max) || !$max)
-                        <div class=" m-2">
-                            <button type="button" data-toggle-show="#elements-filters" class="btn btn-sm btn-info">
-                                <i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры
-                            </button>
-                        </div>
-                    @endif
+                        @if(!(count($elements) >= $max) || !$max)
+                    <div class=" m-2">
+                        <button type="button" data-toggle-show="#elements-filters" class="btn btn-sm btn-info">
+                            <i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры
+                        </button>
+                    </div>
+                        @endif
                 @endif
 
                 @if($permissionToTrashView)
@@ -339,13 +402,7 @@
                         <hr>
                         <div class="row">
                             @foreach($fields as $fk => $fv)
-                                @if($fk == 'products_id' && user()->hasRole('client'))
-                                    @continue
-                                @endif
-                                @if($fk == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
-                                    @continue
-                                @endif
-                                @if($fk == 'where_call' && !user()->access('companies_access_field_where_call'))
+                                @if($fk == 'contract' || $fk == 'contract_id' || $fk == 'contracts')
                                     @continue
                                 @endif
                                 @php $fv['multiple'] = true; @endphp
@@ -427,20 +484,22 @@
                                   data-html="true"
                                   data-trigger="click hover"
                                   title="{{ $field->content }}"
-                               @endif
+                                @endif
                             >
                                 {{ $field->name }}
                             </span>
 
-                            <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field . $queryString }}">
-                                <i class="fa fa-sort"></i>
-                            </a>
+                            @if($field->field !== 'contracts' && $field->field !== 'contract' && $field->field !== 'contract_id')
+                                <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field . $queryString }}">
+                                    <i class="fa fa-sort"></i>
+                                </a>
+                            @endif
                         </th>
                     @endforeach
 
-                    @if($permissionToSyncCompany && !request()->get('deleted'))
-                        <th width="60">#</th>
-                    @endif
+{{--                    @if($permissionToSyncCompany && !request()->get('deleted'))--}}
+{{--                        <th width="60">#</th>--}}
+{{--                    @endif--}}
                     @if($permissionToDelete)
                         {{--УДАЛЕНИЕ--}}
                         <th width="60">#</th>
@@ -457,9 +516,12 @@
                 @foreach ($elements as $el)
                     <tr>
                         @foreach ($fieldPrompts as $field)
-                            @if($field->field == 'products_id' && user()->hasRole('client'))
-                                @continue
-                            @endif
+                            @php
+                            //dd($el['contract'])
+                            @endphp
+{{--                            @if($field->field == 'products_id')--}}
+{{--                                @continue--}}
+{{--                            @endif--}}
                             @if($field->field == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
                                 @continue
                             @endif
@@ -526,6 +588,36 @@
                                             {{ app('App\Product')->getName($el->products_id) }}
                                         @elseif ($field->field === 'essence')
                                             {{ \App\Product::$essence[$el->essence] ?? ''  }}
+                                        @elseif ($field->field === 'contract' )
+                                            <a href="/contract?id={{ $el['contract']['id'] }}" >
+                                                {{ $el['contract']['name']  }}
+
+                                            </a>
+                                        @elseif ( $field->field === 'contracts')
+                                            @foreach($el[$field->field] as $contract)
+                                                <h3>
+                                                    @if($permissionToViewContract)
+                                                    <a href="/contract?id={{ $contract['id'] }}" >
+                                                    @endif
+                                                        <span class="badge badge-success">
+                                                            {{ $contract['name']  }}
+                                                        </span>
+                                                    @if($permissionToViewContract)
+                                                    </a>
+                                                    @endif
+                                                </h3>
+                                            @endforeach
+                                        @elseif ($field->field == 'services' && ( $model === 'Car' || $model === 'Driver' || $model === 'Company'))
+                                            @foreach($el->contracts as $contract)
+                                                @foreach($contract->services as $service)
+                                                    <h5>
+{{--                                                        badge badge-success--}}
+                                                        <span class="badge badge-success">
+                                                            {{ $service['name']  }}
+                                                        </span>
+                                                    </h5>
+                                                @endforeach
+                                            @endforeach
                                         @elseif ($field->field === 'document_bdd' || $field->field === 'bitrix_link')
                                             <a href="{{ $el[$field->field] }}">{{ $el[$field->field] }}</a>
                                         @elseif ($field->field === 'photo')
@@ -582,13 +674,13 @@
                             </td>
                         @endforeach
 
-                        @if($permissionToSyncCompany && !request()->get('deleted'))
-                            <td class="td-option"
-                                title="При синхронизации все услуги компании будут присвоены водителям и автомобилям компании.">
-                                <a href="{{ route('syncElement', ['type' => $model, 'id' => $el->id ]) }}"
-                                   class="btn btn-sm btn-success"><i class="fa fa-refresh"></i></a>
-                            </td>
-                        @endif
+{{--                        @if($permissionToSyncCompany && !request()->get('deleted'))--}}
+{{--                            <td class="td-option"--}}
+{{--                                title="При синхронизации все услуги компании будут присвоены водителям и автомобилям компании.">--}}
+{{--                                <a href="{{ route('syncElement', ['type' => $model, 'id' => $el->id ]) }}"--}}
+{{--                                   class="btn btn-sm btn-success"><i class="fa fa-refresh"></i></a>--}}
+{{--                            </td>--}}
+{{--                        @endif--}}
 
 
                         @if($permissionToDelete)

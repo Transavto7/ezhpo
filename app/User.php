@@ -144,15 +144,6 @@ class User extends Authenticatable
         return $this->getAllPermissions()
                     ->whereIn('name', $permissionName)
                     ->isNotEmpty();
-
-//        foreach (){
-//            $this->getAllPermissions()->where()
-//        }
-//        if(count($permissionName) === 1){
-//            return $this->hasPermissionTo($permissionName[0]);
-//        }else{
-//            return $this->hasAnyPermission($permissionName);
-//        }
     }
 
     public static function fetchPermissions()
@@ -200,7 +191,7 @@ class User extends Authenticatable
 
     public static $userRolesKeys
         = [
-            '0'   => '',
+            '0'   => 'medic',
             '1'   => 'tech',
             '2'   => 'medic',
             '4'   => 'pak_queue',
@@ -240,36 +231,6 @@ class User extends Authenticatable
 
         return -1;
     }
-
-//    public function hasRole($role, $prefix = '>=')
-//    {
-//        if (isset(self::$userRolesValues[$role])) {
-//            $c_role = self::$userRolesValues[$role];
-//            $user   = auth()->user();
-//
-//            eval('$expr = '.$user->role.$prefix.$c_role.';');
-//
-//            if ($expr) {
-//                return true;
-//            }
-//
-//        }
-//
-//        return false;
-//    }
-
-    /**
-     * Проверка админа пользователя
-     */
-//    public static function isAdmin()
-//    {
-//        return Auth::user()->role >= 777;
-//    }
-
-//    public static function getAll()
-//    {
-//        return self::where('role', '!=', 3)->get();
-//    }
 
     /**
      * Получение имени юзера

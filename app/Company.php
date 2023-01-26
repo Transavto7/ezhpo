@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Models\Contract;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
@@ -13,6 +15,7 @@ class Company extends Model
         'note', 'comment','procedure_pv',
         'user_id', 'req_id',
         'pv_id', 'town_id', 'products_id', 'where_call', 'where_call_name', 'inn',
+
         'dismissed',
         'has_actived_prev_month',
         'bitrix_link',
@@ -26,9 +29,48 @@ class Company extends Model
                     ->withDefault();
     }
 
+    public function contracts()
+    {
+        return $this->hasMany(
+            Contract::class,
+            'company_id',
+            'id'
+        );
+    }
+
+    public function inspections_tech()
+    {
+        return $this->hasMany(Anketa::class, 'company_id', 'id')
+                    ->where('type_anketa', 'tech');
+    }
+    public function inspections_medic()
+    {
+        return $this->hasMany(Anketa::class, 'company_id', 'id')
+                    ->where('type_anketa', 'medic');
+    }
+    public function inspections_pechat_pl()
+    {
+        return $this->hasMany(Anketa::class, 'company_id', 'id')
+                    ->where('type_anketa', 'pechat_pl');
+    }
+    public function inspections_bdd()
+    {
+        return $this->hasMany(Anketa::class, 'company_id', 'id')
+                    ->where('type_anketa', 'bdd');
+    }
+    public function inspections_report_cart()
+    {
+        return $this->hasMany(Anketa::class, 'company_id', 'id')
+                    ->where('type_anketa', 'report_cart');
+    }
+
     public function cars()
     {
         return $this->hasMany(Car::class, 'company_id', 'id');
+    }
+    public function drivers()
+    {
+        return $this->hasMany(Driver::class, 'company_id', 'id');
     }
 
     public function delete()
