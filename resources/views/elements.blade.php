@@ -465,7 +465,7 @@ $permissionToViewContract = user()->access('contract_read');
                 <thead>
                 <tr>
                     @foreach ($fieldPrompts as $field)
-                        @if($field->field == 'products_id' && user()->hasRole('client'))
+                        @if(($field->field == 'products_id' || $field->field == 'services') && user()->hasRole('client'))
                             @continue
                         @endif
                         @if($field->field == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
@@ -516,12 +516,12 @@ $permissionToViewContract = user()->access('contract_read');
                 @foreach ($elements as $el)
                     <tr>
                         @foreach ($fieldPrompts as $field)
-                            @php
-                            //dd($el['contract'])
-                            @endphp
-{{--                            @if($field->field == 'products_id')--}}
-{{--                                @continue--}}
-{{--                            @endif--}}
+                            @if($field->field == 'products_id' && user()->hasRole('client'))
+                                @continue
+                            @endif
+                            @if(user()->hasRole('client') && $field->field === 'services')
+                                @continue
+                            @endif
                             @if($field->field == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
                                 @continue
                             @endif
@@ -607,7 +607,7 @@ $permissionToViewContract = user()->access('contract_read');
                                                     @endif
                                                 </h3>
                                             @endforeach
-                                        @elseif ($field->field == 'services' && ( $model === 'Car' || $model === 'Driver' || $model === 'Company'))
+                                        @elseif ($field->field == 'services' && ($model === 'Car' || $model === 'Driver' || $model === 'Company'))
                                             @foreach($el->contracts as $contract)
                                                 @foreach($contract->services as $service)
                                                     <h5>

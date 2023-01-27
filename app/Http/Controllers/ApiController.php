@@ -34,6 +34,10 @@ class ApiController extends Controller
             $query = $query->whereNotIn('role', [3, 12]);
         }
 
+        if ($request->get('trashed')) {
+            $query = $query->withTrashed();
+        }
+
         return $query->select($field, $key)->limit(100)->get();
     }
 
@@ -57,6 +61,7 @@ class ApiController extends Controller
     public function companiesList(Request $request) {
         return Company::where('name', 'like', '%' . $request->search . '%')
             ->orWhere('hash_id', 'like', '%' . $request->search . '%')
+            ->withTrashed()
             ->select('hash_id', DB::raw("concat('[', hash_id, '] ', name) as `name`"), 'id')->limit(100)->get();
     }
 

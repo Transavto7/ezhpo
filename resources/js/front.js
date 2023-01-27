@@ -88,7 +88,7 @@ $(document).ready(function () {
             params: {
                 search,
                 field,
-                key
+                key,
             }
         }).then(({ data }) => {
             data.forEach((element => {

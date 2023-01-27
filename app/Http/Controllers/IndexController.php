@@ -1371,7 +1371,6 @@ class IndexController extends Controller
                 foreach($allFilters as $aFk => $aFv) {
                     if(!empty($aFv)) {
                         if(is_array($aFv)) {
-
                             if(count($aFv) > 0) {
                                 $element['elements'] = $element['elements']->where(function ($q) use ($aFv, $aFk) {
                                     $isId = strpos($aFk, '_id');
@@ -1382,15 +1381,13 @@ class IndexController extends Controller
                                                    ->orWhere($aFk, 'like', "%,$aFvItemValue,%")
                                                    ->orWhere($aFk, 'like', "%,$aFvItemValue")
                                                    ->orWhere($aFk, 'like', "$aFvItemValue,%");
+                                        } else if ($isId) {
+                                                $q = $q->orWhere($aFk, $aFvItemValue);
                                         } else {
-                                            if ($isId) {
+                                            if (strlen($aFvItemValue) === 0) {
                                                 $q = $q->where($aFk, $aFvItemValue);
                                             } else {
-                                                if (strlen($aFvItemValue) === 0) {
-                                                    $q = $q->where($aFk, $aFvItemValue);
-                                                } else {
-                                                    $q = $q->where($aFk, 'LIKE', '%'.trim($aFvItemValue).'%');
-                                                }
+                                                $q = $q->where($aFk, 'LIKE', '%'.trim($aFvItemValue).'%');
                                             }
                                         }
                                     }
