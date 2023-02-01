@@ -228,6 +228,7 @@ class ReportController extends Controller
                 Carbon::setLocale('en');
                 for ($i = 0; $i < 12; $i++) {
                     $monthNamesContainer[$i] = ucfirst(Carbon::now()->subMonths($i)->monthName);
+                    $monthTotalContainer[$i] = 0;
                 }
                 Carbon::setLocale('ru');
 
@@ -253,8 +254,13 @@ class ReportController extends Controller
                     }
                 }
 
-                foreach ($monthNamesContainer as $monthIndex => $monthName) {
-                    $monthTotalContainer[$monthIndex] = $total[$monthName];
+                foreach ($monthNamesContainer as $monthIndex => &$monthName) {
+                    $monthTotalContainer[$monthIndex] = $total[$monthName] ?? 0;
+
+                    Carbon::setLocale('ru');
+                    $tmpMonthName = Carbon::createFromFormat("F", $monthName)->monthName;
+                    $monthName = $tmpMonthName;
+                    Carbon::setLocale('en');
                 }
             } elseif ($orderBy == 'created') {
                 $whereCase = "and ";
@@ -283,9 +289,12 @@ class ReportController extends Controller
                 $date_from = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay();
                 $date_to = Carbon::now()->lastOfMonth()->endOfDay();
 
+                Carbon::setLocale('en');
                 for ($i = 0; $i < 12; $i++) {
                     $monthNamesContainer[$i] = Carbon::now()->subMonths($i)->monthName;
+                    $monthTotalContainer[$i] = 0;
                 }
+                Carbon::setLocale('ru');
 
                 $subSelectCase = "select sub.month as month,
                                          sub.cnt,
@@ -303,42 +312,31 @@ class ReportController extends Controller
                                   ";
 
                 $responseFromDB = DB::select($subSelectCase, ['$date_from' => $date_from, '$date_to' => $date_to]);
-                $months = [
-                    "01" => "January",
-                    "02" => "February",
-                    "03" => "March",
-                    "04" => "April",
-                    "05" => "May",
-                    "06" => "June",
-                    "07" => "July",
-                    "08" => "August",
-                    "09" => "September",
-                    "10" => "October",
-                    "11" => "November",
-                    "12" => "December"
-                ];
+
                 foreach ($responseFromDB as $response) {
+                    Carbon::setLocale('en');
                     $response = json_decode(json_encode($response), true);
-                    $result[$response["company"]]["name"] = $response["name"] ?? "Неизвестная компания";
-                    if (!isset($result[$response["company"]][$months[$response["month"]]])) {
-                        $result[$response["company"]][$months[$response["month"]]] = 0;
+                    $monthName = ucfirst(Carbon::createFromFormat("d-m-Y", "01-{$response['month']}-2000")->monthName);
+                    Carbon::setLocale('ru');
+                    $result[$response["company"]]["name"] = $response['name'] ?? "Неизвестная компания";
+                    if (!isset($result[$response["company"]][$monthName])) {
+                        $result[$response["company"]][$monthName] = 0;
                     }
-                    $result[$response["company"]][$months[$response["month"]]] += $response["cnt"] ?? 0;
-                    $total[$months[$response["month"]]] = ($total[$months[$response["month"]]] ?? 0) + ($response["cnt"] ?? 0);
+                    $result[$response["company"]][$monthName] += $response["cnt"] ?? 0;
+                    $total[$monthName] = ($total[$monthName] ?? 0) + ($response["cnt"] ?? 0);
                 }
 
                 foreach ($monthNamesContainer as $monthIndex => $monthName) {
-                    $monthTotalContainer[$monthIndex] = $total[$monthName];
+                    $monthTotalContainer[$monthIndex] = $total[$monthName] ?? 0;
+                }
+
+                foreach ($monthNamesContainer as $monthIndex => &$monthName) {
+                    $carbon = Carbon::createFromFormat("F", $monthName);
+                    Carbon::setLocale('ru');
+                    $monthName = ucfirst($carbon->monthName);
+                    Carbon::setLocale('en');
                 }
             }
-        }
-
-        foreach ($monthNamesContainer as $monthIndex => &$monthName) {
-            $tmpMonthIndex = $monthIndex + 1;
-            $carbon = Carbon::createFromFormat("d-m-Y", "01-$tmpMonthIndex-2022");
-            Carbon::setLocale('ru');
-            $monthName = ucfirst($carbon->monthName);
-            Carbon::setLocale('en');
         }
 
         $towns = Town::get(['id', 'name']);
