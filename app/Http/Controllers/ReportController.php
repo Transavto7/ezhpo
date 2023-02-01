@@ -70,22 +70,22 @@ class ReportController extends Controller
                     if ($isApi) {
 
                         $reports = Anketa::whereIn('pv_id', $pv_id)
-                             ->where('type_anketa', $request->get('type_anketa'))
-                             ->where('in_cart', 0)
-                             ->where(function ($q) use ($date_from, $date_to) {
-                                 $q->where(function ($q) use ($date_from, $date_to) {
-                                     $q->whereNotNull('date')
-                                         ->whereBetween('date', [
-                                             $date_from.' '.'00:00:00',
-                                             $date_to.' '.'23:59:59',
-                                         ]);
-                                 })->orWhere(function ($q) use ($date_from, $date_to) {
-                                     $q->whereNull('date')->whereBetween('period_pl', [
-                                         Carbon::parse($date_from)->format('Y-m'),
-                                         Carbon::parse($date_to)->format('Y-m'),
-                                     ]);
-                                 });
-                            });
+                                         ->where('type_anketa', $request->get('type_anketa'))
+                                         ->where('in_cart', 0)
+                                         ->where(function ($q) use ($date_from, $date_to) {
+                                             $q->where(function ($q) use ($date_from, $date_to) {
+                                                 $q->whereNotNull('date')
+                                                   ->whereBetween('date', [
+                                                       $date_from.' '.'00:00:00',
+                                                       $date_to.' '.'23:59:59',
+                                                   ]);
+                                             })->orWhere(function ($q) use ($date_from, $date_to) {
+                                                 $q->whereNull('date')->whereBetween('period_pl', [
+                                                     Carbon::parse($date_from)->format('Y-m'),
+                                                     Carbon::parse($date_to)->format('Y-m'),
+                                                 ]);
+                                             });
+                                         });
 
                         $reports2 = Anketa::whereIn('pv_id', $pv_id)
 //                            ->where('type_anketa', 'medic')
@@ -159,7 +159,9 @@ class ReportController extends Controller
     }
 
     public function getDynamic(Request $request, $journal) {
-        //dd($request->all());
+        $monthTotalContainer = [];
+        $monthNamesContainer = [];
+
         $pv_id = trim($request->pv_id, ',[]');
         $town_id = trim($request->town_id, ',[]');
         $months = [];
@@ -223,29 +225,39 @@ class ReportController extends Controller
 
                 $anketas = $anketas->get();
 
+                Carbon::setLocale('en');
+                for ($i = 0; $i < 12; $i++) {
+                    $monthNamesContainer[$i] = ucfirst(Carbon::now()->subMonths($i)->monthName);
+                }
+                Carbon::setLocale('ru');
+
                 foreach ($anketas->groupBy('company_id') as $company_id => $anketasByCompany) {
-                        $result[$company_id]['name'] = $anketasByCompany->first()->company_name;
-                        for ($i = 0 ; $i < 12 ; $i++) {
-                            $date      = Carbon::now()->subMonths($i);
-                            $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
-                            $date_to   = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay();
+                    $result[$company_id]['name'] = $anketasByCompany->first()->company_name;
+                    for ($i = 0 ; $i < 12 ; $i++) {
+                        $date      = Carbon::now()->subMonths($i);
+                        $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
+                        $date_to   = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay();
 
-                            $count = $anketasByCompany
-                                         ->whereBetween('date', [
-                                             $date_from,
-                                             $date_to,
-                                         ])->count() +
-                                     $anketasByCompany->where('date', null)->whereBetween('period_pl', [
-                                         $date_from->format('Y-m'),
-                                         $date_to->format('Y-m'),
-                                     ])->count();
+                        $count = $anketasByCompany
+                                     ->whereBetween('date', [
+                                         $date_from,
+                                         $date_to,
+                                     ])->count() +
+                                 $anketasByCompany->where('date', null)->whereBetween('period_pl', [
+                                     $date_from->format('Y-m'),
+                                     $date_to->format('Y-m'),
+                                 ])->count();
 
-                            $result[$company_id][$date->format('F')] = $count;
-                            $total[$date->format('F')]               = ($total[$date->format('F')] ?? 0) + $count;
-                        }
+                        $result[$company_id][$date->format('F')] = $count;
+                        $total[$date->format('F')]               = ($total[$date->format('F')] ?? 0) + $count;
                     }
+                }
+
+                foreach ($monthNamesContainer as $monthIndex => $monthName) {
+                    $monthTotalContainer[$monthIndex] = $total[$monthName];
+                }
             } elseif ($orderBy == 'created') {
-                $whereCase = "where ";
+                $whereCase = "and ";
                 $whereCase .= $journal == "all"
                     ? "type_anketa = 'medic' or type_anketa = 'tech'"
                     : "type_anketa = '$journal'";
@@ -267,34 +279,66 @@ class ReportController extends Controller
                     }
                     $whereCase .= $points;
                 }
-                $tmpWhereCase = $whereCase;
+
+                $date_from = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay();
+                $date_to = Carbon::now()->lastOfMonth()->endOfDay();
+
                 for ($i = 0; $i < 12; $i++) {
-                    $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
-                    $date_to   = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay();
-                    $monthName = Carbon::now()->subMonths($i)->format("F");
+                    $monthNamesContainer[$i] = Carbon::now()->subMonths($i)->monthName;
+                }
 
-                    $whereCase .= " and `anketas`.`created_at` >= date(\"$date_from\") and `anketas`.`created_at` <= date(\"$date_to\")";
-                    $subSelectCase = "select count(`anketas`.`id`) as `$monthName`,
-					                                   `company_id` as `company`,
-					                                   if(`companies`.`name` is null, `companies_2`.`name`, `companies`.`name`) as `name`
-				                              from `anketas`
-                                      left join `companies` on `companies`.`hash_id` = `anketas`.`company_id`
-		                                  left join `companies_2` on `companies_2`.`hash_id` = `anketas`.`company_id`
+                $subSelectCase = "select sub.month as month,
+                                         sub.cnt,
+                                         sub.company_id as company,
+                                         companies.name as name
+                                  from (
+                                      select date_format(created_at, '%m') as month,
+                                             company_id,
+                                             count(*) as cnt
+                                      from anketas
+                                      where (anketas.created_at between '$date_from' and '$date_to')
                                       $whereCase
-                                      group by `company_id`";
+                                      group by date_format(created_at, '%m'), company_id, type_anketa) sub
+                                      left join companies on companies.hash_id = sub.company_id
+                                  ";
 
-                    $responseFromDB = DB::select($subSelectCase);
-
-                    foreach ($responseFromDB as $response) {
-                        $response = json_decode(json_encode($response), true);
-                        $result[$response["company"]]["name"] = $response["name"];
-                        $result[$response["company"]][$monthName] = $response[$monthName] ?: 0;
-                        $total[$monthName] = ($total[$monthName] ?? 0) + $response[$monthName] ?: 0;
+                $responseFromDB = DB::select($subSelectCase, ['$date_from' => $date_from, '$date_to' => $date_to]);
+                $months = [
+                    "01" => "January",
+                    "02" => "February",
+                    "03" => "March",
+                    "04" => "April",
+                    "05" => "May",
+                    "06" => "June",
+                    "07" => "July",
+                    "08" => "August",
+                    "09" => "September",
+                    "10" => "October",
+                    "11" => "November",
+                    "12" => "December"
+                ];
+                foreach ($responseFromDB as $response) {
+                    $response = json_decode(json_encode($response), true);
+                    $result[$response["company"]]["name"] = $response["name"] ?? "Неизвестная компания";
+                    if (!isset($result[$response["company"]][$months[$response["month"]]])) {
+                        $result[$response["company"]][$months[$response["month"]]] = 0;
                     }
+                    $result[$response["company"]][$months[$response["month"]]] += $response["cnt"] ?? 0;
+                    $total[$months[$response["month"]]] = ($total[$months[$response["month"]]] ?? 0) + ($response["cnt"] ?? 0);
+                }
 
-                    $whereCase = $tmpWhereCase;
+                foreach ($monthNamesContainer as $monthIndex => $monthName) {
+                    $monthTotalContainer[$monthIndex] = $total[$monthName];
                 }
             }
+        }
+
+        foreach ($monthNamesContainer as $monthIndex => &$monthName) {
+            $tmpMonthIndex = $monthIndex + 1;
+            $carbon = Carbon::createFromFormat("d-m-Y", "01-$tmpMonthIndex-2022");
+            Carbon::setLocale('ru');
+            $monthName = ucfirst($carbon->monthName);
+            Carbon::setLocale('en');
         }
 
         $towns = Town::get(['id', 'name']);
@@ -315,7 +359,9 @@ class ReportController extends Controller
             'towns' => $towns,
             'points' => $points,
             'journal' => $journal,
-            'totalstr' => $totalStr ?? ''
+            'totalstr' => $totalStr ?? '',
+            'monthnames' => $monthNamesContainer,
+            'monthtotal' => $monthTotalContainer
         ]);
     }
 
@@ -353,31 +399,32 @@ class ReportController extends Controller
 
     public function getJournalMedic($company, $date_from, $date_to, $products, $discounts) {
         // Get table info by filters
+        dd('wtf');
         $medics = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart', 'pechat_pl'])
-            ->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
-            ->where(function ($query) use ($company) {
-                $query->where('anketas.company_id', $company->hash_id)
-                    ->orWhere('anketas.company_name', $company->name);
-            })
-            ->where('anketas.in_cart', 0)
-            ->where(function ($q) use ($date_from, $date_to) {
-                $q->where(function ($q) use ($date_from, $date_to) {
-                    $q->whereNotNull('anketas.date')
-                        ->whereBetween('anketas.date', [
-                            $date_from,
-                            $date_to,
-                        ]);
-                })
-                ->orWhere(function ($q) use ($date_from, $date_to) {
-                    $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
-                        $date_from->format('Y-m'),
-                        $date_to->format('Y-m'),
-                    ]);
-                });
-            })
-            ->select('driver_fio', 'driver_id', 'type_anketa', 'type_view', 'result_dop', 'products_id', 'pv_id',
-                'is_dop')
-            ->get();
+                        ->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
+                        ->where(function ($query) use ($company) {
+                            $query->where('anketas.company_id', $company->hash_id)
+                                  ->orWhere('anketas.company_name', $company->name);
+                        })
+                        ->where('anketas.in_cart', 0)
+                        ->where(function ($q) use ($date_from, $date_to) {
+                            $q->where(function ($q) use ($date_from, $date_to) {
+                                $q->whereNotNull('anketas.date')
+                                  ->whereBetween('anketas.date', [
+                                      $date_from,
+                                      $date_to,
+                                  ]);
+                            })
+                              ->orWhere(function ($q) use ($date_from, $date_to) {
+                                  $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
+                                      $date_from->format('Y-m'),
+                                      $date_to->format('Y-m'),
+                                  ]);
+                              });
+                        })
+                        ->select('driver_fio', 'driver_id', 'type_anketa', 'type_view', 'result_dop', 'products_id', 'pv_id',
+                                 'is_dop')
+                        ->get();
 
         $result = [];
 
@@ -475,7 +522,7 @@ class ReportController extends Controller
 
 
             $result[$id]['types']['is_dop']['total'] = $driver->where('type_anketa', 'medic')
-                ->where('result_dop', null)->where('is_dop', 1)->count();
+                                                              ->where('result_dop', null)->where('is_dop', 1)->count();
         }
 
         return $result;
@@ -484,30 +531,30 @@ class ReportController extends Controller
     public function getJournalTechs($company, $date_from, $date_to, $products, $discounts) {
         // Get table info by filters
         $techs = Anketa::where('type_anketa', 'tech')
-            ->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')
-            ->where(function ($query) use ($company) {
-                $query->where('anketas.company_id', $company->hash_id)
-                    ->orWhere('anketas.company_name', $company->name);
-            })
-            ->where('anketas.in_cart', 0)
-            ->where(function ($q) use ($date_from, $date_to) {
-                $q->where(function ($q) use ($date_from, $date_to) {
-                    $q->whereNotNull('anketas.date')
-                        ->whereBetween('anketas.date', [
-                            $date_from,
-                            $date_to,
-                        ]);
-                })
-                    ->orWhere(function ($q) use ($date_from, $date_to) {
-                        $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
-                            $date_from->format('Y-m'),
-                            $date_to->format('Y-m'),
-                        ]);
-                    });
-            })
-            ->select('car_gos_number', 'car_id', 'type_auto', 'type_anketa', 'is_dop', 'result_dop', 'pv_id',
-                'type_view', 'products_id')
-            ->get();
+                       ->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')
+                       ->where(function ($query) use ($company) {
+                           $query->where('anketas.company_id', $company->hash_id)
+                                 ->orWhere('anketas.company_name', $company->name);
+                       })
+                       ->where('anketas.in_cart', 0)
+                       ->where(function ($q) use ($date_from, $date_to) {
+                           $q->where(function ($q) use ($date_from, $date_to) {
+                               $q->whereNotNull('anketas.date')
+                                 ->whereBetween('anketas.date', [
+                                     $date_from,
+                                     $date_to,
+                                 ]);
+                           })
+                             ->orWhere(function ($q) use ($date_from, $date_to) {
+                                 $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
+                                     $date_from->format('Y-m'),
+                                     $date_to->format('Y-m'),
+                                 ]);
+                             });
+                       })
+                       ->select('car_gos_number', 'car_id', 'type_auto', 'type_anketa', 'is_dop', 'result_dop', 'pv_id',
+                                'type_view', 'products_id')
+                       ->get();
 
         $result = [];
 
@@ -567,7 +614,7 @@ class ReportController extends Controller
             }
 
             $result[$id]['types']['is_dop']['total'] = $car->where('type_anketa', 'tech')
-                ->where('result_dop', null)->where('is_dop', 1)->count();
+                                                           ->where('result_dop', null)->where('is_dop', 1)->count();
         }
 
         return $result;
@@ -575,34 +622,34 @@ class ReportController extends Controller
 
     public function getJournalMedicsOther($company, $date_from, $date_to, $products, $discounts) {
         $reports = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart', 'pechat_pl'])
-            ->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
-            ->where(function ($query) use ($company) {
-                $query->where('anketas.company_id', $company->hash_id)
-                    ->orWhere('anketas.company_name', $company->name);
-            })
-            ->where('in_cart', 0)
-            ->whereBetween('anketas.created_at', [
-                $date_from,
-                $date_to
-            ])
-            ->where(function ($q) use ($date_from, $date_to) {
-                $q->where(function ($q) use ($date_from, $date_to) {
-                    $q->whereNotNull('anketas.date')
-                        ->whereNotBetween('anketas.date', [
-                            $date_from,
-                            $date_to,
-                        ]);
-                })
-                    ->orWhere(function ($q) use ($date_from, $date_to) {
-                        $q->whereNull('anketas.date')->whereNotBetween('anketas.period_pl', [
-                            $date_from->format('Y-m'),
-                            $date_to->format('Y-m'),
-                        ]);
-                    });
-            })
-            ->select('driver_id', 'period_pl', 'type_view', 'driver_fio', 'date', 'is_dop', 'pv_id',
-                'products_id', 'result_dop', 'type_anketa')
-            ->get();
+                         ->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
+                         ->where(function ($query) use ($company) {
+                             $query->where('anketas.company_id', $company->hash_id)
+                                   ->orWhere('anketas.company_name', $company->name);
+                         })
+                         ->where('in_cart', 0)
+                         ->whereBetween('anketas.created_at', [
+                             $date_from,
+                             $date_to
+                         ])
+                         ->where(function ($q) use ($date_from, $date_to) {
+                             $q->where(function ($q) use ($date_from, $date_to) {
+                                 $q->whereNotNull('anketas.date')
+                                   ->whereNotBetween('anketas.date', [
+                                       $date_from,
+                                       $date_to,
+                                   ]);
+                             })
+                               ->orWhere(function ($q) use ($date_from, $date_to) {
+                                   $q->whereNull('anketas.date')->whereNotBetween('anketas.period_pl', [
+                                       $date_from->format('Y-m'),
+                                       $date_to->format('Y-m'),
+                                   ]);
+                               });
+                         })
+                         ->select('driver_id', 'period_pl', 'type_view', 'driver_fio', 'date', 'is_dop', 'pv_id',
+                                  'products_id', 'result_dop', 'type_anketa')
+                         ->get();
 
         $result = [];
 
@@ -622,7 +669,7 @@ class ReportController extends Controller
             $result[$key]['month'] = $date->month;
             $result[$key]['reports'][$report->driver_id]['driver_fio'] = $report->driver_fio;
             $result[$key]['reports'][$report->driver_id]['pv_id'] = implode('; ',
-                array_unique($reports->where('driver_id', $report->driver_id)->pluck('pv_id')->toArray()));
+                                                                            array_unique($reports->where('driver_id', $report->driver_id)->pluck('pv_id')->toArray()));
 
             $total = $result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['total'] =
                 ($result[$key]['reports'][$report->driver_id]['types'][$report->type_view]['total']?? 0) + 1;
@@ -702,35 +749,35 @@ class ReportController extends Controller
 
     public function getJournalTechsOther($company, $date_from, $date_to, $products, $discounts) {
         $reports = Anketa::whereIn('type_anketa', ['tech', 'bdd', 'type_anketa', 'pechat_pl'])
-            ->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')
-            ->where(function ($query) use ($company) {
-                $query->where('anketas.company_id', $company->hash_id)
-                    ->orWhere('anketas.company_name', $company->name);
-            })
-            ->where('in_cart', 0)
-            ->whereBetween('anketas.created_at', [
-                $date_from,
-                $date_to
-            ])
-            ->where(function ($q) use ($date_from, $date_to) {
-                $q->where(function ($q) use ($date_from, $date_to) {
-                    $q->whereNotNull('anketas.date')
-                        ->whereNotBetween('anketas.date', [
-                            $date_from,
-                            $date_to,
-                        ]);
-                })
-                    ->orWhere(function ($q) use ($date_from, $date_to) {
-                        $q->whereNull('anketas.date')->whereNotBetween('anketas.period_pl', [
-                            $date_from->format('Y-m'),
-                            $date_to->format('Y-m'),
-                        ]);
-                    });
-            })
-            ->select('anketas.car_gos_number', 'type_auto', 'period_pl', 'car_id', 'date', 'result_dop',
-                'type_anketa', 'is_dop',
-               'pv_id', 'products_id', 'type_view')
-            ->get();
+                         ->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')
+                         ->where(function ($query) use ($company) {
+                             $query->where('anketas.company_id', $company->hash_id)
+                                   ->orWhere('anketas.company_name', $company->name);
+                         })
+                         ->where('in_cart', 0)
+                         ->whereBetween('anketas.created_at', [
+                             $date_from,
+                             $date_to
+                         ])
+                         ->where(function ($q) use ($date_from, $date_to) {
+                             $q->where(function ($q) use ($date_from, $date_to) {
+                                 $q->whereNotNull('anketas.date')
+                                   ->whereNotBetween('anketas.date', [
+                                       $date_from,
+                                       $date_to,
+                                   ]);
+                             })
+                               ->orWhere(function ($q) use ($date_from, $date_to) {
+                                   $q->whereNull('anketas.date')->whereNotBetween('anketas.period_pl', [
+                                       $date_from->format('Y-m'),
+                                       $date_to->format('Y-m'),
+                                   ]);
+                               });
+                         })
+                         ->select('anketas.car_gos_number', 'type_auto', 'period_pl', 'car_id', 'date', 'result_dop',
+                                  'type_anketa', 'is_dop',
+                                  'pv_id', 'products_id', 'type_view')
+                         ->get();
 
         $result = [];
 
@@ -751,7 +798,7 @@ class ReportController extends Controller
             $result[$key]['reports'][$report->car_id]['car_gos_number'] = $report->car_gos_number;
             $result[$key]['reports'][$report->car_id]['type_auto'] = $report->type_auto;
             $result[$key]['reports'][$report->car_id]['pv_id'] = implode('; ',
-                array_unique($reports->where('car_id', $report->car_id)->pluck('pv_id')->toArray()));
+                                                                         array_unique($reports->where('car_id', $report->car_id)->pluck('pv_id')->toArray()));
 
             $total = $result[$key]['reports'][$report->car_id]['types'][$report->type_view]['total']
                 = ($result[$key]['reports'][$report->car_id]['types'][$report->type_view]['total'] ?? 0) + 1;

@@ -1412,9 +1412,9 @@ class IndexController extends Controller
             }
 
             if(auth()->user()->hasRole('client')) {
-                if($model == 'Driver' || $model == 'Car') {
+                if($model == 'Driver' || $model == 'Car' || $model == 'Company') {
                     $element['elements'] = $element['elements']->where('company_id', auth()->user()->company_id);
-                } else if ($model == 'Company') {
+                } else {
                     $element['elements'] = $element['elements']->where('id', auth()->user()->company_id);
                 }
             }

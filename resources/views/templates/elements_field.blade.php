@@ -3,32 +3,32 @@
 
 @if($v['type'] !== 'select')
     <input
-        @if(isset($v['saveToHistory']) && $v['type'] !== 'file')
-            onchange="addFieldToHistory(event.target.value, '{{ $v['label'] }}');"
-        @endif
+            @if(isset($v['saveToHistory']) && $v['type'] !== 'file')
+                onchange="addFieldToHistory(event.target.value, '{{ $v['label'] }}');"
+            @endif
 
-        @if($v['type'] == 'file' && isset($v['resize']))
-            id="croppie-input{{ $uniqueInputId }}"
-        @endif
+            @if($v['type'] == 'file' && isset($v['resize']))
+                id="croppie-input{{ $uniqueInputId }}"
+            @endif
 
-        @if ($k === 'date_of_employment')
-            @php
-                if ($default_value == 'current_date') {
-                    $default_value = \Carbon\Carbon::now()->format('Y-m-d');
-                } else if ($default_value != null) {
-                    $default_value = \Carbon\Carbon::parse($default_value)->format('Y-m-d');
-                }
+            @if ($k === 'date_of_employment')
+                @php
+                    if ($default_value == 'current_date') {
+                        $default_value = \Carbon\Carbon::now()->format('Y-m-d');
+                    } else if ($default_value != null) {
+                        $default_value = \Carbon\Carbon::parse($default_value)->format('Y-m-d');
+                    }
 
-            @endphp
-        @endif
+                @endphp
+            @endif
 
-        value="{{ $default_value }}"
-        type="{{ $v['type'] }}" {{ $is_required }}
-        name="{{ $k }}"
-        data-label="{{ isset($v['label']) ? $v['label'] : $k }}"
-        placeholder="{{ $v['label'] }}"
-        data-field="{{ $model }}_{{ $k }}"
-        @if ($v['type'] !== 'file') class="form-control {{ isset($v['classes']) ? $v['classes'] : '' }}" @endif
+            value="{{ $default_value }}"
+            type="{{ $v['type'] }}" {{ $is_required }}
+            name="{{ $k }}"
+            data-label="{{ isset($v['label']) ? $v['label'] : $k }}"
+            placeholder="{{ $v['label'] }}"
+            data-field="{{ $model }}_{{ $k }}"
+            @if ($v['type'] !== 'file') class="form-control {{ isset($v['classes']) ? $v['classes'] : '' }}" @endif
     />
 
     @if($v['type'] == 'file' && $default_value)
@@ -58,9 +58,9 @@
         $value = isset($v['getField']) ? $v['getField'] : 'name';
     @endphp
     <select
-        disabled
-        name="company_name"
-        class="filled-select2 filled-select"
+            disabled
+            name="company_name"
+            class="filled-select2 filled-select"
     >
         <option selected value="{{ user()->company->name }}">
             {{ user()->company->name }}
@@ -74,12 +74,12 @@
         $value = isset($v['getField']) ? $v['getField'] : 'name';
     @endphp
     <select
-        disabled
-        name="company_id"
-        class="filled-select2 filled-select"
+            disabled
+            name="company_id"
+            class="filled-select2 filled-select"
     >
         <option selected value="{{ user()->company->hash_id }}">
-            {{ user()->company->name }}
+            [{{ user()->company->hash_id }}] {{ user()->company->name }}
         </option>
     </select>
 
@@ -90,45 +90,45 @@
         $value = $v['getField'] ?? 'name';
     @endphp
     @php
-    //if($v['label'] == 'Компания'){
-    //        dd($v, app("App\\" . $v['values'])::whereIn($key, $default_value)->get()->toArray(), $key, $default_value);
-//
-    //}
-    //dump($el ?? '');
-          // if(($el->type_product ?? '') != 'Абонентская плата без реестров' && ($k == 'essence' )):
-          //      dd(123);
-          // endif;
+        //if($v['label'] == 'Компания'){
+        //        dd($v, app("App\\" . $v['values'])::whereIn($key, $default_value)->get()->toArray(), $key, $default_value);
+    //
+        //}
+        //dump($el ?? '');
+              // if(($el->type_product ?? '') != 'Абонентская плата без реестров' && ($k == 'essence' )):
+              //      dd(123);
+              // endif;
     @endphp
     <select
-        @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' )) disabled @endif
-        @if(($el->type_product ?? '') != 'Абонентская плата без реестров' && ($k == 'essence' )) disabled @endif
-        @isset($v['saveToHistory'])
-            onchange="addFieldToHistory(event.target.value, '{{ $v['label'] }}');"
-        @endisset
+            @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' )) disabled @endif
+    @if(($el->type_product ?? '') != 'Абонентская плата без реестров' && ($k == 'essence' )) disabled @endif
+            @isset($v['saveToHistory'])
+                onchange="addFieldToHistory(event.target.value, '{{ $v['label'] }}');"
+            @endisset
 
-        @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' ))
-            @php
-                $is_required = '';
-            @endphp
-        @endif
-        @if(!is_array($v['values']))
-            model="{{ $v['values'] }}"
+            @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' ))
+                @php
+                    $is_required = '';
+                @endphp
+            @endif
+            @if(!is_array($v['values']))
+                model="{{ $v['values'] }}"
             field-key="{{ $key }}"
             field="{{ $value }}"
-        @endif
+            @endif
 
-        @isset($v['multiple'])
-            multiple="multiple"
+            @isset($v['multiple'])
+                multiple="multiple"
             name="{{ $k }}[]"
-        @else
-            name="{{ $k }}"
-        @endisset
+            @else
+                name="{{ $k }}"
+            @endisset
 
-        {{ $is_required }}
-        data-label="{{ $v['label'] ?? $k }}"
-        data-field="{{ $model }}_{{ $k }}"
-        class="filled-select2 filled-select @if($k === 'type_product') {{ 'type_product' }} @endif"
-        data-allow-clear=true
+            {{ $is_required }}
+            data-label="{{ $v['label'] ?? $k }}"
+            data-field="{{ $model }}_{{ $k }}"
+            class="filled-select2 filled-select @if($k === 'type_product') {{ 'type_product' }} @endif"
+            data-allow-clear=true
     >
         {{-- disabled selected --}}
         <option value="">Не установлено</option>
@@ -136,7 +136,7 @@
         @if(is_array($v['values']))
             @foreach($v['values'] as $optionK => $optionV)
                 <option
-                    @if(in_array($optionV, $default_value) || in_array($optionK, $default_value)) selected @endif
+                        @if(in_array($optionV, $default_value) || in_array($optionK, $default_value)) selected @endif
                 value="{{ $optionK }}">
                     {{ $optionV }}
                 </option>
@@ -144,12 +144,20 @@
         @else
             @foreach(app("App\\" . $v['values'])::whereIn($key, $default_value)->get() as $option)
                 <option selected value="{{ $option[$key] }}">
-                    {{ $option[$value] }}
+                    @if (in_array($k, ['company_id', 'driver_fio', ]))
+                        [{{ $option[$key] }}] {{ $option[$value] }}
+                    @else
+                        {{ $option[$value] }}
+                    @endif
                 </option>
             @endforeach
             @foreach(app("App\\" . $v['values'])::whereNotIn($key, $default_value)->limit(100)->get() as $option)
                 <option value="{{ $option[$key] }}">
-                    {{ $option[$value] }}
+                    @if (in_array($k, ['company_id', 'driver_fio']))
+                        [{{ $option[$key] }}] {{ $option[$value] }}
+                    @else
+                        {{ $option[$value] }}
+                    @endif
                 </option>
             @endforeach
         @endif

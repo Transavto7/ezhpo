@@ -230,12 +230,13 @@ class Anketa extends Model
                 'pv_id'          => 'Пункт выпуска',
             ],
 
-
             'bdd' => [
-                'company_id'  => 'Компания',
-                'date'          => 'Дата инструктажа',
-                'driver_fio'   => 'Ф.И.О водителя',
-                'pv_id'          => 'Пункт выпуска',
+                'company_id'          => 'Компания',
+                'straight_company_id' => 'ID компании',
+                'date'                => 'Дата инструктажа',
+                'driver_fio'          => 'Ф.И.О водителя',
+                'driver_id'           => 'ID водителя',
+                'pv_id'               => 'Пункт выпуска',
             ],
 
             'report_cart' => [
@@ -559,22 +560,24 @@ class Anketa extends Model
              */
             'report_cart' => [
                 'company_id'   => 'ID Компании',
-                'company_name'   => 'Компания',
+                'company_name' => 'Компания',
                 'date'         => 'Дата снятия отчета',
                 'driver_fio'   => 'Ф.И.О водителя',
+                'driver_id'    => 'ID водителя',
                 'user_name'    => 'Ф.И.О (при наличии) лица, проводившего снятие',
                 'user_eds'     => 'Подпись лица, проводившего снятие',
                 'pv_id'        => 'Пункт выпуска',
-                'driver_id'    => 'ID водителя',
                 'signature'    => 'ЭЛ подпись водителя',
                 'created_at' => 'Дата/Время создания записи',
             ],
 
             'pechat_pl' => [
                 'company_name' => 'Компания',
-                'company_id' => 'ID Компания',
+                'company_id'   => 'ID Компания',
+                'straight_compony_id' => 'ID компании',
                 'date'         => 'Дата распечатки ПЛ',
                 'driver_fio'   => 'ФИО водителя',
+                'driver_id'    => 'ID водителя',
                 'count_pl'     => 'Количество распечатанных ПЛ',
                 'user_name'    => 'Ф.И.О сотрудника, который готовил ПЛ',
                 'user_eds'     => 'ЭЦП сотрудника',
@@ -582,16 +585,17 @@ class Anketa extends Model
             ],
 
             'bdd' => [
-                'company_name'    => 'Компания',
+                'company_name'  => 'Компания',
                 'company_id'    => 'ID Компании',
+                'straight_company_id' => 'ID компании',
                 'date'          => 'Дата, время',
                 'created_at'    => 'Дата внесения в журнал',
                 'type_briefing' => 'Вид инструктажа',
                 'driver_fio'    => 'Ф.И.О водителя, прошедшего инструктаж',
+                'driver_id'     => 'ID водителя',
                 'user_name'     => 'Ф.И.О (при наличии) лица, проводившего инструктаж',
                 'pv_id'         => 'Пункт выпуска',
                 'user_eds'      => 'Подпись лица, проводившего инструктаж',
-                'driver_id'     => 'ID водителя',
                 'signature'     => 'ЭЛ подпись водителя',
             ],
 

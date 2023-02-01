@@ -28,13 +28,22 @@ class ApiController extends Controller
         }
 
         $query = app("App\\" . $model)::where(DB::raw("($field)"),
-            'like', '%' . $request->search . '%');
+                                              'like', '%' . $request->search . '%')
+                                      ->orWhere("hash_id", "like", "%" . $request->search . "%");
 
         if ($model === 'User') {
             $query = $query->whereNotIn('role', [3, 12]);
         }
 
-        return $query->select($field, $key)->limit(100)->get();
+        if ($model == "Company" && $field == "name" && $key == "name") {
+            return $query->select(DB::raw("concat('[', `hash_id`, '] ', `name`) as `name`"), 'hash_id')->limit(100)->get();
+        }
+
+        if (in_array($model, ['Company', 'Driver']) && in_array($field, ['name', 'fio'])) {
+            return $query->select(DB::raw("concat('[', `hash_id`, '] ', `$field`) as `$field`"), $key)->limit(100)->get();
+        } else {
+            return $query->select($field, $key)->limit(100)->get();
+        }
     }
 
     // Response
@@ -56,7 +65,7 @@ class ApiController extends Controller
 
     public function companiesList(Request $request) {
         return Company::where('name', 'like', '%' . $request->search . '%')
-            ->select('hash_id', 'name', 'id')->limit(100)->get();
+                      ->select('hash_id', 'name', 'id')->limit(100)->get();
     }
 
     // Обновляем все пункты выпуска
@@ -224,13 +233,13 @@ class ApiController extends Controller
     {
         if ($model = app("App\\$request->model")->where($prop, $val)->first()) {
             return response([
-                'status' => true,
-                'name'   => $model->fio ?? $model->name,
-            ]);
+                                'status' => true,
+                                'name'   => $model->fio ?? $model->name,
+                            ]);
         } else {
             return response([
-                'status' => false,
-            ]);
+                                'status' => false,
+                            ]);
         }
     }
 
