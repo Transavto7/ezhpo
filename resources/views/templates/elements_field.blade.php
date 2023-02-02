@@ -99,6 +99,7 @@
               //      dd(123);
               // endif;
     @endphp
+
     <select
             @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' )) disabled @endif
     @if(($el->type_product ?? '') != 'Абонентская плата без реестров' && ($k == 'essence' )) disabled @endif
@@ -143,18 +144,18 @@
             @endforeach
         @else
             @foreach(app("App\\" . $v['values'])::whereIn($key, $default_value)->get() as $option)
-                <option selected value="{{ $option[$key] }}">
-                    @if (in_array($k, ['company_id', 'driver_fio', ]))
-                        [{{ $option[$key] }}] {{ $option[$value] }}
+                <option selected value="{{ $k == 'hash_id' ? $option['hash_id'] : $option[$key] }}">
+                    @if (in_array($k, ['company_id', 'driver_id', 'car_id', 'id', 'hash_id', 'pv_id', 'parent_town_id']))
+                        [{{ $option['hash_id'] }}] {{ $option['name'] ?? $option['fio'] ?? $option["gos_number"] }}
                     @else
                         {{ $option[$value] }}
                     @endif
                 </option>
             @endforeach
             @foreach(app("App\\" . $v['values'])::whereNotIn($key, $default_value)->limit(100)->get() as $option)
-                <option value="{{ $option[$key] }}">
-                    @if (in_array($k, ['company_id', 'driver_fio']))
-                        [{{ $option[$key] }}] {{ $option[$value] }}
+                <option value="{{ $k == 'hash_id' ? $option['hash_id'] : $option[$key] }}">
+                    @if (in_array($k, ['company_id', 'driver_id', 'car_id', 'id', 'hash_id', 'pv_id', 'parent_town_id']))
+                        [{{ $option['hash_id'] }}] {{ $option['name'] ?? $option['fio'] ?? $option["gos_number"]}}
                     @else
                         {{ $option[$value] }}
                     @endif
