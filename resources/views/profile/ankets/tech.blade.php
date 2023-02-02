@@ -143,7 +143,7 @@
 
     <div class="form-group">
         <label class="form-control-label">Отметка о прохождении предрейсового контроля:</label>
-        <select name="point_reys_control" required class="form-control">
+        <select name="point_reys_control" id="point_reys_control" required class="form-control">
             @isset($point_reys_control)
                 <option disabled selected value="{{ $point_reys_control }}">{{ $point_reys_control }}</option>
             @endisset
