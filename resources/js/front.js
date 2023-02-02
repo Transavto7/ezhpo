@@ -21,6 +21,14 @@ $.fn.select2.amd.require(['select2/selection/search'], function (Search) {
     };
 });
 
+function toggleAnketaCloneButton(state) {
+    let button = $('#ANKETA_CLONE_TRIGGER');
+    if (state === true) {
+        return button.hide();
+    }
+    return button.show();
+}
+
 $(document).ready(function () {
     const Toast = swal.mixin({
         toast: true,
@@ -35,10 +43,32 @@ $(document).ready(function () {
     })
 
     let loading = false
+    let pprResult = false
+    let anketa_type = $('#ANKETA_FORM_VIEW').data('anketa');
 
-    $(document).on('click', '.reload-filters', function(event) {
+    switch (anketa_type) {
+        case ('profile.ankets.tech') :
+            pprResult = ($('#point_reys_control').val() === 'Пройден');
+            toggleAnketaCloneButton(!pprResult);
+            $(document).on('change', '#point_reys_control', function (event) {
+                pprResult = ($(event.target).val() === 'Пройден');
+                toggleAnketaCloneButton(!pprResult);
+            });
+            break;
+        case ('profile.ankets.medic') :
+            pprResult = ($('#med_view').val() === 'В норме');
+            toggleAnketaCloneButton(!pprResult);
+            $(document).on('change', '#med_view', function (event) {
+                pprResult = ($(event.target).val() === 'В норме');
+                toggleAnketaCloneButton(!pprResult);
+            });
+            break;
+    }
+
+
+    $(document).on('click', '.reload-filters', function (event) {
         const btn = $(event.target);
-        if(location.pathname.indexOf('home') > -1) {
+        if (location.pathname.indexOf('home') > -1) {
             btn.disabled = true;
             btn.children('span.spinner').removeClass('d-none');
             $('#filter-group-2-tab').removeClass('active');
@@ -857,9 +887,9 @@ $(document).ready(function () {
 
     // Клонируем анкету
     let count_anketa = 1;
+
     $('#ANKETA_CLONE_TRIGGER').click(e => {
         const CLONE_ID = 'cloning'
-
         if(count_anketa+1 === 31) {
             swal.fire({
                 title: 'Нельзя добавлять более 30 осмотров',
