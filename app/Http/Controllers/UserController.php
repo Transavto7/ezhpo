@@ -24,7 +24,7 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $users = User::with(['roles'  => function ($q) use ($request) {
+        $users = User::with(['roles' => function ($q) use ($request) {
         }, 'pv', 'company'])
                      ->where(function ($query) use ($request) {
                          $query->whereDoesntHave('roles')

@@ -27,21 +27,33 @@ class ApiController extends Controller
             $key = $request->key;
         }
 
-        $query = app("App\\" . $model)::where(DB::raw("($field)"),
-            'like', '%' . $request->search . '%');
-
         if ($model === 'User') {
-            $query = $query->whereHas('roles', function ($q) use ($request) {
+            $query = User::with('roles')->whereHas('roles', function ($q) use ($request) {
                 $q->whereNotIn('roles.id', [3, 6, 9]);
-            });
+            })->where(DB::raw("($field)"),
+                'like', '%' . $request->search . '%')
+                ->orWhere("hash_id", "like", "%" . $request->search . "%");
+        } else {
+            $query = app("App\\" . $model)::where(DB::raw("($field)"),
+                'like', '%' . $request->search . '%')
+                ->orWhere("hash_id", "like", "%" . $request->search . "%");
         }
 
         if ($request->get('trashed')) {
             $query = $query->withTrashed();
         }
 
-        return $query->select($field, $key)->limit(100)->get();
+        if ($model == "Company" && $field == "name" && $key == "name") {
+            return $query->select(DB::raw("concat('[', `hash_id`, '] ', `name`) as `name`"), 'hash_id')->limit(100)->get();
+        }
+
+        if (in_array($model, ['Company', 'Driver']) && in_array($field, ['name', 'fio'])) {
+            return $query->select(DB::raw("concat('[', `hash_id`, '] ', `$field`) as `$field`"), $key)->limit(100)->get();
+        } else {
+            return $query->select($field, $key)->limit(100)->get();
+        }
     }
+
 
     // Response
     public static function r($data = [], $action = 1) {
