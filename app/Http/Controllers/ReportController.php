@@ -176,7 +176,7 @@ class ReportController extends Controller
 
         if ($request->town_id || $request->pv_id) {
             $date_from = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay();
-            $date_to   = Carbon::now()->lastOfMonth()->endOfDay();
+            $date_to   = Carbon::now()->lastOfMonth()->endOfDay()->addDay();
             $result    = [];
             $total     = [];
 
@@ -237,7 +237,7 @@ class ReportController extends Controller
                     for ($i = 0 ; $i < 12 ; $i++) {
                         $date      = Carbon::now()->subMonths($i);
                         $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
-                        $date_to   = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay();
+                        $date_to   = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay()->addDay();
 
                         $count = $anketasByCompany
                                      ->whereBetween('date', [
@@ -287,7 +287,7 @@ class ReportController extends Controller
                 }
 
                 $date_from = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay();
-                $date_to = Carbon::now()->lastOfMonth()->endOfDay();
+                $date_to = Carbon::now()->lastOfMonth()->endOfDay()->addDay();
 
                 Carbon::setLocale('en');
                 for ($i = 0; $i < 12; $i++) {
@@ -314,6 +314,10 @@ class ReportController extends Controller
                 $responseFromDB = DB::select($subSelectCase, ['$date_from' => $date_from, '$date_to' => $date_to]);
 
                 foreach ($responseFromDB as $response) {
+                    if (is_null($response['name']) || $response['name'] == '') {
+                        continue;
+                    }
+
                     Carbon::setLocale('en');
                     $response = json_decode(json_encode($response), true);
                     $monthName = ucfirst(Carbon::createFromFormat("d-m-Y", "01-{$response['month']}-2000")->monthName);
