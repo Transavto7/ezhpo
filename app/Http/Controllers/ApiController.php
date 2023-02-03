@@ -31,7 +31,9 @@ class ApiController extends Controller
             'like', '%' . $request->search . '%');
 
         if ($model === 'User') {
-            $query = $query->whereNotIn('role', [3, 12]);
+            $query = $query->whereHas('roles', function ($q) use ($request) {
+                $q->whereNotIn('roles.id', [3, 6, 9]);
+            });
         }
 
         if ($request->get('trashed')) {
