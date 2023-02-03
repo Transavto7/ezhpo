@@ -3,14 +3,20 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property  User responsible
+ */
 class Company extends Model
 {
-    use \Illuminate\Database\Eloquent\SoftDeletes;
+    use SoftDeletes;
 
     public $fillable = [
         'hash_id', 'name',
-        'note', 'comment','procedure_pv',
+        'note', 'comment', 'procedure_pv',
         'user_id', 'req_id',
         'pv_id', 'town_id', 'products_id', 'where_call', 'where_call_name', 'inn',
         'dismissed',
@@ -20,13 +26,18 @@ class Company extends Model
         'deleted_id',
     ];
 
-    public function deleted_user()
+    public function responsible(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'deleted_id', 'id')
-                    ->withDefault();
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function cars()
+    public function deleted_user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'deleted_id', 'id')
+            ->withDefault();
+    }
+
+    public function cars(): HasMany
     {
         return $this->hasMany(Car::class, 'company_id', 'id');
     }

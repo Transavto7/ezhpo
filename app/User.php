@@ -2,19 +2,19 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @property string $name
+ * @property Collection $companies
+ */
 class User extends Authenticatable
 {
     use Notifiable, HasRoles, SoftDeletes;
@@ -97,19 +97,24 @@ class User extends Authenticatable
     public function anketas()
     {
         return $this->hasMany(Anketa::class, 'user_id', 'id')
-                    ->withDefault();
+            ->withDefault();
     }
 
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id', 'id')
-                    ->withDefault();
+            ->withDefault();
+    }
+
+    public function companies()
+    {
+        return $this->hasMany(Company::class);
     }
 
     public function pv()
     {
         return $this->belongsTo(Point::class, 'pv_id')
-                    ->withDefault();
+            ->withDefault();
     }
 
     public static $newUserRolesText
