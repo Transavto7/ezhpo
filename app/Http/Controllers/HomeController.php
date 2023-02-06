@@ -10,8 +10,11 @@ use App\Exports\AnketasExport;
 use App\Exports\TechAnketasExport;
 use App\FieldPrompt;
 use App\User;
+use Auth;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -36,7 +39,7 @@ class HomeController extends Controller
     /**
      * Show the application dashboard.
      *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * @return Renderable
      */
     public static function searchFieldsAnkets($anketa, $anketaModel, $fieldsKeys)
     {
@@ -92,7 +95,7 @@ class HomeController extends Controller
             }
         }
 
-        $user = \Auth::user();
+        $user = Auth::user();
 
         $validTypeAnkets       = User::$userRolesKeys[$user->role] ?? 'medic';
         $blockedToExportFields = [];
@@ -338,7 +341,8 @@ class HomeController extends Controller
 
             if ($validTypeAnkets == 'tech') {
                 if ($request->get('exportPrikaz')) {
-                    $techs = $anketas
+                    $techs = $anketas->where('type_anketa', 'tech')->when(!empty($request->get('type_view')),
+                        function (Builder $query) use ($request) { return $query->whereIn('type_view', $request->get('type_view')); })
                         ->where('type_anketa', 'tech')
                         ->get();
 
@@ -347,9 +351,9 @@ class HomeController extends Controller
                 }
 
                 if ($request->get('exportPrikazPL')) {
-                    $techs = $anketas->where('type_anketa', 'tech')
-                        ->whereIn('type_view', $request->get('type_view', []))
-                                     ->get();
+                    $techs = $anketas->where('type_anketa', 'tech')->when(!empty($request->get('type_view')),
+                        function (Builder $query) use ($request) { return $query->whereIn('type_view', $request->get('type_view')); })
+                        ->get();
 
                     return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_pl']),
                                            'ЭЖ учета ПЛ.xlsx');
