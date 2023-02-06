@@ -169,7 +169,8 @@
                             @hasSection('ankets_submit')
                                 @yield('ankets_submit')
                             @else
-                                <button type="submit" class="m-center btn btn-success">{{ __('ankets.submit') }}</button>
+                                <button type="submit" class="m-center btn btn-info">{{ __('Вернуться в журнал') }}</button>
+                                <button type="button" href="{{ url()->previous()  }}" class="m-center btn btn-success">{{ __('ankets.submit') }}</button>
                             @endif
                         </div>
                     </form>
