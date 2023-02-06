@@ -339,7 +339,7 @@ class HomeController extends Controller
 
                 if ($request->get('exportPrikazPL')) {
                     $techs = $anketas->where(['type_view' => 'Предрейсовый/Предсменный'])
-                        ->get()
+                        ->cursor()
                     ;
 
                     return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_pl']),
