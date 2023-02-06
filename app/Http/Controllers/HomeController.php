@@ -331,15 +331,6 @@ class HomeController extends Controller
             if ($validTypeAnkets == 'tech') {
                 if ($request->get('exportPrikaz')) {
                     $techs = $anketas->where('type_anketa', 'tech')
-                        ->when(!empty($request->get('type_view')),
-                            function (Builder $query) use ($request) {
-                                return $query->whereIn('type_view', $request->get('type_view'));
-                            })
-                        ->where('type_anketa', 'tech')
-                        ->when(!$request->has('type_view'),
-                            function (Builder $query) use ($request) {
-                                return $query->where(['type_view' => 'Предрейсовый/Предсменный']);
-                            })
                         ->get();
 
                     return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_to']),
@@ -347,16 +338,9 @@ class HomeController extends Controller
                 }
 
                 if ($request->get('exportPrikazPL')) {
-                    $techs = $anketas->where('type_anketa', 'tech')
-                        ->when(!empty($request->get('type_view')),
-                            function (Builder $query) use ($request) {
-                                return $query->whereIn('type_view', $request->get('type_view'));
-                            })
-                        ->when(!$request->has('type_view'),
-                            function (Builder $query) use ($request) {
-                                return $query->where(['type_view' => 'Предрейсовый/Предсменный']);
-                            })
-                        ->get();
+                    $techs = $anketas->where(['type_view' => 'Предрейсовый/Предсменный'])
+                        ->get()
+                    ;
 
                     return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_pl']),
                         'ЭЖ учета ПЛ.xlsx');
