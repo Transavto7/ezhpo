@@ -348,6 +348,7 @@ class HomeController extends Controller
 
                 if ($request->get('exportPrikazPL')) {
                     $techs = $anketas->where('type_anketa', 'tech')
+                        ->whereIn('type_view', $request->get('type_view', []))
                                      ->get();
 
                     return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_pl']),
