@@ -53,7 +53,10 @@ export class ApiController {
 
     getFindModel ({ model, params }) {
         return this.client.get(`/api/find/${model}`, {
-            params
+            params: {
+                ...params,
+                trashed: true
+            }
         });
     }
 

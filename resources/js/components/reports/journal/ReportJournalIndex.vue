@@ -1,70 +1,70 @@
 <template>
-  <div>
-      <div class="card mb-4" style="overflow-x: inherit">
-          <h5 class="card-header">Выбор информации</h5>
-          <div class="card-body">
-              <div class="row">
-                  <div class="form-group col-lg-3">
-                      <label class="mb-1" for="company">Компании</label>
-                      <multiselect
-                          :disabled="client"
-                          v-model="company"
-                          @search-change="searchCompany"
-                          @select="(company) => company_id = company.hash_id"
-                          :options="companies"
-                          :searchable="true"
-                          :close-on-select="true"
-                          :show-labels="false"
-                          placeholder="Выберите компанию"
-                          label="name"
-                          class="is-invalid"
-                      >
-                          <span slot="noResult">Результатов не найдено</span>
-                          <span slot="noOptions">Список пуст</span>
-                      </multiselect>
-                  </div>
-                  <div class="form-group col-lg-2">
-                      <label class="mb-1" for="date_from">Период:</label>
-                      <input type="month" required ref="month" v-model="month"
-                             id="month" class="form-control form-date" name="month">
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="form-group col-lg-12">
-                      <button v-if="permissions.create" type="submit" @click="report" class="btn btn-info" :disabled="loading">
-                          <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                          Сформировать отчет
-                      </button>
-                      <button v-if="permissions.export" type="submit" @click="exportData" class="btn btn-info" :disabled="loadingExport">
-                          <span v-if="loadingExport" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                          Экспортировать
-                      </button>
-                      <a href="?" class="btn btn-danger">Сбросить</a>
-                  </div>
-              </div>
-          </div>
-      </div>
+    <div>
+        <div class="card mb-4" style="overflow-x: inherit">
+            <h5 class="card-header">Выбор информации</h5>
+            <div class="card-body">
+                <div class="row">
+                    <div class="form-group col-lg-3">
+                        <label class="mb-1" for="company">Компании</label>
+                        <multiselect
+                            :disabled="client"
+                            v-model="company"
+                            @search-change="searchCompany"
+                            @select="(company) => company_id = company.hash_id"
+                            :options="companies"
+                            :searchable="true"
+                            :close-on-select="true"
+                            :show-labels="false"
+                            placeholder="Выберите компанию"
+                            label="name"
+                            class="is-invalid"
+                        >
+                            <span slot="noResult">Результатов не найдено</span>
+                            <span slot="noOptions">Список пуст</span>
+                        </multiselect>
+                    </div>
+                    <div class="form-group col-lg-2">
+                        <label class="mb-1" for="date_from">Период:</label>
+                        <input type="month" required ref="month" v-model="month"
+                               id="month" class="form-control form-date" name="month">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-12">
+                        <button v-if="permissions.create" type="submit" @click="report" class="btn btn-info" :disabled="loading">
+                            <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Сформировать отчет
+                        </button>
+                        <button v-if="permissions.export" type="submit" @click="exportData" class="btn btn-info" :disabled="loadingExport">
+                            <span v-if="loadingExport" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Экспортировать
+                        </button>
+                        <a href="?" class="btn btn-danger">Сбросить</a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-      <ReportJournalMedic
-          ref="reportsMedic"
-      />
+        <ReportJournalMedic
+            ref="reportsMedic"
+        />
 
-      <ReportJournalTech
-          ref="reportsTech"
-      />
+        <ReportJournalTech
+            ref="reportsTech"
+        />
 
-      <ReportJournalMedicOther
-          ref="reportsMedicOther"
-      />
+        <ReportJournalMedicOther
+            ref="reportsMedicOther"
+        />
 
-      <ReportJournalTechOther
-        ref="reportsTechOther"
-      />
+        <ReportJournalTechOther
+            ref="reportsTechOther"
+        />
 
-      <ReportJournalOther
-          ref="reportsOther"
-      />
-  </div>
+        <ReportJournalOther
+            ref="reportsOther"
+        />
+    </div>
 </template>
 
 <script>

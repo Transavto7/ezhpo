@@ -2,23 +2,78 @@
 
 namespace App;
 
+use App\Models\Contract;
+use App\Models\ContractAnketaSnapshot;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Model;
 
 class Anketa extends Model
 {
+    // archive
+    public function contract_snapshot()
+    {
+        return $this->belongsTo(ContractAnketaSnapshot::class, 'contract_snapshot_id', 'id')
+                    ->withDefault();
+    }
+
+
+    public function services_snapshot()
+    {
+        return $this->belongsToMany(
+            Product::class,
+            'anketa_services_discount_snapshot_contracts',
+            'anketa_id',
+            'service_id',
+            'id',
+            'id'
+        )->withPivot('service_cost');
+//        return $this->belongsTo(ContractAnketaSnapshot::class, 'contract_snapshot_id', 'id')
+//                    ->withDefault();
+    }
+
+
+//    public function contract()
+//    {
+////        return $this->belongsTo(Contract::class, 'contract_id', 'id')
+////                    ->withDefault();
+//        return $this->hasOne(
+//            Contract::class,
+//            'contract_id',
+//            'id'
+//        )
+//                    ->withDefault();
+//    }
+
+    public function our_company()
+    {
+        return $this->belongsTo(
+            Req::class,
+            'our_company_id',
+            'id'
+        )->withDefault();
+    }
+
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id')
+                    ->withDefault();
     }
 
     public function company()
     {
-        return $this->belongsTo(Company::class, 'company_id', 'hash_id');
+        return $this->belongsTo(Company::class, 'company_id', 'hash_id')
+                    ->withDefault();
+    }
+    public function car()
+    {
+        return $this->belongsTo(Car::class, 'car_id', 'hash_id')
+                    ->withDefault();
     }
 
     public function driver()
     {
-        return $this->belongsTo(User::class, 'driver_id', 'hash_id');
+        return $this->belongsTo(Driver::class, 'driver_id', 'hash_id')
+                    ->withDefault();
     }
 
     public function deleted_user()
@@ -106,6 +161,8 @@ class Anketa extends Model
             'protokol_path',
             'comments',
             'connected_hash',
+            'contract_id',
+            'contract_snapshot_id',
         ];
 
 
@@ -170,12 +227,11 @@ class Anketa extends Model
                 'pv_id'          => 'Пункт выпуска',
             ],
 
-
             'bdd' => [
-                'company_id'  => 'Компания',
-                'date'          => 'Дата инструктажа',
-                'driver_fio'   => 'Ф.И.О водителя',
-                'pv_id'          => 'Пункт выпуска',
+                'company_id'          => 'Компания',
+                'date'                => 'Дата инструктажа',
+                'driver_fio'          => 'Ф.И.О водителя',
+                'pv_id'               => 'Пункт выпуска',
             ],
 
             'report_cart' => [
@@ -239,6 +295,7 @@ class Anketa extends Model
         'medic' => [
             'date',
             'driver_fio',
+            'driver_id',
             'period_pl',
             'created_at',
             'driver_group_risk',
@@ -249,7 +306,6 @@ class Anketa extends Model
             'company_name',
             'company_id',
             'pv_id',
-            'driver_id',
             'user_name',
             'driver_gender',
             'driver_year_birthday',
@@ -281,7 +337,6 @@ class Anketa extends Model
             'pv_id',
             'car_id',
             'odometer',
-            'driver_id',
             'number_list_road',
             'point_reys_control',
             'user_eds',
@@ -377,7 +432,7 @@ class Anketa extends Model
             ],
 
             'medic' => [
-                'company_name'             => 'Компания',
+                'company_name'           => 'Компания',
                 'company_id'             => 'ID Компании',
                 'date'                   => 'Дата и время осмотра',
                 'period_pl'              => 'Период выдачи ПЛ',
@@ -395,14 +450,13 @@ class Anketa extends Model
                 't_people'               => 'Температура тела',
                 'tonometer'              => "Артериальное давление",
                 'pulse'                  => 'Пульс',
-//                'test_narko'             => 'Тест на наркотики',
+                //                'test_narko'             => 'Тест на наркотики',
                 'admitted'               => 'Заключение о результатах осмотра',
                 'user_name'              => 'ФИО ответственного',
                 'user_eds'               => 'ЭЦП медицинского работника',
 
                 // Поля не в выгрузку
                 'created_at'             => 'Дата создания',
-                'driver_id'              => 'ID водителя',
                 'photos'                 => 'Фото',
                 'videos'                 => 'Видео',
                 'med_view'               => 'Мед показания',
@@ -434,7 +488,6 @@ class Anketa extends Model
                 'driver_group_risk'      => 'Группа риска',
                 'driver_fio'             => 'Водитель',
                 'company_id'             => 'ID компании',
-                'driver_id'              => 'ID водителя',
                 'photos'                 => 'Фото',
                 'med_view'               => 'Мед показания',
                 'pv_id'                  => 'Пункт выпуска',
@@ -465,7 +518,7 @@ class Anketa extends Model
              */
             'tech'      => [
                 'company_id'     => 'ID Компании',
-                'company_name'     => 'Компания',
+                'company_name'   => 'Компания',
                 'date'           => 'Дата, время проведения контроля',
                 'period_pl'      => 'Период выдачи ПЛ',
                 'created_at'     => 'Дата создания',
@@ -477,7 +530,6 @@ class Anketa extends Model
                 'driver_fio'     => 'ФИО Водителя',
 
                 // ID'шники
-                'driver_id'      => 'ID водителя',
                 'car_id'         => 'ID автомобиля',
 
                 // Доп поля
@@ -497,20 +549,18 @@ class Anketa extends Model
              */
             'report_cart' => [
                 'company_id'   => 'ID Компании',
-                'company_name'   => 'Компания',
+                'company_name' => 'Компания',
                 'date'         => 'Дата снятия отчета',
                 'driver_fio'   => 'Ф.И.О водителя',
                 'user_name'    => 'Ф.И.О (при наличии) лица, проводившего снятие',
                 'user_eds'     => 'Подпись лица, проводившего снятие',
                 'pv_id'        => 'Пункт выпуска',
-                'driver_id'    => 'ID водителя',
                 'signature'    => 'ЭЛ подпись водителя',
                 'created_at' => 'Дата/Время создания записи',
             ],
 
             'pechat_pl' => [
                 'company_name' => 'Компания',
-                'company_id' => 'ID Компания',
                 'date'         => 'Дата распечатки ПЛ',
                 'driver_fio'   => 'ФИО водителя',
                 'count_pl'     => 'Количество распечатанных ПЛ',
@@ -520,7 +570,7 @@ class Anketa extends Model
             ],
 
             'bdd' => [
-                'company_name'    => 'Компания',
+                'company_name'  => 'Компания',
                 'company_id'    => 'ID Компании',
                 'date'          => 'Дата, время',
                 'created_at'    => 'Дата внесения в журнал',
@@ -529,7 +579,6 @@ class Anketa extends Model
                 'user_name'     => 'Ф.И.О (при наличии) лица, проводившего инструктаж',
                 'pv_id'         => 'Пункт выпуска',
                 'user_eds'      => 'Подпись лица, проводившего инструктаж',
-                'driver_id'     => 'ID водителя',
                 'signature'     => 'ЭЛ подпись водителя',
             ],
 

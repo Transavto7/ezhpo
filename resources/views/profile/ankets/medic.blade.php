@@ -194,7 +194,7 @@
     <div class="form-group row">
         <label class="col-md-3 form-control-label">Мед показания:</label>
         <article class="col-md-9">
-            <select name="med_view" required class="form-control">
+            <select name="med_view" id="med_view" required class="form-control">
                 @if($med_view ?? false)
                     <option
                         @if ($med_view === 'В норме') selected @endif

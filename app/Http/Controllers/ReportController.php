@@ -17,6 +17,7 @@ use Carbon\CarbonPeriod;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
@@ -153,10 +154,19 @@ class ReportController extends Controller
         return $this->getDynamic($request, 'medic');
     }
 
+    public function getDynamicAll(Request $request) {
+        return $this->getDynamic($request, 'all');
+    }
+
     public function getDynamic(Request $request, $journal) {
+        //dd($request->all());
+        $pv_id = trim($request->pv_id, ',[]');
+        $town_id = trim($request->town_id, ',[]');
         $months = [];
         $periodStart = Carbon::now()->subMonths(11);
         $period = CarbonPeriod::create($periodStart, '1 month', Carbon::now());
+        $orderBy = $request->order_by;
+
         foreach ($period as $month) {
             $months[] = $month->format('F');
         }
@@ -164,61 +174,139 @@ class ReportController extends Controller
 
         if ($request->town_id || $request->pv_id) {
             $date_from = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay();
-            $date_to = Carbon::now()->lastOfMonth()->endOfDay();
-            $result = [];
-            $total = [];
+            $date_to   = Carbon::now()->lastOfMonth()->endOfDay();
+            $result    = [];
+            $total     = [];
 
-            $anketas = Anketa::where('type_anketa', $journal)->where('in_cart', 0)
-                ->where(function ($q) use ($date_from, $date_to) {
+            if ($orderBy == 'execute') {
+                if ($journal != 'all') {
+                    $anketas = Anketa::where('type_anketa', $journal);
+                } else {
+                    $anketas = Anketa::whereRaw("`type_anketa` in ('medic', 'tech')");
+                }
+
+                $anketas = $anketas->where('in_cart', 0);
+
+                $anketas = $anketas->where(function ($q) use ($date_from, $date_to, $orderBy) {
                     $q->where(function ($q) use ($date_from, $date_to) {
                         $q->whereNotNull('date')
-                            ->whereBetween('date', [
-                                $date_from,
-                                $date_to,
-                            ]);
+                          ->whereBetween('date', [
+                              $date_from,
+                              $date_to,
+                          ]);
                     })
-                        ->orWhere(function ($q) use ($date_from, $date_to) {
-                            $q->whereNull('date')->whereBetween('period_pl', [
-                                $date_from->format('Y-m'),
-                                $date_to->format('Y-m'),
-                            ]);
-                        });
+                      ->orWhere(function ($q) use ($date_from, $date_to) {
+                          $q->whereNull('date')->whereBetween('period_pl', [
+                              $date_from->format('Y-m'),
+                              $date_to->format('Y-m'),
+                          ]);
+                      });
                 });
 
-                if ($request->pv_id) {
-                    $anketas = $anketas->where('pv_id', Point::find($request->pv_id)->name);
-                } else if ($request->town_id) {
-                    $points = Point::where('pv_id', $request->town_id)->pluck('name');
-                    $anketas = $anketas->whereIn('pv_id', $points);
+                if ($pv_id) {
+                    if (str_contains($pv_id, ',')) {
+                        $anketas = $anketas->where(function ($q) use ($pv_id) {
+                            $pointsNames = Point::whereRaw("pv_id in ($pv_id)")->pluck('name');
+                            $q->whereIn('pv_id', $pointsNames);
+                        });
+                    } else {
+                        $anketas = $anketas->where('pv_id', Point::find($pv_id)->name);
+                    }
+                } elseif ($town_id) {
+                    if (str_contains($town_id, ',')) {
+                        $points = Point::whereRaw("pv_id in ($town_id)")->pluck('name');
+                    } else {
+                        $points = Point::where('pv_id', $town_id)->pluck('name');
+                    }
+                    $anketas = $anketas->whereIn("pv_id", $points);
                 }
 
                 $anketas = $anketas->get();
 
-                foreach($anketas->groupBy('company_id') as $company_id => $anketasByCompany) {
-                    $result[$company_id]['name'] = $anketasByCompany->first()->company_name;
-                    for ($i = 0; $i < 12; $i++) {
-                        $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
-                        $date_to = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay();
-                        $date = Carbon::now()->subMonths($i);
+                foreach ($anketas->groupBy('company_id') as $company_id => $anketasByCompany) {
+                        $result[$company_id]['name'] = $anketasByCompany->first()->company_name;
+                        for ($i = 0 ; $i < 12 ; $i++) {
+                            $date      = Carbon::now()->subMonths($i);
+                            $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
+                            $date_to   = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay();
 
-                         $count = $anketasByCompany
-                           ->whereBetween('date', [
-                                $date_from,
-                                $date_to,
-                            ])->count() +
-                        $anketasByCompany->where('date', null)->whereBetween('period_pl', [
-                                $date_from->format('Y-m'),
-                                $date_to->format('Y-m'),
-                            ])->count();
+                            $count = $anketasByCompany
+                                         ->whereBetween('date', [
+                                             $date_from,
+                                             $date_to,
+                                         ])->count() +
+                                     $anketasByCompany->where('date', null)->whereBetween('period_pl', [
+                                         $date_from->format('Y-m'),
+                                         $date_to->format('Y-m'),
+                                     ])->count();
 
-                        $result[$company_id][$date->format('F')] = $count;
-                        $total[$date->format('F')] = ($total[$date->format('F')] ?? 0) + $count;
+                            $result[$company_id][$date->format('F')] = $count;
+                            $total[$date->format('F')]               = ($total[$date->format('F')] ?? 0) + $count;
+                        }
                     }
+            } elseif ($orderBy == 'created') {
+                $whereCase = "where ";
+                $whereCase .= $journal == "all"
+                    ? "type_anketa = 'medic' or type_anketa = 'tech'"
+                    : "type_anketa = '$journal'";
+
+                $whereCase .= " and `in_cart` = 0 ";
+                if ($pv_id) {
+                    if (str_contains($pv_id, ',')) {
+                        $pointsNames = "\"" . implode("\",\"", Point::whereRaw("pv_id in ($pv_id)")->pluck('name')->toArray()) . "\" ";
+                        $whereCase .= " and `anketas`.`pv_id` in ($pointsNames) ";
+                    } else {
+                        $pointName = trim(Point::find($pv_id)->name, "[]");
+                        $whereCase .= " and `anketas`.`pv_id` = \"$pointName\" ";
+                    }
+                } elseif ($town_id) {
+                    if (str_contains($town_id, ',')) {
+                        $points = " and `anketas`.`pv_id` in(\"" . implode("\",\"", Point::whereRaw("pv_id in ($town_id)")->pluck('name')) . "\") ";
+                    } else {
+                        $points = " and `anketas`.`pv_id` = \"" . Point::where('pv_id', $town_id)->pluck('name')[0] . "\" ";
+                    }
+                    $whereCase .= $points;
                 }
+                $tmpWhereCase = $whereCase;
+                for ($i = 0; $i < 12; $i++) {
+                    $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
+                    $date_to   = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay();
+                    $monthName = Carbon::now()->subMonths($i)->format("F");
+
+                    $whereCase .= " and `anketas`.`created_at` >= date(\"$date_from\") and `anketas`.`created_at` <= date(\"$date_to\")";
+                    $subSelectCase = "select count(`anketas`.`id`) as `$monthName`,
+					                                   `company_id` as `company`,
+					                                   if(`companies`.`name` is null, `companies_2`.`name`, `companies`.`name`) as `name`
+				                              from `anketas`
+                                      left join `companies` on `companies`.`hash_id` = `anketas`.`company_id`
+		                                  left join `companies_2` on `companies_2`.`hash_id` = `anketas`.`company_id`
+                                      $whereCase
+                                      group by `company_id`";
+
+                    $responseFromDB = DB::select($subSelectCase);
+
+                    foreach ($responseFromDB as $response) {
+                        $response = json_decode(json_encode($response), true);
+                        $result[$response["company"]]["name"] = $response["name"];
+                        $result[$response["company"]][$monthName] = $response[$monthName] ?: 0;
+                        $total[$monthName] = ($total[$monthName] ?? 0) + $response[$monthName] ?: 0;
+                    }
+
+                    $whereCase = $tmpWhereCase;
+                }
+            }
         }
 
         $towns = Town::get(['id', 'name']);
         $points = Point::get(['id', 'name', 'pv_id']);
+
+        if (isset($total)) {
+            $totalStr = "";
+            foreach ($total as $sum) {
+                $totalStr .= "$sum, ";
+            }
+            $totalStr = rtrim($totalStr, ",");
+        }
 
         return view('reports.dynamic.medic.index', [
             'months' => $months,
@@ -226,7 +314,8 @@ class ReportController extends Controller
             'total' => $total ?? null,
             'towns' => $towns,
             'points' => $points,
-            'journal' => $journal
+            'journal' => $journal,
+            'totalstr' => $totalStr ?? ''
         ]);
     }
 

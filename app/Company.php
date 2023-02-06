@@ -2,23 +2,21 @@
 
 namespace App;
 
+use App\Models\Contract;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * @property  User responsible
- */
 class Company extends Model
 {
-    use SoftDeletes;
+    use \Illuminate\Database\Eloquent\SoftDeletes;
 
     public $fillable = [
         'hash_id', 'name',
         'note', 'comment', 'procedure_pv',
         'user_id', 'req_id',
         'pv_id', 'town_id', 'products_id', 'where_call', 'where_call_name', 'inn',
+
         'dismissed',
         'has_actived_prev_month',
         'bitrix_link',
@@ -37,9 +35,48 @@ class Company extends Model
             ->withDefault();
     }
 
+    public function contracts()
+    {
+        return $this->hasMany(
+            Contract::class,
+            'company_id',
+            'id'
+        );
+    }
+
+    public function inspections_tech() : HasMany
+    {
+        return $this->hasMany(Anketa::class, 'company_id', 'id')
+                    ->where('type_anketa', 'tech');
+    }
+    public function inspections_medic()
+    {
+        return $this->hasMany(Anketa::class, 'company_id', 'id')
+                    ->where('type_anketa', 'medic');
+    }
+    public function inspections_pechat_pl()
+    {
+        return $this->hasMany(Anketa::class, 'company_id', 'id')
+                    ->where('type_anketa', 'pechat_pl');
+    }
+    public function inspections_bdd()
+    {
+        return $this->hasMany(Anketa::class, 'company_id', 'id')
+                    ->where('type_anketa', 'bdd');
+    }
+    public function inspections_report_cart()
+    {
+        return $this->hasMany(Anketa::class, 'company_id', 'id')
+                    ->where('type_anketa', 'report_cart');
+    }
+
     public function cars(): HasMany
     {
         return $this->hasMany(Car::class, 'company_id', 'id');
+    }
+    public function drivers()
+    {
+        return $this->hasMany(Driver::class, 'company_id', 'id');
     }
 
     public function delete()

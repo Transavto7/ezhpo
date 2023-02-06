@@ -24,9 +24,7 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        // ebat' ya query builder
-        $users = User::with(['roles'  => function ($q) use ($request) {
-            $q->orderBy('guard_name', ($request->get('sortDesc') == 'true' && $request->get('sortBy') == 'roles') ? 'DESC' : 'ASC');
+        $users = User::with(['roles' => function ($q) use ($request) {
         }, 'pv', 'company'])
                      ->where(function ($query) use ($request) {
                          $query->whereDoesntHave('roles')
@@ -50,13 +48,15 @@ class UserController extends Controller
 
         if ($sortBy = $request->get('sortBy', 'id')) {
             if($sortBy == 'roles'){
-                $users->rightJoin('model_has_roles', 'users.id', 'model_has_roles.model_id')
-                      ->rightJoin('roles', function ($join)  {
+                $users->join('model_has_roles', 'users.id', 'model_has_roles.model_id')
+                      ->join('roles', function ($join) use($request) {
                           $join->on('model_has_roles.role_id', '=', 'roles.id')
+                               ->orderBy('roles.guard_name', $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC')
                           ;
-                })
-                    ->orderBy('roles.guard_name', $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC')//;
-                    ->select('users.*', 'guard_name');
+                      })
+                      ->orderBy('roles.guard_name', $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC')//;
+                      ->select('users.*', 'guard_name')
+                      ->groupBy('users.id');
             }else{
                 $users->orderBy($sortBy, $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC');
             }
@@ -66,9 +66,10 @@ class UserController extends Controller
                 $q->where('id', $role);
             });
         }
-//dd($users->limit(3)->get()->toArray());
+
         if ($request->get('api')) {
             $res = $users->paginate();
+            $secondRes = $users->get()->sortBy;
 
             return response([
                 'total_rows'   => $res->total(),
@@ -78,8 +79,6 @@ class UserController extends Controller
         }
 
         $fields = FieldPrompt::where('type', 'users')->get();
-
-//        dd($fields->toArray());
 
         return view('admin.users_v2.index')
             ->with([

@@ -44,7 +44,7 @@
 
                             @php $field_view_key = join('_', explode('.', $field)); @endphp
                             @php $field_view = 'profile.ankets.fields.' . $field_view_key; @endphp
-
+                          
                             @if(View::exists($field_view))
                                 @include($field_view, [
                                     'field_default_value' => !empty(request()->get($field_view_key)) ? request()->get($field_view_key) : 'Не установлено'

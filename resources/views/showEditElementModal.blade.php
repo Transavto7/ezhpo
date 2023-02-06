@@ -47,15 +47,16 @@
                 @endif
                 @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
                 @php if ($model === 'Instr' && $k === 'signature') continue; @endphp
+                @php if ($k == 'essence') continue; @endphp
 
-                @if($k == 'essence')
-                        <div data-field="essence" class="form-group" @if(($el->type_product ?? '') != 'Абонентская плата без реестров')  style="display: none" @endif>
-                            <label>Сущности</label>
-                            <select name="essence"
-                                    data-label="Сущности"
-                                    data-field="Product_type_view"
-                                    class="js-chosen"
-                                    style="display: none;"
+                    @if($k == 'unit' && ($model === 'Service' || $model === 'Product'))
+                        <div data-field="essence" class="form-group">
+                            <label><b class="text-danger text-bold">*</b>Сущности</label>
+                            <select
+                                name="essence"
+                                data-label="Сущности"
+                                class="filled-select2 filled-select"
+                                required="required"
                             >
                                 <option value="" selected>Не установлено</option>
                                 @foreach(\App\Product::$essence as $essenceKey => $essenceName)
@@ -66,11 +67,99 @@
                                 @endforeach
                             </select>
                         </div>
+                    @endif
+
+                @if($k == 'contracts')
+                    @php
+                        $contractCollect = collect($el->contracts);
+                    @endphp
+{{--                    <div data-field="contracts" class="form-group">--}}
+{{--                        <label>Договор</label>--}}
+{{--                        <select name="contracts[]"--}}
+{{--                                data-label="Договоры"--}}
+{{--                                class="js-chosen"--}}
+{{--                                style="display: none;"--}}
+{{--                                multiple="multiple"--}}
+{{--                        >--}}
+{{--                            <option value=""  @if(!$contractCollect->count()) selected @endif>Не установлено</option>--}}
+{{--                            @foreach(\App\Models\Contract::whereNull('company_id')->orWhere('company_id', $el->id)->get(['id', 'name']) as $contract)--}}
+{{--                                <option value="{{ $contract->id }}"--}}
+{{--                                        @if ($contractCollect->where('id', $contract->id)->first()) selected @endif>--}}
+{{--                                    {{ $contract->name }}--}}
+{{--                                </option>--}}
+{{--                            @endforeach--}}
+{{--                        </select>--}}
+{{--                    </div>--}}
+                        <div class="">
+                            <ul class="list-group">
+                                @foreach($el->contracts as $contract)
+                                <li style="padding: 0;" class=" text-small list-group-item list-group-item-action list-group-item-success"><b>{{ $contract->name }}</b>
+                                    @foreach($contract->services as $new_service)
+                                        <ul class="list-group">
+                                            <li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">{{ $new_service->name }}</li>
+                                        </ul>
+                                    @endforeach
+                                </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     @continue
+                @endif
+                @if($k == 'contract_id' && (
+                        $model == 'Driver'
+                        ||
+                        $model == 'Car'))
+                        @php
+                            $contractCollect = \App\Models\Contract::where('company_id', $el->company_id)->get(['id', 'name']);
+//                            $class = ''
+if($model === 'Car'){
+                                $contractForFuckingDriverORCAR = \App\Car::with('contracts')->find($el->id);
+
+}
+if($model === 'Driver'){
+                                $contractForFuckingDriverORCAR = \App\Driver::with('contracts')->find($el->id);
+
+}
+                        @endphp
+                    @if(( $model == 'Driver' && user()->access('contract_edit_driver')) || ($model == 'Car' && user()->access('contract_edit_car')) )
+                    <div data-field="contract" class="form-group">
+                        <label>Договор</label>
+                        <select name="contract_ids[]"
+                                data-label="Договор"
+                                id="select_for_contract_driver_car"
+                                class="js-chosen"
+                                style="display: none;"
+                                multiple="multiple"
+                        >
+{{--                            <option value="" @if(!$el->contract_id) selected @endif>Не установлено</option>--}}
+                            @foreach($contractCollect as $contract)
+                                <option value="{{ $contract->id }}"
+                                        @if($contractForFuckingDriverORCAR->contracts->where('id', $contract->id)->first()) selected @endif
+                                >
+                                    {{ $contract->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @endif
+                        <div class="">
+                            <ul class="list-group">
+                                @foreach($el->contracts as $contract)
+                                    <li style="padding: 0;" class=" text-small list-group-item list-group-item-action list-group-item-success"><b>{{ $contract->name }}</b>
+                                        @foreach($contract->services as $new_service)
+                                            <ul class="list-group">
+                                                <li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">{{ $new_service->name }}</li>
+                                            </ul>
+                                        @endforeach
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @continue`
                 @endif
 
                 @if($k !== 'id' && !isset($v['hidden']))
-                    <div class="form-group" data-field="{{ $k }}" @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' ))  style="display: none" @endif>
+                    <div class="form-group" data-field="{{ $k }}">
                         <label>
                             @if($is_required) <b class="text-danger text-bold">*</b> @endif
                             {{ $v['label'] }}</label>
@@ -86,12 +175,12 @@
                         @if(isset($v['syncData']) && $model !== 'Company')
                             @foreach($v['syncData'] as $syncData)
                                 <a href="{{ route('syncDataElement', [
-                                                                            'model' => $syncData['model'],
-                                                                            'fieldFind' => $syncData['fieldFind'],
-                                                                            'fieldFindId' => $el['id'],
-                                                                            'fieldSync' => $k,
-                                                                            'fieldSyncValue' => $el[$k]
-                                                                        ]) }}" target="_blank" class="text-info btn-link"><i class="fa fa-spinner"></i> Синхронизация с: {{ $syncData['text'] }}</a>
+                                    'model' => $syncData['model'],
+                                    'fieldFind' => $syncData['fieldFind'],
+                                    'fieldFindId' => $el['id'],
+                                    'fieldSync' => $k,
+                                    'fieldSyncValue' => $el[$k]
+                                ]) }}" target="_blank" class="text-info btn-link"><i class="fa fa-spinner"></i> Синхронизация с: {{ $syncData['text'] }}</a>
                             @endforeach
                         @endif
                     </div>

@@ -17,16 +17,17 @@ class FixFieldsIntoDdates extends Migration
             $table->string('deleted_id')->nullable();
             $table->softDeletes();
         });
+
         Schema::table('field_histories', function (Blueprint $table) {
             $table->string('deleted_id')->nullable();
             $table->softDeletes();
         });
+
         \App\FieldPrompt::create([
             'type' => 'ddates',
             'field' => 'item_model',
             'name' => 'Сущность'
         ]);
-
     }
 
     /**
