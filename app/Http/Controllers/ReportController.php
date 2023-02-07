@@ -162,184 +162,127 @@ class ReportController extends Controller
         $monthTotalContainer = [];
         $monthNamesContainer = [];
 
+        /** @var $pv_id string ID выбранных пунктов выпуска. Если их несколько, то они перечисляются через запятую. */
         $pv_id = trim($request->pv_id, ',[]');
+        /** @var $town_id string ID выбранных городов пунктов выпуска. Если их несколько, то они перечисляются через запятую. */
         $town_id = trim($request->town_id, ',[]');
+        /** @var $orderBy string Тип построения - execute (по дате осмотра) или created (по дате создания) */
+        $orderBy = $request->order_by;
+
         $months = [];
         $periodStart = Carbon::now()->subMonths(11);
         $period = CarbonPeriod::create($periodStart, '1 month', Carbon::now());
-        $orderBy = $request->order_by;
-
         foreach ($period as $month) {
             $months[] = $month->format('F');
         }
         $months = array_reverse($months);
 
         if ($request->town_id || $request->pv_id) {
-            $date_from = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay();
-            $date_to   = Carbon::now()->lastOfMonth()->endOfDay()->addDay();
+            /** @var $data_from Carbon Дата начала исчисления - это первый день месяца и -1 секунда... */
+            $date_from = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay()->subSecond();
+            /** @var $data_to Carbon Дата конца исчисления - это последний день + 1 день... */
+            $date_to   = Carbon::now()->lastOfMonth()->addDay();
+            // Почему такая разница?
+            // Потому что конструкция between смотрит по правилу больше или меньше, но не больше/меньше ИЛИ РАВНО.
+            // Если делать проверку по прямому математическому сравнению, это увеличит время обработки, а значит
+            // запрос будет менее оптимизирован.
             $result    = [];
             $total     = [];
 
-            if ($orderBy == 'execute') {
-                if ($journal != 'all') {
-                    $anketas = Anketa::where('type_anketa', $journal);
+            // Достаём названия нужных нам месяцев для назначения по порядку.
+            // Назначаем изначальную локаль как английскую, потом меняем обратно на русскую.
+            Carbon::setLocale('en');
+            for ($i = 0; $i < 12; $i++) {
+                $monthNamesContainer[$i] = Carbon::now()->subMonths($i)->monthName;
+                $monthTotalContainer[$i] = 0;
+            }
+            Carbon::setLocale('ru');
+
+            $whereCase = "and ";
+            $whereCase .= $journal == "all"
+                ? "type_anketa in ('medic', 'tech')"
+                : "type_anketa = '$journal'";
+
+            $whereCase .= " and `in_cart` = 0 ";
+
+            if ($pv_id) {
+                if (str_contains($pv_id, ',')) {
+                    $pointsNames = implode(',', Point::whereRaw("id in ($pv_id)")
+                                                     ->pluck("name")
+                                                     ->map(function ($pn) {
+                                                         return "'$pn'";
+                                                     }));
+                    $whereCase .= " and `anketas`.`pv_id` in ($pointsNames) ";
                 } else {
-                    $anketas = Anketa::whereRaw("`type_anketa` in ('medic', 'tech')");
+                    $pointName = trim(Point::find($pv_id)->name, "[]");
+                    $whereCase .= " and `anketas`.`pv_id` = '$pointName' ";
                 }
-
-                $anketas = $anketas->where('in_cart', 0);
-
-                $anketas = $anketas->where(function ($q) use ($date_from, $date_to, $orderBy) {
-                    $q->where(function ($q) use ($date_from, $date_to) {
-                        $q->whereNotNull('date')
-                          ->whereBetween('date', [
-                              $date_from,
-                              $date_to,
-                          ]);
-                    })
-                      ->orWhere(function ($q) use ($date_from, $date_to) {
-                          $q->whereNull('date')->whereBetween('period_pl', [
-                              $date_from->format('Y-m'),
-                              $date_to->format('Y-m'),
-                          ]);
-                      });
-                });
-
-                if ($pv_id) {
-                    if (str_contains($pv_id, ',')) {
-                        $anketas = $anketas->where(function ($q) use ($pv_id) {
-                            $pointsNames = Point::whereRaw("pv_id in ($pv_id)")->pluck('name');
-                            $q->whereIn('pv_id', $pointsNames);
-                        });
-                    } else {
-                        $anketas = $anketas->where('pv_id', Point::find($pv_id)->name);
-                    }
-                } elseif ($town_id) {
-                    if (str_contains($town_id, ',')) {
-                        $points = Point::whereRaw("pv_id in ($town_id)")->pluck('name');
-                    } else {
-                        $points = Point::where('pv_id', $town_id)->pluck('name');
-                    }
-                    $anketas = $anketas->whereIn("pv_id", $points);
+            } elseif ($town_id) {
+                if (str_contains($town_id, ',')) {
+                    $pointsNames = implode(',', Point::whereRaw("pv_id in ($town_id)")
+                                                     ->pluck("name")
+                                                     ->map(function ($tn) {
+                                                         return "'$tn'";
+                                                     }));
+                    $whereCase .= " and `anketas`.`pv_id` in ($pointsNames) ";
+                } else {
+                    $pointName = trim(Point::where("pv_id", $town_id)->pluck('name'), "[]");
+                    $whereCase .= " and `anketas`.`pv_id` = '$pointName' ";
                 }
+            }
 
-                $anketas = $anketas->get();
-
-                Carbon::setLocale('en');
-                for ($i = 0; $i < 12; $i++) {
-                    $monthNamesContainer[$i] = ucfirst(Carbon::now()->subMonths($i)->monthName);
-                    $monthTotalContainer[$i] = 0;
-                }
-                Carbon::setLocale('ru');
-
-                foreach ($anketas->groupBy('company_id') as $company_id => $anketasByCompany) {
-                    $result[$company_id]['name'] = $anketasByCompany->first()->company_name;
-                    for ($i = 0 ; $i < 12 ; $i++) {
-                        $date      = Carbon::now()->subMonths($i);
-                        $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
-                        $date_to   = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay()->addDay();
-
-                        $count = $anketasByCompany
-                                     ->whereBetween('date', [
-                                         $date_from,
-                                         $date_to,
-                                     ])->count() +
-                                 $anketasByCompany->where('date', null)->whereBetween('period_pl', [
-                                     $date_from->format('Y-m'),
-                                     $date_to->format('Y-m'),
-                                 ])->count();
-
-                        $result[$company_id][$date->format('F')] = $count;
-                        $total[$date->format('F')]               = ($total[$date->format('F')] ?? 0) + $count;
-                    }
-                }
-
-                foreach ($monthNamesContainer as $monthIndex => &$monthName) {
-                    $monthTotalContainer[$monthIndex] = $total[$monthName] ?? 0;
-
-                    Carbon::setLocale('ru');
-                    $tmpMonthName = Carbon::createFromFormat("F", $monthName)->monthName;
-                    $monthName = $tmpMonthName;
-                    Carbon::setLocale('en');
-                }
+            if ($orderBy == 'execute') {
+                $mainField = "coalesce(date, period_pl)";
             } elseif ($orderBy == 'created') {
-                $whereCase = "and ";
-                $whereCase .= $journal == "all"
-                    ? "type_anketa = 'medic' or type_anketa = 'tech'"
-                    : "type_anketa = '$journal'";
+                $mainField = "created_at";
+            }
+            $mainTimeCondition = "($mainField between '$date_from' and '$date_to') ";
+            $mainTimeResult = "date_format($mainField, '%Y-%m-%d')";
 
-                $whereCase .= " and `in_cart` = 0 ";
-                if ($pv_id) {
-                    if (str_contains($pv_id, ',')) {
-                        $pointsNames = "\"" . implode("\",\"", Point::whereRaw("pv_id in ($pv_id)")->pluck('name')->toArray()) . "\" ";
-                        $whereCase .= " and `anketas`.`pv_id` in ($pointsNames) ";
-                    } else {
-                        $pointName = trim(Point::find($pv_id)->name, "[]");
-                        $whereCase .= " and `anketas`.`pv_id` = \"$pointName\" ";
-                    }
-                } elseif ($town_id) {
-                    if (str_contains($town_id, ',')) {
-                        $points = " and `anketas`.`pv_id` in(\"" . implode("\",\"", Point::whereRaw("pv_id in ($town_id)")->pluck('name')) . "\") ";
-                    } else {
-                        $points = " and `anketas`.`pv_id` = \"" . Point::where('pv_id', $town_id)->pluck('name')[0] . "\" ";
-                    }
-                    $whereCase .= $points;
+            $subSelectCase = "select sub.month as `month`,
+                                     sub.cnt as `cnt`,
+                                     sub.company_id as `company`,
+                                     companies.name as `name`
+                              from (
+                                  select $mainTimeResult as `month`,
+                                         company_id,
+                                         count(*) as cnt
+                                  from anketas
+                                  where $mainTimeCondition
+                                  $whereCase
+                                  group by $mainTimeResult, company_id, type_anketa) sub
+                                  left join companies on companies.hash_id = sub.company_id
+                              ";
+            $responseFromDB = DB::select($subSelectCase, ['$date_from' => $date_from, '$date_to' => $date_to]);
+
+            foreach ($responseFromDB as $response) {
+                $response = json_decode(json_encode($response), true);
+
+                if (is_null($response['name']) || $response['name'] == '') {
+                    continue;
                 }
-
-                $date_from = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay();
-                $date_to = Carbon::now()->lastOfMonth()->endOfDay()->addDay();
 
                 Carbon::setLocale('en');
-                for ($i = 0; $i < 12; $i++) {
-                    $monthNamesContainer[$i] = Carbon::now()->subMonths($i)->monthName;
-                    $monthTotalContainer[$i] = 0;
-                }
+                //dd(Carbon::createFromFormat("d-m-Y", "01-$monthFromResponse-2000")->monthName);
+                $monthName = ucfirst(Carbon::parse($response['month'])->monthName);
                 Carbon::setLocale('ru');
-
-                $subSelectCase = "select sub.month as month,
-                                         sub.cnt,
-                                         sub.company_id as company,
-                                         companies.name as name
-                                  from (
-                                      select date_format(created_at, '%m') as month,
-                                             company_id,
-                                             count(*) as cnt
-                                      from anketas
-                                      where (anketas.created_at between '$date_from' and '$date_to')
-                                      $whereCase
-                                      group by date_format(created_at, '%m'), company_id, type_anketa) sub
-                                      left join companies on companies.hash_id = sub.company_id
-                                  ";
-
-                $responseFromDB = DB::select($subSelectCase, ['$date_from' => $date_from, '$date_to' => $date_to]);
-
-                foreach ($responseFromDB as $response) {
-                    if (is_null($response['name']) || $response['name'] == '') {
-                        continue;
-                    }
-
-                    Carbon::setLocale('en');
-                    $response = json_decode(json_encode($response), true);
-                    $monthName = ucfirst(Carbon::createFromFormat("d-m-Y", "01-{$response['month']}-2000")->monthName);
-                    Carbon::setLocale('ru');
-                    $result[$response["company"]]["name"] = $response['name'] ?? "Неизвестная компания";
-                    if (!isset($result[$response["company"]][$monthName])) {
-                        $result[$response["company"]][$monthName] = 0;
-                    }
-                    $result[$response["company"]][$monthName] += $response["cnt"] ?? 0;
-                    $total[$monthName] = ($total[$monthName] ?? 0) + ($response["cnt"] ?? 0);
+                $result[$response["company"]]["name"] = $response['name'] ?? "Неизвестная компания";
+                if (!isset($result[$response["company"]][$monthName])) {
+                    $result[$response["company"]][$monthName] = 0;
                 }
+                $result[$response["company"]][$monthName] += $response["cnt"] ?? 0;
+                $total[$monthName] = ($total[$monthName] ?? 0) + ($response["cnt"] ?? 0);
+            }
 
-                foreach ($monthNamesContainer as $monthIndex => $monthName) {
-                    $monthTotalContainer[$monthIndex] = $total[$monthName] ?? 0;
-                }
+            foreach ($monthNamesContainer as $monthIndex => $monthName) {
+                $monthTotalContainer[$monthIndex] = $total[$monthName] ?? 0;
+            }
 
-                foreach ($monthNamesContainer as $monthIndex => &$monthName) {
-                    $carbon = Carbon::createFromFormat("F", $monthName);
-                    Carbon::setLocale('ru');
-                    $monthName = ucfirst($carbon->monthName);
-                    Carbon::setLocale('en');
-                }
+            foreach ($monthNamesContainer as $monthIndex => &$monthName) {
+                $carbon = Carbon::createFromFormat("F", $monthName);
+                Carbon::setLocale('ru');
+                $monthName = ucfirst($carbon->monthName);
+                Carbon::setLocale('en');
             }
         }
 
