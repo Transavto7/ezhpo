@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Anketa;
 use App\Car;
 use App\Company;
 use App\Driver;
@@ -12,17 +11,12 @@ use App\Imports\CompanyImport;
 use App\Imports\DriverImport;
 use App\Models\Contract;
 use App\Point;
-use App\Product;
 use App\User;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App as FacadesApp;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
-use Maatwebsite\Excel\Excel;
 
 class IndexController extends Controller
 {
@@ -33,24 +27,6 @@ class IndexController extends Controller
             /**
              * Для администратора
              */
-            'Point' => [
-                'title'       => 'Пункты выпуска',
-                'role'        => 777,
-                'popupTitle'  => 'Пункта выпуска',
-                'editOnField' => 'name',
-
-                'model'  => 'Point',
-                'fields' => [
-                    'name'       => ['label' => 'Пункт выпуска', 'type' => 'text'],
-                    'pv_id'      => ['label' => 'Город', 'type' => 'select', 'values' => 'Town'],
-                    'company_id' => [
-                        'label'      => 'Компания',
-                        'type'       => 'select',
-                        'values'     => 'Company',
-                        'noRequired' => 1,
-                    ],
-                ],
-            ],
             'Town'  => [
                 'title'       => 'Города',
                 'role'        => 777,
@@ -60,8 +36,25 @@ class IndexController extends Controller
                 'model'         => 'Town',
                 'notShowHashId' => 1,
                 'fields'        => [
-                    'id'   => ['label' => 'ID', 'type' => 'text'],
-                    'name' => ['label' => 'Город', 'type' => 'text'],
+                    'hash_id' => ['label' => 'Город', 'type' => 'select', 'values' => 'Town', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
+                ],
+            ],
+            'Point' => [
+                'title'       => 'Пункты выпуска',
+                'role'        => 777,
+                'popupTitle'  => 'Пункта выпуска',
+                'editOnField' => 'name',
+
+                'model'  => 'Point',
+                'fields' => [
+                    'hash_id'    => ['label' => 'Пункт выпуска', 'type' => 'select', 'values' => 'Point', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
+                    'pv_id'      => ['label' => 'Город', 'type' => 'select', 'values' => 'Town', 'getField' => 'concat', 'getFieldKey' => 'id'],
+                    'company_id' => [
+                        'label'      => 'Компания',
+                        'type'       => 'select',
+                        'values'     => 'Company',
+                        'noRequired' => 1,
+                    ],
                 ],
             ],
             'Req'   => [
@@ -173,10 +166,10 @@ class IndexController extends Controller
                 'model'  => 'Driver',
                 'fields' => [
                     //'old_id' => ['label' => 'Старый ID', 'type' => 'number', 'noRequired' => 1],
-                    'photo'         => ['label' => 'Фото', 'type' => 'file', 'resize' => 1, 'noRequired' => 1],
-                    'fio'           => ['label' => 'ФИО', 'type' => 'text'],
-                    'hash_id'       => ['label' => 'ID водителя', 'type' => 'text'],
+                    'company_id'    => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
+                    'hash_id'       => ['label' => 'Водитель', 'type' => 'select', 'values' => 'Driver', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
                     'year_birthday' => ['label' => 'Дата рождения', 'type' => 'date', 'noRequired' => 1],
+                    'photo'         => ['label' => 'Фото', 'type' => 'file', 'resize' => 1, 'noRequired' => 1],
                     'phone'         => [
                         'label'      => 'Телефон',
                         'classes'    => 'MASK_PHONE',
@@ -203,20 +196,18 @@ class IndexController extends Controller
                         'defaultValue' => 'Не указано',
                         'noRequired'   => 1,
                     ],
-                    'company_id'    => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
-
                     'contract_id'        => [
                         'label'  => 'Договор',
                         'type'   => 'select',
                         'values' => 'Models\Contract',
                     ],
-                                        'products_id'        => [
-                                            'label'      => 'Услуги[старые]',
-                                            'multiple'   => 1,
-                                            'type'       => 'select',
-                                            'values'     => 'Product',
-                                            'noRequired' => 1,
-                                        ],
+                    'products_id'        => [
+                        'label'      => 'Услуги[старые]',
+                        'multiple'   => 1,
+                        'type'       => 'select',
+                        'values'     => 'Product',
+                        'noRequired' => 1,
+                    ],
 
                     //                'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1, 'saveToHistory' => 1],
                     'note'               => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
@@ -290,9 +281,8 @@ class IndexController extends Controller
 
                 'model'  => 'Car',
                 'fields' => [
-                    //'old_id' => ['label' => 'Старый ID', 'type' => 'number', 'noRequired' => 1],
-                    'hash_id' => ['label' => 'ID автомобиля', 'type' => 'text'],
-                    'gos_number' => ['label' => 'Гос.номер', 'type' => 'text'],
+                    'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
+                    'hash_id'    => ['label' => 'Гос.номер', 'type' => 'select', 'values' => 'Car', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
                     'mark_model' => ['label' => 'Марка и модель', 'type' => 'text'],
                     'type_auto'  => [
                         'label'        => 'Тип автомобиля',
@@ -306,13 +296,13 @@ class IndexController extends Controller
                         'defaultValue' => 'Не установлено',
                     ],
 
-                                        'products_id' => [
-                                            'label'      => 'Услуги[старые]',
-                                            'multiple'   => 1,
-                                            'type'       => 'select',
-                                            'values'     => 'Product',
-                                            'noRequired' => 1,
-                                        ],
+                    'products_id' => [
+                        'label'      => 'Услуги[старые]',
+                        'multiple'   => 1,
+                        'type'       => 'select',
+                        'values'     => 'Product',
+                        'noRequired' => 1,
+                    ],
 
                     'trailer'         => [
                         'label'        => 'Прицеп',
@@ -321,7 +311,6 @@ class IndexController extends Controller
                         'defaultValue' => '',
                         'noRequired'   => 1,
                     ],
-                    'company_id'      => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
                     'contract_id'     => [
                         'label'  => 'Договор',
                         'type'   => 'select',
@@ -380,10 +369,13 @@ class IndexController extends Controller
 
                 'model'  => 'Company',
                 'fields' => [
-                    'name'    => [
+                    'hash_id'    => [
                         'label'                => 'Название компании клиента',
-                        'type'                 => 'text',
+                        'type'                 => 'select',
                         'filterJournalLinkKey' => 'company_id',
+                        'values'               => 'Company',
+                        'getField'             => 'concat',
+                        'getFieldKey'          => 'hash_id'
                     ],
                     'note'    => ['label' => 'Договоренности с клиентом', 'type' => 'text', 'noRequired' => 1],
                     'comment'    => ['label' => 'Комментарий', 'type' => 'text', 'noRequired' => 1],
@@ -488,30 +480,6 @@ class IndexController extends Controller
                     ],
                 ],
             ],
-
-            'Discount' => [
-                'title'       => 'Скидки',
-                'role'        => 0,
-                'popupTitle'  => 'Скидка',
-                'editOnField' => 'products_id',
-
-                'model'  => 'Discount',
-                'fields' => [
-                    'products_id' => ['label' => 'Услуга', 'type' => 'select', 'values' => 'Product'],
-                    'trigger'     => [
-                        'label'        => 'Триггер (больше/меньше)',
-                        'type'         => 'select',
-                        'values'       => [
-                            '>' => 'больше',
-                            '<' => 'меньше',
-                        ],
-                        'defaultValue' => '>',
-                    ],
-                    'porog'       => ['label' => 'Пороговое значение', 'type' => 'number'],
-                    'discount'    => ['label' => 'Скидка (%)', 'type' => 'porog'],
-                ],
-            ],
-
             'Product' => [
                 'title'       => 'Услуги',
                 'role'        => 0,
@@ -520,7 +488,7 @@ class IndexController extends Controller
 
                 'model'  => 'Product',
                 'fields' => [
-                    'name'         => ['label' => 'Название', 'type' => 'text'],
+                    'hash_id'         => ['label' => 'Название', 'type' => 'select', 'values' => 'Product', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
                     'type_product' => [
                         'label'        => 'Тип',
                         'type'         => 'select',
@@ -562,7 +530,28 @@ class IndexController extends Controller
                     'essence'      => ['label' => 'Сущности', 'type' => 'text', 'noRequired' => 1],
                 ],
             ],
+            'Discount' => [
+                'title'       => 'Скидки',
+                'role'        => 0,
+                'popupTitle'  => 'Скидка',
+                'editOnField' => 'products_id',
 
+                'model'  => 'Discount',
+                'fields' => [
+                    'products_id' => ['label' => 'Услуга', 'type' => 'select', 'values' => 'Product', 'getField' => 'concat', 'getFieldKey' => 'id'],
+                    'trigger'     => [
+                        'label'        => 'Триггер (больше/меньше)',
+                        'type'         => 'select',
+                        'values'       => [
+                            '>' => 'больше',
+                            '<' => 'меньше',
+                        ],
+                        'defaultValue' => '>',
+                    ],
+                    'porog'       => ['label' => 'Пороговое значение', 'type' => 'number'],
+                    'discount'    => ['label' => 'Скидка (%)', 'type' => 'porog'],
+                ],
+            ],
 
             'Service' => [
                 'title'       => 'Услуги новые',
@@ -624,7 +613,7 @@ class IndexController extends Controller
                 'model'  => 'Instr',
                 'fields' => [
                     'photos'        => ['label' => 'Фото', 'type' => 'file', 'noRequired' => 1],
-                    'name'          => ['label' => 'Название', 'type' => 'text'],
+                    'hash_id'       => ['label' => 'Название', 'type' => 'select', 'values' => 'Instr', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
                     'descr'         => ['label' => 'Описание', 'type' => 'text'],
                     'type_briefing' => [
                         'label'        => 'Вид инструктажа',
@@ -717,12 +706,12 @@ class IndexController extends Controller
 
         if ($model) {
             $model = $this->syncDataFunc([
-                'model'          => $model_text,
-                'fieldFind'      => $fieldFind,
-                'fieldFindId'    => $fieldFindId,
-                'fieldSync'      => $fieldSync,
-                'fieldSyncValue' => $fieldSyncValue,
-            ]);
+                                             'model'          => $model_text,
+                                             'fieldFind'      => $fieldFind,
+                                             'fieldFindId'    => $fieldFindId,
+                                             'fieldSync'      => $fieldSync,
+                                             'fieldSyncValue' => $fieldSyncValue,
+                                         ]);
 
             if ($model) {
                 if ( !$is_api) {
@@ -852,8 +841,8 @@ class IndexController extends Controller
 
                         if ($elDouble > 0) {
                             return back()->withErrors([
-                                'errors' => 'Найден дубликат по названию компании',
-                            ]);
+                                                          'errors' => 'Найден дубликат по названию компании',
+                                                      ]);
                         }
                     }
                     /**
@@ -879,8 +868,8 @@ class IndexController extends Controller
 
                             if ($elDouble > 0) {
                                 return back()->withErrors([
-                                    'errors' => 'Найден дубликат по гос.номеру Автомобиля',
-                                ]);
+                                                              'errors' => 'Найден дубликат по гос.номеру Автомобиля',
+                                                          ]);
                             }
                         }
                         /**
@@ -914,8 +903,8 @@ class IndexController extends Controller
 
                         if ($elDouble > 0) {
                             return back()->withErrors([
-                                'errors' => 'Найден дубликат по ФИО Водителя',
-                            ]);
+                                                          'errors' => 'Найден дубликат по ФИО Водителя',
+                                                      ]);
                         }
                     }
                     /**
@@ -1023,23 +1012,23 @@ class IndexController extends Controller
             if ($created) {
                 if ($model_type === 'Company') {
                     $user = User::create([
-                        'hash_id'  => mt_rand(0,9999) . date('s'),
-                        'email'    => $created->hash_id . '-' . mt_rand(100000, 499999).'@ta-7.ru',
-                        'api_token' => Hash::make(date('H:i:s').sha1($created->hash_id)),
-                        'login'    => '0' . $created->hash_id,
-                        'password' => Hash::make('0' .$created->hash_id),
-                        'name'     => $created->name,
-                        'role'     => 12,
-                        'company_id' => $created->id
-                    ]);
+                                             'hash_id'  => mt_rand(0,9999) . date('s'),
+                                             'email'    => $created->hash_id . '-' . mt_rand(100000, 499999).'@ta-7.ru',
+                                             'api_token' => Hash::make(date('H:i:s').sha1($created->hash_id)),
+                                             'login'    => '0' . $created->hash_id,
+                                             'password' => Hash::make('0' .$created->hash_id),
+                                             'name'     => $created->name,
+                                             'role'     => 12,
+                                             'company_id' => $created->id
+                                         ]);
 
                     $user->roles()->attach(6);
                 }else if($model_type === 'Car' || $model_type === 'Driver'){
                     if($created->company_id){
                         $contracts_ids = Contract::where('company_id', $created->company_id)
-                            ->forDate(Carbon::now())
-                            ->main()
-                            ->get(['id']);
+                                                 ->forDate(Carbon::now())
+                                                 ->main()
+                                                 ->get(['id']);
 
                         $created->contracts()->sync($contracts_ids->pluck('id'));
                     }
@@ -1208,20 +1197,20 @@ class IndexController extends Controller
 
                     if (isset($element->products_id)) {
                         $this->syncDataFunc([
-                            'model'          => 'Driver',
-                            'fieldFind'      => 'company_id',
-                            'fieldFindId'    => $element->id,
-                            'fieldSync'      => 'products_id',
-                            'fieldSyncValue' => $element->products_id
-                        ]);
+                                                'model'          => 'Driver',
+                                                'fieldFind'      => 'company_id',
+                                                'fieldFindId'    => $element->id,
+                                                'fieldSync'      => 'products_id',
+                                                'fieldSyncValue' => $element->products_id
+                                            ]);
 
                         $this->syncDataFunc([
-                            'model'          => 'Car',
-                            'fieldFind'      => 'company_id',
-                            'fieldFindId'    => $element->id,
-                            'fieldSync'      => 'products_id',
-                            'fieldSyncValue' => $element->products_id
-                        ]);
+                                                'model'          => 'Car',
+                                                'fieldFind'      => 'company_id',
+                                                'fieldFindId'    => $element->id,
+                                                'fieldSync'      => 'products_id',
+                                                'fieldSyncValue' => $element->products_id
+                                            ]);
                     }
 
                 }
@@ -1270,7 +1259,7 @@ class IndexController extends Controller
             $el = app("App\\$model")
                 ->with(['contracts.services'])
                 ->find($id);
-         }else{
+        }else{
             $el = app("App\\$model")->find($id);
         }
 
@@ -1371,6 +1360,7 @@ class IndexController extends Controller
                 foreach($allFilters as $aFk => $aFv) {
                     if(!empty($aFv)) {
                         if(is_array($aFv)) {
+
                             if(count($aFv) > 0) {
                                 $element['elements'] = $element['elements']->where(function ($q) use ($aFv, $aFk) {
                                     $isId = strpos($aFk, '_id');
@@ -1381,13 +1371,15 @@ class IndexController extends Controller
                                                    ->orWhere($aFk, 'like', "%,$aFvItemValue,%")
                                                    ->orWhere($aFk, 'like', "%,$aFvItemValue")
                                                    ->orWhere($aFk, 'like', "$aFvItemValue,%");
-                                        } else if ($isId) {
-                                                $q = $q->orWhere($aFk, $aFvItemValue);
                                         } else {
-                                            if (strlen($aFvItemValue) === 0) {
+                                            if ($isId) {
                                                 $q = $q->where($aFk, $aFvItemValue);
                                             } else {
-                                                $q = $q->where($aFk, 'LIKE', '%'.trim($aFvItemValue).'%');
+                                                if (strlen($aFvItemValue) === 0) {
+                                                    $q = $q->where($aFk, $aFvItemValue);
+                                                } else {
+                                                    $q = $q->where($aFk, 'LIKE', '%'.trim($aFvItemValue).'%');
+                                                }
                                             }
                                         }
                                     }
@@ -1398,9 +1390,9 @@ class IndexController extends Controller
                         } else {
                             if ($aFk == 'date_of_employment') {
                                 $element['elements'] = $element['elements']->whereBetween($aFk, [
-                                        Carbon::parse($aFv)->startOfDay(),
-                                        Carbon::parse($aFv)->endOfDay()
-                                        ]
+                                                                                                  Carbon::parse($aFv)->startOfDay(),
+                                                                                                  Carbon::parse($aFv)->endOfDay()
+                                                                                              ]
                                 );
                             } else {
                                 $element['elements'] = $element['elements']->where($aFk, 'LIKE', '%' . trim($aFv) . '%');
@@ -1411,9 +1403,9 @@ class IndexController extends Controller
             }
 
             if(auth()->user()->hasRole('client')) {
-                if($model == 'Driver' || $model == 'Car') {
+                if($model == 'Driver' || $model == 'Car' || $model == 'Company') {
                     $element['elements'] = $element['elements']->where('company_id', auth()->user()->company_id);
-                } else if ($model == 'Company') {
+                } else {
                     $element['elements'] = $element['elements']->where('id', auth()->user()->company_id);
                 }
             }
