@@ -48,7 +48,7 @@ class IndexController extends Controller
                 'model'  => 'Point',
                 'fields' => [
                     'hash_id'    => ['label' => 'Пункт выпуска', 'type' => 'select', 'values' => 'Point', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
-                    'pv_id'      => ['label' => 'Город', 'type' => 'select', 'values' => 'Town', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
+                    'pv_id'      => ['label' => 'Город', 'type' => 'select', 'values' => 'Town', 'getField' => 'concat', 'getFieldKey' => 'id'],
                     'company_id' => [
                         'label'      => 'Компания',
                         'type'       => 'select',
@@ -201,13 +201,13 @@ class IndexController extends Controller
                         'type'   => 'select',
                         'values' => 'Models\Contract',
                     ],
-                                        'products_id'        => [
-                                            'label'      => 'Услуги[старые]',
-                                            'multiple'   => 1,
-                                            'type'       => 'select',
-                                            'values'     => 'Product',
-                                            'noRequired' => 1,
-                                        ],
+                    'products_id'        => [
+                        'label'      => 'Услуги[старые]',
+                        'multiple'   => 1,
+                        'type'       => 'select',
+                        'values'     => 'Product',
+                        'noRequired' => 1,
+                    ],
 
                     //                'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1, 'saveToHistory' => 1],
                     'note'               => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
@@ -296,13 +296,13 @@ class IndexController extends Controller
                         'defaultValue' => 'Не установлено',
                     ],
 
-                                        'products_id' => [
-                                            'label'      => 'Услуги[старые]',
-                                            'multiple'   => 1,
-                                            'type'       => 'select',
-                                            'values'     => 'Product',
-                                            'noRequired' => 1,
-                                        ],
+                    'products_id' => [
+                        'label'      => 'Услуги[старые]',
+                        'multiple'   => 1,
+                        'type'       => 'select',
+                        'values'     => 'Product',
+                        'noRequired' => 1,
+                    ],
 
                     'trailer'         => [
                         'label'        => 'Прицеп',
@@ -538,7 +538,7 @@ class IndexController extends Controller
 
                 'model'  => 'Discount',
                 'fields' => [
-                    'products_id' => ['label' => 'Услуга', 'type' => 'select', 'values' => 'Product', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
+                    'products_id' => ['label' => 'Услуга', 'type' => 'select', 'values' => 'Product', 'getField' => 'concat', 'getFieldKey' => 'id'],
                     'trigger'     => [
                         'label'        => 'Триггер (больше/меньше)',
                         'type'         => 'select',
@@ -706,12 +706,12 @@ class IndexController extends Controller
 
         if ($model) {
             $model = $this->syncDataFunc([
-                'model'          => $model_text,
-                'fieldFind'      => $fieldFind,
-                'fieldFindId'    => $fieldFindId,
-                'fieldSync'      => $fieldSync,
-                'fieldSyncValue' => $fieldSyncValue,
-            ]);
+                                             'model'          => $model_text,
+                                             'fieldFind'      => $fieldFind,
+                                             'fieldFindId'    => $fieldFindId,
+                                             'fieldSync'      => $fieldSync,
+                                             'fieldSyncValue' => $fieldSyncValue,
+                                         ]);
 
             if ($model) {
                 if ( !$is_api) {
@@ -841,8 +841,8 @@ class IndexController extends Controller
 
                         if ($elDouble > 0) {
                             return back()->withErrors([
-                                'errors' => 'Найден дубликат по названию компании',
-                            ]);
+                                                          'errors' => 'Найден дубликат по названию компании',
+                                                      ]);
                         }
                     }
                     /**
@@ -868,8 +868,8 @@ class IndexController extends Controller
 
                             if ($elDouble > 0) {
                                 return back()->withErrors([
-                                    'errors' => 'Найден дубликат по гос.номеру Автомобиля',
-                                ]);
+                                                              'errors' => 'Найден дубликат по гос.номеру Автомобиля',
+                                                          ]);
                             }
                         }
                         /**
@@ -903,8 +903,8 @@ class IndexController extends Controller
 
                         if ($elDouble > 0) {
                             return back()->withErrors([
-                                'errors' => 'Найден дубликат по ФИО Водителя',
-                            ]);
+                                                          'errors' => 'Найден дубликат по ФИО Водителя',
+                                                      ]);
                         }
                     }
                     /**
@@ -1012,23 +1012,23 @@ class IndexController extends Controller
             if ($created) {
                 if ($model_type === 'Company') {
                     $user = User::create([
-                        'hash_id'  => mt_rand(0,9999) . date('s'),
-                        'email'    => $created->hash_id . '-' . mt_rand(100000, 499999).'@ta-7.ru',
-                        'api_token' => Hash::make(date('H:i:s').sha1($created->hash_id)),
-                        'login'    => '0' . $created->hash_id,
-                        'password' => Hash::make('0' .$created->hash_id),
-                        'name'     => $created->name,
-                        'role'     => 12,
-                        'company_id' => $created->id
-                    ]);
+                                             'hash_id'  => mt_rand(0,9999) . date('s'),
+                                             'email'    => $created->hash_id . '-' . mt_rand(100000, 499999).'@ta-7.ru',
+                                             'api_token' => Hash::make(date('H:i:s').sha1($created->hash_id)),
+                                             'login'    => '0' . $created->hash_id,
+                                             'password' => Hash::make('0' .$created->hash_id),
+                                             'name'     => $created->name,
+                                             'role'     => 12,
+                                             'company_id' => $created->id
+                                         ]);
 
                     $user->roles()->attach(6);
                 }else if($model_type === 'Car' || $model_type === 'Driver'){
                     if($created->company_id){
                         $contracts_ids = Contract::where('company_id', $created->company_id)
-                            ->forDate(Carbon::now())
-                            ->main()
-                            ->get(['id']);
+                                                 ->forDate(Carbon::now())
+                                                 ->main()
+                                                 ->get(['id']);
 
                         $created->contracts()->sync($contracts_ids->pluck('id'));
                     }
@@ -1197,20 +1197,20 @@ class IndexController extends Controller
 
                     if (isset($element->products_id)) {
                         $this->syncDataFunc([
-                            'model'          => 'Driver',
-                            'fieldFind'      => 'company_id',
-                            'fieldFindId'    => $element->id,
-                            'fieldSync'      => 'products_id',
-                            'fieldSyncValue' => $element->products_id
-                        ]);
+                                                'model'          => 'Driver',
+                                                'fieldFind'      => 'company_id',
+                                                'fieldFindId'    => $element->id,
+                                                'fieldSync'      => 'products_id',
+                                                'fieldSyncValue' => $element->products_id
+                                            ]);
 
                         $this->syncDataFunc([
-                            'model'          => 'Car',
-                            'fieldFind'      => 'company_id',
-                            'fieldFindId'    => $element->id,
-                            'fieldSync'      => 'products_id',
-                            'fieldSyncValue' => $element->products_id
-                        ]);
+                                                'model'          => 'Car',
+                                                'fieldFind'      => 'company_id',
+                                                'fieldFindId'    => $element->id,
+                                                'fieldSync'      => 'products_id',
+                                                'fieldSyncValue' => $element->products_id
+                                            ]);
                     }
 
                 }
@@ -1259,7 +1259,7 @@ class IndexController extends Controller
             $el = app("App\\$model")
                 ->with(['contracts.services'])
                 ->find($id);
-         }else{
+        }else{
             $el = app("App\\$model")->find($id);
         }
 
@@ -1390,9 +1390,9 @@ class IndexController extends Controller
                         } else {
                             if ($aFk == 'date_of_employment') {
                                 $element['elements'] = $element['elements']->whereBetween($aFk, [
-                                        Carbon::parse($aFv)->startOfDay(),
-                                        Carbon::parse($aFv)->endOfDay()
-                                        ]
+                                                                                                  Carbon::parse($aFv)->startOfDay(),
+                                                                                                  Carbon::parse($aFv)->endOfDay()
+                                                                                              ]
                                 );
                             } else {
                                 $element['elements'] = $element['elements']->where($aFk, 'LIKE', '%' . trim($aFv) . '%');

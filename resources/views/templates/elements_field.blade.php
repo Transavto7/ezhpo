@@ -165,7 +165,7 @@
                 }
             @endphp
             @foreach(app("App\\" . $v['values'])::whereIn($key, $default_value)->get() as $option)
-                <option selected value="{{ $value == 'concat' ? $option['hash_id'] : $option[$key] }}">
+                <option selected value="{{ $option[$key] }}">
                     @if ($value == 'concat')
                         [{{ $option['hash_id'] }}] {{ $option[$mainField] }}
                     @else
@@ -174,7 +174,7 @@
                 </option>
             @endforeach
             @foreach(app("App\\" . $v['values'])::whereNotIn($key, $default_value)->limit(100)->get() as $option)
-                <option value="{{ $value == 'concat' ? $option['hash_id'] : $option[$key] }}">
+                <option value="{{ $option[$key] }}">
                     @if ($value == 'concat')
                         [{{ $option['hash_id'] }}] {{ $option[$mainField] }}
                     @else
