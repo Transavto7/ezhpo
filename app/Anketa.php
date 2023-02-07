@@ -412,7 +412,6 @@ class Anketa extends Model
             ],
             'tech_export_pl' => [
                 'number_list_road' => 'Номер ПЛ',
-                'type_view' => 'Тип осмотра',
                 'date'             => 'Дата и время выдачи ПЛ',
                 'car_mark_model'   => 'Наименование марки, модели транспортного средства',
                 'car_gos_number'   => 'Гос. регистрационный номер ТС',
