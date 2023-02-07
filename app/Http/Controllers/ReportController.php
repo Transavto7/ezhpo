@@ -178,14 +178,10 @@ class ReportController extends Controller
         $months = array_reverse($months);
 
         if ($request->town_id || $request->pv_id) {
-            /** @var $data_from Carbon Дата начала исчисления - это первый день месяца и -1 секунда... */
-            $date_from = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay()->subSecond();
-            /** @var $data_to Carbon Дата конца исчисления - это последний день + 1 день... */
-            $date_to   = Carbon::now()->lastOfMonth()->addDay();
-            // Почему такая разница?
-            // Потому что конструкция between смотрит по правилу больше или меньше, но не больше/меньше ИЛИ РАВНО.
-            // Если делать проверку по прямому математическому сравнению, это увеличит время обработки, а значит
-            // запрос будет менее оптимизирован.
+            /** @var $data_from Carbon Дата начала исчисления - это первый день месяца */
+            $date_from = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay();
+            /** @var $data_to Carbon Дата конца исчисления */
+            $date_to   = Carbon::now()->lastOfMonth()->endOfDay();
             $result    = [];
             $total     = [];
 
@@ -204,7 +200,7 @@ class ReportController extends Controller
                 : "type_anketa = '$journal'";
 
             $whereCase .= " and `in_cart` = 0 ";
-
+            $whereCase .= " and `deleted_at` is null ";
             if ($pv_id) {
                 if (str_contains($pv_id, ',')) {
                     $pointsNames = implode(',', Point::whereRaw("id in ($pv_id)")
@@ -241,17 +237,17 @@ class ReportController extends Controller
 
             $subSelectCase = "select sub.month as `month`,
                                      sub.cnt as `cnt`,
-                                     sub.company_id as `company`,
+                                     companies.hash_id as `company`,
                                      companies.name as `name`
                               from (
                                   select $mainTimeResult as `month`,
-                                         company_id,
+                                         company_name,
                                          count(*) as cnt
                                   from anketas
                                   where $mainTimeCondition
                                   $whereCase
                                   group by $mainTimeResult, company_id, type_anketa) sub
-                                  left join companies on companies.hash_id = sub.company_id
+                                  left join companies on companies.name = sub.company_name
                               ";
             $responseFromDB = DB::select($subSelectCase, ['$date_from' => $date_from, '$date_to' => $date_to]);
 
@@ -263,10 +259,12 @@ class ReportController extends Controller
                 }
 
                 Carbon::setLocale('en');
-                //dd(Carbon::createFromFormat("d-m-Y", "01-$monthFromResponse-2000")->monthName);
                 $monthName = ucfirst(Carbon::parse($response['month'])->monthName);
                 Carbon::setLocale('ru');
-                $result[$response["company"]]["name"] = $response['name'] ?? "Неизвестная компания";
+                if (!$response["name"]) {
+                    continue;
+                }
+                $result[$response["company"]]["name"] = $response['name'];
                 if (!isset($result[$response["company"]][$monthName])) {
                     $result[$response["company"]][$monthName] = 0;
                 }

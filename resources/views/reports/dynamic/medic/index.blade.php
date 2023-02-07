@@ -4,15 +4,15 @@
 @section('sidebar', 1)
 @section('content')
     <report-dynamic-index
-            :towns='JSON.parse(`@json($towns)`)'
-            :points='JSON.parse(`@json($points)`)'
+            :towns='@json($towns)'
+            :points='@json($points)'
             town="{{ request()->get('town_id') }}"
             point="{{ request()->get('pv_id') }}"
             order="{{ request()->get('order_by') ?? 'execute' }}"
             type="{{ $journal }}"
-            :infos='JSON.parse(`@json($total)`)'
-            :monthnames='JSON.parse(`@json($monthnames)`)'
-            :monthtotal='JSON.parse(`@json($monthtotal)`)'
+            :infos='@json($total)'
+            :monthnames='@json($monthnames)'
+            :monthtotal='@json($monthtotal)'
     >
         @if($companies)
             <div class="card">
