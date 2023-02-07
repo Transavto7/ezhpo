@@ -3,7 +3,7 @@
         'type' => 'select',
         'values' => 'Company',
         'getField' => 'name',
-        'getFieldKey' => 'name',
+        'getFieldKey' => 'hash_id',
         'multiple' => 1
     ],
     'model' => $type_ankets,

@@ -16,11 +16,20 @@ class ApiController extends Controller
 {
 
     public function modelList(Request $request, $model) {
+        $mainContentFields = [
+            "Company" => "name",
+            "Driver"  => "fio",
+            "Car"     => "gos_number",
+            "Product" => "name",
+            "Instr"   => "name"
+        ];
+
         $field = 'name';
         $key = 'id';
 
         if ($request->get('field')) {
-            $field = $request->field;
+            $field = $request->get('field');
+            $searchingIn = $mainContentFields[$model] ?? $field;
         }
 
         if ($request->get('key')) {
@@ -30,30 +39,25 @@ class ApiController extends Controller
         if ($model === 'User') {
             $query = User::with('roles')->whereHas('roles', function ($q) use ($request) {
                 $q->whereNotIn('roles.id', [3, 6, 9]);
-            })->where(DB::raw("($field)"),
-                'like', '%' . $request->search . '%')
-                ->orWhere("hash_id", "like", "%" . $request->search . "%");
+            })->where(DB::raw("$searchingIn"),
+                      'like', '%' . $request->search . '%')
+                         ->orWhere("hash_id", "like", "%" . $request->search . "%");
         } else {
-            $query = app("App\\" . $model)::where(DB::raw("($field)"),
-                'like', '%' . $request->search . '%')
-                ->orWhere("hash_id", "like", "%" . $request->search . "%");
+            $query = app("App\\" . $model)::where(DB::raw("$searchingIn"),
+                                                  'like', '%' . $request->search . '%')
+                                          ->orWhere("hash_id", "like", "%" . $request->search . "%");
         }
 
         if ($request->get('trashed')) {
             $query = $query->withTrashed();
         }
 
-        if ($model == "Company" && $field == "name" && $key == "name") {
-            return $query->select(DB::raw("concat('[', `hash_id`, '] ', `name`) as `name`"), 'hash_id')->limit(100)->get();
+        if (in_array($model, array_keys($mainContentFields)) && $field == "concat" && ($key == "hash_id" || $key == 'id')) {
+            return $query->select(DB::raw("concat('[', `hash_id`, '] ', `$mainContentFields[$model]`) as concat"), $key)->limit(100)->get();
         }
 
-        if (in_array($model, ['Company', 'Driver']) && in_array($field, ['name', 'fio'])) {
-            return $query->select(DB::raw("concat('[', `hash_id`, '] ', `$field`) as `$field`"), $key)->limit(100)->get();
-        } else {
-            return $query->select($field, $key)->limit(100)->get();
-        }
+        return $query->select($field, $key)->limit(100)->get();
     }
-
 
     // Response
     public static function r($data = [], $action = 1) {
@@ -74,9 +78,8 @@ class ApiController extends Controller
 
     public function companiesList(Request $request) {
         return Company::where('name', 'like', '%' . $request->search . '%')
-            ->orWhere('hash_id', 'like', '%' . $request->search . '%')
-            ->withTrashed()
-            ->select('hash_id', DB::raw("concat('[', hash_id, '] ', name) as `name`"), 'id')->limit(100)->get();
+                      ->orWhere('hash_id', 'like', '%' . $request->search . '%')
+                      ->select('hash_id', DB::raw("concat('[', hash_id, '] ', name) as name"), 'id')->limit(100)->get();
     }
 
     // Обновляем все пункты выпуска
@@ -244,13 +247,13 @@ class ApiController extends Controller
     {
         if ($model = app("App\\$request->model")->where($prop, $val)->first()) {
             return response([
-                'status' => true,
-                'name'   => $model->fio ?? $model->name,
-            ]);
+                                'status' => true,
+                                'name'   => $model->fio ?? $model->name,
+                            ]);
         } else {
             return response([
-                'status' => false,
-            ]);
+                                'status' => false,
+                            ]);
         }
     }
 
