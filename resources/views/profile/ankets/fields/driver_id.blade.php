@@ -2,7 +2,7 @@
     'v' => [
         'type' => 'select',
         'values' => 'Driver',
-        'getField' => 'fio',
+        'getField' => 'concat',
         'getFieldKey' => 'hash_id',
         'multiple' => 1
     ],

@@ -1,8 +1,8 @@
 @include('templates.elements_field', [
     'v' => [
         'type' => 'select',
-        'values' => 'Company',
-        'getField' => 'hash_id',
+        'values' => 'Car',
+        'getField' => 'concat',
         'getFieldKey' => 'hash_id',
         'multiple' => 1
     ],

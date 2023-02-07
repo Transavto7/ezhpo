@@ -16,34 +16,47 @@ class ApiController extends Controller
 {
 
     public function modelList(Request $request, $model) {
+        $mainContentFields = [
+            "Company" => "name",
+            "Driver"  => "fio",
+            "Car"     => "gos_number",
+            "Product" => "name",
+            "Instr"   => "name"
+        ];
+
         $field = 'name';
         $key = 'id';
 
         if ($request->get('field')) {
-            $field = $request->field;
+            $field = $request->get('field');
+            $searchingIn = $mainContentFields[$model] ?? $field;
         }
 
         if ($request->get('key')) {
             $key = $request->key;
         }
 
-        $query = app("App\\" . $model)::where(DB::raw("($field)"),
-                                              'like', '%' . $request->search . '%')
-                                      ->orWhere("hash_id", "like", "%" . $request->search . "%");
-
         if ($model === 'User') {
-            $query = $query->whereNotIn('role', [3, 12]);
-        }
-
-        if ($model == "Company" && $field == "name" && $key == "name") {
-            return $query->select(DB::raw("concat('[', `hash_id`, '] ', `name`) as `name`"), 'hash_id')->limit(100)->get();
-        }
-
-        if (in_array($model, ['Company', 'Driver']) && in_array($field, ['name', 'fio'])) {
-            return $query->select(DB::raw("concat('[', `hash_id`, '] ', `$field`) as `$field`"), $key)->limit(100)->get();
+            $query = User::with('roles')->whereHas('roles', function ($q) use ($request) {
+                $q->whereNotIn('roles.id', [3, 6, 9]);
+            })->where(DB::raw("$searchingIn"),
+                      'like', '%' . $request->search . '%')
+                         ->orWhere("hash_id", "like", "%" . $request->search . "%");
         } else {
-            return $query->select($field, $key)->limit(100)->get();
+            $query = app("App\\" . $model)::where(DB::raw("$searchingIn"),
+                                                  'like', '%' . $request->search . '%')
+                                          ->orWhere("hash_id", "like", "%" . $request->search . "%");
         }
+
+        if ($request->get('trashed')) {
+            $query = $query->withTrashed();
+        }
+
+        if (in_array($model, array_keys($mainContentFields)) && $field == "concat" && ($key == "hash_id" || $key == 'id')) {
+            return $query->select(DB::raw("concat('[', `hash_id`, '] ', `$mainContentFields[$model]`) as concat"), $key)->limit(100)->get();
+        }
+
+        return $query->select($field, $key)->limit(100)->get();
     }
 
     // Response
@@ -65,7 +78,8 @@ class ApiController extends Controller
 
     public function companiesList(Request $request) {
         return Company::where('name', 'like', '%' . $request->search . '%')
-                      ->select('hash_id', 'name', 'id')->limit(100)->get();
+                      ->orWhere('hash_id', 'like', '%' . $request->search . '%')
+                      ->select('hash_id', DB::raw("concat('[', hash_id, '] ', name) as name"), 'id')->limit(100)->get();
     }
 
     // Обновляем все пункты выпуска

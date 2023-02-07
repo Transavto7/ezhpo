@@ -143,19 +143,40 @@
                 </option>
             @endforeach
         @else
+            @php
+                $mainField = "";
+                if ($value == 'concat') {
+                    if (!isset($field)) {
+                        $field = lcfirst($v['values']) . '_id';
+                    }
+
+                    switch ($field) {
+                        case 'driver_id':
+                            $mainField = 'fio';
+                            break;
+                        case 'car_id':
+                            $mainField = 'gos_number';
+                            break;
+                        case 'products_id':
+                        default:
+                            $mainField = 'name';
+                            break;
+                    }
+                }
+            @endphp
             @foreach(app("App\\" . $v['values'])::whereIn($key, $default_value)->get() as $option)
-                <option selected value="{{ $k == 'hash_id' ? $option['hash_id'] : $option[$key] }}">
-                    @if (in_array($k, ['company_id', 'driver_id', 'car_id', 'id', 'hash_id', 'pv_id', 'parent_town_id']))
-                        [{{ $option['hash_id'] }}] {{ $option['name'] ?? $option['fio'] ?? $option["gos_number"] }}
+                <option selected value="{{ $value == 'concat' ? $option['hash_id'] : $option[$key] }}">
+                    @if ($value == 'concat')
+                        [{{ $option['hash_id'] }}] {{ $option[$mainField] }}
                     @else
                         {{ $option[$value] }}
                     @endif
                 </option>
             @endforeach
             @foreach(app("App\\" . $v['values'])::whereNotIn($key, $default_value)->limit(100)->get() as $option)
-                <option value="{{ $k == 'hash_id' ? $option['hash_id'] : $option[$key] }}">
-                    @if (in_array($k, ['company_id', 'driver_id', 'car_id', 'id', 'hash_id', 'pv_id', 'parent_town_id']))
-                        [{{ $option['hash_id'] }}] {{ $option['name'] ?? $option['fio'] ?? $option["gos_number"]}}
+                <option value="{{ $value == 'concat' ? $option['hash_id'] : $option[$key] }}">
+                    @if ($value == 'concat')
+                        [{{ $option['hash_id'] }}] {{ $option[$mainField] }}
                     @else
                         {{ $option[$value] }}
                     @endif

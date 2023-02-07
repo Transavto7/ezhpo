@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Anketa;
 use App\Car;
 use App\Company;
 use App\Driver;
@@ -12,17 +11,12 @@ use App\Imports\CompanyImport;
 use App\Imports\DriverImport;
 use App\Models\Contract;
 use App\Point;
-use App\Product;
 use App\User;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App as FacadesApp;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
-use Maatwebsite\Excel\Excel;
 
 class IndexController extends Controller
 {
@@ -33,24 +27,6 @@ class IndexController extends Controller
             /**
              * Для администратора
              */
-            'Point' => [
-                'title'       => 'Пункты выпуска',
-                'role'        => 777,
-                'popupTitle'  => 'Пункта выпуска',
-                'editOnField' => 'name',
-
-                'model'  => 'Point',
-                'fields' => [
-                    'name'       => ['label' => 'Пункт выпуска', 'type' => 'text'],
-                    'pv_id'      => ['label' => 'Город', 'type' => 'select', 'values' => 'Town'],
-                    'company_id' => [
-                        'label'      => 'Компания',
-                        'type'       => 'select',
-                        'values'     => 'Company',
-                        'noRequired' => 1,
-                    ],
-                ],
-            ],
             'Town'  => [
                 'title'       => 'Города',
                 'role'        => 777,
@@ -60,8 +36,25 @@ class IndexController extends Controller
                 'model'         => 'Town',
                 'notShowHashId' => 1,
                 'fields'        => [
-                    'id'   => ['label' => 'ID', 'type' => 'text'],
-                    'name' => ['label' => 'Город', 'type' => 'text'],
+                    'hash_id' => ['label' => 'Город', 'type' => 'select', 'values' => 'Town', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
+                ],
+            ],
+            'Point' => [
+                'title'       => 'Пункты выпуска',
+                'role'        => 777,
+                'popupTitle'  => 'Пункта выпуска',
+                'editOnField' => 'name',
+
+                'model'  => 'Point',
+                'fields' => [
+                    'hash_id'    => ['label' => 'Пункт выпуска', 'type' => 'select', 'values' => 'Point', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
+                    'pv_id'      => ['label' => 'Город', 'type' => 'select', 'values' => 'Town', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
+                    'company_id' => [
+                        'label'      => 'Компания',
+                        'type'       => 'select',
+                        'values'     => 'Company',
+                        'noRequired' => 1,
+                    ],
                 ],
             ],
             'Req'   => [
@@ -173,9 +166,10 @@ class IndexController extends Controller
                 'model'  => 'Driver',
                 'fields' => [
                     //'old_id' => ['label' => 'Старый ID', 'type' => 'number', 'noRequired' => 1],
-                    'photo'         => ['label' => 'Фото', 'type' => 'file', 'resize' => 1, 'noRequired' => 1],
-                    'fio'           => ['label' => 'ФИО', 'type' => 'text'],
+                    'company_id'    => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
+                    'hash_id'       => ['label' => 'Водитель', 'type' => 'select', 'values' => 'Driver', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
                     'year_birthday' => ['label' => 'Дата рождения', 'type' => 'date', 'noRequired' => 1],
+                    'photo'         => ['label' => 'Фото', 'type' => 'file', 'resize' => 1, 'noRequired' => 1],
                     'phone'         => [
                         'label'      => 'Телефон',
                         'classes'    => 'MASK_PHONE',
@@ -202,8 +196,6 @@ class IndexController extends Controller
                         'defaultValue' => 'Не указано',
                         'noRequired'   => 1,
                     ],
-                    'company_id'    => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
-
                     'contract_id'        => [
                         'label'  => 'Договор',
                         'type'   => 'select',
@@ -289,8 +281,8 @@ class IndexController extends Controller
 
                 'model'  => 'Car',
                 'fields' => [
-                    //'old_id' => ['label' => 'Старый ID', 'type' => 'number', 'noRequired' => 1],
-                    'gos_number' => ['label' => 'Гос.номер', 'type' => 'text'],
+                    'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
+                    'hash_id'    => ['label' => 'Гос.номер', 'type' => 'select', 'values' => 'Car', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
                     'mark_model' => ['label' => 'Марка и модель', 'type' => 'text'],
                     'type_auto'  => [
                         'label'        => 'Тип автомобиля',
@@ -319,7 +311,6 @@ class IndexController extends Controller
                         'defaultValue' => '',
                         'noRequired'   => 1,
                     ],
-                    'company_id'      => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company'],
                     'contract_id'     => [
                         'label'  => 'Договор',
                         'type'   => 'select',
@@ -378,10 +369,13 @@ class IndexController extends Controller
 
                 'model'  => 'Company',
                 'fields' => [
-                    'name'    => [
+                    'hash_id'    => [
                         'label'                => 'Название компании клиента',
-                        'type'                 => 'text',
+                        'type'                 => 'select',
                         'filterJournalLinkKey' => 'company_id',
+                        'values'               => 'Company',
+                        'getField'             => 'concat',
+                        'getFieldKey'          => 'hash_id'
                     ],
                     'note'    => ['label' => 'Договоренности с клиентом', 'type' => 'text', 'noRequired' => 1],
                     'comment'    => ['label' => 'Комментарий', 'type' => 'text', 'noRequired' => 1],
@@ -486,30 +480,6 @@ class IndexController extends Controller
                     ],
                 ],
             ],
-
-            'Discount' => [
-                'title'       => 'Скидки',
-                'role'        => 0,
-                'popupTitle'  => 'Скидка',
-                'editOnField' => 'products_id',
-
-                'model'  => 'Discount',
-                'fields' => [
-                    'products_id' => ['label' => 'Услуга', 'type' => 'select', 'values' => 'Product'],
-                    'trigger'     => [
-                        'label'        => 'Триггер (больше/меньше)',
-                        'type'         => 'select',
-                        'values'       => [
-                            '>' => 'больше',
-                            '<' => 'меньше',
-                        ],
-                        'defaultValue' => '>',
-                    ],
-                    'porog'       => ['label' => 'Пороговое значение', 'type' => 'number'],
-                    'discount'    => ['label' => 'Скидка (%)', 'type' => 'porog'],
-                ],
-            ],
-
             'Product' => [
                 'title'       => 'Услуги',
                 'role'        => 0,
@@ -518,7 +488,7 @@ class IndexController extends Controller
 
                 'model'  => 'Product',
                 'fields' => [
-                    'name'         => ['label' => 'Название', 'type' => 'text'],
+                    'hash_id'         => ['label' => 'Название', 'type' => 'select', 'values' => 'Product', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
                     'type_product' => [
                         'label'        => 'Тип',
                         'type'         => 'select',
@@ -560,7 +530,28 @@ class IndexController extends Controller
                     'essence'      => ['label' => 'Сущности', 'type' => 'text', 'noRequired' => 1],
                 ],
             ],
+            'Discount' => [
+                'title'       => 'Скидки',
+                'role'        => 0,
+                'popupTitle'  => 'Скидка',
+                'editOnField' => 'products_id',
 
+                'model'  => 'Discount',
+                'fields' => [
+                    'products_id' => ['label' => 'Услуга', 'type' => 'select', 'values' => 'Product', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
+                    'trigger'     => [
+                        'label'        => 'Триггер (больше/меньше)',
+                        'type'         => 'select',
+                        'values'       => [
+                            '>' => 'больше',
+                            '<' => 'меньше',
+                        ],
+                        'defaultValue' => '>',
+                    ],
+                    'porog'       => ['label' => 'Пороговое значение', 'type' => 'number'],
+                    'discount'    => ['label' => 'Скидка (%)', 'type' => 'porog'],
+                ],
+            ],
 
             'Service' => [
                 'title'       => 'Услуги новые',
@@ -622,7 +613,7 @@ class IndexController extends Controller
                 'model'  => 'Instr',
                 'fields' => [
                     'photos'        => ['label' => 'Фото', 'type' => 'file', 'noRequired' => 1],
-                    'name'          => ['label' => 'Название', 'type' => 'text'],
+                    'hash_id'       => ['label' => 'Название', 'type' => 'select', 'values' => 'Instr', 'getField' => 'concat', 'getFieldKey' => 'hash_id'],
                     'descr'         => ['label' => 'Описание', 'type' => 'text'],
                     'type_briefing' => [
                         'label'        => 'Вид инструктажа',

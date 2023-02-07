@@ -2,7 +2,7 @@
     'v' => [
         'type' => 'select',
         'values' => 'Company',
-        'getField' => 'name',
+        'getField' => 'concat',
         'getFieldKey' => 'hash_id',
         'multiple' => 1
     ],
