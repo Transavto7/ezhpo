@@ -61,7 +61,7 @@ class AnketsController extends Controller
             $data[$f] = $anketa[$f];
         }
 
-        $point = Point::getPointText($anketa->pv_id);
+        $point = $anketa->pv_id;
         $points = Point::getAll();
 
         $iController = new IndexController();
@@ -444,12 +444,13 @@ class AnketsController extends Controller
 
         $data = $request->all();
         $d_id = $request->get('driver_id', 0); // Driver
+
         $pv_id = $request->get('pv_id', 0);
 
         function mt_rand_float($min, $max, $countZero = '0') {
             $countZero = +('1'.$countZero);
-            $min = floor($min*$countZero);
-            $max = floor($max*$countZero);
+            $min = floor($min * $countZero);
+            $max = floor($max * $countZero);
             $rand = mt_rand($min, $max) / $countZero;
             return $rand;
         }
@@ -497,14 +498,15 @@ class AnketsController extends Controller
         }
 
         // Анкета
-        if(isset($data['anketa'])) {
+        if (isset($data['anketa'])) {
             // Клонируем анкету
             $createdAnketas = [];
             $createdAnketasDataResponseApi = [];
             $data_anketa = $data['anketa'];
             $errorsAnketa = array();
-            $Driver = Driver::where('hash_id', $d_id)->first();
+
             $cars = [];
+            $drivers = [];
 
             // Только обычные осмотры валидируем
             if(($data['is_dop'] ?? 0) != 1){
@@ -573,13 +575,17 @@ class AnketsController extends Controller
             if (isset($data['car_id'])) {
                 $cars[] = $data['car_id'];
             }
+            if (isset($data['driver_id'])) {
+                $drivers[] = $data['driver_id'];
+            }
 
             foreach ($data_anketa as $anketa) {
                 $cars[] = $anketa['car_id'] ?? 0;
+                $drivers[] = $anketa['driver_id'] ?? 0;
             }
 
             if ($data['type_anketa'] === 'medic' || $data['type_anketa'] === 'pak') {
-                $anketasMedic = Anketa::where('driver_id', $d_id)
+                $anketasMedic = Anketa::whereIn('driver_id', $drivers)
                     ->where('type_anketa', 'medic')
                     ->where('in_cart', 0)
                     ->orderBy('date', 'desc')
@@ -598,8 +604,10 @@ class AnketsController extends Controller
 
                 // ID автомобиля
                 $c_id = $anketa['car_id'] ?? 0;
+                $d_id = $anketa['driver_id'] ?? $d_id;
 
                 $Car = Car::where('hash_id', $c_id)->first();
+                $Driver = Driver::where('hash_id', $d_id)->first();
 
                 // Тонометр
                 $tonometer = $anketa['tonometer'] ?? $defaultDatas['tonometer'];
@@ -1018,6 +1026,10 @@ class AnketsController extends Controller
                     }
                 }
 
+                if ($anketa['type_anketa'] === 'tech' && $is_dop) {
+                    $anketa['point_reys_control'] = 'Пройден';
+                }
+
                 /**
                  * Создаем анкету
                  */
@@ -1052,13 +1064,39 @@ class AnketsController extends Controller
                     }
                 }
 
+//                dd();
+                // ДОГОВОР СНЕПШОТ
+//                if($anketa['type_anketa'] == 'medic'){
+//                dd($Driver);
+//                    if($Driver){
+//                        $servicesToSync = [];
+//                        foreach ($Driver->contract->services as $service) {
+//                            $servicesToSync[$service['id']] = ['service_cost' => $service['price_unit']];
+//                        }
+//
+//                        $anketa['contract_id'] = $Driver->contract_id;
+//                    }
+////                }
+////                if($anketa['type_anketa'] == 'tech'){
+//                    if($Car){
+//                        $anketa['contract_id'] = $Car->contract_id;
+//                    }
+//                }
+
                 $ank = new Anketa();
                 $createdAnketas[] = Arr::only($anketa, $ank->getFillable());
             }
 
             Anketa::insert($createdAnketas);
-            $createdAnketas = Anketa::where('type_anketa', $data['type_anketa'])
+            $createdAnketas = Anketa::with(['services_snapshot'])->where('type_anketa', $data['type_anketa'])
                 ->limit(count($createdAnketas))->orderBy('id', 'desc')->get();
+
+            if(isset($servicesToSync)){
+//                dd($createdAnketas->toArray());
+                foreach ($createdAnketas as $createdAnketa){
+                    $createdAnketa->services_snapshot()->sync($servicesToSync);
+                }
+            }
 
             $responseData = [
                 'createdId' => $createdAnketas->pluck('id')->toArray(),
@@ -1331,7 +1369,7 @@ class AnketsController extends Controller
                  */
                 $tonometer = explode('/', $anketa['tonometer']);
                 if($proba_alko === 'Отрицательно' && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
-                    && $anketa['t_people'] < 38 && $tonometer[0] < 150 && $tonometer[1] < 100) {
+                    && doubleval($anketa['t_people']) < 38 && intval($tonometer[0]) < 150 && intval($tonometer[1]) < 100) {
                     $anketa['med_view'] = 'В норме';
                     $anketa['admitted'] = 'Допущен';
 
@@ -1357,7 +1395,7 @@ class AnketsController extends Controller
                  * ПРОВЕРЯЕМ СТАТУС для поля "Заключение" - от ПАК
                  */
                 if(isset($anketa['sleep_status']) && isset($anketa['people_status']) && isset($anketa['alcometer_result'])) {
-                    if($anketa['sleep_status'] === 'Да' && $anketa['people_status'] === 'Да' && $anketa['alcometer_result'] <= 0) {
+                    if($anketa['sleep_status'] === 'Да' && $anketa['people_status'] === 'Да' && doubleval($anketa['alcometer_result']) <= 0) {
                         $anketa['admitted'] = 'Допущен';
                     } else {
                         $anketa['admitted'] = 'Не допущен';

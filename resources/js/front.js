@@ -3,6 +3,7 @@ import swal from 'sweetalert2'
 import { v4 as uidv4 } from 'uuid'
 import {ApiController} from "./components/ApiController";
 import { Fancybox } from "@fancyapps/ui";
+import Swal2 from "sweetalert2";
 
 require('./init-plugins')
 require('chosen-js')
@@ -20,6 +21,14 @@ $.fn.select2.amd.require(['select2/selection/search'], function (Search) {
     };
 });
 
+function toggleAnketaCloneButton(state) {
+    let button = $('#ANKETA_CLONE_TRIGGER');
+    if (state === true) {
+        return button.hide();
+    }
+    return button.show();
+}
+
 $(document).ready(function () {
     const Toast = swal.mixin({
         toast: true,
@@ -34,10 +43,32 @@ $(document).ready(function () {
     })
 
     let loading = false
+    let pprResult = false
+    let anketa_type = $('#ANKETA_FORM_VIEW').data('anketa');
 
-    $(document).on('click', '.reload-filters', function(event) {
+    switch (anketa_type) {
+        case ('profile.ankets.tech') :
+            pprResult = ($('#point_reys_control').val() === 'Пройден');
+            toggleAnketaCloneButton(!pprResult);
+            $(document).on('change', '#point_reys_control', function (event) {
+                pprResult = ($(event.target).val() === 'Пройден');
+                toggleAnketaCloneButton(!pprResult);
+            });
+            break;
+        case ('profile.ankets.medic') :
+            pprResult = ($('#med_view').val() === 'В норме');
+            toggleAnketaCloneButton(!pprResult);
+            $(document).on('change', '#med_view', function (event) {
+                pprResult = ($(event.target).val() === 'В норме');
+                toggleAnketaCloneButton(!pprResult);
+            });
+            break;
+    }
+
+
+    $(document).on('click', '.reload-filters', function (event) {
         const btn = $(event.target);
-        if(location.pathname.indexOf('home') > -1) {
+        if (location.pathname.indexOf('home') > -1) {
             btn.disabled = true;
             btn.children('span.spinner').removeClass('d-none');
             $('#filter-group-2-tab').removeClass('active');
@@ -87,7 +118,7 @@ $(document).ready(function () {
             params: {
                 search,
                 field,
-                key
+                key,
             }
         }).then(({ data }) => {
             data.forEach((element => {
@@ -402,32 +433,109 @@ $(document).ready(function () {
             for(let i in data) {
                 let fvItem = fieldsValues[i]
 
-                if(fvItem) {
+                if(fvItem
+                || i === 'contract'
+                || i === 'contracts'
+                ) {
                    if(i != 'id' && i != 'hash_id') {
                        let field = '',
                            otherHtmlItems = '',
                            fId = uidv4(),
                            isBlocked = fullData.blockedFields.includes(i) ? 'disabled' : ''
 
-                       otherHtmlItems = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
+                       if(isBlocked === ''){
+                           otherHtmlItems = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
+                       }
+                       if(i === 'contract_id' || i === 'contract' || i === 'contracts'){
+                           // fvItem['type'] = 'text';
+                           continue;
+                       }
 
-                       if(fvItem['type'] == 'select') {
-                            await API_CONTROLLER.getFieldHTML({ field: i, model, default_value: encodeURIComponent(data[i]) }).then(response => {
-                                field = response.data
-                            })
-                        } else {
-                           if(i === 'note' || i === 'comment') {
-                               field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${(data[i] ? data[i] : '').trim()}</textarea>`
-                           } else if(i === 'photo') {
-                               otherHtmlItems = ''
+                       if(i === 'products_id'){
+                           // for company
+                           // if(fieldsValues.contracts){
+                           //     fieldsValues.contracts
+                           // }
 
-                               if(data[i]) {
-                                   field = `<img src="/storage/${data[i]}" width="60%" />`
+                       }
+
+                       if(i === 'products_id' && data.contract){
+                           // driver & auto
+                           msg += `
+                               <p class="text-small m-0">Договор:</p>`;
+                           if(data.contract.length != 0){
+                               msg +=  `
+                            <ul class="list-group my-2">
+                                <li style="padding: 0;" class="text-small list-group-item list-group-item-action list-group-item-success">
+                                <b>${data.contract.name_with_dates}</b>
+
+                            <ul class="list-group">`;
+                               if(data.contract.services){
+
+                                   data.contract.services.map((service) => {
+                                       msg +=  `<li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">${service.name}</li>`;
+                                   })
                                }
-                           } else {
-                               field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${data[i] ? data[i] : ''}' name="${i}" />`
+
+                               msg +=  `
+                            </ul></li>
+                            </ul>`;
+                           }else{
+                               msg += `
+                               <p class="text-small">-- Отсутствует --</p>`;
                            }
-                        }
+
+                           // continue;
+                         }else if(i === 'products_id' && data.contracts){
+                           // copmany
+                           msg += `
+                               <p class="text-small m-0">Договор:</p>`;
+                           if(data.contracts.length != 0){
+
+                               msg += `<ul class="list-group my-2">`;
+                               data.contracts.map((contract) => {
+                                   if(contract.services){
+
+                                       msg += `
+
+                                    <li style="padding: 0;" class=" text-small list-group-item list-group-item-action list-group-item-success"><ul class="list-group">
+                                    <b>${contract.name_with_dates}</b>`;
+                                       contract.services.map((service) => {
+                                           msg += `
+                                    <li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">
+                                    ${service.name}</li>`;
+                                       })
+                                       msg += `</ul></li>`;
+                                   }
+
+                               })
+                               msg += `</ul>`;
+                           }else{
+
+                               msg += `
+                               <p class="text-small">-- Отсутствует --</p>`;
+                           }
+                           // continue;
+                       }
+                       // else{
+                           if(fvItem['type'] === 'select') {
+                               await API_CONTROLLER.getFieldHTML({ field: i, model, default_value: encodeURIComponent(data[i]) }).then(response => {
+                                   field = response.data
+                               })
+                           } else {
+                               if(i === 'note' || i === 'comment') {
+                                   field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${(data[i] ? data[i] : '').trim()}</textarea>`
+                               } else if(i === 'photo') {
+                                   otherHtmlItems = ''
+
+                                   if(data[i]) {
+                                       field = `<img src="/storage/${data[i]}" width="60%" />`
+                                   }
+                               } else {
+                                   field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${data[i] ? data[i] : ''}' name="${i}" />`
+                               }
+                           }
+                       // }
 
                        msg += `
                         <p style="${i === 'dismissed' ? data[i].toUpperCase() === 'ДА' ? 'color: red; font-weight: bold;' : '' : ''}" data-field-card="${model}_${i}" class="text-small m-0">${fvItem.label}:<br/>
@@ -779,9 +887,9 @@ $(document).ready(function () {
 
     // Клонируем анкету
     let count_anketa = 1;
+
     $('#ANKETA_CLONE_TRIGGER').click(e => {
         const CLONE_ID = 'cloning'
-
         if(count_anketa+1 === 31) {
             swal.fire({
                 title: 'Нельзя добавлять более 30 осмотров',
@@ -860,6 +968,7 @@ $(document).ready(function () {
     // ------------------------------------------------------ //
 
     $('[data-toggle="tooltip"]').tooltip()
+    $("[rel='tooltip'], .tooltip").tooltip();
 
     // ------------------------------------------------------- //
     // Adding fade effect to dropdowns
@@ -1147,47 +1256,99 @@ $(document).ready(function () {
     })
     let field = $("*[name=type_product]").chosen()
     field.change(function(e, { selected }){
+
         if(selected === 'Абонентская плата без реестров'){
-            field.closest('.modal-body').find('div[data-field=essence]').show()
+            // field.closest('.modal-body').find('select[name=essence]').prop("disabled", false);
 
-            field.closest('.modal-body').find('div[data-field=type_anketa]').hide()
-            field.closest('.modal-body').find('div[data-field=type_view]').hide()
+            field.closest('.modal-body').find('select[name=type_anketa]').prop( "disabled", true);
+            field.closest('.modal-body').find('select[name="type_view[]"]').prop( "disabled", true);
 
-            field.closest('.modal-body').find('select[name=essence]').prop('required', true) // тип осмотра
+            // field.closest('.modal-body').find('select[name=essence]').prop('required', true) // тип осмотра
             field.closest('.modal-body').find('select[name=type_anketa]').prop('required', false) // тип осмотра
             field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', false) // Реестр
         }else{
-            field.closest('.modal-body').find('div[data-field=essence]').hide()
-            field.closest('.modal-body').find('div[data-field=type_view]').show()
-            field.closest('.modal-body').find('div[data-field=type_anketa]').show()
+            // field.closest('.modal-body').find('select[name=essence]').prop( "disabled", true);
+            field.closest('.modal-body').find('select[name=type_anketa]').prop( "disabled", false);
+            field.closest('.modal-body').find('select[name="type_view[]"]').prop( "disabled", false);
 
-            field.closest('.modal-body').find('select[name=essence]').prop('required', false) // тип осмотра
+            // field.closest('.modal-body').find('select[name=essence]').prop('required', false) // тип осмотра
             field.closest('.modal-body').find('select[name=type_anketa]').prop('required', true) // тип осмотра
             field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', true) // Реестр
         }
     });
 
-    $(document).on('change', '.filled-select2.filled-select', function(event) {
+    $(document).on('change', '.filled-select2.filled-select.type_product', function(event) {
         const field = $(event.target);
         let selected = field.val()
 
         if(selected === 'Абонентская плата без реестров'){
-            field.closest('.modal-body').find('div[data-field=essence]').show()
-            field.closest('.modal-body').find('div[data-field=type_anketa]').hide()
-            field.closest('.modal-body').find('div[data-field=type_view]').hide()
+            // field.closest('.modal-body').find('select[name=essence]').prop( "disabled", false);
+            field.closest('.modal-body').find('select[name=type_anketa]').prop( "disabled", true);
+            field.closest('.modal-body').find('select[name="type_view[]"]').prop( "disabled", true);
 
-            field.closest('.modal-body').find('select[name=essence]').prop('required', true) // тип осмотра
+            // field.closest('.modal-body').find('select[name=essence]').prop('required', true) // тип осмотра
             field.closest('.modal-body').find('select[name=type_anketa]').prop('required', false) // тип осмотра
             field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', false) // Реестр
         }else{
-            field.closest('.modal-body').find('div[data-field=essence]').hide()
-            field.closest('.modal-body').find('div[data-field=type_view]').show()
-            field.closest('.modal-body').find('div[data-field=type_anketa]').show()
+            // field.closest('.modal-body').find('select[name=essence]').prop( "disabled", true);
+            field.closest('.modal-body').find('select[name="type_view[]"]').prop( "disabled", false);
+            field.closest('.modal-body').find('select[name=type_anketa]').prop( "disabled", false);
 
-            field.closest('.modal-body').find('select[name=essence]').prop('required', false) // тип осмотра
+            // field.closest('.modal-body').find('select[name=essence]').prop('required', false) // тип осмотра
             field.closest('.modal-body').find('select[name=type_anketa]').prop('required', true) // тип осмотра
             field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', true) // Реестр
         }
     });
+
+
+    $(document).on('change ready', 'select[name="company_id"]', function (e) {
+        //select_for_contract_driver_car 'input[name="company_id"]'
+        let value = $(this).val();
+        let targetSelect = $('select[name="company_id"]').parent().parent().parent().find('#select_for_contract_driver_car');
+        // let targetSelect = $('#select_for_contract_driver_car');
+        targetSelect.empty();
+
+        axios.post('/contract/getAvailableForCompany', {
+            company_id: value,
+        }).then(({data}) => {
+            console.log(data)
+            if (data.status) {
+                targetSelect.append($('<option>', {
+                    value: '',
+                    text: 'Не установлено'
+                }));
+                data.contracts.map((item) => {
+                    targetSelect.append($('<option>', {
+                        value: item.id,
+                        text: item.name
+                    }));
+                })
+            } else {
+                Swal2.fire('Ошибка', data.message, 'warning');
+            }
+
+        });
+
+
+        // $.ajax({
+        //     type:     'post',
+        //     url:      '/app/purchase/check-active-discount',
+        //     dataType: 'json',
+        //     data:     {
+        //         current_category_id: select.value,
+        //     },
+        //     success:  function (response) {
+        //         if (response.status) {
+        //         } else {
+        //             alert('Ошибка');
+        //         }
+        //     },
+        //     error:    function () {
+        //         alert('Ошибка на сервере при запросе на checkActiveDiscount');
+        //     },
+        // });
+    })
+
+
     // let field = $('*[data-field="Product_type_product"]')
 });

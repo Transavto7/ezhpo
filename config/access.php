@@ -275,10 +275,10 @@ return [
         'name'        => 'company_delete',
         'description' => 'Компании - Удаление',
     ],
-    [
-        'name'        => 'company_sync',
-        'description' => 'Компании - Синхронизация',
-    ],
+//    [
+//        'name'        => 'company_sync',
+//        'description' => 'Компании - Синхронизация',
+//    ],
     [
         'name'        => 'company_trash_read',
         'description' => 'Компании - Корзина',
@@ -551,20 +551,50 @@ return [
 
     //============== Подсказки полей =============//
     [
-        'name'        => 'field_prompt_read',
+        'name'       => 'field_prompt_read',
         'description' => 'Подсказки полей - Просмотр',
     ],
     [
-        'name'        => 'field_prompt_edit',
+        'name'       => 'field_prompt_edit',
         'description' => 'Подсказки полей - Редактирование',
     ],
     [
-        'name'        => 'field_prompt_delete',
+        'name'       => 'field_prompt_delete',
         'description' => 'Подсказки полей - Удаление',
     ],
     [
-        'name'        => 'field_prompt_trash',
+        'name'       => 'field_prompt_trash',
         'description' => 'Подсказки полей - Корзина',
+    ],
+
+    //============== Договор =============//
+    [
+        'name'       => 'contract_read',
+        'description' => 'Договор - Просмотр',
+    ],
+    [
+        'name'       => 'contract_create',
+        'description' => 'Договор - Создание',
+    ],
+    [
+        'name'       => 'contract_edit',
+        'description' => 'Договор - Редактирование',
+    ],
+    [
+        'name'       => 'contract_edit_car',
+        'description' => 'Договор - Редактирование в карточке автомобиля',
+    ],
+    [
+        'name'       => 'contract_edit_driver',
+        'description' => 'Договор - Редактирование в карточке водителя',
+    ],
+    [
+        'name'       => 'contract_delete',
+        'description' => 'Договор - Удаление',
+    ],
+    [
+        'name'       => 'contract_trash',
+        'description' => 'Договор - Корзина',
     ],
 
     //============== Кому отправлять СМС && Кому звонить при отстранении (имя, должность) =============//

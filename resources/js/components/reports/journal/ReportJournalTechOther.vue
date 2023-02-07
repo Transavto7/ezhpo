@@ -27,8 +27,29 @@
                                 <td class="text-center">
                                     {{ getStringMark(report) }}
                                 </td>
-                                <td class="text-center">{{ getTotal(report, 'Предрейсовый', 'Предсменный') }}</td>
-                                <td class="text-center">{{ getTotal(report, 'Послерейсовый', 'Послесменный') }}</td>
+                                <td class="text-center">
+                                    {{ getTotal(report, 'Предрейсовый', 'Предсменный') }}
+                                    <div class="font-weight-bold" v-if="getSum(report, 'Предрейсовый', 'Предсменный')">
+                                        {{ getSum(report, 'Предрейсовый', 'Предсменный') }}₽
+                                        <span class="text-red" v-if="getDiscount(report, 'Предрейсовый', 'Предсменный')">
+                                            ({{ getDiscount(report, 'Предрейсовый', 'Предсменный') }}%)
+                                        </span>
+                                        <i v-if="isSync(report, 'Предрейсовый', 'Предсменный')" class="fa fa-refresh text-success"></i>
+                                        <i v-else class="fa fa-refresh text-red"></i>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    {{ getTotal(report, 'Послерейсовый', 'Послесменный') }}
+
+                                    <div class="font-weight-bold" v-if="getSum(item, 'Послерейсовый', 'Послесменный')">
+                                        {{ getSum(report, 'Послерейсовый', 'Послесменный') }}₽
+                                        <span class="text-red" v-if="getDiscount(report, 'Послерейсовый', 'Послесменный')">
+                                            ({{ getDiscount(report, 'Послерейсовый', 'Послесменный') }}%)
+                                        </span>
+                                        <i v-if="isSync(report, 'Послерейсовый', 'Послесменный')" class="fa fa-refresh text-success"></i>
+                                        <i v-else class="fa fa-refresh text-red"></i>
+                                    </div>
+                                </td>
                                 <td class="text-center">{{ getTotal(report, 'is_dop') }}</td>
                             </tr>
                             <tr v-if="item.reports">
@@ -55,7 +76,7 @@
 
 <script>
 import { months } from '../../const/local';
-import { getTotalAll, getTotal } from "../../const/reportsAmount";
+import {getTotalAll, getTotal, getSumAll, getSum, getDiscount, isSync} from "../../const/reportsAmount";
 
 export default {
     name: "ReportJournalTechOther",
@@ -95,6 +116,10 @@ export default {
         },
         getTotalAll,
         getTotal,
+        getSumAll,
+        getSum,
+        getDiscount,
+        isSync
     }
 }
 </script>

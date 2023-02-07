@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Car;
 use App\Company;
+use App\Driver;
 use App\Req;
 use App\User;
 use Carbon\Carbon;
@@ -14,22 +16,44 @@ class ApiController extends Controller
 {
 
     public function modelList(Request $request, $model) {
+        $mainContentFields = [
+            "Company" => "name",
+            "Driver"  => "fio",
+            "Car"     => "gos_number",
+            "Product" => "name",
+            "Instr"   => "name"
+        ];
+
         $field = 'name';
         $key = 'id';
 
         if ($request->get('field')) {
-            $field = $request->field;
+            $field = $request->get('field');
+            $searchingIn = $mainContentFields[$model] ?? $field;
         }
 
         if ($request->get('key')) {
             $key = $request->key;
         }
 
-        $query = app("App\\" . $model)::where(DB::raw("LOWER($field)"),
-            'like', '%' . $request->search . '%');
-
         if ($model === 'User') {
-            $query = $query->whereNotIn('role', [3, 12]);
+            $query = User::with('roles')->whereHas('roles', function ($q) use ($request) {
+                $q->whereNotIn('roles.id', [3, 6, 9]);
+            })->where(DB::raw("$searchingIn"),
+                      'like', '%' . $request->search . '%')
+                         ->orWhere("hash_id", "like", "%" . $request->search . "%");
+        } else {
+            $query = app("App\\" . $model)::where(DB::raw("$searchingIn"),
+                                                  'like', '%' . $request->search . '%')
+                                          ->orWhere("hash_id", "like", "%" . $request->search . "%");
+        }
+
+        if ($request->get('trashed')) {
+            $query = $query->withTrashed();
+        }
+
+        if (in_array($model, array_keys($mainContentFields)) && $field == "concat" && ($key == "hash_id" || $key == 'id')) {
+            return $query->select(DB::raw("concat('[', `hash_id`, '] ', `$mainContentFields[$model]`) as concat"), $key)->limit(100)->get();
         }
 
         return $query->select($field, $key)->limit(100)->get();
@@ -54,7 +78,8 @@ class ApiController extends Controller
 
     public function companiesList(Request $request) {
         return Company::where('name', 'like', '%' . $request->search . '%')
-            ->select('hash_id', 'name')->limit(100)->get();
+                      ->orWhere('hash_id', 'like', '%' . $request->search . '%')
+                      ->select('hash_id', DB::raw("concat('[', hash_id, '] ', name) as name"), 'id')->limit(100)->get();
     }
 
     // Обновляем все пункты выпуска
@@ -129,7 +154,9 @@ class ApiController extends Controller
         $blockedFields = [
             'old_id', 'req_id', 'inn',
             'date_bdd',
-            'date_report_driver'
+            'date_report_driver',
+            'contracts',
+            'contract_id'
         ];
 
         $deleteImportantFields = [
@@ -142,6 +169,13 @@ class ApiController extends Controller
             $fields = $data->fillable;
             array_push($fields, 'id');
 
+            if ($_model['model'] == Company::class){
+                $data = $data::with(['contracts.services']);
+            }elseif($_model['model'] == Driver::class || $_model['model'] == Car::class){
+                $data = $data::with(['contracts.services']);
+            }
+//            array_push($fields, 'id');
+
             /**
              * Контроль дат
              */
@@ -150,14 +184,15 @@ class ApiController extends Controller
             /**
              * Фильтрация полей
              */
-            $fields = array_filter($fields, function ($item) use ($deleteImportantFields) {
-                return !in_array($item, $deleteImportantFields);
-            });
+//            $fields = array_filter($fields, function ($item) use ($deleteImportantFields) {
+//                return !in_array($item, $deleteImportantFields);
+//            });
 
 
             $fieldsValues = new IndexController();
             $fieldsValues = $fieldsValues->elements[$model]['fields'];
 
+//            $data = $data->where($prop, $val)->get()->first();
             if ($_model['model'] == Company::class){
                 if(!user()->access('companies_access_field_where_call')){   //'Кому отправлять СМС при отстранении'
                     unset($fields['where_call']);
@@ -169,13 +204,16 @@ class ApiController extends Controller
                 }
             }
 
-            $data = $data->where($prop, $val)->get($fields)->first();
+            $data = $data->where($prop, $val)
+                         ->get($fields)
+                         ->first();
 
-            if(isset($data)) {
+            if($data) {
                 $data_exists = $data->count() > 0;
                 $data = $data->toArray();
             } else {
                 $data_exists = $data;
+                return ApiController::r(['exists' => $data_exists, 'model' => $model, 'blockedFields' => $blockedFields, 'message' => $data, 'fieldsValues' => $fieldsValues, 'redDates' => $redDates], 1);
             }
 
             if ($_model['model'] == Company::class && isset($data['dismissed']) && isset($data['name'])) {
@@ -209,13 +247,13 @@ class ApiController extends Controller
     {
         if ($model = app("App\\$request->model")->where($prop, $val)->first()) {
             return response([
-                'status' => true,
-                'name'   => $model->fio ?? $model->name,
-            ]);
+                                'status' => true,
+                                'name'   => $model->fio ?? $model->name,
+                            ]);
         } else {
             return response([
-                'status' => false,
-            ]);
+                                'status' => false,
+                            ]);
         }
     }
 

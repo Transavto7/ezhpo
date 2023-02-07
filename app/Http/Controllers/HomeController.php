@@ -3,22 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Anketa;
-use App\Car;
-use App\Company;
-use App\Driver;
 use App\Exports\AnketasExport;
 use App\Exports\TechAnketasExport;
 use App\FieldPrompt;
 use App\User;
+use Auth;
 use Carbon\Carbon;
-use Carbon\CarbonPeriod;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Facades\Excel;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
-use function foo\func;
 
 class HomeController extends Controller
 {
@@ -35,7 +29,7 @@ class HomeController extends Controller
     /**
      * Show the application dashboard.
      *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * @return Renderable
      */
     public static function searchFieldsAnkets($anketa, $anketaModel, $fieldsKeys)
     {
@@ -91,7 +85,7 @@ class HomeController extends Controller
             }
         }
 
-        $user = \Auth::user();
+        $user = Auth::user();
 
         $validTypeAnkets       = User::$userRolesKeys[$user->role] ?? 'medic';
         $blockedToExportFields = [];
@@ -126,7 +120,6 @@ class HomeController extends Controller
          * Выбор полей
          */
         $fieldsKeysTypeAnkets = $validTypeAnkets;
-
         $fieldsKeys       = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
         $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets])
             ? Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] : [];
@@ -184,8 +177,7 @@ class HomeController extends Controller
 
         // Фильтр
         if (count($filter_params) > 0 && $filter_activated) {
-            foreach ($filter_params as $fk => $fv) {
-
+            foreach ($filter_params as $fk => &$fv) {
                 if ($fk == 'hour_from' && $fv) {
                     $anketas->whereTime('date', '>=', $fv.':00');
                     continue;
@@ -284,6 +276,7 @@ class HomeController extends Controller
                         if ($fk === 'car_type_auto') {
                             $anketas = $anketas->whereIn('cars.type_auto', $fv);
                         } else {
+                            if ($fk === 'straight_company_id') continue;
                             $anketas = $anketas->where('anketas.' . $fk, 'LIKE', '%'.$fv.'%');
                         }
                     }
@@ -315,18 +308,18 @@ class HomeController extends Controller
             $anketasCountCompany = $anketasTrigger->count('company_id');
 
             return response()->json([
-                'anketasCountDrivers' => $anketasCountDrivers,
-                'anketasCountCars'    => $anketasCountCars,
-                'anketasCountCompany' => $anketasCountCompany,
-            ]);
+                                        'anketasCountDrivers' => $anketasCountDrivers,
+                                        'anketasCountCars'    => $anketasCountCars,
+                                        'anketasCountCompany' => $anketasCountCompany,
+                                    ]);
         }
 
         if ($validTypeAnkets == 'tech') {
             $anketas = $anketas->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')->select('anketas.*',
-                'cars.type_auto as car_type_auto');
+                                                                                                 'cars.type_auto as car_type_auto');
         } else if ($validTypeAnkets == 'pak') {
             $anketas = $anketas->leftJoin('points', 'anketas.pv_id', '=', 'points.id')->select('anketas.*',
-                'points.name as pv_id');
+                                                                                               'points.name as pv_id');
         }
 
         /**
@@ -335,11 +328,9 @@ class HomeController extends Controller
 
         // Экспорт из техосмотров и БДД
         if ($is_export && $filter_activated) {
-
             if ($validTypeAnkets == 'tech') {
                 if ($request->get('exportPrikaz')) {
-                    $techs = $anketas
-                        ->where('type_anketa', 'tech')
+                    $techs = $anketas->where('type_anketa', 'tech')
                         ->get();
 
                     return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_to']),
@@ -347,8 +338,9 @@ class HomeController extends Controller
                 }
 
                 if ($request->get('exportPrikazPL')) {
-                    $techs = $anketas->where('type_anketa', 'tech')
-                        ->get();
+                    $techs = $anketas->where(['type_view' => 'Предрейсовый/Предсменный'])
+                        ->cursor()
+                    ;
 
                     return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_pl']),
                         'ЭЖ учета ПЛ.xlsx');
@@ -358,32 +350,32 @@ class HomeController extends Controller
             if ($validTypeAnkets == 'medic') {
                 if ($request->get('exportPrikaz')) {
                     $medic = $anketas->where('type_anketa', 'medic')
-                        ->get();
+                                     ->get();
 
                     return Excel::download(new AnketasExport($medic, Anketa::$fieldsKeys['medic_export_pl']),
-                        'ЭЖ ПРМО.xlsx');
+                                           'ЭЖ ПРМО.xlsx');
                 }
             }
 
             if ($validTypeAnkets == 'bdd') {
                 if ($request->get('exportPrikaz')) {
                     $bdd = $anketas->where('type_anketa', 'bdd')
-                              ->with(['user.roles'])
-                        ->get()
-                        ->map(function ($q) {
-                                $q->user_id = !isset($q->user->roles[0]) ? '' : $q->user->roles[0]->guard_name;
-                                  unset($q->user);
-                                  return $q;
-                              });
+                                   ->with(['user.roles'])
+                                   ->get()
+                                   ->map(function ($q) {
+                                       $q->user_id = !isset($q->user->roles[0]) ? '' : $q->user->roles[0]->guard_name;
+                                       unset($q->user);
+                                       return $q;
+                                   });
 
                     return Excel::download(new AnketasExport($bdd, Anketa::$fieldsKeys['bdd_export_prikaz']),
-                        'ЭЖ инструктажей БДД.xlsx');
+                                           'ЭЖ инструктажей БДД.xlsx');
                 }
             }
 
             return Excel::download(new AnketasExport($anketas->where('type_anketa', $validTypeAnkets)
-                ->get(), Anketa::$fieldsKeys[$validTypeAnkets]),
-                'ЭЖ.xlsx');
+                                                             ->get(), Anketa::$fieldsKeys[$validTypeAnkets]),
+                                   'ЭЖ.xlsx');
         }
 
 
@@ -399,7 +391,9 @@ class HomeController extends Controller
 
         }
         $table = $orderKey === 'car_type_auto' ? '' : 'anketas.';
-
+//        dd(
+//            $anketas->toSql(), $typeAnkets
+//        );
         $anketas = ($filter_activated || $typeAnkets === 'pak_queue')
             ? $anketas->orderBy($table . $orderKey, $orderBy)->paginate($take) : [];
 
@@ -470,8 +464,7 @@ class HomeController extends Controller
         $fieldsKeysTypeAnkets = $validTypeAnkets;
 
         $fieldsKeys       = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
-        $fieldsGroupFirst = isset(Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets])
-            ? Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] : [];
+        $fieldsGroupFirst = Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] ?? [];
         $anketsFields     = array_keys($fieldsKeys);
 
         if (auth()->user()->hasRole('client')) {

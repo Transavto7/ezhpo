@@ -30,7 +30,8 @@ class SdpoController extends Controller
         }
 
         if ($request->user_id) {
-            if (!User::find($request->user_id)) {
+            $user = User::find($request->user_id);
+            if (!$user) {
                 return response()->json(['message' => 'Пользователь с таким ID не найден!'], 401);
             }
         }
@@ -50,7 +51,7 @@ class SdpoController extends Controller
         $medic['user_name'] = $user->name;
         $medic['user_eds'] = $user->eds;
         $medic['pulse'] = $request->pulse ?? mt_rand(60,80);
-        $medic['pv_id'] = $user->pv->name;
+        $medic['pv_id'] = $request->user('api')->pv->name;
         $medic['tonometer'] = $tonometer;
         $medic['driver_id'] = $driver->hash_id;
         $medic['driver_fio'] = $driver->fio;
@@ -59,16 +60,24 @@ class SdpoController extends Controller
         $medic['company_name'] = $company->name;
         $medic['med_view'] = $request->med_view ?? 'В норме';
         $medic['t_people'] = $request->t_people ?? 36.6;
-        $medic['type_view'] = $request->type_view ?? 'Послерейсовый/Послесменный';
+        $medic['type_view'] = $request->type_view ?? 'Предрейсовый/Предсменный';
         $medic['flag_pak'] = 'СДПО А';
 
         if ($driver->year_birthday !== '' && $driver->year_birthday !== '0000-00-00') {
             $medic['driver_year_birthday'] = $driver->year_birthday;
         }
 
+        if ($request->photo) {
+            $medic['photos'] = $request->photo;
+        }
+
+        if ($request->video) {
+            $medic['videos'] = $request->video;
+        }
+
         date_default_timezone_set('UTC');
         $time = time();
-        $timezone = $user->timezone ? $user->timezone : 3;
+        $timezone = $request->user('api')->timezone ? $request->user('api')->timezone : 3;
         $time += $timezone * 3600;
         $time = date('Y-m-d H:i:s', $time);
 
@@ -84,19 +93,37 @@ class SdpoController extends Controller
         }
 
         $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
+        $driver->date_prmo = Carbon::now();
 
         $admitted = null;
 
         //ПРОВЕРЯЕМ статус для поля "Заключение"
         $ton = explode('/', $tonometer);
-        if ($proba_alko === 'Положительно' || $test_narko === 'Положительно'
-            || $medic['med_view'] !== 'В норме' || $medic['t_people'] >= 38 || $ton[0] >= 150) {
+        if ($proba_alko === 'Положительно' || $test_narko === 'Положительно' || intval($ton[1]) >= 120
+            || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38 || intval($ton[0]) >= 220) {
             $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
         }
-        if ($request->sleep_status && $request->people_status && $request->alcometer_result) {
-            if($request->sleep_status === 'Нет' && $request->people_status === 'Нет' && $request->alcometer_result > 0) {
-                $admitted = 'Не допущен';
-            }
+
+        if ($request->sleep_status && $request->sleep_status === 'Нет') {
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
+        }
+
+        if ($request->people_status && $request->people_status === 'Нет') {
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
+        }
+
+        if ($request->people_status && $request->people_status === 'Нет') {
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
+        }
+
+        if (doubleval($request->alcometer_result) > 0) {
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
+            $medic['proba_alko'] = 'Положительно';
         }
 
         if ($request->type_anketa === 'pak_queue') {
@@ -106,7 +133,6 @@ class SdpoController extends Controller
         }
 
         $medic['admitted'] = $admitted ?? 'Допущен';
-
         $anketa = Anketa::create($medic);
 
         // ОТПРАВКА SMS
@@ -116,5 +142,68 @@ class SdpoController extends Controller
         }
 
         return response()->json($anketa);
+    }
+
+    /*
+     * Check connection sdpo
+     */
+    public function checkConnaction(Request $request) {
+        return "true";
+    }
+
+    /*
+     * Get PV name by user
+     */
+    public function getPoint(Request $request) {
+        $user = $request->user('api');
+        return $user->pv->name;
+    }
+
+    /*
+     * return all medics
+     */
+    public function getMedics(Request $request) {
+        $users = User::with(['roles', 'pv:id,name,pv_id', 'pv.town:id,name'])->whereHas('roles', function ($q) use ($request) {
+            $q->where('roles.id', 2);
+        })->select('id', 'name', 'eds', 'pv_id')->limit(10)->get();
+
+        $users = $users->groupBy(['pv.town.name', 'pv.name']);
+
+        return $users;
+    }
+
+    /*
+    * return driver by id
+    */
+    public function getDriver(Request $request, $id) {
+        $driver = Driver::where('hash_id', $id)->select('hash_id', 'fio')->first();
+        return $driver;
+    }
+
+    /*
+    * return all drivers
+    */
+    public function getDrivers(Request $request) {
+        $drivers = Driver::select('hash_id', 'fio')->get();
+        return $drivers;
+    }
+
+
+    /*
+    * Return inspection info
+    */
+    public function getInspection(Request $request, $id) {
+        $inspection = Anketa::find($id);
+        return $inspection;
+    }
+
+    /*
+    * Inspection update type
+    */
+    public function changeType(Request $request, $id) {
+        $inspection = Anketa::find($id);
+        if ($inspection) {
+            $inspection->update(['type_anketa' => 'medic']);
+        }
     }
 }

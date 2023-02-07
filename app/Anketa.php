@@ -2,23 +2,78 @@
 
 namespace App;
 
+use App\Models\Contract;
+use App\Models\ContractAnketaSnapshot;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Model;
 
 class Anketa extends Model
 {
+    // archive
+    public function contract_snapshot()
+    {
+        return $this->belongsTo(ContractAnketaSnapshot::class, 'contract_snapshot_id', 'id')
+                    ->withDefault();
+    }
+
+
+    public function services_snapshot()
+    {
+        return $this->belongsToMany(
+            Product::class,
+            'anketa_services_discount_snapshot_contracts',
+            'anketa_id',
+            'service_id',
+            'id',
+            'id'
+        )->withPivot('service_cost');
+//        return $this->belongsTo(ContractAnketaSnapshot::class, 'contract_snapshot_id', 'id')
+//                    ->withDefault();
+    }
+
+
+//    public function contract()
+//    {
+////        return $this->belongsTo(Contract::class, 'contract_id', 'id')
+////                    ->withDefault();
+//        return $this->hasOne(
+//            Contract::class,
+//            'contract_id',
+//            'id'
+//        )
+//                    ->withDefault();
+//    }
+
+    public function our_company()
+    {
+        return $this->belongsTo(
+            Req::class,
+            'our_company_id',
+            'id'
+        )->withDefault();
+    }
+
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id')
+                    ->withDefault();
     }
 
     public function company()
     {
-        return $this->belongsTo(Company::class, 'company_id', 'hash_id');
+        return $this->belongsTo(Company::class, 'company_id', 'hash_id')
+                    ->withDefault();
+    }
+    public function car()
+    {
+        return $this->belongsTo(Car::class, 'car_id', 'hash_id')
+                    ->withDefault();
     }
 
     public function driver()
     {
-        return $this->belongsTo(User::class, 'driver_id', 'hash_id');
+        return $this->belongsTo(Driver::class, 'driver_id', 'hash_id')
+                    ->withDefault();
     }
 
     public function deleted_user()
@@ -106,6 +161,8 @@ class Anketa extends Model
             'protokol_path',
             'comments',
             'connected_hash',
+            'contract_id',
+            'contract_snapshot_id',
         ];
 
 
@@ -126,8 +183,8 @@ class Anketa extends Model
             'medic' => [
                 'date'         => 'Дата осмотра',
                 'company_id'   => 'Компания',
+                'driver_id'    => 'Водитель',
                 'period_pl'    => 'Период выдачи ПЛ',
-                'driver_fio'   => 'Водитель',
                 'realy'        => 'Осмотр реальный?',
                 'driver_group_risk'      => 'Группа риска',
                 'type_view'    => 'Тип осмотра',
@@ -135,16 +192,44 @@ class Anketa extends Model
                 'test_narko'   => 'Тест на наркотики',
                 'pv_id'          => 'Пункт выпуска',
             ],
-
-            'pak' => [
+            'tech' => [
+                'company_id'     => 'Компания',
+                'driver_id'      => 'Водитель',
+                'car_id'         => 'Гос. регистрационный номер ТС',
                 'date'           => 'Дата осмотра',
-                'company_id'   => 'Место работы',
-                'driver_fio'     => 'Водитель',
+                'period_pl'      => 'Период выдачи ПЛ',
+                'realy'          => 'Осмотр реальный?',
+                'car_type_auto'  => 'Категория ТС',
+                'type_view'      => 'Тип осмотра',
                 'pv_id'          => 'Пункт выпуска',
-                'car_mark_model' => 'Автомобиль',
+            ],
+            'bdd' => [
+                'company_id'          => 'Компания',
+                'driver_id'           => 'Водитель',
+                'date'                => 'Дата инструктажа',
+                'pv_id'               => 'Пункт выпуска',
+            ],
+            'pechat_pl' => [
+                'company_id'   => 'Компания',
+                'driver_id'    => 'Водитель',
+                'date'         => 'Дата выдачи',
+                'pv_id'        => 'Пункт выпуска',
+            ],
+            'report_cart' => [
+                'company_id' => 'Компания',
+                'driver_id'  => 'Водитель',
+                'date'       => 'Дата снятия отчета',
+                'pv_id'      => 'Пункт выпуска',
+            ],
+            'pak' => [
+                'company_id'     => 'Место работы',
+                'driver_id'      => 'Водитель',
+                'car_id'         => 'Госномер ТС',
+                'date'           => 'Дата осмотра',
+                'pv_id'          => 'Пункт выпуска',
+                'car_mark_model' => 'Марка/модель автомобиля',
                 'flag_pak'       => 'Флаг СДПО',
             ],
-
             'pak_queue' => [
                 'created_at' => 'Дата создания',
                 'driver_fio' => 'Водитель',
@@ -158,40 +243,6 @@ class Anketa extends Model
                 'videos'     => 'Видео',
 
             ],
-
-            'tech' => [
-                'date'           => 'Дата осмотра',
-                'period_pl'    => 'Период выдачи ПЛ',
-                'car_gos_number' => 'Гос. регистрационный номер ТС',
-                'realy'        => 'Осмотр реальный?',
-                'car_type_auto' => 'Категория ТС',
-                'company_id'   => 'Компания',
-                'type_view'          => 'Тип осмотра',
-                'pv_id'          => 'Пункт выпуска',
-            ],
-
-
-            'bdd' => [
-                'company_id'  => 'Компания',
-                'date'          => 'Дата инструктажа',
-                'driver_fio'   => 'Ф.И.О водителя',
-                'pv_id'          => 'Пункт выпуска',
-            ],
-
-            'report_cart' => [
-                'date'         => 'Дата снятия отчета',
-                'driver_fio'   => 'Ф.И.О водителя',
-                'company_id' => 'Компания',
-                'pv_id'          => 'Пункт выпуска',
-            ],
-
-            'pechat_pl' => [
-                'date'         => 'Дата выдачи',
-                'driver_fio'   => 'ФИО водителя',
-                'company_name' => 'Компания',
-                'pv_id'          => 'Пункт выпуска',
-            ],
-
             /*'vid_pl' => [
                 'date' => 'Дата выдачи ПЛ',
                 'company_name' => 'Компания',
@@ -237,8 +288,9 @@ class Anketa extends Model
 
     public static $fieldsKeysTable = [
         'medic' => [
+            'company_id',
+            'driver_id',
             'date',
-            'driver_fio',
             'period_pl',
             'created_at',
             'driver_group_risk',
@@ -246,10 +298,7 @@ class Anketa extends Model
             'realy',
             'proba_alko', // Проба на алкоголь
             'test_narko',
-            'company_name',
-            'company_id',
             'pv_id',
-            'driver_id',
             'user_name',
             'driver_gender',
             'driver_year_birthday',
@@ -268,20 +317,17 @@ class Anketa extends Model
             'is_dop',
         ],
         'tech' => [
+            'company_id',
+            'driver_id',
+            'car_id',
             'date',
-            'car_gos_number',
             'period_pl',
             'created_at',
             'car_type_auto',
             'type_view',
             'realy',
-            'driver_fio',
-            'company_name',
-            'company_id',
             'pv_id',
-            'car_id',
             'odometer',
-            'driver_id',
             'number_list_road',
             'point_reys_control',
             'user_eds',
@@ -289,39 +335,35 @@ class Anketa extends Model
             'user_name',
         ],
         'bdd' => [
-            'date',
-            'driver_fio',
-            'type_briefing',
-            'company_name',
-            'created_at',
-            'user_name',
-            'pv_id',
-            'user_eds',
-            'driver_id',
-            'signature',
-        ],
-        'report_cart' => [
-            'date',
-            'driver_fio',
-            'company_name',
-            'user_name',
-            'created_at',
             'company_id',
+            'driver_id',
+            'date',
+            'type_briefing',
+            'created_at',
+            'user_name',
             'pv_id',
             'user_eds',
-            'driver_id',
             'signature',
         ],
         'pechat_pl' => [
+            'company_id',
+            'driver_id',
             'date',
-            'driver_fio',
             'count_pl',
-            'company_name',
             'user_name',
             'pv_id',
             'created_at',
-            'company_id',
             'user_eds',
+        ],
+        'report_cart' => [
+            'company_id',
+            'driver_id',
+            'date',
+            'user_name',
+            'created_at',
+            'pv_id',
+            'user_eds',
+            'signature',
         ]
     ];
 
@@ -344,7 +386,6 @@ class Anketa extends Model
                 'user_name' => 'ФИО медицинского работника',
                 'user_eds' => 'ЭЦП МЕДИЦИНСКОГО РАБОТНИКА ',
             ],
-
             'tech_export_to' => [
                 'date'               => 'Дата, время проведения контроля',
                 'car_mark_model'     => 'Наименование марки, модели ТС',
@@ -364,7 +405,6 @@ class Anketa extends Model
                 'user_name'        => 'ФИО лица, выдавшего ПЛ',
                 'user_eds'         => 'Подпись лица, выдавшего ПЛ (ЭЦП)',
             ],
-
             'bdd_export_prikaz' => [
                 'date'          => 'Дата инструктажа',
                 'type_briefing' => 'Вид инструктажа',
@@ -377,11 +417,12 @@ class Anketa extends Model
             ],
 
             'medic' => [
-                'company_name'             => 'Компания',
-                'company_id'             => 'ID Компании',
+                // ID
+                'company_id'             => 'Компания',
+                'driver_id'              => 'Водитель',
+
                 'date'                   => 'Дата и время осмотра',
                 'period_pl'              => 'Период выдачи ПЛ',
-                'driver_fio'             => 'ФИО работника',
                 'realy'                  => 'Осмотр реальный?',
                 'driver_group_risk'      => 'Группа риска',
                 'type_view'              => 'Тип осмотра',
@@ -395,14 +436,13 @@ class Anketa extends Model
                 't_people'               => 'Температура тела',
                 'tonometer'              => "Артериальное давление",
                 'pulse'                  => 'Пульс',
-//                'test_narko'             => 'Тест на наркотики',
+                //                'test_narko'             => 'Тест на наркотики',
                 'admitted'               => 'Заключение о результатах осмотра',
                 'user_name'              => 'ФИО ответственного',
                 'user_eds'               => 'ЭЦП медицинского работника',
 
                 // Поля не в выгрузку
                 'created_at'             => 'Дата создания',
-                'driver_id'              => 'ID водителя',
                 'photos'                 => 'Фото',
                 'videos'                 => 'Видео',
                 'med_view'               => 'Мед показания',
@@ -413,8 +453,69 @@ class Anketa extends Model
                 'flag_pak'               => 'Флаг СДПО',
                 'is_dop'                 => 'Режим ввода ПЛ',
             ],
+            /**
+             * Технический осмотр (параметры полей)
+             */
+            'tech'      => [
+                'company_id'     => 'Компания',
+                'driver_id'      => 'Водитель',
+                'car_id'         => 'Гос. регистрационный номер ТС',
+                'date'           => 'Дата, время проведения контроля',
+                'period_pl'      => 'Период выдачи ПЛ',
+                'created_at'     => 'Дата создания',
+                'realy'          => 'Осмотр реальный?',
+                'car_type_auto'  => 'Категория ТС',
+                'car_mark_model' => 'Марка автомобиля',
+                'type_view'          => 'Тип осмотра',
 
+                // Доп поля
+
+                'number_list_road'   => 'Номер ПЛ',
+                //'date_number_list_road' => 'Срок действия путевого листа',
+                'odometer'           => 'Показания одометра',
+                'point_reys_control' => 'Отметка о прохождении контроля',
+                'user_name'          => 'ФИО ответственного',
+                'user_eds'           => 'Подпись лица, проводившего контроль',
+                'pv_id'              => 'Пункт выпуска',
+                'is_dop'             => 'Режим ввода ПЛ',
+            ],
+            'bdd' => [
+                'company_id'    => 'Компания',
+                'driver_id'     => 'Водитель',
+                'date'          => 'Дата, время',
+                'created_at'    => 'Дата внесения в журнал',
+                'type_briefing' => 'Вид инструктажа',
+                'user_name'     => 'Ф.И.О (при наличии) лица, проводившего инструктаж',
+                'pv_id'         => 'Пункт выпуска',
+                'user_eds'      => 'Подпись лица, проводившего инструктаж',
+                'signature'     => 'ЭЛ подпись водителя',
+            ],
+            'pechat_pl' => [
+                'company_id'   => 'Компания',
+                'driver_id'    => 'Водитель',
+                'date'         => 'Дата распечатки ПЛ',
+                'count_pl'     => 'Количество распечатанных ПЛ',
+                'user_name'    => 'Ф.И.О сотрудника, который готовил ПЛ',
+                'user_eds'     => 'ЭЦП сотрудника',
+                'pv_id'        => 'Пункт выпуска',
+            ],
+            /**
+             * ЖУРНАЛЫ
+             */
+            'report_cart' => [
+                'company_id'   => 'Компания',
+                'driver_id'    => 'Водитель',
+                'date'         => 'Дата снятия отчета',
+                'user_name'    => 'Ф.И.О (при наличии) лица, проводившего снятие',
+                'user_eds'     => 'Подпись лица, проводившего снятие',
+                'pv_id'        => 'Пункт выпуска',
+                'signature'    => 'ЭЛ подпись водителя',
+                'created_at'   => 'Дата/Время создания записи',
+            ],
             'pak' => [
+                'company_id'             => 'Компания',
+                'driver_id'              => 'Водитель',
+                'car_id'                 => 'Госномер ТС',
                 'date'                   => 'Дата и время осмотра',
                 'user_name'              => 'ФИО работника',
                 'driver_gender'          => 'Пол',
@@ -432,21 +533,16 @@ class Anketa extends Model
                 // Поля не в выгрузку
                 'created_at'             => 'Дата создания',
                 'driver_group_risk'      => 'Группа риска',
-                'driver_fio'             => 'Водитель',
-                'company_id'             => 'ID компании',
-                'driver_id'              => 'ID водителя',
                 'photos'                 => 'Фото',
                 'med_view'               => 'Мед показания',
                 'pv_id'                  => 'Пункт выпуска',
-                'car_mark_model'         => 'Автомобиль',
-                'car_id'                 => 'ID автомобиля',
+                'car_mark_model'         => 'Марка/модель втомобиль',
                 'number_list_road'       => 'Номер путевого листа',
                 //'date_number_list_road' => 'Срок действия путевого листа',
                 'type_view'              => 'Тип осмотра',
                 'comments'               => 'Комментарий',
                 'flag_pak'               => 'Флаг СДПО',
             ],
-
             'pak_queue' => [
                 'created_at' => 'Дата создания',
                 'driver_fio' => 'Водитель',
@@ -459,80 +555,6 @@ class Anketa extends Model
                 'photos'     => 'Фото',
                 'videos'     => 'Видео',
             ],
-
-            /**
-             * Технический осмотр (параметры полей)
-             */
-            'tech'      => [
-                'company_id'     => 'ID Компании',
-                'company_name'     => 'Компания',
-                'date'           => 'Дата, время проведения контроля',
-                'period_pl'      => 'Период выдачи ПЛ',
-                'created_at'     => 'Дата создания',
-                'car_gos_number' => 'Гос.регистрационный номер ТС',
-                'realy'        => 'Осмотр реальный?',
-                'car_type_auto' => 'Категория ТС',
-                'car_mark_model' => 'Марка автомобиля',
-                'type_view'          => 'Тип осмотра',
-                'driver_fio'     => 'ФИО Водителя',
-
-                // ID'шники
-                'driver_id'      => 'ID водителя',
-                'car_id'         => 'ID автомобиля',
-
-                // Доп поля
-
-                'number_list_road'   => 'Номер ПЛ',
-                //'date_number_list_road' => 'Срок действия путевого листа',
-                'odometer'           => 'Показания одометра',
-                'point_reys_control' => 'Отметка о прохождении контроля',
-                'user_name'          => 'ФИО ответственного',
-                'user_eds'           => 'Подпись лица, проводившего контроль',
-                'pv_id'              => 'Пункт выпуска',
-                'is_dop'             => 'Режим ввода ПЛ',
-            ],
-
-            /**
-             * ЖУРНАЛЫ
-             */
-            'report_cart' => [
-                'company_id'   => 'ID Компании',
-                'company_name'   => 'Компания',
-                'date'         => 'Дата снятия отчета',
-                'driver_fio'   => 'Ф.И.О водителя',
-                'user_name'    => 'Ф.И.О (при наличии) лица, проводившего снятие',
-                'user_eds'     => 'Подпись лица, проводившего снятие',
-                'pv_id'        => 'Пункт выпуска',
-                'driver_id'    => 'ID водителя',
-                'signature'    => 'ЭЛ подпись водителя',
-                'created_at' => 'Дата/Время создания записи',
-            ],
-
-            'pechat_pl' => [
-                'company_name' => 'Компания',
-                'company_id' => 'ID Компания',
-                'date'         => 'Дата распечатки ПЛ',
-                'driver_fio'   => 'ФИО водителя',
-                'count_pl'     => 'Количество распечатанных ПЛ',
-                'user_name'    => 'Ф.И.О сотрудника, который готовил ПЛ',
-                'user_eds'     => 'ЭЦП сотрудника',
-                'pv_id'        => 'Пункт выпуска',
-            ],
-
-            'bdd' => [
-                'company_name'    => 'Компания',
-                'company_id'    => 'ID Компании',
-                'date'          => 'Дата, время',
-                'created_at'    => 'Дата внесения в журнал',
-                'type_briefing' => 'Вид инструктажа',
-                'driver_fio'    => 'Ф.И.О водителя, прошедшего инструктаж',
-                'user_name'     => 'Ф.И.О (при наличии) лица, проводившего инструктаж',
-                'pv_id'         => 'Пункт выпуска',
-                'user_eds'      => 'Подпись лица, проводившего инструктаж',
-                'driver_id'     => 'ID водителя',
-                'signature'     => 'ЭЛ подпись водителя',
-            ],
-
         ];
 
 

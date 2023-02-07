@@ -11,15 +11,15 @@
 
     @if($fieldsGroupFirst)
         <div class="row">
-        @isset ($fieldsGroupFirst['id'])
-            <div class="col-md-3">
-                <div class="form-group">
-                    <label>{{ $fieldsGroupFirst['id'] }}</label>
+            @isset ($fieldsGroupFirst['id'])
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>{{ $fieldsGroupFirst['id'] }}</label>
 
-                    <input type="number" name="id" class="form-control" value="{{ request()->get('id') ? request()->get('id') : '' }}">
+                        <input type="number" name="id" class="form-control" value="{{ request()->get('id') ? request()->get('id') : '' }}">
+                    </div>
                 </div>
-            </div>
-        @endisset
+            @endisset
 
             @php
                 // если есть дата в _GET запросе, но пустая, то оставляем пустую
@@ -44,7 +44,7 @@
 
                             @php $field_view_key = join('_', explode('.', $field)); @endphp
                             @php $field_view = 'profile.ankets.fields.' . $field_view_key; @endphp
-
+                          
                             @if(View::exists($field_view))
                                 @include($field_view, [
                                     'field_default_value' => !empty(request()->get($field_view_key)) ? request()->get($field_view_key) : 'Не установлено'
@@ -52,13 +52,13 @@
                             @else
                                 {{--ИЗНАЧАЛЬНОЕ ПОЛЕ ФИЛЬТР--}}
                                 <input
-                                    @if($field === 'date' || strpos($field, '_at') > 0)
-                                    type="date"
-                                    @else
-                                    type="search"
-                                    @endif
+                                        @if($field === 'date' || strpos($field, '_at') > 0)
+                                            type="date"
+                                        @else
+                                            type="search"
+                                        @endif
 
-                                    value="{{ request()->get($field) ? request()->get($field) : (($field === 'date' || strpos($field, '_at')) ? $date_from_filter : '') }}" name="{{ $field }}" class="form-control" />
+                                        value="{{ request()->get($field) ? request()->get($field) : (($field === 'date' || strpos($field, '_at')) ? $date_from_filter : '') }}" name="{{ $field }}" class="form-control" />
                             @endif
 
                         </div>
@@ -70,9 +70,9 @@
                             <div class="form-group">
                                 <label>{{ (isset($fieldsGroupFirst[$field]['name'])) ? $fieldsGroupFirst[$field]['name'] : $fieldsGroupFirst[$field] }} до</label>
                                 <input
-                                    type="date"
-                                    value="{{ request()->get('TO_'.$field) ? request()->get('TO_'.$field) : $date_to_filter }}"
-                                    name="TO_{{ $field }}" class="form-control" />
+                                        type="date"
+                                        value="{{ request()->get('TO_'.$field) ? request()->get('TO_'.$field) : $date_to_filter }}"
+                                        name="TO_{{ $field }}" class="form-control" />
                             </div>
                         </div>
                     @endif
@@ -120,13 +120,13 @@
                             @else
                                 {{--ИЗНАЧАЛЬНОЕ ПОЛЕ ФИЛЬТР--}}
                                 <input
-                                    @if($field === 'date' || strpos($field, '_at') > 0)
-                                    type="date"
-                                    @else
-                                    type="search"
-                                    @endif
+                                        @if($field === 'date' || strpos($field, '_at') > 0)
+                                            type="date"
+                                        @else
+                                            type="search"
+                                        @endif
 
-                                    value="{{ request()->get($field) }}" name="{{ $field }}" class="form-control" />
+                                        value="{{ request()->get($field) }}" name="{{ $field }}" class="form-control" />
                             @endif
 
                         </div>
@@ -138,9 +138,9 @@
                             <div class="form-group">
                                 <label>{{ (isset($fieldsKeys[$field]['name'])) ? $fieldsKeys[$field]['name'] : $fieldsKeys[$field] }} до</label>
                                 <input
-                                    type="date"
-                                    value="{{ request()->get('TO_'.$field) }}"
-                                    name="TO_{{ $field }}" class="form-control" />
+                                        type="date"
+                                        value="{{ request()->get('TO_'.$field) }}"
+                                        name="TO_{{ $field }}" class="form-control" />
                             </div>
                         </div>
                     @endif
@@ -150,24 +150,24 @@
         @endforeach
 
         @if($type_ankets == 'tech' || $type_ankets == 'medic')
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label><b>Время проведения осмотра с:</b></label>
-                        <input
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label><b>Время проведения осмотра с:</b></label>
+                    <input
                             type="time"
                             value="{{ request()->get('hour_from') }}"
                             name="hour_from" class="form-control" />
-                    </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label><b>Время проведения осмотра до:</b></label>
-                        <input
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label><b>Время проведения осмотра до:</b></label>
+                    <input
                             type="time"
                             value="{{ request()->get('hour_to') }}"
                             name="hour_to" class="form-control" />
-                    </div>
                 </div>
+            </div>
         @endif
     </div>
 </div>

@@ -4,11 +4,15 @@
 @section('sidebar', 1)
 @section('content')
     <report-dynamic-index
-        :towns='JSON.parse(`@json($towns)`)'
-        :points='JSON.parse(`@json($points)`)'
-        town="{{ request()->get('town_id') }}"
-        point="{{ request()->get('pv_id') }}"
-        type="{{ $journal }}"
+            :towns='@json($towns)'
+            :points='@json($points)'
+            town="{{ request()->get('town_id') }}"
+            point="{{ request()->get('pv_id') }}"
+            order="{{ request()->get('order_by') ?? 'execute' }}"
+            type="{{ $journal }}"
+            :infos='@json($total)'
+            :monthnames='@json($monthnames)'
+            :monthtotal='@json($monthtotal)'
     >
         @if($companies)
             <div class="card">
@@ -33,7 +37,7 @@
                                 <td width="100">{{ $company_id }}</td>
                                 <td width="250">{{ $info['name'] }}</td>
                                 @foreach($months as $month)
-                                    <td width="250" class="text-center">{{ $info[$month] }}</td>
+                                    <td width="250" class="text-center">{{ $info[$month] ?? 0 }}</td>
                                 @endforeach
                             </tr>
                         @endforeach
@@ -43,7 +47,7 @@
                             <td width="100"></td>
                             <td width="250">Всего</td>
                             @foreach($months as $month)
-                                <td width="250" class="text-center">{{ $total[$month] }}</td>
+                                <td width="250" class="text-center">{{ $total[$month] ?? 0 }}</td>
                             @endforeach
                         </tr>
                         </tbody>
@@ -55,5 +59,6 @@
                 Осмотры не найдены
             </div>
         @endif
+        <canvas id="chart"></canvas>
     </report-dynamic-index>
 @endsection

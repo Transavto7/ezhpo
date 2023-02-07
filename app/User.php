@@ -2,19 +2,19 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @property string $name
+ * @property Collection $companies
+ */
 class User extends Authenticatable
 {
     use Notifiable, HasRoles, SoftDeletes;
@@ -97,19 +97,24 @@ class User extends Authenticatable
     public function anketas()
     {
         return $this->hasMany(Anketa::class, 'user_id', 'id')
-                    ->withDefault();
+            ->withDefault();
     }
 
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id', 'id')
-                    ->withDefault();
+            ->withDefault();
+    }
+
+    public function companies()
+    {
+        return $this->hasMany(Company::class);
     }
 
     public function pv()
     {
         return $this->belongsTo(Point::class, 'pv_id')
-                    ->withDefault();
+            ->withDefault();
     }
 
     public static $newUserRolesText
@@ -144,15 +149,6 @@ class User extends Authenticatable
         return $this->getAllPermissions()
                     ->whereIn('name', $permissionName)
                     ->isNotEmpty();
-
-//        foreach (){
-//            $this->getAllPermissions()->where()
-//        }
-//        if(count($permissionName) === 1){
-//            return $this->hasPermissionTo($permissionName[0]);
-//        }else{
-//            return $this->hasAnyPermission($permissionName);
-//        }
     }
 
     public static function fetchPermissions()
@@ -200,7 +196,7 @@ class User extends Authenticatable
 
     public static $userRolesKeys
         = [
-            '0'   => '',
+            '0'   => 'medic',
             '1'   => 'tech',
             '2'   => 'medic',
             '4'   => 'pak_queue',
@@ -240,36 +236,6 @@ class User extends Authenticatable
 
         return -1;
     }
-
-//    public function hasRole($role, $prefix = '>=')
-//    {
-//        if (isset(self::$userRolesValues[$role])) {
-//            $c_role = self::$userRolesValues[$role];
-//            $user   = auth()->user();
-//
-//            eval('$expr = '.$user->role.$prefix.$c_role.';');
-//
-//            if ($expr) {
-//                return true;
-//            }
-//
-//        }
-//
-//        return false;
-//    }
-
-    /**
-     * Проверка админа пользователя
-     */
-//    public static function isAdmin()
-//    {
-//        return Auth::user()->role >= 777;
-//    }
-
-//    public static function getAll()
-//    {
-//        return self::where('role', '!=', 3)->get();
-//    }
 
     /**
      * Получение имени юзера

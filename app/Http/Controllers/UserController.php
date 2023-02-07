@@ -24,9 +24,7 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        // ebat' ya query builder
-        $users = User::with(['roles'  => function ($q) use ($request) {
-            $q->orderBy('guard_name', ($request->get('sortDesc') == 'true' && $request->get('sortBy') == 'roles') ? 'DESC' : 'ASC');
+        $users = User::with(['roles' => function ($q) use ($request) {
         }, 'pv', 'company'])
                      ->where(function ($query) use ($request) {
                          $query->whereDoesntHave('roles')
@@ -38,8 +36,8 @@ class UserController extends Controller
         if ($request->get('deleted')) {
             $users->with(['deleted_user'])->onlyTrashed();
         }
-        if ($name = $request->get('name')) {
-            $users->where('name', 'like', "%$name%");
+        if ($id = $request->get('hash_id')) {
+            $users->where('hash_id', $id);
         }
         if ($email = $request->get('email')) {
             $users->where('email', 'like', "%$email%");
@@ -50,13 +48,15 @@ class UserController extends Controller
 
         if ($sortBy = $request->get('sortBy', 'id')) {
             if($sortBy == 'roles'){
-                $users->rightJoin('model_has_roles', 'users.id', 'model_has_roles.model_id')
-                      ->rightJoin('roles', function ($join)  {
+                $users->join('model_has_roles', 'users.id', 'model_has_roles.model_id')
+                      ->join('roles', function ($join) use($request) {
                           $join->on('model_has_roles.role_id', '=', 'roles.id')
+                               ->orderBy('roles.guard_name', $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC')
                           ;
-                })
-                    ->orderBy('roles.guard_name', $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC')//;
-                    ->select('users.*', 'guard_name');
+                      })
+                      ->orderBy('roles.guard_name', $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC')//;
+                      ->select('users.*', 'guard_name')
+                      ->groupBy('users.id');
             }else{
                 $users->orderBy($sortBy, $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC');
             }
@@ -66,26 +66,25 @@ class UserController extends Controller
                 $q->where('id', $role);
             });
         }
-//dd($users->limit(3)->get()->toArray());
+
         if ($request->get('api')) {
             $res = $users->paginate();
+            $secondRes = $users->get()->sortBy;
 
             return response([
-                'total_rows'   => $res->total(),
-                'current_page' => $res->currentPage(),
-                'items'        => $res->getCollection(),
-            ]);
+                                'total_rows'   => $res->total(),
+                                'current_page' => $res->currentPage(),
+                                'items'        => $res->getCollection(),
+                            ]);
         }
 
         $fields = FieldPrompt::where('type', 'users')->get();
 
-//        dd($fields->toArray());
-
         return view('admin.users_v2.index')
             ->with([
-                'users' => $users->paginate(),
-                'fields' => $fields
-            ]);
+                       'users' => $users->paginate(),
+                       'fields' => $fields
+                   ]);
     }
 
     /**
@@ -151,19 +150,19 @@ class UserController extends Controller
 
             if ($validator->fails()) {
                 return response([
-                    'message' => $validator->errors(),
-                    'status'  => false,
-                ]);
+                                    'message' => $validator->errors(),
+                                    'status'  => false,
+                                ]);
             }
 
             $user = User::create([
-                'name'     => $request->get('name', null),
-                'email'    => $request->get('email', null),
-                'hash_id'  => mt_rand(1000, 9999).date('s'),
-                'eds'      => $request->get('eds', null),
-                'timezone' => $request->get('timezone', null),
-                'blocked'  => $request->get('blocked', null),
-            ]);
+                                     'name'     => $request->get('name', null),
+                                     'email'    => $request->get('email', null),
+                                     'hash_id'  => mt_rand(1000, 9999).date('s'),
+                                     'eds'      => $request->get('eds', null),
+                                     'timezone' => $request->get('timezone', null),
+                                     'blocked'  => $request->get('blocked', null),
+                                 ]);
         }
 
         if ($login = $request->get('login', null)) {
@@ -189,10 +188,10 @@ class UserController extends Controller
         $user->save();
 
         return response([
-            'status'    => true,
-            'user_info' => User::with(['roles', 'permissions', 'pv'])
-                               ->find($user->id),
-        ]);
+                            'status'    => true,
+                            'user_info' => User::with(['roles', 'permissions', 'pv'])
+                                               ->find($user->id),
+                        ]);
     }
 
 
@@ -228,15 +227,15 @@ class UserController extends Controller
     public function destroy(Request $request)
     {
         return response([
-            'status' => User::find($request->post('id'))->delete(),
-        ]);
+                            'status' => User::find($request->post('id'))->delete(),
+                        ]);
     }
 
     public function returnTrash(Request $request)
     {
         return response([
-            'status' => User::withTrashed()->find($request->post('id'))->restore(),
-        ]);
+                            'status' => User::withTrashed()->find($request->post('id'))->restore(),
+                        ]);
     }
 
     public function fetchRoleData(Request $request)

@@ -28,6 +28,29 @@ Artisan::command('fetch:permissions', function () {
                    .$permissions['deleted'].' - доступов удалено');
 })->describe('Display an inspiring quote');
 
+Artisan::command('init:contracts', function () {
+    if(\App\Models\Contract::startContract()){
+        $this->comment('Договора вроде инициализированы');
+    }
+})->describe('Display an inspiring quote');
+
+Artisan::command('contract:first', function () {
+    if(\App\Models\Contract::deleteOld()){
+        $this->comment('Всё удалено');
+    }
+})->describe('Display an inspiring quote');
+
+Artisan::command('contract:second {limit}', function ($limit) {
+    if(\App\Models\Contract::init_companies($limit)){
+        $this->comment('Связано');
+    }
+})->describe('Display an inspiring quote');
+Artisan::command('contract:third', function () {
+    if(\App\Models\Contract::test_one()){
+        $this->comment('Связано nakonec to');
+    }
+})->describe('Display an inspiring quote');
+
 Artisan::command('companies:procedure_pv-fix', function () {
     \App\Company::whereNotIn('procedure_pv', [
         'Наперед без дат',
@@ -69,6 +92,55 @@ Artisan::command('anketas:fix', function () {
     $this->comment('Анкеты пофикшенs');
 
 })->describe('Display an inspiring quote');
+
+Artisan::command('services:create', function () {
+    \App\FieldPrompt::where('type', 'service')->forceDelete();
+
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'hash_id',
+        'name' => 'ID'
+    ]);
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'name',
+        'name' => 'Название'
+    ]);
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'type_product',
+        'name' => 'Тип'
+    ]);
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'unit',
+        'name' => 'Ед.изм.'
+    ]);
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'price_unit',
+        'name' => 'Стоимость за единицу'
+    ]);
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'type_anketa',
+        'name' => 'Реестр'
+    ]);
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'type_view',
+        'name' => 'Тип осмотра'
+    ]);
+    \App\FieldPrompt::create([
+        'type' => 'service',
+        'field' => 'essence',
+        'name' => 'Сущности'
+    ]);
+
+    \App\Service::where('id', '>', -1)->forceDelete();
+    $products = \App\Product::get()->toArray();
+    \App\Service::insert($products);
+});
 
 Artisan::command('drivers_birthday:fix', function () {
 
