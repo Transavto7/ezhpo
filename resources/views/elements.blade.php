@@ -650,6 +650,10 @@ $permissionToViewContract = user()->access('contract_read');
                                                     </a>
                                                 @endif
                                             </nobr>
+                                        @elseif ($field->field === 'pressure_systolic' && $model === 'Driver')
+                                            {{ $el->getPressureSystolic() }}
+                                        @elseif ($field->field === 'pressure_diastolic' && $model === 'Driver')
+                                            {{ $el->getPressureDiastolic() }}
                                         @else
                                             {{--ПРОВЕРКА ДАТЫ--}}
                                             @if($field->field === 'date' || strpos($field->field, '_at') > 0)
