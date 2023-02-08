@@ -1195,7 +1195,10 @@ class IndexController extends Controller
                                 $aSyncFields = explode(',', $element->autosync_fields);
 
                                 foreach ($aSyncFields as $fSync) {
-                                    $element->$fSync = Company::find($element->company_id)->$fSync;
+                                    $company = Company::find($element->company_id);
+                                    if ($company) {
+                                        $element->$fSync = $company->$fSync;
+                                    }
                                 }
                             }
                         }
