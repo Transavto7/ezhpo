@@ -3,23 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Anketa;
-use App\Car;
-use App\Company;
-use App\Driver;
 use App\Exports\AnketasExport;
 use App\Exports\TechAnketasExport;
 use App\FieldPrompt;
 use App\User;
+use Auth;
 use Carbon\Carbon;
-use Carbon\CarbonPeriod;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
-use function foo\func;
 
 class HomeController extends Controller
 {
@@ -36,7 +29,7 @@ class HomeController extends Controller
     /**
      * Show the application dashboard.
      *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * @return Renderable
      */
     public static function searchFieldsAnkets($anketa, $anketaModel, $fieldsKeys)
     {
@@ -92,7 +85,7 @@ class HomeController extends Controller
             }
         }
 
-        $user = \Auth::user();
+        $user = Auth::user();
 
         $validTypeAnkets       = User::$userRolesKeys[$user->role] ?? 'medic';
         $blockedToExportFields = [];
@@ -335,23 +328,22 @@ class HomeController extends Controller
 
         // Экспорт из техосмотров и БДД
         if ($is_export && $filter_activated) {
-
             if ($validTypeAnkets == 'tech') {
                 if ($request->get('exportPrikaz')) {
-                    $techs = $anketas
-                        ->where('type_anketa', 'tech')
+                    $techs = $anketas->where('type_anketa', 'tech')
                         ->get();
 
                     return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_to']),
-                                           'ЭЖ ПРТО.xlsx');
+                        'ЭЖ ПРТО.xlsx');
                 }
 
                 if ($request->get('exportPrikazPL')) {
-                    $techs = $anketas->where('type_anketa', 'tech')
-                                     ->get();
+                    $techs = $anketas->where(['type_view' => 'Предрейсовый/Предсменный'])
+                        ->cursor()
+                    ;
 
                     return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_pl']),
-                                           'ЭЖ учета ПЛ.xlsx');
+                        'ЭЖ учета ПЛ.xlsx');
                 }
             }
 

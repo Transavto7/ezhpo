@@ -246,53 +246,6 @@ export default {
             // }
 
             })
-
-
-            // for (let contract_key in this.contracts) {
-            //     // this.temporary = [];
-            //     // this.temporary[this.contracts[contract_key].id] = contract_key;
-            //
-            //     axios.get('/api/reports/contract/journal_v2', {
-            //         params: {
-            //             company_id: this.company_id,
-            //             contracts_ids: [this.contracts[contract_key].id],
-            //             month:         this.month
-            //         }
-            //     }).then(({data}) => {
-            //         console.log('==========================')
-            //         console.log(data)
-            //         this.contracts[contract_key].visible_result = true;
-            //         this.contracts[contract_key].sum = this.getTotalContractSum(data);
-            //
-            //         this.$refs.reportsMedic[contract_key].hide();
-            //         this.$refs.reportsMedic[contract_key].visible(data.medics);
-            //
-            //         this.$refs.reportsTech[contract_key].hide();
-            //         this.$refs.reportsTech[contract_key].visible(data.techs);
-            //
-            //         this.$refs.reportsTechOther[contract_key].hide();
-            //         this.$refs.reportsTechOther[contract_key].visible(data.techs_other);
-            //
-            //         this.$refs.reportsMedicOther[contract_key].hide();
-            //         this.$refs.reportsMedicOther[contract_key].visible(data.medics_other);
-            //
-            //         this.$refs.reportsOther[contract_key].hide();
-            //         this.$refs.reportsOther[contract_key].visible(data.other);
-            //
-            //         if (data.message.length) {
-            //             Swal2.fire({
-            //                 icon:  'error',
-            //                 title: 'Упсс...',
-            //                 text:  data.message,
-            //             })
-            //         }
-            //     }).finally(() => {
-            //         fuckerCounterInAssMazzarettoEbleto++;
-            //         if (fuckerCounterInAssMazzarettoEbleto === fuckerCounterInAssMazzarettoEbletoTotalCountDickInHerAss) {
-            //             this.loading = false;
-            //         }
-            //     });
-            // }
         },
         searchCompany(query = '') {
             axios.get('/api/companies/find', {
@@ -301,6 +254,7 @@ export default {
                 }
             }).then(({ data }) => {
                 this.companies = data;
+                console.log(this.companies)
             });
         },
         searchServices() {
@@ -350,7 +304,6 @@ export default {
 
             this.report();
         }
-
     },
     watch:{
         company(val){

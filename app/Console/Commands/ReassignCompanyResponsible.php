@@ -76,21 +76,19 @@ class ReassignCompanyResponsible extends Command
 
         \DB::transaction(function () use ($namesFirst, $namesSecond) {
 
-            $generalAccountManager = Role::where(['name' => 'general_account_manager'])->first();
-            $accountManager = Role::where(['name' => 'account_manager'])->first();
+            $generalAccountManager = Role::where(['guard_name' => 'Менеджер по работе с общими клиентами'])->first();
+            $accountManager = Role::where(['guard_name' => 'Менеджер по работе с клиентами'])->first();
 
             if (!($generalAccountManager && $accountManager)) {
                 $generalAccountManager = Role::updateOrCreate([
                     'name' => 'general_account_manager',
-                    'guard_name' => 'web,api',
+                    'guard_name' => 'Менеджер по работе с общими клиентами',
                 ]);
 
                 $accountManager = Role::updateOrCreate([
                     'name' => 'account_manager',
-                    'guard_name' => 'web,api',
+                    'guard_name' => 'Менеджер по работе с общими клиентами',
                 ]);
-
-                dump('Roles created!');
             }
 
             /**

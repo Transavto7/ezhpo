@@ -59,7 +59,6 @@
                                 @isset($anketa)
                                     <div class="col-md-6">
                                         <div class="card p-2 text-xsmall">
-
                                             @if($type_anketa === 'medic')
                                                 <b>"{{ $title }}" успешно создан!</b>
                                                 <br/> ID осмотра: {{ $cId }}
@@ -169,7 +168,10 @@
                             @hasSection('ankets_submit')
                                 @yield('ankets_submit')
                             @else
-                                <button type="submit" class="m-center btn btn-success">{{ __('ankets.submit') }}</button>
+                                @if (isset($anketa_route))
+                                    <a href="{{ url()->previous()  }}" class="m-center btn btn-info">{{ __('Вернуться в журнал') }}</a>
+                                @endif
+                                <button type="submit"  class="m-center btn btn-success">{{ __('ankets.submit') }}</button>
                             @endif
                         </div>
                     </form>

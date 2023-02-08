@@ -1,9 +1,8 @@
 import axios from 'axios'
 import swal from 'sweetalert2'
-import { v4 as uidv4 } from 'uuid'
+import Swal2 from 'sweetalert2'
+import {v4 as uidv4} from 'uuid'
 import {ApiController} from "./components/ApiController";
-import { Fancybox } from "@fancyapps/ui";
-import Swal2 from "sweetalert2";
 
 require('./init-plugins')
 require('chosen-js')
@@ -30,6 +29,11 @@ function toggleAnketaCloneButton(state) {
 }
 
 $(document).ready(function () {
+
+    $('div.form-group').each(function (i, el) {
+        $(el).has(':input[required]').addClass('required')
+    });
+
     const Toast = swal.mixin({
         toast: true,
         position: 'top-end',
