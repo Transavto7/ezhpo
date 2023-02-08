@@ -287,6 +287,12 @@ Route::middleware(['auth'])->group(function () {
 
 });
 
+Route::get('/fix', function () {
+   $driver = Driver::where('hash_id', '123456')->first();
+
+   dd($driver->fio, $driver->getPressureSystolic(), $driver->getPressureDiastolic());
+});
+
 // Маршруты авторизации
 Auth::routes();
 

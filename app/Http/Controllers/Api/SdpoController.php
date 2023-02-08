@@ -99,8 +99,9 @@ class SdpoController extends Controller
 
         //ПРОВЕРЯЕМ статус для поля "Заключение"
         $ton = explode('/', $tonometer);
-        if ($proba_alko === 'Положительно' || $test_narko === 'Положительно' || intval($ton[1]) >= 120
-            || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38 || intval($ton[0]) >= 220) {
+        if ($proba_alko === 'Положительно' || $test_narko === 'Положительно'
+            || intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()
+            || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38) {
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
         }
@@ -163,9 +164,10 @@ class SdpoController extends Controller
      * return all medics
      */
     public function getMedics(Request $request) {
-        $users = User::with(['roles', 'pv:id,name,pv_id', 'pv.town:id,name'])->whereHas('roles', function ($q) use ($request) {
+        $users = User::with(['roles', 'pv:id,name,pv_id', 'pv.town:id,name'])
+            ->whereHas('roles', function ($q) use ($request) {
             $q->where('roles.id', 2);
-        })->select('id', 'name', 'eds', 'pv_id')->limit(10)->get();
+        })->select('id', 'name', 'eds', 'pv_id')->get();
 
         $users = $users->groupBy(['pv.town.name', 'pv.name']);
 

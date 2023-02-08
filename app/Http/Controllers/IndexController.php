@@ -279,6 +279,16 @@ class IndexController extends Controller
                         'multiple'     => 1,
                         'hidden'       => 1,
                     ],
+                    'pressure_systolic' => [
+                        'label'        => 'Порог верхнего давления',
+                        'type'         => 'number',
+                        'noRequired' => 1,
+                    ],
+                    'pressure_diastolic' => [
+                        'label'        => 'Порог нижнего давления',
+                        'type'         => 'number',
+                        'noRequired' => 1,
+                    ],
                 ],
             ],
             'Car'      => [
@@ -484,6 +494,16 @@ class IndexController extends Controller
                     'document_bdd' => [
                         'label'      => 'Ссылка на таблицу с документами по бдд',
                         'type'       => 'text',
+                        'noRequired' => 1,
+                    ],
+                    'pressure_systolic' => [
+                        'label'        => 'Порог верхнего давления',
+                        'type'         => 'number',
+                        'noRequired' => 1,
+                    ],
+                    'pressure_diastolic' => [
+                        'label'        => 'Порог нижнего давления',
+                        'type'         => 'number',
                         'noRequired' => 1,
                     ],
                 ],
@@ -1170,6 +1190,8 @@ class IndexController extends Controller
                         } else {
                             if (isset($v) && !$request->hasFile($k)) {
                                 $element[$k] = $v;
+                            } else if ($k === 'pressure_systolic' || $k === 'pressure_diastolic') {
+                                $element[$k] = null;
                             }
                         }
                     }
