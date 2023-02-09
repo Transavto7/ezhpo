@@ -2,9 +2,10 @@
     'v' => [
         'type' => 'select',
         'values' => 'Driver',
-        'getField' => 'concat',
+        'getField' => 'fio',
         'getFieldKey' => 'hash_id',
-        'multiple' => 1
+        'multiple' => 1,
+        'concatField' => 'hash_id'
     ],
     'model' => $type_ankets,
     'k' => $field,

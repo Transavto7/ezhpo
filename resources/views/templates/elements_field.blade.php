@@ -88,86 +88,59 @@
         $default_value = is_array($default_value) ? $default_value : explode(',', $default_value);
         $key = $v['getFieldKey'] ?? 'id';
         $value = $v['getField'] ?? 'name';
-    @endphp
-    @php
-        //if($v['label'] == 'Компания'){
-        //        dd($v, app("App\\" . $v['values'])::whereIn($key, $default_value)->get()->toArray(), $key, $default_value);
-    //
-        //}
-        //dump($el ?? '');
-              // if(($el->type_product ?? '') != 'Абонентская плата без реестров' && ($k == 'essence' )):
-              //      dd(123);
-              // endif;
+        $concatField = $v['concatField'] ?? false;
     @endphp
 
     <select
-            @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' )) disabled @endif
-    @if(($el->type_product ?? '') != 'Абонентская плата без реестров' && ($k == 'essence' )) disabled @endif
-            @isset($v['saveToHistory'])
-                onchange="addFieldToHistory(event.target.value, '{{ $v['label'] }}');"
-            @endisset
+        @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' )) disabled @endif
+        @if(($el->type_product ?? '') != 'Абонентская плата без реестров' && ($k == 'essence' )) disabled @endif
+        @isset($v['saveToHistory'])
+            onchange="addFieldToHistory(event.target.value, '{{ $v['label'] }}');"
+        @endisset
 
-            @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' ))
-                @php
-                    $is_required = '';
-                @endphp
-            @endif
-            @if(!is_array($v['values']))
-                model="{{ $v['values'] }}"
+        @if(($el->type_product ?? '') == 'Абонентская плата без реестров' && ($k == 'type_view'|| $k == 'type_anketa' ))
+            @php
+                $is_required = '';
+            @endphp
+        @endif
+        @if(!is_array($v['values']))
+            model="{{ $v['values'] }}"
             field-key="{{ $key }}"
             field="{{ $value }}"
-            @endif
+        @endif
 
-            @isset($v['multiple'])
-                multiple="multiple"
+        @if($concatField)
+            field-concat="{{ $concatField }}"
+        @endif
+
+        @isset($v['multiple'])
+            multiple="multiple"
             name="{{ $k }}[]"
-            @else
-                name="{{ $k }}"
-            @endisset
+        @else
+            name="{{ $k }}"
+        @endisset
 
-            {{ $is_required }}
-            data-label="{{ $v['label'] ?? $k }}"
-            data-field="{{ $model }}_{{ $k }}"
-            class="filled-select2 filled-select @if($k === 'type_product') {{ 'type_product' }} @endif"
-            data-allow-clear=true
+        {{ $is_required }}
+        data-label="{{ $v['label'] ?? $k }}"
+        data-field="{{ $model }}_{{ $k }}"
+        class="filled-select2 filled-select @if($k === 'type_product') {{ 'type_product' }} @endif"
+        data-allow-clear=true
     >
         {{-- disabled selected --}}
         <option value="">Не установлено</option>
-
         @if(is_array($v['values']))
             @foreach($v['values'] as $optionK => $optionV)
                 <option
-                        @if(in_array($optionV, $default_value) || in_array($optionK, $default_value)) selected @endif
+                    @if(in_array($optionV, $default_value) || in_array($optionK, $default_value)) selected @endif
                 value="{{ $optionK }}">
                     {{ $optionV }}
                 </option>
             @endforeach
         @else
-            @php
-                $mainField = "";
-                if ($value == 'concat') {
-                    if (!isset($field)) {
-                        $field = lcfirst($v['values']) . '_id';
-                    }
-
-                    switch ($field) {
-                        case 'driver_id':
-                            $mainField = 'fio';
-                            break;
-                        case 'car_id':
-                            $mainField = 'gos_number';
-                            break;
-                        case 'products_id':
-                        default:
-                            $mainField = 'name';
-                            break;
-                    }
-                }
-            @endphp
             @foreach(app("App\\" . $v['values'])::whereIn($key, $default_value)->get() as $option)
                 <option selected value="{{ $option[$key] }}">
-                    @if ($value == 'concat')
-                        [{{ $option['hash_id'] }}] {{ $option[$mainField] }}
+                    @if ($concatField)
+                        [{{ $option[$concatField] }}] {{ $option[$value] }}
                     @else
                         {{ $option[$value] }}
                     @endif
@@ -175,8 +148,8 @@
             @endforeach
             @foreach(app("App\\" . $v['values'])::whereNotIn($key, $default_value)->limit(100)->get() as $option)
                 <option value="{{ $option[$key] }}">
-                    @if ($value == 'concat')
-                        [{{ $option['hash_id'] }}] {{ $option[$mainField] }}
+                    @if ($concatField)
+                        [{{ $option[$concatField] }}] {{ $option[$value] }}
                     @else
                         {{ $option[$value] }}
                     @endif

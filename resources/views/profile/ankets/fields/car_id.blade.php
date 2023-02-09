@@ -2,9 +2,10 @@
     'v' => [
         'type' => 'select',
         'values' => 'Car',
-        'getField' => 'concat',
+        'getField' => 'gos_number',
         'getFieldKey' => 'hash_id',
-        'multiple' => 1
+        'multiple' => 1,
+        'concat' => 'hash_id'
     ],
     'model' => $type_ankets,
     'k' => $field,

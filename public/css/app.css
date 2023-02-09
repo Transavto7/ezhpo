@@ -18248,3 +18248,13 @@ input:checked + .slider:before {
 .modal-backdrop {
   opacity: 0.5;
 }
+
+.form-group.required .form-control-label:after {
+  content: "*";
+  color: red;
+}
+
+.table-responsive {
+  height: 400px;
+  overflow: scroll;
+}

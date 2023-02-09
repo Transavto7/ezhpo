@@ -37,7 +37,7 @@ class UserController extends Controller
             $users->with(['deleted_user'])->onlyTrashed();
         }
         if ($id = $request->get('hash_id')) {
-            $users->where('hash_id', $id);
+            $users->whereIn('hash_id', $id);
         }
         if ($email = $request->get('email')) {
             $users->where('email', 'like', "%$email%");
