@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Anketa;
 use App\Exports\AnketasExport;
-use App\Exports\TechAnketasExport;
 use App\FieldPrompt;
 use App\User;
 use Auth;
