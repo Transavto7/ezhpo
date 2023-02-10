@@ -155,6 +155,7 @@ class Anketa extends Model
             'questions',
             'photos',
             'videos',
+            'terminal_id',
 
             //системные поля
             'in_cart',

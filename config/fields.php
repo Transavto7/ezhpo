@@ -253,6 +253,18 @@ return [
             'blocked' => 'Заблокирован',
             'roles' => 'Роль',
         ],
+        'terminals' => [
+            'status' => 'on/off',
+            'hash_id' => 'ID',
+            'name' => 'AnyDesk',
+            'company_id' => 'Компания',
+            'town' => 'Город',
+            'pv' => 'ПВ',
+            'timez  one' => 'GMT',
+            'blocked' => 'Заблокирован',
+            'last_month_amount' => 'Количество осмотров за предыдущий месяц',
+            'month_amount' => 'Количество осмотров за текущий месяц',
+        ],
         'roles' => [
             'id' => 'ID',
             'guard_name' => 'Название',

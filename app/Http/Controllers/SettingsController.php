@@ -24,6 +24,8 @@ class SettingsController extends Controller
             'id_auto_required' => $settings->where('key', 'id_auto_required')->first(),
             'phone' => $settings->where('key', 'phone')->first(),
             'telegram' => $settings->where('key', 'telegram')->first(),
+            'pressure_systolic' => $settings->where('key', 'pressure_systolic')->first(),
+            'pressure_diastolic' => $settings->where('key', 'pressure_diastolic')->first()
         ]);
     }
 
@@ -44,6 +46,8 @@ class SettingsController extends Controller
         Settings::where('key', 'sms_text_default')->update(['value' => $request->sms_text_default]);
         Settings::where('key', 'phone')->update(['value' => $request->phone]);
         Settings::where('key', 'telegram')->update(['value' => $request->telegram]);
+        Settings::where('key', 'pressure_systolic')->update(['value' => $request->pressure_systolic]);
+        Settings::where('key', 'pressure_diastolic')->update(['value' => $request->pressure_diastolic]);
 
         $id_auto = (bool) $request->id_auto;
         Settings::where('key', 'id_auto')->update(['value' => $id_auto ? '1' : '0']);

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -39,6 +40,7 @@ class User extends Authenticatable
             'user_post',
             'company_id',
             'deleted_id',
+            'last_connection_at'
         ];
 
     protected $hidden
@@ -49,7 +51,13 @@ class User extends Authenticatable
     protected $casts
         = [
             'email_verified_at' => 'datetime',
+            'last_connection_at' => 'datetime',
         ];
+
+    protected $appends = [
+        'last_month_amount',
+        'month_amount',
+    ];
 
     public function deleted_user()
     {
@@ -98,6 +106,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Anketa::class, 'user_id', 'id')
             ->withDefault();
+    }
+
+    public function terminalAnketas()
+    {
+        return $this->hasMany(Anketa::class, 'terminal_id', 'id');
     }
 
     public function company()
@@ -258,5 +271,19 @@ class User extends Authenticatable
         }
 
         return $userName;
+    }
+
+    public function getLastMonthAmountAttribute() {
+        if ($this->terminalAnketas) {
+            $date = Carbon::now()->startOfMonth()->startOfDay();
+            return $this->terminalAnketas->where('created_at', '<', $date)->count();
+        }
+    }
+
+    public function getMonthAmountAttribute() {
+        if ($this->terminalAnketas) {
+            $date = Carbon::now()->startOfMonth()->startOfDay();
+            return $this->terminalAnketas->where('created_at', '>=', $date)->count();
+        }
     }
 }

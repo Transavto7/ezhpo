@@ -62,6 +62,7 @@ class SdpoController extends Controller
         $medic['t_people'] = $request->t_people ?? 36.6;
         $medic['type_view'] = $request->type_view ?? 'Предрейсовый/Предсменный';
         $medic['flag_pak'] = 'СДПО А';
+        $medic['terminal_id'] = $request->user('api')->id;
 
         if ($driver->year_birthday !== '' && $driver->year_birthday !== '0000-00-00') {
             $medic['driver_year_birthday'] = $driver->year_birthday;

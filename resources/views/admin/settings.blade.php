@@ -178,6 +178,46 @@
                                 </div>
                             </div>
 
+                            <div class="form-group col-lg-6">
+                                <label for="telegram" class="mb-1">Верхний порого давления</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="pressure_systolic">
+                                            <i class="fa fa-sort-numeric-asc"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="pressure_systolic"
+                                           style="height: auto"
+                                           placeholder="Введите пороговое давление"
+                                           name="pressure_systolic"
+                                           aria-describedby="pressure_systolic"
+                                           value="{{ $pressure_systolic->value }}"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-6">
+                                <label for="telegram" class="mb-1">Нижний порого давления</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="pressure_diastolic">
+                                            <i class="fa fa-sort-numeric-asc"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="pressure_diastolic"
+                                           style="height: auto"
+                                           placeholder="Введите пороговое давление"
+                                           name="pressure_diastolic"
+                                           aria-describedby="pressure_diastolic"
+                                           value="{{ $pressure_diastolic->value }}"
+                                    >
+                                </div>
+                            </div>
+
                             <div class="form-group col-lg-12">
                                 <div class="row px-3">
                                     <div class="custom-control custom-checkbox col-lg-3">
