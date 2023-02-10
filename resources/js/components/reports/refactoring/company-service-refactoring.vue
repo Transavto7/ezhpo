@@ -253,8 +253,11 @@ export default {
                     search: query
                 }
             }).then(({ data }) => {
+                data.forEach(company => {
+                    company.name = `[${company.hash_id}] ${company.name}`;
+                });
+
                 this.companies = data;
-                console.log(this.companies)
             });
         },
         searchServices() {

@@ -155,6 +155,8 @@ return [
             'town_id' => 'Город',
             'dismissed' => 'Уволен',
             'date_of_employment' => 'Дата устройства на работу',
+            'pressure_systolic' => 'Порог верхнего давления',
+            'pressure_diastolic' => 'Порог нижнего давления'
         ],
 
         'car' => [
@@ -199,6 +201,8 @@ return [
             'has_actived_prev_month' => 'Были ли активны в прошлом месяце',
             'bitrix_link' => 'Ссылка на компанию в Bitrix24',
             'document_bdd' => 'Ссылка на таблицу с документами по бдд',
+            'pressure_systolic' => 'Порог верхнего давления',
+            'pressure_diastolic' => 'Порог нижнего давления'
         ],
 
         'product' => [

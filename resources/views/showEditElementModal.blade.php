@@ -48,6 +48,7 @@
                 @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
                 @php if ($model === 'Instr' && $k === 'signature') continue; @endphp
                 @php if ($k == 'essence') continue; @endphp
+                @php if ($k == 'hash_id') continue; @endphp
 
                     @if($k == 'unit' && ($model === 'Service' || $model === 'Product'))
                         <div data-field="essence" class="form-group">

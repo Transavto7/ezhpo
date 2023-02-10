@@ -34,6 +34,8 @@ class Driver extends Model
             'date_of_employment',
             'contract_id',
             'deleted_id',
+            'pressure_systolic',
+            'pressure_diastolic'
         ];
 
     protected $casts
@@ -261,5 +263,29 @@ class Driver extends Model
     {
         return $this->belongsTo(Company::class, 'company_id', 'id')
                     ->withDefault();
+    }
+
+    public function getPressureSystolic() {
+        if ($this->pressure_systolic) {
+            return $this->pressure_systolic;
+        }
+
+        if ($this->company->pressure_systolic) {
+            return $this->company->pressure_systolic;
+        }
+
+        return 150;
+    }
+
+    public function getPressureDiastolic() {
+        if ($this->pressure_diastolic) {
+            return $this->pressure_diastolic;
+        }
+
+        if ($this->company->pressure_diastolic) {
+            return $this->company->pressure_diastolic;
+        }
+
+        return 100;
     }
 }

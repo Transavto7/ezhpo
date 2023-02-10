@@ -22,6 +22,8 @@ class Company extends Model
         'bitrix_link',
         'document_bdd',
         'deleted_id',
+        'pressure_systolic',
+        'pressure_diastolic'
     ];
 
     public function responsible(): BelongsTo

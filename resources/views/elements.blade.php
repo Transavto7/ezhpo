@@ -405,6 +405,10 @@ $permissionToViewContract = user()->access('contract_read');
                                 @if($fk == 'contract' || $fk == 'contract_id' || $fk == 'contracts')
                                     @continue
                                 @endif
+                                @if(isset($fv['hideFilter']) && $fv['hideFilter'])
+                                        @continue
+                                @endif
+
                                 @php $fv['multiple'] = true; @endphp
 
                                 @if(!in_array($fk, ['photo']) && !isset($fv['hidden']))
@@ -427,14 +431,14 @@ $permissionToViewContract = user()->access('contract_read');
                                             ])
                                         @elseif($model === 'Instr' && $fk === 'sort')
                                             <!-- Сортировка доступна только инженеру БДД и Админу -->
-                                            @else
-                                                @include('templates.elements_field', [
-                                                    'v' => $fv,
-                                                    'k' => $fk,
-                                                    'is_required' => '',
-                                                    'default_value' => request()->get($fk)
-                                                ])
-                                            @endif
+                                        @else
+                                            @include('templates.elements_field', [
+                                                'v' => $fv,
+                                                'k' => $fk,
+                                                'is_required' => '',
+                                                'default_value' => request()->get($fk)
+                                            ])
+                                        @endif
 
                                         </div>
                                     </div>
@@ -650,6 +654,10 @@ $permissionToViewContract = user()->access('contract_read');
                                                     </a>
                                                 @endif
                                             </nobr>
+                                        @elseif ($field->field === 'pressure_systolic' && $model === 'Driver')
+                                            {{ $el->getPressureSystolic() }}
+                                        @elseif ($field->field === 'pressure_diastolic' && $model === 'Driver')
+                                            {{ $el->getPressureDiastolic() }}
                                         @else
                                             {{--ПРОВЕРКА ДАТЫ--}}
                                             @if($field->field === 'date' || strpos($field->field, '_at') > 0)

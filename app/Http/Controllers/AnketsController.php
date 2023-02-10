@@ -756,7 +756,8 @@ class AnketsController extends Controller
                  */
                 $tonometer = explode('/', $anketa['tonometer']);
                 if($proba_alko === 'Отрицательно' && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
-                    && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38 && $tonometer[0] < 150) {
+                    && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38
+                    && $tonometer[0] < $Driver->getPressureSystolic() && $tonometer[1] < $Driver->getPressureDiastolic()) {
                     $anketa['admitted'] = 'Допущен';
                 } else {
                     $anketa['admitted'] = 'Не допущен';
@@ -1368,8 +1369,11 @@ class AnketsController extends Controller
                  * ПРОВЕРЯЕМ статус для поля "Заключение"
                  */
                 $tonometer = explode('/', $anketa['tonometer']);
-                if($proba_alko === 'Отрицательно' && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
-                    && doubleval($anketa['t_people']) < 38 && intval($tonometer[0]) < 150 && intval($tonometer[1]) < 100) {
+                if($proba_alko === 'Отрицательно'
+                    && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
+                    && doubleval($anketa['t_people']) < 38
+                    && intval($tonometer[0]) < $Driver->getPressureSystolic()
+                    && intval($tonometer[1]) < $Driver->getPressureDiastolic()) {
                     $anketa['med_view'] = 'В норме';
                     $anketa['admitted'] = 'Допущен';
 

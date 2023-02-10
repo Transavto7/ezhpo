@@ -104,6 +104,8 @@ $(document).ready(function () {
         }
 
         const model = select.attr('model');
+        const concat = select.attr('field-concat') || false;
+        const concatField = select.attr('field-concat-name') || 'hash_id';
         const field = select.attr('field');
         const key = select.attr('field-key');
 
@@ -127,7 +129,12 @@ $(document).ready(function () {
         }).then(({ data }) => {
             data.forEach((element => {
                 const value = element[key];
-                const text = element[field];
+                let text = element[field];
+
+                if (concat) {
+                    text = '[' + element[concatField] + '] ' + text;
+                }
+
                 const exist = select.children('option');
                 for(let i = 0; i < exist.length; i++) {
                     if (exist[i].value == value) {
