@@ -25,7 +25,8 @@ class SettingsController extends Controller
             'phone' => $settings->where('key', 'phone')->first(),
             'telegram' => $settings->where('key', 'telegram')->first(),
             'pressure_systolic' => $settings->where('key', 'pressure_systolic')->first(),
-            'pressure_diastolic' => $settings->where('key', 'pressure_diastolic')->first()
+            'pressure_diastolic' => $settings->where('key', 'pressure_diastolic')->first(),
+            'timeout' => $settings->where('key', 'timeout')->first()
         ]);
     }
 
@@ -48,6 +49,7 @@ class SettingsController extends Controller
         Settings::where('key', 'telegram')->update(['value' => $request->telegram]);
         Settings::where('key', 'pressure_systolic')->update(['value' => $request->pressure_systolic]);
         Settings::where('key', 'pressure_diastolic')->update(['value' => $request->pressure_diastolic]);
+        Settings::where('key', 'timeout')->update(['value' => $request->timeout]);
 
         $id_auto = (bool) $request->id_auto;
         Settings::where('key', 'id_auto')->update(['value' => $id_auto ? '1' : '0']);

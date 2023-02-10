@@ -179,14 +179,14 @@
                             </div>
 
                             <div class="form-group col-lg-6">
-                                <label for="telegram" class="mb-1">Верхний порого давления</label>
+                                <label for="pressure_systolic" class="mb-1">Верхний порого давления</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="pressure_systolic">
                                             <i class="fa fa-sort-numeric-asc"></i>
                                         </span>
                                     </div>
-                                    <input type="text"
+                                    <input type="number"
                                            class="form-control"
                                            id="pressure_systolic"
                                            style="height: auto"
@@ -199,14 +199,14 @@
                             </div>
 
                             <div class="form-group col-lg-6">
-                                <label for="telegram" class="mb-1">Нижний порого давления</label>
+                                <label for="pressure_diastolic" class="mb-1">Нижний порого давления</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="pressure_diastolic">
                                             <i class="fa fa-sort-numeric-asc"></i>
                                         </span>
                                     </div>
-                                    <input type="text"
+                                    <input type="number"
                                            class="form-control"
                                            id="pressure_diastolic"
                                            style="height: auto"
@@ -214,6 +214,26 @@
                                            name="pressure_diastolic"
                                            aria-describedby="pressure_diastolic"
                                            value="{{ $pressure_diastolic->value }}"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-6">
+                                <label for="timeout" class="mb-1">Время ожидания ручного режима</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="timeout">
+                                            <i class="fa fa-times"></i>
+                                        </span>
+                                    </div>
+                                    <input type="number"
+                                           class="form-control"
+                                           id="timeout"
+                                           style="height: auto"
+                                           placeholder="Введите ожидания ручного режима"
+                                           name="timeout"
+                                           aria-describedby="timeout"
+                                           value="{{ $timeout->value }}"
                                     >
                                 </div>
                             </div>
