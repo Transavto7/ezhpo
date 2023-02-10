@@ -239,6 +239,11 @@ class IndexController extends Controller
                         'type' => 'date',
                         'noRequired' => 1
                     ],
+                    'date_narcotic_test'=> [
+                        'label' => 'Дата тестирования на наркотики',
+                        'type' => 'date',
+                        'noRequired' => 1
+                    ],
                     'date_report_driver' => [
                         'label'      => 'Дата снятия отчета с карты водителя',
                         'type'       => 'date',
