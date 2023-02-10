@@ -364,7 +364,12 @@ export default {
         this.validationStates.nameState = valid;
         this.validationStates.companyState = valid;
         this.validationStates.ourCompanyState = valid;
-        this.validationStates.servicesState = false;
+        this.validationStates.servicesState = valid;
+
+        if (this.contractData.name.length < 1) {
+            this.validationStates.nameState = false;
+            return false;
+        }
 
         if (!this.contractData.company) {
           this.validationStates.companyState = false
