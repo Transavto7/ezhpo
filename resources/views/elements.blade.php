@@ -1,28 +1,7 @@
 @extends('layouts.app')
 
-@section('title')
-    @if($title === 'services')
-        Услуги
-        <span class="
-            start-100
-            translate-middle
-            badge
-            text-white
-            rounded-pill
-            bg-success"
-        >
-        new
-    </span>
-    @else
-        {{ $title }}
-    @endif
-@endsection
+@section('title', $title)
 @section('sidebar', 1)
-
-@php
-//dd($fieldPrompts->pluck('name')->toArray());
-//dd($elements->getCollection()->toArray());
-@endphp
 
 @section('content')
     <!-- Модалка для редактирования см front.js  -->
@@ -52,6 +31,7 @@
                             <p>Заполните форму внимательно и нажмите кнопку "Добавить"</p>
 
                         @foreach ($fields as $k => $v)
+                            @php if ($k == 'hash_id') continue; @endphp
                             @if($k == 'products_id' && user()->hasRole('client'))
                                 @continue
                             @endif
@@ -63,36 +43,10 @@
                             @endif
 
                             @if($k == 'contracts')
-{{--                                <div data-field="contracts" class="form-group">--}}
-{{--                                    <label>Договор</label>--}}
-{{--                                    <select name="contracts[]"--}}
-{{--                                            data-label="Договоры"--}}
-{{--                                            class="js-chosen"--}}
-{{--                                            style="display: none;"--}}
-{{--                                            multiple="multiple"--}}
-{{--                                    >--}}
-{{--                                        <option value="">Не установлено</option>--}}
-{{--                                        @foreach(\App\Models\Contract::whereNull('company_id')->get(['id', 'name']) as $contract)--}}
-{{--                                            <option value="{{ $contract->id }}">--}}
-{{--                                                {{ $contract->name }}--}}
-{{--                                            </option>--}}
-{{--                                        @endforeach--}}
-{{--                                    </select>--}}
-{{--                                </div>--}}
                                 @continue
                             @endif
 
                             @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
-{{--                                <div data-field="contract" class="form-group">--}}
-{{--                                    <label>Договор</label>--}}
-{{--                                    <select name="contract_id"--}}
-{{--                                            class="form-control"--}}
-{{--                                            data-label="Договор"--}}
-{{--                                            id="select_for_contract_driver_car"--}}
-{{--                                    >--}}
-{{--                                        <option value="" selected>Не установлено</option>--}}
-{{--                                    </select>--}}
-{{--                                </div>--}}
                                 @continue
                             @endif
 
@@ -105,9 +59,10 @@
                                         <div class="form-group" data-field="{{ $k }}">
                                             <label>
                                                 @if($is_required) <b class="text-danger text-bold">*</b> @endif
+                                                {{ $v['label'] }}
+                                            </label>
 
-                                                {{ $v['label'] }}</label>
-@if ($v['label'] == 'ФИО') dd($v); @endif
+                                            @if ($v['label'] == 'ФИО') dd($v); @endif
                                             @include('templates.elements_field')
                                         </div>
                                     <!-- Сортировка инструктажей доступна админу или инженеру -->
@@ -116,8 +71,8 @@
                                         <div class="form-group" data-field="{{ $k }}">
                                             <label>
                                                 @if($is_required) <b class="text-danger text-bold">*</b> @endif
-
-                                                {{ $v['label'] }}</label>
+                                                {{ $v['label'] }}
+                                            </label>
 
                                             @include('templates.elements_field')
                                         </div>
@@ -145,9 +100,6 @@
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    @php
-                    //dump($model);
-                    @endphp
                     <form action="{{ route('addElement', $model) }}" enctype="multipart/form-data" method="POST">
                         @csrf
                         <div class="modal-body">
@@ -166,7 +118,6 @@
                                         data-field="Product_type_product"
                                         class="js-chosen"
                                 >
-{{--                                    <option value="" selected>Не установлено</option>--}}
                                     @foreach($fields['type_product']['values'] as $nameOfTypeProduct)
                                         <option value="{{ $nameOfTypeProduct }}">
                                             {{ $nameOfTypeProduct }}
@@ -180,7 +131,6 @@
                                         data-label="Сущности"
                                         data-field="Product_essence"
                                         class="filled-select2 filled-select"
-{{--                                        disabled--}}
                                 >
                                     <option value="">Не установлено</option>
                                     @foreach(\App\Product::$essence as $essenceKey => $essenceName)

@@ -30,12 +30,15 @@
                                 @if(isset($v['syncData']) && $model !== 'Company')
                                     @foreach($v['syncData'] as $syncData)
                                         <a href="{{ route('syncDataElement', [
-                                                                                        'model' => $syncData['model'],
-                                                                                        'fieldFind' => $syncData['fieldFind'],
-                                                                                        'fieldFindId' => $el['id'],
-                                                                                        'fieldSync' => $k,
-                                                                                        'fieldSyncValue' => $el[$k]
-                                                                                    ]) }}" target="_blank" class="text-info btn-link"><i class="fa fa-spinner"></i> Синхронизация с: {{ $syncData['text'] }}</a>
+                                            'model' => $syncData['model'],
+                                            'fieldFind' => $syncData['fieldFind'],
+                                            'fieldFindId' => $el['id'],
+                                            'fieldSync' => $k,
+                                            'fieldSyncValue' => $el[$k]
+                                        ]) }}" target="_blank" class="text-info btn-link">
+                                            <i class="fa fa-spinner"></i>
+                                            Синхронизация с: {{ $syncData['text'] }}
+                                        </a>
                                     @endforeach
                                 @endif
                             </div>
