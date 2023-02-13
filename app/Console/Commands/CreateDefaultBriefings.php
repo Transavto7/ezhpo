@@ -45,13 +45,13 @@ class CreateDefaultBriefings extends Command
     {
         /** @var $companiesWithAutoBriefing array Массив с hash ID компаний, где требуется базовый инструктаж */
         $companiesWithAutoBriefing = Company::where("required_type_briefing", true)->pluck("hash_id", "name");
-        /** @var $defaultBriefing int Hash ID базового инструктажа */
-        $defaultBriefing = Instr::where("is_default", true)->pluck("hash_id");
+        /** @var $defaultBriefing Object Hash ID базового инструктажа */
+        $defaultBriefing = Instr::where("is_default", true)->pluck("hash_id", "name");
         /** @var $drivers Driver Данные водителей, которым нужно прописать инструктаж */
         $drivers = Driver::select(["hash_id", "fio", "gender", "year_birthday"])->whereIn("company_id", $companiesWithAutoBriefing)->get();
         $user = Auth::user();
 
-        $drivers->map(function ($driver) use ($user, $companiesWithAutoBriefing) {
+        $drivers->map(function ($driver) use ($user, $companiesWithAutoBriefing, $defaultBriefing) {
             Anketa::create([
                                "type_anketa" => "bdd",
                                "user_id"     => $user->id,
@@ -66,7 +66,8 @@ class CreateDefaultBriefings extends Command
                                "date" => Carbon::now(),
                                "type_view" => "Предрейсовый",
                                "company_id" => $driver->company_id,
-                               "company_name" => $companiesWithAutoBriefing->where("hash_id", $driver->company_id)->pluck("name")
+                               "company_name" => $companiesWithAutoBriefing->where("hash_id", $driver->company_id)->pluck("name"),
+                               "briefing_name" => $defaultBriefing->name
                            ]);
         });
     }

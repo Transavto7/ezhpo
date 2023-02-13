@@ -25,6 +25,10 @@ class AddNeccessaryParameterToCompaniesTable extends Migration
                ->nullable(false)
                ->comment("Is this briefing default?");
         });
+
+        Schema::table("anketas", function (Blueprint $table) {
+           $table->string("briefing_name")->nullable();
+        });
     }
 
     /**
@@ -39,6 +43,9 @@ class AddNeccessaryParameterToCompaniesTable extends Migration
         });
         Schema::table("instrs", function (Blueprint $table) {
             $table->removeColumn("is_default");
+        });
+        Schema::table("anketas", function (Blueprint $table) {
+            $table->removeColumn("briefing_name");
         });
     }
 }

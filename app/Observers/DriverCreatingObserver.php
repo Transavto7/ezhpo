@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Anketa;
 use App\Company;
 use App\Driver;
+use App\Instr;
 use App\Product;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +17,8 @@ class DriverCreatingObserver
         $products = explode(",", $products);
 
         $productsEntities = Product::whereIn("id", $products)->pluck("hash_id");
+        /** @var $defaultBriefing Object Hash ID базового инструктажа */
+        $defaultBriefing = Instr::where("is_default", true)->pluck("hash_id", "name");
 
         if (in_array(570316, $productsEntities) || in_array(199217, $productsEntities)) {
             $user = Auth::user();
@@ -36,6 +39,7 @@ class DriverCreatingObserver
                 "type_view" => "Предрейсовый",
                 "company_id" => $driver->company_id,
                 "company_name" => $company->name,
+                "briefing_name" => $defaultBriefing->name
            ]);
         }
     }
