@@ -22,7 +22,7 @@ class DriverCreatingObserver
 
         if (in_array(570316, $productsEntities) || in_array(199217, $productsEntities)) {
             $user = Auth::user();
-            $company = Company::where("hash_id", $driver->company_id)->first();
+            $company = Company::where("id", $driver->company_id)->first();
 
             Anketa::create([
                 "type_anketa" => "bdd",
