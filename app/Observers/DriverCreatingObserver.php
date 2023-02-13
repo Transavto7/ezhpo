@@ -20,6 +20,10 @@ class DriverCreatingObserver
         /** @var $defaultBriefing Object Hash ID базового инструктажа */
         $defaultBriefing = Instr::select("hash_id", "name")->where("is_default", true)->get();
 
+        if ($defaultBriefing->isEmpty()) {
+            return;
+        }
+
         if (in_array(570316, $productsEntities) || in_array(199217, $productsEntities)) {
             $user = Auth::user();
             $company = Company::where("id", $driver->company_id)->first();
