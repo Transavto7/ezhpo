@@ -1657,14 +1657,19 @@ class AnketsController extends Controller
                 /**
                  * Создаем анкету
                  */
-                $companyRequireBriefing = Company::where("hash_id", $anketa["company_id"])->pluck("required_type_briefing");
+                $companyRequireBriefing = Company::where("hash_id", $anketa["company_id"])->pluck("required_type_briefing")[0];
                 if ($companyRequireBriefing) {
-                    $rmsEngineer = User::whereIn("id", DB::table("model_has_roles")
-                                                         ->select("model_id")
-                                                         ->where("role_id", 7)
-                                                         ->get())->inRandomOrder();
-                    dd($rmsEngineer);
-                    $anketa["user_name"] = $rmsEngineer->fio;
+                    $rmsEngineerIds = [];
+                    DB::table("model_has_roles")
+                      ->select("model_id")
+                      ->where("role_id", 7)
+                      ->get()
+                      ->map(function ($container) use (&$rmsEngineerIds) {
+                          $rmsEngineerIds[] = $container->model_id;
+                      });
+
+                    $rmsEngineer = User::whereIn("id", $rmsEngineerIds)->inRandomOrder()->first();
+                    $anketa["user_name"] = $rmsEngineer->name;
                     $anketa["signature"] = $rmsEngineer->eds;
                 }
                 $createdAnketa = Anketa::create($anketa);
