@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcher;
 
@@ -116,11 +117,11 @@ class AnketsController extends Controller
 
         if($anketa->type_anketa === 'medic') {
             $anketaMedic = Anketa::where('driver_id', $anketa->driver_id)
-                ->where('type_anketa', 'medic')
-                ->where('type_view', $anketa->type_view)
-                ->where('in_cart', 0)
-                ->orderBy('date', 'desc')
-                ->get();
+                                 ->where('type_anketa', 'medic')
+                                 ->where('type_view', $anketa->type_view)
+                                 ->where('in_cart', 0)
+                                 ->orderBy('date', 'desc')
+                                 ->get();
 
             foreach($anketaMedic as $aM) {
                 if (!$aM->date || $aM->id === $anketa->id || ($aM->is_dop && $aM->result_dop == null)) {
@@ -137,11 +138,11 @@ class AnketsController extends Controller
             }
         } else if($anketa->type_anketa === 'tech') {
             $anketasTech = Anketa::where('car_id', $anketa->car_id)
-                ->where('type_anketa', 'tech')
-                ->where('type_view', $anketa->type_view ?? '')
-                ->where('in_cart', 0)
-                ->orderBy('date', 'desc')
-                ->get();
+                                 ->where('type_anketa', 'tech')
+                                 ->where('type_view', $anketa->type_view ?? '')
+                                 ->where('in_cart', 0)
+                                 ->orderBy('date', 'desc')
+                                 ->get();
 
             foreach($anketasTech as $aT) {
                 if (!$aT->date || $aT->id === $anketa->id || ($aT->is_dop && $aT->result_dop == null)) {
@@ -205,11 +206,11 @@ class AnketsController extends Controller
         if(isset($data['anketa'])) {
             if($anketa->type_anketa === 'medic' && (!$anketa->is_dop || $anketa->result_dop != null)) {
                 $anketaMedic = Anketa::where('driver_id', $data['driver_id'])
-                    ->where('type_anketa', 'medic')
-                    ->where('type_view', $data['anketa'][0]['type_view'])
-                    ->where('in_cart', 0)
-                    ->orderBy('date', 'desc')
-                    ->get();
+                                     ->where('type_anketa', 'medic')
+                                     ->where('type_view', $data['anketa'][0]['type_view'])
+                                     ->where('in_cart', 0)
+                                     ->orderBy('date', 'desc')
+                                     ->get();
 
                 foreach($anketaMedic as $aM) {
                     if (!$aM->date || $aM->id === $anketa->id || ($aM->is_dop && $aM->result_dop == null)) {
@@ -226,11 +227,11 @@ class AnketsController extends Controller
                 }
             } else if($anketa->type_anketa === 'tech' && (!$anketa->is_dop || $anketa->result_dop != null)) {
                 $anketasTech = Anketa::where('car_id', $data['anketa'][0]['car_id'])
-                    ->where('type_anketa', 'tech')
-                    ->where('type_view', $data['anketa'][0]['type_view'] ?? '')
-                    ->where('in_cart', 0)
-                    ->orderBy('date', 'desc')
-                    ->get();
+                                     ->where('type_anketa', 'tech')
+                                     ->where('type_view', $data['anketa'][0]['type_view'] ?? '')
+                                     ->where('in_cart', 0)
+                                     ->orderBy('date', 'desc')
+                                     ->get();
 
                 foreach($anketasTech as $aT) {
                     if (!$aT->date || $aT->id === $anketa->id || ($aT->is_dop && $aT->result_dop == null)) {
@@ -586,16 +587,16 @@ class AnketsController extends Controller
 
             if ($data['type_anketa'] === 'medic' || $data['type_anketa'] === 'pak') {
                 $anketasMedic = Anketa::whereIn('driver_id', $drivers)
-                    ->where('type_anketa', 'medic')
-                    ->where('in_cart', 0)
-                    ->orderBy('date', 'desc')
-                    ->get();
+                                      ->where('type_anketa', 'medic')
+                                      ->where('in_cart', 0)
+                                      ->orderBy('date', 'desc')
+                                      ->get();
             } else if ($data['type_anketa'] === 'tech' || $data['type_anketa'] === 'vid_pl') {
                 $anketasTech = Anketa::whereIn('car_id', $cars)
-                    ->where('type_anketa', 'tech')
-                    ->where('in_cart', 0)
-                    ->orderBy('date', 'desc')
-                    ->get();
+                                     ->where('type_anketa', 'tech')
+                                     ->where('in_cart', 0)
+                                     ->orderBy('date', 'desc')
+                                     ->get();
             }
 
             foreach($data_anketa as $anketa) {
@@ -756,8 +757,8 @@ class AnketsController extends Controller
                  */
                 $tonometer = explode('/', $anketa['tonometer']);
                 if($proba_alko === 'Отрицательно' && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
-                    && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38
-                    && $tonometer[0] < $Driver->getPressureSystolic() && $tonometer[1] < $Driver->getPressureDiastolic()) {
+                   && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38
+                   && $tonometer[0] < $Driver->getPressureSystolic() && $tonometer[1] < $Driver->getPressureDiastolic()) {
                     $anketa['admitted'] = 'Допущен';
                 } else {
                     $anketa['admitted'] = 'Не допущен';
@@ -952,7 +953,7 @@ class AnketsController extends Controller
                         $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
                         $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
                         $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id)
-                            . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
+                                                      . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
                     }
                 }
 
@@ -1090,7 +1091,7 @@ class AnketsController extends Controller
 
             Anketa::insert($createdAnketas);
             $createdAnketas = Anketa::with(['services_snapshot'])->where('type_anketa', $data['type_anketa'])
-                ->limit(count($createdAnketas))->orderBy('id', 'desc')->get();
+                                    ->limit(count($createdAnketas))->orderBy('id', 'desc')->get();
 
             if(isset($servicesToSync)){
 //                dd($createdAnketas->toArray());
@@ -1370,10 +1371,10 @@ class AnketsController extends Controller
                  */
                 $tonometer = explode('/', $anketa['tonometer']);
                 if($proba_alko === 'Отрицательно'
-                    && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
-                    && doubleval($anketa['t_people']) < 38
-                    && intval($tonometer[0]) < $Driver->getPressureSystolic()
-                    && intval($tonometer[1]) < $Driver->getPressureDiastolic()) {
+                   && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
+                   && doubleval($anketa['t_people']) < 38
+                   && intval($tonometer[0]) < $Driver->getPressureSystolic()
+                   && intval($tonometer[1]) < $Driver->getPressureDiastolic()) {
                     $anketa['med_view'] = 'В норме';
                     $anketa['admitted'] = 'Допущен';
 
@@ -1464,11 +1465,11 @@ class AnketsController extends Controller
 
                 if ($anketa['type_anketa'] === 'medic' || $anketa['type_anketa'] === 'pak') {
                     $anketaMedic = Anketa::where('driver_id', $d_id)
-                        ->where('type_anketa', 'medic')
-                        ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '')
-                        ->where('in_cart', 0)
-                        ->orderBy('date', 'desc')
-                        ->get();
+                                         ->where('type_anketa', 'medic')
+                                         ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '')
+                                         ->where('in_cart', 0)
+                                         ->orderBy('date', 'desc')
+                                         ->get();
 
                     if($anketaMedic) {
                         foreach($anketaMedic as $aM) {
@@ -1487,11 +1488,11 @@ class AnketsController extends Controller
                     }
                 } else if ($anketa['type_anketa'] === 'tech' || $anketa['type_anketa'] === 'vid_pl') {
                     $anketaTech = Anketa::where('car_id', $c_id)
-                        ->where('type_anketa', 'tech')
-                        ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '')
-                        ->where('in_cart', 0)
-                        ->orderBy('date', 'desc')
-                        ->get();
+                                        ->where('type_anketa', 'tech')
+                                        ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '')
+                                        ->where('in_cart', 0)
+                                        ->orderBy('date', 'desc')
+                                        ->get();
 
 
                     /**
@@ -1658,7 +1659,11 @@ class AnketsController extends Controller
                  */
                 $companyRequireBriefing = Company::where("hash_id", $anketa["company_id"])->pluck("required_type_briefing");
                 if ($companyRequireBriefing) {
-                    $rmsEngineer = User::where("role", 7)->inRandomOrder()->first();
+                    $rmsEngineer = User::whereIn("id", DB::table("model_has_roles")
+                                                         ->select("model_id")
+                                                         ->where("role_id", 7)
+                                                         ->get())->inRandomOrder();
+                    dd($rmsEngineer);
                     $anketa["user_name"] = $rmsEngineer->fio;
                     $anketa["signature"] = $rmsEngineer->eds;
                 }

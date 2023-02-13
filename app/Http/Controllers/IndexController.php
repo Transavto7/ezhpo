@@ -41,7 +41,7 @@ class IndexController extends Controller
                 'notShowHashId' => 1,
                 'fields'        => [
                     'hash_id' => ['label' => 'Город', 'type' => 'select', 'values' => 'Town',
-                        'getField' => 'name', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id'],
+                                  'getField' => 'name', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id'],
                     'name' => ['label' => 'Город', 'type' => 'text', 'hideFilter' => true],
                 ],
             ],
@@ -54,9 +54,9 @@ class IndexController extends Controller
                 'model'  => 'Point',
                 'fields' => [
                     'hash_id'    => ['label' => 'Пункт выпуска', 'type' => 'select', 'values' => 'Point',
-                        'getField' => 'name', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id',],
+                                     'getField' => 'name', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id',],
                     'pv_id'      => ['label' => 'Город', 'type' => 'select', 'values' => 'Town',
-                        'getField' => 'name', 'getFieldKey' => 'id', 'concatField' => 'hash_id'],
+                                     'getField' => 'name', 'getFieldKey' => 'id', 'concatField' => 'hash_id'],
                     'company_id' => [
                         'label'      => 'Компания',
                         'type'       => 'select',
@@ -175,10 +175,10 @@ class IndexController extends Controller
                 'model'  => 'Driver',
                 'fields' => [
                     'company_id'    => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company', 'getField' => 'name',
-                        'concatField' => 'hash_id', 'getFieldKey' => 'id'],
+                                        'concatField' => 'hash_id', 'getFieldKey' => 'id'],
                     'hash_id'       => ['label' => 'Водитель',
-                        'type' => 'select', 'values' => 'Driver',
-                        'getField' => 'fio', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id'],
+                                        'type' => 'select', 'values' => 'Driver',
+                                        'getField' => 'fio', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id'],
                     'fio' => ['label' => 'ФИО', 'type' => 'text', 'hideFilter' => true],
                     'year_birthday' => ['label' => 'Дата рождения', 'type' => 'date', 'noRequired' => 1],
                     'photo'         => ['label' => 'Фото', 'type' => 'file', 'resize' => 1, 'noRequired' => 1],
@@ -306,9 +306,9 @@ class IndexController extends Controller
                 'model'  => 'Car',
                 'fields' => [
                     'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company',
-                        'getField' => 'name', 'getFieldKey' => 'id', 'concatField' => 'hash_id'],
+                                     'getField' => 'name', 'getFieldKey' => 'id', 'concatField' => 'hash_id'],
                     'hash_id'    => ['label' => 'Гос.номер', 'type' => 'select',
-                        'values' => 'Car', 'getField' => 'gos_number', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id'],
+                                     'values' => 'Car', 'getField' => 'gos_number', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id'],
                     'gos_number' => ['label' => 'Гос.номер', 'type' => 'text', 'hideFilter' => true],
                     'mark_model' => ['label' => 'Марка и модель', 'type' => 'text'],
                     'type_auto'  => [
@@ -432,7 +432,7 @@ class IndexController extends Controller
                     ],
                     'req_id'  => ['label' => 'Реквизиты нашей компании', 'type' => 'select', 'values' => 'Req'],
                     'pv_id'   => ['label' => 'ПВ', 'type' => 'select', 'values' => 'Point',
-                        'getFieldKey' => 'id', 'concatField' => 'hash_id', 'noRequired' => 1],
+                                  'getFieldKey' => 'id', 'concatField' => 'hash_id', 'noRequired' => 1],
                     'town_id' => [
                         'label'      => 'Город',
                         'multiple'   => 1,
@@ -530,7 +530,7 @@ class IndexController extends Controller
                 'model'  => 'Product',
                 'fields' => [
                     'hash_id'         => ['label' => 'Услуга', 'type' => 'select',
-                        'values' => 'Product', 'getField' => 'name', 'getFieldKey' => 'hash_id', 'concatField' => 'hash_id'],
+                                          'values' => 'Product', 'getField' => 'name', 'getFieldKey' => 'hash_id', 'concatField' => 'hash_id'],
                     'name' => ['label' => 'Название', 'type' => 'text', 'hideFilter' => true],
                     'type_product' => [
                         'label'        => 'Тип',
@@ -582,7 +582,7 @@ class IndexController extends Controller
                 'model'  => 'Discount',
                 'fields' => [
                     'products_id' => ['label' => 'Услуга', 'type' => 'select', 'values' => 'Product',
-                        'getField' => 'name', 'getFieldKey' => 'id', 'concatField' => 'hash_id'],
+                                      'getField' => 'name', 'getFieldKey' => 'id', 'concatField' => 'hash_id'],
                     'trigger'     => [
                         'label'        => 'Триггер (больше/меньше)',
                         'type'         => 'select',
@@ -658,7 +658,7 @@ class IndexController extends Controller
                 'fields' => [
                     'photos'        => ['label' => 'Фото', 'type' => 'file', 'noRequired' => 1, 'hideFilter' => true],
                     'hash_id'       => ['label' => 'Инструктаж', 'type' => 'select', 'values' => 'Instr',
-                        'getField' => 'name', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id'],
+                                        'getField' => 'name', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id'],
                     'name' => ['label' => 'Название', 'type' => 'text', 'hideFilter' => true],
                     'descr'         => ['label' => 'Описание', 'type' => 'text'],
                     'type_briefing' => [
@@ -976,7 +976,7 @@ class IndexController extends Controller
 
                     $productsEntities = Product::whereIn("id", $data['products_id'])->pluck("hash_id")->toArray();
                     /** @var $defaultBriefing Object Hash ID базового инструктажа */
-                    $defaultBriefing = Instr::select("hash_id", "name")->where("is_default", 1)->get();
+                    $defaultBriefing = Instr::select("hash_id", "name")->where("is_default", 1)->first();
                     /** @var $needMakeRMB boolean Нужно ли создать запись в журнал БДД */
                     $needMakeRMB = in_array(570316, $productsEntities) || in_array(199217, $productsEntities);
 
@@ -1054,26 +1054,27 @@ class IndexController extends Controller
             $created = $model::create($data);
 
             if (isset($needMakeRMB) && $needMakeRMB && $defaultBriefing) {
-                    $user = Auth::user();
-                    $company = Company::where("id", $data['company_id'])->first();
+                $user = Auth::user();
+                $company = Company::where("id", $data['company_id'])->first();
 
-                    Anketa::create([
-                                       "type_anketa" => "bdd",
-                                       "user_id"     => $user->id,
-                                       "user_name"   => $user->name,
-                                       "driver_id"   => $created->hash_id,
-                                       "driver_fio"  => $created->fio,
-                                       "driver_gender" => $created->gender,
-                                       "driver_year_birthday" => $created->year_birthday,
-                                       "complaint" => "Нет",
-                                       "condition_visible_sliz" => "Без особенностей",
-                                       "condition_koj_pokr" => "Без особенностей",
-                                       "date" => Carbon::now(),
-                                       "type_view" => "Предрейсовый",
-                                       "company_id" => $created->company_id,
-                                       "company_name" => $company->name,
-                                       "briefing_name" => $defaultBriefing->name
-                                   ]);
+                Anketa::create([
+                                   "type_anketa" => "bdd",
+                                   "user_id"     => $user->id,
+                                   "user_name"   => $user->name,
+                                   "driver_id"   => $created->hash_id,
+                                   "driver_fio"  => $created->fio,
+                                   "driver_gender" => $created->gender,
+                                   "driver_year_birthday" => $created->year_birthday,
+                                   "complaint" => "Нет",
+                                   "condition_visible_sliz" => "Без особенностей",
+                                   "condition_koj_pokr" => "Без особенностей",
+                                   "date" => Carbon::now(),
+                                   "type_view" => "Предрейсовый",
+                                   "company_id" => $created->company_id,
+                                   "company_name" => $company->name,
+                                   "briefing_name" => $defaultBriefing->name,
+                                   "type_briefing" => 'Вводный'
+                               ]);
             }
 //            if ($model_type == 'Company') {
 //                if ( !empty($contracts)) {
@@ -1276,20 +1277,20 @@ class IndexController extends Controller
 
                     if (isset($element->products_id)) {
                         $this->syncDataFunc([
-                            'model'          => 'Driver',
-                            'fieldFind'      => 'company_id',
-                            'fieldFindId'    => $element->id,
-                            'fieldSync'      => 'products_id',
-                            'fieldSyncValue' => $element->products_id
-                        ]);
+                                                'model'          => 'Driver',
+                                                'fieldFind'      => 'company_id',
+                                                'fieldFindId'    => $element->id,
+                                                'fieldSync'      => 'products_id',
+                                                'fieldSyncValue' => $element->products_id
+                                            ]);
 
                         $this->syncDataFunc([
-                            'model'          => 'Car',
-                            'fieldFind'      => 'company_id',
-                            'fieldFindId'    => $element->id,
-                            'fieldSync'      => 'products_id',
-                            'fieldSyncValue' => $element->products_id
-                        ]);
+                                                'model'          => 'Car',
+                                                'fieldFind'      => 'company_id',
+                                                'fieldFindId'    => $element->id,
+                                                'fieldSync'      => 'products_id',
+                                                'fieldSyncValue' => $element->products_id
+                                            ]);
                     }
 
                     $requiredBriefing = isset($data['required_type_briefing']) && $data['required_type_briefing'] == 'on';
@@ -1300,7 +1301,8 @@ class IndexController extends Controller
 
             if ($model_text === 'Instr') {
                 $isDefault = isset($data['is_default']) && $data['is_default'] == 'on';
-                $element->is_default = $is_default;
+                Instr::where('is_default', 1)->update(["is_default" => 0]);
+                $element->is_default = $isDefault;
             }
 
             /**
@@ -1470,9 +1472,9 @@ class IndexController extends Controller
                         } else {
                             if ($aFk == 'date_of_employment') {
                                 $element['elements'] = $element['elements']->whereBetween($aFk, [
-                                          Carbon::parse($aFv)->startOfDay(),
-                                          Carbon::parse($aFv)->endOfDay()
-                                      ]
+                                                                                                  Carbon::parse($aFv)->startOfDay(),
+                                                                                                  Carbon::parse($aFv)->endOfDay()
+                                                                                              ]
                                 );
                             } else {
                                 $element['elements'] = $element['elements']->where($aFk, 'LIKE', '%' . trim($aFv) . '%');
