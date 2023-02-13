@@ -415,65 +415,12 @@ $permissionToViewContract = user()->access('contract_read');
             </div>
             @enderror
 
-            <table id="elements-table" class="table table-striped table-sm">
-                <thead>
-                <tr>
-                    @foreach ($fieldPrompts as $field)
-                        @if(($field->field == 'products_id' || $field->field == 'services') && user()->hasRole('client'))
-                            @continue
-                        @endif
-                        @if($field->field == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
-                            @continue
-                        @endif
-                        @if($field->field == 'where_call' && !user()->access('companies_access_field_where_call'))
-                            @continue
-                        @endif
-                        <th data-key="{{ $field->field }}">
-                            <span class="user-select-none"
-                                  @if($field->field == 'comment')
-                                      style="width: 200px;"
-                                  @endif
-                                  @if ($field->content)
-                                  data-toggle="tooltip"
-                                  data-html="true"
-                                  data-trigger="click hover"
-                                  title="{{ $field->content }}"
-                                @endif
-                            >
-                                {{ $field->name }}
-                            </span>
-
-                            @if($field->field !== 'contracts' && $field->field !== 'contract' && $field->field !== 'contract_id')
-                                <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field . $queryString }}">
-                                    <i class="fa fa-sort"></i>
-                                </a>
-                            @endif
-                        </th>
-                    @endforeach
-
-{{--                    @if($permissionToSyncCompany && !request()->get('deleted'))--}}
-{{--                        <th width="60">#</th>--}}
-{{--                    @endif--}}
-                    @if($permissionToDelete)
-                        {{--УДАЛЕНИЕ--}}
-                        <th width="60">#</th>
-                    @endif
-                    @if(request()->get('deleted'))
-                        <th width="60">Удаливший</th>
-                        <th width="60">Время удаления</th>
-                        <th width="60">#</th>
-                    @endif
-
-                </tr>
-                </thead>
-                <tbody>
-                @foreach ($elements as $el)
+            <div class="table-responsive">
+                <table id="elements-table" class="table table-striped table-sm">
+                    <thead>
                     <tr>
                         @foreach ($fieldPrompts as $field)
-                            @if($field->field == 'products_id' && user()->hasRole('client'))
-                                @continue
-                            @endif
-                            @if(user()->hasRole('client') && $field->field === 'services')
+                            @if(($field->field == 'products_id' || $field->field == 'services') && user()->hasRole('client'))
                                 @continue
                             @endif
                             @if($field->field == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
@@ -482,194 +429,251 @@ $permissionToViewContract = user()->access('contract_read');
                             @if($field->field == 'where_call' && !user()->access('companies_access_field_where_call'))
                                 @continue
                             @endif
-                            <td class="td-option">
-                                @if($field->field === $editOnField && $permissionToEdit)
-                                    <a href="#" class="showEditModal"
-                                       data-route="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}"
-                                       data-toggle="modal" data-target="#modalEditor">
-                                        @endif
+                            <th data-key="{{ $field->field }}">
+                            <span class="user-select-none"
+                                  @if($field->field == 'comment')
+                                      style="width: 200px;"
+                                  @endif
+                                  @if ($field->content)
+                                      data-toggle="tooltip"
+                                  data-html="true"
+                                  data-trigger="click hover"
+                                  title="{{ $field->content }}"
+                                @endif
+                            >
+                                {{ $field->name }}
+                            </span>
 
-                                        @if($field->field === 'company_id' && $el->company_id)
-                                            <div>
-                                                @if(user()->access('company_read'))
-                                                    <a href="{{ route('renderElements', ['model' => 'Company', 'filter' => 1, 'id' => $el->company_id ]) }}">
+                                @if($field->field !== 'contracts' && $field->field !== 'contract' && $field->field !== 'contract_id')
+                                    <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field . $queryString }}">
+                                        <i class="fa fa-sort"></i>
+                                    </a>
+                                @endif
+                            </th>
+                        @endforeach
+
+                        {{--                    @if($permissionToSyncCompany && !request()->get('deleted'))--}}
+                        {{--                        <th width="60">#</th>--}}
+                        {{--                    @endif--}}
+                        @if($permissionToDelete)
+                            {{--УДАЛЕНИЕ--}}
+                            <th width="60">#</th>
+                        @endif
+                        @if(request()->get('deleted'))
+                            <th width="60">Удаливший</th>
+                            <th width="60">Время удаления</th>
+                            <th width="60">#</th>
+                        @endif
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach ($elements as $el)
+                        <tr>
+                            @foreach ($fieldPrompts as $field)
+                                @if($field->field == 'products_id' && user()->hasRole('client'))
+                                    @continue
+                                @endif
+                                @if(user()->hasRole('client') && $field->field === 'services')
+                                    @continue
+                                @endif
+                                @if($field->field == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
+                                    @continue
+                                @endif
+                                @if($field->field == 'where_call' && !user()->access('companies_access_field_where_call'))
+                                    @continue
+                                @endif
+                                <td class="td-option">
+                                    @if($field->field === $editOnField && $permissionToEdit)
+                                        <a href="#" class="showEditModal"
+                                           data-route="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}"
+                                           data-toggle="modal" data-target="#modalEditor">
+                                            @endif
+
+                                            @if($field->field === 'company_id' && $el->company_id)
+                                                <div>
+                                                    @if(user()->access('company_read'))
+                                                        <a href="{{ route('renderElements', ['model' => 'Company', 'filter' => 1, 'id' => $el->company_id ]) }}">
+                                                            {{ app('App\Company')->getName($el->company_id) }}
+                                                        </a>
+                                                    @else
                                                         {{ app('App\Company')->getName($el->company_id) }}
+                                                    @endif
+                                                    <p>
+                                                        @if(user()->access('cars_read'))
+                                                            <a class="btn btn-sm btn-outline-info"
+                                                               href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'company_id' => $el->company_id ]) }}">
+                                                                <i class="fa fa-car"></i>
+                                                            </a>
+                                                        @endif
+                                                        @if(user()->access('drivers_read'))
+                                                            <a class="btn btn-sm btn-outline-info"
+                                                               href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'company_id' => $el->company_id ]) }}">
+                                                                <i class="fa fa-user"></i>
+                                                            </a>
+                                                        @endif
+                                                    </p>
+                                                </div>
+                                            @elseif ($field->field === 'journals')
+                                                <nobr>
+                                                    @if(user()->access('medic_read'))
+                                                        <a class="btn btn-sm btn-outline-info"
+                                                           href="{{ route('home', 'medic') }}/?filter=1&{{ $field->type . '_id' }}={{ $el->hash_id }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
+                                                            МЕД
+                                                        </a>
+                                                    @endif
+                                                    @if(user()->access('tech_read') )
+                                                        <a class="btn btn-sm btn-outline-info"
+                                                           href="{{ route('home', 'tech') }}/?filter=1&{{ $field->type . '_id' }}={{ $el->hash_id }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
+                                                            ТЕХ
+                                                            @endif
+                                                        </a>
+                                                </nobr>
+                                            @elseif ($field->field === 'user_id')
+                                                {{ app('App\User')->getName($el->user_id, false) }}
+                                            @elseif ($field->field === 'req_id')
+                                                {{ app('App\Req')->getName($el->req_id) }}
+                                            @elseif ($field->field === 'town_id')
+                                                {{ app('App\Town')->getName($el->town_id) }}
+                                            @elseif ($field->field === 'pv_id' && $type !== 'Point')
+                                                {{ app('App\Point')->getPointText($el->pv_id) }}
+                                            @elseif ($field->field === 'pv_id' && $type === 'Point')
+                                                {{ app('App\Town')->getName($el->pv_id) }}
+                                            @elseif ($field->field == 'products_id')
+                                                {{ app('App\Product')->getName($el->products_id) }}
+                                            @elseif ($field->field === 'essence')
+                                                {{ \App\Product::$essence[$el->essence] ?? ''  }}
+                                            @elseif ($field->field === 'contract' )
+                                                <a href="/contract?id={{ $el['contract']['id'] }}" >
+                                                    {{ $el['contract']['name']  }}
+
+                                                </a>
+                                            @elseif ( $field->field === 'contracts')
+                                                @foreach($el[$field->field] as $contract)
+                                                    <h3>
+                                                        @if($permissionToViewContract)
+                                                            <a href="/contract?id={{ $contract['id'] }}" >
+                                                                @endif
+                                                                <span class="badge badge-success">
+                                                            {{ $contract['name']  }}
+                                                        </span>
+                                                                @if($permissionToViewContract)
+                                                            </a>
+                                                        @endif
+                                                    </h3>
+                                                @endforeach
+                                            @elseif ($field->field == 'services' && ($model === 'Car' || $model === 'Driver' || $model === 'Company'))
+                                                @foreach($el->contracts as $contract)
+                                                    @foreach($contract->services as $service)
+                                                        <h5>
+                                                            {{--                                                        badge badge-success--}}
+                                                            <span class="badge badge-success">
+                                                            {{ $service['name']  }}
+                                                        </span>
+                                                        </h5>
+                                                    @endforeach
+                                                @endforeach
+                                            @elseif ($field->field === 'document_bdd' || $field->field === 'bitrix_link')
+                                                <a href="{{ $el[$field->field] }}">{{ $el[$field->field] }}</a>
+                                            @elseif ($field->field === 'photo')
+                                                @if(Storage::disk('public')->exists($el[$field->field]) && $el[$field->field] !== '<' && $el[$field->field] !== '>')
+                                                    <a href="{{ Storage::url($el[$field->field]) }}"
+                                                       data-fancybox="gallery_{{ $el->id }}">
+                                                        <b>
+                                                            <i class="fa fa-camera"></i>
+                                                        </b>
                                                     </a>
-                                                @else
-                                                    {{ app('App\Company')->getName($el->company_id) }}
                                                 @endif
-                                                <p>
+                                            @elseif ($field->field === 'crm')
+                                                <nobr>
+                                                    @if(user()->access('report_service_company_read'))
+                                                        <a class="btn btn-sm btn-outline-info"
+                                                           href="{{ route('report.get', ['type' => 'journal', 'company_id' => $el->hash_id]) }}">
+                                                            ₽
+                                                        </a>
+                                                    @endif
                                                     @if(user()->access('cars_read'))
                                                         <a class="btn btn-sm btn-outline-info"
-                                                           href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'company_id' => $el->company_id ]) }}">
+                                                           href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'company_id' => $el->id ]) }}">
                                                             <i class="fa fa-car"></i>
                                                         </a>
                                                     @endif
                                                     @if(user()->access('drivers_read'))
                                                         <a class="btn btn-sm btn-outline-info"
-                                                           href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'company_id' => $el->company_id ]) }}">
+                                                           href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'company_id' => $el->id ]) }}">
                                                             <i class="fa fa-user"></i>
                                                         </a>
                                                     @endif
-                                                </p>
-                                            </div>
-                                        @elseif ($field->field === 'journals')
-                                            <nobr>
-                                                @if(user()->access('medic_read'))
-                                                    <a class="btn btn-sm btn-outline-info"
-                                                       href="{{ route('home', 'medic') }}/?filter=1&{{ $field->type . '_id' }}={{ $el->hash_id }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
-                                                        МЕД
-                                                    </a>
-                                                @endif
-                                                @if(user()->access('tech_read') )
-                                                    <a class="btn btn-sm btn-outline-info"
-                                                       href="{{ route('home', 'tech') }}/?filter=1&{{ $field->type . '_id' }}={{ $el->hash_id }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
-                                                        ТЕХ
-                                                        @endif
-                                                    </a>
-                                            </nobr>
-                                        @elseif ($field->field === 'user_id')
-                                            {{ app('App\User')->getName($el->user_id, false) }}
-                                        @elseif ($field->field === 'req_id')
-                                            {{ app('App\Req')->getName($el->req_id) }}
-                                        @elseif ($field->field === 'town_id')
-                                            {{ app('App\Town')->getName($el->town_id) }}
-                                        @elseif ($field->field === 'pv_id' && $type !== 'Point')
-                                            {{ app('App\Point')->getPointText($el->pv_id) }}
-                                        @elseif ($field->field === 'pv_id' && $type === 'Point')
-                                            {{ app('App\Town')->getName($el->pv_id) }}
-                                        @elseif ($field->field == 'products_id')
-                                            {{ app('App\Product')->getName($el->products_id) }}
-                                        @elseif ($field->field === 'essence')
-                                            {{ \App\Product::$essence[$el->essence] ?? ''  }}
-                                        @elseif ($field->field === 'contract' )
-                                            <a href="/contract?id={{ $el['contract']['id'] }}" >
-                                                {{ $el['contract']['name']  }}
-
-                                            </a>
-                                        @elseif ( $field->field === 'contracts')
-                                            @foreach($el[$field->field] as $contract)
-                                                <h3>
-                                                    @if($permissionToViewContract)
-                                                    <a href="/contract?id={{ $contract['id'] }}" >
-                                                    @endif
-                                                        <span class="badge badge-success">
-                                                            {{ $contract['name']  }}
-                                                        </span>
-                                                    @if($permissionToViewContract)
-                                                    </a>
-                                                    @endif
-                                                </h3>
-                                            @endforeach
-                                        @elseif ($field->field == 'services' && ($model === 'Car' || $model === 'Driver' || $model === 'Company'))
-                                            @foreach($el->contracts as $contract)
-                                                @foreach($contract->services as $service)
-                                                    <h5>
-{{--                                                        badge badge-success--}}
-                                                        <span class="badge badge-success">
-                                                            {{ $service['name']  }}
-                                                        </span>
-                                                    </h5>
-                                                @endforeach
-                                            @endforeach
-                                        @elseif ($field->field === 'document_bdd' || $field->field === 'bitrix_link')
-                                            <a href="{{ $el[$field->field] }}">{{ $el[$field->field] }}</a>
-                                        @elseif ($field->field === 'photo')
-                                            @if(Storage::disk('public')->exists($el[$field->field]) && $el[$field->field] !== '<' && $el[$field->field] !== '>')
-                                                <a href="{{ Storage::url($el[$field->field]) }}"
-                                                   data-fancybox="gallery_{{ $el->id }}">
-                                                    <b>
-                                                        <i class="fa fa-camera"></i>
-                                                    </b>
-                                                </a>
-                                            @endif
-                                        @elseif ($field->field === 'crm')
-                                            <nobr>
-                                                @if(user()->access('report_service_company_read'))
-                                                    <a class="btn btn-sm btn-outline-info"
-                                                       href="{{ route('report.get', ['type' => 'journal', 'company_id' => $el->hash_id]) }}">
-                                                        ₽
-                                                    </a>
-                                                @endif
-                                                @if(user()->access('cars_read'))
-                                                    <a class="btn btn-sm btn-outline-info"
-                                                       href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'company_id' => $el->id ]) }}">
-                                                        <i class="fa fa-car"></i>
-                                                    </a>
-                                                @endif
-                                                @if(user()->access('drivers_read'))
-                                                    <a class="btn btn-sm btn-outline-info"
-                                                       href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'company_id' => $el->id ]) }}">
-                                                        <i class="fa fa-user"></i>
-                                                    </a>
-                                                @endif
-                                            </nobr>
-                                        @elseif ($field->field === 'pressure_systolic' && $model === 'Driver')
-                                            {{ $el->getPressureSystolic() }}
-                                        @elseif ($field->field === 'pressure_diastolic' && $model === 'Driver')
-                                            {{ $el->getPressureDiastolic() }}
-                                        @else
-                                            {{--ПРОВЕРКА ДАТЫ--}}
-                                            @if($field->field === 'date' || strpos($field->field, '_at') > 0)
-                                                {{ date('d-m-Y H:i:s', strtotime($el[$field->field])) }}
-                                            @elseif($field->field === 'autosync_fields')
-                                                @foreach(explode(',', $el[$field->field]) as $aSyncData)
-                                                    <div class="text-bold text-success"><i
-                                                            class="fa fa-refresh"></i> {{ __($aSyncData) }}
-                                                    </div>
-                                                @endforeach
-                                            @elseif ($field->field === 'date_of_employment')
-                                                {{ $el[$field->field] ? \Carbon\Carbon::parse($el[$field->field])->format('d.m.Y') : '' }}
-                                            @elseif ($field->field === 'trigger')
-                                                {{ $el[$field->field] === '<' ? 'меньше' : 'больше'  }}
+                                                </nobr>
+                                            @elseif ($field->field === 'pressure_systolic' && $model === 'Driver')
+                                                {{ $el->getPressureSystolic() }}
+                                            @elseif ($field->field === 'pressure_diastolic' && $model === 'Driver')
+                                                {{ $el->getPressureDiastolic() }}
                                             @else
-                                                @foreach(explode(',', htmlspecialchars($el[$field->field])) as $keyElK => $valElK)
-                                                    @if($keyElK !== 0), @endif
-                                {{ htmlspecialchars_decode(__($valElK)) }}
-                                @endforeach
-                                @endif
-                                @endif
-                            </td>
-                        @endforeach
+                                                {{--ПРОВЕРКА ДАТЫ--}}
+                                                @if($field->field === 'date' || strpos($field->field, '_at') > 0)
+                                                    {{ date('d-m-Y H:i:s', strtotime($el[$field->field])) }}
+                                                @elseif($field->field === 'autosync_fields')
+                                                    @foreach(explode(',', $el[$field->field]) as $aSyncData)
+                                                        <div class="text-bold text-success"><i
+                                                                class="fa fa-refresh"></i> {{ __($aSyncData) }}
+                                                        </div>
+                                                    @endforeach
+                                                @elseif ($field->field === 'date_of_employment')
+                                                    {{ $el[$field->field] ? \Carbon\Carbon::parse($el[$field->field])->format('d.m.Y') : '' }}
+                                                @elseif ($field->field === 'trigger')
+                                                    {{ $el[$field->field] === '<' ? 'меньше' : 'больше'  }}
+                                                @else
+                                                    @foreach(explode(',', htmlspecialchars($el[$field->field])) as $keyElK => $valElK)
+                                                        @if($keyElK !== 0), @endif
+                                    {{ htmlspecialchars_decode(__($valElK)) }}
+                                    @endforeach
+                                    @endif
+                                    @endif
+                                </td>
+                            @endforeach
 
-{{--                        @if($permissionToSyncCompany && !request()->get('deleted'))--}}
-{{--                            <td class="td-option"--}}
-{{--                                title="При синхронизации все услуги компании будут присвоены водителям и автомобилям компании.">--}}
-{{--                                <a href="{{ route('syncElement', ['type' => $model, 'id' => $el->id ]) }}"--}}
-{{--                                   class="btn btn-sm btn-success"><i class="fa fa-refresh"></i></a>--}}
-{{--                            </td>--}}
-{{--                        @endif--}}
+                            {{--                        @if($permissionToSyncCompany && !request()->get('deleted'))--}}
+                            {{--                            <td class="td-option"--}}
+                            {{--                                title="При синхронизации все услуги компании будут присвоены водителям и автомобилям компании.">--}}
+                            {{--                                <a href="{{ route('syncElement', ['type' => $model, 'id' => $el->id ]) }}"--}}
+                            {{--                                   class="btn btn-sm btn-success"><i class="fa fa-refresh"></i></a>--}}
+                            {{--                            </td>--}}
+                            {{--                        @endif--}}
 
 
-                        @if($permissionToDelete)
-                            {{--УДАЛЕНИЕ--}}
-                            <td class="td-option">
-                                <a href="{{ route('removeElement', ['type' => $model, 'id' => $el->id ]) }}"
-                                   class="ACTION_DELETE btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>
-                            </td>
-                        @endif
-                        @if(request()->get('deleted'))
-                            <td class="td-option">
-                                {{ ($el->deleted_user->name) }}
-                            </td>
-                            <td class="td-option">
-                                {{ ($el->deleted_at) }}
-                            </td>
-                            <td class="td-option">
-                                <a href="{{ route('removeElement', ['type' => $model, 'id' => $el->id , 'undo' => 1]) }}"
-                                   class="btn btn-sm btn-warning"><i class="fa fa-undo"></i></a>
-                            </td>
-                        @endif
-                    </tr>
-                @endforeach
+                            @if($permissionToDelete)
+                                {{--УДАЛЕНИЕ--}}
+                                <td class="td-option">
+                                    <a href="{{ route('removeElement', ['type' => $model, 'id' => $el->id ]) }}"
+                                       class="ACTION_DELETE btn btn-sm btn-danger"><i class="fa fa-trash"></i></a>
+                                </td>
+                            @endif
+                            @if(request()->get('deleted'))
+                                <td class="td-option">
+                                    {{ ($el->deleted_user->name) }}
+                                </td>
+                                <td class="td-option">
+                                    {{ ($el->deleted_at) }}
+                                </td>
+                                <td class="td-option">
+                                    <a href="{{ route('removeElement', ['type' => $model, 'id' => $el->id , 'undo' => 1]) }}"
+                                       class="btn btn-sm btn-warning"><i class="fa fa-undo"></i></a>
+                                </td>
+                            @endif
+                        </tr>
+                    @endforeach
 
-                @if (count($elements) < 1)
-                    <tr class="text-center">
-                        <td colspan="{{ count($fields)+4 }}">Элементы не найдены</td>
-                    </tr>
-                @endif
-                </tbody>
-            </table>
+                    @if (count($elements) < 1)
+                        <tr class="text-center">
+                            <td colspan="{{ count($fields)+4 }}">Элементы не найдены</td>
+                        </tr>
+                    @endif
+                    </tbody>
+                </table>
+            </div>
+
+
             <div class="col-md-12">
                 @if(count($elements) > 1)
                     {{ $elements->appends($_GET)->render() }}

@@ -113,6 +113,10 @@
             field-concat="{{ $concatField }}"
         @endif
 
+        @isset($v['trashed'])
+            field-trashed="true"
+        @endisset
+
         @isset($v['multiple'])
             multiple="multiple"
             name="{{ $k }}[]"

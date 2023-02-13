@@ -313,253 +313,253 @@ $permissionToExportPrikazPL = (
                         <div class="alert alert-danger" role="alert">{{ session()->get('error') }}</div>
                     @endif
 
-                    @if((count($ankets) > 0) && $permissionToView)
-                        <table id="ankets-table" class="ankets-table table table-striped table-sm">
-                            <thead>
-                                <tr>
-                                    @if($type_ankets === 'pak_queue')
-                                        <th class="not-export">
-                                            Таймер
-                                        </th>
-                                    @endif
-
-                                    @foreach($fieldPrompts as $field)
-                                        @if($field->field == 'hour_from' || $field->field == 'hour_to')
-                                            @continue
-                                        @endif
-
-                                        <th @isset($blockedToExportFields[$field->field])
-                                            class="not-export"
-                                            @endisset
-                                            data-field-key="{{ $field->field }}"
-                                        >
-                                            <span class="user-select-none"
-                                                @if ($field->content)
-                                                    data-toggle="tooltip"
-                                                    data-html="true"
-                                                    data-trigger="click hover"
-                                                    title="{{ $field->content }}"
-                                                @endif
-                                            >
-                                                {{ $field->name }}
-                                            </span>
-
-                                            <a class="not-export" href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field }}{{ $queryString }}">
-                                                <i class="fa fa-sort"></i>
-                                            </a>
-                                        </th>
-                                    @endforeach
-
-                                    @if(request()->get('trash'))
-                                        <th width="60">Удаливший</th>
-                                        <th width="60">Время удаления</th>
-                                    @endif
-
-                                    <!-- ОЧЕРЕДЬ ОСМОТРОВ -->
-                                    @if($type_ankets === 'pak_queue')
-                                        <th class="not-export">#</th>
-                                        <th class="not-export">#</th>
-                                    @endif
-                                    <!-- /ОЧЕРЕДЬ ОСМОТРОВ -->
-
-                                    {{-- redactirovanie --}}
-                                    @if($permissionToUpdate)
-                                        <th class="not-export">#</th>
-                                    @endif
-
-                                    {{-- УДАЛЕНИЕ--}}
-{{--                                    @if($permissionToDelete)--}}
-{{--                                        <th class="not-export">#</th>--}}
-{{--                                    @endif--}}
-
-                                    @if($type_ankets !== 'pak_queue')
-                                            @if($permissionToDelete)
-                                                <th class="not-export">#</th>
-                                            @endif
-                                    @endif
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($ankets as $anketaKey => $anketa)
-                                    <tr data-field="{{ $anketaKey }}">
-
+                    <div class="table-responsive">
+                        @if((count($ankets) > 0) && $permissionToView)
+                            <table id="ankets-table" class="ankets-table table table-striped table-sm">
+                                <thead>
+                                    <tr>
                                         @if($type_ankets === 'pak_queue')
-                                            <td class="not-export">
-                                                <div class="App-Timer" data-date="{{ $anketa->created_at }}"></div>
-                                            </td>
+                                            <th class="not-export">
+                                                Таймер
+                                            </th>
                                         @endif
-
 
                                         @foreach($fieldPrompts as $field)
-                                            <td
-                                                @isset($blockedToExportFields[$field->field])
-                                                    class="not-export"
+                                            @if($field->field == 'hour_from' || $field->field == 'hour_to')
+                                                @continue
+                                            @endif
+
+                                            <th @isset($blockedToExportFields[$field->field])
+                                                class="not-export"
                                                 @endisset
                                                 data-field-key="{{ $field->field }}"
                                             >
-                                                @if($field->field === 'date' || strpos($field->field, '_at') > 0)
-                                                    @if($anketa[$field->field])
-                                                        {{ date('d-m-Y H:i:s', strtotime($anketa[$field->field])) }}
+                                                <span class="user-select-none"
+                                                    @if ($field->content)
+                                                        data-toggle="tooltip"
+                                                        data-html="true"
+                                                        data-trigger="click hover"
+                                                        title="{{ $field->content }}"
                                                     @endif
-                                                @elseif($field->field === 'photos')
+                                                >
+                                                    {{ $field->name }}
+                                                </span>
 
-                                                    @if($anketa[$field->field])
-                                                        @php $photos = explode(',', $anketa[$field->field]); @endphp
-
-                                                        @foreach($photos as $phI => $ph)
-                                                            @php $isUri = strpos($ph, 'sdpo.ta-7'); @endphp
-
-                                                            @if($phI == 0)
-                                                                <a href="{{ $isUri ? $ph : Storage::url($ph) }}" data-fancybox="gallery_{{ $anketa->id }}"><i class="fa fa-camera"></i> ({{ count($photos) }})</a>
-                                                            @else
-                                                                <a href="{{ $isUri ? $ph : Storage::url($ph) }}" data-fancybox="gallery_{{ $anketa->id }}"></a>
-                                                            @endif
-                                                        @endforeach
-                                                    @endif
-
-                                                @elseif($field->field === 'videos')
-
-                                                    @if($anketa[$field->field])
-                                                        @php $videos = explode(',', $anketa[$field->field]); @endphp
-
-                                                        @foreach($videos as $vK => $vV)
-                                                            @if($vK == 0)
-                                                                <a data-type="iframe" href="{{ route('showVideo', ['url' => $vV]) }}" data-fancybox="video_{{ $anketa->id }}">
-                                                                    <i class="fa fa-video-camera"></i>
-
-                                                                    ({{ count($videos) }})
-                                                                </a>
-                                                            @else
-                                                                <a data-type="iframe" href="{{ $vV }}" data-fancybox="video_{{ $anketa->id }}"></a>
-                                                            @endif
-
-                                                        @endforeach
-                                                    @endif
-
-                                                @elseif($field->field === 'company_name' && user()->access('company_read'))
-                                                    <a href="{{ route('renderElements', ['model' => 'Company', 'filter' => 1, 'name' => $anketa[$field->field] ]) }}">
-                                                        {{ $anketa[$field->field] }}
-                                                    </a>
-                                                @elseif($field->field === 'user_name' && user()->access('employee_read'))
-                                                    <a href="{{ route('users', ['name' => $anketa[$field->field] ]) }}">
-                                                        {{ $anketa[$field->field] }}
-                                                    </a>
-                                                @elseif($field->field === 'driver_fio' && user()->access('drivers_read'))
-                                                    <a href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'fio' => $anketa[$field->field] ]) }}">
-                                                        {{ $anketa[$field->field] }}
-                                                    </a>
-                                                @elseif($field->field === 'car_gos_number' && user()->access('cars_read'))
-                                                    <a href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'gos_number' => $anketa[$field->field] ]) }}">
-                                                        {{ $anketa[$field->field] }}
-                                                    </a>
-                                                @else
-
-                                                    {{ $anketa[$field->field] }}
-
-                                                    @if($type_ankets === 'medic' && $field->field === 'admitted' && $anketa[$field->field] === 'Не допущен')
-                                                        @if ($anketa->proba_alko === 'Положительно')
-                                                            <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
-                                                        @else
-                                                            <a href="{{ route('docs.get', ['type' => 'other', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
-                                                        @endif
-                                                    @endif
-                                                @endif
-                                            </td>
+                                                <a class="not-export" href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field }}{{ $queryString }}">
+                                                    <i class="fa fa-sort"></i>
+                                                </a>
+                                            </th>
                                         @endforeach
 
-
-                                        @if($permissionToDelete)
                                         @if(request()->get('trash'))
-                                            <td class="td-option">
-                                                {{ ($anketa->deleted_user->name) }}
-                                            </td>
-                                            <td class="td-option">
-                                                {{ ($anketa->deleted_at) }}
-                                            </td>
-                                        @endif
+                                            <th width="60">Удаливший</th>
+                                            <th width="60">Время удаления</th>
                                         @endif
 
                                         <!-- ОЧЕРЕДЬ ОСМОТРОВ -->
                                         @if($type_ankets === 'pak_queue')
-                                            <td class="td-option not-export d-flex">
-                                                <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm mr-1"><i class="fa fa-search"></i></a>
-                                                <a href="{{ route('changePakQueue', ['admitted' => 'Допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-success"><i class="fa fa-check"></i></a>
-                                            </td>
-
-                                            <td class="td-option not-export">
-                                                <a href="{{ route('changePakQueue', ['admitted' => 'Не допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-danger"><i class="fa fa-close"></i></a>
-                                            </td>
+                                            <th class="not-export">#</th>
+                                            <th class="not-export">#</th>
                                         @endif
                                         <!-- /ОЧЕРЕДЬ ОСМОТРОВ -->
 
-                                            @if($permissionToUpdate)
-                                            <td class="td-option not-export">
-                                                <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i></a>
-                                                @if($anketa->is_dop && !$anketa->result_dop)
-                                                    @if (checkChangeResult($anketa))
-                                                        <a
-                                                            href="{{ route('changeResultDop', ['result_dop' => 'Утвержден', 'id' => $anketa->id]) }}"
-                                                            class="btn btn-sm btn-success">
-                                                            <i class="fa fa-check"></i>
+                                        {{-- redactirovanie --}}
+                                        @if($permissionToUpdate)
+                                            <th class="not-export">#</th>
+                                        @endif
+
+                                        {{-- УДАЛЕНИЕ--}}
+    {{--                                    @if($permissionToDelete)--}}
+    {{--                                        <th class="not-export">#</th>--}}
+    {{--                                    @endif--}}
+
+                                        @if($type_ankets !== 'pak_queue')
+                                                @if($permissionToDelete)
+                                                    <th class="not-export">#</th>
+                                                @endif
+                                        @endif
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($ankets as $anketaKey => $anketa)
+                                        <tr data-field="{{ $anketaKey }}">
+
+                                            @if($type_ankets === 'pak_queue')
+                                                <td class="not-export">
+                                                    <div class="App-Timer" data-date="{{ $anketa->created_at }}"></div>
+                                                </td>
+                                            @endif
+
+
+                                            @foreach($fieldPrompts as $field)
+                                                <td
+                                                    @isset($blockedToExportFields[$field->field])
+                                                        class="not-export"
+                                                    @endisset
+                                                    data-field-key="{{ $field->field }}"
+                                                >
+                                                    @if($field->field === 'date' || strpos($field->field, '_at') > 0)
+                                                        @if($anketa[$field->field])
+                                                            {{ date('d-m-Y H:i:s', strtotime($anketa[$field->field])) }}
+                                                        @endif
+                                                    @elseif($field->field === 'photos')
+
+                                                        @if($anketa[$field->field])
+                                                            @php $photos = explode(',', $anketa[$field->field]); @endphp
+
+                                                            @foreach($photos as $phI => $ph)
+                                                                @php $isUri = strpos($ph, 'sdpo.ta-7'); @endphp
+
+                                                                @if($phI == 0)
+                                                                    <a href="{{ $isUri ? $ph : Storage::url($ph) }}" data-fancybox="gallery_{{ $anketa->id }}"><i class="fa fa-camera"></i> ({{ count($photos) }})</a>
+                                                                @else
+                                                                    <a href="{{ $isUri ? $ph : Storage::url($ph) }}" data-fancybox="gallery_{{ $anketa->id }}"></a>
+                                                                @endif
+                                                            @endforeach
+                                                        @endif
+
+                                                    @elseif($field->field === 'videos')
+
+                                                        @if($anketa[$field->field])
+                                                            @php $videos = explode(',', $anketa[$field->field]); @endphp
+
+                                                            @foreach($videos as $vK => $vV)
+                                                                @if($vK == 0)
+                                                                    <a data-type="iframe" href="{{ route('showVideo', ['url' => $vV]) }}" data-fancybox="video_{{ $anketa->id }}">
+                                                                        <i class="fa fa-video-camera"></i>
+
+                                                                        ({{ count($videos) }})
+                                                                    </a>
+                                                                @else
+                                                                    <a data-type="iframe" href="{{ $vV }}" data-fancybox="video_{{ $anketa->id }}"></a>
+                                                                @endif
+
+                                                            @endforeach
+                                                        @endif
+
+                                                    @elseif($field->field === 'company_name' && user()->access('company_read'))
+                                                        <a href="{{ route('renderElements', ['model' => 'Company', 'filter' => 1, 'name' => $anketa[$field->field] ]) }}">
+                                                            {{ $anketa[$field->field] }}
+                                                        </a>
+                                                    @elseif($field->field === 'user_name' && user()->access('employee_read'))
+                                                        <a href="{{ route('users', ['name' => $anketa[$field->field] ]) }}">
+                                                            {{ $anketa[$field->field] }}
+                                                        </a>
+                                                    @elseif($field->field === 'driver_fio' && user()->access('drivers_read'))
+                                                        <a href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'fio' => $anketa[$field->field] ]) }}">
+                                                            {{ $anketa[$field->field] }}
+                                                        </a>
+                                                    @elseif($field->field === 'car_gos_number' && user()->access('cars_read'))
+                                                        <a href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'gos_number' => $anketa[$field->field] ]) }}">
+                                                            {{ $anketa[$field->field] }}
                                                         </a>
                                                     @else
 
-                                                        <button disabled
-                                                            class="btn btn-sm btn-success">
-                                                            <i class="fa fa-check"></i>
-                                                        </button>
+                                                        {{ $anketa[$field->field] }}
+
+                                                        @if($type_ankets === 'medic' && $field->field === 'admitted' && $anketa[$field->field] === 'Не допущен')
+                                                            @if ($anketa->proba_alko === 'Положительно')
+                                                                <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
+                                                            @else
+                                                                <a href="{{ route('docs.get', ['type' => 'other', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
+                                                            @endif
+                                                        @endif
                                                     @endif
-                                                @endif
-                                            </td>
-                                        @endif
-
-                                        @if($type_ankets !== 'pak_queue')
-                                            <td class="td-option not-export">
-
-                                                {{--  poka ne nado--}}
-{{--                                                @if(false)--}}
-{{--                                                    @if(--}}
-{{--                                                        $type_ankets == 'medic' && user()->access('medic_delete')--}}
-{{--                                                        || $type_ankets == 'tech' && user()->access('tech_delete')--}}
-{{--                                                        || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_delete')--}}
-{{--                                                        )--}}
-{{--                                                    <form action="{{ route('forms.delete', $anketa->id) }}" onsubmit="if(!confirm('Хотите удалить?')) return false;" method="POST">--}}
-{{--                                                        @csrf--}}
-{{--                                                        {{ method_field('DELETE') }}--}}
-{{--                                                        <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-remove"></i></button>--}}
-{{--                                                    </form>--}}
-{{--                                                    @endif--}}
-{{--                                                @endif--}}
+                                                </td>
+                                            @endforeach
 
 
-                                                @if($permissionToDelete)
-                                                <a href="{{ route('forms.trash', [
-                                                    'id' => $anketa->id,
-                                                    'action' => isset($_GET['trash']) ? 0 : 1
-                                                ]) }}" class="btn btn-warning btn-sm">
-                                                    @isset($_GET['trash'])
-                                                        <i class="fa fa-undo"></i>
-                                                    @else
-                                                        <i class="fa fa-trash"></i>
-                                                    @endisset
-                                                </a>
-                                                @endif
+                                            @if($permissionToDelete)
+                                            @if(request()->get('trash'))
+                                                <td class="td-option">
+                                                    {{ ($anketa->deleted_user->name) }}
+                                                </td>
+                                                <td class="td-option">
+                                                    {{ ($anketa->deleted_at) }}
+                                                </td>
+                                            @endif
+                                            @endif
 
-                                            </td>
-                                        @endif
+                                            <!-- ОЧЕРЕДЬ ОСМОТРОВ -->
+                                            @if($type_ankets === 'pak_queue')
+                                                <td class="td-option not-export d-flex">
+                                                    <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm mr-1"><i class="fa fa-search"></i></a>
+                                                    <a href="{{ route('changePakQueue', ['admitted' => 'Допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-success"><i class="fa fa-check"></i></a>
+                                                </td>
 
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                                                <td class="td-option not-export">
+                                                    <a href="{{ route('changePakQueue', ['admitted' => 'Не допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-danger"><i class="fa fa-close"></i></a>
+                                                </td>
+                                            @endif
+                                            <!-- /ОЧЕРЕДЬ ОСМОТРОВ -->
 
-                    <hr>
+                                                @if($permissionToUpdate)
+                                                <td class="td-option not-export">
+                                                    <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i></a>
+                                                    @if($anketa->is_dop && !$anketa->result_dop)
+                                                        @if (checkChangeResult($anketa))
+                                                            <a
+                                                                href="{{ route('changeResultDop', ['result_dop' => 'Утвержден', 'id' => $anketa->id]) }}"
+                                                                class="btn btn-sm btn-success">
+                                                                <i class="fa fa-check"></i>
+                                                            </a>
+                                                        @else
 
-                    @if(count($ankets) > 0)
-                        {{ $ankets->appends($_GET)->render() }}
+                                                            <button disabled
+                                                                class="btn btn-sm btn-success">
+                                                                <i class="fa fa-check"></i>
+                                                            </button>
+                                                        @endif
+                                                    @endif
+                                                </td>
+                                            @endif
+
+                                            @if($type_ankets !== 'pak_queue')
+                                                <td class="td-option not-export">
+
+                                                    {{--  poka ne nado--}}
+    {{--                                                @if(false)--}}
+    {{--                                                    @if(--}}
+    {{--                                                        $type_ankets == 'medic' && user()->access('medic_delete')--}}
+    {{--                                                        || $type_ankets == 'tech' && user()->access('tech_delete')--}}
+    {{--                                                        || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_delete')--}}
+    {{--                                                        )--}}
+    {{--                                                    <form action="{{ route('forms.delete', $anketa->id) }}" onsubmit="if(!confirm('Хотите удалить?')) return false;" method="POST">--}}
+    {{--                                                        @csrf--}}
+    {{--                                                        {{ method_field('DELETE') }}--}}
+    {{--                                                        <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-remove"></i></button>--}}
+    {{--                                                    </form>--}}
+    {{--                                                    @endif--}}
+    {{--                                                @endif--}}
+
+
+                                                    @if($permissionToDelete)
+                                                    <a href="{{ route('forms.trash', [
+                                                        'id' => $anketa->id,
+                                                        'action' => isset($_GET['trash']) ? 0 : 1
+                                                    ]) }}" class="btn btn-warning btn-sm">
+                                                        @isset($_GET['trash'])
+                                                            <i class="fa fa-undo"></i>
+                                                        @else
+                                                            <i class="fa fa-trash"></i>
+                                                        @endisset
+                                                    </a>
+                                                    @endif
+
+                                                </td>
+                                            @endif
+
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr>
+
+                        @if(count($ankets) > 0)
+                            {{ $ankets->appends($_GET)->render() }}
+                        @endif
                     @endif
-                @endif
 
                 @if($permissionToView)
 

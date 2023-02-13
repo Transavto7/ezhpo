@@ -47,7 +47,7 @@
                                     'getField' => 'name',
                                     'getFieldKey' => 'hash_id',
                                     'multiple' => 1,
-                                    'concat' => 'hash_id'
+                                    'concatField' => 'hash_id'
                                 ],
                                 'model' => 'User',
                                 'k' => 'hash_id',

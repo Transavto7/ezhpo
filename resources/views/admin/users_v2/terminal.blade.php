@@ -40,20 +40,38 @@
                         @endif
 
                         <div class="col-lg-3">
-                            @include('templates.elements_field', [
-                                'v' => [
-                                    'type' => 'select',
-                                    'values' => 'User',
-                                    'getField' => 'name',
-                                    'getFieldKey' => 'hash_id',
-                                    'multiple' => 1,
-                                    'concat' => 'hash_id'
-                                ],
-                                'model' => 'User',
-                                'k' => 'hash_id',
-                                'is_required' => '',
-                                'default_value' => request()->get('hash_id')
-                            ])
+                            <select multiple
+                                    name="hash_id[]"
+                                    data-label="hash_id"
+                                    data-field="Terminal_hash_id"
+                                    data-allow-clear="true"
+                                    class="filled-select2 filled-select select2-hidden-accessible"
+                                    aria-hidden="true">
+                                <option value="" data-select2-id="8">Не установлено</option>
+
+                                @php
+                                    $default = request()->get('hash_id') ?? [];
+                                    $terminals = app("App\\User")::with('roles')
+                                        ->whereNotIn('hash_id', $default)->whereHas('roles', function ($q) {
+                                        $q->where('roles.id', 9);
+                                    })->get();
+
+                                    $default = app("App\\User")::with('roles')
+                                        ->whereIn('hash_id', $default)->whereHas('roles', function ($q) {
+                                        $q->where('roles.id', 9);
+                                        })->get();
+                                @endphp
+                                @foreach($default as $option)
+                                    <option selected value="{{ $option['hash_id'] }}">
+                                        [{{ $option['hash_id'] }}] {{ $option['name'] }}
+                                    </option>
+                                @endforeach
+                                @foreach($terminals as $option)
+                                    <option value="{{ $option['hash_id'] }}">
+                                        [{{ $option['hash_id'] }}] {{ $option['name'] }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="col-lg-3 form-group">

@@ -50,7 +50,8 @@ class IndexController extends Controller
                 'model'  => 'Point',
                 'fields' => [
                     'hash_id'    => ['label' => 'Пункт выпуска', 'type' => 'select', 'values' => 'Point',
-                        'getField' => 'name', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id',],
+                        'getField' => 'name', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id'],
+                    'name'    => ['label' => 'Пункт выпуска', 'type' => 'text', 'hideFilter' => true],
                     'pv_id'      => ['label' => 'Город', 'type' => 'select', 'values' => 'Town',
                         'getField' => 'name', 'getFieldKey' => 'id', 'concatField' => 'hash_id'],
                     'company_id' => [
