@@ -187,6 +187,14 @@ if($model === 'Driver'){
                     </div>
                 @endif
             @endforeach
+            @if ($model == "Company")
+                <input type="checkbox" name="required_type_briefing" id="required_type_briefing_checkbox" @if(App\Company::find($id)->required_type_briefing == 1) checked @endif>
+                <label for="required_type_briefing_checkbox">Автоматическое проведение инструктажа водителям</label>
+            @endif
+            @if ($model == "Instr")
+                <input type="checkbox" name="is_default" id="is_default_checkbox" @if(App\Instr::find($id)->is_default) checked @endif>
+                <label for="is_default_checkbox">Базовый инструктаж</label>
+            @endif
         </div>
         <div class="modal-footer">
             <button type="submit" class="btn btn-success">Сохранить</button>

@@ -1656,10 +1656,14 @@ class AnketsController extends Controller
                 /**
                  * Создаем анкету
                  */
+                $companyRequireBriefing = Company::where("hash_id", $anketa["company_id"])->pluck("required_type_briefing");
+                if ($companyRequireBriefing) {
+                    $rmsEngineer = User::where("role", 7)->inRandomOrder()->first();
+                    $anketa["user_name"] = $rmsEngineer->fio;
+                    $anketa["signature"] = $rmsEngineer->eds;
+                }
                 $createdAnketa = Anketa::create($anketa);
                 array_push($createdAnketas, $createdAnketa->id);
-
-
 
                 /**
                  * ОТПРАВКА SMS
