@@ -976,7 +976,7 @@ class IndexController extends Controller
 
                     $productsEntities = Product::whereIn("id", $data['products_id'])->pluck("hash_id")->toArray();
                     /** @var $defaultBriefing Object Hash ID базового инструктажа */
-                    $defaultBriefing = Instr::select("hash_id", "name")->where("is_default", true)->get();
+                    $defaultBriefing = Instr::select("hash_id", "name")->where("is_default", 1)->get();
                     /** @var $needMakeRMB boolean Нужно ли создать запись в журнал БДД */
                     $needMakeRMB = in_array(570316, $productsEntities) || in_array(199217, $productsEntities);
 
@@ -1053,7 +1053,7 @@ class IndexController extends Controller
 
             $created = $model::create($data);
 
-            if (isset($needMakeRMB) && $needMakeRMB) {
+            if (isset($needMakeRMB) && $needMakeRMB && $defaultBriefing) {
                     $user = Auth::user();
                     $company = Company::where("id", $data['company_id'])->first();
 
@@ -1292,8 +1292,15 @@ class IndexController extends Controller
                         ]);
                     }
 
+                    $requiredBriefing = isset($data['required_type_briefing']) && $data['required_type_briefing'] == 'on';
+                    $element->required_type_briefing = $requiredBriefing;
                 }
 
+            }
+
+            if ($model_text === 'Instr') {
+                $isDefault = isset($data['is_default']) && $data['is_default'] == 'on';
+                $element->is_default = $is_default;
             }
 
             /**
