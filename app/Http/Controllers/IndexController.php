@@ -1368,6 +1368,10 @@ class IndexController extends Controller
 
         $take = $request->get('take', 500);
 
+        if (auth()->user()->hasRole(['medic', 'tech'])) {
+            unset($this->elements[$type]['fields']['procedure_pv']);
+        }
+
         if(isset($this->elements[$type])) {
             $element = $this->elements[$type];
 
