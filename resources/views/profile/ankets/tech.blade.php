@@ -94,7 +94,7 @@
     <div class="form-group">
         <label class="form-control-label">ID водителя:</label>
         <article>
-            <input value="{{ $driver_id ?? '' }}" type="number" oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})" min="6" name="driver_id" class="MASK_ID_ELEM form-control">
+            <input required value="{{ $driver_id ?? '' }}" type="number" oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})" min="6" name="driver_id" class="MASK_ID_ELEM form-control">
             <p class="app-checker-prop"></p>
         </article>
     </div>
