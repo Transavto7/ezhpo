@@ -18,7 +18,7 @@ class DriverCreatingObserver
 
         $productsEntities = Product::whereIn("id", $products)->pluck("hash_id")->toArray();
         /** @var $defaultBriefing Object Hash ID базового инструктажа */
-        $defaultBriefing = Instr::where("is_default", true)->pluck("hash_id", "name");
+        $defaultBriefing = Instr::select("hash_id", "name")->where("is_default", true)->get();
 
         if (in_array(570316, $productsEntities) || in_array(199217, $productsEntities)) {
             $user = Auth::user();
