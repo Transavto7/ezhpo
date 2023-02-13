@@ -16,7 +16,7 @@ class DriverCreatingObserver
         $products = $driver->products_id;
         $products = explode(",", $products);
 
-        $productsEntities = Product::whereIn("id", $products)->pluck("hash_id");
+        $productsEntities = Product::whereIn("id", $products)->pluck("hash_id")->toArray();
         /** @var $defaultBriefing Object Hash ID базового инструктажа */
         $defaultBriefing = Instr::where("is_default", true)->pluck("hash_id", "name");
 
