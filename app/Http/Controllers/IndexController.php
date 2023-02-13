@@ -11,11 +11,10 @@ use App\Imports\CompanyImport;
 use App\Imports\DriverImport;
 use App\Models\Contract;
 use App\Point;
-use App\Town;
 use App\User;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
@@ -1456,6 +1455,7 @@ class IndexController extends Controller
                     $element['elements'] = $element['elements']->where('id', auth()->user()->company_id);
                 }
             }
+
 
             $element['max'] = isset($element['max']) ? $element['max'] : null;
             $element['elements_count_all'] = $MODEL_ELEMENTS->count();

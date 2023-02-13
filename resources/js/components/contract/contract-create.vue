@@ -14,7 +14,7 @@
             invalid-feedback="Название договора - обязательное поле!"
             class="required my-1">
 
-          <b-form-input required :state="validationStates.nameState" id="contract_name" v-model="contractData.name"
+          <b-form-input :state="validationStates.nameState" id="contract_name" v-model="contractData.name"
                         placeholder="Введите название"></b-form-input>
         </b-form-group>
 
@@ -366,7 +366,7 @@ export default {
         this.validationStates.ourCompanyState = valid;
         this.validationStates.servicesState = valid;
 
-        if (this.contractData.name.length < 1) {
+        if (!this.contractData.name) {
             this.validationStates.nameState = false;
             return false;
         }
@@ -381,7 +381,7 @@ export default {
           return false;
         }
 
-        if (this.contractData.services.length < 1) {
+        if (!this.contractData.services) {
           this.validationStates.servicesState = false
           return false;
         }

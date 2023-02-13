@@ -26,6 +26,7 @@ class Driver extends Model
             'date_bdd',
             'date_prmo',
             'date_driver_license',
+            'date_narcotic_test',
             'date_report_driver',
             'time_card_driver',
             'town_id',
