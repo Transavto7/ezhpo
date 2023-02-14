@@ -6,9 +6,9 @@
         hide-footer
     >
       <b-form @submit.stop.prevent="submitForm" ref="form">
-
         <b-form-group
             label="Название"
+            label-class="form-control-label"
             label-for="contract_name"
             :state="validationStates.nameState"
             invalid-feedback="Название договора - обязательное поле!"
@@ -40,6 +40,7 @@
             class="required my-1"
             label="Компания"
             label-for="company_select"
+            label-class="form-control-label"
             :state="validationStates.companyState"
             invalid-feedback="Выберите компанию">
 
@@ -65,6 +66,7 @@
 
         <b-form-group
             class="required my-1"
+            label-class="form-control-label"
             label="Наша компания"
             label-for="our_company_select"
             :state="validationStates.ourCompanyState"
@@ -103,6 +105,7 @@
             label="Услуги"
             :state="validationStates.servicesState"
             class="required my-1"
+            label-class="form-control-label"
             invalid-feedback="Выберите услуги"
         >
             <v-select

@@ -8,9 +8,11 @@ use App\Driver;
 use App\Req;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Psy\Util\Json;
 
 class ApiController extends Controller
 {
@@ -77,8 +79,9 @@ class ApiController extends Controller
 
     public function companiesList(Request $request) {
         $company = Company::where('name', 'like', '%' . $request->search . '%')
-                      ->orWhere('hash_id', 'like', '%' . $request->search . '%')
-                      ->select('hash_id', 'name', 'id')->limit(100);
+                        ->orWhere('hash_id', 'like', '%' . $request->search . '%')
+                        ->orWhere('inn', 'like', "%$request->search%")
+                        ->select('hash_id', 'name', 'id', 'inn')->limit(100);
 
         if ($request->get('trashed') === 'true') {
             $company = $company->withTrashed();
