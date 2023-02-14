@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddTerminalIdToAnketasTable extends Migration
+class AddPointIdToAnketasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddTerminalIdToAnketasTable extends Migration
     public function up()
     {
         Schema::table('anketas', function (Blueprint $table) {
-            $table->integer('terminal_id')->nullable();
+            $table->integer('point_id')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ class AddTerminalIdToAnketasTable extends Migration
     public function down()
     {
         Schema::table('anketas', function (Blueprint $table) {
-           $table->dropColumn('terminal_id');
+            $table->dropColumn('point_id');
         });
     }
 }

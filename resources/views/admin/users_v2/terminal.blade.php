@@ -85,7 +85,7 @@
 
                         <div class="col-lg-2 form-group">
                             <input type="submit" class="btn btn-success btn-sm" value="Поиск">
-                            <a href="{{ route('users') }}" class="btn btn-danger btn-sm">Сбросить</a>
+                            <a href="{{ route('terminals') }}" class="btn btn-danger btn-sm">Сбросить</a>
                         </div>
 
                     </form>
