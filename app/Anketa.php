@@ -117,6 +117,7 @@ class Anketa extends Model
             'company_name',
 
             'pv_id',
+            'point_id',
             'date',
             'number_list_road', //'date_number_list_road',
             'type_view',

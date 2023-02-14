@@ -52,6 +52,7 @@ class SdpoController extends Controller
         $medic['user_eds'] = $user->eds;
         $medic['pulse'] = $request->pulse ?? mt_rand(60,80);
         $medic['pv_id'] = $request->user('api')->pv->name;
+        $medic['point_id'] = $request->user('api')->pv->id;
         $medic['tonometer'] = $tonometer;
         $medic['driver_id'] = $driver->hash_id;
         $medic['driver_fio'] = $driver->fio;
@@ -150,6 +151,9 @@ class SdpoController extends Controller
      * Check connection sdpo
      */
     public function checkConnaction(Request $request) {
+        $user = $request->user('api');
+        $user->last_connection_at = Carbon::now();
+        $user->save();
         return "true";
     }
 

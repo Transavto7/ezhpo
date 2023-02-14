@@ -199,7 +199,9 @@ class AnketsController extends Controller
             unset($data['REFERER']);
         }
 
-        $data['pv_id'] = Point::where('id', $data['pv_id'])->first()->name;
+        $point = Point::where('id', $data['pv_id'])->first();
+        $data['pv_id'] = $point->name;
+        $data['point_id'] = $point->id;
         $type_anketa = $data['type_anketa'];
 
         if(isset($data['anketa'])) {
@@ -1582,10 +1584,12 @@ class AnketsController extends Controller
                 $anketa['pv_id'] = Point::where('id', $pv_id)->first();
 
                 // Проверка ПВ
-                if($anketa['pv_id'])
+                if($anketa['pv_id']) {
                     $anketa['pv_id'] = $anketa['pv_id']->name;
-                else
+                    $anketa['point_id'] = $anketa['pv_id']->id;
+                } else {
                     $anketa['pv_id'] = '';
+                }
 
                 // Проверка АВТО
                 if($Car) {
@@ -1614,6 +1618,7 @@ class AnketsController extends Controller
 
                     if ($isApiRoute) {
                         $Driver->date_prmo = Carbon::now();
+                        $anketa['terminal_id'] = $request->user('api')->id;
                     }
 
                     $Driver->save();
@@ -1653,12 +1658,13 @@ class AnketsController extends Controller
                 } else {
                     $anketa['realy'] = 'нет';
                 }
+
+
                 /**
                  * Создаем анкету
                  */
                 $createdAnketa = Anketa::create($anketa);
                 array_push($createdAnketas, $createdAnketa->id);
-
 
 
                 /**
