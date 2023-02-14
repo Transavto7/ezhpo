@@ -31,7 +31,8 @@ function toggleAnketaCloneButton(state) {
 $(document).ready(function () {
 
     $('div.form-group').each(function (i, el) {
-        $(el).has(':input[required]').addClass('required')
+        let requiredInput = $(el).has(':input[required]');
+        requiredInput.addClass('required')
     });
 
     const Toast = swal.mixin({
