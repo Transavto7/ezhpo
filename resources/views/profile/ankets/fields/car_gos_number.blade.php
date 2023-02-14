@@ -4,7 +4,8 @@
         'values' => 'Car',
         'getField' => 'gos_number',
         'getFieldKey' => 'gos_number',
-        'multiple' => 1
+        'multiple' => 1,
+        'trashed' => true
     ],
     'model' => $type_ankets,
     'k' => $field,

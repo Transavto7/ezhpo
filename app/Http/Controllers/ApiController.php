@@ -47,10 +47,10 @@ class ApiController extends Controller
                                           ->orWhere("hash_id", "like", "%" . $request->search . "%");
         }
 
-        if ($request->get('trashed')) {
+        if ($request->get('trashed') === 'true') {
             $query = $query->withTrashed();
         }
-
+        
 //        if (in_array($model, array_keys($mainContentFields)) && $field == "concat" && ($key == "hash_id" || $key == 'id')) {
 //            return $query->select(DB::raw("CONCAT('[', `hash_id`, '] ', `$mainContentFields[$model]`) as concat"), $key)->limit(100)->get();
 //        }
@@ -76,9 +76,15 @@ class ApiController extends Controller
     }
 
     public function companiesList(Request $request) {
-        return Company::where('name', 'like', '%' . $request->search . '%')
+        $company = Company::where('name', 'like', '%' . $request->search . '%')
                       ->orWhere('hash_id', 'like', '%' . $request->search . '%')
-                      ->select('hash_id', 'name', 'id')->limit(100)->get();
+                      ->select('hash_id', 'name', 'id')->limit(100);
+
+        if ($request->get('trashed') === 'true') {
+            $company = $company->withTrashed();
+        }
+
+        return $company->get();
     }
 
     // Обновляем все пункты выпуска

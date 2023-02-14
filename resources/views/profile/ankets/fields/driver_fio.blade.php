@@ -4,7 +4,8 @@
         'values' => 'Driver',
         'getField' => 'fio',
         'getFieldKey' => 'hash_id',
-        'multiple' => 1
+        'multiple' => 1,
+        'trashed' => true
     ],
     'model' => $type_ankets,
     'k' => $field,

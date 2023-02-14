@@ -108,6 +108,10 @@ $(document).ready(function () {
         const concatField = select.attr('field-concat-name') || 'hash_id';
         const field = select.attr('field');
         const key = select.attr('field-key');
+        let trashed = false;
+        if (select.attr('field-trashed')) {
+            trashed = true;
+        }
 
         if (!model) {
             return;
@@ -125,6 +129,7 @@ $(document).ready(function () {
                 search,
                 field,
                 key,
+                trashed
             }
         }).then(({ data }) => {
             data.forEach((element => {

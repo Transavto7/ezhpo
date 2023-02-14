@@ -215,6 +215,7 @@ class IndexController extends Controller
                         'multiple'   => 1,
                         'type'       => 'select',
                         'values'     => 'Product',
+                        'concatField' => 'hash_id',
                         'noRequired' => 1,
                     ],
 
@@ -330,6 +331,7 @@ class IndexController extends Controller
                         'multiple'   => 1,
                         'type'       => 'select',
                         'values'     => 'Product',
+                        'concatField' => 'hash_id',
                         'noRequired' => 1,
                     ],
 
@@ -409,7 +411,7 @@ class IndexController extends Controller
                         'concatField'          => 'hash_id',
                         'getFieldKey'          => 'hash_id'
                     ],
-                    'name' => ['label' => 'Название компании', 'type' => 'text', 'hideFilter'],
+                    'name' => ['label' => 'Название компании', 'type' => 'text', 'hideFilter' => true],
                     'note'    => ['label' => 'Договоренности с клиентом', 'type' => 'text', 'noRequired' => 1],
                     'comment'    => ['label' => 'Комментарий', 'type' => 'text', 'noRequired' => 1],
                     'procedure_pv' => [
@@ -458,6 +460,7 @@ class IndexController extends Controller
                         'label'    => 'Услуги [старые]',
                         'multiple' => 1,
                         'noRequired' => 1,
+                        'concatField' => 'hash_id',
                         'type'     => 'select',
                         'values'   => 'Product',
                         'syncData' => [
