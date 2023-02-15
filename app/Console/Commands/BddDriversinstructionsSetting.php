@@ -69,8 +69,9 @@ class BddDriversinstructionsSetting extends Command
                 if ($ankets->count() > 0) {
                     /** @var Anketa $anket */
                     foreach ($ankets as $anket) {
+                        $date = Carbon::parse($anket->date);
                         $new_ankets_cnt++;
-                        $bddDate = Carbon::create($anket->date->year, $anket->date->month, 10, 6);
+                        $bddDate = Carbon::create($date->year, $date->month, 10, 6);
                         $driver->inspections_bdd()->create([
                             'type_anketa' => 'bdd',
                             'pv_id' => $anket->pv_id,
