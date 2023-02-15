@@ -179,7 +179,7 @@
                             </div>
 
                             <div class="form-group col-lg-6">
-                                <label for="pressure_systolic" class="mb-1">Верхний порого давления</label>
+                                <label for="pressure_systolic" class="mb-1">Верхний порого А/Д</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="pressure_systolic">
@@ -199,7 +199,7 @@
                             </div>
 
                             <div class="form-group col-lg-6">
-                                <label for="pressure_diastolic" class="mb-1">Нижний порого давления</label>
+                                <label for="pressure_diastolic" class="mb-1">Нижний порого А/Д</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="pressure_diastolic">

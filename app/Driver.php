@@ -275,6 +275,12 @@ class Driver extends Model
             return $this->company->pressure_systolic;
         }
 
+        $setting = Settings::setting('pressure_diastolic');
+
+        if ($setting) {
+            return $setting;
+        }
+
         return 150;
     }
 
@@ -285,6 +291,12 @@ class Driver extends Model
 
         if ($this->company->pressure_diastolic) {
             return $this->company->pressure_diastolic;
+        }
+
+        $setting = Settings::setting('pressure_diastolic');
+
+        if ($setting) {
+            return $setting;
         }
 
         return 100;
