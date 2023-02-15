@@ -20,7 +20,7 @@
                                 <div class="logo d-flex justify-content-center pb-2"
                                     style="max-height: 80px; overflow: hidden"
                                 >
-                                    <img src="{{ Storage::url($logo->value) }}"
+                                    <img src="{{ Storage::url($logo) }}"
                                          alt=""
                                          width="300px"
                                          style="height: 100%;"
@@ -56,7 +56,7 @@
                                            placeholder="Введите API ключ"
                                            name="sms_api_key"
                                            aria-describedby="sms_api_key_prepend"
-                                           value="{{ $sms_api_key->value }}"
+                                           value="{{ $sms_api_key }}"
                                     >
                                 </div>
                             </div>
@@ -76,7 +76,7 @@
                                            placeholder="Введите телефон"
                                            name="sms_text_phone"
                                            aria-describedby="sms_text_phone_prepend"
-                                           value="{{ $sms_text_phone->value }}"
+                                           value="{{ $sms_text_phone }}"
                                     >
                                 </div>
                             </div>
@@ -96,7 +96,7 @@
                                            placeholder="Введите телефон"
                                            name="phone"
                                            aria-describedby="sms_text_phone_prepend"
-                                           value="{{ $phone->value }}"
+                                           value="{{ $phone }}"
                                     >
                                 </div>
                             </div>
@@ -116,7 +116,7 @@
                                            placeholder="Введите ссылку на телеграм"
                                            name="telegram"
                                            aria-describedby="sms_text_phone_prepend"
-                                           value="{{ $telegram->value }}"
+                                           value="{{ $telegram }}"
                                     >
                                 </div>
                             </div>
@@ -136,7 +136,7 @@
                                         placeholder="Введите Текст SMS"
                                         name="sms_text_driver"
                                         aria-describedby="sms_text_driver_prepend"
-                                    >{{ $sms_text_driver->value }}</textarea>
+                                    >{{ $sms_text_driver }}</textarea>
                                 </div>
                             </div>
 
@@ -155,7 +155,7 @@
                                         placeholder="Введите Текст SMS"
                                         name="sms_text_car"
                                         aria-describedby="sms_text_car_prepend"
-                                    >{{ $sms_text_car->value }}</textarea>
+                                    >{{ $sms_text_car }}</textarea>
                                 </div>
                             </div>
 
@@ -174,7 +174,7 @@
                                         name="sms_text_default"
                                         placeholder="Введите Текст SMS"
                                         aria-describedby="sms_text_default_prepend"
-                                    >{{ $sms_text_default->value }}</textarea>
+                                    >{{ $sms_text_default }}</textarea>
                                 </div>
                             </div>
 
@@ -193,7 +193,7 @@
                                            placeholder="Введите пороговое давление"
                                            name="pressure_systolic"
                                            aria-describedby="pressure_systolic"
-                                           value="{{ $pressure_systolic->value }}"
+                                           value="{{ $pressure_systolic }}"
                                     >
                                 </div>
                             </div>
@@ -213,7 +213,7 @@
                                            placeholder="Введите пороговое давление"
                                            name="pressure_diastolic"
                                            aria-describedby="pressure_diastolic"
-                                           value="{{ $pressure_diastolic->value }}"
+                                           value="{{ $pressure_diastolic }}"
                                     >
                                 </div>
                             </div>
@@ -233,7 +233,7 @@
                                            placeholder="Введите ожидания ручного режима"
                                            name="timeout"
                                            aria-describedby="timeout"
-                                           value="{{ $timeout->value }}"
+                                           value="{{ $timeout }}"
                                     >
                                 </div>
                             </div>
@@ -245,7 +245,7 @@
                                                type="checkbox"
                                                class="custom-control-input"
                                                id="id_auto"
-                                            {{ $id_auto->value === '1' ? 'checked' : '' }}
+                                            {{ $id_auto === '1' ? 'checked' : '' }}
                                         >
                                         <label class="custom-control-label" style="padding-top: 2px" for="id_auto">
                                             Поле "ID авто" в МО
@@ -257,7 +257,7 @@
                                                type="checkbox"
                                                class="custom-control-input"
                                                id="id_auto_required"
-                                            {{ $id_auto_required->value === '1' ? 'checked' : '' }}
+                                            {{ $id_auto_required === '1' ? 'checked' : '' }}
                                         >
                                         <label class="custom-control-label" style="padding-top: 2px" for="id_auto_required">
                                             Обязательное поле ID авто в МО

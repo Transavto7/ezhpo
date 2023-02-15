@@ -8,17 +8,9 @@ class Settings extends Model
 {
     public $fillable
         = [
-            'id',
-            'logo',
+            'deleted_at',
             'key',
-            'name',
             'value',
-            'sms_api_key',
-            'sms_text_driver',
-            'sms_text_car',
-            'sms_text_phone',
-            'sms_text_default',
-            'deleted_id'
         ];
 
     public static function setting($key)
@@ -30,6 +22,12 @@ class Settings extends Model
         }
 
         return '';
+    }
+
+    public static function set($key, $value) {
+        self::updateOrCreate(['key' => $key], [
+            'value' => $value
+        ]);
     }
 
     public static function getAll()
