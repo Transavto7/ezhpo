@@ -16,8 +16,8 @@
     opacity: 0.5;
 }
 
-.form-group.required label.form-control-label:after {
-    content: " *";
+.form-group.required label.form-control-label:before {
+    content: "* ";
     color: red;
 }
 

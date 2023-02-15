@@ -13,6 +13,7 @@ use App\Models\Contract;
 use App\Point;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -1507,8 +1508,13 @@ class IndexController extends Controller
             }
 
             $element['queryString'] = $queryString;
-            $element['fieldPrompts'] = FieldPrompt::where('type', strtolower($model))->get();
+            $fieldsQuery = FieldPrompt::where('type', strtolower($model))
+                ->when(auth()->user()->hasRole(['medic', 'tech']),
+                    function (\Illuminate\Database\Eloquent\Builder $builder) {
+                        return $builder->where('field', '!=', 'procedure_pv');
+                    });
 
+            $element['fieldPrompts'] = $fieldsQuery->get();
             return view('elements', $element);
         } else {
             return redirect( route('home') );
