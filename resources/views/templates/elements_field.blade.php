@@ -140,6 +140,29 @@
                     {{ $optionV }}
                 </option>
             @endforeach
+        @elseif ($v['values'] === 'User')
+            @foreach(app("App\\" . $v['values'])::with('roles')->whereHas('roles', function ($q) use ($request) {
+                $q->whereNotIn('roles.id', [3, 6, 9]);
+            })->whereIn($key, $default_value)->get() as $option)
+                <option selected value="{{ $option[$key] }}">
+                    @if ($concatField)
+                        [{{ $option[$concatField] }}] {{ $option[$value] }}
+                    @else
+                        {{ $option[$value] }}
+                    @endif
+                </option>
+            @endforeach
+            @foreach(app("App\\" . $v['values'])::with('roles')->whereHas('roles', function ($q) use ($request) {
+                $q->whereNotIn('roles.id', [3, 6, 9]);
+            })->whereNotIn($key, $default_value)->limit(100)->get() as $option)
+                <option value="{{ $option[$key] }}">
+                    @if ($concatField)
+                        [{{ $option[$concatField] }}] {{ $option[$value] }}
+                    @else
+                        {{ $option[$value] }}
+                    @endif
+                </option>
+            @endforeach
         @else
             @foreach(app("App\\" . $v['values'])::whereIn($key, $default_value)->get() as $option)
                 <option selected value="{{ $option[$key] }}">

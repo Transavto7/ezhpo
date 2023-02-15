@@ -271,7 +271,7 @@
                     @endif
 
                     @if(user()->access('pak_sdpo_read', 'pak_sdpo_create'))
-                        <li><a href="{{ route('terminals') }}">ПАК СДПО</a></li>
+                        <li><a href="{{ route('terminals') }}">Терминалы</a></li>
                     @endif
 
                     @if(user()->access('date_control_read', 'date_control_create'))
