@@ -64,7 +64,7 @@ class BddDriversinstructionsSetting extends Command
 
                 dump($driver->fio);
                 dump('Количество мед. осмотров c 2022-07-01 по 2023-02-01 ' . $ankets->count());
-                sleep(3);
+                sleep(1);
                 $new_ankets_cnt = 0;
                 if ($ankets->count() > 0) {
                     /** @var Anketa $anket */
@@ -77,13 +77,13 @@ class BddDriversinstructionsSetting extends Command
                             'pv_id' => $anket->pv_id,
                             'date' => $bddDate,
                             'type_briefing' => 'Специальный',
-                            'signature' => 'Подписано простой ЭЦП',
+                            'signature' => $anket->signature,
                             'user_eds' => $anket->user_eds,
                             'driver_id' => $driver->id,
                             'driver_fio' => $driver->fio,
                             'company_name' => $driver->company->name,
                         ]);
-                        $this->info("Добавлен инструктаж для $driver->fio : $driver->hash_id" );
+                        $this->info("Добавлен инструктаж для $driver->fio : $driver->hash_id : $anket->date : $company->name" );
                     }
                     $this->info("Добавлено анкет $new_ankets_cnt");
                 }

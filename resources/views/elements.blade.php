@@ -68,7 +68,7 @@
                                         <div class="form-group" data-field="{{ $k }}">
                                             <label>
                                                 @if($is_required)
-                                                    <b class="text-danger text-bold">*</b>
+                                                    <b class="text-danger text-bold">* </b>
                                                 @endif
                                                 {{ $v['label'] }}
                                             </label>
@@ -81,7 +81,7 @@
                                     @else
                                         <div class="form-group" data-field="{{ $k }}">
                                             <label>
-                                                @if($is_required) <b class="text-danger text-bold">*</b> @endif
+                                                @if($is_required) <b class="text-danger text-bold">* </b> @endif
                                                 {{ $v['label'] }}
                                             </label>
 
@@ -116,13 +116,13 @@
                         <div class="modal-body">
                             <p>Заполните форму внимательно и нажмите кнопку "Добавить"</p>
                             <div data-field="name" class="form-group">
-                                <label><b class="text-danger text-bold">*</b>Название</label>
+                                <label><b class="text-danger text-bold">* </b>Название</label>
                                 <input value="" type="text" required="required" name="name"
                                        data-label="Название" placeholder="Название"
                                        data-field="Product_name" class="form-control ">
                             </div>
                             <div data-field="type_product" class="form-group">
-                                <label><b class="text-danger text-bold">*</b>Тип</label>
+                                <label><b class="text-danger text-bold">* </b>Тип</label>
                                 <select name="type_product"
                                         required="required"
                                         data-label="Тип"
@@ -152,14 +152,14 @@
                                 </select>
                             </div>
                             <div data-field="unit" class="form-group">
-                                <label><b class="text-danger text-bold">*</b>
+                                <label><b class="text-danger text-bold">* </b>
                                     Ед.изм.</label>
                                 <input value="" type="text" required="required" name="unit"
                                        data-label="Ед.изм." placeholder="Ед.изм." data-field="Product_unit"
                                        class="form-control ">
                             </div>
                             <div data-field="price_unit" class="form-group">
-                                <label><b class="text-danger text-bold">*</b>
+                                <label><b class="text-danger text-bold">* </b>
                                     Стоимость за единицу</label>
                                 <input value="" type="number" required="required"
                                        name="price_unit" data-label="Стоимость за единицу"
@@ -167,7 +167,7 @@
                                        data-field="Product_price_unit" class="form-control ">
                             </div>
                             <div data-field="type_anketa" class="form-group">
-                                <label><b class="text-danger text-bold">*</b> Реестр</label>
+                                <label><b class="text-danger text-bold">* </b> Реестр</label>
                                 <select name="type_anketa" required="required" data-label="Реестр"
                                         data-field="Product_type_anketa" class="filled-select2 filled-select">
                                     <option value="">Не установлено</option>
@@ -189,7 +189,7 @@
                                 </select>
                             </div>
                             <div data-field="type_view" class="form-group">
-                                <label><b class="text-danger text-bold">*</b>Тип осмотра</label>
+                                <label><b class="text-danger text-bold">* </b>Тип осмотра</label>
                                 <select multiple="multiple" name="type_view[]" required="required"
                                         data-label="Тип осмотра" data-field="Product_type_view"
                                         class="filled-select2 filled-select">

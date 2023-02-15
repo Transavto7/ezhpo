@@ -16,7 +16,7 @@
                         @if($k !== 'id' && !isset($v['hidden']))
                             <div class="form-group" data-field="{{ $k }}">
                                 <label>
-                                    @if($is_required) <b class="text-danger text-bold">*</b> @endif
+                                    @if($is_required) <b class="text-danger text-bold">* </b> @endif
                                     {{ $v['label'] }}</label>
 
                                 @include('templates.elements_field', [

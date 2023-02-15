@@ -59,7 +59,7 @@
 
                     @if($k == 'unit' && ($model === 'Service' || $model === 'Product'))
                         <div data-field="essence" class="form-group">
-                            <label><b class="text-danger text-bold">*</b>Сущности</label>
+                            <label><b class="text-danger text-bold">* </b>Сущности</label>
                             <select
                                     name="essence"
                                     data-label="Сущности"
@@ -169,7 +169,7 @@ if($model === 'Driver'){
                 @if($k !== 'id' && !isset($v['hidden']))
                     <div class="form-group" data-field="{{ $k }}">
                         <label>
-                            @if($is_required) <b class="text-danger text-bold">*</b> @endif
+                            @if($is_required) <b class="text-danger text-bold">* </b> @endif
                             {{ $v['label'] }}</label>
 
                         @include('templates.elements_field', [
