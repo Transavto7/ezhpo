@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Anketa;
 use App\FieldPrompt;
 use App\Role;
 use App\User;
@@ -15,9 +16,7 @@ class TerminalController extends Controller
     public function index(Request $request)
     {
         $date = Carbon::now()->subMonth()->startOfMonth()->startOfDay();
-        $users = User::with(['roles', 'pv', 'company', 'pv.town', 'terminalAnketas' => function ($q) use ($date) {
-            $q->select('id', 'terminal_id', 'created_at')->where('created_at', '>=', $date);
-        }])
+        $users = User::with(['roles', 'pv', 'company', 'pv.town'])
             ->whereHas('roles', function ($q) use ($request) {
                 $q->where('roles.id', 9);
             });
@@ -39,6 +38,17 @@ class TerminalController extends Controller
 
         $res = $users->paginate();
         if ($request->get('api')) {
+            $terminals = $res->getCollection();
+            $anketas = Anketa::whereIn('terminal_id', $terminals->pluck('id'))
+                ->where('created_at', '>=', Carbon::now()->subMonth()->startOfMonth())->select('created_at', 'terminal_id')->get();
+            foreach ($terminals as $terminal) {
+                $terminal->month_amount = $anketas->where('terminal_id', $terminal->id)
+                    ->where('created_at', '>=', Carbon::now()->startOfMonth())->count();
+
+                $terminal->last_month_amount = $anketas->where('terminal_id', $terminal->id)
+                    ->where('created_at', '<', Carbon::now()->startOfMonth())->count();
+            }
+
             return response([
                 'total_rows'   => $res->total(),
                 'current_page' => $res->currentPage(),

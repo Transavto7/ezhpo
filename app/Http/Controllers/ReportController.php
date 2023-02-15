@@ -216,10 +216,10 @@ class ReportController extends Controller
             } elseif ($town_id) {
                 if (str_contains($town_id, ',')) {
                     $pointsNames = implode(',', Point::whereRaw("pv_id in ($town_id)")
-                                                     ->pluck("name")
-                                                     ->map(function ($tn) {
-                                                         return "'$tn'";
-                                                     }));
+                                     ->pluck("name")
+                                     ->map(function ($tn) {
+                                         return "'$tn'";
+                                     }));
                     $whereCase .= " and `anketas`.`pv_id` in ($pointsNames) ";
                 } else {
                     $pointName = trim(Point::where("pv_id", $town_id)->pluck('name'), "[]");
@@ -284,8 +284,8 @@ class ReportController extends Controller
             }
         }
 
-        $towns = Town::get(['id', 'name']);
-        $points = Point::get(['id', 'name', 'pv_id']);
+        $towns = Town::get(['hash_id', 'id', 'name']);
+        $points = Point::get(['hash_id', 'id', 'name', 'pv_id']);
 
         if (isset($total)) {
             $totalStr = "";

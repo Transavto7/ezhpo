@@ -3,7 +3,6 @@
     <div class="card mb-4" style="overflow-x: inherit">
       <h5 class="card-header d-flex justify-content-between align-items-center">
         Выбор информации
-
         <div class="d-flex align-items-center">
           <select v-model="journal" @change="changeFormParams">
             <option value="tech">Техосмотры</option>
@@ -16,8 +15,28 @@
         <form :action="'/report/dynamic/' + journal" method="GET"
               onsubmit="document.querySelector('#page-preloader').classList.remove('hide')">
           <div class="row">
+          <div class="form-group col-lg-3">
+              <label class="mb-1" for="company_id">Компания</label>
+              <multiselect
+                  v-model="company"
+                  @search-change="searchCompany"
+                  :options="companies"
+                  :searchable="true"
+                  :close-on-select="false"
+                  :show-labels="false"
+                  label="name"
+                  track-by="id"
+                  :multiple="true"
+                  :taggable="true"
+                  placeholder="Выберите компании"
+              >
+                  <span slot="noResult">Результатов не найдено</span>
+                  <span slot="noOptions">Список пуст</span>
+              </multiselect>
+          </div>
+
             <div class="form-group col-lg-3">
-              <label class="mb-1" for="company">Город</label>
+              <label class="mb-1" for="town_id">Город</label>
               <select
                   ref="towns"
                   name="town_id"
@@ -32,13 +51,13 @@
                         :value="item.id"
                         :selected="item.id === Number(town)"
                 >
-                  {{ item.name }}
+                  [{{ item.hash_id }}] {{ item.name }}
                 </option>
               </select>
             </div>
 
             <div class="form-group col-lg-3">
-              <label class="mb-1" for="company">Пункт выпуска</label>
+              <label class="mb-1" for="pv_id">Пункт выпуска</label>
               <select
                   ref="points"
                   name="pv_id"
@@ -54,7 +73,7 @@
                         :selected="item.id === Number(point) || selectedPoints.includes(item.id)"
                         v-if="!item.hide"
                 >
-                  {{ item.name }}
+                    [{{ item.hash_id }}] {{ item.name }}
                 </option>
               </select>
             </div>
@@ -99,6 +118,8 @@ export default {
       journal: 'medic',
       pointList: [],
       //Дата осмотра - execute, дата создания - created.
+      companies: [],
+      company: [],
       orderBy: 'execute',
       selectedTowns: [],
       selectedPoints: [],
@@ -113,31 +134,7 @@ export default {
     this.orderBy = this.order;
     $(this.$refs.towns).on("change", this.selectTown);
     $(this.$refs.points).on("change", this.selectPoint);
-
-    var _sTown = this.town;
-    if (this.selectedTown != null) {
-      $("#town_selector").children('option').each(function (i, e) {
-        if (e.value == '' || e.value == 'Не установлено') {
-          return;
-        }
-        if (_sTown.split(',').includes(e.value)) {
-          e.selected = true;
-        }
-      });
-      $(this.$refs.towns).trigger("change");
-
-      //_sPoints - выделенные пункты.
-      var _sPoints = this.point.split(',').map(e => Number(e)),
-          points = this.points.filter(function (p) {
-            //Если пункт был выбран - выделить.
-            //Если пункт принадлежит городу, то включаем в список.
-            if (_sTown.includes(p.pv_id)) {
-              return true;
-            }
-          });
-    }
-    this.pointList = points;
-    this.selectedPoints = _sPoints;
+    this.searchCompany();
 
     if (this.infos !== null) {
       var ctx = document.getElementById('chart').getContext('2d');
@@ -167,17 +164,14 @@ export default {
   methods: {
     selectTown(event) {
       const selected = $(event.currentTarget).val();
-      let converterArray = selected.map(point => Number(point));
-
       this.selectedTowns = selected;
       this.pointList = this.points.filter(function (point) {
-        return converterArray.includes(point.pv_id);
+        return selected.includes(point.pv_id);
       });
     },
     selectPoint(event) {
       const selected = $(event.currentTarget).val();
       let converterArray = selected.map(point => Number(point));
-
       this.selectedPoints = converterArray;
     },
     getAvailablePoints() {
@@ -199,8 +193,24 @@ export default {
     },
     submitForm() {
       this.changeFormParams();
-      window.location = `/report/dynamic/${this.journal}?town_id=${this.selectedTownsAsString}&pv_id=${this.selectedPvAsString}&order_by=${this.orderBy}`;
-    }
+      window.location = `/report/dynamic/${this.journal}?
+      town_id=${this.selectedTownsAsString}
+      &pv_id=${this.selectedPvAsString}
+      &order_by=${this.orderBy}`;
+    },
+      searchCompany(query = '') {
+          axios.get('/api/companies/find', {
+              params: {
+                  search: query
+              }
+          }).then(({ data }) => {
+              data.forEach(company => {
+                  company.name = `[${company.hash_id}] ${company.name}`;
+              });
+
+              this.companies = data;
+          });
+      },
   }
 }
 

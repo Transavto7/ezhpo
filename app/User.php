@@ -54,11 +54,6 @@ class User extends Authenticatable
             'last_connection_at' => 'datetime',
         ];
 
-    protected $appends = [
-        'last_month_amount',
-        'month_amount',
-    ];
-
     public function deleted_user()
     {
         return $this->belongsTo(User::class, 'deleted_id', 'id')
@@ -74,7 +69,6 @@ class User extends Authenticatable
 
     public function roles($deleted = false) : BelongsToMany
     {
-        // pizdec huita///.....// prosto nahui relationship
         return $this->belongsToMany(\App\Role::class,
             'model_has_roles',
             'model_id',
@@ -85,32 +79,10 @@ class User extends Authenticatable
         ->wherePivot('deleted', $deleted ? 1 : 0);
     }
 
-//    public function scopePermissions() : BelongsToMany
-//    {
-//        return parent::permissions()->wherePivot('deleted',0);
-//    }
-//    public function roles() : BelongsToMany
-//    {
-//        // pizdec huita///.....// prosto nahui relationship
-//        return $this->belongsToMany(\App\Role::class,
-//            'model_has_roles',
-//            'model_id',
-//            'role_id',
-//            'id',
-//            'id'
-//        )->withPivot('deleted')
-//                    ->wherePivot('deleted', 0);
-//    }
-
     public function anketas()
     {
         return $this->hasMany(Anketa::class, 'user_id', 'id')
             ->withDefault();
-    }
-
-    public function terminalAnketas()
-    {
-        return $this->hasMany(Anketa::class, 'terminal_id', 'id');
     }
 
     public function company()
@@ -271,19 +243,5 @@ class User extends Authenticatable
         }
 
         return $userName;
-    }
-
-    public function getLastMonthAmountAttribute() {
-        if ($this->terminalAnketas) {
-            $date = Carbon::now()->startOfMonth()->startOfDay();
-            return $this->terminalAnketas->where('created_at', '<', $date)->count();
-        }
-    }
-
-    public function getMonthAmountAttribute() {
-        if ($this->terminalAnketas) {
-            $date = Carbon::now()->startOfMonth()->startOfDay();
-            return $this->terminalAnketas->where('created_at', '>=', $date)->count();
-        }
     }
 }
