@@ -1373,10 +1373,6 @@ class IndexController extends Controller
 
         $take = $request->get('take', 500);
 
-        if (auth()->user()->hasRole(['medic', 'tech'])) {
-            unset($this->elements[$type]['fields']['procedure_pv']);
-        }
-
         if(isset($this->elements[$type])) {
             $element = $this->elements[$type];
 
@@ -1508,12 +1504,7 @@ class IndexController extends Controller
             }
 
             $element['queryString'] = $queryString;
-            $fieldsQuery = FieldPrompt::where('type', strtolower($model))
-                ->when(auth()->user()->hasRole(['medic', 'tech']),
-                    function (\Illuminate\Database\Eloquent\Builder $builder) {
-                        return $builder->where('field', '!=', 'procedure_pv');
-                    });
-
+            $fieldsQuery = FieldPrompt::where('type', strtolower($model));
             $element['fieldPrompts'] = $fieldsQuery->get();
             return view('elements', $element);
         } else {

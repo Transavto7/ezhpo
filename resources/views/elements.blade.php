@@ -39,26 +39,37 @@
                                 @continue
                             @endif
                             @if($k == 'where_call' && !user()->access('companies_access_field_where_call'))
-                                @continue
-                            @endif
+                                    @continue
+                                @endif
 
-                            @if($k == 'contracts')
-                                @continue
-                            @endif
+                                @if($k == 'contracts')
+                                    @continue
+                                @endif
 
-                            @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
-                                @continue
-                            @endif
+                                @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
+                                    @continue
+                                @endif
 
-                            @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
+                                @if($k == 'procedure_pv' && user()->hasRole(['medic', 'tech']))
+                                    <div class="form-group" data-field="comment">
+                                        <label for="disabledProcedureInput">{{$v['label']}}</label>
+                                        <input type="text" id="disabledProcedureInput" class="form-control"
+                                               placeholder="Закрыто для редактирования" disabled>
+                                    </div>
+                                    @continue
+                                @endif
 
-                            @php $default_value = isset($v['defaultValue']) ? $v['defaultValue'] : '' @endphp
+                                @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
 
-                            @if($k !== 'id' && !isset($v['hidden']))
-                                @if($model === 'Instr' && $k === 'sort')
+                                @php $default_value = isset($v['defaultValue']) ? $v['defaultValue'] : '' @endphp
+
+                                @if($k !== 'id' && !isset($v['hidden']))
+                                    @if($model === 'Instr' && $k === 'sort')
                                         <div class="form-group" data-field="{{ $k }}">
                                             <label>
-                                                @if($is_required) <b class="text-danger text-bold">*</b> @endif
+                                                @if($is_required)
+                                                    <b class="text-danger text-bold">*</b>
+                                                @endif
                                                 {{ $v['label'] }}
                                             </label>
 

@@ -55,34 +55,36 @@ class BddDriversinstructionsSetting extends Command
 
         foreach ($driversCompanies as $company) {
             /** @var Driver $driver */
-            foreach ($company->drivers()->cursor() as $driver) {
+            foreach ($company->drivers()->with('inspections_medic')->cursor() as $driver) {
                 $ankets = $driver->inspections_medic()
                     ->whereBetween('anketas.date', [
                         \DateTime::createFromFormat('Y-m-d', '2022-07-01'),
                         \DateTime::createFromFormat('Y-m-d', '2023-02-01')]
                     )->get();
 
+                dump($driver->fio);
+                dump('Количество мед. осмотров c 2022-07-01 по 2023-02-01 ' . $ankets->count());
+                sleep(3);
+                $new_ankets_cnt = 0;
                 if ($ankets->count() > 0) {
-                    $last = Carbon::parse($ankets->max('date'));
                     /** @var Anketa $anket */
                     foreach ($ankets as $anket) {
-                        $bddDate = Carbon::create($last->year, $last->month, 10, 6);
-                        $count = $driver->inspections_bdd()->where(['date' => $bddDate])->count();
-
-                        if ($count === 0) {
-                            $driver->inspections_bdd()->create([
-                                'type_anketa' => 'bdd',
-                                'pv_id' => $anket->pv_id,
-                                'date' => $bddDate,
-                                'type_briefing' => 'Специальный',
-                                'signature' => 'Подписано простой ЭЦП'
-                            ]);
-
-                            $this->info("Добавлен инструктаж для $driver->fio : $driver->hash_id" );
-                        } else {
-                            $this->info("Уже существует инструктаж для $driver->fio : $driver->hash_id" );
-                        }
+                        $new_ankets_cnt++;
+                        $bddDate = Carbon::create($anket->date->year, $anket->date->month, 10, 6);
+                        $driver->inspections_bdd()->create([
+                            'type_anketa' => 'bdd',
+                            'pv_id' => $anket->pv_id,
+                            'date' => $bddDate,
+                            'type_briefing' => 'Специальный',
+                            'signature' => 'Подписано простой ЭЦП',
+                            'user_eds' => $anket->user_eds,
+                            'driver_id' => $driver->id,
+                            'driver_fio' => $driver->fio,
+                            'company_name' => $driver->company->name,
+                        ]);
+                        $this->info("Добавлен инструктаж для $driver->fio : $driver->hash_id" );
                     }
+                    $this->info("Добавлено анкет $new_ankets_cnt");
                 }
             }
         }
