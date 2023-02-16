@@ -85,7 +85,7 @@ class BddDriversinstructionsSetting extends Command
                     $bddDate = Carbon::create($date->year, $date->month, 10, 6);
                     $model = $driver->inspections_bdd()->create([
                         'type_anketa' => 'bdd',
-                        'pv_id' => $bddUser->pv_id,
+                        'pv_id' => $company->pv_id,
                         'date' => $bddDate,
                         'type_briefing' => 'Специальный',
                         'signature' => 'Подписано простой ЭЦП',
