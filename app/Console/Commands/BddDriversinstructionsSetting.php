@@ -57,7 +57,9 @@ class BddDriversinstructionsSetting extends Command
         /** @var User $bddUser */
         $bddUser = User::with(['roles'])->whereHas('roles', function (Builder $queryBuilder) {
             return $queryBuilder->where('id', 7);
-        })->first();
+        })->get()
+            ->random();
+
 
         foreach ($driversCompanies as $company) {
             /** @var Driver $driver */
@@ -92,7 +94,7 @@ class BddDriversinstructionsSetting extends Command
                         'driver_fio' => $driver->fio,
                         'company_name' => $driver->company->name,
                         'user_name' => $bddUser->name,
-                        'user_id' => $bddUser->id
+                        'user_id' => $bddUser->id,
                     ]);
 
                     dump($model->toArray());
