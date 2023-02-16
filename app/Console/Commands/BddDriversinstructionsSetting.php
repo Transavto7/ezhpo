@@ -6,6 +6,7 @@ use App\Anketa;
 use App\Company;
 use App\Driver;
 use Carbon\Carbon;
+use DB;
 use Illuminate\Console\Command;
 use Illuminate\Database\Query\Expression;
 use SebastianBergmann\Environment\Console;
@@ -56,22 +57,28 @@ class BddDriversinstructionsSetting extends Command
         foreach ($driversCompanies as $company) {
             /** @var Driver $driver */
             foreach ($company->drivers()->with('inspections_medic')->cursor() as $driver) {
-                $ankets = $driver->inspections_medic()
+                $anketsByMonth = $driver->inspections_medic()
+                    ->selectRaw(
+                        new Expression("
+                            count(*) as count,
+                            DATE_FORMAT(`date`,'%Y-%m') dateMonth,
+                            id
+                        ")
+                    )
                     ->whereBetween('anketas.date', [
                         \DateTime::createFromFormat('Y-m-d', '2022-07-01'),
                         \DateTime::createFromFormat('Y-m-d', '2023-02-01')]
-                    )->get();
+                    )
+                    ->groupBy([DB::raw("dateMonth")])
 
-                dump($driver->fio);
-                dump('Количество мед. осмотров c 2022-07-01 по 2023-02-01 ' . $ankets->count());
-                sleep(1);
-                $new_ankets_cnt = 0;
-                if ($ankets->count() > 0) {
-                    /** @var Anketa $anket */
-                    foreach ($ankets as $anket) {
-                        $date = Carbon::parse($anket->date);
-                        $new_ankets_cnt++;
-                        $bddDate = Carbon::create($date->year, $date->month, 10, 6);
+                ;
+
+                /** @var Anketa $anket */
+                $anket = $driver->inspections_medic()->first();
+
+                foreach ($anketsByMonth->get()->pluck('count', 'dateMonth')->toArray() as $date => $count) {
+                    $date = Carbon::parse($date);
+                    $bddDate = Carbon::create($date->year, $date->month, 10, 6);
                         $driver->inspections_bdd()->create([
                             'type_anketa' => 'bdd',
                             'pv_id' => $anket->pv_id,
@@ -82,10 +89,10 @@ class BddDriversinstructionsSetting extends Command
                             'driver_id' => $driver->id,
                             'driver_fio' => $driver->fio,
                             'company_name' => $driver->company->name,
+                            'user_name' => $anket->user_name,
+                            'user_id' => $anket->user_id
                         ]);
-                        $this->info("Добавлен инструктаж для $driver->fio : $driver->hash_id : $anket->date : $company->name" );
-                    }
-                    $this->info("Добавлено анкет $new_ankets_cnt");
+
                 }
             }
         }
