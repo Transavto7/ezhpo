@@ -73,13 +73,12 @@ class BddDriversinstructionsSetting extends Command
 
                 ;
 
+                $anket = $driver->inspections_bdd()->inRandomOrder()->first();
                 /** @var Anketa $anket */
-                $anket = $driver->inspections_medic()->first();
-
                 foreach ($anketsByMonth->get()->pluck('count', 'dateMonth')->toArray() as $date => $count) {
                     $date = Carbon::parse($date);
                     $bddDate = Carbon::create($date->year, $date->month, 10, 6);
-                        $driver->inspections_bdd()->create([
+                        $model = $driver->inspections_bdd()->create([
                             'type_anketa' => 'bdd',
                             'pv_id' => $anket->pv_id,
                             'date' => $bddDate,
@@ -92,6 +91,8 @@ class BddDriversinstructionsSetting extends Command
                             'user_name' => $anket->user_name,
                             'user_id' => $anket->user_id
                         ]);
+
+                        dump($model->toArray());
 
                 }
             }
