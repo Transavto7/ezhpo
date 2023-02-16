@@ -1223,18 +1223,18 @@ $(document).ready(function () {
         triggerField()
     })
 
-    // $('*[data-field="Company_name"]').suggestions({
-    //     token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
-    //     type: "PARTY",
-    //     /* Вызывается, когда пользователь выбирает одну из подсказок */
-    //     onSelect: function(suggestion) {
-    //         if(suggestion.data) {
-    //             const { inn } = suggestion.data
-    //
-    //             $('#elements-modal-add input[name="inn"]').val(inn)
-    //         }
-    //     }
-    // });
+    $('*[data-field="Company_name"]').suggestions({
+        token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
+        type: "PARTY",
+        /* Вызывается, когда пользователь выбирает одну из подсказок */
+        onSelect: function(suggestion) {
+            if(suggestion.data) {
+                const { inn } = suggestion.data
+
+                $('#elements-modal-add input[name="inn"]').val(inn)
+            }
+        }
+    });
 
     $('.header #toggle-btn').each(function () {
         let localStatusSidebar = () => {
