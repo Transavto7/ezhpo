@@ -5,11 +5,12 @@ namespace App\Console\Commands;
 use App\Anketa;
 use App\Company;
 use App\Driver;
+use App\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
-use SebastianBergmann\Environment\Console;
 
 class BddDriversinstructionsSetting extends Command
 {
@@ -51,8 +52,12 @@ class BddDriversinstructionsSetting extends Command
             ->orWhereRaw(new Expression("FIND_IN_SET('20', companies.products_id)"))
             ->orWhereRaw(new Expression("FIND_IN_SET('24', companies.products_id)"))
             ->orWhereRaw(new Expression("FIND_IN_SET('6', companies.products_id)"))
-            ->cursor()
-        ;
+            ->cursor();
+
+        /** @var User $bddUser */
+        $bddUser = User::with(['roles'])->whereHas('roles', function (Builder $queryBuilder) {
+            return $queryBuilder->where('id', 7);
+        })->first();
 
         foreach ($driversCompanies as $company) {
             /** @var Driver $driver */
@@ -66,37 +71,36 @@ class BddDriversinstructionsSetting extends Command
                         ")
                     )
                     ->whereBetween('anketas.date', [
-                        \DateTime::createFromFormat('Y-m-d', '2022-07-01'),
-                        \DateTime::createFromFormat('Y-m-d', '2023-02-01')]
+                            \DateTime::createFromFormat('Y-m-d', '2022-07-01'),
+                            \DateTime::createFromFormat('Y-m-d', '2023-02-01')]
                     )
                     ->groupBy([DB::raw("dateMonth")])
 
                 ;
 
-                $anket = $driver->inspections_bdd()->inRandomOrder()->first();
-                /** @var Anketa $anket */
                 foreach ($anketsByMonth->get()->pluck('count', 'dateMonth')->toArray() as $date => $count) {
                     $date = Carbon::parse($date);
                     $bddDate = Carbon::create($date->year, $date->month, 10, 6);
-                        $model = $driver->inspections_bdd()->create([
-                            'type_anketa' => 'bdd',
-                            'pv_id' => $anket->pv_id,
-                            'date' => $bddDate,
-                            'type_briefing' => 'Специальный',
-                            'signature' => $anket->signature,
-                            'user_eds' => $anket->user_eds,
-                            'driver_id' => $driver->id,
-                            'driver_fio' => $driver->fio,
-                            'company_name' => $driver->company->name,
-                            'user_name' => $anket->user_name,
-                            'user_id' => $anket->user_id
-                        ]);
+                    $model = $driver->inspections_bdd()->create([
+                        'type_anketa' => 'bdd',
+                        'pv_id' => $bddUser->pv_id,
+                        'date' => $bddDate,
+                        'type_briefing' => 'Специальный',
+                        'signature' => 'Подписано простой ЭЦП',
+                        'user_eds' => $bddUser->eds,
+                        'driver_id' => $driver->id,
+                        'driver_fio' => $driver->fio,
+                        'company_name' => $driver->company->name,
+                        'user_name' => $bddUser->name,
+                        'user_id' => $bddUser->id
+                    ]);
 
-                        dump($model->toArray());
+                    dump($model->toArray());
 
                 }
             }
         }
+
 
         return 0;
 
