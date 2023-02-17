@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Anketa;
 use App\FieldPrompt;
+use App\Req;
 use App\Role;
 use App\User;
 use Carbon\Carbon;
@@ -41,11 +42,6 @@ class TerminalController extends Controller
             $anketas = Anketa::whereIn('terminal_id', $terminals->pluck('id'))
                 ->where('created_at', '>=', Carbon::now()->subMonth()->startOfMonth())->select('created_at', 'terminal_id')->get();
             foreach ($terminals as $terminal) {
-                $terminal->connected = false;
-                if ($terminal->last_connection_at) {
-                    $terminal->connected = Carbon::now()->diffInSeconds($terminal->last_connection_at) < 20;
-                }
-
                 $terminal->month_amount = $anketas->where('terminal_id', $terminal->id)
                     ->where('created_at', '>=', Carbon::now()->startOfMonth())->count();
 
@@ -67,6 +63,22 @@ class TerminalController extends Controller
                 'users' => $res,
                 'fields' => $fields
             ]);
+    }
+
+    public function getConnectionStatus(Request $request) {
+        if (!$request->terminals_id) {
+            return;
+        }
+
+        $terminals = User::whereIn('id', $request->terminals_id)->select('id', 'last_connection_at')->get();
+        foreach ($terminals as $terminal) {
+            $terminal->connected = false;
+            if ($terminal->last_connection_at) {
+                $terminal->connected = Carbon::now()->diffInSeconds($terminal->last_connection_at) < 20;
+            }
+        }
+
+        return $terminals;
     }
 
     public function update(Request $request)
