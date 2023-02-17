@@ -180,6 +180,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('users/return_trash', 'UserController@returnTrash');
     Route::get('users/fetchCompanies', 'UserController@fetchCompanies');
     Route::get('/terminals', 'TerminalController@index')->name('terminals');
+    Route::get('/terminals/status', 'TerminalController@getConnectionStatus')->name('terminals.status');
     Route::post('/terminals', 'TerminalController@update')->name('terminals.update');
 
     Route::resource('roles', 'RoleController');

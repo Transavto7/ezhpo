@@ -241,6 +241,32 @@ export default {
             this.sortDesc = e.sortDesc;
             this.loadData();
         },
+        loadConnectionStatus() {
+          if (!this.items) {
+              return;
+          }
+
+          const terminals_id = this.items.map((item) => {
+              return item.id;
+          });
+
+          axios.get('/terminals/status', {
+              params: {
+                  terminals_id
+              }
+          }).then(({ data }) => {
+            data.forEach(item => {
+                this.items.forEach(terminal => {
+                    if (terminal.id === item.id) {
+                        terminal.connected = item.connected;
+                    }
+                });
+            });
+
+            this.$forceUpdate();
+            console.log(this.items);
+          });
+        },
         loadData() {
             this.busy = true;
             this.loading = true;
@@ -258,7 +284,7 @@ export default {
                 this.currentPage = data.current_page;
                 this.totalRows = data.total_rows;
                 this.busy = false;
-
+                this.loadConnectionStatus();
             }).finally(() => {
                 this.loading = false;
             });
@@ -465,6 +491,8 @@ export default {
                 label: '#',
             })
         }
+
+        setInterval(this.loadConnectionStatus, 5000);
     },
     watch: {
         searchPermissions(val){
