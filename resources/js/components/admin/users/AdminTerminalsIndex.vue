@@ -47,8 +47,8 @@
                                 {{ row.value }}
                             </template>
                         </template>
-                        <template #cell(status)="row">
-                            <span v-if="row.value" class="badge badge-success">on</span>
+                        <template #cell(status)="{ item }">
+                            <span v-if="item.connected" class="badge badge-success">on</span>
                             <span v-else class="badge badge-danger">off</span>
                         </template>
 
@@ -254,15 +254,6 @@ export default {
                     api: 1,
                 },
             }).then(({data}) => {
-                data.items.forEach(item => {
-                    let date = item.last_connection_at;
-                    if (!date) {
-                        item.status = false;
-                    } else {
-                        item.status = (Date.now() - Date.parse(date)) <= 30;
-                    }
-
-                });
                 this.items = data.items;
                 this.currentPage = data.current_page;
                 this.totalRows = data.total_rows;
