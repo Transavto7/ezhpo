@@ -33,7 +33,7 @@ class Kernel extends ConsoleKernel
         $randomMinutes = mt_rand(0, 59);
         //todo перенести логику куда нибудь
         $schedule->command('companies:inspect')->monthlyOn(1, '6:00');
-        $schedule->command("run:briefings")->monthlyOn(10, ($randomHours < 10 ? "0$randomHours" : "$randomHours") . ":" . ($randomMinutes < 10 ? "0$randomMinutes" : "$randomMinutes"));
+        $schedule->command("run:briefings")->monthlyOn(10, '10:00');
     }
 
     /**

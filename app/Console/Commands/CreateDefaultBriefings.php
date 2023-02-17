@@ -46,11 +46,10 @@ class CreateDefaultBriefings extends Command
     {
         $entersInto = 0;
         /** @var $companiesWithAutoBriefing array Массив с hash ID компаний, где требуется базовый инструктаж */
-        $companiesWithAutoBriefing = Company::where("required_type_briefing", true)->pluck("id");
-        /** @var $defaultBriefing Object Hash ID базового инструктажа */
-        $defaultBriefing = Instr::where("is_default", true)->pluck("name");
+        $companiesWithAutoBriefing = Company::where("required_type_briefing", true)->select('name', 'id', 'hash_id')->get();
         /** @var $drivers Driver Данные водителей, которым нужно прописать инструктаж */
-        $drivers = Driver::select(["hash_id", "fio", "gender", "year_birthday"])->whereIn("company_id", $companiesWithAutoBriefing)->get();
+        $drivers = Driver::select(["hash_id", "fio", "gender", "year_birthday"])
+            ->whereIn("company_id", $companiesWithAutoBriefing->pluck("id"))->get();
 
         $rmsEngineerIds = [];
         DB::table("model_has_roles")
@@ -62,7 +61,8 @@ class CreateDefaultBriefings extends Command
           });
         $rmsEngineer = User::whereIn("id", $rmsEngineerIds)->inRandomOrder()->first();
 
-        $drivers->map(function ($driver) use ($rmsEngineer, $companiesWithAutoBriefing, $defaultBriefing, &$entersInto) {
+        $drivers->map(function ($driver) use ($rmsEngineer, $companiesWithAutoBriefing, &$entersInto) {
+            $company = $companiesWithAutoBriefing->where('hash_id', $driver->company_id);
             Anketa::create([
                                "type_anketa" => "bdd",
                                "user_id"     => $rmsEngineer->id,
@@ -72,14 +72,15 @@ class CreateDefaultBriefings extends Command
                                "driver_gender" => $driver->gender,
                                "driver_year_birthday" => $driver->year_birthday,
                                "complaint" => "Нет",
+                               "signature" => "Подписано простой ЭЦП",
                                "condition_visible_sliz" => "Без особенностей",
                                "condition_koj_pokr" => "Без особенностей",
                                "date" => Carbon::now(),
                                "type_view" => "Предрейсовый",
-                               "company_id" => $driver->company_id,
-                               "company_name" => Company::where("id", $companiesWithAutoBriefing)->get(),
-                               "briefing_name" => $defaultBriefing
-                           ]);
+                               "company_id" => $company->hash_id,
+                               "company_name" => $company->name,
+//                               "briefing_name" => $defaultBriefing
+            ]);
             $entersInto++;
         });
 
