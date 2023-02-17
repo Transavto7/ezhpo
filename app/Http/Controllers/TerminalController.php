@@ -41,7 +41,11 @@ class TerminalController extends Controller
             $anketas = Anketa::whereIn('terminal_id', $terminals->pluck('id'))
                 ->where('created_at', '>=', Carbon::now()->subMonth()->startOfMonth())->select('created_at', 'terminal_id')->get();
             foreach ($terminals as $terminal) {
-                $terminal->connected = Carbon::now()->diffInSeconds($terminal->last_connection_at) < 20;
+                $terminal->connected = false;
+                if ($terminal->last_connection_at) {
+                    $terminal->connected = Carbon::now()->diffInSeconds($terminal->last_connection_at) < 20;
+                }
+
                 $terminal->month_amount = $anketas->where('terminal_id', $terminal->id)
                     ->where('created_at', '>=', Carbon::now()->startOfMonth())->count();
 
