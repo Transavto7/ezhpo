@@ -344,6 +344,7 @@ class Anketa extends Model
             'created_at',
             'user_name',
             'pv_id',
+            'briefing_name',
             'user_eds',
             'signature',
         ],

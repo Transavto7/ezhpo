@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcher;
 
@@ -951,8 +952,9 @@ class AnketsController extends Controller
                     if($anketa['type_anketa'] === 'tech' && !$anketa['is_dop']) {
                         // Генерируем номер ПЛ
                         $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
+                        $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
                         $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id)
-                            . '-' . date('d.m.Y', strtotime($anketa['date']));
+                            . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
                     }
                 }
 
@@ -1564,7 +1566,8 @@ class AnketsController extends Controller
                     if($anketa['type_anketa'] !== 'medic') {
                         // Генерируем номер ПЛ
                         $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
-                        $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id) . '-' . date('d.m.Y', strtotime($anketa['date']));
+                        $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
+                        $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id) . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
                     }
                 }
 
@@ -1581,12 +1584,10 @@ class AnketsController extends Controller
                 $anketa['pv_id'] = Point::where('id', $pv_id)->first();
 
                 // Проверка ПВ
-                if($anketa['pv_id']) {
+                if($anketa['pv_id'])
                     $anketa['pv_id'] = $anketa['pv_id']->name;
-                    $anketa['point_id'] = $anketa['pv_id']->id;
-                } else {
+                else
                     $anketa['pv_id'] = '';
-                }
 
                 // Проверка АВТО
                 if($Car) {
@@ -1615,7 +1616,6 @@ class AnketsController extends Controller
 
                     if ($isApiRoute) {
                         $Driver->date_prmo = Carbon::now();
-                        $anketa['terminal_id'] = $request->user('api')->id;
                     }
 
                     $Driver->save();
