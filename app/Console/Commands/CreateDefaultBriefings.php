@@ -47,7 +47,7 @@ class CreateDefaultBriefings extends Command
     {
         $entersInto = 0;
         /** @var $companiesWithAutoBriefing array Массив с hash ID компаний, где требуется базовый инструктаж */
-        $companiesWithAutoBriefing = Company::where("required_type_briefing", true)->select('name', 'id', 'hash_id')->get();
+        $companiesWithAutoBriefing = Company::where("required_type_briefing", true)->select('name', 'id', 'hash_id', 'pv_id')->get();
         /** @var $drivers Driver Данные водителей, которым нужно прописать инструктаж */
         $drivers = Driver::select(["hash_id", "fio", "gender", "year_birthday"])
             ->whereIn("company_id", $companiesWithAutoBriefing->pluck("id"))->get();
