@@ -6,7 +6,7 @@
     <report-dynamic-index
             :towns='@json($towns)'
             :points='@json($points)'
-            :companies="JSON.parse(`{{ $company_id }}`)"
+            :companies='@json($company_id)'
             :sel-towns=`@json(request()->get('town_id'))`
             :sel-points=`@json(request()->get('pv_id'))`
             :sel-companies=`@json(request()->get('company_id'))`
