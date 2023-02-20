@@ -147,6 +147,7 @@ class Anketa extends Model
 
             // Журнал БДД
             'type_briefing',
+            'briefing_name',
 
             // ПАК
             'pulse',

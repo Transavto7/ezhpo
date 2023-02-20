@@ -150,25 +150,15 @@ class ReportController extends Controller
         return $this->getDynamic($request, 'tech');
     }
 
-    public function getDynamicMedic(Request $request) {
-        return $this->getDynamic($request, 'medic');
-    }
-
     public function getDynamicAll(Request $request) {
         return $this->getDynamic($request, 'all');
     }
 
+    public function getDynamicMedic(Request $request) {
+        return $this->getDynamic($request, 'medic');
+    }
+
     public function getDynamic(Request $request, $journal) {
-        $monthTotalContainer = [];
-        $monthNamesContainer = [];
-
-        /** @var $pv_id string ID выбранных пунктов выпуска. Если их несколько, то они перечисляются через запятую. */
-        $pv_id = trim($request->pv_id, ',[]');
-        /** @var $town_id string ID выбранных городов пунктов выпуска. Если их несколько, то они перечисляются через запятую. */
-        $town_id = trim($request->town_id, ',[]');
-        /** @var $orderBy string Тип построения - execute (по дате осмотра) или created (по дате создания) */
-        $orderBy = $request->order_by;
-
         $months = [];
         $periodStart = Carbon::now()->subMonths(11);
         $period = CarbonPeriod::create($periodStart, '1 month', Carbon::now());
@@ -178,121 +168,95 @@ class ReportController extends Controller
         $months = array_reverse($months);
 
         if ($request->town_id || $request->pv_id) {
-            /** @var $data_from Carbon Дата начала исчисления - это первый день месяца */
             $date_from = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay();
-            /** @var $data_to Carbon Дата конца исчисления */
-            $date_to   = Carbon::now()->lastOfMonth()->endOfDay();
-            $result    = [];
-            $total     = [];
+            $date_to = Carbon::now()->lastOfMonth()->endOfDay();
+            $result = [];
+            $total = [];
 
-            // Достаём названия нужных нам месяцев для назначения по порядку.
-            // Назначаем изначальную локаль как английскую, потом меняем обратно на русскую.
-            Carbon::setLocale('en');
-            for ($i = 0; $i < 12; $i++) {
-                $monthNamesContainer[$i] = Carbon::now()->subMonths($i)->monthName;
-                $monthTotalContainer[$i] = 0;
-            }
-            Carbon::setLocale('ru');
+            $anketas = Anketa::query();
 
-            $whereCase = "and ";
-            $whereCase .= $journal == "all"
-                ? "type_anketa in ('medic', 'tech')"
-                : "type_anketa = '$journal'";
-
-            $whereCase .= " and `in_cart` = 0 ";
-            $whereCase .= " and `deleted_at` is null ";
-            if ($pv_id) {
-                if (str_contains($pv_id, ',')) {
-                    $pointsNames = implode(',', Point::whereRaw("id in ($pv_id)")
-                                                     ->pluck("name")
-                                                     ->map(function ($pn) {
-                                                         return "'$pn'";
-                                                     }));
-                    $whereCase .= " and `anketas`.`pv_id` in ($pointsNames) ";
-                } else {
-                    $pointName = trim(Point::find($pv_id)->name, "[]");
-                    $whereCase .= " and `anketas`.`pv_id` = '$pointName' ";
-                }
-            } elseif ($town_id) {
-                if (str_contains($town_id, ',')) {
-                    $pointsNames = implode(',', Point::whereRaw("pv_id in ($town_id)")
-                                     ->pluck("name")
-                                     ->map(function ($tn) {
-                                         return "'$tn'";
-                                     }));
-                    $whereCase .= " and `anketas`.`pv_id` in ($pointsNames) ";
-                } else {
-                    $pointName = trim(Point::where("pv_id", $town_id)->pluck('name'), "[]");
-                    $whereCase .= " and `anketas`.`pv_id` = '$pointName' ";
-                }
+            if ($journal !== 'all') {
+                $anketas = $anketas->where('type_anketa', $journal);
+            } else {
+                $anketas = $anketas->whereIn('type_anketa', ['tech', 'medic']);
             }
 
-            if ($orderBy == 'execute') {
-                $mainField = "coalesce(date, period_pl)";
-            } elseif ($orderBy == 'created') {
-                $mainField = "created_at";
-            }
-            $mainTimeCondition = "($mainField between '$date_from' and '$date_to') ";
-            $mainTimeResult = "date_format($mainField, '%Y-%m-%d')";
+            $anketas = $anketas->where('in_cart', 0);
 
-            $subSelectCase = "select sub.month as `month`,
-                                     sub.cnt as `cnt`,
-                                     companies.hash_id as `company`,
-                                     companies.name as `name`
-                              from (
-                                  select $mainTimeResult as `month`,
-                                         company_name,
-                                         count(*) as cnt
-                                  from anketas
-                                  where $mainTimeCondition
-                                  $whereCase
-                                  group by $mainTimeResult, company_id, type_anketa) sub
-                                  left join companies on companies.name = sub.company_name
-                              ";
-            $responseFromDB = DB::select($subSelectCase, ['$date_from' => $date_from, '$date_to' => $date_to]);
-
-            foreach ($responseFromDB as $response) {
-                $response = json_decode(json_encode($response), true);
-
-                if (is_null($response['name']) || $response['name'] == '') {
-                    continue;
-                }
-
-                Carbon::setLocale('en');
-                $monthName = ucfirst(Carbon::parse($response['month'])->monthName);
-                Carbon::setLocale('ru');
-                if (!$response["name"]) {
-                    continue;
-                }
-                $result[$response["company"]]["name"] = $response['name'];
-                if (!isset($result[$response["company"]][$monthName])) {
-                    $result[$response["company"]][$monthName] = 0;
-                }
-                $result[$response["company"]][$monthName] += $response["cnt"] ?? 0;
-                $total[$monthName] = ($total[$monthName] ?? 0) + ($response["cnt"] ?? 0);
+            if ($request->order_by === 'created') {
+                $anketas = $anketas->whereBetween('created_at', [
+                    $date_from,
+                    $date_to,
+                ]);
+            } else {
+                $anketas = $anketas->where(function ($q) use ($date_from, $date_to) {
+                    $q->where(function ($q) use ($date_from, $date_to) {
+                        $q->whereNotNull('date')
+                            ->whereBetween('date', [
+                                $date_from,
+                                $date_to,
+                            ]);
+                    })->orWhere(function ($q) use ($date_from, $date_to) {
+                        $q->whereNull('date')->whereBetween('period_pl', [
+                            $date_from->format('Y-m'),
+                            $date_to->format('Y-m'),
+                        ]);
+                    });
+                });
             }
 
-            foreach ($monthNamesContainer as $monthIndex => $monthName) {
-                $monthTotalContainer[$monthIndex] = $total[$monthName] ?? 0;
+            if ($request->pv_id) {
+                $anketas = $anketas->whereIn('pv_id', Point::whereIn('id', $request->pv_id)->pluck('name'));
+            } else if ($request->town_id) {
+                $points = Point::whereIn('pv_id', $request->town_id)->pluck('name');
+                $anketas = $anketas->whereIn('pv_id', $points);
             }
 
-            foreach ($monthNamesContainer as $monthIndex => &$monthName) {
-                $carbon = Carbon::createFromFormat("F", $monthName);
-                Carbon::setLocale('ru');
-                $monthName = ucfirst($carbon->monthName);
-                Carbon::setLocale('en');
+            if ($request->company_id) {
+                $anketas = $anketas->whereIn('company_id', $request->company_id);
+            }
+
+            $anketas = $anketas->get();
+
+            foreach($anketas->groupBy('company_id') as $company_id => $anketasByCompany) {
+                $result[$company_id]['name'] = $anketasByCompany
+                    ->where('company_name', '!=', null)->first()->company_name;
+                for ($i = 0; $i < 12; $i++) {
+                    $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
+                    $date_to = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay();
+                    $date = Carbon::now()->subMonths($i);
+
+
+                    if ($request->order_by === 'created') {
+                        $count = $anketasByCompany
+                            ->whereBetween('created_at', [
+                                $date_from,
+                                $date_to,
+                            ])->count();
+                    } else {
+                        $count = $anketasByCompany
+                                ->whereBetween('date', [
+                                    $date_from,
+                                    $date_to,
+                                ])->count() +
+                            $anketasByCompany->where('date', null)->whereBetween('period_pl', [
+                                $date_from->format('Y-m'),
+                                $date_to->format('Y-m'),
+                            ])->count();
+                    }
+
+                    $result[$company_id][$date->format('F')] = $count;
+                    $total[$date->format('F')] = ($total[$date->format('F')] ?? 0) + $count;
+                }
             }
         }
 
         $towns = Town::get(['hash_id', 'id', 'name']);
         $points = Point::get(['hash_id', 'id', 'name', 'pv_id']);
-
-        if (isset($total)) {
-            $totalStr = "";
-            foreach ($total as $sum) {
-                $totalStr .= "$sum, ";
-            }
-            $totalStr = rtrim($totalStr, ",");
+        $company_id = Company::select('hash_id', 'name')->limit(100)->get();
+        if ($request->company_id) {
+            $company_id =
+                $company_id->merge(Company::select('hash_id', 'name')->whereIn('hash_id', $request->company_id)->get());
         }
 
         return view('reports.dynamic.medic.index', [
@@ -300,11 +264,9 @@ class ReportController extends Controller
             'companies' => $result ?? null,
             'total' => $total ?? null,
             'towns' => $towns,
+            'company_id' => $company_id,
             'points' => $points,
-            'journal' => $journal,
-            'totalstr' => $totalStr ?? '',
-            'monthnames' => $monthNamesContainer,
-            'monthtotal' => $monthTotalContainer
+            'journal' => $journal
         ]);
     }
 

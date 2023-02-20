@@ -232,6 +232,7 @@ return [
             'type_briefing' => 'Вид инструктажа',
             'youtube' => 'Ссылка на YouTube',
             'active' => 'Активен',
+            'is_default' => 'Базовый',
             'sort' => 'Сортировка',
         ],
         'point' => [

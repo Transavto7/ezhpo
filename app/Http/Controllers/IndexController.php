@@ -984,12 +984,6 @@ class IndexController extends Controller
                     $user = User::create($userData);
                     $user->roles()->attach(3);
 
-                    $productsEntities = Product::whereIn("id", $data['products_id'])->pluck("hash_id")->toArray();
-                    /** @var $defaultBriefing Object Hash ID базового инструктажа */
-                    $defaultBriefing = Instr::select("hash_id", "name")->where("is_default", 1)->first();
-                    /** @var $needMakeRMB boolean Нужно ли создать запись в журнал БДД */
-                    $needMakeRMB = in_array(570316, $productsEntities) || in_array(199217, $productsEntities);
-
                     // СИНХРОНИЗАЦИЯ ПОЛЕЙ
                     if (isset($data['company_id'])) {
                         $fieldsSync = isset($data['autosync_fields']) ? $data['autosync_fields'] : [];
@@ -1011,8 +1005,6 @@ class IndexController extends Controller
                     if ($data['type_product'] === 'Абонентская плата без реестров') {
                         $data['type_anketa'] = null;
                         $data['type_view']   = null;
-                    } else {
-//                        $data['essence'] = null;
                     }
 
                     break;
@@ -1063,49 +1055,55 @@ class IndexController extends Controller
 
             $created = $model::create($data);
 
-            if (isset($needMakeRMB) && $needMakeRMB && $defaultBriefing) {
-                $user = Auth::user();
-                $company = Company::where("id", $data['company_id'])->first();
 
-                Anketa::create([
-                                   "type_anketa" => "bdd",
-                                   "user_id"     => $user->id,
-                                   "user_name"   => $user->name,
-                                   "driver_id"   => $created->hash_id,
-                                   "driver_fio"  => $created->fio,
-                                   "driver_gender" => $created->gender,
-                                   "driver_year_birthday" => $created->year_birthday,
-                                   "complaint" => "Нет",
-                                   "condition_visible_sliz" => "Без особенностей",
-                                   "condition_koj_pokr" => "Без особенностей",
-                                   "date" => Carbon::now(),
-                                   "type_view" => "Предрейсовый",
-                                   "company_id" => $created->company_id,
-                                   "company_name" => $company->name,
-                                   "briefing_name" => $defaultBriefing->name,
-                                   "type_briefing" => 'Вводный'
-                               ]);
+            if ($model_type === 'Driver') {
+                $company = Company::where("id", $data['company_id'])->first();
+                $briefing = Instr::where('is_default', true)->where('type_briefing', 'Вводный')->first();
+
+                if ($company && $company->required_type_briefing) {
+                    $bddUser = User::with(['roles'])->whereHas('roles', function ($queryBuilder) {
+                        return $queryBuilder->where('id', 7);
+                    })->get()->random();
+                    $point = Point::find($company->pv_id);
+
+                    Anketa::create([
+                        "type_anketa" => "bdd",
+                        "user_id"     => $bddUser->id,
+                        "user_name"   => $bddUser->name,
+                        "driver_id"   => $created->hash_id,
+                        "driver_fio"  => $created->fio,
+                        "driver_gender" => $created->gender,
+                        'pv_id' => $point->name,
+                        'point_id' => $point->id,
+                        'user_eds' => $bddUser->eds,
+                        "driver_year_birthday" => $created->year_birthday,
+                        "complaint" => "Нет",
+                        "type_briefing" => 'Вводный',
+                        "signature" => "Подписано простой ЭЦП",
+                        "condition_visible_sliz" => "Без особенностей",
+                        "condition_koj_pokr" => "Без особенностей",
+                        "date" => Carbon::now(),
+                        "type_view" => "Предрейсовый",
+                        "company_id" => $company->hash_id,
+                        "company_name" => $company->name,
+                        "briefing_name" => $briefing->name ?? ''
+                    ]);
+                }
             }
-//            if ($model_type == 'Company') {
-//                if ( !empty($contracts)) {
-//                    Contract::whereIn('id', $contracts)
-//                            ->update(['company_id' => $created->id]);
-//                }
-//            }
 
 
             if ($created) {
                 if ($model_type === 'Company') {
                     $user = User::create([
-                                             'hash_id'  => mt_rand(0,9999) . date('s'),
-                                             'email'    => $created->hash_id . '-' . mt_rand(100000, 499999).'@ta-7.ru',
-                                             'api_token' => Hash::make(date('H:i:s').sha1($created->hash_id)),
-                                             'login'    => '0' . $created->hash_id,
-                                             'password' => Hash::make('0' .$created->hash_id),
-                                             'name'     => $created->name,
-                                             'role'     => 12,
-                                             'company_id' => $created->id
-                                         ]);
+                         'hash_id'  => mt_rand(0,9999) . date('s'),
+                         'email'    => $created->hash_id . '-' . mt_rand(100000, 499999).'@ta-7.ru',
+                         'api_token' => Hash::make(date('H:i:s').sha1($created->hash_id)),
+                         'login'    => '0' . $created->hash_id,
+                         'password' => Hash::make('0' .$created->hash_id),
+                         'name'     => $created->name,
+                         'role'     => 12,
+                         'company_id' => $created->id
+                     ]);
 
                     $user->roles()->attach(6);
                 }else if($model_type === 'Car' || $model_type === 'Driver'){
@@ -1311,7 +1309,7 @@ class IndexController extends Controller
 
             if ($model_text === 'Instr') {
                 $isDefault = isset($data['is_default']) && $data['is_default'] == 'on';
-                Instr::where('is_default', 1)->update(["is_default" => 0]);
+                Instr::where('type_briefing', $element->type_briefing)->where('is_default', 1)->update(["is_default" => 0]);
                 $element->is_default = $isDefault;
             }
 
@@ -1388,9 +1386,6 @@ class IndexController extends Controller
         $oBy = 'orderBy';
 
         // ОПЕРАТОР ПАК & КОМПАНИИ
-//        if($user->role === 4 && $type === 'Company') {
-//            return back();
-//        }
 
         foreach($_GET as $getK => $getV) {
             if($getK !== $oKey && $getK !== $oBy) {
@@ -1422,7 +1417,6 @@ class IndexController extends Controller
 
             $element['elements_count_all'] = $MODEL_ELEMENTS->count();
 
-//            $fieldsModel = $MODEL_ELEMENTS->fillable;
             if ($model == 'Company') {
                 $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contracts.services']);
             } elseif ($model == 'Car' || $model == 'Driver') {
@@ -1430,8 +1424,6 @@ class IndexController extends Controller
             }
 
             $element['elements'] = $MODEL_ELEMENTS;
-//            dd($element['elements']);
-//            $fieldsModel = $element['elements']->fillable;
 
             $element['type'] = $type;
             $element['orderBy'] = $orderBy;
@@ -1482,10 +1474,9 @@ class IndexController extends Controller
                         } else {
                             if ($aFk == 'date_of_employment') {
                                 $element['elements'] = $element['elements']->whereBetween($aFk, [
-                                                                                                  Carbon::parse($aFv)->startOfDay(),
-                                                                                                  Carbon::parse($aFv)->endOfDay()
-                                                                                              ]
-                                );
+                                    Carbon::parse($aFv)->startOfDay(),
+                                    Carbon::parse($aFv)->endOfDay()
+                                ]);
                             } else {
                                 $element['elements'] = $element['elements']->where($aFk, 'LIKE', '%' . trim($aFv) . '%');
                             }

@@ -6,9 +6,11 @@ use App\Anketa;
 use App\Company;
 use App\Driver;
 use App\Instr;
+use App\Point;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class CreateDefaultBriefings extends Command
@@ -46,40 +48,42 @@ class CreateDefaultBriefings extends Command
     {
         $entersInto = 0;
         /** @var $companiesWithAutoBriefing array Массив с hash ID компаний, где требуется базовый инструктаж */
-        $companiesWithAutoBriefing = Company::where("required_type_briefing", true)->pluck("id");
-        /** @var $defaultBriefing Object Hash ID базового инструктажа */
-        $defaultBriefing = Instr::where("is_default", true)->pluck("name");
+        $companiesWithAutoBriefing = Company::where("required_type_briefing", true)->select('name', 'id', 'hash_id', 'pv_id')->get();
         /** @var $drivers Driver Данные водителей, которым нужно прописать инструктаж */
-        $drivers = Driver::select(["hash_id", "fio", "gender", "year_birthday"])->whereIn("company_id", $companiesWithAutoBriefing)->get();
+        $drivers = Driver::select(["hash_id", "fio", "gender", "year_birthday", 'company_id'])
+            ->whereIn("company_id", $companiesWithAutoBriefing->pluck("id"))->get();
+        $briefing = Instr::where('is_default', true)->where('type_briefing', 'Специальный')->first();
 
-        $rmsEngineerIds = [];
-        DB::table("model_has_roles")
-          ->select("model_id")
-          ->where("role_id", 7)
-          ->get()
-          ->map(function ($container) use (&$rmsEngineerIds) {
-              $rmsEngineerIds[] = $container->model_id;
-          });
-        $rmsEngineer = User::whereIn("id", $rmsEngineerIds)->inRandomOrder()->first();
+        $bddUser = User::with(['roles'])->whereHas('roles', function (Builder $queryBuilder) {
+            return $queryBuilder->where('id', 7);
+        })->get()->random();
 
-        $drivers->map(function ($driver) use ($rmsEngineer, $companiesWithAutoBriefing, $defaultBriefing, &$entersInto) {
+        $drivers->map(function ($driver) use ($bddUser, $companiesWithAutoBriefing, &$entersInto, $briefing) {
+            $company = $companiesWithAutoBriefing->where('id', $driver->company_id)->first();
+            $point = Point::find($company->pv_id);
+
             Anketa::create([
                                "type_anketa" => "bdd",
-                               "user_id"     => $rmsEngineer->id,
-                               "user_name"   => $rmsEngineer->name,
+                               "user_id"     => $bddUser->id,
+                               "user_name"   => $bddUser->name,
+                               'pv_id'       => $point->name,
+                               'user_eds'    => $bddUser->eds,
                                "driver_id"   => $driver->hash_id,
                                "driver_fio"  => $driver->fio,
                                "driver_gender" => $driver->gender,
                                "driver_year_birthday" => $driver->year_birthday,
                                "complaint" => "Нет",
+                               "type_briefing" => 'Специальный',
+                               "signature" => "Подписано простой ЭЦП",
                                "condition_visible_sliz" => "Без особенностей",
                                "condition_koj_pokr" => "Без особенностей",
                                "date" => Carbon::now(),
                                "type_view" => "Предрейсовый",
-                               "company_id" => $driver->company_id,
-                               "company_name" => Company::where("id", $companiesWithAutoBriefing)->get(),
-                               "briefing_name" => $defaultBriefing
-                           ]);
+                               "company_id" => $company->hash_id,
+                               "company_name" => $company->name,
+                               'point_id' => $point->id,
+                               "briefing_name" => $briefing->name ?? ''
+            ]);
             $entersInto++;
         });
 

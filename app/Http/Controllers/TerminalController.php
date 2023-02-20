@@ -36,7 +36,7 @@ class TerminalController extends Controller
             $users->orderBy($sortBy, $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC');
         }
 
-        $res = $users->paginate();
+        $res = $users->paginate(100);
         if ($request->get('api')) {
             $terminals = $res->getCollection();
             $anketas = Anketa::whereIn('terminal_id', $terminals->pluck('id'))
@@ -101,6 +101,8 @@ class TerminalController extends Controller
                 'blocked'  => $request->get('blocked', 0),
                 'password' => $api_token,
                 'api_token' => $api_token,
+                'email' => time() . '@ta-7.ru',
+                'login' => time() . '@ta-7.ru',
                 'pv_id' => $request->get('pv', null),
             ]);
         }
