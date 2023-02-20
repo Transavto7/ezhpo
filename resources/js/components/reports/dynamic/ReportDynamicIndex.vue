@@ -132,6 +132,13 @@ export default {
     this.selectedTowns = this.selTowns || [];
     this.selectedPoints = this.selPoints || [];
     this.selectedCompanies = this.selCompanies || [];
+
+      this.pointList = this.points.filter((point) => {
+          return this.selectedTowns.includes('' + point.pv_id);
+      });
+
+      console.log(this.pointList);
+
     this.journal = this.type;
     this.orderBy = this.order;
     $(this.$refs.towns).on("change", this.selectTown);
@@ -139,9 +146,7 @@ export default {
   methods: {
     selectTown(event) {
       const selected = $(event.currentTarget).val();
-      console.log(selected);
       this.pointList = this.points.filter(function (point) {
-          console.log(point.pv_id, selected.includes(point.pv_id));
         return selected.includes('' + point.pv_id);
       });
     },

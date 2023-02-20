@@ -208,7 +208,7 @@ class ReportController extends Controller
             $anketas = $anketas->get();
 
             foreach($anketas->groupBy('company_id') as $company_id => $anketasByCompany) {
-                $result[$company_id]['name'] = $anketasByCompany->first()->company_name;
+                $result[$company_id]['name'] = $anketasByCompany->whereNotNull('company_name')->first()->company_name;
                 for ($i = 0; $i < 12; $i++) {
                     $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
                     $date_to = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay();
