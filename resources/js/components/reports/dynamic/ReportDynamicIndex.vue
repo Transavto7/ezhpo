@@ -142,7 +142,7 @@ export default {
       console.log(selected);
       this.pointList = this.points.filter(function (point) {
           console.log(point.pv_id, selected.includes(point.pv_id));
-        return selected.includes(point.pv_id);
+        return selected.includes('' + point.pv_id);
       });
     },
   }
