@@ -11,6 +11,7 @@ use App\Notify;
 use App\Point;
 use App\Settings;
 use App\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -1656,6 +1657,20 @@ class AnketsController extends Controller
                     $anketa['realy'] = 'нет';
                 }
 
+                if ($anketa['type_anketa'] === 'bdd') {
+                    $bddUser = User::with(['roles'])->whereHas('roles', function (Builder $queryBuilder) {
+                        return $queryBuilder->where('id', 7);
+                    })->get()->random();
+
+                    if ($Driver) {
+                        $point = Point::find($Driver->pv_id);
+                        $anketa['pv_id'] = $point->name;
+                        $anketa['point_id'] = $point->id;
+                    }
+
+                    $anketa['user_id'] = $bddUser->id;
+                    $anketa['user_eds'] = $bddUser->eds;
+                }
 
                 /**
                  * Создаем анкету
