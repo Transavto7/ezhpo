@@ -1663,9 +1663,11 @@ class AnketsController extends Controller
                     })->get()->random();
 
                     if ($Driver) {
-                        $point = Point::find($Driver->pv_id);
-                        $anketa['pv_id'] = $point->name;
-                        $anketa['point_id'] = $point->id;
+                        $point = Company::find($Driver->company_id)->point()->get();
+                        if ($point) {
+                            $anketa['pv_id'] = $point->name;
+                            $anketa['point_id'] = $point->id;
+                        }
                     }
 
                     $anketa['user_id'] = $bddUser->id;
