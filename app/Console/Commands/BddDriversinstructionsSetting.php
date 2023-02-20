@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Company;
 use App\Driver;
+use App\Point;
 use App\User;
 use Carbon\Carbon;
 use DB;
@@ -59,9 +60,9 @@ class BddDriversinstructionsSetting extends Command
         })->get()
             ->random();
 
-
         foreach ($driversCompanies as $company) {
             /** @var Driver $driver */
+            $point = Point::where('id', $company->pv_id)->first();
             foreach ($company->drivers()->with('inspections_medic')->cursor() as $driver) {
                 $anketsByMonth = $driver->inspections_medic()
                     ->selectRaw(
@@ -84,7 +85,7 @@ class BddDriversinstructionsSetting extends Command
                     $bddDate = Carbon::create($date->year, $date->month, 10, 6);
                     $model = $driver->inspections_bdd()->create([
                         'type_anketa' => 'bdd',
-                        'pv_id' => $company->pv_id,
+                        'pv_id' => $point->name ?? null,
                         'date' => $bddDate,
                         'type_briefing' => 'Специальный',
                         'signature' => 'Подписано простой ЭЦП',
@@ -92,8 +93,8 @@ class BddDriversinstructionsSetting extends Command
                         'driver_id' => $driver->id,
                         'driver_fio' => $driver->fio,
                         'company_name' => $driver->company->name,
-                        'user_name' => 'Скрипт',
-                        'user_id' => null,
+                        'user_name' => $bddUser->name,
+                        'user_id' => $bddUser->id,
                     ]);
 
                     dump($model->toArray());
