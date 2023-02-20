@@ -1615,7 +1615,7 @@ class AnketsController extends Controller
 
                     $anketa['driver_gender'] = isset($Driver->gender) ? $Driver->gender : '';
 
-                    if ($isApiRoute) {
+                    if ($isApiRoute && $anketa['type_anketa'] === 'medic') {
                         $Driver->date_prmo = Carbon::now();
                     }
 
