@@ -1058,6 +1058,8 @@ class IndexController extends Controller
 
             if ($model_type === 'Driver') {
                 $company = Company::where("id", $data['company_id'])->first();
+                $briefing = Instr::where('is_default', true)->where('type_briefing', 'Вводный')->first();
+
                 if ($company && $company->required_type_briefing) {
                     $bddUser = User::with(['roles'])->whereHas('roles', function ($queryBuilder) {
                         return $queryBuilder->where('id', 7);
@@ -1084,6 +1086,7 @@ class IndexController extends Controller
                         "type_view" => "Предрейсовый",
                         "company_id" => $company->hash_id,
                         "company_name" => $company->name,
+                        "briefing_name" => $briefing->name ?? ''
                     ]);
                 }
             }

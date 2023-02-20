@@ -52,12 +52,13 @@ class CreateDefaultBriefings extends Command
         /** @var $drivers Driver Данные водителей, которым нужно прописать инструктаж */
         $drivers = Driver::select(["hash_id", "fio", "gender", "year_birthday", 'company_id'])
             ->whereIn("company_id", $companiesWithAutoBriefing->pluck("id"))->get();
+        $briefing = Instr::where('is_default', true)->where('type_briefing', 'Специальный')->first();
 
         $bddUser = User::with(['roles'])->whereHas('roles', function (Builder $queryBuilder) {
             return $queryBuilder->where('id', 7);
         })->get()->random();
 
-        $drivers->map(function ($driver) use ($bddUser, $companiesWithAutoBriefing, &$entersInto) {
+        $drivers->map(function ($driver) use ($bddUser, $companiesWithAutoBriefing, &$entersInto, $briefing) {
             $company = $companiesWithAutoBriefing->where('id', $driver->company_id)->first();
             $point = Point::find($company->pv_id);
 
@@ -81,7 +82,7 @@ class CreateDefaultBriefings extends Command
                                "company_id" => $company->hash_id,
                                "company_name" => $company->name,
                                'point_id' => $point->id,
-//                               "briefing_name" => $defaultBriefing
+                               "briefing_name" => $briefing->name ?? ''
             ]);
             $entersInto++;
         });
