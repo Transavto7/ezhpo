@@ -6,13 +6,12 @@
     <report-dynamic-index
             :towns='@json($towns)'
             :points='@json($points)'
-            town="{{ request()->get('town_id') }}"
-            point="{{ request()->get('pv_id') }}"
+            :companies="JSON.parse(`{{ $company_id }}`)"
+            :sel-towns=`@json(request()->get('town_id'))`
+            :sel-points=`@json(request()->get('pv_id'))`
+            :sel-companies=`@json(request()->get('company_id'))`
             order="{{ request()->get('order_by') ?? 'execute' }}"
             type="{{ $journal }}"
-            :infos='@json($total)'
-            :monthnames='@json($monthnames)'
-            :monthtotal='@json($monthtotal)'
     >
         @if($companies)
             <div class="card">
@@ -54,11 +53,36 @@
                     </table>
                 </div>
             </div>
+
+            <canvas id="chart"></canvas>
+{{--            <script>--}}
+{{--                const ctx = document.getElementById('chart').getContext('2d');--}}
+{{--                const chart = new Chart(ctx, {--}}
+{{--                    type: 'bar',--}}
+{{--                    data: {--}}
+{{--                      labels: Object.values(@json($months)).map((month) => month.charAt(0).toUpperCase() + month.slice(1)),--}}
+{{--                      datasets: [{--}}
+{{--                        label: 'Количество проведённых осмотров',--}}
+{{--                        backgroundColor: 'rgb(196, 219, 231)',--}}
+{{--                        borderColor: 'rgb(23,66,231)',--}}
+{{--                        minBarLength: 1,--}}
+{{--                        borderWidth: 1,--}}
+{{--                        data: @json($total)--}}
+{{--                      }]--}}
+{{--                    },--}}
+{{--                    options: {--}}
+{{--                      scales: {--}}
+{{--                        y: {--}}
+{{--                          beginAtZero: true--}}
+{{--                        }--}}
+{{--                      }--}}
+{{--                    },--}}
+{{--                  })--}}
+{{--            </script>--}}
         @elseif (request()->get('pv_id') || request()->get('town_id'))
             <div class="alert alert-secondary" role="alert">
                 Осмотры не найдены
             </div>
         @endif
-        <canvas id="chart"></canvas>
     </report-dynamic-index>
 @endsection
