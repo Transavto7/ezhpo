@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Anketa;
 use App\Company;
 use App\Driver;
 use App\User;
@@ -93,8 +92,8 @@ class BddDriversinstructionsSetting extends Command
                         'driver_id' => $driver->id,
                         'driver_fio' => $driver->fio,
                         'company_name' => $driver->company->name,
-                        'user_name' => $bddUser->name,
-                        'user_id' => $bddUser->id,
+                        'user_name' => 'Скрипт',
+                        'user_id' => null,
                     ]);
 
                     dump($model->toArray());
