@@ -1672,6 +1672,7 @@ class AnketsController extends Controller
                     }
 
                     $anketa['user_id'] = $bddUser->id;
+                    $anketa]['user_name'] = $bddUser->name;
                     $anketa['user_eds'] = $bddUser->eds;
                 }
 
