@@ -101,6 +101,7 @@ class TerminalController extends Controller
                 'blocked'  => $request->get('blocked', 0),
                 'password' => $api_token,
                 'api_token' => $api_token,
+                'email' => time() . '@ta-7.ru',
                 'pv_id' => $request->get('pv', null),
             ]);
         }

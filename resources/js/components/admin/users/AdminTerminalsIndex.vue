@@ -400,6 +400,7 @@ export default {
                     !this.infoModalUser.pv_id ||
                     !this.infoModalUser.company_id) {
                 this.$toast('Не все поля указаны', { type: 'error' });
+                return;
             }
 
             axios.post('/terminals', {
