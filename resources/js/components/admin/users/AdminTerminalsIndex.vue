@@ -128,7 +128,6 @@
                         <b-form-input v-model="infoModalUser.name"
                                       id="input-small"
                                       size="sm"
-                                      required
                                       placeholder="Введите AnyDesk"
                         />
                     </b-col>
@@ -149,7 +148,6 @@
                             :show-labels="false"
                             placeholder="Выберите компанию"
                             label="name"
-                            required
                             class="is-invalid"
                         >
                             <span slot="noResult">Результатов не найдено</span>
@@ -166,7 +164,6 @@
                         </label>
                         <b-form-input v-model="infoModalUser.timezone"
                                       size="sm"
-                                      required
                                       placeholder="Введите часовой пояс"
                         />
                     </b-col>
@@ -178,7 +175,6 @@
                             Пункт выпуска:
                         </label>
                         <b-form-select v-model="infoModalUser.pv_id"
-                               required
                                :options="[{ value: null, text: 'Выберите пункт выпуска', disabled: true }, ...optionsPvs]"/>
                     </b-col>
                 </b-row>
@@ -398,6 +394,13 @@ export default {
 
         saveUser() {
             this.loading = true;
+
+            if (!this.infoModalUser.name ||
+                    !this.infoModalUser.timezone ||
+                    !this.infoModalUser.pv_id ||
+                    !this.infoModalUser.company_id) {
+                this.$toast('Не все поля указаны', { type: 'error' });
+            }
 
             axios.post('/terminals', {
                 user_id: this.infoModalUser.id,
