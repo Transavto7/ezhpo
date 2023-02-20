@@ -1304,7 +1304,7 @@ class IndexController extends Controller
 
             if ($model_text === 'Instr') {
                 $isDefault = isset($data['is_default']) && $data['is_default'] == 'on';
-                Instr::where('is_default', 1)->update(["is_default" => 0]);
+                Instr::where('type_briefing', $element->type_briefing)->where('is_default', 1)->update(["is_default" => 0]);
                 $element->is_default = $isDefault;
             }
 
