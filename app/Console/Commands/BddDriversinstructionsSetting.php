@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Anketa;
 use App\Company;
 use App\Driver;
 use App\User;
