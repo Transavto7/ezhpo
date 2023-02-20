@@ -181,8 +181,15 @@ class ReportController extends Controller
                 $anketas = $anketas->whereIn('type_anketa', ['tech', 'medic']);
             }
 
-            $anketas = $anketas->where('in_cart', 0)
-                ->where(function ($q) use ($date_from, $date_to) {
+            $anketas = $anketas->where('in_cart', 0);
+
+            if ($request->order_by === 'created') {
+                $anketas = $anketas->whereBetween('created_at', [
+                    $date_from,
+                    $date_to,
+                ]);
+            } else {
+                $anketas = $anketas->where(function ($q) use ($date_from, $date_to) {
                     $q->where(function ($q) use ($date_from, $date_to) {
                         $q->whereNotNull('date')
                             ->whereBetween('date', [
@@ -190,12 +197,14 @@ class ReportController extends Controller
                                 $date_to,
                             ]);
                     })->orWhere(function ($q) use ($date_from, $date_to) {
-                            $q->whereNull('date')->whereBetween('period_pl', [
-                                $date_from->format('Y-m'),
-                                $date_to->format('Y-m'),
-                            ]);
-                        });
+                        $q->whereNull('date')->whereBetween('period_pl', [
+                            $date_from->format('Y-m'),
+                            $date_to->format('Y-m'),
+                        ]);
+                    });
                 });
+            }
+
             if ($request->pv_id) {
                 $anketas = $anketas->whereIn('pv_id', Point::whereIn('id', $request->pv_id)->pluck('name'));
             } else if ($request->town_id) {
@@ -220,8 +229,10 @@ class ReportController extends Controller
 
                     if ($request->order_by === 'created') {
                         $count = $anketasByCompany
-                            ->where('created_at', '>=', $date_from)
-                            ->where('created_at', '<=',$date_to)->count();
+                            ->whereBetween('created_at', [
+                                $date_from,
+                                $date_to,
+                            ])->count();
                     } else {
                         $count = $anketasByCompany
                                 ->whereBetween('date', [
