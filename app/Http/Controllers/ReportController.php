@@ -177,6 +177,8 @@ class ReportController extends Controller
 
             if ($journal !== 'all') {
                 $anketas = $anketas->where('type_anketa', $journal);
+            } else {
+                $anketas = $anketas->whereIn('type_anketa', ['tech', 'medic']);
             }
 
             $anketas = $anketas->where('in_cart', 0)

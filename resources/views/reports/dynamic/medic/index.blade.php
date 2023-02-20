@@ -54,35 +54,70 @@
                 </div>
             </div>
 
-            <canvas id="chart"></canvas>
-{{--            <script>--}}
-{{--                const ctx = document.getElementById('chart').getContext('2d');--}}
-{{--                const chart = new Chart(ctx, {--}}
-{{--                    type: 'bar',--}}
-{{--                    data: {--}}
-{{--                      labels: Object.values(@json($months)).map((month) => month.charAt(0).toUpperCase() + month.slice(1)),--}}
-{{--                      datasets: [{--}}
-{{--                        label: 'Количество проведённых осмотров',--}}
-{{--                        backgroundColor: 'rgb(196, 219, 231)',--}}
-{{--                        borderColor: 'rgb(23,66,231)',--}}
-{{--                        minBarLength: 1,--}}
-{{--                        borderWidth: 1,--}}
-{{--                        data: @json($total)--}}
-{{--                      }]--}}
-{{--                    },--}}
-{{--                    options: {--}}
-{{--                      scales: {--}}
-{{--                        y: {--}}
-{{--                          beginAtZero: true--}}
-{{--                        }--}}
-{{--                      }--}}
-{{--                    },--}}
-{{--                  })--}}
-{{--            </script>--}}
         @elseif (request()->get('pv_id') || request()->get('town_id'))
             <div class="alert alert-secondary" role="alert">
                 Осмотры не найдены
             </div>
         @endif
     </report-dynamic-index>
+
+    <canvas id="chart"></canvas>
+@endsection
+
+@section('custom-scripts')
+    <script>
+        const monthName = {
+            'February': 'Февраль',
+            'January': 'Январь',
+            'December': 'Декабрь',
+            'November': 'Ноябрь',
+            'October': 'Октябрь',
+            'September': 'Сентябрь',
+            'August': 'Август',
+            'July': 'Июль',
+            'June': 'Июнь',
+            'May': 'Май',
+            'April': 'Апрель',
+            'March': 'Март'
+        };
+
+        let months = @json($months);
+        const data = @json($total);
+        const result = [];
+        for (key in data) {
+            result.push(data[key]);
+        }
+
+        months = months.map(item => {
+            if (monthName[item]) {
+                return monthName[item];
+            }
+            return item;
+        });
+
+        console.log(months);
+
+        const ctx = document.getElementById('chart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: months.map((month) => month.charAt(0).toUpperCase() + month.slice(1)),
+                datasets: [{
+                    label: 'Количество проведённых осмотров',
+                    backgroundColor: 'rgb(196, 219, 231)',
+                    borderColor: 'rgb(23,66,231)',
+                    minBarLength: 1,
+                    borderWidth: 1,
+                    data: result
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            },
+        })
+    </script>
 @endsection
