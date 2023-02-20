@@ -16,13 +16,22 @@ class Company extends Model
         'note', 'comment', 'procedure_pv',
         'user_id', 'req_id',
         'pv_id', 'town_id', 'products_id', 'where_call', 'where_call_name', 'inn',
-
+        'required_type_briefing',
         'dismissed',
         'has_actived_prev_month',
         'bitrix_link',
         'document_bdd',
         'deleted_id',
+        'pressure_systolic',
+        'pressure_diastolic'
     ];
+
+
+    public function point()
+    {
+        return $this->belongsTo(Point::class, 'pv_id')
+            ->withDefault();
+    }
 
     public function responsible(): BelongsTo
     {

@@ -11,10 +11,12 @@ use App\Notify;
 use App\Point;
 use App\Settings;
 use App\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcher;
 
@@ -170,8 +172,7 @@ class AnketsController extends Controller
             if($anketa->number_list_road === null && $anketa->type_anketa !== 'medic') {
                 // Генерируем номер ПЛ
                 $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
-                $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
-                $anketa->number_list_road = $anketa->car_id . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
+                $anketa->number_list_road = $anketa->car_id . '-' . date('d.m.Y', strtotime($anketa['date']));
             }
         }
 
@@ -199,7 +200,9 @@ class AnketsController extends Controller
             unset($data['REFERER']);
         }
 
-        $data['pv_id'] = Point::where('id', $data['pv_id'])->first()->name;
+        $point = Point::where('id', $data['pv_id'])->first();
+        $data['pv_id'] = $point->name;
+        $data['point_id'] = $point->id;
         $type_anketa = $data['type_anketa'];
 
         if(isset($data['anketa'])) {
@@ -756,7 +759,8 @@ class AnketsController extends Controller
                  */
                 $tonometer = explode('/', $anketa['tonometer']);
                 if($proba_alko === 'Отрицательно' && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
-                    && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38 && $tonometer[0] < 150) {
+                    && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38
+                    && $tonometer[0] < $Driver->getPressureSystolic() && $tonometer[1] < $Driver->getPressureDiastolic()) {
                     $anketa['admitted'] = 'Допущен';
                 } else {
                     $anketa['admitted'] = 'Не допущен';
@@ -1368,8 +1372,11 @@ class AnketsController extends Controller
                  * ПРОВЕРЯЕМ статус для поля "Заключение"
                  */
                 $tonometer = explode('/', $anketa['tonometer']);
-                if($proba_alko === 'Отрицательно' && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
-                    && doubleval($anketa['t_people']) < 38 && intval($tonometer[0]) < 150 && intval($tonometer[1]) < 100) {
+                if($proba_alko === 'Отрицательно'
+                    && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
+                    && doubleval($anketa['t_people']) < 38
+                    && intval($tonometer[0]) < $Driver->getPressureSystolic()
+                    && intval($tonometer[1]) < $Driver->getPressureDiastolic()) {
                     $anketa['med_view'] = 'В норме';
                     $anketa['admitted'] = 'Допущен';
 
@@ -1608,7 +1615,7 @@ class AnketsController extends Controller
 
                     $anketa['driver_gender'] = isset($Driver->gender) ? $Driver->gender : '';
 
-                    if ($isApiRoute) {
+                    if ($isApiRoute && $anketa['type_anketa'] === 'medic') {
                         $Driver->date_prmo = Carbon::now();
                     }
 
@@ -1649,12 +1656,31 @@ class AnketsController extends Controller
                 } else {
                     $anketa['realy'] = 'нет';
                 }
+
+                if ($anketa['type_anketa'] === 'bdd') {
+                    $bddUser = User::with(['roles'])->whereHas('roles', function (Builder $queryBuilder) {
+                        return $queryBuilder->where('id', 7);
+                    })->get()->random();
+
+                    if ($Driver) {
+                        $point = Company::find($Driver->company_id)->point;
+
+                        if ($point) {
+                            $anketa['pv_id'] = $point->name;
+                            $anketa['point_id'] = $point->id;
+                        }
+                    }
+
+                    $anketa['user_id'] = $bddUser->id;
+                    $anketa['user_name'] = $bddUser->name;
+                    $anketa['user_eds'] = $bddUser->eds;
+                }
+
                 /**
                  * Создаем анкету
                  */
                 $createdAnketa = Anketa::create($anketa);
                 array_push($createdAnketas, $createdAnketa->id);
-
 
 
                 /**

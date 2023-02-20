@@ -92,6 +92,21 @@
                         </b-form-group>
                     </div>
                     <div class="d-flex align-items-center col-lg-3">
+                        <b-form-group label="Завершен" v-slot="{ ariaDescribedby }" class="w-100">
+                            <b-form-select v-model="filters.finished" :options="[{
+                                    value: null,
+                                    text: '----',
+                                },{
+                                    value: 0,
+                                    text: 'Нет',
+                                },{
+                                    value: 1,
+                                    text: 'Да',
+                                }]">
+                            </b-form-select>
+                        </b-form-group>
+                    </div>
+                    <div class="d-flex align-items-center col-lg-3">
                         <b-form-group label="Дата окончания договора от" v-slot="{ ariaDescribedby }" class="w-100">
                             <b-form-datepicker id="date_of_end_start" v-model="filters.date_of_end_start"
                                                placeholder="Укажите дату"
@@ -210,7 +225,7 @@ export default {
                 date_of_end_start: null,
                 created_at_start: null,
                 created_at_end: null,
-                // main_for_company: null,
+                finished: null,
                 our_company_id: null,
                 main_for_company: null,
                 company_id: null,
@@ -244,6 +259,7 @@ export default {
                 created_at_start: null,
                 created_at_end: null,
                 date_check_main: null,
+                finished: null,
                 // main_for_company: null,
                 our_company_id: null,
                 main_for_company: null,

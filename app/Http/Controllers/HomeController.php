@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Anketa;
 use App\Exports\AnketasExport;
-use App\Exports\TechAnketasExport;
 use App\FieldPrompt;
+use App\Point;
 use App\User;
 use Auth;
 use Carbon\Carbon;
@@ -239,16 +239,25 @@ class HomeController extends Controller
                             $explodeData = (count($explodeData) == 1) ? $explodeData[0] : $explodeData;
 
                             if (is_array($explodeData)) {
+                                if ($fk === 'pv_id') {
+                                    $points = Point::whereIn('id', $explodeData)->get();
+                                    $anketas = $anketas->where(function ($q) use ($points, $fk) {
+                                        foreach ($points as $point) {
+                                            $q = $q->orWhere('anketas.pv_id', $point->name)
+                                            ->orWhere('anketas.point_id', $point->id);
+                                        }
 
-                                $anketas = $anketas->where(function ($q) use ($explodeData, $fk) {
+                                        return $q;
+                                    });
+                                } else {
+                                    $anketas = $anketas->where(function ($q) use ($explodeData, $fk) {
+                                        foreach ($explodeData as $fvItemKey => $fvItemValue) {
+                                            $q = $q->orWhere('anketas.' . $fk, $fvItemValue); // TODO: поправили Like
+                                        }
 
-                                    foreach ($explodeData as $fvItemKey => $fvItemValue) {
-                                        $q = $q->orWhere('anketas.' . $fk, $fvItemValue); // TODO: поправили Like
-                                    }
-
-                                    return $q;
-                                });
-
+                                        return $q;
+                                    });
+                                }
                             } else {
                                 /**
                                  * Проверяем что данные есть (повлияло на ФЛАГ СДПО)
@@ -258,7 +267,17 @@ class HomeController extends Controller
                                     // Для строгих значений
                                     if (in_array($fk, ['company_name', 'driver_fio']) || strpos($fk, '_id')
                                         || $fk === 'id') {
-                                        $anketas = $anketas->where('anketas.' . $fk, $explodeData);
+                                        if ($fk === 'pv_id') {
+                                            $point = Point::find($explodeData);
+                                            $anketas = $anketas->where(function ($q) use ($point) {
+                                                $q->where('anketas.pv_id', $point->name)
+                                                    ->orWhere('anketas.point_id', $point->id);
+
+                                                return $q;
+                                            });
+                                        } else {
+                                            $anketas = $anketas->where('anketas.' . $fk, $explodeData);
+                                        }
                                     } // Для динамичных значений
                                     else {
                                         $anketas = $anketas->where('anketas.' . $fk, 'LIKE', '%'.$explodeData.'%');

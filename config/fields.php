@@ -125,6 +125,7 @@ return [
             'date' => 'Дата, время',
             'created_at' => 'Дата внесения в журнал',
             'type_briefing' => 'Вид инструктажа',
+            'briefing_name' => 'Название инструктажа',
             'driver_fio' => 'Ф.И.О водителя, прошедшего инструктаж',
             'user_name' => 'Ф.И.О (при наличии) лица, проводившего инструктаж',
             'pv_id' => 'Пункт выпуска',
@@ -150,11 +151,14 @@ return [
             'date_bdd' => 'Дата БДД',
             'date_prmo' => 'Дата ПРМО',
             'date_driver_license' => 'Срок действия водительского удостоверения',
+            'date_narcotic_test' => 'Дата тестирования на наркотики',
             'date_report_driver' => 'Дата снятия отчета с карты водителя',
             'time_card_driver' => 'Срок действия карты водителя',
             'town_id' => 'Город',
             'dismissed' => 'Уволен',
             'date_of_employment' => 'Дата устройства на работу',
+            'pressure_systolic' => 'Порог верхнего давления',
+            'pressure_diastolic' => 'Порог нижнего давления'
         ],
 
         'car' => [
@@ -199,6 +203,8 @@ return [
             'has_actived_prev_month' => 'Были ли активны в прошлом месяце',
             'bitrix_link' => 'Ссылка на компанию в Bitrix24',
             'document_bdd' => 'Ссылка на таблицу с документами по бдд',
+            'pressure_systolic' => 'Порог верхнего давления',
+            'pressure_diastolic' => 'Порог нижнего давления'
         ],
 
         'product' => [
@@ -226,6 +232,7 @@ return [
             'type_briefing' => 'Вид инструктажа',
             'youtube' => 'Ссылка на YouTube',
             'active' => 'Активен',
+            'is_default' => 'Базовый',
             'sort' => 'Сортировка',
         ],
         'point' => [
@@ -248,6 +255,19 @@ return [
             'timezone' => 'GMT',
             'blocked' => 'Заблокирован',
             'roles' => 'Роль',
+        ],
+        'terminals' => [
+            'status' => 'on/off',
+            'hash_id' => 'ID',
+            'name' => 'AnyDesk',
+            'company_id' => 'Компания',
+            'town' => 'Город',
+            'pv' => 'ПВ',
+            'timez  one' => 'GMT',
+            'blocked' => 'Заблокирован',
+            'api_token' => 'Токен',
+            'last_month_amount' => 'Количество осмотров за предыдущий месяц',
+            'month_amount' => 'Количество осмотров за текущий месяц',
         ],
         'roles' => [
             'id' => 'ID',

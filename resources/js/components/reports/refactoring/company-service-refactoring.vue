@@ -6,7 +6,7 @@
             <h5 class="card-header">Выбор информации</h5>
             <div class="card-body">
                 <div class="row">
-                    <div class="form-group col-lg-3">
+                    <div class="form-group col-lg-8">
                         <label class="mb-1" for="company">Компании</label>
                         <multiselect
                             :disabled="client"
@@ -25,7 +25,7 @@
                             <span slot="noOptions">Список пуст</span>
                         </multiselect>
                     </div>
-                    <div class="form-group col-lg-3">
+                    <div class="form-group col-lg-2">
                         <label class="mb-1" for="company">Договор</label>
                         <multiselect
                             v-model="contracts"
@@ -253,8 +253,11 @@ export default {
                     search: query
                 }
             }).then(({ data }) => {
+                data.forEach(company => {
+                    company.name = `[ID:${company.hash_id}][ИНН:${company.inn}] ${company.name}`;
+                });
+
                 this.companies = data;
-                console.log(this.companies)
             });
         },
         searchServices() {

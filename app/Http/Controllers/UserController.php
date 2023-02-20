@@ -37,7 +37,7 @@ class UserController extends Controller
             $users->with(['deleted_user'])->onlyTrashed();
         }
         if ($id = $request->get('hash_id')) {
-            $users->where('hash_id', $id);
+            $users->whereIn('hash_id', $id);
         }
         if ($email = $request->get('email')) {
             $users->where('email', 'like', "%$email%");
@@ -72,10 +72,10 @@ class UserController extends Controller
             $secondRes = $users->get()->sortBy;
 
             return response([
-                                'total_rows'   => $res->total(),
-                                'current_page' => $res->currentPage(),
-                                'items'        => $res->getCollection(),
-                            ]);
+                'total_rows'   => $res->total(),
+                'current_page' => $res->currentPage(),
+                'items'        => $res->getCollection(),
+            ]);
         }
 
         $fields = FieldPrompt::where('type', 'users')->get();
@@ -188,11 +188,11 @@ class UserController extends Controller
         $user->save();
 
         return response([
-                            'status'    => true,
-                            'user_info' => User::with(['roles', 'permissions', 'pv'])
-                                               ->find($user->id),
-                        ]);
-    }
+                'status'    => true,
+                'user_info' => User::with(['roles', 'permissions', 'pv'])
+                                   ->find($user->id),
+            ]);
+        }
 
 
     /**

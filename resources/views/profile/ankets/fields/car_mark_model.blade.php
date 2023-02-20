@@ -4,7 +4,8 @@
         'values' => 'Car',
         'getField' => 'mark_model',
         'getFieldKey' => 'mark_model',
-        'multiple' => 1
+        'multiple' => 1,
+        'trashed' => true
     ],
     'model' => $type_ankets,
     'k' => $field,

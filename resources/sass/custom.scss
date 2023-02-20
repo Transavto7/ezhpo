@@ -154,8 +154,8 @@ label {
 }
 
 .form-date {
-    min-height: 40px;
-    font-size: 14px;
+    min-height: 31px;
+    font-size: 0.8rem;
 }
 
 .multiselect, .multiselect__input, .multiselect__single {
@@ -767,6 +767,29 @@ input:checked + .slider:before {
         right: 5px;
         top: -10px;
     }
+}
+
+.multiselect__placeholder {
+    font-size: 0.8rem;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.multiselect__tags {
+    padding: 5px 40px 0 8px;
+}
+
+.multiselect {
+    min-height: 31px;
+}
+
+.multiselect__select {
+    height: 31px;
+}
+
+.multiselect__tags {
+    min-height: 31px;
+    border-radius: 0;
 }
 
 @keyframes lds-ring {

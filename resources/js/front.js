@@ -1,9 +1,8 @@
 import axios from 'axios'
 import swal from 'sweetalert2'
-import { v4 as uidv4 } from 'uuid'
+import Swal2 from 'sweetalert2'
+import {v4 as uidv4} from 'uuid'
 import {ApiController} from "./components/ApiController";
-import { Fancybox } from "@fancyapps/ui";
-import Swal2 from "sweetalert2";
 
 require('./init-plugins')
 require('chosen-js')
@@ -30,6 +29,12 @@ function toggleAnketaCloneButton(state) {
 }
 
 $(document).ready(function () {
+
+    $('div.form-group').each(function (i, el) {
+        let requiredInput = $(el).has(':input[required]');
+        requiredInput.addClass('required')
+    });
+
     const Toast = swal.mixin({
         toast: true,
         position: 'top-end',
@@ -100,8 +105,14 @@ $(document).ready(function () {
         }
 
         const model = select.attr('model');
+        const concat = select.attr('field-concat') || false;
+        const concatField = select.attr('field-concat-name') || 'hash_id';
         const field = select.attr('field');
         const key = select.attr('field-key');
+        let trashed = false;
+        if (select.attr('field-trashed')) {
+            trashed = true;
+        }
 
         if (!model) {
             return;
@@ -119,11 +130,17 @@ $(document).ready(function () {
                 search,
                 field,
                 key,
+                trashed
             }
         }).then(({ data }) => {
             data.forEach((element => {
                 const value = element[key];
-                const text = element[field];
+                let text = element[field];
+
+                if (concat) {
+                    text = '[' + element[concatField] + '] ' + text;
+                }
+
                 const exist = select.children('option');
                 for(let i = 0; i < exist.length; i++) {
                     if (exist[i].value == value) {
@@ -1206,18 +1223,18 @@ $(document).ready(function () {
         triggerField()
     })
 
-    // $('*[data-field="Company_name"]').suggestions({
-    //     token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
-    //     type: "PARTY",
-    //     /* Вызывается, когда пользователь выбирает одну из подсказок */
-    //     onSelect: function(suggestion) {
-    //         if(suggestion.data) {
-    //             const { inn } = suggestion.data
-    //
-    //             $('#elements-modal-add input[name="inn"]').val(inn)
-    //         }
-    //     }
-    // });
+    $('*[data-field="Company_name"]').suggestions({
+        token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
+        type: "PARTY",
+        /* Вызывается, когда пользователь выбирает одну из подсказок */
+        onSelect: function(suggestion) {
+            if(suggestion.data) {
+                const { inn } = suggestion.data
+
+                $('#elements-modal-add input[name="inn"]').val(inn)
+            }
+        }
+    });
 
     $('.header #toggle-btn').each(function () {
         let localStatusSidebar = () => {

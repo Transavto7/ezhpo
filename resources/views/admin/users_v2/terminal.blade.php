@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Сотрудники')
+@section('title', 'Терминалы')
 @section('sidebar', 1)
 @php
     $points = \App\Town::with(['pvs'])->get();
@@ -17,7 +17,7 @@
     $permissionToTrashView  = user()->access('employee_trash');
 @endphp
 @section('content')
-    <admin-users-index
+    <admin-terminals-index
             :roles='@json($roles)'
             :deleted='{{ request()->get('deleted', 0) }}'
             :current_user_permissions='@json($current_user_permissions)'
@@ -40,41 +40,38 @@
                         @endif
 
                         <div class="col-lg-3">
-                            @include('templates.elements_field', [
-                                'v' => [
-                                    'type' => 'select',
-                                    'values' => 'User',
-                                    'getField' => 'name',
-                                    'getFieldKey' => 'hash_id',
-                                    'multiple' => 1,
-                                    'concatField' => 'hash_id'
-                                ],
-                                'model' => 'User',
-                                'k' => 'hash_id',
-                                'is_required' => '',
-                                'default_value' => request()->get('hash_id')
-                            ])
-                        </div>
+                            <select multiple
+                                    name="hash_id[]"
+                                    data-label="hash_id"
+                                    data-field="Terminal_hash_id"
+                                    data-allow-clear="true"
+                                    class="filled-select2 filled-select select2-hidden-accessible"
+                                    aria-hidden="true">
+                                <option value="" data-select2-id="8">Не установлено</option>
 
-                        <div class="col-lg-3 form-group">
-                            <select class="form-control" name="role" style="color: gray;">
-                                <option value="" selected>Роль</option>
-                                @foreach(\App\Role::get() as $role)
-                                    @if($role->name == 'driver')
-                                        @continue
-                                    @endif
-                                    <option value="{{$role->id}}"
-                                        {{ $role->id == request()->get('role') ? 'selected' : '' }}
-                                    >
-                                        [{{ $role->id }}] {{ $role->guard_name }}
+                                @php
+                                    $default = request()->get('hash_id') ?? [];
+                                    $terminals = app("App\\User")::with('roles')
+                                        ->whereNotIn('hash_id', $default)->whereHas('roles', function ($q) {
+                                        $q->where('roles.id', 9);
+                                    })->get();
+
+                                    $default = app("App\\User")::with('roles')
+                                        ->whereIn('hash_id', $default)->whereHas('roles', function ($q) {
+                                        $q->where('roles.id', 9);
+                                        })->get();
+                                @endphp
+                                @foreach($default as $option)
+                                    <option selected value="{{ $option['hash_id'] }}">
+                                        [{{ $option['hash_id'] }}] {{ $option['name'] }}
+                                    </option>
+                                @endforeach
+                                @foreach($terminals as $option)
+                                    <option value="{{ $option['hash_id'] }}">
+                                        [{{ $option['hash_id'] }}] {{ $option['name'] }}
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
-
-                        <div class="col-lg-3 form-group">
-                            <input type="text" name="email" value="{{ request()->get('email') }}" placeholder="E-mail"
-                                   class="form-control">
                         </div>
 
                         <div class="col-lg-3 form-group">
@@ -88,12 +85,12 @@
 
                         <div class="col-lg-2 form-group">
                             <input type="submit" class="btn btn-success btn-sm" value="Поиск">
-                            <a href="{{ route('users') }}" class="btn btn-danger btn-sm">Сбросить</a>
+                            <a href="{{ route('terminals') }}" class="btn btn-danger btn-sm">Сбросить</a>
                         </div>
 
                     </form>
                 @endif
             </div>
         </div>
-    </admin-users-index>
+    </admin-terminals-index>
 @endsection

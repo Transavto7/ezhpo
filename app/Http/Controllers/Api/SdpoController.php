@@ -52,6 +52,7 @@ class SdpoController extends Controller
         $medic['user_eds'] = $user->eds;
         $medic['pulse'] = $request->pulse ?? mt_rand(60,80);
         $medic['pv_id'] = $request->user('api')->pv->name;
+        $medic['point_id'] = $request->user('api')->pv->id;
         $medic['tonometer'] = $tonometer;
         $medic['driver_id'] = $driver->hash_id;
         $medic['driver_fio'] = $driver->fio;
@@ -62,6 +63,7 @@ class SdpoController extends Controller
         $medic['t_people'] = $request->t_people ?? 36.6;
         $medic['type_view'] = $request->type_view ?? 'Предрейсовый/Предсменный';
         $medic['flag_pak'] = 'СДПО А';
+        $medic['terminal_id'] = $request->user('api')->id;
 
         if ($driver->year_birthday !== '' && $driver->year_birthday !== '0000-00-00') {
             $medic['driver_year_birthday'] = $driver->year_birthday;
@@ -99,8 +101,9 @@ class SdpoController extends Controller
 
         //ПРОВЕРЯЕМ статус для поля "Заключение"
         $ton = explode('/', $tonometer);
-        if ($proba_alko === 'Положительно' || $test_narko === 'Положительно' || intval($ton[1]) >= 120
-            || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38 || intval($ton[0]) >= 220) {
+        if ($proba_alko === 'Положительно' || $test_narko === 'Положительно'
+            || intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()
+            || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38) {
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
         }
@@ -141,6 +144,9 @@ class SdpoController extends Controller
             $sms->sms($company->where_call, Settings::setting('sms_text_driver') . " $driver->fio . $phone_to_call");
         }
 
+        $timeout = Settings::setting('timeout');
+        $anketa['timeout'] = $timeout ?? 20;
+
         return response()->json($anketa);
     }
 
@@ -148,6 +154,9 @@ class SdpoController extends Controller
      * Check connection sdpo
      */
     public function checkConnaction(Request $request) {
+        $user = $request->user('api');
+        $user->last_connection_at = Carbon::now();
+        $user->save();
         return "true";
     }
 
@@ -163,9 +172,10 @@ class SdpoController extends Controller
      * return all medics
      */
     public function getMedics(Request $request) {
-        $users = User::with(['roles', 'pv:id,name,pv_id', 'pv.town:id,name'])->whereHas('roles', function ($q) use ($request) {
+        $users = User::with(['roles', 'pv:id,name,pv_id', 'pv.town:id,name'])
+            ->whereHas('roles', function ($q) use ($request) {
             $q->where('roles.id', 2);
-        })->select('id', 'name', 'eds', 'pv_id')->limit(10)->get();
+        })->select('id', 'name', 'eds', 'pv_id')->get();
 
         $users = $users->groupBy(['pv.town.name', 'pv.name']);
 

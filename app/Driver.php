@@ -26,6 +26,7 @@ class Driver extends Model
             'date_bdd',
             'date_prmo',
             'date_driver_license',
+            'date_narcotic_test',
             'date_report_driver',
             'time_card_driver',
             'town_id',
@@ -34,6 +35,8 @@ class Driver extends Model
             'date_of_employment',
             'contract_id',
             'deleted_id',
+            'pressure_systolic',
+            'pressure_diastolic'
         ];
 
     protected $casts
@@ -261,5 +264,41 @@ class Driver extends Model
     {
         return $this->belongsTo(Company::class, 'company_id', 'id')
                     ->withDefault();
+    }
+
+    public function getPressureSystolic() {
+        if ($this->pressure_systolic) {
+            return $this->pressure_systolic;
+        }
+
+        if ($this->company->pressure_systolic) {
+            return $this->company->pressure_systolic;
+        }
+
+        $setting = Settings::setting('pressure_systolic');
+
+        if ($setting) {
+            return $setting;
+        }
+
+        return 150;
+    }
+
+    public function getPressureDiastolic() {
+        if ($this->pressure_diastolic) {
+            return $this->pressure_diastolic;
+        }
+
+        if ($this->company->pressure_diastolic) {
+            return $this->company->pressure_diastolic;
+        }
+
+        $setting = Settings::setting('pressure_diastolic');
+
+        if ($setting) {
+            return $setting;
+        }
+
+        return 100;
     }
 }

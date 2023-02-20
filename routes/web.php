@@ -179,7 +179,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('users/fetchRoleData', 'UserController@fetchRoleData');
     Route::post('users/return_trash', 'UserController@returnTrash');
     Route::get('users/fetchCompanies', 'UserController@fetchCompanies');
-    //Route::get('/users/index', 'UserController@index')->name('users');
+    Route::get('/terminals', 'TerminalController@index')->name('terminals');
+    Route::get('/terminals/status', 'TerminalController@getConnectionStatus')->name('terminals.status');
+    Route::post('/terminals', 'TerminalController@update')->name('terminals.update');
 
     Route::resource('roles', 'RoleController');
     Route::post('roles/return_trash', 'RoleController@returnTrash');
@@ -285,6 +287,12 @@ Route::middleware(['auth'])->group(function () {
 
     });
 
+});
+
+Route::get('/fix', function () {
+   $driver = Driver::where('hash_id', '123456')->first();
+
+   dd($driver->fio, $driver->getPressureSystolic(), $driver->getPressureDiastolic());
 });
 
 // Маршруты авторизации

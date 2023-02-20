@@ -91,6 +91,10 @@ class ContractController extends Controller
             $contracts->where('main_for_company', $filters['main_for_company']);
         }
 
+        if ($filters['finished'] ?? false) {
+            $contracts->where('finished', $filters['finished']);
+        }
+
         if ($filters['name'] ?? false) {
             $contracts->where('name', 'like', "%{$filters['name']}%");
         }

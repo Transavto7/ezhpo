@@ -262,23 +262,16 @@
                         <li><a href="{{ route('renderElements', 'Point') }}">Пункты выпуска</a></li>
                     @endif
 
-                    {{--                    @if(user()->access('employee_read'))--}}
-                    {{--                        <li><a href="{{ route('adminUsers') }}">Сотрудники</a></li>--}}
-                    {{--                    @endif--}}
-
                     @if(user()->access('employee_read', 'employee_create'))
                         <li><a href="{{ route('users') }}">Сотрудники</a></li>
                     @endif
 
                     @if(user()->access('group_read', 'group_create'))
-                        <li><a href="{{ route('roles.index') }}">Роли</a></li>
+                        <li><a href="{{ route('roles.index') }}"> Роли </a></li>
                     @endif
 
                     @if(user()->access('pak_sdpo_read', 'pak_sdpo_create'))
-                        <li><a href="{{ route('adminUsers', [
-                                'filter' => 1,
-                                'pak_sdpo' => 1
-                            ]) }}">ПАК СДПО</a></li>
+                        <li><a href="{{ route('terminals') }}">Терминалы</a></li>
                     @endif
 
                     @if(user()->access('date_control_read', 'date_control_create'))

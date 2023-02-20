@@ -18,7 +18,6 @@ class Role extends \Spatie\Permission\Models\Role
 
     public function permissions($deleted = false) : BelongsToMany
     {
-        // pizdec huita///.....// prosto nahui relationship
         return $this->belongsToMany(Permission::class,
             'role_has_permissions',
             'role_id',
@@ -32,7 +31,6 @@ class Role extends \Spatie\Permission\Models\Role
 
     public function users($deleted = false) : BelongsToMany
     {
-        // pizdec huita///.....// prosto nahui relationship
         return $this->belongsToMany(User::class,
             'model_has_roles',
             'role_id',

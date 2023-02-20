@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -39,6 +40,7 @@ class User extends Authenticatable
             'user_post',
             'company_id',
             'deleted_id',
+            'last_connection_at'
         ];
 
     protected $hidden
@@ -49,6 +51,7 @@ class User extends Authenticatable
     protected $casts
         = [
             'email_verified_at' => 'datetime',
+            'last_connection_at' => 'datetime',
         ];
 
     public function deleted_user()
@@ -66,7 +69,6 @@ class User extends Authenticatable
 
     public function roles($deleted = false) : BelongsToMany
     {
-        // pizdec huita///.....// prosto nahui relationship
         return $this->belongsToMany(\App\Role::class,
             'model_has_roles',
             'model_id',
@@ -76,23 +78,6 @@ class User extends Authenticatable
         )->withPivot('deleted')
         ->wherePivot('deleted', $deleted ? 1 : 0);
     }
-
-//    public function scopePermissions() : BelongsToMany
-//    {
-//        return parent::permissions()->wherePivot('deleted',0);
-//    }
-//    public function roles() : BelongsToMany
-//    {
-//        // pizdec huita///.....// prosto nahui relationship
-//        return $this->belongsToMany(\App\Role::class,
-//            'model_has_roles',
-//            'model_id',
-//            'role_id',
-//            'id',
-//            'id'
-//        )->withPivot('deleted')
-//                    ->wherePivot('deleted', 0);
-//    }
 
     public function anketas()
     {

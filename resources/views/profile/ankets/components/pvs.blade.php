@@ -3,9 +3,8 @@
 @endphp
 @if(!isset($defaultShowPvs))
     <div class="form-group mb-4">
-        <b>Пункт выпуска:</b> &nbsp;
-
-        <select name="pv_id" class="col-sm-3 form-control" required>
+        <label class="form-control-label">Пункт выпуска:</label> &nbsp;
+        <select name="pv_id" class="col-sm-6 form-control" required>
             @foreach($points as $point)
 
                 @if(count($point['pvs']) > 0)

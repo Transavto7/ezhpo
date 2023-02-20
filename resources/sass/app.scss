@@ -12,6 +12,16 @@
 @import "main";
 @import "custom";
 
-.modal-backdrop{
+.modal-backdrop {
     opacity: 0.5;
+}
+
+.form-group.required label.form-control-label:before {
+    content: "* ";
+    color: red;
+}
+
+.table-responsive {
+    max-height: 1000px;
+    overflow: scroll;
 }

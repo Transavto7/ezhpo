@@ -117,6 +117,7 @@ class Anketa extends Model
             'company_name',
 
             'pv_id',
+            'point_id',
             'date',
             'number_list_road', //'date_number_list_road',
             'type_view',
@@ -146,6 +147,7 @@ class Anketa extends Model
 
             // Журнал БДД
             'type_briefing',
+            'briefing_name',
 
             // ПАК
             'pulse',
@@ -155,6 +157,7 @@ class Anketa extends Model
             'questions',
             'photos',
             'videos',
+            'terminal_id',
 
             //системные поля
             'in_cart',
@@ -342,6 +345,7 @@ class Anketa extends Model
             'created_at',
             'user_name',
             'pv_id',
+            'briefing_name',
             'user_eds',
             'signature',
         ],

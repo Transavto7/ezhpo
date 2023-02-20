@@ -3,8 +3,10 @@
         'type' => 'select',
         'values' => 'Point',
         'getField' => 'name',
-        'getFieldKey' => 'name',
-        'multiple' => 1
+        'getFieldKey' => 'id',
+        'multiple' => 1,
+        'concatField' => 'hash_id',
+        'trashed' => true,
     ],
     'model' => $type_ankets,
     'k' => $field,

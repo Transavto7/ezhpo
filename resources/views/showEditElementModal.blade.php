@@ -26,37 +26,45 @@
                             </label>
                             <textarea {{ user()->access('companies_access_field_note') ? '' : 'disabled' }}
                                    name="note"
-                                   data-label="{{ $v['label'] }}"
-                                   placeholder="{{ $v['label'] }}"
-                                   data-field="Company_note" class="form-control">{{ $el[$k] ?? '' }}</textarea>
+                                      data-label="{{ $v['label'] }}"
+                                      placeholder="{{ $v['label'] }}"
+                                      data-field="Company_note" class="form-control">{{ $el[$k] ?? '' }}</textarea>
                         </div>
-                    @continue
-                @endif
-                @if(( $k === 'comment') && $model === 'Company')
+                        @continue
+                    @endif
+                    @if(( $k === 'comment') && $model === 'Company')
                         <div class="form-group" data-field="comment">
                             <label>
                                 {{ $v['label'] }}
                             </label>
                             <textarea
-                                   name="comment"
-                                   data-label="{{ $v['label'] }}"
-                                   placeholder="{{ $v['label'] }}"
-                                   data-field="Company_comment" class="form-control">{{ $el[$k] ?? '' }}</textarea>
+                                    name="comment"
+                                    data-label="{{ $v['label'] }}"
+                                    placeholder="{{ $v['label'] }}"
+                                    data-field="Company_comment" class="form-control">{{ $el[$k] ?? '' }}</textarea>
                         </div>
-                    @continue
-                @endif
-                @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
-                @php if ($model === 'Instr' && $k === 'signature') continue; @endphp
-                @php if ($k == 'essence') continue; @endphp
+                        @continue
+                    @endif
+                    @if($k == 'procedure_pv' && user()->hasRole(['medic', 'tech']))
+                        <div class="form-group" data-field="comment">
+                            <label for="disabledProcedureInput">{{$v['label']}}</label>
+                            <input type="text" id="disabledProcedureInput" class="form-control" placeholder="{{$el[$k]}}" disabled>
+                        </div>
+                        @continue
+                    @endif
+                    @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
+                    @php if ($model === 'Instr' && $k === 'signature') continue; @endphp
+                    @php if ($k == 'essence') continue; @endphp
+                    @php if ($k == 'hash_id') continue; @endphp
 
                     @if($k == 'unit' && ($model === 'Service' || $model === 'Product'))
                         <div data-field="essence" class="form-group">
-                            <label><b class="text-danger text-bold">*</b>Сущности</label>
+                            <label><b class="text-danger text-bold">* </b>Сущности</label>
                             <select
-                                name="essence"
-                                data-label="Сущности"
-                                class="filled-select2 filled-select"
-                                required="required"
+                                    name="essence"
+                                    data-label="Сущности"
+                                    class="filled-select2 filled-select"
+                                    required="required"
                             >
                                 <option value="" selected>Не установлено</option>
                                 @foreach(\App\Product::$essence as $essenceKey => $essenceName)
@@ -161,7 +169,7 @@ if($model === 'Driver'){
                 @if($k !== 'id' && !isset($v['hidden']))
                     <div class="form-group" data-field="{{ $k }}">
                         <label>
-                            @if($is_required) <b class="text-danger text-bold">*</b> @endif
+                            @if($is_required) <b class="text-danger text-bold">* </b> @endif
                             {{ $v['label'] }}</label>
 
                         @include('templates.elements_field', [
@@ -186,6 +194,14 @@ if($model === 'Driver'){
                     </div>
                 @endif
             @endforeach
+            @if ($model == "Company")
+                <input type="checkbox" name="required_type_briefing" id="required_type_briefing_checkbox" @if(App\Company::find($id)->required_type_briefing == 1) checked @endif>
+                <label for="required_type_briefing_checkbox">Автоматическое проведение инструктажа водителям</label>
+            @endif
+            @if ($model == "Instr")
+                <input type="checkbox" name="is_default" id="is_default_checkbox" @if(App\Instr::find($id)->is_default) checked @endif>
+                <label for="is_default_checkbox">Базовый инструктаж</label>
+            @endif
         </div>
         <div class="modal-footer">
             <button type="submit" class="btn btn-success">Сохранить</button>
