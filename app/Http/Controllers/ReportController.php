@@ -220,10 +220,8 @@ class ReportController extends Controller
 
                     if ($request->order_by === 'created') {
                         $count = $anketasByCompany
-                            ->whereBetween('created_at', [
-                                $date_from,
-                                $date_to,
-                            ])->count();
+                            ->where('created_at', '>=', $date_from)
+                            ->where('created_at', '<=',$date_to)->count();
                     } else {
                         $count = $anketasByCompany
                                 ->whereBetween('date', [
