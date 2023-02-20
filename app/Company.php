@@ -26,6 +26,13 @@ class Company extends Model
         'pressure_diastolic'
     ];
 
+
+    public function point()
+    {
+        return $this->belongsTo(Point::class, 'pv_id')
+            ->withDefault();
+    }
+
     public function responsible(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
