@@ -3,7 +3,7 @@
 @endphp
 @if(!isset($defaultShowPvs))
     <div class="form-group mb-4">
-H        <label class="form-control-label">Пункт выпуска:</label> &nbsp;
+        <label class="form-control-label">Пункт выпуска:</label> &nbsp;
         <select name="pv_id" class="col-sm-6 form-control" required>
             @foreach($points as $point)
 
