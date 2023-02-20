@@ -9,6 +9,7 @@ use App\Instr;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class CreateDefaultBriefings extends Command
@@ -51,27 +52,24 @@ class CreateDefaultBriefings extends Command
         $drivers = Driver::select(["hash_id", "fio", "gender", "year_birthday"])
             ->whereIn("company_id", $companiesWithAutoBriefing->pluck("id"))->get();
 
-        $rmsEngineerIds = [];
-        DB::table("model_has_roles")
-          ->select("model_id")
-          ->where("role_id", 7)
-          ->get()
-          ->map(function ($container) use (&$rmsEngineerIds) {
-              $rmsEngineerIds[] = $container->model_id;
-          });
-        $rmsEngineer = User::whereIn("id", $rmsEngineerIds)->inRandomOrder()->first();
+        $bddUser = User::with(['roles'])->whereHas('roles', function (Builder $queryBuilder) {
+            return $queryBuilder->where('id', 7);
+        })->get()->random();
 
-        $drivers->map(function ($driver) use ($rmsEngineer, $companiesWithAutoBriefing, &$entersInto) {
+        $drivers->map(function ($driver) use ($bddUser, $companiesWithAutoBriefing, &$entersInto) {
             $company = $companiesWithAutoBriefing->where('hash_id', $driver->company_id);
             Anketa::create([
                                "type_anketa" => "bdd",
-                               "user_id"     => $rmsEngineer->id,
-                               "user_name"   => $rmsEngineer->name,
+                               "user_id"     => $bddUser->id,
+                               "user_name"   => $bddUser->name,
+                               'pv_id' => $company->pv_id,
+                               'user_eds' => $bddUser->eds,
                                "driver_id"   => $driver->hash_id,
                                "driver_fio"  => $driver->fio,
                                "driver_gender" => $driver->gender,
                                "driver_year_birthday" => $driver->year_birthday,
                                "complaint" => "Нет",
+                               "type_briefing" => 'Специальный',
                                "signature" => "Подписано простой ЭЦП",
                                "condition_visible_sliz" => "Без особенностей",
                                "condition_koj_pokr" => "Без особенностей",

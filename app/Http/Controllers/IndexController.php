@@ -984,12 +984,6 @@ class IndexController extends Controller
                     $user = User::create($userData);
                     $user->roles()->attach(3);
 
-//                    $productsEntities = Product::whereIn("id", $data['products_id'])->pluck("hash_id")->toArray();
-//                    /** @var $defaultBriefing Object Hash ID базового инструктажа */
-//                    $defaultBriefing = Instr::select("hash_id", "name")->where("is_default", 1)->first();
-//                    /** @var $needMakeRMB boolean Нужно ли создать запись в журнал БДД */
-//                    $needMakeRMB = in_array(570316, $productsEntities) || in_array(199217, $productsEntities);
-
                     // СИНХРОНИЗАЦИЯ ПОЛЕЙ
                     if (isset($data['company_id'])) {
                         $fieldsSync = isset($data['autosync_fields']) ? $data['autosync_fields'] : [];
@@ -1061,29 +1055,36 @@ class IndexController extends Controller
 
             $created = $model::create($data);
 
-//            if (isset($needMakeRMB) && $needMakeRMB && $defaultBriefing) {
-//                $user = Auth::user();
-//                $company = Company::where("id", $data['company_id'])->first();
-//
-//                Anketa::create([
-//                   "type_anketa" => "bdd",
-//                   "user_id"     => $user->id,
-//                   "user_name"   => $user->name,
-//                   "driver_id"   => $created->hash_id,
-//                   "driver_fio"  => $created->fio,
-//                   "driver_gender" => $created->gender,
-//                   "driver_year_birthday" => $created->year_birthday,
-//                   "complaint" => "Нет",
-//                   "condition_visible_sliz" => "Без особенностей",
-//                   "condition_koj_pokr" => "Без особенностей",
-//                   "date" => Carbon::now(),
-//                   "type_view" => "Предрейсовый",
-//                   "company_id" => $created->company_id,
-//                   "company_name" => $company->name,
-//                   "briefing_name" => $defaultBriefing->name,
-//                   "type_briefing" => 'Вводный'
-//               ]);
-//            }
+
+            if ($model === 'Driver') {
+                $company = Company::where("id", $data['company_id'])->first();
+                if ($company && $company->required_type_briefing) {
+                    $bddUser = User::with(['roles'])->whereHas('roles', function ($queryBuilder) {
+                        return $queryBuilder->where('id', 7);
+                    })->get()->random();
+
+                    Anketa::create([
+                        "type_anketa" => "bdd",
+                        "user_id"     => $bddUser->id,
+                        "user_name"   => $bddUser->name,
+                        "driver_id"   => $created->hash_id,
+                        "driver_fio"  => $created->fio,
+                        "driver_gender" => $created->gender,
+                        'pv_id' => $company->name,
+                        'user_eds' => $bddUser->eds,
+                        "driver_year_birthday" => $created->year_birthday,
+                        "complaint" => "Нет",
+                        "type_briefing" => 'Вводный',
+                        "signature" => "Подписано простой ЭЦП",
+                        "condition_visible_sliz" => "Без особенностей",
+                        "condition_koj_pokr" => "Без особенностей",
+                        "date" => Carbon::now(),
+                        "type_view" => "Предрейсовый",
+                        "company_id" => $company->hash_id,
+                        "company_name" => $company->name,
+                    ]);
+                }
+            }
 
 
             if ($created) {

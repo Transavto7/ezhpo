@@ -121,17 +121,24 @@
 
                 <b-row class="mb-3">
                     <b-col lg="12">
-                        <label>AnyDesk:</label>
+                        <label>
+                            <b class="text-danger text-bold">* </b>
+                            AnyDesk:
+                        </label>
                         <b-form-input v-model="infoModalUser.name"
                                       id="input-small"
                                       size="sm"
+                                      required
                                       placeholder="Введите AnyDesk"
                         />
                     </b-col>
                 </b-row>
                 <b-row class="mb-3">
                     <b-col lg="12">
-                        <label class="mb-1" for="company">Компании</label>
+                        <label class="mb-1" for="company">
+                            <b class="text-danger text-bold">* </b>
+                            Компании
+                        </label>
                         <multiselect
                             v-model="infoModalUser.company"
                             @search-change="searchCompany"
@@ -142,6 +149,7 @@
                             :show-labels="false"
                             placeholder="Выберите компанию"
                             label="name"
+                            required
                             class="is-invalid"
                         >
                             <span slot="noResult">Результатов не найдено</span>
@@ -152,17 +160,25 @@
 
                 <b-row class="mb-3">
                     <b-col lg="12">
-                        <label>Часовой пояс:</label>
+                        <label>
+                            <b class="text-danger text-bold">* </b>
+                            Часовой пояс:
+                        </label>
                         <b-form-input v-model="infoModalUser.timezone"
                                       size="sm"
+                                      required
                                       placeholder="Введите часовой пояс"
                         />
                     </b-col>
                 </b-row>
                 <b-row class="mb-3">
                     <b-col lg="12">
-                        <label>Пункт выпуска:</label>
+                        <label>
+                            <b class="text-danger text-bold">* </b>
+                            Пункт выпуска:
+                        </label>
                         <b-form-select v-model="infoModalUser.pv_id"
+                               required
                                :options="[{ value: null, text: 'Выберите пункт выпуска', disabled: true }, ...optionsPvs]"/>
                     </b-col>
                 </b-row>
