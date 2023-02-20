@@ -1056,12 +1056,13 @@ class IndexController extends Controller
             $created = $model::create($data);
 
 
-            if ($model === 'Driver') {
+            if ($model_type === 'Driver') {
                 $company = Company::where("id", $data['company_id'])->first();
                 if ($company && $company->required_type_briefing) {
                     $bddUser = User::with(['roles'])->whereHas('roles', function ($queryBuilder) {
                         return $queryBuilder->where('id', 7);
                     })->get()->random();
+                    $point = Point::find($company->pv_id);
 
                     Anketa::create([
                         "type_anketa" => "bdd",
@@ -1070,7 +1071,8 @@ class IndexController extends Controller
                         "driver_id"   => $created->hash_id,
                         "driver_fio"  => $created->fio,
                         "driver_gender" => $created->gender,
-                        'pv_id' => $company->name,
+                        'pv_id' => $point->name,
+                        'point_id' => $point->id,
                         'user_eds' => $bddUser->eds,
                         "driver_year_birthday" => $created->year_birthday,
                         "complaint" => "Нет",

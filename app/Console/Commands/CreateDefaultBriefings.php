@@ -6,6 +6,7 @@ use App\Anketa;
 use App\Company;
 use App\Driver;
 use App\Instr;
+use App\Point;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -49,7 +50,7 @@ class CreateDefaultBriefings extends Command
         /** @var $companiesWithAutoBriefing array Массив с hash ID компаний, где требуется базовый инструктаж */
         $companiesWithAutoBriefing = Company::where("required_type_briefing", true)->select('name', 'id', 'hash_id', 'pv_id')->get();
         /** @var $drivers Driver Данные водителей, которым нужно прописать инструктаж */
-        $drivers = Driver::select(["hash_id", "fio", "gender", "year_birthday"])
+        $drivers = Driver::select(["hash_id", "fio", "gender", "year_birthday", 'company_id'])
             ->whereIn("company_id", $companiesWithAutoBriefing->pluck("id"))->get();
 
         $bddUser = User::with(['roles'])->whereHas('roles', function (Builder $queryBuilder) {
@@ -57,13 +58,15 @@ class CreateDefaultBriefings extends Command
         })->get()->random();
 
         $drivers->map(function ($driver) use ($bddUser, $companiesWithAutoBriefing, &$entersInto) {
-            $company = $companiesWithAutoBriefing->where('hash_id', $driver->company_id);
+            $company = $companiesWithAutoBriefing->where('id', $driver->company_id)->first();
+            $point = Point::find($company->pv_id);
+
             Anketa::create([
                                "type_anketa" => "bdd",
                                "user_id"     => $bddUser->id,
                                "user_name"   => $bddUser->name,
-                               'pv_id' => $company->pv_id,
-                               'user_eds' => $bddUser->eds,
+                               'pv_id'       => $point->name,
+                               'user_eds'    => $bddUser->eds,
                                "driver_id"   => $driver->hash_id,
                                "driver_fio"  => $driver->fio,
                                "driver_gender" => $driver->gender,
@@ -77,6 +80,7 @@ class CreateDefaultBriefings extends Command
                                "type_view" => "Предрейсовый",
                                "company_id" => $company->hash_id,
                                "company_name" => $company->name,
+                               'point_id' => $point->id,
 //                               "briefing_name" => $defaultBriefing
             ]);
             $entersInto++;
