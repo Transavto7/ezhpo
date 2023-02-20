@@ -102,6 +102,7 @@ class TerminalController extends Controller
                 'password' => $api_token,
                 'api_token' => $api_token,
                 'email' => time() . '@ta-7.ru',
+                'login' => time() . '@ta-7.ru',
                 'pv_id' => $request->get('pv', null),
             ]);
         }
