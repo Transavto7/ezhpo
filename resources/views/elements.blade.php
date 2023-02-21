@@ -365,9 +365,8 @@ $permissionToViewContract = user()->access('contract_read');
                             @foreach($fields as $fk => $fv)
                                 @if($fk == 'contract' || $fk == 'contract_id' || $fk == 'contracts')
                                     @continue
-                                @endif
-                                @if(isset($fv['hideFilter']) && $fv['hideFilter'])
-                                        @continue
+                                @elseif(isset($fv['hideFilter']) && $fv['hideFilter'])
+                                    @continue
                                 @endif
 
                                 @php $fv['multiple'] = true; @endphp
@@ -433,11 +432,9 @@ $permissionToViewContract = user()->access('contract_read');
                         @foreach ($fieldPrompts as $field)
                             @if(($field->field == 'products_id' || $field->field == 'services') && user()->hasRole('client'))
                                 @continue
-                            @endif
-                            @if($field->field == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
+                            @elseif($field->field === 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
                                 @continue
-                            @endif
-                            @if($field->field == 'where_call' && !user()->access('companies_access_field_where_call'))
+                            @elseif($field->field === 'where_call' && !user()->access('companies_access_field_where_call'))
                                 @continue
                             @endif
                             <th data-key="{{ $field->field }}">
@@ -525,6 +522,10 @@ $permissionToViewContract = user()->access('contract_read');
                                                         @endif
                                                     </p>
                                                 </div>
+                                            @elseif($field->field === 'active' && $model === 'Instr')
+                                                {{ $el[$field->field] == 1 ? 'Да' : 'Нет' }}
+                                            @elseif($field->field === 'is_default' && $model === 'Instr')
+                                                {{ $el[$field->field] == 1 ? 'Да' : 'Нет' }}
                                             @elseif ($field->field === 'journals')
                                                 <nobr>
                                                     @if(user()->access('medic_read'))

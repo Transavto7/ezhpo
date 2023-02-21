@@ -17,7 +17,8 @@ class Instr extends Model
         'youtube',
         'active',
         'sort',
-        'deleted_id'
+        'deleted_id',
+        'is_default'
     ];
 
     public function delete()

@@ -144,6 +144,9 @@ class SdpoController extends Controller
             $sms->sms($company->where_call, Settings::setting('sms_text_driver') . " $driver->fio . $phone_to_call");
         }
 
+        $timeout = Settings::setting('timeout');
+        $anketa['timeout'] = $timeout ?? 20;
+
         return response()->json($anketa);
     }
 

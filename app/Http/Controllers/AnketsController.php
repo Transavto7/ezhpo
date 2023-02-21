@@ -11,10 +11,12 @@ use App\Notify;
 use App\Point;
 use App\Settings;
 use App\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcher;
 
@@ -951,8 +953,9 @@ class AnketsController extends Controller
                     if($anketa['type_anketa'] === 'tech' && !$anketa['is_dop']) {
                         // Генерируем номер ПЛ
                         $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
+                        $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
                         $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id)
-                            . '-' . date('d.m.Y', strtotime($anketa['date']));
+                            . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
                     }
                 }
 
@@ -1564,7 +1567,8 @@ class AnketsController extends Controller
                     if($anketa['type_anketa'] !== 'medic') {
                         // Генерируем номер ПЛ
                         $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
-                        $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id) . '-' . date('d.m.Y', strtotime($anketa['date']));
+                        $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
+                        $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id) . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
                     }
                 }
 
@@ -1581,12 +1585,10 @@ class AnketsController extends Controller
                 $anketa['pv_id'] = Point::where('id', $pv_id)->first();
 
                 // Проверка ПВ
-                if($anketa['pv_id']) {
+                if($anketa['pv_id'])
                     $anketa['pv_id'] = $anketa['pv_id']->name;
-                    $anketa['point_id'] = $anketa['pv_id']->id;
-                } else {
+                else
                     $anketa['pv_id'] = '';
-                }
 
                 // Проверка АВТО
                 if($Car) {
@@ -1613,9 +1615,8 @@ class AnketsController extends Controller
 
                     $anketa['driver_gender'] = isset($Driver->gender) ? $Driver->gender : '';
 
-                    if ($isApiRoute) {
+                    if ($isApiRoute && $anketa['type_anketa'] === 'medic') {
                         $Driver->date_prmo = Carbon::now();
-                        $anketa['terminal_id'] = $request->user('api')->id;
                     }
 
                     $Driver->save();
@@ -1656,6 +1657,24 @@ class AnketsController extends Controller
                     $anketa['realy'] = 'нет';
                 }
 
+                if ($anketa['type_anketa'] === 'bdd') {
+                    $bddUser = User::with(['roles'])->whereHas('roles', function (Builder $queryBuilder) {
+                        return $queryBuilder->where('id', 7);
+                    })->get()->random();
+
+                    if ($Driver) {
+                        $point = Company::find($Driver->company_id)->point;
+
+                        if ($point) {
+                            $anketa['pv_id'] = $point->name;
+                            $anketa['point_id'] = $point->id;
+                        }
+                    }
+
+                    $anketa['user_id'] = $bddUser->id;
+                    $anketa['user_name'] = $bddUser->name;
+                    $anketa['user_eds'] = $bddUser->eds;
+                }
 
                 /**
                  * Создаем анкету

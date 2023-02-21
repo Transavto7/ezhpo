@@ -147,6 +147,7 @@ class Anketa extends Model
 
             // Журнал БДД
             'type_briefing',
+            'briefing_name',
 
             // ПАК
             'pulse',
@@ -344,6 +345,7 @@ class Anketa extends Model
             'created_at',
             'user_name',
             'pv_id',
+            'briefing_name',
             'user_eds',
             'signature',
         ],

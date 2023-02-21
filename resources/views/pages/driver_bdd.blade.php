@@ -91,6 +91,10 @@
                                                    name="anketa[0][date]">
                                             <input type="hidden" value="Подписано простой ЭЦП"
                                                    name="anketa[0][signature]">
+                                            <input type="hidden" value="{{ $instr->name }}"
+                                                   name="anketa[0][briefing_name]">
+                                            <input type="hidden" value="{{ $instr->name }}"
+                                                   name="anketa[0][briefing_name]">
 
                                             <button type="submit" class="btn btn-success">Да</button>
                                         </form>

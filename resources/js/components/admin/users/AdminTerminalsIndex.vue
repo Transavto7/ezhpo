@@ -121,7 +121,10 @@
 
                 <b-row class="mb-3">
                     <b-col lg="12">
-                        <label>AnyDesk:</label>
+                        <label>
+                            <b class="text-danger text-bold">* </b>
+                            AnyDesk:
+                        </label>
                         <b-form-input v-model="infoModalUser.name"
                                       id="input-small"
                                       size="sm"
@@ -131,7 +134,10 @@
                 </b-row>
                 <b-row class="mb-3">
                     <b-col lg="12">
-                        <label class="mb-1" for="company">Компании</label>
+                        <label class="mb-1" for="company">
+                            <b class="text-danger text-bold">* </b>
+                            Компании
+                        </label>
                         <multiselect
                             v-model="infoModalUser.company"
                             @search-change="searchCompany"
@@ -152,7 +158,10 @@
 
                 <b-row class="mb-3">
                     <b-col lg="12">
-                        <label>Часовой пояс:</label>
+                        <label>
+                            <b class="text-danger text-bold">* </b>
+                            Часовой пояс:
+                        </label>
                         <b-form-input v-model="infoModalUser.timezone"
                                       size="sm"
                                       placeholder="Введите часовой пояс"
@@ -161,7 +170,10 @@
                 </b-row>
                 <b-row class="mb-3">
                     <b-col lg="12">
-                        <label>Пункт выпуска:</label>
+                        <label>
+                            <b class="text-danger text-bold">* </b>
+                            Пункт выпуска:
+                        </label>
                         <b-form-select v-model="infoModalUser.pv_id"
                                :options="[{ value: null, text: 'Выберите пункт выпуска', disabled: true }, ...optionsPvs]"/>
                     </b-col>
@@ -382,6 +394,14 @@ export default {
 
         saveUser() {
             this.loading = true;
+
+            if (!this.infoModalUser.name ||
+                    !this.infoModalUser.timezone ||
+                    !this.infoModalUser.pv_id ||
+                    !this.infoModalUser.company_id) {
+                this.$toast('Не все поля указаны', { type: 'error' });
+                return;
+            }
 
             axios.post('/terminals', {
                 user_id: this.infoModalUser.id,

@@ -29,8 +29,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $randomHours = mt_rand(8, 17);
+        $randomMinutes = mt_rand(0, 59);
         //todo перенести логику куда нибудь
         $schedule->command('companies:inspect')->monthlyOn(1, '6:00');
+        $schedule->command("run:briefings")->monthlyOn(10, '10:00');
     }
 
     /**
