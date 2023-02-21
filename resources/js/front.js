@@ -53,20 +53,26 @@ $(document).ready(function () {
 
     switch (anketa_type) {
         case ('profile.ankets.tech') :
-            pprResult = ($('#point_reys_control').val() === 'Пройден');
-            toggleAnketaCloneButton(!pprResult);
-            $(document).on('change', '#point_reys_control', function (event) {
-                pprResult = ($(event.target).val() === 'Пройден');
+            let elPrc = $('#point_reys_control');
+            if (elPrc.length > 0) {
+                pprResult = (el.val() === 'Пройден');
                 toggleAnketaCloneButton(!pprResult);
-            });
+                $(document).on('change', '#point_reys_control', function (event) {
+                    pprResult = ($(event.target).val() === 'Пройден');
+                    toggleAnketaCloneButton(!pprResult);
+                });
+            }
             break;
         case ('profile.ankets.medic') :
-            pprResult = ($('#med_view').val() === 'В норме');
-            toggleAnketaCloneButton(!pprResult);
-            $(document).on('change', '#med_view', function (event) {
-                pprResult = ($(event.target).val() === 'В норме');
+            let elMv = $('#med_view');
+            if (elMv.length > 0) {
+                pprResult = (el.val() === 'В норме');
                 toggleAnketaCloneButton(!pprResult);
-            });
+                $(document).on('change', '#med_view', function (event) {
+                    pprResult = ($(event.target).val() === 'В норме');
+                    toggleAnketaCloneButton(!pprResult);
+                });
+            }
             break;
     }
 
