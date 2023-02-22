@@ -7,9 +7,9 @@
             :towns='@json($towns)'
             :points='@json($points)'
             :companies='@json($company_id)'
-            :sel-towns=`@json(request()->get('town_id'))`
-            :sel-points=`@json(request()->get('pv_id'))`
-            :sel-companies=`@json(request()->get('company_id'))`
+            :sel-towns='JSON.parse(`@json(request()->get("town_id"))`)'
+            :sel-points='JSON.parse(`@json(request()->get('pv_id'))`)'
+            :sel-companies='JSON.parse(`@json(request()->get('company_id'))`)'
             order="{{ request()->get('order_by') ?? 'execute' }}"
             type="{{ $journal }}"
     >

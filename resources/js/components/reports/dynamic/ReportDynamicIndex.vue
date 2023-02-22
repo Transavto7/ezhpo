@@ -33,7 +33,7 @@
                   <option v-for="item in companies"
                           :key="item.hash_id"
                           :value="item.hash_id"
-                          :selected="selectedCompanies.includes(item.hash_id)"
+                          :selected="selectedCompanies.includes('' + item.hash_id)"
                   >
                       [{{ item.hash_id }}] {{ item.name }}
                   </option>
@@ -54,7 +54,7 @@
                 <option v-for="item in towns"
                         :key="item.id"
                         :value="item.id"
-                        :selected="selectedTowns.includes(item.id)"
+                        :selected="selectedTowns.includes('' + item.id)"
                 >
                   [{{ item.hash_id }}] {{ item.name }}
                 </option>
@@ -75,7 +75,7 @@
                 <option v-for="item in pointList"
                         :key="item.id"
                         :value="item.id"
-                        :selected="selectedPoints.includes(item.id)"
+                        :selected="selectedPoints.includes('' + item.id)"
                 >
                     [{{ item.hash_id }}] {{ item.name }}
                 </option>
@@ -132,12 +132,11 @@ export default {
     this.selectedTowns = this.selTowns || [];
     this.selectedPoints = this.selPoints || [];
     this.selectedCompanies = this.selCompanies || [];
+    console.log(this.companies, this.selectedCompanies);
 
       this.pointList = this.points.filter((point) => {
           return this.selectedTowns.includes('' + point.pv_id);
       });
-
-      console.log(this.pointList);
 
     this.journal = this.type;
     this.orderBy = this.order;
