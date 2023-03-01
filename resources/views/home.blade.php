@@ -458,10 +458,13 @@ $permissionToExportPrikazPL = (
                                                         {{ $anketa[$field->field] }}
 
                                                         @if($type_ankets === 'medic' && $field->field === 'admitted' && $anketa[$field->field] === 'Не допущен')
-                                                            @if ($anketa->proba_alko === 'Положительно')
-                                                                <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
+                                                            @if ($anketa->proba_alko === 'Положительно' or $anketa->test_narko === 'Положительно')
+                                                                @if(!$anketa->is_pak)
+                                                                    <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
+                                                                @endif
+                                                                    <a href="{{ route('docs.get', ['type' => 'other', 'anketa_id' => $anketa->id]) }}">Мед. заключение</a>
                                                             @else
-                                                                <a href="{{ route('docs.get', ['type' => 'other', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
+                                                                <a href="{{ route('docs.get', ['type' => 'other', 'anketa_id' => $anketa->id]) }}">Мед. заключение</a>
                                                             @endif
                                                         @endif
                                                     @endif

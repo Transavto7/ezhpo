@@ -7,7 +7,7 @@ use App\Services\Contracts\BaseInspectionService;
 
 class MedicalInspectionService extends BaseInspectionService
 {
-    public function getInspectionConclusion(Anketa $inspection) : array
+    public function getInspectionConclusion(Anketa $inspection): array
     {
         return [];
     }
