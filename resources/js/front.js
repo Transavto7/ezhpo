@@ -55,7 +55,7 @@ $(document).ready(function () {
         case ('profile.ankets.tech') :
             let elPrc = $('#point_reys_control');
             if (elPrc.length > 0) {
-                pprResult = (el.val() === 'Пройден');
+                pprResult = (elPrc.val() === 'Пройден');
                 toggleAnketaCloneButton(!pprResult);
                 $(document).on('change', '#point_reys_control', function (event) {
                     pprResult = ($(event.target).val() === 'Пройден');
@@ -66,7 +66,7 @@ $(document).ready(function () {
         case ('profile.ankets.medic') :
             let elMv = $('#med_view');
             if (elMv.length > 0) {
-                pprResult = (el.val() === 'В норме');
+                pprResult = (elMv.val() === 'В норме');
                 toggleAnketaCloneButton(!pprResult);
                 $(document).on('change', '#med_view', function (event) {
                     pprResult = ($(event.target).val() === 'В норме');

@@ -33,28 +33,28 @@ class DocsController extends Controller
             'alko' => false
         ];
 
-        $a = \App\Anketa::find($anketa_id);
+        $anketa = \App\Anketa::find($anketa_id);
 
-        if($a) {
-            $data['user_post'] = ProfileController::getUserRole(true, $a->user_id);
+        if($anketa) {
+            $data['user_post'] = ProfileController::getUserRole(true, $anketa->user_id);
 
             $fields = new Anketa();
             $fields = $fields->fillable;
 
             foreach($fields as $field) {
-                $data[$field] = $a[$field];
+                $data[$field] = $anketa[$field];
             }
 
-            if ($a->test_narko === 'Положительно') {
+            if ($anketa->test_narko === 'Положительно') {
                 $data['drugs'] = true;
             }
 
-            if ($a->proba_alko === 'Положительно') {
+            if ($anketa->proba_alko === 'Положительно') {
                 $data['alko'] = true;
             }
 
-            if($a->company_id) {
-                $c = Company::where('hash_id', $a->company_id)->first();
+            if($anketa->company_id) {
+                $c = Company::where('hash_id', $anketa->company_id)->first();
 
                 if($c) {
                     $c = Point::find($c->pv_id);
@@ -65,8 +65,8 @@ class DocsController extends Controller
                 }
             }
 
-            if ($a->pv_id) {
-                $point = Point::where('name', $a->pv_id)->with('town')->first();
+            if ($anketa->pv_id) {
+                $point = Point::where('name', $anketa->pv_id)->with('town')->first();
                 $data['town'] = $point->town->name;
             }
         }

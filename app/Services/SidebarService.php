@@ -13,6 +13,23 @@ class SidebarService implements ServiceInterface
      */
     public function getAllItems(array $filter = []): Collection
     {
-        return SideBarMenuItem::all();
+        return SideBarMenuItem::with('children')->get();
+    }
+
+
+    /**
+     * @return array
+     */
+    public static function renderItems(): array
+    {
+        $pakQueueCnt = \App\Anketa::where('type_anketa', 'pak_queue')->count();
+        $pakErrorsCnt = \App\Anketa::where('type_anketa', 'pak')->count();
+        $sidebarItems = (new static())->getAllItems();
+
+        return [
+            $pakQueueCnt,
+            $pakErrorsCnt,
+            $sidebarItems
+        ];
     }
 }

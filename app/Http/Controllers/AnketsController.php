@@ -9,6 +9,8 @@ use App\DDates;
 use App\Driver;
 use App\Notify;
 use App\Point;
+use App\Services\Contracts\BaseInspectionService;
+use App\Services\Inspections\MedicalInspectionService;
 use App\Settings;
 use App\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,12 +18,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\Routing\Matcher\RedirectableUrlMatcher;
 
 class AnketsController extends Controller
 {
+    public MedicalInspectionService $inspectionService;
+
+    public function __construct(BaseInspectionService $inspectionService)
+    {
+        $this->inspectionService = $inspectionService;
+    }
+
     public function Delete (Request $request)
     {
         $id = $request->id;

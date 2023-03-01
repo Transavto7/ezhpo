@@ -14,6 +14,55 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Contract
+ *
+ * @property int $id
+ * @property int|null $company_id
+ * @property int|null $our_company_id
+ * @property int $main_for_company
+ * @property \Illuminate\Support\Carbon|null $date_of_end
+ * @property \Illuminate\Support\Carbon|null $date_of_start
+ * @property string|null $name
+ * @property string|null $sum
+ * @property int|null $deleted_id
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int $finished
+ * @property-read \Illuminate\Database\Eloquent\Collection|Car[] $cars
+ * @property-read int|null $cars_count
+ * @property-read Company|null $company
+ * @property-read User|null $deleted_user
+ * @property-read \Illuminate\Database\Eloquent\Collection|Driver[] $drivers
+ * @property-read int|null $drivers_count
+ * @property-read mixed $name_with_dates
+ * @property-read Req|null $our_company
+ * @property-read \Illuminate\Database\Eloquent\Collection|Product[] $services
+ * @property-read int|null $services_count
+ * @method static Builder|Contract forDate(\Carbon\Carbon $date)
+ * @method static Builder|Contract main()
+ * @method static Builder|Contract newModelQuery()
+ * @method static Builder|Contract newQuery()
+ * @method static \Illuminate\Database\Query\Builder|Contract onlyTrashed()
+ * @method static Builder|Contract query()
+ * @method static Builder|Contract whereCompanyId($value)
+ * @method static Builder|Contract whereCreatedAt($value)
+ * @method static Builder|Contract whereDateOfEnd($value)
+ * @method static Builder|Contract whereDateOfStart($value)
+ * @method static Builder|Contract whereDeletedAt($value)
+ * @method static Builder|Contract whereDeletedId($value)
+ * @method static Builder|Contract whereFinished($value)
+ * @method static Builder|Contract whereId($value)
+ * @method static Builder|Contract whereMainForCompany($value)
+ * @method static Builder|Contract whereName($value)
+ * @method static Builder|Contract whereOurCompanyId($value)
+ * @method static Builder|Contract whereSum($value)
+ * @method static Builder|Contract whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|Contract withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|Contract withoutTrashed()
+ * @mixin \Eloquent
+ */
 class Contract extends Model
 {
     use \Illuminate\Database\Eloquent\SoftDeletes;

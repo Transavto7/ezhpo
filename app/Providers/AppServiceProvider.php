@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Http\Controllers\SideBarMenuItemsController;
+use App\Services\Contracts\BaseInspectionService;
 use App\Services\Contracts\ServiceInterface;
+use App\Services\Inspections\MedicalInspectionService;
 use App\Services\SidebarService;
 use App\Settings;
 use App\User;
@@ -25,6 +27,8 @@ class AppServiceProvider extends ServiceProvider
             ->needs(ServiceInterface::class)
             ->give(SidebarService::class)
         ;
+
+        $this->app->singleton(BaseInspectionService::class, MedicalInspectionService::class);
     }
 
     /**

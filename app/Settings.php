@@ -13,15 +13,15 @@ class Settings extends Model
             'value',
         ];
 
-    public static function setting($key)
+    public static function setting(string $key, ?string $default = '') : ?string
     {
         $setting = self::where('key', $key)->first();
 
         if ($setting) {
-            return $setting->value;
+            return $setting->value ?? $default;
         }
 
-        return '';
+        return $default;
     }
 
     public static function set($key, $value) {
