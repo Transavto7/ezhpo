@@ -167,7 +167,7 @@ class ReportController extends Controller
         }
         $months = array_reverse($months);
 
-        if ($request->town_id || $request->pv_id) {
+        if ($request->town_id || $request->pv_id || $request->order_by) {
             $date_from = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay();
             $date_to = Carbon::now()->lastOfMonth()->endOfDay();
             $result = [];
@@ -219,8 +219,13 @@ class ReportController extends Controller
             $anketas = $anketas->get();
 
             foreach($anketas->groupBy('company_id') as $company_id => $anketasByCompany) {
-                $result[$company_id]['name'] = $anketasByCompany
-                    ->where('company_name', '!=', null)->first()->company_name;
+                $company = $anketasByCompany->where('company_name', '!=', null)->first();
+                if ($company) {
+                    $result[$company_id]['name'] = $company->company_name;
+                } else {
+                    $result[$company_id]['name'] = 'Неизвестная компания';
+                }
+
                 for ($i = 0; $i < 12; $i++) {
                     $date_from = Carbon::now()->subMonths($i)->firstOfMonth()->startOfDay();
                     $date_to = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay();
@@ -253,10 +258,16 @@ class ReportController extends Controller
 
         $towns = Town::get(['hash_id', 'id', 'name']);
         $points = Point::get(['hash_id', 'id', 'name', 'pv_id']);
-        $company_id = Company::select('hash_id', 'name')->limit(100)->get();
+
         if ($request->company_id) {
             $company_id =
-                $company_id->merge(Company::select('hash_id', 'name')->whereIn('hash_id', $request->company_id)->get());
+                Company::select('hash_id', 'name')
+                    ->whereNotIn('hash_id', $request->company_id)
+                    ->limit(100)->get()
+                    ->concat(Company::select('hash_id', 'name')
+                    ->whereIn('hash_id', $request->company_id)->get());
+        } else {
+            $company_id = Company::select('hash_id', 'name')->limit(100)->get();
         }
 
         return view('reports.dynamic.medic.index', [

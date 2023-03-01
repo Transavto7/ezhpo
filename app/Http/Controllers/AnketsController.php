@@ -754,13 +754,22 @@ class AnketsController extends Controller
                 $is_med_dop = $anketa['type_anketa'] === 'medic';
                 $is_tech_dop = $anketa['type_anketa'] === 'tech';
 
+                $pressure_systolic = 150;
+                $pressure_diastolic = 100;
+
+                if ($Driver) {
+                    $pressure_systolic = $Driver->getPressureSystolic();
+                    $pressure_diastolic = $Driver->getPressureDiastolic();
+                }
+
+
                 /**
                  * ПРОВЕРЯЕМ статус для поля "Заключение"
                  */
                 $tonometer = explode('/', $anketa['tonometer']);
                 if($proba_alko === 'Отрицательно' && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
                     && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38
-                    && $tonometer[0] < $Driver->getPressureSystolic() && $tonometer[1] < $Driver->getPressureDiastolic()) {
+                    && $tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic) {
                     $anketa['admitted'] = 'Допущен';
                 } else {
                     $anketa['admitted'] = 'Не допущен';
@@ -952,10 +961,8 @@ class AnketsController extends Controller
                 if(empty($anketa['number_list_road'])) {
                     if($anketa['type_anketa'] === 'tech' && !$anketa['is_dop']) {
                         // Генерируем номер ПЛ
-                        $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
-                        $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
                         $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id)
-                            . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
+                            . '-' . date('d.m.Y', strtotime($anketa['date']));
                     }
                 }
 
@@ -1566,9 +1573,9 @@ class AnketsController extends Controller
                 if(empty($anketa['number_list_road'])) {
                     if($anketa['type_anketa'] !== 'medic') {
                         // Генерируем номер ПЛ
-                        $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
-                        $suffix_anketa = count($findCurrentPL) > 0 ? '/' . (count($findCurrentPL) + 1) : '';
-                        $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id) . '-' . date('d.m.Y', strtotime($anketa['date'])) . $suffix_anketa;
+
+                        $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id)
+                            . '-' . date('d.m.Y', strtotime($anketa['date']));
                     }
                 }
 
