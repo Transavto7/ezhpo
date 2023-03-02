@@ -17,7 +17,7 @@ class SideBarMenuItemsController extends Controller
     /**
      * @var ServiceInterface|null
      */
-    private ?ServiceInterface $sidebarMenuService;
+    private ServiceInterface $sidebarMenuService;
 
     /**
      * @param  SidebarService  $sidebarMenuService
