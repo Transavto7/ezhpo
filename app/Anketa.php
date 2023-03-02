@@ -2,11 +2,16 @@
 
 namespace App;
 
-use App\Models\Contract;
 use App\Models\ContractAnketaSnapshot;
-use App\Models\Service;
+use App\Services\Helpers\ArrayObject;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property string tonometer
+ * @property ArrayObject tonometer_data
+ * @property array tonometer_data_int
+ * @property float t_people voodoo people
+ */
 class Anketa extends Model
 {
     // archive
@@ -550,14 +555,14 @@ class Anketa extends Model
             'pak_queue' => [
                 'created_at' => 'Дата создания',
                 'driver_fio' => 'Водитель',
-                'pv_id'      => 'Пункт выпуска',
-                'tonometer'  => "Артериальное давление",
-                't_people'   => 'Температура тела',
+                'pv_id' => 'Пункт выпуска',
+                'tonometer' => "Артериальное давление",
+                't_people' => 'Температура тела',
                 'proba_alko' => 'Признаки опьянения', // Проба на алкоголь
-                'complaint'  => 'Жалобы',
-                'admitted'   => 'Заключение о результатах осмотра',
-                'photos'     => 'Фото',
-                'videos'     => 'Видео',
+                'complaint' => 'Жалобы',
+                'admitted' => 'Заключение о результатах осмотра',
+                'photos' => 'Фото',
+                'videos' => 'Видео',
             ],
         ];
 
@@ -565,5 +570,47 @@ class Anketa extends Model
     public static function getAll()
     {
         return self::all();
+    }
+
+    public const BLOOD_PRESSURE_THRESHOLDS = [
+        'systolic' => [50, 220],
+        'diastolic' => [40, 160],
+    ];
+
+    public const HUMAN_BODY_TEMPERATURE_THRESHOLDS = [35.5, 37.5];
+
+    /**
+     * Mutator
+     * @property array tonometer_data_int
+     * @property string tonometer
+     */
+    public function getTonometerDataIntAttribute(): ArrayObject
+    {
+        return new ArrayObject(explode('/', $this->tonometer));
+    }
+
+    /**
+     * Mutator
+     * @return array
+     * @throws \Exception
+     * @property string tonometer
+     */
+    public function getTonometerDataAttribute(): array
+    {
+        return ['systolic' => $this->tonometer_data_int[0], 'diastolic' => $this->tonometer_data_int[1]];
+
+    }
+
+    public function checkTemperatureFine(array $thresholds = self::HUMAN_BODY_TEMPERATURE_THRESHOLDS): bool
+    {
+        return in_array_thresholds($this->t_people, $thresholds);
+    }
+
+    public function checkBloodPressureFine(array $thresholds = self::BLOOD_PRESSURE_THRESHOLDS) : bool
+    {
+        return (
+            in_array_thresholds($this->tonometer_data['systolic'], $thresholds['systolic']) and
+            in_array_thresholds($this->tonometer_data['diastolic'], $thresholds['diastolic'])
+        );
     }
 }

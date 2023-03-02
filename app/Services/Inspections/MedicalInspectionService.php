@@ -7,9 +7,16 @@ use App\Services\Contracts\BaseInspectionService;
 
 class MedicalInspectionService extends BaseInspectionService
 {
-    public function getInspectionConclusion(Anketa $inspection): array
+    /**
+     * @param  \App\Anketa  $anketa
+     * @return bool
+     */
+    public static function acceptConclusion(Anketa $anketa) : bool
     {
-        return [];
-    }
+        if ($anketa->complaint === 'Да') {
+            return false;
+        }
 
+        return ($anketa->checkTemperatureFine() && $anketa->checkBloodPressureFine());
+    }
 }

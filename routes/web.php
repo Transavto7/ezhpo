@@ -193,6 +193,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('roles/return_trash', 'RoleController@returnTrash');
 
     Route::any('/field/prompt/filter', 'FieldPromptController@getAll');
+    Route::any('/sidebar/items/filter', [SideBarMenuItemsController::class, 'filter']);
     Route::resource('field/prompt', 'FieldPromptController');
 });
 

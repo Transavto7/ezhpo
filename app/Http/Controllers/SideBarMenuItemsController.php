@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\SaveSidebarItem;
 use App\Services\Contracts\ServiceInterface;
 use App\Services\SidebarService;
 use App\SideBarMenuItem;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,7 +17,7 @@ class SideBarMenuItemsController extends Controller
     /**
      * @var ServiceInterface|null
      */
-    private ?ServiceInterface $sidebarMenuService = null;
+    private ?ServiceInterface $sidebarMenuService;
 
     /**
      * @param  SidebarService  $sidebarMenuService
@@ -32,38 +32,20 @@ class SideBarMenuItemsController extends Controller
      */
     public function index()
     {
+        $items = $this->sidebarMenuService->getAllItems();
         return view(
-            'admin.sidebar.index',
-            $this->sidebarMenuService->getAllItems(),
+            'admin.sidebar.index', [
+                'items' => $items->get()->toArray()
+            ]
         );
     }
 
-    /**
-     * @param  SaveSidebarItem  $request
-     * @return array
-     */
-    public function store(SaveSidebarItem $request): array
-    {
-        return [];
-    }
+    /*
+    * Axios get all rows in table
+    */
+    public function filter(Request $request) {
+        $items = $this->sidebarMenuService->getAllItems($request->all());
 
-    /**
-     * @param  SaveSidebarItem  $request
-     * @param  SideBarMenuItem  $sidebarItem
-     * @return void
-     */
-    public function update(SaveSidebarItem $request, SidebarMenuItem $sidebarItem)
-    {
-
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function destroy(SidebarMenuItem $sideBarMenuItem)
-    {
-        $sideBarMenuItem->delete();
-
-        return response('', Response::HTTP_NO_CONTENT);
+        return $items->paginate(100);
     }
 }
