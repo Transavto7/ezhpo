@@ -3,10 +3,43 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Builder;
 
+/**
+ * App\Point
+ *
+ * @property int $id
+ * @property string $hash_id
+ * @property string $name
+ * @property int $pv_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $company_id
+ * @property string|null $deleted_id
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\User|null $deleted_user
+ * @property-read \App\Town $town
+ * @method static \Illuminate\Database\Eloquent\Builder|Point newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Point newQuery()
+ * @method static Builder|Point onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Point query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Point whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Point whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Point whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Point whereDeletedId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Point whereHashId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Point whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Point whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Point wherePvId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Point whereUpdatedAt($value)
+ * @method static Builder|Point withTrashed()
+ * @method static Builder|Point withoutTrashed()
+ * @mixin \Eloquent
+ */
 class Point extends Model
 {
-    use \Illuminate\Database\Eloquent\SoftDeletes;
+    use SoftDeletes;
 
     public $fillable
         = [

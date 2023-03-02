@@ -3,10 +3,50 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Builder;
 
+/**
+ * App\Service
+ *
+ * @property int $id
+ * @property string $hash_id
+ * @property string $name
+ * @property string|null $type_product
+ * @property string $unit
+ * @property int $price_unit
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $type_anketa
+ * @property string|null $type_view
+ * @property int|null $essence
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property string|null $deleted_id
+ * @property-read \App\User|null $deleted_user
+ * @method static \Illuminate\Database\Eloquent\Builder|Service newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Service newQuery()
+ * @method static Builder|Service onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|Service query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereDeletedId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereEssence($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereHashId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service wherePriceUnit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereTypeAnketa($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereTypeProduct($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereTypeView($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereUnit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Service whereUpdatedAt($value)
+ * @method static Builder|Service withTrashed()
+ * @method static Builder|Service withoutTrashed()
+ * @mixin \Eloquent
+ */
 class Service extends Model
 {
-    use \Illuminate\Database\Eloquent\SoftDeletes;
+    use SoftDeletes;
 
 //    protected $table = 'services';
     protected $table = 'products';
