@@ -41,12 +41,15 @@
                     >
                         <template #cell(name)="row">
                             <template v-if="current_user_permissions.permission_to_edit">
-                                <a href="#" @click="editUserData(row.item)">{{ row.value }}</a>
+                                <a href="#" @click="editUserData(row.item)">
+                                    {{ row.value || 'Неизвестно' }}
+                                </a>
                             </template>
                             <template v-else>
-                                {{ row.value }}
+                                {{ row.value || 'Неизвестно' }}
                             </template>
                         </template>
+
                         <template #cell(status)="{ item }">
                             <span v-if="item.connected" class="badge badge-success">on</span>
                             <span v-else class="badge badge-danger">off</span>
