@@ -1,5 +1,5 @@
 require('./bootstrap');
-// require('./front')
+require('./front')
 
 import Vue from 'vue';
 import Multiselect from 'vue-multiselect'
