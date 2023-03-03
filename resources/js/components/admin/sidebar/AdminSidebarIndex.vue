@@ -70,11 +70,11 @@ export default {
             return item.parent?.title;
           }
         },
-        {
-          key: "access_permissions",
-          sortable: true,
-          label: "Права доступа"
-        },
+        // {
+        //   key: "access_permissions",
+        //   sortable: true,
+        //   label: "Права доступа"
+        // },
         {
           key: "tooltip_prompt",
           sortable: false,
