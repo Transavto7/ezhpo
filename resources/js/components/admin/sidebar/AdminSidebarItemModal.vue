@@ -13,6 +13,14 @@
         />
       </div>
       <div class="form-group mb-3">
+        <label class="mb-1">Короткое название-идентификатор</label>
+        <b-form-input
+            v-model="item.slug"
+            size="sm"
+            placeholder="Введите название"
+        />
+      </div>
+      <div class="form-group mb-3">
         <label class="mb-1">Родительский элемент меню</label>
         <b-form-select
             v-model="item.parent_id"
