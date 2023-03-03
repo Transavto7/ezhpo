@@ -8,22 +8,44 @@
             striped hover
             responsive
         >
+          <template #cell(actions)="{ item }">
+            <div class="d-flex justify-content-end">
+              <b-button size="sm"
+                        variant="info"
+                        class="mr-2"
+                        @click="$refs.itemModal.open(item)"
+              >
+                <b-icon-pencil></b-icon-pencil>
+              </b-button>
+            </div>
+          </template>
+          <template #table-busy>
+            <div class="text-center text-primary my-2">
+              <b-spinner class="align-middle"></b-spinner>
+            </div>
+          </template>
+
         </b-table>
       </div>
     </div>
-  </div>
 
+    <AdminSidebarItemModal
+        ref="itemModal"
+        :headitems="headitems"
+    />
+  </div>
 </template>
 
 <script>
-// import AdminPromptDeleteModal from "./AdminPromptDeleteModal";
-// import AdminPromptRestoreModal from "./AdminPromptRestoreModal";
-// import AdminPromptEditModal from "./AdminPromptEditModal";
+import AdminSidebarItemModal from "./AdminSidebarItemModal";
 
 import {addParams, getParams} from "../../const/params";
 
 export default {
-  props: ['sidebarItems'],
+  props: ['sidebaritems', 'headitems'],
+  components: {
+    AdminSidebarItemModal,
+  },
   data() {
     return {
       items: [],
@@ -35,41 +57,27 @@ export default {
       total: 0,
       fields: [
         {
-          key: "tooltip_prompt",
-          sortable: false,
-          label: "Подсказка"
-        },
-        {
           key: "title",
           sortable: true,
           label: "Название"
+        },
+        {
+          key: "parent",
+          sortable: false,
+          label: "Родительский элемент",
+          formatter: (value, key, item) => {
+            return item.parent?.title;
+          }
         },
         {
           key: "access_permissions",
           sortable: true,
           label: "Права доступа"
         },
-        // {
-        //   key: "route_name",
-        //   sortable: true,
-        //   label: "Ссылка"
-        // },
-        // {
-        //   key: "is_header",
-        //   sortable: true,
-        //   label: "Заголовок",
-        //   formatter: (value, key, item) => {
-        //       return value === 1? "Да" : "Нет";
-        //   }
-        // },
-
         {
-          key: "parent",
+          key: "tooltip_prompt",
           sortable: false,
-          label: "Родительский элемент",
-          formatter: (value, key, item) => {
-             return item.parent?.title;
-          }
+          label: "Подсказка"
         },
         {
           key: "actions",
@@ -85,10 +93,7 @@ export default {
   },
   mounted() {
     this.filters = getParams();
-    // this.sidebarItems.forEach(item => {
-    //   console.log(item);
-    // });
-    this.loadData()
+    this.items = this.sidebaritems
   },
   methods: {
     loadData() {

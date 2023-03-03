@@ -48,6 +48,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class SideBarMenuItem extends Model
 {
+    protected $fillable = [
+        'title',
+        'route_name',
+        'slug',
+        'access_permissions',
+        'css_class',
+        'tooltip_prompt',
+        'parent_id',
+        'icon_class',
+        'sort'
+    ];
+
     public function children(): HasMany
     {
         return $this->hasMany(static::class, 'parent_id');

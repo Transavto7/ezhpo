@@ -7,7 +7,7 @@ use App\Driver;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\ReportContractRefactoringController;
-use App\Http\Controllers\SideBarMenuItemsController;
+use App\Http\Controllers\SidebarMenuItemsController;
 use App\Http\Middleware\CheckDriver;
 use App\Instr;
 use App\Models\Contract;
@@ -193,8 +193,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('roles/return_trash', 'RoleController@returnTrash');
 
     Route::any('/field/prompt/filter', 'FieldPromptController@getAll');
-    Route::any('/sidebar/items/filter', [SideBarMenuItemsController::class, 'filter']);
+    Route::any('/sidebar/items/filter', [SidebarMenuItemsController::class, 'filter']);
     Route::resource('field/prompt', 'FieldPromptController');
+    Route::resource('sidebar/items', 'SidebarMenuItemsController'   );
 });
 
 
@@ -216,7 +217,7 @@ Route::middleware(['auth', CheckDriver::class])->group(function () {
     });
 
     Route::prefix('sidebar')->group(function() {
-        Route::get('index', [SideBarMenuItemsController::class, 'index'])->name('sidebar.menu.index');
+        Route::get('index', [SidebarMenuItemsController::class, 'index'])->name('sidebar.menu.index');
     });
 
     // Рендер элемента (водитель, компания и т.д.)

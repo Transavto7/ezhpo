@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Dtos\SidebarMenuItemData;
+use App\Http\Requests\SaveSidebarMenuItem;
 use App\Services\Contracts\ServiceInterface;
 use App\Services\SidebarService;
-use App\SideBarMenuItem;
-use Exception;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\Response;
 
-class SideBarMenuItemsController extends Controller
+class SidebarMenuItemsController extends Controller
 {
     /**
      * @var ServiceInterface|null
@@ -35,7 +35,10 @@ class SideBarMenuItemsController extends Controller
         $items = $this->sidebarMenuService->getAllItems();
         return view(
             'admin.sidebar.index', [
-                'items' => $items->get()->toArray()
+                'sidebarItems' => $items->get(),
+                'headers' => $items->get()
+                    ->where('is_header', '=', true)
+                    ->pluck('title', 'id')
             ]
         );
     }
@@ -43,9 +46,22 @@ class SideBarMenuItemsController extends Controller
     /*
     * Axios get all rows in table
     */
-    public function filter(Request $request) {
+    public function filter(Request $request): LengthAwarePaginator
+    {
         $items = $this->sidebarMenuService->getAllItems($request->all());
 
         return $items->paginate(100);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     */
+    public function update(SaveSidebarMenuItem $request, int $id) : array
+    {
+        return $this->sidebarMenuService->updateItem(
+            new SidebarMenuItemData($request->validated()),
+            $id
+        );
     }
 }

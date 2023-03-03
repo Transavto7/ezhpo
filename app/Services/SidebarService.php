@@ -2,9 +2,11 @@
 namespace App\Services;
 
 use App\Anketa;
+use App\Dtos\SidebarMenuItemData;
 use App\Services\Contracts\ServiceInterface;
 use App\SideBarMenuItem;
 use Illuminate\Database\Eloquent\Builder;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class SidebarService implements ServiceInterface
 {
@@ -38,5 +40,24 @@ class SidebarService implements ServiceInterface
             $pakErrorsCnt,
             $sidebarItems
         ];
+    }
+
+    /**
+     * @param  \App\Dtos\SidebarMenuItemData  $data
+     * @param  int  $id
+     * @return bool
+     */
+    public function updateItem(SidebarMenuItemData $data, int $id): array
+    {
+        $item = SideBarMenuItem::find($id);
+
+        if ($item) {
+            return [
+                'result' => $item->update($data->all()),
+                'model' => $item->refresh()
+            ];
+        } else {
+            throw new NotFoundHttpException("Item not found!");
+        }
     }
 }
