@@ -746,7 +746,7 @@ class Anketa extends Model
         return in_array_thresholds($this->t_people, $thresholds);
     }
 
-    public function checkBloodPressureFine(array $thresholds = self::BLOOD_PRESSURE_THRESHOLDS) : bool
+    public function checkBloodPressureFine(array $thresholds = self::BLOOD_PRESSURE_THRESHOLDS): bool
     {
         return (
             in_array_thresholds($this->tonometer_data['systolic'], $thresholds['systolic']) and

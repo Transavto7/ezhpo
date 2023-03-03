@@ -5,10 +5,22 @@ namespace App\Http\Controllers;
 use App\Anketa;
 use App\Company;
 use App\Point;
+use App\Services\Inspections\MedicalInspectionService;
 use Illuminate\Http\Request;
 
 class DocsController extends Controller
 {
+
+    /**
+     * @var \App\Services\Inspections\MedicalInspectionService
+     */
+    protected MedicalInspectionService $medicalService;
+
+    public function __construct(MedicalInspectionService $service)
+    {
+        $this->medicalService = $service;
+    }
+
     public function Get (Request $request)
     {
         $anketa_id = $request->anketa_id;
@@ -69,6 +81,8 @@ class DocsController extends Controller
                 $point = Point::where('name', $anketa->pv_id)->with('town')->first();
                 $data['town'] = $point->town->name;
             }
+
+            $data['conclusionStr'] = !MedicalInspectionService::acceptConclusion($anketa)? "Наличие признаков заболевания" : "Здоров";
         }
 
         if(view()->exists("docs.$type")) {
