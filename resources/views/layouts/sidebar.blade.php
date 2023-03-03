@@ -20,22 +20,29 @@
             </article>
         </div>
     </div>
-
     <ul class="list-unstyled">
         <li>
             <a class="bg-info text-white">МЕНЮ</a>
         </li>
         @foreach($sidebarItems as $k => $item)
-            @if ($item->is_header)
+            @if($item->is_header === 1)
                 <li>
-                    <a data-btn-collapse="#items-{{$k}}" role="button" href="#">
+                    <a data-btn-collapse="#items-{{$k}}"
+                       data-toggle="tooltip"
+                       data-placement="right"
+                       title="{{$item->tooltip_prompt}}"
+                       role="button" href="#">
                         <i class="{{$item->icon_class}}"></i>
                         {{$item->title}}
                     </a>
                     <ul id="items-{{$k}}" class="collapse list-unstyle">
                         @foreach($item->children as $child)
                             <li>
-                                <a href="{{$child->route_name}}">
+                                <a href="{{$child->route_name}}"
+                                   data-toggle="tooltip"
+                                   data-placement="right"
+                                   title="{{$item->tooltip_prompt}}"
+                                >
                                     <i class="{{$child->icon_class}}"></i>
                                     {{$child->title}}
                                     @if($child->slug === 'errors_pak_log')
@@ -46,13 +53,18 @@
                         @endforeach
                     </ul>
                 </li>
-            @elseif($item->parent == null)
+            @elseif($item->parent()->count() === 0)
                 <li>
-                    <a class="{{$item->css_class}}" href="{{$item->route_name}}">
+                    <a data-toggle="tooltip"
+                       data-placement="right"
+                       title="{{$item->tooltip_prompt}}"
+                       class="{{$item->css_class}}"
+                       href="{{$item->route_name}}"
+                    >
                         <i class="{{$item->icon_class}}"></i>
                         {{$item->title}}
                         @if ($item->slug === 'pak_queue')
-                            <span class="badge bg-primary text-white">{{$pakQueueCnt}}</span>
+                            <span class="badge bg-primary text-white">{{$item->parent}}{{$pakQueueCnt}}</span>
                         @endif
                     </a>
                 </li>
@@ -93,7 +105,6 @@
                     @if(user()->access('date_control_read', 'date_control_create'))
                         <li><a href="{{ route('renderElements', 'DDates') }}">Контроль дат</a></li>
                     @endif
-
 
                     @if(user()->access('requisites_read', 'requisites_create'))
                         <li><a href="{{ route('renderElements', 'Req') }}">Реквизиты нашей компании</a></li>

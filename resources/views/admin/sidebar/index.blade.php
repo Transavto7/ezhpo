@@ -4,6 +4,7 @@
 @section('sidebar', 1)
 @section('content')
     <admin-sidebar-index
-            :sidebarItems='@json($items)'
+            :sidebaritems='@json($sidebarItems->toArray())'
+            :headitems='@json($headers->toArray())'
     ></admin-sidebar-index>
 @endsection

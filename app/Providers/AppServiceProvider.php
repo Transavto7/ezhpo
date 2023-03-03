@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Http\Controllers\SideBarMenuItemsController;
+use App\Http\Controllers\SidebarMenuItemsController;
 use App\Services\Contracts\BaseInspectionService;
 use App\Services\Contracts\ServiceInterface;
 use App\Services\Inspections\MedicalInspectionService;
@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->when(SideBarMenuItemsController::class)
+        $this->app->when(SidebarMenuItemsController::class)
             ->needs(ServiceInterface::class)
             ->give(SidebarService::class)
         ;
