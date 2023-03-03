@@ -77,13 +77,13 @@ export default {
       await axios.put('/sidebar/items/' + this.item.id, {
         title: this.item.title,
         tooltip_prompt: this.item.tooltip_prompt,
-        parent_id: this.item.parent_id,
+        parent_id: +this.item.parent_id,
       }).then(({data}) => {
         this.show = false;
         this.$toast('Изменения сохранены');
         this.$emit('success', this.item);
       }).catch((error) => {
-        console.log(error);
+        console.log(error?.message, error?.code);
       });
       this.saving = false;
     }

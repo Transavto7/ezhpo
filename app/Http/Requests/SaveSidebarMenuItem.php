@@ -1,7 +1,8 @@
 <?php
-
+declare(strict_types=1);
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SaveSidebarMenuItem extends FormRequest
@@ -26,7 +27,8 @@ class SaveSidebarMenuItem extends FormRequest
     {
         return [
             'title' => 'string|required',
-            'tooltip_prompt' => 'string|required|nullable',
+            'tooltip_prompt' => 'string|nullable',
+            'parent_id' => 'integer|nullable'
         ];
     }
 }
