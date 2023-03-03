@@ -32,6 +32,7 @@
     <AdminSidebarItemModal
         ref="itemModal"
         :headitems="headitems"
+        v-on:success="loadData"
     />
   </div>
 </template>
