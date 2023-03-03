@@ -3,7 +3,7 @@
 <form action="?orderBy={{ $orderBy }}&orderKey={{ $orderKey . (isset($queryString) ? $queryString : '') }}" method="GET" id="FORM_COUNT_ELEMENTS">
     @include('templates.GET_INPUTS')
 
-    <select onchange="FORM_COUNT_ELEMENTS.submit()" name="take">
+    <select onchange="$('#FORM_COUNT_ELEMENTS').submit()" name="take">
         @foreach([500, 1500, 2000, 2500] as $numb)
             <option
                 @isset($take)
