@@ -49,7 +49,7 @@ Route::middleware('auth:api')->get('/users/{role}', function (Request $request) 
         '2' => true // medic
     ];
 
-    if($user->role >= 777 && isset($validRoles[$roleRequest])) {
+    if(isset($validRoles[$roleRequest])) {
         $user = User::with('roles')->whereHas('roles', function ($q) use ($request) {
             $q->where('roles.id', 2);
         })->get();
