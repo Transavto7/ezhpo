@@ -82,7 +82,8 @@ class CreateDefaultBriefings extends Command
                                "company_id" => $company->hash_id,
                                "company_name" => $company->name,
                                'point_id' => $point->id,
-                               "briefing_name" => $briefing->name ?? ''
+                               "briefing_name" => $briefing->name ?? '',
+                               'realy' => 'Нет'
             ]);
             $entersInto++;
         });
