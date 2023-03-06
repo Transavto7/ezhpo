@@ -459,11 +459,8 @@ $permissionToExportPrikazPL = (
 
                                                         @if($type_ankets === 'medic' && $field->field === 'admitted' && $anketa[$field->field] === 'Не допущен')
                                                             @if ($anketa->proba_alko === 'Положительно' or $anketa->test_narko === 'Положительно')
-                                                                @if(!is_null($anketa->flag_pak))
-                                                                    <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
-                                                                @else
-                                                                    <a href="{{ route('docs.get', ['type' => 'other', 'anketa_id' => $anketa->id]) }}">Мед. Заключение</a>
-                                                                @endif
+                                                                <a href="{{ route('docs.get', ['type' => 'other', 'anketa_id' => $anketa->id]) }}">Мед. Заключение</a>
+                                                                <a class="btn btn-danger small" href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">Сформировать протокол отстранения</a>
                                                             @elseif(\App\Services\Inspections\MedicalInspectionService::acceptConclusion($anketa) === false)
                                                                 <a href="{{ route('docs.get', ['type' => 'other', 'anketa_id' => $anketa->id]) }}">Мед. Заключение</a>
                                                             @endif

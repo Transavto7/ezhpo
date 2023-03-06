@@ -26,13 +26,12 @@ class SmsNotification
      */
     public function handle($event)
     {
-        dd($event);
-//        if(isset($Driver)) {
-//            $sms->sms($Company->where_call, Settings::setting('sms_text_driver') . " $Driver->fio. $phone_to_call");
-//        } else if (isset($Car)) {
-//            $sms->sms($Company->where_call, Settings::setting('sms_text_car') . " $Car->gos_number. $phone_to_call");
-//        } else {
-//            $sms->sms($Company->where_call, Settings::setting('sms_text_default') . ' ' . new Anketa($anketa) . '.' . ' ' . $phone_to_call);
-//        }
+        if(isset($Driver)) {
+            $sms->sms($Company->where_call, Settings::setting('sms_text_driver') . " $Driver->fio. $phone_to_call");
+        } else if (isset($Car)) {
+            $sms->sms($Company->where_call, Settings::setting('sms_text_car') . " $Car->gos_number. $phone_to_call");
+        } else {
+            $sms->sms($Company->where_call, Settings::setting('sms_text_default') . ' ' . new Anketa($anketa) . '.' . ' ' . $phone_to_call);
+        }
     }
 }

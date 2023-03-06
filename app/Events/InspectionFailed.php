@@ -19,7 +19,6 @@ class InspectionFailed
      */
     public function __construct(array $payloadData)
     {
-        $a = new class() {};
         $this->payloadData = $payloadData;
     }
 }
