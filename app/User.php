@@ -14,6 +14,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property string $name
+ * @property int $id
  * @property Collection $companies
  */
 class User extends Authenticatable

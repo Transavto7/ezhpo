@@ -4,6 +4,10 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -42,10 +46,27 @@ class Handler extends ExceptionHandler
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Exception  $exception
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response| \Illuminate\Http\JsonResponse
      */
     public function render($request, Exception $exception)
     {
+        if ($request->expectsJson()) {
+            switch (true) {
+                case ($exception instanceof NotFoundHttpException):
+                    return response(['message' => $exception->getMessage()], Response::HTTP_NOT_FOUND);
+                    break;
+                case ($exception instanceof UnprocessableEntityHttpException):
+                    return response(['message' => $exception->getMessage(), 'errors' => $exception]);
+                default:
+                    return response([
+                        'message' => $exception->getMessage(),
+                        'previous' => $exception->getPrevious(),
+                        'trace' => $exception->getTrace()
+                    ],
+                        Response::HTTP_BAD_REQUEST);
+                    break;
+            }
+        }
         if ($this->isHttpException($exception)) {
             $status = $exception->getStatusCode();
             /** @var HttpExceptionInterface $exception */

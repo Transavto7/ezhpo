@@ -1086,7 +1086,8 @@ class IndexController extends Controller
                         "type_view" => "Предрейсовый",
                         "company_id" => $company->hash_id,
                         "company_name" => $company->name,
-                        "briefing_name" => $briefing->name ?? ''
+                        "briefing_name" => $briefing->name ?? '',
+                        'realy' => 'Нет'
                     ]);
                 }
             }

@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Driver;
+use App\Events\InspectionFailed;
+use App\Listeners\SmsNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -18,6 +20,9 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        InspectionFailed::class => [
+            SmsNotification::class
+        ]
     ];
 
     /**

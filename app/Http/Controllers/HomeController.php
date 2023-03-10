@@ -226,12 +226,15 @@ class HomeController extends Controller
 
                     // Проверяем пустые поля
                     if (isset($fv)) { //  && !is_null($fv)
-                        if ($fk == 'is_dop' && !$fv){
-                            $anketas = $anketas->where(function ($q){
-                                $q->whereNull('is_dop')
-                                  ->orwhere('is_dop', 0);
-                            });
-                            continue;
+                        if ($fk == 'is_dop') {
+                            if($fv == 2) continue;
+                            if(!$fv) {
+                                $anketas = $anketas->where(function ($q) {
+                                    $q->whereNull('is_dop')
+                                        ->orwhere('is_dop', 0);
+                                });
+                                continue;
+                            }
                         }
 
                         if ($fk !== 'date' && $fk !== 'created_at') {

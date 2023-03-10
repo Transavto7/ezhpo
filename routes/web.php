@@ -1,9 +1,15 @@
 <?php
 
+use App\Anketa;
 use App\Car;
 use App\Company;
 use App\Driver;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ContractController;
+use App\Http\Controllers\ReportContractRefactoringController;
+use App\Http\Controllers\SidebarMenuItemsController;
+use App\Http\Middleware\CheckDriver;
+use App\Instr;
 use App\Models\Contract;
 use App\Models\Service;
 use App\User;
@@ -13,13 +19,13 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/fix/types', function() {
-    \App\Anketa::whereIn('type_view', ['Предрейсовый', 'Предсменный', 'предрейсовый/Предсменный', 'Предрейсовый/предсменный',
+    Anketa::whereIn('type_view', ['Предрейсовый', 'Предсменный', 'предрейсовый/Предсменный', 'Предрейсовый/предсменный',
         'предрейсовый/предсменный'])->update(
         [
             'type_view' => 'Предрейсовый/Предсменный'
         ]
     );
-    \App\Anketa::whereIn('type_view', ['Послерейсовый', 'Послесменный', 'послерейсовый/Послесменный', 'Послерейсовый/послесменый',
+    Anketa::whereIn('type_view', ['Послерейсовый', 'Послесменный', 'послерейсовый/Послесменный', 'Послерейсовый/послесменый',
         'Послерейсовый/послесменый', 'послерейсовый/послесменный'])->update(
         [
             'type_view' => 'Послерейсовый/Послесменный'
@@ -52,7 +58,7 @@ Route::get('/api/getField/{model}/{field}/{default_value?}', 'IndexController@Ge
 
 Route::prefix('snippet')->group(function () {
     Route::get('/update-pak-fields/$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx', function () {
-        $ankets = \App\Anketa::where('is_pak', 1)
+        $ankets = Anketa::where('is_pak', 1)
             ->where('type_anketa', 'medic')
             ->update(array( 'flag_pak' => 'СДПО А' ));
 
@@ -67,7 +73,7 @@ Route::prefix('snippet')->group(function () {
         }
 
         foreach($drivers as $driver) {
-            $pv_id = isset($driver->company_id) ? \App\Company::where('id', $driver->company_id)->first() : 0;
+            $pv_id = isset($driver->company_id) ? Company::where('id', $driver->company_id)->first() : 0;
 
             if($pv_id) {
                 $pv_id = $pv_id->pv_id ?? 0;
@@ -77,7 +83,7 @@ Route::prefix('snippet')->group(function () {
                 $pv_id = 0;
             }
 
-            $register = new \App\Http\Controllers\Auth\RegisterController();
+            $register = new RegisterController();
             $created = $register->create([
                 'hash_id' => $driver->hash_id . rand(999,99999),
                 'email' => $driver->hash_id . 'driver@ta-7.ru',
@@ -139,11 +145,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/add-client', 'IndexController@RenderAddClient')->name('pages.add_client');
 
     Route::get('driver-bdd', function () {
-        $instrs = \App\Instr::where('active', 1)->orderBy('sort', 'asc')->get();
-        $pv_id = \App\Driver::where('hash_id', auth()->user()->id)->first();
+        $instrs = Instr::where('active', 1)->orderBy('sort', 'asc')->get();
+        $pv_id = Driver::where('hash_id', auth()->user()->id)->first();
 
         if($pv_id) {
-            $pv_id = \App\Company::find($pv_id->company_id);
+            $pv_id = Company::find($pv_id->company_id);
 
             if($pv_id) {
                 $pv_id = $pv_id->pv_id;
@@ -187,7 +193,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('roles/return_trash', 'RoleController@returnTrash');
 
     Route::any('/field/prompt/filter', 'FieldPromptController@getAll');
+    Route::any('/sidebar/items/filter', [SidebarMenuItemsController::class, 'filter']);
     Route::resource('field/prompt', 'FieldPromptController');
+    Route::resource('sidebar/items', 'SidebarMenuItemsController'   );
 });
 
 
@@ -195,7 +203,7 @@ Route::middleware(['auth'])->group(function () {
 /**
  * Профиль, анкета, авторзация
  */
-Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(function () {
+Route::middleware(['auth', CheckDriver::class])->group(function () {
     Route::get('/home/filters', 'HomeController@getFilters');
     Route::get('/home/{type_ankets?}/filters', 'HomeController@getFilters')->name('home.filters');
     Route::get('/home/{type_ankets?}', 'HomeController@index')->name('home');
@@ -208,6 +216,10 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
         Route::get('{type}/{anketa_id}', 'DocsController@Get')->name('docs.get');
     });
 
+    Route::prefix('sidebar')->group(function() {
+        Route::get('index', [SidebarMenuItemsController::class, 'index'])->name('sidebar.menu.index');
+    });
+
     // Рендер элемента (водитель, компания и т.д.)
     Route::get('/elements/{type}', 'IndexController@RenderElements')->name('renderElements');
 });
@@ -216,7 +228,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
 /**
  * Элементы CRM
  */
-Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(function () {
+Route::middleware(['auth', CheckDriver::class])->group(function () {
     Route::prefix('elements')->group(function () {
         // Удаление элемента (водитель, компания и т.д.)
         Route::get('/{type}/{id}', 'IndexController@RemoveElement')->name('removeElement');
@@ -246,13 +258,13 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
 
     Route::prefix('report')->group(function () {
         Route::get('/getContractsForCompany_v2',[
-            \App\Http\Controllers\ReportContractRefactoringController::class, 'getContractsForCompany'
+            ReportContractRefactoringController::class, 'getContractsForCompany'
         ]);
 //        Route::get('journal_contract', 'ReportController@ShowJournalContract')->name('report.journal_contract');
 //        Route::get('journal_contract', 'ReportController@ShowJournalContract')->name('company_service');
         Route::get('journal', 'ReportController@ShowJournal')->name('report.journal');
         Route::get('journal_new',[
-            \App\Http\Controllers\ReportContractRefactoringController::class, 'index'
+            ReportContractRefactoringController::class, 'index'
             ])->name('report.company_service');
 //        Route::get('journal', 'ReportController@showJournal')->name('report.journal');
         Route::get('dynamic/medic', 'ReportController@getDynamicMedic')->name('report.dynamic.medic');

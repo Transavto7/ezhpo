@@ -44,7 +44,7 @@
 
                             @php $field_view_key = join('_', explode('.', $field)); @endphp
                             @php $field_view = 'profile.ankets.fields.' . $field_view_key; @endphp
-                          
+
                             @if(View::exists($field_view))
                                 @include($field_view, [
                                     'field_default_value' => !empty(request()->get($field_view_key)) ? request()->get($field_view_key) : 'Не установлено'
@@ -107,18 +107,45 @@
                             @if($field === 'date' || strpos($field, '_at') > 0)
                                 <label>{{ (isset($fieldsKeys[$field]['name'])) ? $fieldsKeys[$field]['name'] : $fieldsKeys[$field] }} от</label>
                             @else
-                                <label>{{ (isset($fieldsKeys[$field]['name'])) ? $fieldsKeys[$field]['name'] : $fieldsKeys[$field] }}</label>
+                                @if($field != "is_dop")
+                                    <label>{{ (isset($fieldsKeys[$field]['name'])) ? $fieldsKeys[$field]['name'] : $fieldsKeys[$field] }}</label>
+                                @else
+                                    <label>{{ (isset($fieldsKeys[$field]['name'])) ? $fieldsKeys[$field]['name'] : $fieldsKeys[$field] }} (утвержденные осмотры)</label>
+                                @endif
                             @endif
 
                             @php $field_view_key = join('_', explode('.', $field)); @endphp
                             @php $field_view = 'profile.ankets.fields.' . $field_view_key; @endphp
 
-                            @if(View::exists($field_view))
+
+
+                            @if(View::exists($field_view) && $field !== "is_dop")
                                 @include($field_view, [
                                     'field_default_value' => !empty(request()->get($field_view_key)) ? request()->get($field_view_key) : 'Не установлено'
                                 ])
+                            @elseif(View::exists($field_view) && $field === "is_dop")
+                                    @php
+                                        $default_dop_value = (string)request()->get($field_view_key);
+                                        switch ($default_dop_value) {
+                                            case '0':
+                                            case '1':
+                                            case '2':
+                                                break;
+                                            case '':
+                                                $default_dop_value = '2';
+                                                break;
+                                                default:
+                                                $default_dop_value = '2';
+                                                    break;
+                                        }
+                                    @endphp
+
+                                    @include($field_view, [
+                                        'field_default_value' => $default_dop_value
+                                    ])
                             @else
                                 {{--ИЗНАЧАЛЬНОЕ ПОЛЕ ФИЛЬТР--}}
+                                @if($field !== 'is_dop')
                                 <input
                                         @if($field === 'date' || strpos($field, '_at') > 0)
                                             type="date"
@@ -127,6 +154,8 @@
                                         @endif
 
                                         value="{{ request()->get($field) }}" name="{{ $field }}" class="form-control" />
+
+                                    @endif
                             @endif
 
                         </div>

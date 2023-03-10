@@ -59,7 +59,7 @@
                 <tr>
                     <td class="head">Результат осмотра</td>
                     <td colspan="3">
-                        <textarea rows="1" class="doc-input">Здоров</textarea>
+                        <textarea rows="1" class="doc-input">{{$conclusionStr}}</textarea>
                     </td>
                 </tr>
                 <tr>
