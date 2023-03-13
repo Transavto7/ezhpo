@@ -793,13 +793,13 @@ class AnketsController extends Controller
 
                     if(!($tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic)){
                         $driver = Driver::where('hash_id', $data['driver_id'])->first();
-                        $driver->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 20 minute'));
+                        $driver->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + '.$driver->getTimeOfPressureBan().' minute'));
                         $driver->save();
                     }
 
                     if($proba_alko === "Положительно"){
                         $driver = Driver::where('hash_id', $data['driver_id'])->first();
-                        $driver->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 2 hours'));
+                        $driver->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + '.$driver->getTimeOfAlcoholBan().' minute'));
                         $driver->save();
                     }
                 }
@@ -1446,12 +1446,12 @@ class AnketsController extends Controller
 
                     if(!(intval($tonometer[0]) < $Driver->getPressureSystolic()
                     && intval($tonometer[1]) < $Driver->getPressureDiastolic())){
-                        $driverTemp->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 20 minute'));
+                        $driverTemp->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + '.$driverTemp->getTimeOfPressureBan().' minute'));
                         $driverTemp->save();
                     }
 
                     if($proba_alko === "Положительно"){
-                        $driverTemp->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 2 hours'));
+                        $driverTemp->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + '.$driverTemp->getTimeOfAlcoholBan().' minute'));
                         $driverTemp->save();
                     }
 

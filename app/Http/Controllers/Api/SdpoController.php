@@ -113,12 +113,12 @@ class SdpoController extends Controller
             $medic['med_view'] = 'Отстранение';
 
             if(intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()){
-                $driver->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 20 minute'));
+                $driver->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + '.$driver->getTimeOfPressureBan().' minute'));
                 $driver->save();
             }
 
             if($proba_alko === 'Положительно'){
-                $driver->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 2 hours'));
+                $driver->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + '.$driver->getTimeOfAlcoholBan().' minute'));
                 $driver->save();
             }            
         }
