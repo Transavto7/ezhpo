@@ -1323,6 +1323,12 @@ class AnketsController extends Controller
                  * Проверка водителя по: тесту наркотиков, возрасту
                  */
                 if($d_id || isset($Driver)) {
+                    if($Driver->end_of_ban > date('Y-m-d H:i:s')){
+                        $errMsg = 'Водитель остранен до '.$Driver->end_of_ban."!";
+
+                        array_push($errorsAnketa, $errMsg);
+                    }
+
                     if(!Driver::DriverChecker($d_id, $tonometer, $test_narko, $proba_alko) && !in_array($anketa['type_anketa'], ['bdd', 'pechat_pl', 'vid_pl', 'report_cart'])) {
 
                         if($anketa['type_anketa'] !== 'tech') {
