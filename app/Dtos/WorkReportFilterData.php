@@ -2,28 +2,34 @@
 
 namespace App\Dtos;
 
-use Spatie\DataTransferObject\DataTransferObject;
+use App\Dtos\Contracts\MutableDTO;
+use App\Values\WorkReport\FilterDateValue;
 
-class WorkReportFilterData extends DataTransferObject
+class WorkReportFilterData extends MutableDTO
 {
     /**
-     * @var string|null
+     * @var FilterDateValue|null
      */
-    public ?string $dateFrom = null;
+    public ?FilterDateValue $dateFrom = null;
     /**
-     * @var string|null
+     * @var FilterDateValue|null
      */
-    public ?string $dateTo = null;
+    public ?FilterDateValue $dateTo = null;
     /**
-     * @var int|null|string
+     * @var int|null
      */
     public ?int $userId = null;
     /**
-     * @var int|null|string
+     * @var int|null
      */
     public ?int $pvId = null;
     /**
      * @var int|string
      */
     public int $perPage = 150;
+
+    public function __construct(array $parameters = [])
+    {
+        parent::__construct($parameters);
+    }
 }
