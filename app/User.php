@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
@@ -13,9 +14,80 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
+ * App\User
+ *
  * @property string $name
  * @property int $id
  * @property Collection $companies
+ * @property string $hash_id
+ * @property int|null $req_id
+ * @property int $role
+ * @property int $role_manager
+ * @property int $blocked
+ * @property int $pv_id
+ * @property int $pv_id_default
+ * @property string|null $eds
+ * @property string|null $photo
+ * @property string $email
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property string $password
+ * @property string|null $timezone
+ * @property string|null $api_token
+ * @property string|null $remember_token
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string $login
+ * @property string|null $user_post
+ * @property int|null $company_id
+ * @property string|null $deleted_id
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property mixed|null $fields_visible
+ * @property \Illuminate\Support\Carbon|null $last_connection_at
+ * @property-read Collection|\App\Anketa[] $anketas
+ * @property-read int|null $anketas_count
+ * @property-read int|null $companies_count
+ * @property-read \App\Company|null $company
+ * @property-read User|null $deleted_user
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read int|null $notifications_count
+ * @property-read Collection|Permission[] $permissions
+ * @property-read int|null $permissions_count
+ * @property-read \App\Point $pv
+ * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
+ * @method static Builder|User onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|User permission($permissions)
+ * @method static \Illuminate\Database\Eloquent\Builder|User query()
+ * @method static \Illuminate\Database\Eloquent\Builder|User role($roles, $guard = null)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereApiToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereBlocked($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereDeletedId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereEds($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereEmailVerifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereFieldsVisible($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereHashId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereLastConnectionAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereLogin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePhoto($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePvId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePvIdDefault($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereReqId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereRole($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereRoleManager($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereTimezone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereUserPost($value)
+ * @method static Builder|User withTrashed()
+ * @method static Builder|User withoutTrashed()
+ * @mixin \Eloquent
  */
 class User extends Authenticatable
 {
@@ -58,7 +130,8 @@ class User extends Authenticatable
     public function deleted_user()
     {
         return $this->belongsTo(User::class, 'deleted_id', 'id')
-                    ->withDefault();
+//                    ->withDefault()
+            ;
     }
     public function delete()
     {
@@ -70,7 +143,7 @@ class User extends Authenticatable
 
     public function roles($deleted = false) : BelongsToMany
     {
-        return $this->belongsToMany(\App\Role::class,
+        return $this->belongsToMany(Role::class,
             'model_has_roles',
             'model_id',
             'role_id',
@@ -83,13 +156,15 @@ class User extends Authenticatable
     public function anketas()
     {
         return $this->hasMany(Anketa::class, 'user_id', 'id')
-            ->withDefault();
+            ->withDefault()
+            ;
     }
 
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id', 'id')
-            ->withDefault();
+            ->withDefault()
+            ;
     }
 
     public function companies()
@@ -100,7 +175,8 @@ class User extends Authenticatable
     public function pv()
     {
         return $this->belongsTo(Point::class, 'pv_id')
-            ->withDefault();
+            ->withDefault()
+            ;
     }
 
     public static $newUserRolesText

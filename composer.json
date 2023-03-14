@@ -10,6 +10,7 @@
     "require": {
         "php": "^7.4",
         "anper/iuliia": "^1.2",
+        "brick/phonenumber": "^0.5.0",
         "doctrine/dbal": "^2.0",
         "fideloper/proxy": "^4.0",
         "guzzlehttp/guzzle": "^7.5",

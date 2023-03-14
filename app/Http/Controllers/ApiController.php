@@ -5,14 +5,12 @@ namespace App\Http\Controllers;
 use App\Car;
 use App\Company;
 use App\Driver;
+use App\Point;
 use App\Req;
 use App\User;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
-use Psy\Util\Json;
 
 class ApiController extends Controller
 {
@@ -265,12 +263,33 @@ class ApiController extends Controller
         }
     }
 
-    public function saveFieldsVisible(Request $request) {
+    public function saveFieldsVisible(Request $request)
+    {
         if ($request->params && $request->params !== 'null') {
             $request->user()->fields_visible = json_encode($request->params);
         } else {
             $request->user()->fields_visible = null;
         }
         $request->user()->save();
+    }
+
+    public function usersList(Request $request)
+    {
+        $users = User::where('name', 'like', '%'.$request->get('search').'%')
+            ->orWhere('hash_id', 'like', '%'.$request->get('search').'%')
+            ->orWhere('name', 'like', "%{$request->get('search')}%")
+            ->select(['hash_id', 'name', 'id', 'name'])->limit(100);
+
+        return $users->get();
+    }
+
+    public function pointsList(Request $request)
+    {
+        $users = Point::where('name', 'like', '%'.$request->get('search').'%')
+            ->orWhere('hash_id', 'like', '%'.$request->get('search').'%')
+            ->orWhere('name', 'like', "%{$request->get('search')}%")
+            ->select(['hash_id', 'name', 'id', 'name'])->limit(100);
+
+        return $users->get();
     }
 }
