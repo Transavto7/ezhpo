@@ -30,7 +30,7 @@ class SdpoController extends Controller
         }
 
 
-        if (!is_null($driver->end_of_ban) && (date("Y-m-d H:i:s") < $driver->end_of_ban)) {
+        if (!is_null($driver->end_of_ban) && (Carbon::now() < $driver->end_of_ban)) {
             return response()->json(['message' => 'Указанный водитель остранен до '.$driver->end_of_ban."!"], 401);
         }
 
@@ -113,12 +113,12 @@ class SdpoController extends Controller
             $medic['med_view'] = 'Отстранение';
 
             if(intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()){
-                $driver->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + '.$driver->getTimeOfPressureBan().' minute'));
+                $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfPressureBan());
                 $driver->save();
             }
 
             if($proba_alko === 'Положительно'){
-                $driver->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + '.$driver->getTimeOfAlcoholBan().' minute'));
+                $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
                 $driver->save();
             }            
         }
