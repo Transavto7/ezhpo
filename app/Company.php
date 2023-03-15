@@ -105,9 +105,7 @@ class Company extends Model
         'document_bdd',
         'deleted_id',
         'pressure_systolic',
-        'pressure_diastolic',
-        'time_of_alcohol_ban',
-        'time_of_pressure_ban'
+        'pressure_diastolic'
     ];
 
 

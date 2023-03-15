@@ -238,46 +238,6 @@
                                 </div>
                             </div>
 
-                            <div class="form-group col-lg-6">
-                                <label for="time_of_alcohol_ban" class="mb-1">Время запрета на прохождение повторного обследования при положительной пробе на алкоголь, (мин.)</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="time_of_alcohol_ban">
-                                            <i class="fa fa-clock-o"></i>
-                                        </span>
-                                    </div>
-                                    <input type="number"
-                                           class="form-control"
-                                           id="time_of_alcohol_ban"
-                                           style="height: auto"
-                                           placeholder="Введите время запрета"
-                                           name="time_of_alcohol_ban"
-                                           aria-describedby="time_of_alcohol_ban"
-                                           value="{{ $time_of_alcohol_ban }}"
-                                    >
-                                </div>
-                            </div>
-
-                            <div class="form-group col-lg-6">
-                                <label for="time_of_pressure_ban" class="mb-1">Время запрета на прохождение повторного обследования при повышенном давлении, (мин.)</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="time_of_pressure_ban">
-                                            <i class="fa fa-clock-o"></i>
-                                        </span>
-                                    </div>
-                                    <input type="number"
-                                           class="form-control"
-                                           id="time_of_pressure_ban"
-                                           style="height: auto"
-                                           placeholder="Введите время запрета"
-                                           name="time_of_pressure_ban"
-                                           aria-describedby="time_of_pressure_ban"
-                                           value="{{ $time_of_pressure_ban }}"
-                                    >
-                                </div>
-                            </div>
-
                             <div class="form-group col-lg-12">
                                 <div class="row px-3">
                                     <div class="custom-control custom-checkbox col-lg-3">
@@ -305,8 +265,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            
 
                             <div class="form-group col-12">
                                 <button type="submit" class="btn btn-success float-right">Сохранить</button>
