@@ -454,8 +454,6 @@ class AnketsController extends Controller
 
         $data = $request->all();
         $d_id = $request->get('driver_id', 0); // Driver
-        $driver;
-
         $pv_id = $request->get('pv_id', 0);
 
         function mt_rand_float($min, $max, $countZero = '0') {
@@ -1002,6 +1000,7 @@ class AnketsController extends Controller
                 $anketa['pulse'] = isset($anketa['pulse']) ? $anketa['pulse'] : mt_rand(60,80);
 
                 $anketa['pv_id'] = Point::where('id', $pv_id)->first();
+                $anketa['point_id'] = $pv_id;
 
                 // Проверка ПВ
                 if($anketa['pv_id'])
