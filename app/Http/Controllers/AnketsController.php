@@ -454,7 +454,7 @@ class AnketsController extends Controller
 
         $data = $request->all();
         $d_id = $request->get('driver_id', 0); // Driver
-
+        $driver;
 
         $pv_id = $request->get('pv_id', 0);
 
@@ -545,18 +545,16 @@ class AnketsController extends Controller
                             $errorsAnketa[] = 'Не найдена компания.';
                         }
                     }
-                    if(!Driver::where('hash_id', $data['driver_id'])->count()){
-                        $errorsAnketa[] = 'Не найден водитель.';
-                    }
 
-
-                    if(!is_null(Driver::where('hash_id', $data['driver_id'])->first())){
-                        if(!is_null(Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban)){
-                            if(Carbon::now() < Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban){
+                    if($driver = Driver::where('hash_id', $data['driver_id'])->first()){
+                        if($driver->end_of_ban){
+                            if(Carbon::now() < $driver->end_of_ban){
                                 $errorsAnketa[] = 'Водитель отстранен до '.Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban;
                             }
-                        } 
-                    } 
+                        }
+                    }else{
+                        $errorsAnketa[] = 'Не найден водитель.';
+                    }
                 }
 
                 // Журнал снятия отчетов с карт
@@ -792,15 +790,13 @@ class AnketsController extends Controller
                     $anketa['admitted'] = 'Не допущен';
 
                     if(!($tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic)){
-                        $driver = Driver::where('hash_id', $data['driver_id'])->first();
-                        $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfPressureBan()); 
-                        $driver->save();
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfPressureBan()); 
+                        $Driver->save();
                     }
 
                     if($proba_alko === "Положительно"){
-                        $driver = Driver::where('hash_id', $data['driver_id'])->first();
-                        $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
-                        $driver->save();
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
+                        $Driver ->save();
                     }
                 }
 
