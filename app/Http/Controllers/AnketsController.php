@@ -545,18 +545,16 @@ class AnketsController extends Controller
                             $errorsAnketa[] = 'Не найдена компания.';
                         }
                     }
-                    if(!Driver::where('hash_id', $data['driver_id'])->count()){
-                        $errorsAnketa[] = 'Не найден водитель.';
-                    }else{
-                        $driver = Driver::where('hash_id', $data['driver_id'])->first();
-                    }
 
-
-                    if(!is_null($driver->end_of_ban)){
-                        if(Carbon::now() < $driver->end_of_ban){
-                            $errorsAnketa[] = 'Водитель отстранен до '.Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban;
+                    if($driver = Driver::where('hash_id', $data['driver_id'])->first()){
+                        if($driver->end_of_ban){
+                            if(Carbon::now() < $driver->end_of_ban){
+                                $errorsAnketa[] = 'Водитель отстранен до '.Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban;
+                            }
                         }
-                    } 
+                    }else{
+                        $errorsAnketa[] = 'Не найден водитель.';
+                    }
                 }
 
                 // Журнал снятия отчетов с карт
