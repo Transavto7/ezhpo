@@ -302,16 +302,6 @@ class IndexController extends Controller
                         'type'         => 'number',
                         'noRequired' => 1,
                     ],
-                    'time_of_pressure_ban' => [
-                        'label'        => 'Время запрета повторного осмотра при повышенном давлении',
-                        'type'         => 'number',
-                        'noRequired' => 1,
-                    ],
-                    'time_of_alcohol_ban' => [
-                        'label'        => 'Время запрета повторного осмотра при положительном тесте на алкоголь',
-                        'type'         => 'number',
-                        'noRequired' => 1,
-                    ],
                 ],
             ],
             'Car'      => [
@@ -536,16 +526,6 @@ class IndexController extends Controller
                     ],
                     'pressure_diastolic' => [
                         'label'        => 'Порог нижнего давления',
-                        'type'         => 'number',
-                        'noRequired' => 1,
-                    ],
-                    'time_of_pressure_ban' => [
-                        'label'        => 'Время запрета повторного осмотра при повышенном давлении',
-                        'type'         => 'number',
-                        'noRequired' => 1,
-                    ],
-                    'time_of_alcohol_ban' => [
-                        'label'        => 'Время запрета повторного осмотра при положительном тесте на алкоголь',
                         'type'         => 'number',
                         'noRequired' => 1,
                     ],
