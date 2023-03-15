@@ -790,7 +790,7 @@ class AnketsController extends Controller
                     $anketa['admitted'] = 'Не допущен';
 
                     if(!($tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic)){
-                        $Driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfPressureBan()); 
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfPressureBan());
                         $Driver->save();
                     }
 
@@ -1227,10 +1227,10 @@ class AnketsController extends Controller
 
             $data['photos'] = $photos_path;
         }
-        
+
         // Анкета
         if(isset($data['anketa'])) {
-            
+
             // Клонируем анкету
             $createdAnketas = [];
             $createdAnketasDataResponseApi = [];
@@ -1431,7 +1431,7 @@ class AnketsController extends Controller
                         $anketa['admitted'] = 'Не допущен';
                         $anketa['med_view'] = 'Отстранение';
                     }
-                    if ($driver->end_of_ban > Carbon::now()){
+                    if ($Driver->end_of_ban > Carbon::now()){
                         $anketa['admitted'] = 'Не допущен';
                         $anketa['med_view'] = 'Отстранение';
                     }
@@ -1448,19 +1448,6 @@ class AnketsController extends Controller
                     if($proba_alko === "Положительно"){
                         $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfAlcoholBan());
                         $Driver->save();
-                    }
-
-                    
-                }
-
-                /**
-                 * ПРОВЕРЯЕМ СТАТУС для поля "Заключение" - от ПАК
-                 */
-                if(isset($anketa['sleep_status']) && isset($anketa['people_status']) && isset($anketa['alcometer_result'])) {
-                    if($anketa['sleep_status'] === 'Да' && $anketa['people_status'] === 'Да' && doubleval($anketa['alcometer_result']) <= 0) {
-                        $anketa['admitted'] = 'Допущен';
-                    } else {
-                        $anketa['admitted'] = 'Не допущен';
                     }
                 }
 
