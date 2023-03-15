@@ -29,6 +29,11 @@ class SdpoController extends Controller
             return response()->json(['message' => 'Указанный водитель не найден!'], 401);
         }
 
+
+        if (!is_null($driver->end_of_ban) && (Carbon::now() < $driver->end_of_ban)) {
+            return response()->json(['message' => 'Указанный водитель остранен до '.$driver->end_of_ban."!"], 401);
+        }
+
         if ($request->user_id) {
             $user = User::find($request->user_id);
             if (!$user) {
@@ -106,6 +111,16 @@ class SdpoController extends Controller
             || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38) {
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
+
+            if(intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()){
+                $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfPressureBan());
+                $driver->save();
+            }
+
+            if($proba_alko === 'Положительно'){
+                $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
+                $driver->save();
+            }            
         }
 
         if ($request->sleep_status && $request->sleep_status === 'Нет') {
