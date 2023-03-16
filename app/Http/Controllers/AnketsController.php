@@ -454,8 +454,6 @@ class AnketsController extends Controller
 
         $data = $request->all();
         $d_id = $request->get('driver_id', 0); // Driver
-        $driver;
-
         $pv_id = $request->get('pv_id', 0);
 
         function mt_rand_float($min, $max, $countZero = '0') {
@@ -986,6 +984,7 @@ class AnketsController extends Controller
                 $anketa['pulse'] = isset($anketa['pulse']) ? $anketa['pulse'] : mt_rand(60,80);
 
                 $anketa['pv_id'] = Point::where('id', $pv_id)->first();
+                $anketa['point_id'] = $pv_id;
 
                 // Проверка ПВ
                 if($anketa['pv_id'])
@@ -1211,10 +1210,10 @@ class AnketsController extends Controller
 
             $data['photos'] = $photos_path;
         }
-        
+
         // Анкета
         if(isset($data['anketa'])) {
-            
+
             // Клонируем анкету
             $createdAnketas = [];
             $createdAnketasDataResponseApi = [];
@@ -1415,7 +1414,7 @@ class AnketsController extends Controller
                         $anketa['admitted'] = 'Не допущен';
                         $anketa['med_view'] = 'Отстранение';
                     }
-                    if ($driver->end_of_ban > Carbon::now()){
+                    if ($Driver->end_of_ban > Carbon::now()){
                         $anketa['admitted'] = 'Не допущен';
                         $anketa['med_view'] = 'Отстранение';
                     }
@@ -1432,19 +1431,6 @@ class AnketsController extends Controller
                     if($proba_alko === "Положительно"){
                         $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfAlcoholBan());
                         $Driver->save();
-                    }
-
-                    
-                }
-
-                /**
-                 * ПРОВЕРЯЕМ СТАТУС для поля "Заключение" - от ПАК
-                 */
-                if(isset($anketa['sleep_status']) && isset($anketa['people_status']) && isset($anketa['alcometer_result'])) {
-                    if($anketa['sleep_status'] === 'Да' && $anketa['people_status'] === 'Да' && doubleval($anketa['alcometer_result']) <= 0) {
-                        $anketa['admitted'] = 'Допущен';
-                    } else {
-                        $anketa['admitted'] = 'Не допущен';
                     }
                 }
 
