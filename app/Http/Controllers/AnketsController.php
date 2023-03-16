@@ -1608,6 +1608,7 @@ class AnketsController extends Controller
                 $anketa['pulse'] = isset($anketa['pulse']) ? $anketa['pulse'] : mt_rand(60,80);
 
                 $anketa['pv_id'] = Point::where('id', $pv_id)->first();
+                $anketa['terminal_id'] = $request->user('api')->id;
 
                 // Проверка ПВ
                 if($anketa['pv_id'])
@@ -1676,7 +1677,7 @@ class AnketsController extends Controller
                 $timezone = $user->timezone ?? 3;
                 $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($anketa['date'] ?? null);
 
-                if($diffDateCheck <= 60*12 && $anketa['date'] ?? null) {
+                if ($diffDateCheck <= 60*12 && $anketa['date'] ?? null) {
                     $anketa['realy'] = 'да';
                 } else {
                     $anketa['realy'] = 'нет';
