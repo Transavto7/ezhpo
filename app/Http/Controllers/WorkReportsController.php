@@ -29,6 +29,7 @@ class WorkReportsController extends Controller
 
     public function getReport(WorkReportFilterRequest $request): array
     {
-        return $this->workReportService->getAll(new WorkReportFilterData($request->validated()));
+        $dto = new WorkReportFilterData($request->validated());
+        return $this->workReportService->getAll($dto);
     }
 }

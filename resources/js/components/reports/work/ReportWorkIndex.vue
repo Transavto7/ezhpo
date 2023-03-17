@@ -1,67 +1,74 @@
 <template>
-  <div class="card mb-4" style="overflow-x: inherit">
-    <h5 class="card-header">Выбор информации</h5>
-    <div class="card-body">
-      <div class="row">
-        <div class="form-group col-lg-3">
-          <label class="mb-1" for="users">Сотрудник:</label>
-          <multiselect
-              v-model="user"
-              @search-change="searchUsers"
-              @select="(user) => user_id = user.id"
-              :options="users"
-              :searchable="true"
-              :close-on-select="true"
-              :show-labels="false"
-              placeholder="Выберите сотрудника"
-              label="name"
-              class="is-invalid"
-          >
-            <span slot="noResult">Результатов не найдено</span>
-            <span slot="noOptions">Список пуст</span>
-          </multiselect>
+  <div>
+    <div class="card mb-4" style="overflow-x: inherit">
+      <h5 class="card-header">Выбор информации</h5>
+      <div class="card-body">
+        <div class="row">
+          <div class="form-group col-lg-3">
+            <label class="mb-1" for="users">Сотрудник:</label>
+            <multiselect
+                v-model="user"
+                @search-change="searchUsers"
+                @select="(user) => user_id = user.id"
+                :options="users"
+                :searchable="true"
+                :close-on-select="true"
+                :show-labels="false"
+                placeholder="Выберите сотрудника"
+                label="name"
+                class="is-invalid"
+            >
+              <span slot="noResult">Результатов не найдено</span>
+              <span slot="noOptions">Список пуст</span>
+            </multiselect>
+          </div>
+          <div class="form-group col-lg-3">
+            <label class="mb-1" for="users">Пункт выпуска:</label>
+            <multiselect
+                v-model="point"
+                @search-change="searchPoints"
+                @select="(point) => point_id = point.id"
+                :options="points"
+                :searchable="true"
+                :close-on-select="true"
+                :show-labels="false"
+                placeholder="Выберите пункт выпуска"
+                label="name"
+                class="is-invalid"
+            >
+              <span slot="noResult">Результатов не найдено</span>
+              <span slot="noOptions">Список пуст</span>
+            </multiselect>
+          </div>
+          <div class="form-group col-lg-2">
+            <label class="mb-1" for="dateFrom">Период c:</label>
+            <input type="date" required ref="dateFrom" v-model="dateFrom"
+                   id="dateFrom" class="form-control form-date" name="dateFrom">
+          </div>
+          <div class="form-group col-lg-2">
+            <label class="mb-1" for="dateTo">Период по:</label>
+            <input type="date" required ref="dateTo" v-model="dateTo"
+                   id="dateTo" class="form-control form-date" name="dateTo">
+          </div>
         </div>
-        <div class="form-group col-lg-3">
-          <label class="mb-1" for="users">Пункт выпуска:</label>
-          <multiselect
-              v-model="point"
-              @search-change="searchPoints"
-              @select="(point) => point_id = point.id"
-              :options="points"
-              :searchable="true"
-              :close-on-select="true"
-              :show-labels="false"
-              placeholder="Выберите пункт выпуска"
-              label="name"
-              class="is-invalid"
-          >
-            <span slot="noResult">Результатов не найдено</span>
-            <span slot="noOptions">Список пуст</span>
-          </multiselect>
-        </div>
-        <div class="form-group col-lg-2">
-          <label class="mb-1" for="dateFrom">Период c:</label>
-          <input type="date" required ref="dateFrom" v-model="dateFrom"
-                 id="dateFrom" class="form-control form-date" name="dateFrom">
-        </div>
-        <div class="form-group col-lg-2">
-          <label class="mb-1" for="dateTo">Период по:</label>
-          <input type="date" required ref="dateTo" v-model="dateTo"
-                 id="dateTo" class="form-control form-date" name="dateTo">
+        <div class="row">
+          <div class="form-group col-lg-12">
+            <button type="submit" @click="submitFilters" class="btn btn-success" :disabled="loading">
+              <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Сформировать отчёт
+            </button>
+            <button type="submit" @click="exportData" class="btn btn-info" :disabled="loadingExport">
+              <span v-if="loadingExport" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Экспортировать
+            </button>
+            <a href="?" class="btn btn-danger">Сбросить</a>
+          </div>
         </div>
       </div>
-      <div class="row">
-        <div class="form-group col-lg-12">
-          <button type="submit" @click="submitFilters" class="btn btn-success" :disabled="loading">
-            <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            Сформировать отчёт
-          </button>
-          <button type="submit" @click="exportData" class="btn btn-info" :disabled="loadingExport">
-            <span v-if="loadingExport" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            Экспортировать
-          </button>
-          <a href="?" class="btn btn-danger">Сбросить</a>
-        </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+
       </div>
     </div>
   </div>
@@ -80,7 +87,7 @@ export default {
       user_id: null,
       points: [],
       point: null,
-      point_id: null
+      point_id: null,
     }
   },
   methods: {

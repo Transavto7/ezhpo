@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * App\WorkReport
@@ -11,7 +12,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $pv_id
  * @property int $user_id
- * @property string $date
+ * @property \App\User $user
+ * @property \App\Point $point
+ * @property \Illuminate\Support\Carbon|null $datetime_begin
+ * @property \Illuminate\Support\Carbon|null $datetime_end
+ * @property string $comment
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|WorkReport newModelQuery()
@@ -28,6 +33,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class WorkReport extends Model
 {
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'datetime_begin',
+        'datetime_end',
+    ];
+
+    protected $casts = [];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -40,4 +54,16 @@ class WorkReport extends Model
     {
         return $this->belongsTo(Point::class, 'pv_id');
     }
+
+    public function getDateAttribute(): string
+    {
+        return $this->datetime_begin->format('Y-m-d');
+    }
+
+    public function getHoursAttribute(): string
+    {
+        return $this->datetime_begin->diffInHours($this->datetime_end);
+    }
+
+
 }

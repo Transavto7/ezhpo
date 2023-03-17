@@ -4,6 +4,8 @@ namespace App\Dtos;
 
 use App\Dtos\Contracts\MutableDTO;
 use App\Values\WorkReport\FilterDateValue;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class WorkReportFilterData extends MutableDTO
 {
@@ -24,12 +26,19 @@ class WorkReportFilterData extends MutableDTO
      */
     public ?int $pvId = null;
     /**
-     * @var int|string
+     * @var int|null
      */
-    public int $perPage = 150;
+    public ?int $perPage = 150;
 
-    public function __construct(array $parameters = [])
+    /**
+     * @var string|null
+     */
+    public ?string $orderBy = null;
+
+    public function getDatesPeriod(): CarbonPeriod
     {
-        parent::__construct($parameters);
+        return CarbonPeriod::create(
+            $this->dateFrom->getValue(),
+            $this->dateTo->getValue());
     }
 }

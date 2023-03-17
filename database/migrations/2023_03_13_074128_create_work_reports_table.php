@@ -15,9 +15,12 @@ class CreateWorkReportsTable extends Migration
     {
         Schema::create('work_reports', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->uuid('uuid');
             $table->unsignedBigInteger('pv_id');
             $table->unsignedBigInteger('user_id');
-            $table->dateTime('date');
+            $table->dateTime('datetime_begin')->nullable();
+            $table->dateTime('datetime_end')->nullable();
+            $table->text('comment')->nullable();
             $table->timestamps();
         });
     }
