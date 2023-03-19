@@ -26,18 +26,21 @@ class SdpoController extends Controller
         $sms = new SmsController();
 
         if (!$driver) {
-            return response()->json(['message' => 'Указанный водитель не найден!'], 401);
+            return response()->json(['message' => 'Указанный водитель не найден!'], 400);
         }
 
+        if ($driver->end_of_ban && (Carbon::now() < $driver->end_of_ban)) {
+            return response()->json(['message' => 'Указанный водитель остранен до '.$driver->end_of_ban."!"], 400);
+        }
 
-        if (!is_null($driver->end_of_ban) && (Carbon::now() < $driver->end_of_ban)) {
-            return response()->json(['message' => 'Указанный водитель остранен до '.$driver->end_of_ban."!"], 401);
+        if ($request->user('api')->blocked) {
+            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
         }
 
         if ($request->user_id) {
             $user = User::find($request->user_id);
             if (!$user) {
-                return response()->json(['message' => 'Пользователь с таким ID не найден!'], 401);
+                return response()->json(['message' => 'Пользователь с таким ID не найден!'], 400);
             }
         }
 
@@ -100,9 +103,8 @@ class SdpoController extends Controller
         }
 
         $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
-        $driver->date_prmo = Carbon::now();
-
         $admitted = null;
+        $driver->date_prmo = Carbon::now();
 
         //ПРОВЕРЯЕМ статус для поля "Заключение"
         $ton = explode('/', $tonometer);
@@ -114,14 +116,16 @@ class SdpoController extends Controller
 
             if(intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()){
                 $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfPressureBan());
-                $driver->save();
             }
 
-            if($proba_alko === 'Положительно'){
+            if($proba_alko === 'Положительно') {
                 $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
-                $driver->save();
             }            
         }
+
+        
+        $driver->save();
+
 
         if ($request->sleep_status && $request->sleep_status === 'Нет') {
             $admitted = 'Не допущен';
@@ -201,7 +205,30 @@ class SdpoController extends Controller
     * return driver by id
     */
     public function getDriver(Request $request, $id) {
-        $driver = Driver::where('hash_id', $id)->select('hash_id', 'fio')->first();
+        if ($request->user('api')->blocked) {
+            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
+        }
+        
+        $driver = Driver::where('hash_id', $id)
+            ->with('company')
+            ->select('hash_id', 'fio', 'dismissed', 'company_id', 'end_of_ban')->first();
+        
+        if (!$driver) {
+            return response()->json(['message' => 'Водитель с указанным ID не найден!'], 400);
+        }
+        
+        if ($driver->end_of_ban && (Carbon::now() < $driver->end_of_ban)) {
+            return response()->json(['message' => 'Указанный водитель остранен до ' . $driver->end_of_ban], 400);
+        }
+
+        if ($driver->dismissed === 'Да') {
+            return response()->json(['message' => 'Водитель с указанным ID уволен!'], 303);
+        }
+
+        if ($driver->company->dismissed === 'Да') {
+            return response()->json(['message' => 'Комания указанного водителя заблокирована!'], 303);
+        }
+
         return $driver;
     }
 

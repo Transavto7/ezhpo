@@ -660,7 +660,6 @@ class AnketsController extends Controller
                 /**
                  * ОЧЕРЕДЬ ПАК
                  */
-
                 if($anketa['type_anketa'] == 'pak_queue') {
                     $notifyTo = new Notify();
                     $notifyTo->sendMsgToUsersFrom('role', '4', 'Новый осмотр в очереди СДПО');
@@ -780,6 +779,24 @@ class AnketsController extends Controller
                     $anketa['admitted'] = 'Допущен';
                 } else {
                     $anketa['admitted'] = 'Не допущен';
+
+                    /**
+                     * Запрещает прохождение осмотра на ЭСДПО
+                     * если давление водителя не соответсвует норме
+                     */
+                    if(!($tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic)){
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan());
+                        $Driver->save();
+                    }
+
+                    /**
+                     * Запрещает прохождение осмотра на ЭСДПО 
+                     * если положительный тест на алкоголь
+                     */
+                    if($proba_alko !== 'Отрицательно'){
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfAlcoholBan());
+                        $Driver->save();
+                    }
                 }
 
                 /**
