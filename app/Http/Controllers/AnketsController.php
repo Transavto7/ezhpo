@@ -1665,11 +1665,9 @@ class AnketsController extends Controller
                 }
 
                 // Конвертация текущего времени Юзера
-                date_default_timezone_set('UTC');
-                $time = time();
-                $timezone = $user->timezone ? $user->timezone : 3;
-                $time += $timezone * 3600;
-                $time = date('Y-m-d H:i:s', $time);
+                $timezone = $request->user('api')->timezone ? $request->user('api')->timezone : 3;
+                $time = Carbon::now('UTC')->addHours($timezone);
+                $time = $time->format('Y-m-d H:i:s');
 
                 $anketa['created_at'] = isset($anketa['created_at']) ? $anketa['created_at'] : $time;
 
