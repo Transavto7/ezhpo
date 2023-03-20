@@ -85,11 +85,9 @@ class SdpoController extends Controller
             $medic['videos'] = $request->video;
         }
 
-        date_default_timezone_set('UTC');
-        $time = time();
         $timezone = $request->user('api')->timezone ? $request->user('api')->timezone : 3;
-        $time += $timezone * 3600;
-        $time = date('Y-m-d H:i:s', $time);
+        $time = Carbon::now('UTC')->addHours($timezone);
+        $time = $time->format('Y-m-d H:i:s');
 
         $medic['created_at'] = $request->created_at ?? $time;
         $medic['date'] = $request->date ?? $medic['created_at'];
@@ -105,28 +103,7 @@ class SdpoController extends Controller
         $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
         $admitted = null;
         $driver->date_prmo = Carbon::now();
-
-        //ПРОВЕРЯЕМ статус для поля "Заключение"
-        $ton = explode('/', $tonometer);
-        if ($proba_alko === 'Положительно' || $test_narko === 'Положительно'
-            || intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()
-            || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38) {
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-
-            if(intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()){
-                $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfPressureBan());
-            }
-
-            if($proba_alko === 'Положительно') {
-                $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
-            }            
-        }
-
         
-        $driver->save();
-
-
         if ($request->sleep_status && $request->sleep_status === 'Нет') {
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
@@ -146,7 +123,27 @@ class SdpoController extends Controller
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
             $medic['proba_alko'] = 'Положительно';
+            $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
         }
+
+        //ПРОВЕРЯЕМ статус для поля "Заключение"
+        $ton = explode('/', $tonometer);
+        if ($proba_alko === 'Положительно' || $test_narko === 'Положительно'
+            || intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()
+            || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38) {
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
+
+            if(intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()) {
+                $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfPressureBan());
+            }
+
+            if($proba_alko === 'Положительно') {
+                $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
+            }            
+        }
+        
+        $driver->save();
 
         if ($request->type_anketa === 'pak_queue') {
             $notifyTo = new Notify();
