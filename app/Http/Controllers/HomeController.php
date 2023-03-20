@@ -136,9 +136,10 @@ class HomeController extends Controller
             $typeClearAnkets = trim($_GET['type_anketa']);
 
             if ($typeClearAnkets === 'pak_queue') {
-                Anketa::where('type_anketa', 'pak_queue')
+                Anketa::where('type_anketa', 'pak_queue')->delete();
+                /*Anketa::where('type_anketa', 'pak_queue')
                     ->where('pv_id', Point::where('id', Auth::user()->pv_id)->first()->name)
-                    ->delete();
+                    ->delete();*/
 
                 return redirect(route('home', $typeClearAnkets));
             }
@@ -419,9 +420,9 @@ class HomeController extends Controller
 //        dd(
 //            $anketas->toSql(), $typeAnkets
 //        );
-        $point_name = Point::where('id', Auth::user()->pv_id)->first()->name;
+        //$point_name = Point::where('id', Auth::user()->pv_id)->first()->name;
         $anketas = ($filter_activated || $typeAnkets === 'pak_queue')
-            ? $anketas->where('pv_id', $point_name)->orderBy($table . $orderKey, $orderBy)->paginate($take) : [];
+            ? $anketas->orderBy($table . $orderKey, $orderBy)->paginate($take) : [];
 
         //$anketas = $anketas->where('pv_id', $point_name);
         $anketasCountResult = ($filter_activated || $typeAnkets === 'pak_queue')
