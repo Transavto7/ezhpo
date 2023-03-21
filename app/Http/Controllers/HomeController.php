@@ -138,10 +138,14 @@ class HomeController extends Controller
             $typeClearAnkets = trim($_GET['type_anketa']);
 
             if ($typeClearAnkets === 'pak_queue') {
-                Anketa::where('type_anketa', 'pak_queue')->delete();
-                /*Anketa::where('type_anketa', 'pak_queue')
-                    ->where('pv_id', Point::where('id', Auth::user()->pv_id)->first()->name)
-                    ->delete();*/
+                $removedAnketas = Anketa::where('type_anketa', 'pak_queue');
+
+                if($user->role === Role::where('name', 'medic')->first()->id){
+                    $point_name = Point::where('id', $user->pv_id)->first()->name;
+                    $removedAnketas = $removedAnketas->where('pv_id', $point_name);
+                }
+                
+                $removedAnketas->delete();
 
                 return redirect(route('home', $typeClearAnkets));
             }
