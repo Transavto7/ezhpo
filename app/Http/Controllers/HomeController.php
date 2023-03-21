@@ -7,6 +7,7 @@ use App\Exports\AnketasExport;
 use App\FieldPrompt;
 use App\Point;
 use App\User;
+use App\Role;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Renderable;
@@ -420,13 +421,29 @@ class HomeController extends Controller
 //        dd(
 //            $anketas->toSql(), $typeAnkets
 //        );
-        //$point_name = Point::where('id', Auth::user()->pv_id)->first()->name;
+        //
+        
         $anketas = ($filter_activated || $typeAnkets === 'pak_queue')
-            ? $anketas->orderBy($table . $orderKey, $orderBy)->paginate($take) : [];
+            ? $anketas->orderBy($table . $orderKey, $orderBy) : [];
+
+        
+        if($typeAnkets === 'pak_queue'){
+            $tempUser = Auth::user(); 
+
+            if($tempUser){
+                if($tempUser->role === Role::where('name', 'medic')->first()->id){
+                    //dd('Это медик');
+                    $point_name = Point::where('id', $tempUser->pv_id)->first()->name;
+                    $anketas = $anketas->where('pv_id', $point_name);
+                }
+            }
+        }
+
+        $anketas = $anketas->paginate($take);
 
         //$anketas = $anketas->where('pv_id', $point_name);
         $anketasCountResult = ($filter_activated || $typeAnkets === 'pak_queue')
-            ? $anketas->total() : 0;
+            ? $anketas->count() : 0;
 
         $anketsFields = array_keys($fieldsKeys);
         if (isset(Anketa::$fieldsKeysTable[$fieldsKeysTypeAnkets])) {
