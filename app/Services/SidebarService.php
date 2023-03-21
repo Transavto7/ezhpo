@@ -7,6 +7,7 @@ use App\Services\Contracts\ServiceInterface;
 use App\SideBarMenuItem;
 use Illuminate\Database\Eloquent\Builder;
 use App\Point;
+use App\Role;
 use Auth;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -33,7 +34,15 @@ class SidebarService implements ServiceInterface
      */
     public static function renderItems(): array
     {
-        $pakQueueCnt = Anketa::where('type_anketa', 'pak_queue')->count();
+        $pakQueueCnt = Anketa::where('type_anketa', 'pak_queue');
+
+        if(Auth::user()->role === Role::where('name', 'medic')->first()->id){
+            $point_name = Point::where('id', Auth::user()->pv_id)->first()->name;
+            $pakQueueCnt = $pakQueueCnt->where('pv_id', $point_name);
+        }
+
+        $pakQueueCnt = $pakQueueCnt->count();
+        
         //$pakQueueCnt = Anketa::where('type_anketa', 'pak_queue')->where('pv_id', Point::where('id', Auth::user()->pv_id)->first()->name)->count();
         $pakErrorsCnt = Anketa::where('type_anketa', 'pak')->count();
         $sidebarItems = (new static())->getAllItems()->get();
