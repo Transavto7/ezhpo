@@ -14,6 +14,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Hash;
 
 class HomeController extends Controller
 {
@@ -426,22 +427,20 @@ class HomeController extends Controller
         $anketas = ($filter_activated || $typeAnkets === 'pak_queue')
             ? $anketas->orderBy($table . $orderKey, $orderBy) : [];
 
-        
         if($typeAnkets === 'pak_queue'){
-            $tempUser = Auth::user(); 
-
-            if($tempUser){
-                if($tempUser->role === Role::where('name', 'medic')->first()->id){
-                    //dd('Это медик');
-                    $point_name = Point::where('id', $tempUser->pv_id)->first()->name;
+            if($user){
+                if($user->role === Role::where('name', 'medic')->first()->id){
+                    $point_name = Point::where('id', $user->pv_id)->first()->name;
                     $anketas = $anketas->where('pv_id', $point_name);
                 }
             }
         }
 
-        $anketas = $anketas->paginate($take);
+        if($anketas != []){
+            $anketas = $anketas->paginate($take);
+        }
+        
 
-        //$anketas = $anketas->where('pv_id', $point_name);
         $anketasCountResult = ($filter_activated || $typeAnkets === 'pak_queue')
             ? $anketas->count() : 0;
 
