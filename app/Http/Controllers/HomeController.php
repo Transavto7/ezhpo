@@ -433,12 +433,12 @@ class HomeController extends Controller
 
         if($typeAnkets === 'pak_queue'){
             if($user){
-                $users = User::with(['roles', 'pv:id,name,pv_id', 'pv.town:id,name'])
+                /*$users = User::with(['roles', 'pv:id,name,pv_id', 'pv.town:id,name'])
                         ->whereHas('roles', function ($q) use ($request) {
                     $q->where('roles.id', 2);
-                })->where('id', Auth::user()->id)->select('id', 'name', 'eds', 'pv_id')->get();
+                })->where('id', Auth::user()->id)->select('id', 'name', 'eds', 'pv_id')->get();*/
 
-                if($users->count()){
+                if($user->load('roles')->roles->where('id', 2)->count()){
                     $point_name = Point::where('id', $user->pv_id)->first()->name;
                     $anketas = $anketas->where('pv_id', $point_name);
                 }

@@ -36,7 +36,7 @@ class SidebarService implements ServiceInterface
     {
         $pakQueueCnt = Anketa::where('type_anketa', 'pak_queue');
 
-        if(Auth::user()->role === Role::where('name', 'medic')->first()->id){
+        if(Auth::user()->load('roles')->roles->where('id', 2)->count()){
             $point_name = Point::where('id', Auth::user()->pv_id)->first()->name;
             $pakQueueCnt = $pakQueueCnt->where('pv_id', $point_name);
         }
