@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Carbon;
 use Matrix\Exception;
+use Illuminate\Support\Facades\Storage;
 
 class SdpoController extends Controller
 {
@@ -103,7 +104,7 @@ class SdpoController extends Controller
         $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
         $admitted = null;
         $driver->date_prmo = Carbon::now();
-        
+
         if ($request->sleep_status && $request->sleep_status === 'Нет') {
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
@@ -140,9 +141,9 @@ class SdpoController extends Controller
 
             if($proba_alko === 'Положительно') {
                 $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
-            }            
+            }
         }
-        
+
         $driver->save();
 
         if ($request->type_anketa === 'pak_queue') {
@@ -190,8 +191,8 @@ class SdpoController extends Controller
     public function getMedics(Request $request) {
         $users = User::with(['roles', 'pv:id,name,pv_id', 'pv.town:id,name'])
             ->whereHas('roles', function ($q) use ($request) {
-            $q->where('roles.id', 2);
-        })->select('id', 'name', 'eds', 'pv_id')->get();
+                $q->where('roles.id', 2);
+            })->select('id', 'name', 'eds', 'pv_id')->get();
 
         $users = $users->groupBy(['pv.town.name', 'pv.name']);
 
@@ -205,15 +206,15 @@ class SdpoController extends Controller
         if ($request->user('api')->blocked) {
             return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
         }
-        
+
         $driver = Driver::where('hash_id', $id)
             ->with('company')
-            ->select('hash_id', 'fio', 'dismissed', 'company_id', 'end_of_ban')->first();
-        
+            ->select('hash_id', 'fio', 'dismissed', 'company_id', 'end_of_ban', 'photo')->first();
+
         if (!$driver) {
             return response()->json(['message' => 'Водитель с указанным ID не найден!'], 400);
         }
-        
+
         if ($driver->end_of_ban && (Carbon::now() < $driver->end_of_ban)) {
             return response()->json(['message' => 'Указанный водитель остранен до ' . $driver->end_of_ban], 400);
         }
@@ -253,6 +254,22 @@ class SdpoController extends Controller
         $inspection = Anketa::find($id);
         if ($inspection) {
             $inspection->update(['type_anketa' => 'medic']);
+        }
+    }
+
+    /*
+    * Driver update photo
+    */
+    public function setDriverPhoto(Request $request, $id) {
+        if ($request->photo) {
+            $image = base64_decode($request->photo);
+            $hash = sha1(time());
+            $path = "elements/$hash.png";
+            $image = Storage::disk('public')->put($path, $image);
+
+            $driver = Driver::where('hash_id', $id)->update([
+                'photo' => $path
+            ]);
         }
     }
 }
