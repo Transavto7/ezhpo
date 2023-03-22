@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Dtos\WorkReportFilterData;
+use App\Exports\WorkReportsExport;
 use App\Http\Requests\WorkReportFilterRequest;
 use App\Services\WorkReportService;
+use Excel;
 use Illuminate\View\View;
 
 class WorkReportsController extends Controller
@@ -31,5 +33,16 @@ class WorkReportsController extends Controller
     {
         $dto = new WorkReportFilterData($request->validated());
         return $this->workReportService->getAll($dto);
+    }
+
+    public function export(WorkReportFilterRequest $request)
+    {
+        $dto = new WorkReportFilterData($request->validated());
+
+        return Excel::download(new WorkReportsExport($this->workReportService->getAll($dto)), 'work_reports.xlsx');
+
+//        return view('reports.work.export', [
+//            'data' => $this->workReportService->getAll($dto)
+//        ]);
     }
 }

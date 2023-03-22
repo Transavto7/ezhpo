@@ -68,7 +68,19 @@
     </div>
     <div class="card">
       <div class="card-body">
-
+        <table class="table-bordered" v-for="item in work_reports">
+          <thead>
+            <th v-for="pointCell in item.pointRow">
+              {{pointCell}}
+            </th>
+          </thead>
+          <tbody>
+            <tr v-for="reportData in item.reports">
+              <td v-for="reportCell in reportData">
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -88,6 +100,7 @@ export default {
       points: [],
       point: null,
       point_id: null,
+      work_reports: []
     }
   },
   methods: {
@@ -128,7 +141,7 @@ export default {
           dateTo: this.dateTo
         }
       }).then(({ data }) => {
-        console.log(data);
+        this.work_reports = data;
       }).finally(() => {
         this.loading = false;
       });

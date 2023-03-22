@@ -8,7 +8,6 @@ use App\WorkReport;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class WorkReportService implements Contracts\ServiceInterface
@@ -50,20 +49,7 @@ class WorkReportService implements Contracts\ServiceInterface
 
         $dates = CarbonPeriod::create($dateFrom, $dateTo)->toArray();
 
-        dd($this->prepareTableData($reports, $dates)->toArray());
-
-        return [
-            'work_reports' => new LengthAwarePaginator(
-                $this->prepareDataGrouped($reports),
-                $this->prepareDataGrouped($reports)->count(),
-                $data->perPage
-            ),
-
-            'meta' => [
-                'user_names' => $reports->pluck('user.name', 'user_id'),
-                'point_names' => $reports->pluck('point.name', 'pv_id'),
-            ]
-        ];
+        return $this->prepareTableData($reports, $dates)->toArray();
     }
 
     private function prepareDataGrouped(Collection $reports): Collection
@@ -109,11 +95,12 @@ class WorkReportService implements Contracts\ServiceInterface
                 'Итого'
             ];
 
-            $reportsData = [];
             /** @var Collection $datum */
             /** @var WorkReport[]|Collection $workReports */
+            $reportsData = [];
+            $userRows = [];
+
             foreach ($datum as $userId => $workReports) {
-                $userRows = [];
                 $user = $users[$userId] ?? null;
                 $mainUserRow = [
                     ($user) ? $user->name : 'ФИО сотрудника',
@@ -121,6 +108,7 @@ class WorkReportService implements Contracts\ServiceInterface
                 ];
 
                 $userRows[] = $mainUserRow;
+
                 foreach ($firstColumn as $k => $item) {
                     $rowCells = [];
                     $rowCells[] = $item;
@@ -145,12 +133,12 @@ class WorkReportService implements Contracts\ServiceInterface
                     $userRows[] = $rowCells;
                 }
 
-                $reportsData[$userId] = $userRows;
+                $reportsData[] = $userRows;
             }
 
             $tableData[] = [
-                'mainPointRow' => $pointFirstRow,
-                'reportsData' => $reportsData
+                'pointRow' => $pointFirstRow,
+                'reports' => $reportsData
             ];
         }
 
