@@ -86,9 +86,11 @@ class SdpoController extends Controller
             $medic['videos'] = $request->video;
         }
 
+        date_default_timezone_set('UTC');
+        $time = time();
         $timezone = $request->user('api')->timezone ? $request->user('api')->timezone : 3;
-        $time = Carbon::now('UTC')->addHours($timezone);
-        $time = $time->format('Y-m-d H:i:s');
+        $time += $timezone * 3600;
+        $time = date('Y-m-d H:i:s', $time);
 
         $medic['created_at'] = $request->created_at ?? $time;
         $medic['date'] = $request->date ?? $medic['created_at'];
@@ -191,8 +193,8 @@ class SdpoController extends Controller
     public function getMedics(Request $request) {
         $users = User::with(['roles', 'pv:id,name,pv_id', 'pv.town:id,name'])
             ->whereHas('roles', function ($q) use ($request) {
-                $q->where('roles.id', 2);
-            })->select('id', 'name', 'eds', 'pv_id')->get();
+            $q->where('roles.id', 2);
+        })->select('id', 'name', 'eds', 'pv_id')->get();
 
         $users = $users->groupBy(['pv.town.name', 'pv.name']);
 
