@@ -154,6 +154,7 @@ Route::middleware('auth:api')->prefix('sdpo')->name('sdpo')->group(function () {
     Route::get('/pv', 'Api\SdpoController@getPoint');
     Route::get('/medics', 'Api\SdpoController@getMedics');
     Route::get('/driver/{id}', 'Api\SdpoController@getDriver');
+    Route::post('/driver/{id}/photo', 'Api\SdpoController@setDriverPhoto');
     Route::get('/drivers', 'Api\SdpoController@getDrivers');
     Route::get('/check', 'Api\SdpoController@checkConnaction');
 });
