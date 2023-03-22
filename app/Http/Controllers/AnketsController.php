@@ -454,8 +454,6 @@ class AnketsController extends Controller
 
         $data = $request->all();
         $d_id = $request->get('driver_id', 0); // Driver
-
-
         $pv_id = $request->get('pv_id', 0);
 
         function mt_rand_float($min, $max, $countZero = '0') {
@@ -545,18 +543,10 @@ class AnketsController extends Controller
                             $errorsAnketa[] = 'Не найдена компания.';
                         }
                     }
-                    if(!Driver::where('hash_id', $data['driver_id'])->count()){
+
+                    if(!$driver = Driver::where('hash_id', $data['driver_id'])->first()){
                         $errorsAnketa[] = 'Не найден водитель.';
                     }
-
-
-                    if(!is_null(Driver::where('hash_id', $data['driver_id'])->first())){
-                        if(!is_null(Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban)){
-                            if(date("Y-m-d H:i:s") < Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban){
-                                $errorsAnketa[] = 'Водитель отстранен до '.Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban;
-                            }
-                        } 
-                    } 
                 }
 
                 // Журнал снятия отчетов с карт
@@ -670,7 +660,6 @@ class AnketsController extends Controller
                 /**
                  * ОЧЕРЕДЬ ПАК
                  */
-
                 if($anketa['type_anketa'] == 'pak_queue') {
                     $notifyTo = new Notify();
                     $notifyTo->sendMsgToUsersFrom('role', '4', 'Новый осмотр в очереди СДПО');
@@ -791,16 +780,22 @@ class AnketsController extends Controller
                 } else {
                     $anketa['admitted'] = 'Не допущен';
 
+                    /**
+                     * Запрещает прохождение осмотра на ЭСДПО
+                     * если давление водителя не соответсвует норме
+                     */
                     if(!($tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic)){
-                        $driver = Driver::where('hash_id', $data['driver_id'])->first();
-                        $driver->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 20 minute'));
-                        $driver->save();
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan());
+                        $Driver->save();
                     }
 
-                    if($proba_alko === "Положительно"){
-                        $driver = Driver::where('hash_id', $data['driver_id'])->first();
-                        $driver->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 2 hours'));
-                        $driver->save();
+                    /**
+                     * Запрещает прохождение осмотра на ЭСДПО 
+                     * если положительный тест на алкоголь
+                     */
+                    if($proba_alko !== 'Отрицательно'){
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfAlcoholBan());
+                        $Driver->save();
                     }
                 }
 
@@ -1006,6 +1001,7 @@ class AnketsController extends Controller
                 $anketa['pulse'] = isset($anketa['pulse']) ? $anketa['pulse'] : mt_rand(60,80);
 
                 $anketa['pv_id'] = Point::where('id', $pv_id)->first();
+                $anketa['point_id'] = $pv_id;
 
                 // Проверка ПВ
                 if($anketa['pv_id'])
@@ -1231,10 +1227,10 @@ class AnketsController extends Controller
 
             $data['photos'] = $photos_path;
         }
-        
+
         // Анкета
         if(isset($data['anketa'])) {
-            
+
             // Клонируем анкету
             $createdAnketas = [];
             $createdAnketasDataResponseApi = [];
@@ -1323,6 +1319,12 @@ class AnketsController extends Controller
                  * Проверка водителя по: тесту наркотиков, возрасту
                  */
                 if($d_id || isset($Driver)) {
+                    if($Driver->end_of_ban > date('Y-m-d H:i:s')){
+                        $errMsg = 'Водитель остранен до '.$Driver->end_of_ban."!";
+
+                        array_push($errorsAnketa, $errMsg);
+                    }
+
                     if(!Driver::DriverChecker($d_id, $tonometer, $test_narko, $proba_alko) && !in_array($anketa['type_anketa'], ['bdd', 'pechat_pl', 'vid_pl', 'report_cart'])) {
 
                         if($anketa['type_anketa'] !== 'tech') {
@@ -1408,7 +1410,6 @@ class AnketsController extends Controller
                  * ПРОВЕРЯЕМ статус для поля "Заключение"
                  */
                 $tonometer = explode('/', $anketa['tonometer']);
-                $driverTemp = Driver::where('hash_id', $data['driver_id'])->first();
                 if($proba_alko === 'Отрицательно'
                     && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
                     && doubleval($anketa['t_people']) < 38
@@ -1430,7 +1431,7 @@ class AnketsController extends Controller
                         $anketa['admitted'] = 'Не допущен';
                         $anketa['med_view'] = 'Отстранение';
                     }
-                    if ($driverTemp->end_of_ban > date('Y-m-d H:i:s')){
+                    if ($Driver->end_of_ban > Carbon::now()){
                         $anketa['admitted'] = 'Не допущен';
                         $anketa['med_view'] = 'Отстранение';
                     }
@@ -1440,26 +1441,13 @@ class AnketsController extends Controller
 
                     if(!(intval($tonometer[0]) < $Driver->getPressureSystolic()
                     && intval($tonometer[1]) < $Driver->getPressureDiastolic())){
-                        $driverTemp->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 20 minute'));
-                        $driverTemp->save();
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan());
+                        $Driver->save();
                     }
 
                     if($proba_alko === "Положительно"){
-                        $driverTemp->end_of_ban = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 2 hours'));
-                        $driverTemp->save();
-                    }
-
-                    
-                }
-
-                /**
-                 * ПРОВЕРЯЕМ СТАТУС для поля "Заключение" - от ПАК
-                 */
-                if(isset($anketa['sleep_status']) && isset($anketa['people_status']) && isset($anketa['alcometer_result'])) {
-                    if($anketa['sleep_status'] === 'Да' && $anketa['people_status'] === 'Да' && doubleval($anketa['alcometer_result']) <= 0) {
-                        $anketa['admitted'] = 'Допущен';
-                    } else {
-                        $anketa['admitted'] = 'Не допущен';
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfAlcoholBan());
+                        $Driver->save();
                     }
                 }
 
@@ -1637,6 +1625,7 @@ class AnketsController extends Controller
                 $anketa['pulse'] = isset($anketa['pulse']) ? $anketa['pulse'] : mt_rand(60,80);
 
                 $anketa['pv_id'] = Point::where('id', $pv_id)->first();
+                $anketa['terminal_id'] = $request->user('api')->id;
 
                 // Проверка ПВ
                 if($anketa['pv_id'])
@@ -1677,11 +1666,9 @@ class AnketsController extends Controller
                 }
 
                 // Конвертация текущего времени Юзера
-                date_default_timezone_set('UTC');
-                $time = time();
-                $timezone = $user->timezone ? $user->timezone : 3;
-                $time += $timezone * 3600;
-                $time = date('Y-m-d H:i:s', $time);
+                $timezone = $request->user('api')->timezone ? $request->user('api')->timezone : 3;
+                $time = Carbon::now('UTC')->addHours($timezone);
+                $time = $time->format('Y-m-d H:i:s');
 
                 $anketa['created_at'] = isset($anketa['created_at']) ? $anketa['created_at'] : $time;
 
@@ -1705,7 +1692,7 @@ class AnketsController extends Controller
                 $timezone = $user->timezone ?? 3;
                 $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($anketa['date'] ?? null);
 
-                if($diffDateCheck <= 60*12 && $anketa['date'] ?? null) {
+                if ($diffDateCheck <= 60*12 && $anketa['date'] ?? null) {
                     $anketa['realy'] = 'да';
                 } else {
                     $anketa['realy'] = 'нет';

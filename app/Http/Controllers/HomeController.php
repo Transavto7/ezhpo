@@ -7,12 +7,14 @@ use App\Exports\AnketasExport;
 use App\FieldPrompt;
 use App\Point;
 use App\User;
+use App\Role;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Hash;
 
 class HomeController extends Controller
 {
@@ -86,7 +88,7 @@ class HomeController extends Controller
         }
 
         $user = Auth::user();
-
+        
         $validTypeAnkets       = User::$userRolesKeys[$user->role] ?? 'medic';
         $blockedToExportFields = [];
         $typeAnkets            = $request->type_ankets;
@@ -127,6 +129,7 @@ class HomeController extends Controller
         if ($request->get('export')) {
             $take = 10000;
         }
+        
 
         /**
          * Очистка корзины в очереди на утверждение от СДПО
@@ -135,7 +138,14 @@ class HomeController extends Controller
             $typeClearAnkets = trim($_GET['type_anketa']);
 
             if ($typeClearAnkets === 'pak_queue') {
-                Anketa::where('type_anketa', 'pak_queue')->delete();
+                $removedAnketas = Anketa::where('type_anketa', 'pak_queue');
+
+                if($user->role === Role::where('name', 'medic')->first()->id){
+                    $point_name = Point::where('id', $user->pv_id)->first()->name;
+                    $removedAnketas = $removedAnketas->where('pv_id', $point_name);
+                }
+                
+                $removedAnketas->delete();
 
                 return redirect(route('home', $typeClearAnkets));
             }
@@ -416,11 +426,32 @@ class HomeController extends Controller
 //        dd(
 //            $anketas->toSql(), $typeAnkets
 //        );
+        //
+        
         $anketas = ($filter_activated || $typeAnkets === 'pak_queue')
-            ? $anketas->orderBy($table . $orderKey, $orderBy)->paginate($take) : [];
+            ? $anketas->orderBy($table . $orderKey, $orderBy) : [];
+
+        if($typeAnkets === 'pak_queue'){
+            if($user){
+                /*$users = User::with(['roles', 'pv:id,name,pv_id', 'pv.town:id,name'])
+                        ->whereHas('roles', function ($q) use ($request) {
+                    $q->where('roles.id', 2);
+                })->where('id', Auth::user()->id)->select('id', 'name', 'eds', 'pv_id')->get();*/
+
+                if($user->load('roles')->roles->where('id', 2)->count()){
+                    $point_name = Point::where('id', $user->pv_id)->first()->name;
+                    $anketas = $anketas->where('pv_id', $point_name);
+                }
+            }
+        }
+
+        if($anketas != []){
+            $anketas = $anketas->paginate($take);
+        }
+        
 
         $anketasCountResult = ($filter_activated || $typeAnkets === 'pak_queue')
-            ? $anketas->total() : 0;
+            ? $anketas->count() : 0;
 
         $anketsFields = array_keys($fieldsKeys);
         if (isset(Anketa::$fieldsKeysTable[$fieldsKeysTypeAnkets])) {
