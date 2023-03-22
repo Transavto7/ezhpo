@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Dtos\WorkReportData;
 use App\DTOs\WorkReportFilterData;
+use App\Point;
+use App\User;
 use App\WorkReport;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -54,13 +56,13 @@ class WorkReportService implements Contracts\ServiceInterface
 
     private function prepareDataGrouped(Collection $reports): Collection
     {
-        return $reports->groupBy('pv_id', true)
-            ->map(function (Collection $item) {
-                return $item->groupBy('user_id')
-                    ->map(function (Collection $item) {
-                        return $item->keyBy('date');
-                    });
-            });
+       return $reports->groupBy('pv_id', true)
+           ->map(function (Collection $item) {
+               return $item->groupBy('user_id')
+                   ->map(function (Collection $item) {
+                       return $item->keyBy('date');
+                   });
+           });
     }
 
     /**
@@ -74,75 +76,91 @@ class WorkReportService implements Contracts\ServiceInterface
         $users = $reports->pluck('user', 'user_id');
         $points = $reports->pluck('point', 'pv_id');
 
-
         $grouped = $this->prepareDataGrouped($reports);
         $dates = array_map(function (Carbon $item) use ($dateFormat) {
             return $item->format($dateFormat);
         }, $dates);
 
-        $firstColumn = [
-            'datetime_begin' => 'Начало работы:',
-            'datetime_end' => 'Окончание работы:',
-            'hours' => 'Часов отработано:',
-        ];
-
-        $tableData = [];
+        $rowDatum = [];
         foreach ($grouped as $groupId => $datum) {
-            $point = $points[$groupId] ?? null;
-            $pointFirstRow = [
-                ($point) ? $point->name : 'Название пункта выпуска',
+            /** @var Point $point */
+            $point = $points[$groupId];
+            $rowDatum[$groupId]['pointData'] = [
+                $point->name,
                 ...$dates,
                 'Итого'
             ];
 
-            /** @var Collection $datum */
-            /** @var WorkReport[]|Collection $workReports */
-            $reportsData = [];
-            $userRows = [];
-
-            foreach ($datum as $userId => $workReports) {
-                $user = $users[$userId] ?? null;
-                $mainUserRow = [
-                    ($user) ? $user->name : 'ФИО сотрудника',
-                    ...array_fill(0, count($dates) + 1, null)
+            foreach ($datum as $userId => $reportsData) {
+                /** @var User $user*/
+                $user = $users[$userId];
+                $userRowsHeaders = [
+                    'name' => '',
+                    'begin' => 'Начало работы',
+                    'end' => 'Конец',
+                    'hours' => 'Всего часов'
                 ];
 
-                $userRows[] = $mainUserRow;
-
-                foreach ($firstColumn as $k => $item) {
-                    $rowCells = [];
-                    $rowCells[] = $item;
-                    foreach ($dates as $date) {
-                        if (isset($workReports[$date])) {
-                            $workReport = $workReports[$date];
-                            $cellValue = $workReport->{$k};
-                            $cellValue = ($cellValue instanceof Carbon) ?
-                                $cellValue->format('H-i') : $cellValue;
-                            $rowCells[] = $cellValue;
-                        } else {
-                            $rowCells[] = null;
+                foreach ($userRowsHeaders as $slug => $name)  {
+                    /** @var WorkReport $report */
+                    if ($slug === 'name') {
+                        $rowDatum[$groupId]['reports'][] = [
+                            $user->name,
+                            ...array_fill(0, count($dates) + 1, null)
+                        ];
+                    } elseif ($slug === 'begin') {
+                        $beginRows = [];
+                        foreach ($dates as $date) {
+                            if (isset($reportsData[$date])) {
+                                $report = $reportsData[$date];
+                                $beginRows[] = $report->datetime_begin->format('H-i');
+                            } else {
+                                $beginRows[] = null;
+                            }
                         }
+                        $beginRows[] = null;
+                        $rowDatum[$groupId]['reports'][] = [
+                            $name,
+                            ...$beginRows
+                        ];
+                    } elseif ($slug === 'end') {
+                        $endRows = [];
+                        foreach ($dates as $date) {
+                            if (isset($reportsData[$date])) {
+                                $report = $reportsData[$date];
+                                $endRows[] = $report->datetime_end->format('H-i');
+                            } else {
+                                $endRows[] = null;
+                            }
+                        }
+                        $endRows[] = null;
+                        $rowDatum[$groupId]['reports'][] = [
+                            $name,
+                            ...$endRows
+                        ];
+                    } elseif ($slug === 'hours') {
+                        $hoursRows = [];
+                        $hours = 0;
+                        foreach ($dates as $date) {
+                            if (isset($reportsData[$date])) {
+                                $report = $reportsData[$date];
+                                $hoursRows[] = $report->hours. 'ч.';
+                                $hours += $report->hours;
+                            } else {
+                                $hoursRows[] = null;
+                            }
+                        }
+                        $hoursRows[] = $hours. 'ч.';
+                        $rowDatum[$groupId]['reports'][] = [
+                            $name,
+                            ...$hoursRows
+                        ];
                     }
 
-                    if ($k != 'hours') {
-                        $rowCells[] = null;
-                    } else {
-                        $rowCells[] = $workReports->sum('hours');
-                    }
-
-                    $userRows[] = $rowCells;
                 }
-
-                $reportsData[] = $userRows;
             }
-
-            $tableData[] = [
-                'pointRow' => $pointFirstRow,
-                'reports' => $reportsData
-            ];
         }
-
-        return collect($tableData);
+        return collect($rowDatum);
     }
 
 }

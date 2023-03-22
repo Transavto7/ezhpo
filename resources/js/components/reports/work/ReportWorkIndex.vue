@@ -68,21 +68,21 @@
     </div>
     <div class="card">
       <div class="card-body">
-        <table class="table-bordered" v-for="item in work_reports">
-          <thead>
-            <th v-for="pointCell in item.pointRow">
-              {{pointCell}}
-            </th>
-          </thead>
+        <table class="table table-bordered" v-for="pointReport in work_reports">
+            <thead style="background-color: #93C47D;">
+              <td v-for="head in pointReport.pointData">{{ head }}</td>
+            </thead>
           <tbody>
-            <tr v-for="reportData in item.reports">
-              <td v-for="reportCell in reportData">
-              </td>
+            <tr v-for="reportRow in pointReport.reports">
+                <td v-for="value in reportRow">
+                  {{value}}
+                </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -151,5 +151,12 @@ export default {
 </script>
 
 <style scoped>
+tr:nth-child(4n+1)
+{
+  background-color: #B6D7A8;
+}
 
+table {
+  background-color: #D9EAD3;
+}
 </style>

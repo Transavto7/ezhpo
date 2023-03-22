@@ -1,35 +1,31 @@
 <html>
-
-@foreach($data as $k => $pointReport)
-    <table>
-        <thead>
-        <tr>
-            @foreach($pointReport['pointRow'] as $col)
-                <th>{{$col}}</th>
-            @endforeach
-        </tr>
-        </thead>
-        <tbody>
-        @foreach($pointReport['reports'] as $report)
-            @foreach($report as $n => $reportRow)
-                @if ($n === 0)
-                    <tr>
-                        @foreach($reportRow as $k => $reportCell)
-                            <td>{{$reportCell}}</td>
-                        @endforeach
-                    </tr>
-                @else
-                    <tr>
-                        @foreach($reportRow as $reportCell)
-                            <td>{{$reportCell}}</td>
-                        @endforeach
-                    </tr>
-                @endif
+<style>
+    table, th, td {
+        border: 1px solid;
+        border-collapse: collapse;
+    }
+</style>
+@foreach($data as $key => $datumTable)
+<table style="border: solid 1px;" class="table table-bordered">
+    <thead>
+        @foreach($datumTable['pointData'] as $pointCell)
+            <th>{{$pointCell}}</th>
+        @endforeach
+    </thead>
+    <tbody>
+        @foreach($datumTable['reports'] as $reportRow)
+            @foreach($reportRow as $slug => $reportCells)
+                <tr>
+                    @foreach($reportCells as $cell)
+                        <td>
+                            {{$cell}}
+                        </td>
+                    @endforeach
+                </tr>
             @endforeach
         @endforeach
-
-        </tbody>
-    </table>
+    </tbody>
+</table>
 @endforeach
 
 </html>

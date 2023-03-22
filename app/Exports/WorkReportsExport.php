@@ -63,9 +63,9 @@ class WorkReportsExport implements
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function(AfterSheet $event) {
-                dd($event->getSheet());
-            }
+//            AfterSheet::class => function(AfterSheet $event) {
+//                dd($event->getSheet());
+//            }
         ];
     }
 }
