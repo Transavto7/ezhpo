@@ -68,7 +68,7 @@
     </div>
     <div class="card">
       <div class="card-body">
-        <table class="table table-bordered" v-for="pointReport in work_reports">
+        <table class="table table-bordered table-sm" v-for="pointReport in work_reports">
             <thead style="background-color: #93C47D;">
               <td v-for="head in pointReport.pointData">{{ head }}</td>
             </thead>

@@ -97,8 +97,8 @@ class WorkReportService implements Contracts\ServiceInterface
                 $userRowsHeaders = [
                     'name' => '',
                     'begin' => 'Начало работы',
-                    'end' => 'Конец',
-                    'hours' => 'Всего часов'
+                    'end' => 'Окончание работы',
+                    'hours' => 'Часов отработано'
                 ];
 
                 foreach ($userRowsHeaders as $slug => $name)  {
