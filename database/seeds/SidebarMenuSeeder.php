@@ -137,6 +137,12 @@ class SidebarMenuSeeder extends Seeder
                         'icon_class' => 'fa fa-book',
                         'route_name' => '/report/journal_new',
                     ],
+                    [
+                        'title' => 'Отчёты по работе сотрудников',
+                        'slug' => 'report_employee_work',
+                        'icon_class' => 'fa fa-book',
+                        'route_name' => '/report/work',
+                    ],
                 ]
             ],
             [

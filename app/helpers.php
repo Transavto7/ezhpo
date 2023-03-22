@@ -25,3 +25,10 @@ if (!function_exists('in_array_thresholds')) {
         return ($value >= min($thresholds)) && ($value <= max($thresholds));
     }
 }
+
+if (!function_exists('phone_sanitizing')) {
+    function phone_sanitizing(string $phone) : string
+    {
+        return preg_replace('/^0|[^а-яА-Я0-9+]+/u', '', filter_var($phone, FILTER_SANITIZE_NUMBER_INT));
+    }
+}

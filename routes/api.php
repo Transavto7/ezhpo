@@ -1,5 +1,10 @@
 <?php
 
+use App\Anketa;
+use App\Http\Controllers\Api\SdpoController;
+use App\Http\Controllers\ReportContractRefactoringController;
+use App\Notify;
+use App\NotifyStatuse;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Route;
@@ -19,9 +24,12 @@ use App\Point;
 */
 
 Route::get('/companies/find', 'ApiController@companiesList');
+Route::get('/users/find', 'ApiController@usersList');
+Route::get('/points/find', 'ApiController@pointsList');
 Route::get('/find/{model}', 'ApiController@modelList');
 
 Route::get('reports/journal', 'ReportController@getJournalData')->name('api.reports.journal');
+Route::get('reports/work/get', [\App\Http\Controllers\WorkReportsController::class, 'getReport'])->name('api.reports.work');
 Route::get('reports/contract/journal', 'ReportControllerContract@getJournalData')->name('api.reports.journal');
 Route::get('reports/journal/export', 'ReportController@exportJournalData')->name('api.reports.journal.export');
 Route::get('reports/contract/journal/export', 'ReportController@exportJournalData');
@@ -29,10 +37,10 @@ Route::get('reports/getContractsForCompany', 'ReportControllerContract@getContra
 //Route::get('reports/contract/getContractsForCompany', 'ReportControllerContract@getContractsForCompany')->name('api.reports.journal');
 
 Route::get('reports/contract/journal_v2',[
-    \App\Http\Controllers\ReportContractRefactoringController::class, 'getReport'
+    ReportContractRefactoringController::class, 'getReport'
 ]);
 Route::get('reports/contract/export/journal_v2',[
-    \App\Http\Controllers\ReportContractRefactoringController::class, 'export'
+    ReportContractRefactoringController::class, 'export'
 ]);
 
 Route::get('/sync-fields/{model}/{id}', function ($model, $id) {
@@ -85,7 +93,7 @@ Route::middleware('auth:api')->post('/get-user/{user_id}', function (Request $re
 Route::middleware('auth:api')->group(function () {
 
     Route::get('anketa/{id}', function ($id) {
-        $anketa = \App\Anketa::find($id);
+        $anketa = Anketa::find($id);
 
         return response()->json($anketa);
     });
@@ -117,10 +125,10 @@ Route::middleware('auth:api')->group(function () {
 
         Route::post('clear', function () {
             $user = request()->user();
-            $notifies = \App\Notify::where('role', $user->role)->get();
+            $notifies = Notify::where('role', $user->role)->get();
 
             foreach($notifies as $notify) {
-                \App\NotifyStatuse::create([
+                NotifyStatuse::create([
                     'user_id' => $user->id,
                     'notify_id' => $notify->id
                 ]);
@@ -140,6 +148,7 @@ Route::middleware('auth:api')->group(function () {
 
 Route::middleware('auth:api')->prefix('sdpo')->name('sdpo')->group(function () {
     Route::post('/anketa', 'Api\SdpoController@createAnketa');
+    Route::post('/work/report', [SdpoController::class, 'workReport']);
     Route::post('/anketa/{id}', 'Api\SdpoController@changeType');
     Route::get('/anketa/{id}', 'Api\SdpoController@getInspection');
     Route::get('/pv', 'Api\SdpoController@getPoint');

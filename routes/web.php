@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\ReportContractRefactoringController;
 use App\Http\Controllers\SidebarMenuItemsController;
+use App\Http\Controllers\WorkReportsController;
 use App\Http\Middleware\CheckDriver;
 use App\Instr;
 use App\Models\Contract;
@@ -270,7 +271,11 @@ Route::middleware(['auth', CheckDriver::class])->group(function () {
         Route::get('dynamic/medic', 'ReportController@getDynamicMedic')->name('report.dynamic.medic');
         Route::get('dynamic/tech', 'ReportController@getDynamicTech')->name('report.dynamic.tech');
         Route::get('dynamic/all', 'ReportController@getDynamicAll')->name('report.dynamic.all');
+        Route::get('work', [WorkReportsController::class, 'index'])->name('report.work.index');
+        Route::get('work/export', [WorkReportsController::class, 'export'])->name('report.work.export');
+
         Route::get('{type_report}', 'ReportController@GetReport')->name('report.get');
+
     });
 
     // Сохранение полей в HOME

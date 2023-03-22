@@ -4,20 +4,31 @@ namespace App\Http\Controllers\Api;
 
 use App\Anketa;
 use App\Driver;
+use App\Dtos\WorkReportData;
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\SmsController;
+use App\Http\Requests\WorkReportRequest;
 use App\Notify;
-use App\Point;
+use App\Services\Contracts\ServiceInterface;
 use App\Settings;
 use App\User;
-use http\Env\Response;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Carbon;
 use Matrix\Exception;
 use Illuminate\Support\Facades\Storage;
 
 class SdpoController extends Controller
 {
+    /**
+     * @var \App\Services\Contracts\ServiceInterface
+     */
+    protected ServiceInterface $workReportService;
+
+    public function __construct(ServiceInterface $workReportService)
+    {
+        $this->workReportService = $workReportService;
+    }
+
     /*
      * Creating anketa by sdpo request
      */
@@ -250,7 +261,8 @@ class SdpoController extends Controller
     /*
     * Inspection update type
     */
-    public function changeType(Request $request, $id) {
+    public function changeType(Request $request, $id)
+    {
         $inspection = Anketa::find($id);
         if ($inspection) {
             $inspection->update(['type_anketa' => 'medic']);
@@ -271,5 +283,16 @@ class SdpoController extends Controller
                 'photo' => $path
             ]);
         }
+    }
+
+    /**
+     * @param  \App\Http\Requests\WorkReportRequest  $request
+     * @return array
+     */
+    public function workReport(WorkReportRequest $request): array
+    {
+        $dto = new WorkReportData($request->validated());
+        $dto->user_id = $request->user('api')->id;
+        return $this->workReportService->create($dto);
     }
 }

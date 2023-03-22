@@ -93,6 +93,8 @@ use Illuminate\Database\Query\Builder;
  * @method static Builder|Driver withTrashed()
  * @method static Builder|Driver withoutTrashed()
  * @mixin \Eloquent
+ * @property string|null $end_of_ban
+ * @method static \Illuminate\Database\Eloquent\Builder|Driver whereEndOfBan($value)
  */
 class Driver extends Model
 {
