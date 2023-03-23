@@ -8,9 +8,9 @@ use Carbon\Carbon;
 class FilterDateValue implements ValueInterface
 {
     /**
-     * @var \Carbon\Carbon|false
+     * @var \Carbon\Carbon|null
      */
-    private Carbon $value;
+    private ?Carbon $value = null;
 
     /**
      * @var string
@@ -18,11 +18,16 @@ class FilterDateValue implements ValueInterface
     private string $format = 'Y-m-d';
 
     /**
-     * @param $value
+     * @param  string|null  $value
      */
-    public function __construct($value)
+    public function __construct(?string $value = null)
     {
-        $this->value = Carbon::createFromFormat($this->format, $value);
+        if ($value) {
+            $this->value = Carbon::createFromFormat($this->format, $value);
+        } else {
+            $this->value = now();
+        }
+
     }
 
     /**
@@ -36,5 +41,27 @@ class FilterDateValue implements ValueInterface
     public function getValue()
     {
         return $this->value;
+    }
+
+    public function setValue(string $value): self
+    {
+        $this->value = Carbon::createFromFormat($this->format, $value);
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormat(): string
+    {
+        return $this->format;
+    }
+
+    /**
+     * @param  string  $format
+     */
+    public function setFormat(string $format): void
+    {
+        $this->format = $format;
     }
 }

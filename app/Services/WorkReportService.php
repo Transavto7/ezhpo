@@ -38,20 +38,19 @@ class WorkReportService implements Contracts\ServiceInterface
             ->orderBy('datetime_begin', 'desc')
             ->get();
 
-        $dateFrom = $data->dateFrom;
-        $dateTo = $data->dateTo;
-
-        if (is_null($dateFrom)) {
-            $dateFrom = Carbon::now()->subMonth();
+        if (is_null($data->dateFrom) or is_null($data->dateTo)) {
+            $dates = CarbonPeriod::create(now()->subMonth(), now())->toArray();
+        } else {
+            $dates = CarbonPeriod::create(
+                $data->dateFrom->getValue(),
+                $data->dateTo->getValue()
+            )->toArray();
         }
 
-        if (is_null($dateTo)) {
-            $dateTo = Carbon::now();
-        }
 
-        $dates = CarbonPeriod::create($dateFrom, $dateTo)->toArray();
 
-        return $this->prepareTableData($reports, $dates)->toArray();
+        return $this->prepareTableData($reports, $dates)
+            ->toArray();
     }
 
     private function prepareDataGrouped(Collection $reports): Collection

@@ -29,19 +29,25 @@ class WorkReportsController extends Controller
         return view('reports.work.index');
     }
 
+    /**
+     * @throws \ReflectionException
+     * @throws \App\Values\Exceptions\ValueObjectException
+     */
     public function getReport(WorkReportFilterRequest $request): array
     {
         $dto = new WorkReportFilterData($request->validated());
         return $this->workReportService->getAll($dto);
     }
 
+    /**
+     * @throws \App\Values\Exceptions\ValueObjectException
+     * @throws \ReflectionException
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     */
     public function export(WorkReportFilterRequest $request)
     {
         $dto = new WorkReportFilterData($request->validated());
         return Excel::download(new WorkReportsExport($this->workReportService->getAll($dto)), 'work_reports.xlsx');
-
-//        return view('reports.work.export', [
-//            'data' => $this->workReportService->getAll($dto)
-//        ]);
     }
 }
