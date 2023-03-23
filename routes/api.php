@@ -3,6 +3,7 @@
 use App\Anketa;
 use App\Http\Controllers\Api\SdpoController;
 use App\Http\Controllers\ReportContractRefactoringController;
+use App\Http\Controllers\WorkReportsController;
 use App\Notify;
 use App\NotifyStatuse;
 use Illuminate\Http\Request;
@@ -29,7 +30,9 @@ Route::get('/points/find', 'ApiController@pointsList');
 Route::get('/find/{model}', 'ApiController@modelList');
 
 Route::get('reports/journal', 'ReportController@getJournalData')->name('api.reports.journal');
-Route::get('reports/work/get', [\App\Http\Controllers\WorkReportsController::class, 'getReport'])->name('api.reports.work');
+Route::get('reports/work/get', [WorkReportsController::class, 'getReport'])->name('api.reports.work');
+Route::get('reports/work/export', [WorkReportsController::class, 'export'])->name('report.work.export');
+
 Route::get('reports/contract/journal', 'ReportControllerContract@getJournalData')->name('api.reports.journal');
 Route::get('reports/journal/export', 'ReportController@exportJournalData')->name('api.reports.journal.export');
 Route::get('reports/contract/journal/export', 'ReportController@exportJournalData');

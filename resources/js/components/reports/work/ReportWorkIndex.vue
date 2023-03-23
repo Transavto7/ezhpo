@@ -129,7 +129,23 @@ export default {
       });
     },
     exportData() {
-      alert('export')
+      this.loadingExport = true;
+      axios.get('/api/reports/work/export', {
+        params: {
+          company_id: this.company_id,
+          month: this.month
+        },
+        responseType: 'blob'
+      }).then(({ data }) => {
+        const url = window.URL.createObjectURL(new Blob([data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'export.xlsx'); //or any other extension
+        document.body.appendChild(link);
+        link.click();
+      }).finally(() => {
+        this.loadingExport = false;
+      });
     },
     submitFilters() {
       this.loading = true;
@@ -158,5 +174,16 @@ tr:nth-child(4n+1)
 
 table {
   background-color: #D9EAD3;
+  color: #1b1e21;
+}
+table.table-bordered{
+  border:1px solid black;
+  margin-top:20px;
+}
+table.table-bordered > thead > td{
+  border:1px solid black;
+}
+table.table-bordered > tbody > tr > td{
+  border:1px solid black;
 }
 </style>

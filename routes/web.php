@@ -272,7 +272,6 @@ Route::middleware(['auth', CheckDriver::class])->group(function () {
         Route::get('dynamic/tech', 'ReportController@getDynamicTech')->name('report.dynamic.tech');
         Route::get('dynamic/all', 'ReportController@getDynamicAll')->name('report.dynamic.all');
         Route::get('work', [WorkReportsController::class, 'index'])->name('report.work.index');
-        Route::get('work/export', [WorkReportsController::class, 'export'])->name('report.work.export');
 
         Route::get('{type_report}', 'ReportController@GetReport')->name('report.get');
 

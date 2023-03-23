@@ -14,15 +14,13 @@
     </thead>
     <tbody>
         @foreach($datumTable['reports'] as $reportRow)
-            @foreach($reportRow as $slug => $reportCells)
                 <tr>
-                    @foreach($reportCells as $cell)
+                    @foreach($reportRow as $cell)
                         <td>
                             {{$cell}}
                         </td>
                     @endforeach
                 </tr>
-            @endforeach
         @endforeach
     </tbody>
 </table>

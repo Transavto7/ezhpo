@@ -38,7 +38,6 @@ class WorkReportsController extends Controller
     public function export(WorkReportFilterRequest $request)
     {
         $dto = new WorkReportFilterData($request->validated());
-//        dd($this->workReportService->getAll($dto));
         return Excel::download(new WorkReportsExport($this->workReportService->getAll($dto)), 'work_reports.xlsx');
 
 //        return view('reports.work.export', [
