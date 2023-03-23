@@ -60,7 +60,7 @@ Route::middleware('auth:api')->get('/users/{role}', function (Request $request) 
         '2' => true // medic
     ];
 
-    if(isset($validRoles[$roleRequest])) {
+    if (isset($validRoles[$roleRequest])) {
         $user = User::with('roles')->whereHas('roles', function ($q) use ($request) {
             $q->where('roles.id', 2);
         })->get();
@@ -72,31 +72,31 @@ Route::middleware('auth:api')->get('/users/{role}', function (Request $request) 
 Route::middleware('auth:api')->post('/get-user-from-token', function (Request $request) {
     $user = $request->user();
 
-    if($user->role >= 777) {
+    if ($user->hasRole('terminal')) {
         $token = $request->all();
         $token = isset($token['token']) ? $token['token'] : '';
         $user = User::where('api_token', $token)->first();
-
-        return response()->json($user);
     }
+
+    return response()->json($user);
 });
 
 
 Route::middleware('auth:api')->post('/get-user/{user_id}', function (Request $request) {
     $user = $request->user();
 
-    if($user->role >= 777) {
+    if ($user->hasRole('terminal')) {
         $user_id = $request->user_id;
         $user = User::find($user_id);
-
-        return response()->json($user);
     }
+
+    return response()->json($user);
 });
 
 Route::middleware('auth:api')->group(function () {
 
     Route::get('anketa/{id}', function ($id) {
-        $anketa = Anketa::find($id);
+        $anketa = \App\Anketa::find($id);
 
         return response()->json($anketa);
     });
@@ -161,4 +161,3 @@ Route::middleware('auth:api')->prefix('sdpo')->name('sdpo')->group(function () {
     Route::get('/drivers', 'Api\SdpoController@getDrivers');
     Route::get('/check', 'Api\SdpoController@checkConnaction');
 });
-
