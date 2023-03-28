@@ -3,10 +3,12 @@
 namespace App\Providers;
 
 use App\Http\Controllers\SidebarMenuItemsController;
+use App\Http\Controllers\WorkReportsController;
 use App\Services\Contracts\BaseInspectionService;
 use App\Services\Contracts\ServiceInterface;
 use App\Services\Inspections\MedicalInspectionService;
 use App\Services\SidebarService;
+use App\Services\WorkReportService;
 use App\Settings;
 use App\User;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +30,13 @@ class AppServiceProvider extends ServiceProvider
             ->give(SidebarService::class)
         ;
 
+        $this->app->when(WorkReportsController::class)
+            ->needs(ServiceInterface::class)
+            ->give(WorkReportService::class)
+        ;
+
         $this->app->singleton(BaseInspectionService::class, MedicalInspectionService::class);
+        $this->app->singleton(ServiceInterface::class, WorkReportService::class);
     }
 
     /**

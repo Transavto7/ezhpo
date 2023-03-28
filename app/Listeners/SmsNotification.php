@@ -2,20 +2,25 @@
 
 namespace App\Listeners;
 
-use App\Services\SmsService;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Events\InspectionFailed;
+use App\Services\Contracts\SmsServiceInterface;
+use App\Services\SmsRuService;
 
 class SmsNotification
 {
+    /**
+     * @var SmsRuService
+     */
+    private SmsServiceInterface $smsService;
+
     /**
      * Create the event listener.
      *
      * @return void
      */
-    public function __construct(SmsService $smsService)
+    public function __construct(SmsServiceInterface $smsService)
     {
-        //
+        $this->smsService = $smsService;
     }
 
     /**
@@ -26,12 +31,8 @@ class SmsNotification
      */
     public function handle($event)
     {
-        if(isset($Driver)) {
-            $sms->sms($Company->where_call, Settings::setting('sms_text_driver') . " $Driver->fio. $phone_to_call");
-        } else if (isset($Car)) {
-            $sms->sms($Company->where_call, Settings::setting('sms_text_car') . " $Car->gos_number. $phone_to_call");
-        } else {
-            $sms->sms($Company->where_call, Settings::setting('sms_text_default') . ' ' . new Anketa($anketa) . '.' . ' ' . $phone_to_call);
+        if ($event instanceof InspectionFailed) {
+           $this->smsService->multi[$event->payloadData->company->where_call] = $event->payloadData->smsMessage;
         }
     }
 }

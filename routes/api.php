@@ -1,5 +1,11 @@
 <?php
 
+use App\Anketa;
+use App\Http\Controllers\Api\SdpoController;
+use App\Http\Controllers\ReportContractRefactoringController;
+use App\Http\Controllers\WorkReportsController;
+use App\Notify;
+use App\NotifyStatuse;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Route;
@@ -19,9 +25,14 @@ use App\Point;
 */
 
 Route::get('/companies/find', 'ApiController@companiesList');
+Route::get('/users/find', 'ApiController@usersList');
+Route::get('/points/find', 'ApiController@pointsList');
 Route::get('/find/{model}', 'ApiController@modelList');
 
 Route::get('reports/journal', 'ReportController@getJournalData')->name('api.reports.journal');
+Route::get('reports/work/get', [WorkReportsController::class, 'getReport'])->name('api.reports.work');
+Route::get('reports/work/export', [WorkReportsController::class, 'export'])->name('report.work.export');
+
 Route::get('reports/contract/journal', 'ReportControllerContract@getJournalData')->name('api.reports.journal');
 Route::get('reports/journal/export', 'ReportController@exportJournalData')->name('api.reports.journal.export');
 Route::get('reports/contract/journal/export', 'ReportController@exportJournalData');
@@ -29,10 +40,10 @@ Route::get('reports/getContractsForCompany', 'ReportControllerContract@getContra
 //Route::get('reports/contract/getContractsForCompany', 'ReportControllerContract@getContractsForCompany')->name('api.reports.journal');
 
 Route::get('reports/contract/journal_v2',[
-    \App\Http\Controllers\ReportContractRefactoringController::class, 'getReport'
+    ReportContractRefactoringController::class, 'getReport'
 ]);
 Route::get('reports/contract/export/journal_v2',[
-    \App\Http\Controllers\ReportContractRefactoringController::class, 'export'
+    ReportContractRefactoringController::class, 'export'
 ]);
 
 Route::get('/sync-fields/{model}/{id}', function ($model, $id) {
@@ -49,7 +60,7 @@ Route::middleware('auth:api')->get('/users/{role}', function (Request $request) 
         '2' => true // medic
     ];
 
-    if(isset($validRoles[$roleRequest])) {
+    if (isset($validRoles[$roleRequest])) {
         $user = User::with('roles')->whereHas('roles', function ($q) use ($request) {
             $q->where('roles.id', 2);
         })->get();
@@ -61,25 +72,25 @@ Route::middleware('auth:api')->get('/users/{role}', function (Request $request) 
 Route::middleware('auth:api')->post('/get-user-from-token', function (Request $request) {
     $user = $request->user();
 
-    if($user->role >= 777) {
+    if ($user->hasRole('terminal')) {
         $token = $request->all();
         $token = isset($token['token']) ? $token['token'] : '';
         $user = User::where('api_token', $token)->first();
-
-        return response()->json($user);
     }
+
+    return response()->json($user);
 });
 
 
 Route::middleware('auth:api')->post('/get-user/{user_id}', function (Request $request) {
     $user = $request->user();
 
-    if($user->role >= 777) {
+    if ($user->hasRole('terminal')) {
         $user_id = $request->user_id;
         $user = User::find($user_id);
-
-        return response()->json($user);
     }
+
+    return response()->json($user);
 });
 
 Route::middleware('auth:api')->group(function () {
@@ -117,10 +128,10 @@ Route::middleware('auth:api')->group(function () {
 
         Route::post('clear', function () {
             $user = request()->user();
-            $notifies = \App\Notify::where('role', $user->role)->get();
+            $notifies = Notify::where('role', $user->role)->get();
 
             foreach($notifies as $notify) {
-                \App\NotifyStatuse::create([
+                NotifyStatuse::create([
                     'user_id' => $user->id,
                     'notify_id' => $notify->id
                 ]);
@@ -140,6 +151,7 @@ Route::middleware('auth:api')->group(function () {
 
 Route::middleware('auth:api')->prefix('sdpo')->name('sdpo')->group(function () {
     Route::post('/anketa', 'Api\SdpoController@createAnketa');
+    Route::post('/work/report', [SdpoController::class, 'workReport']);
     Route::post('/anketa/{id}', 'Api\SdpoController@changeType');
     Route::get('/anketa/{id}', 'Api\SdpoController@getInspection');
     Route::get('/pv', 'Api\SdpoController@getPoint');
@@ -149,4 +161,3 @@ Route::middleware('auth:api')->prefix('sdpo')->name('sdpo')->group(function () {
     Route::get('/drivers', 'Api\SdpoController@getDrivers');
     Route::get('/check', 'Api\SdpoController@checkConnaction');
 });
-

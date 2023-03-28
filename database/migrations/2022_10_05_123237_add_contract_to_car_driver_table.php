@@ -14,12 +14,16 @@ class AddContractToCarDriverTable extends Migration
     public function up()
     {
         Schema::table('cars', function (Blueprint $table) {
-            $table->unsignedBigInteger('contract_id')->nullable();
-            $table->foreign('contract_id')->references('id')->on('contracts');
+            if (!Schema::hasColumn('cars', 'contract_id')) {
+                $table->unsignedBigInteger('contract_id')->nullable();
+                $table->foreign('contract_id')->references('id')->on('contracts');
+            }
         });
         Schema::table('drivers', function (Blueprint $table) {
-            $table->unsignedBigInteger('contract_id')->nullable();
-            $table->foreign('contract_id')->references('id')->on('contracts');
+            if (!Schema::hasColumn('drivers', 'contract_id')) {
+                $table->unsignedBigInteger('contract_id')->nullable();
+                $table->foreign('contract_id')->references('id')->on('contracts');
+            }
         });
     }
 

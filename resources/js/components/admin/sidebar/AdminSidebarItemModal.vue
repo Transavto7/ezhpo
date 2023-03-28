@@ -38,6 +38,15 @@
             placeholder="Введите текст для всплывающей подсказки"
         />
       </div>
+      <div class="form-group mb-3">
+        <label class="mb-1">Ссылка на ресурс</label>
+        <b-form-input
+            v-model="item.route_name"
+            size="sm"
+            rows="10"
+            placeholder="Введите ссылку на ресурс"
+        />
+      </div>
       <div class="mt-3 d-flex justify-content-end">
         <b-button variant="danger" @click="show = false">Отмена</b-button>
         <b-button class="ml-2" variant="success" :disabled="saving" @click="saveElement">
@@ -77,6 +86,7 @@ export default {
       await axios.put('/sidebar/items/' + this.item.id, {
         title: this.item.title,
         tooltip_prompt: this.item.tooltip_prompt,
+        route_name: this.item.route_name,
         parent_id: +this.item.parent_id,
       }).then(({data}) => {
         this.show = false;

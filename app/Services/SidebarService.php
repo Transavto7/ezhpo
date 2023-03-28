@@ -57,7 +57,7 @@ class SidebarService implements ServiceInterface
     /**
      * @param  \App\Dtos\SidebarMenuItemData  $data
      * @param  int  $id
-     * @return bool
+     * @return array
      */
     public function updateItem(SidebarMenuItemData $data, int $id): array
     {

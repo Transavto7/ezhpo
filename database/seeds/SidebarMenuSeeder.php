@@ -137,6 +137,12 @@ class SidebarMenuSeeder extends Seeder
                         'icon_class' => 'fa fa-book',
                         'route_name' => '/report/journal_new',
                     ],
+                    [
+                        'title' => 'Отчёты по работе сотрудников',
+                        'slug' => 'report_employee_work',
+                        'icon_class' => 'fa fa-book',
+                        'route_name' => '/report/work',
+                    ],
                 ]
             ],
             [
@@ -168,12 +174,12 @@ class SidebarMenuSeeder extends Seeder
                     [
                         'title' => 'Услуги',
                         'slug' => 'products',
-                        'route_name' => '/elements/products',
+                        'route_name' => '/elements/Product',
                     ],
                     [
                         'title' => 'Скидки',
                         'slug' => 'discounts',
-                        'route_name' => '/elements/Product',
+                        'route_name' => '/elements/Discount',
                     ],
                     [
                         'title' => 'Виды инструктажей',

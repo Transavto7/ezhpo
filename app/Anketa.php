@@ -151,6 +151,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder|Anketa whereUserName($value)
  * @method static Builder|Anketa whereVideos($value)
  * @mixin \Eloquent
+ * @property string|null $tonometer
+ * @property float|null $t_people
+ * @property-read array $tonometer_data
+ * @property-read ArrayObject $tonometer_data_int
  */
 class Anketa extends Model
 {
