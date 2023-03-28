@@ -174,12 +174,12 @@ class SidebarMenuSeeder extends Seeder
                     [
                         'title' => 'Услуги',
                         'slug' => 'products',
-                        'route_name' => '/elements/products',
+                        'route_name' => '/elements/Product',
                     ],
                     [
                         'title' => 'Скидки',
                         'slug' => 'discounts',
-                        'route_name' => '/elements/Product',
+                        'route_name' => '/elements/Discount',
                     ],
                     [
                         'title' => 'Виды инструктажей',
