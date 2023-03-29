@@ -151,10 +151,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder|Anketa whereUserName($value)
  * @method static Builder|Anketa whereVideos($value)
  * @mixin \Eloquent
- * @property string|null $tonometer
- * @property float|null $t_people
- * @property-read array $tonometer_data
- * @property-read ArrayObject $tonometer_data_int
  */
 class Anketa extends Model
 {
@@ -721,7 +717,7 @@ class Anketa extends Model
         'diastolic' => [40, 160],
     ];
 
-    public const HUMAN_BODY_TEMPERATURE_THRESHOLDS = [35.5, 37.5];
+    public const HUMAN_BODY_TEMPERATURE_THRESHOLDS = [35.5, 37.0];
 
     /**
      * Mutator
@@ -730,7 +726,7 @@ class Anketa extends Model
      */
     public function getTonometerDataIntAttribute(): ArrayObject
     {
-        return new ArrayObject(explode('/', $this->tonometer));
+        return new ArrayObject(explode('/', tonometer_sanitizing($this->tonometer ?? '120/80')));
     }
 
     /**
@@ -741,7 +737,10 @@ class Anketa extends Model
      */
     public function getTonometerDataAttribute(): array
     {
-        return ['systolic' => $this->tonometer_data_int[0], 'diastolic' => $this->tonometer_data_int[1]];
+        return [
+            'systolic' => trim($this->tonometer_data_int[0] ?? ''),
+            'diastolic' => trim($this->tonometer_data_int[1] ?? '')
+        ];
 
     }
 
