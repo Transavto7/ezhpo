@@ -37,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(BaseInspectionService::class, MedicalInspectionService::class);
         $this->app->singleton(ServiceInterface::class, WorkReportService::class);
+        $this->app->register(TelescopeServiceProvider::class);
     }
 
     /**

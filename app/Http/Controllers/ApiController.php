@@ -249,8 +249,9 @@ class ApiController extends Controller
         return ApiController::r(['exists' => false, 'message' => '', 'model' => $model], 0);
     }
 
-    public function OneCheckProperty($prop, $model, $val, Request $request)
+    public function OneCheckProperty(Request $request)
     {
+        dd(1);
         if ($model = app("App\\$request->model")->where($prop, $val)->first()) {
             return response([
                                 'status' => true,
