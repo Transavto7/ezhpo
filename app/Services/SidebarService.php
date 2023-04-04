@@ -49,7 +49,7 @@ class SidebarService implements ServiceInterface
 
         /** @var SideBarMenuItem $item */
         foreach ($sidebarItems as $k => $item) {
-            if (!user()->access(...sanitize_explode_by_commas($item->access_permissions))) {
+            if (!user()->access(...sanitize_explode_by_commas($item->access_permissions ?? ''))) {
                 $sidebarItems->forget($k);
             }
         }
