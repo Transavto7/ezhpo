@@ -47,6 +47,13 @@ class SidebarService implements ServiceInterface
         $pakErrorsCnt = Anketa::where('type_anketa', 'pak')->count();
         $sidebarItems = (new static())->getAllItems()->get();
 
+        /** @var SideBarMenuItem $item */
+        foreach ($sidebarItems as $k => $item) {
+            if (!user()->access(...sanitize_explode_by_commas($item->access_permissions))) {
+                $sidebarItems->forget($k);
+            }
+        }
+
         return [
             $pakQueueCnt,
             $pakErrorsCnt,
