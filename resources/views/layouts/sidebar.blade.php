@@ -25,7 +25,7 @@
             <a class="bg-info text-white">МЕНЮ</a>
         </li>
         @foreach($sidebarItems as $k => $item)
-            @if(user()->access($item->access_permissions) or user()->hasRole('admin'))
+            @if(user()->access(sanitize_explode_by_commas($item->access_permissions)) or user()->hasRole('admin'))
                 @if($item->is_header === 1)
                     <li>
                         <a data-btn-collapse="#items-{{$k}}"
