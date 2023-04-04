@@ -58,7 +58,7 @@ class SidebarMenuItemsController extends Controller
      * Update the specified resource in storage.
      *
      */
-    public function update(SaveSidebarMenuItem $request, SideBarMenuItem $sideBarMenuItem) : array
+    public function update(SaveSidebarMenuItem $request, $id) : array
     {
         dd($request->validated());
         return $this->sidebarMenuService->updateItem(
