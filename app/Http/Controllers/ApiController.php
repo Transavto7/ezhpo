@@ -50,7 +50,7 @@ class ApiController extends Controller
         if ($request->get('trashed') === 'true') {
             $query = $query->withTrashed();
         }
-        
+
 //        if (in_array($model, array_keys($mainContentFields)) && $field == "concat" && ($key == "hash_id" || $key == 'id')) {
 //            return $query->select(DB::raw("CONCAT('[', `hash_id`, '] ', `$mainContentFields[$model]`) as concat"), $key)->limit(100)->get();
 //        }
@@ -249,9 +249,8 @@ class ApiController extends Controller
         return ApiController::r(['exists' => false, 'message' => '', 'model' => $model], 0);
     }
 
-    public function OneCheckProperty(Request $request)
+    public function OneCheckProperty($prop, $model, $val, Request $request)
     {
-        dd(1);
         if ($model = app("App\\$request->model")->where($prop, $val)->first()) {
             return response([
                                 'status' => true,
