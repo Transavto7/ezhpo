@@ -183,7 +183,7 @@ class SidebarMenuSeeder extends Seeder
                 'slug' => 'crm',
                 'icon_class' => 'icon-interface-windows',
                 'is_header' => true,
-                'access_permissions' => 'medic_create',
+                'access_permissions' => 'drivers_read, cars_read, company_read, service_read, discount_read, briefings_read, drivers_create, cars_create, company_create, service_create, discount_create, briefings_create,contract_read, contract_create',
                 'access_role' => '*',
                 'children' => [
                     [
