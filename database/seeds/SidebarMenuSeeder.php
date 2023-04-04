@@ -75,7 +75,7 @@ class SidebarMenuSeeder extends Seeder
                 'slug' => 'inspection_journal',
                 'icon_class' => 'icon-grid',
                 'is_header' => true,
-                'access_permissions' => 'medic_create',
+                'access_permissions' => 'medic_create, medic_read, tech_create, tech_read',
                 'access_role' => '*',
                 'children' => [
                     [

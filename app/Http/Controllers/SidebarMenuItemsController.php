@@ -60,10 +60,9 @@ class SidebarMenuItemsController extends Controller
      */
     public function update(SaveSidebarMenuItem $request, $id) : array
     {
-        dd($request->validated());
         return $this->sidebarMenuService->updateItem(
             new SidebarMenuItemData($request->validated()),
-            $sideBarMenuItem->id
+            $id
         );
     }
 }
