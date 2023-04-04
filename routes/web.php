@@ -196,7 +196,7 @@ Route::middleware(['auth'])->group(function () {
     Route::any('/field/prompt/filter', 'FieldPromptController@getAll');
     Route::any('/sidebar/items/filter', [SidebarMenuItemsController::class, 'filter']);
     Route::resource('field/prompt', 'FieldPromptController');
-    Route::put('sidebar/items', 'SidebarMenuItemsController@update');
+    Route::put('sidebar/items', [SidebarMenuItemsController::class, 'update']);
 });
 
 
