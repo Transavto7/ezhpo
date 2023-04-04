@@ -42,7 +42,7 @@ class SidebarService implements ServiceInterface
         }
 
         $pakQueueCnt = $pakQueueCnt->count();
-        
+
         //$pakQueueCnt = Anketa::where('type_anketa', 'pak_queue')->where('pv_id', Point::where('id', Auth::user()->pv_id)->first()->name)->count();
         $pakErrorsCnt = Anketa::where('type_anketa', 'pak')->count();
         $sidebarItems = (new static())->getAllItems()->get();

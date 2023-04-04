@@ -634,7 +634,8 @@ $(document).ready(function () {
     // Проверка свойства по модели на бэкенда
     window.checkInputProp = async (prop = '0', model = '0', val = '0', label, parent, is_dop) => {
         let PARENT_ELEM;
-        console.log('---------------')
+        //console.log('---------------')
+        if(!val) return;
         if(parent){
             PARENT_ELEM = parent;
         }else{
