@@ -16,6 +16,10 @@ class ConvertIntegers extends TransformsRequest
      */
     protected function transform($key, $value)
     {
-        return is_numeric($value) ? (int) $value : $value;
+        if ($key !== 'password') {
+            return is_numeric($value) ? (int) $value : $value;
+        }
+
+        return $value;
     }
 }

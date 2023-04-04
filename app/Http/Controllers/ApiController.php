@@ -50,7 +50,7 @@ class ApiController extends Controller
         if ($request->get('trashed') === 'true') {
             $query = $query->withTrashed();
         }
-        
+
 //        if (in_array($model, array_keys($mainContentFields)) && $field == "concat" && ($key == "hash_id" || $key == 'id')) {
 //            return $query->select(DB::raw("CONCAT('[', `hash_id`, '] ', `$mainContentFields[$model]`) as concat"), $key)->limit(100)->get();
 //        }
