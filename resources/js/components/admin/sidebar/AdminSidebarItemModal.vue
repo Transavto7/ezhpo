@@ -47,6 +47,15 @@
             placeholder="Введите ссылку на ресурс"
         />
       </div>
+      <div class="form-group mb-3">
+        <label class="mb-1">Права доступа</label>
+        <b-form-input
+            v-model="item.access_permissions"
+            size="sm"
+            rows="10"
+            placeholder="Введите права доступа через запятую"
+        />
+      </div>
       <div class="mt-3 d-flex justify-content-end">
         <b-button variant="danger" @click="show = false">Отмена</b-button>
         <b-button class="ml-2" variant="success" :disabled="saving" @click="saveElement">
@@ -88,6 +97,7 @@ export default {
         tooltip_prompt: this.item.tooltip_prompt,
         route_name: this.item.route_name,
         parent_id: +this.item.parent_id,
+        access_permissions: this.access_permissions,
       }).then(({data}) => {
         this.show = false;
         this.$toast('Изменения сохранены');

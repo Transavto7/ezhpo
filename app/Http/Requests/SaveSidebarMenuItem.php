@@ -28,7 +28,9 @@ class SaveSidebarMenuItem extends FormRequest
         return [
             'title' => 'string|required',
             'tooltip_prompt' => 'string|nullable',
-            'parent_id' => 'integer|nullable'
+            'parent_id' => 'integer|nullable',
+            'route_name' => 'string|required',
+            'access_permissions' => 'string|required'
         ];
     }
 }

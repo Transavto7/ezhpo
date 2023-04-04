@@ -40,3 +40,9 @@ if (!function_exists('tonometer_sanitizing')) {
         return preg_replace('/[^0-9\/]/',"", $tonometer);
     }
 }
+
+if (!function_exists('sanitize_explode_by_commas')) {
+    function sanitize_explode_by_commas(string $string) {
+        return explode(',', preg_replace("/[^a-zA-Z,_\"{}:]/", "", $string));
+    }
+}
