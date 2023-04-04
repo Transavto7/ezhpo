@@ -32,7 +32,6 @@
         "chosen-js": "^1.8.7",
         "croppie": "^2.6.5",
         "jquery-mask-plugin": "^1.14.16",
-        "libphonenumber-js": "^1.10.24",
         "portal-vue": "^2.1.7",
         "suggestions-jquery": "^21.2.0",
         "sweetalert": "^2.1.2",
@@ -43,6 +42,6 @@
         "vue-multiselect": "^2.1.6",
         "vue-select": "^3.20.0",
         "vue-toastification": "^1.7.14",
-        "vue2-editor": "^1.0.1"
+        "vue2-editor": "^2.10.3"
     }
 }
