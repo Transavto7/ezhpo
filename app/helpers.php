@@ -42,7 +42,7 @@ if (!function_exists('tonometer_sanitizing')) {
 }
 
 if (!function_exists('sanitize_explode_by_commas')) {
-    function sanitize_explode_by_commas(string $string) {
+    function sanitize_explode_by_commas(string $string) : array {
         return explode(',', preg_replace("/[^a-zA-Z,_\"{}:]/", "", $string));
     }
 }
