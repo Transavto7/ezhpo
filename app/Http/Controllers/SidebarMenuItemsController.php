@@ -6,6 +6,7 @@ use App\Dtos\SidebarMenuItemData;
 use App\Http\Requests\SaveSidebarMenuItem;
 use App\Services\Contracts\ServiceInterface;
 use App\Services\SidebarService;
+use App\SideBarMenuItem;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\Factory;
@@ -57,12 +58,12 @@ class SidebarMenuItemsController extends Controller
      * Update the specified resource in storage.
      *
      */
-    public function update(SaveSidebarMenuItem $request, int $id) : array
+    public function update(SaveSidebarMenuItem $request, SideBarMenuItem $sideBarMenuItem) : array
     {
-        dd($request->all());
+        dd($request->validated());
         return $this->sidebarMenuService->updateItem(
             new SidebarMenuItemData($request->validated()),
-            $id
+            $sideBarMenuItem->id
         );
     }
 }
