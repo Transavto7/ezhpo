@@ -178,9 +178,11 @@ class IndexController extends Controller
                 'fields' => [
                     'company_id'    => ['label' => 'Компания', 'type' => 'text', 'values' => 'Company', 'getField' => 'name',
                         'concatField' => 'hash_id', 'getFieldKey' => 'id'],
-                    'hash_id'       => ['label' => 'Водитель',
-                        'type' => 'select', 'values' => 'Driver',
-                        'getField' => 'fio', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id'],
+                    'hash_id'       => [
+                        'label'      => 'Водитель',
+                        'type'       => 'text',
+                        'noRequired' => 1,
+                    ],
                     'fio' => ['label' => 'ФИО', 'type' => 'text', 'hideFilter' => true],
                     'year_birthday' => ['label' => 'Дата рождения', 'type' => 'date', 'noRequired' => 1],
                     'photo'         => ['label' => 'Фото', 'type' => 'file', 'resize' => 1, 'noRequired' => 1],
