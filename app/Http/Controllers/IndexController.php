@@ -179,7 +179,7 @@ class IndexController extends Controller
                     'company_id'    => ['label' => 'Компания', 'type' => 'text', 'values' => 'Company', 'getField' => 'name',
                         'concatField' => 'hash_id', 'getFieldKey' => 'id'],
                     'hash_id'       => [
-                        'label'      => 'Водитель',
+                        'label'      => 'Водитель.',
                         'type'       => 'text',
                         'noRequired' => 1,
                     ],
