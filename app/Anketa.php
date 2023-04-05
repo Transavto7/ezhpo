@@ -568,7 +568,7 @@ class Anketa extends Model
             'medic' => [
                 // ID
                 'company_id'             => 'Компания',
-                'driver_id'              => 'Водитель',
+                'driver_fio'              => 'Водитель',
 
                 'date'                   => 'Дата и время осмотра',
                 'period_pl'              => 'Период выдачи ПЛ',

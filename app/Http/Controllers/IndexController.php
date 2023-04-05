@@ -176,12 +176,14 @@ class IndexController extends Controller
 
                 'model'  => 'Driver',
                 'fields' => [
-                    'company_id'    => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company', 'getField' => 'name',
+                    'company_id'    => ['label' => 'Компания', 'type' => 'text', 'values' => 'Company', 'getField' => 'name',
                         'concatField' => 'hash_id', 'getFieldKey' => 'id'],
-                    'hash_id'       => ['label' => 'Водитель',
-                        'type' => 'select', 'values' => 'Driver',
-                        'getField' => 'fio', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id'],
-                    'fio' => ['label' => 'ФИО', 'type' => 'text', 'hideFilter' => true],
+                    'hash_id'       => [
+                        'label'      => 'Водитель.',
+                        'type'       => 'text',
+                        'noRequired' => 1,
+                    ],
+                    'fio' => ['label' => 'ФИО', 'type' => 'text', 'hideFilter' => false],
                     'year_birthday' => ['label' => 'Дата рождения', 'type' => 'date', 'noRequired' => 1],
                     'photo'         => ['label' => 'Фото', 'type' => 'file', 'resize' => 1, 'noRequired' => 1],
                     'phone'         => [
@@ -331,14 +333,14 @@ class IndexController extends Controller
                         'defaultValue' => 'Не установлено',
                     ],
 
-                   /* 'products_id' => [
+                    'products_id' => [
                         'label'      => 'Услуги[старые]',
                         'multiple'   => 1,
                         'type'       => 'select',
                         'values'     => 'Product',
                         'concatField' => 'hash_id',
                         'noRequired' => 1,
-                    ],*/
+                    ],
 
                     'trailer'         => [
                         'label'        => 'Прицеп',
@@ -461,7 +463,7 @@ class IndexController extends Controller
                         'values'   => 'Models\Service',
                     ],
 
-                    /*'products_id' => [
+                    'products_id' => [
                         'label'    => 'Услуги [старые]',
                         'multiple' => 1,
                         'noRequired' => 1,
@@ -472,7 +474,7 @@ class IndexController extends Controller
                             ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
                             ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
                         ],
-                    ],*/
+                    ],
 
                     'where_call'      => [
                         'label'      => 'Номер телефона при отстранении',
