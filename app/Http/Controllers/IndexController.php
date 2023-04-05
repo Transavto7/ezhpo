@@ -183,7 +183,7 @@ class IndexController extends Controller
                         'type'       => 'text',
                         'noRequired' => 1,
                     ],
-                    'fio' => ['label' => 'ФИО', 'type' => 'text', 'hideFilter' => true],
+                    'fio' => ['label' => 'ФИО', 'type' => 'text', 'hideFilter' => false],
                     'year_birthday' => ['label' => 'Дата рождения', 'type' => 'date', 'noRequired' => 1],
                     'photo'         => ['label' => 'Фото', 'type' => 'file', 'resize' => 1, 'noRequired' => 1],
                     'phone'         => [
