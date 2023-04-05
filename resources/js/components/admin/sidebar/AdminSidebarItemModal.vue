@@ -49,7 +49,7 @@
       </div>
       <div class="form-group mb-3">
         <label class="mb-1">Права доступа</label>
-        <b-form-input
+        <b-form-textarea
             v-model="item.access_permissions"
             size="sm"
             rows="10"
@@ -96,8 +96,8 @@ export default {
         title: this.item.title,
         tooltip_prompt: this.item.tooltip_prompt,
         route_name: this.item.route_name,
-        parent_id: +this.item.parent_id,
-        access_permissions: this.access_permissions,
+        parent_id: this.item.parent_id,
+        access_permissions: this.item.access_permissions,
       }).then(({data}) => {
         this.show = false;
         this.$toast('Изменения сохранены');

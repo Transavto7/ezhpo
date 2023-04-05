@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -54,9 +55,10 @@ class Handler extends ExceptionHandler
             switch (true) {
                 case ($exception instanceof NotFoundHttpException):
                     return response(['message' => $exception->getMessage()], Response::HTTP_NOT_FOUND);
-                    break;
                 case ($exception instanceof UnprocessableEntityHttpException):
                     return response(['message' => $exception->getMessage(), 'errors' => $exception]);
+                case ($exception instanceof ValidationException):
+                    return response(['message' => $exception->getMessage(), 'errors' => $exception->errors()]);
                 default:
                     return response([
                         'message' => $exception->getMessage(),
