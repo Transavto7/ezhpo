@@ -179,9 +179,13 @@ class IndexController extends Controller
                     'company_id'    => ['label' => 'Компания', 'type' => 'text', 'values' => 'Company', 'getField' => 'name',
                         'concatField' => 'hash_id', 'getFieldKey' => 'id'],
                     'hash_id'       => [
-                        'label'      => 'Водитель.',
-                        'type'       => 'text',
-                        'noRequired' => 1,
+                        'label' => 'ID водителя',
+                        'type' => 'select', 
+                        'values' => 'Driver',
+                        'getField' => 
+                        'fio', 
+                        'concatField' => 'hash_id', 
+                        'getFieldKey' => 'hash_id'
                     ],
                     'fio' => ['label' => 'ФИО', 'type' => 'text', 'hideFilter' => false],
                     'year_birthday' => ['label' => 'Дата рождения', 'type' => 'date', 'noRequired' => 1],
@@ -317,9 +321,9 @@ class IndexController extends Controller
                 'fields' => [
                     'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company',
                         'getField' => 'name', 'getFieldKey' => 'id', 'concatField' => 'hash_id'],
-                    'hash_id'    => ['label' => 'Гос.номер', 'type' => 'select',
+                    'hash_id'    => ['label' => 'ID автомобиля', 'type' => 'select',
                         'values' => 'Car', 'getField' => 'gos_number', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id'],
-                    'gos_number' => ['label' => 'Гос.номер', 'type' => 'text', 'hideFilter' => true],
+                    'gos_number' => ['label' => 'Гос.номер', 'type' => 'text', 'hideFilter' => false],
                     'mark_model' => ['label' => 'Марка и модель', 'type' => 'text'],
                     'type_auto'  => [
                         'label'        => 'Тип автомобиля',
