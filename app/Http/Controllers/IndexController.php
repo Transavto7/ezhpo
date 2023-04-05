@@ -176,15 +176,15 @@ class IndexController extends Controller
 
                 'model'  => 'Driver',
                 'fields' => [
-                    'company_id'    => ['label' => 'Компания', 'type' => 'text', 'values' => 'Company', 'getField' => 'name',
+                    'company_id'    => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company', 'getField' => 'name',
                         'concatField' => 'hash_id', 'getFieldKey' => 'id'],
                     'hash_id'       => [
                         'label' => 'ID водителя',
-                        'type' => 'select', 
+                        'type' => 'select',
                         'values' => 'Driver',
-                        'getField' => 
-                        'fio', 
-                        'concatField' => 'hash_id', 
+                        'getField' =>
+                        'fio',
+                        'concatField' => 'hash_id',
                         'getFieldKey' => 'hash_id'
                     ],
                     'fio' => ['label' => 'ФИО', 'type' => 'text', 'hideFilter' => false],
