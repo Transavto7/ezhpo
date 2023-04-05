@@ -221,14 +221,14 @@ class IndexController extends Controller
                         'type'   => 'select',
                         'values' => 'Models\Contract',
                     ],
-                    /*'products_id'        => [
+                    'products_id'        => [
                         'label'      => 'Услуги[старые]',
                         'multiple'   => 1,
                         'type'       => 'select',
                         'values'     => 'Product',
                         'concatField' => 'hash_id',
                         'noRequired' => 1,
-                    ],*/
+                    ],
 
                     //                'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1, 'saveToHistory' => 1],
                     'note'               => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],

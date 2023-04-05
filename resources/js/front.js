@@ -559,14 +559,15 @@ $(document).ready(function () {
                                }
                            }
                        // }
-
-                       msg += `
+                        if(i !== 'products_id') {
+                            msg += `
                         <p style="${i === 'dismissed' ? data[i].toUpperCase() === 'ДА' ? 'color: red; font-weight: bold;' : '' : ''}" data-field-card="${model}_${i}" class="text-small m-0">${fvItem.label}:<br/>
                             ${otherHtmlItems}
                             <div class="form-group ${inputClass}">
                                 ${field}
                             </div>
                         </p>`
+                        }
 
                     }
                 }
