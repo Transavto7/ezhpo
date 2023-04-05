@@ -187,7 +187,7 @@ class IndexController extends Controller
                         'concatField' => 'hash_id', 
                         'getFieldKey' => 'hash_id'
                     ],
-                    'fio' => ['label' => 'ФИО', 'type' => 'text', 'hideFilter' => true],
+                    'fio' => ['label' => 'ФИО', 'type' => 'text', 'hideFilter' => false],
                     'year_birthday' => ['label' => 'Дата рождения', 'type' => 'date', 'noRequired' => 1],
                     'photo'         => ['label' => 'Фото', 'type' => 'file', 'resize' => 1, 'noRequired' => 1],
                     'phone'         => [
