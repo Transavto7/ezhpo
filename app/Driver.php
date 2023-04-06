@@ -393,4 +393,39 @@ class Driver extends Model
         return 100;
     }
 
+    public function getTimeOfAlcoholBan(){
+        if ($this->time_of_alcohol_ban) {
+            return $this->time_of_alcohol_ban;
+        }
+
+        if ($this->company->time_of_alcohol_ban) {
+            return $this->company->time_of_alcohol_ban;
+        }
+
+        $setting = Settings::setting('time_of_alcohol_ban');
+
+        if ($setting) {
+            return $setting;
+        }
+
+        return 120;
+    }
+
+    public function getTimeOfPressureBan(){
+        if ($this->time_of_pressure_ban) {
+            return $this->time_of_pressure_ban;
+        }
+
+        if ($this->company->time_of_pressure_ban) {
+            return $this->company->time_of_pressure_ban;
+        }
+
+        $setting = Settings::setting('time_of_pressure_ban');
+
+        if ($setting) {
+            return $setting;
+        }
+
+        return 20;
+    }
 }
