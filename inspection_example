@@ -1,0 +1,18 @@
+array:10 [▼
+  "_token" => "WscNtP68ZT08Q9LeyxKxotDQFmi1EPEwBl00fx4I"
+  "type_anketa" => "medic"
+  "pv_id" => 13
+  "is_dop" => 0
+  "driver_id" => 666666
+  "anketa" => array:1 [▼
+    0 => array:3 [▼
+      "date" => "2023-04-06T14:52"
+      "type_view" => "Предрейсовый/Предсменный"
+      "tonometer" => "120/80"
+    ]
+  ]
+  "t_people" => 36
+  "proba_alko" => "Отрицательно"
+  "test_narko" => "Не проводился"
+  "med_view" => "В норме"
+]]
