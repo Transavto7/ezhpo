@@ -32,7 +32,7 @@
 
                         @foreach ($fields as $k => $v)
                             @php if ($k == 'hash_id') continue; @endphp
-                            @if($k == 'products_id' && user()->hasRole('client'))
+                            @if($k == 'products_id' /*&& user()->hasRole('client')*/)
                                 @continue
                             @endif
                             @if($k == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
@@ -430,7 +430,9 @@ $permissionToViewContract = user()->access('contract_read');
                     <thead>
                     <tr>
                         @foreach ($fieldPrompts as $field)
-                            @if(($field->field == 'products_id' || $field->field == 'services') && user()->hasRole('client'))
+                            @if(($field->field == 'products_id') /*&& user()->hasRole('client')*/)
+                                @continue
+                            @elseif($field->field == 'services' && user()->hasRole('client'))
                                 @continue
                             @elseif($field->field === 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
                                 @continue
@@ -479,7 +481,7 @@ $permissionToViewContract = user()->access('contract_read');
                     @foreach ($elements as $el)
                         <tr>
                             @foreach ($fieldPrompts as $field)
-                                @if($field->field == 'products_id' && user()->hasRole('client'))
+                                @if($field->field == 'products_id' /*&& user()->hasRole('client')*/)
                                     @continue
                                 @endif
                                 @if(user()->hasRole('client') && $field->field === 'services')

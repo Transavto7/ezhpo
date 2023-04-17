@@ -448,8 +448,7 @@ $(document).ready(function () {
             let dbItemId = 'CARD_' + model.toUpperCase(), msg = `<form id="form_${model}">`,
                 inputClass = model + '_' + 'input'
 
-            $(`#${dbItemId}`).html('<b class="text-info">Загружаем данные...</b>')
-
+            $(`#${dbItemId}`).html('<b class="text-info">Загружаем данные...</b>');
             /**
              * Вставляем поля
              */
@@ -472,14 +471,6 @@ $(document).ready(function () {
                        if(i === 'contract_id' || i === 'contract' || i === 'contracts'){
                            // fvItem['type'] = 'text';
                            continue;
-                       }
-
-                       if(i === 'products_id'){
-                           // for company
-                           // if(fieldsValues.contracts){
-                           //     fieldsValues.contracts
-                           // }
-
                        }
 
                        if(i === 'products_id' && data.contract){
