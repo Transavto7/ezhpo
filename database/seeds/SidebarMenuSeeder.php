@@ -5,6 +5,7 @@ use Illuminate\Database\Seeder;
 class SidebarMenuSeeder extends Seeder
 {
     /**
+     * Test
      * Run the database seeds.
      *
      * @return void

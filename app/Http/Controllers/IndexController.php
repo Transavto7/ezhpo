@@ -14,6 +14,7 @@ use App\Instr;
 use App\Models\Contract;
 use App\Point;
 use App\Product;
+use App\Services\ElementsService;
 use App\Town;
 use App\User;
 use Carbon\Carbon;
@@ -883,6 +884,7 @@ class IndexController extends Controller
 
         $model = app("App\\$model_type");
 
+        /** @var \Illuminate\Database\Eloquent\Model $model */
         if ($model) {
             $data = $request->all();
 
@@ -911,11 +913,11 @@ class IndexController extends Controller
                      * </Проверка на дубликат по названию/номеру>
                      */
 
-                    $data['hash_id'] = mt_rand(1000, 9999).date('s');
+                    $data['hash_id'] = ElementsService::generateSafeHashId(1000, 9999, $model).date('s');
                     break;
 
                 case 'Car':
-                    $data['hash_id'] = mt_rand(500000, 999999);
+                    $data['hash_id'] = ElementsService::generateSafeHashId(500000, 999999, $model);
 
                     // СИНХРОНИЗАЦИЯ ПОЛЕЙ
                     if (isset($data['company_id'])) {
@@ -952,7 +954,7 @@ class IndexController extends Controller
                     break;
 
                 case 'Driver':
-                    $data['hash_id'] = mt_rand(100000, 499999);
+                    $data['hash_id'] = ElementsService::generateSafeHashId(100000, 499999, $model);
 
                     $pv_id = isset($data['company_id']) ? Company::where('id', $data['company_id'])->first()->pv_id : 0;
 
@@ -1007,7 +1009,7 @@ class IndexController extends Controller
 
                     break;
                 case 'Product':
-                    $data['hash_id'] = mt_rand(100000, 499999);
+                    $data['hash_id'] = ElementsService::generateSafeHashId(100000, 499999, $model);
                     if ($data['type_product'] === 'Абонентская плата без реестров') {
                         $data['type_anketa'] = null;
                         $data['type_view']   = null;
@@ -1015,7 +1017,7 @@ class IndexController extends Controller
 
                     break;
                 default:
-                    $data['hash_id'] = mt_rand(1000, 9999).date('s');
+                    $data['hash_id'] = ElementsService::generateSafeHashId(1000, 9999, $model).date('s');
                     break;
             }
 
