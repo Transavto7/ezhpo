@@ -10,7 +10,7 @@
 
         <div class="modal-body">
             @foreach ($fields as $k => $v)
-                @if($k == 'products_id' && user()->hasRole('client'))
+                @if($k == 'products_id' /*&& user()->hasRole('client')*/)
                     @continue
                 @endif
                 @if($k == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
