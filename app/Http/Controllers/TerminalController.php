@@ -44,8 +44,10 @@ class TerminalController extends Controller
                 $terminal->month_amount = $anketas->where('terminal_id', $terminal->id)
                     ->where('created_at', '>=', Carbon::now()->startOfMonth())->count();
 
+                $start = new Carbon('first day of last month');
+                $end = new Carbon('last day of last month');
                 $terminal->last_month_amount = $anketas->where('terminal_id', $terminal->id)
-                    ->where('created_at', '<', Carbon::now()->startOfMonth())->count();
+                    ->whereBetween('created_at', [ $start, $end ])->count();
             }
 
 
