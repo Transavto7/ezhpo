@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
+use App\Services\ElementsService;
 use function foo\func;
 
 class UserController extends Controller
@@ -158,7 +159,7 @@ class UserController extends Controller
             $user = User::create([
                                      'name'     => $request->get('name', null),
                                      'email'    => $request->get('email', null),
-                                     'hash_id'  => mt_rand(1000, 9999).date('s'),
+                                     'hash_id'  => ElementsService::generateSafeHashId(1000000, 9999999, app("App\\User")),
                                      'eds'      => $request->get('eds', null),
                                      'timezone' => $request->get('timezone', null),
                                      'blocked'  => $request->get('blocked', null),
