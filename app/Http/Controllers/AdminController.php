@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use App\Services\ElementsService;
 
 // this is huita for SDPO in SETTINGS ->>>> ONLY
 class AdminController extends Controller
@@ -40,7 +41,7 @@ class AdminController extends Controller
 
         // Добавляем и удаляем лишние данные
         $data['api_token'] = sha1($data['password']) . sha1(date('H:i:s'));
-        $data['hash_id'] = mt_rand(0,9999) . date('s');
+        $data['hash_id'] = ElementsService::generateSafeHashId(1000000, 9999999, app("App\\User"));
         unset($data['_token']);
 
         $data['pv_id_default'] = $data['pv_id'];

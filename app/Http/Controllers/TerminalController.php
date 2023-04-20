@@ -8,6 +8,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Services\ElementsService;
 
 class TerminalController extends Controller
 {
@@ -96,13 +97,13 @@ class TerminalController extends Controller
             $api_token = Hash::make(date('H:i:s'));
             $user = User::create([
                 'name'     => $request->get('name', null),
-                'hash_id'  => mt_rand(1000, 9999).date('s'),
+                'hash_id'  => ElementsService::generateSafeHashId(1000000, 9999999, app("App\\User")),
                 'timezone' => $request->get('timezone', null),
                 'company_id' => $request->get('company_id', null),
                 'blocked'  => $request->get('blocked', 0),
                 'password' => $api_token,
                 'api_token' => $api_token,
-                'email' => time() . '@ta-7.ru',
+                'email' => ElementsService::generateSafeEmail(1000000, 9999999, app("App\\User")),
                 'login' => time() . '@ta-7.ru',
                 'pv_id' => $request->get('pv', null),
             ]);

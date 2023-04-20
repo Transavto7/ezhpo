@@ -22,4 +22,20 @@ class ElementsService implements Contracts\ServiceInterface
         return $hash_id;
     }
 
+    /**
+     * @param  int  $min
+     * @param  int  $max
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return string
+     */
+    public static function generateSafeEmail(int $min, int $max, Model $model): string
+    {
+        $email = mt_rand($min, $max).'@ta-7.ru';
+        while ($model->newQuery()->where(['email' => $email])->exists()) {
+            $email = mt_rand($min, $max).'@ta-7.ru';
+        }
+
+        return $email;
+    }
+
 }
