@@ -17,32 +17,42 @@ use Matrix\Exception;
 
 class SdpoController extends Controller
 {
+
     /*
      * Creating anketa by sdpo request
      */
-    public function createAnketa(Request $request) {
+    public function createAnketa(Request $request)
+    {
         $driver = Driver::where('hash_id', $request->driver_id)->first();
         $user = $request->user('api');
         $sms = new SmsController();
 
         if (!$driver) {
-            return response()->json(['message' => 'Указанный водитель не найден!'], 401);
+            return response()->json(['message' => 'Указанный водитель не найден!'], 400);
+        }
+
+        if ($driver->end_of_ban && (Carbon::now() < $driver->end_of_ban)) {
+            return response()->json(['message' => 'Указанный водитель остранен до ' . $driver->end_of_ban . "!"], 400);
+        }
+
+        if ($request->user('api')->blocked) {
+            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
         }
 
         if ($request->user_id) {
             $user = User::find($request->user_id);
             if (!$user) {
-                return response()->json(['message' => 'Пользователь с таким ID не найден!'], 401);
+                return response()->json(['message' => 'Пользователь с таким ID не найден!'], 400);
             }
         }
 
-        $tonometer = $request->tonometer ?? rand(118,129) .'/'. rand(70,90);
+        $tonometer = $request->tonometer ?? rand(118, 129) . '/' . rand(70, 90);
         $test_narko = $request->test_narko ?? 'Отрицательно';
         $proba_alko = $request->proba_alko ?? 'Отрицательно';
         $company = $driver->company;
         $medic = [];
 
-        if ($company->dismissed  === 'Да') {
+        if ($company->dismissed === 'Да') {
             return response()->json(['message' => 'Компания в черном списке. Необходимо связаться с руководителем!', 401]);
         }
 
@@ -50,7 +60,7 @@ class SdpoController extends Controller
         $medic['user_id'] = $request->user_id ?? $user->id;
         $medic['user_name'] = $user->name;
         $medic['user_eds'] = $user->eds;
-        $medic['pulse'] = $request->pulse ?? mt_rand(60,80);
+        $medic['pulse'] = $request->pulse ?? mt_rand(60, 80);
         $medic['pv_id'] = $request->user('api')->pv->name;
         $medic['point_id'] = $request->user('api')->pv->id;
         $medic['tonometer'] = $tonometer;
@@ -95,18 +105,8 @@ class SdpoController extends Controller
         }
 
         $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
-        $driver->date_prmo = Carbon::now();
-
         $admitted = null;
-
-        //ПРОВЕРЯЕМ статус для поля "Заключение"
-        $ton = explode('/', $tonometer);
-        if ($proba_alko === 'Положительно' || $test_narko === 'Положительно'
-            || intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()
-            || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38) {
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-        }
+        $driver->date_prmo = Carbon::now();
 
         if ($request->sleep_status && $request->sleep_status === 'Нет') {
             $admitted = 'Не допущен';
@@ -127,7 +127,27 @@ class SdpoController extends Controller
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
             $medic['proba_alko'] = 'Положительно';
+            $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
         }
+
+        //ПРОВЕРЯЕМ статус для поля "Заключение"
+        $ton = explode('/', $tonometer);
+        if ($proba_alko === 'Положительно' || $test_narko === 'Положительно'
+            || intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()
+            || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38) {
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
+
+            if (intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()) {
+                $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfPressureBan());
+            }
+
+            if ($proba_alko === 'Положительно') {
+                $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
+            }
+        }
+
+        $driver->save();
 
         if ($request->type_anketa === 'pak_queue') {
             $notifyTo = new Notify();
@@ -153,67 +173,114 @@ class SdpoController extends Controller
     /*
      * Check connection sdpo
      */
-    public function checkConnaction(Request $request) {
+    public function checkConnaction(Request $request)
+    {
         $user = $request->user('api');
         $user->last_connection_at = Carbon::now();
         $user->save();
-        return "true";
+        return response()->json(true);
     }
 
     /*
      * Get PV name by user
      */
-    public function getPoint(Request $request) {
+    public function getPoint(Request $request)
+    {
         $user = $request->user('api');
-        return $user->pv->name;
+        return response()->json($user->pv->name);
     }
 
     /*
      * return all medics
      */
-    public function getMedics(Request $request) {
+    public function getMedics(Request $request)
+    {
         $users = User::with(['roles', 'pv:id,name,pv_id', 'pv.town:id,name'])
             ->whereHas('roles', function ($q) use ($request) {
-            $q->where('roles.id', 2);
-        })->select('id', 'name', 'eds', 'pv_id')->get();
+                $q->where('roles.id', 2);
+            })->select('id', 'name', 'eds', 'pv_id')->get();
 
         $users = $users->groupBy(['pv.town.name', 'pv.name']);
 
-        return $users;
+        return response()->json($users);
     }
 
     /*
     * return driver by id
     */
-    public function getDriver(Request $request, $id) {
-        $driver = Driver::where('hash_id', $id)->select('hash_id', 'fio')->first();
-        return $driver;
+    public function getDriver(Request $request, $id)
+    {
+        if ($request->user('api')->blocked) {
+            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
+        }
+
+        $driver = Driver::where('hash_id', $id)
+            ->with('company')
+            ->select('hash_id', 'fio', 'dismissed', 'company_id', 'end_of_ban', 'photo')->first();
+
+        if (!$driver) {
+            return response()->json(['message' => 'Водитель с указанным ID не найден!'], 400);
+        }
+
+        if ($driver->end_of_ban && (Carbon::now() < $driver->end_of_ban)) {
+            return response()->json(['message' => 'Указанный водитель остранен до ' . $driver->end_of_ban], 400);
+        }
+
+        if ($driver->dismissed === 'Да') {
+            return response()->json(['message' => 'Водитель с указанным ID уволен!'], 303);
+        }
+
+        if ($driver->company->dismissed === 'Да') {
+            return response()->json(['message' => 'Комания указанного водителя заблокирована!'], 303);
+        }
+
+        return response()->json($driver);
     }
 
     /*
     * return all drivers
     */
-    public function getDrivers(Request $request) {
+    public function getDrivers(Request $request)
+    {
         $drivers = Driver::select('hash_id', 'fio')->get();
-        return $drivers;
+        return response()->json($drivers);
     }
 
 
     /*
     * Return inspection info
     */
-    public function getInspection(Request $request, $id) {
+    public function getInspection(Request $request, $id)
+    {
         $inspection = Anketa::find($id);
-        return $inspection;
+        return response()->json($inspection);
     }
 
     /*
     * Inspection update type
     */
-    public function changeType(Request $request, $id) {
+    public function changeType(Request $request, $id)
+    {
         $inspection = Anketa::find($id);
         if ($inspection) {
             $inspection->update(['type_anketa' => 'medic']);
+        }
+    }
+
+    /*
+    * Driver update photo
+    */
+    public function setDriverPhoto(Request $request, $id)
+    {
+        if ($request->photo) {
+            $image = base64_decode($request->photo);
+            $hash = sha1(time());
+            $path = "elements/$hash.png";
+            $image = Storage::disk('public')->put($path, $image);
+
+            $driver = Driver::where('hash_id', $id)->update([
+                'photo' => $path
+            ]);
         }
     }
 }
