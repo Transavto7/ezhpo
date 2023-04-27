@@ -4,31 +4,19 @@ namespace App\Http\Controllers\Api;
 
 use App\Anketa;
 use App\Driver;
-use App\Dtos\WorkReportData;
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\SmsController;
-use App\Http\Requests\WorkReportRequest;
 use App\Notify;
-use App\Services\Contracts\ServiceInterface;
+use App\Point;
 use App\Settings;
 use App\User;
+use http\Env\Response;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Carbon;
 use Matrix\Exception;
-use Illuminate\Support\Facades\Storage;
 
 class SdpoController extends Controller
 {
-    /**
-     * @var \App\Services\Contracts\ServiceInterface
-     */
-    protected ServiceInterface $workReportService;
-
-    public function __construct(ServiceInterface $workReportService)
-    {
-        $this->workReportService = $workReportService;
-    }
-
     /*
      * Creating anketa by sdpo request
      */
@@ -38,21 +26,13 @@ class SdpoController extends Controller
         $sms = new SmsController();
 
         if (!$driver) {
-            return response()->json(['message' => 'Указанный водитель не найден!'], 400);
-        }
-
-        if ($driver->end_of_ban && (Carbon::now() < $driver->end_of_ban)) {
-            return response()->json(['message' => 'Указанный водитель остранен до '.$driver->end_of_ban."!"], 400);
-        }
-
-        if ($request->user('api')->blocked) {
-            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
+            return response()->json(['message' => 'Указанный водитель не найден!'], 401);
         }
 
         if ($request->user_id) {
             $user = User::find($request->user_id);
             if (!$user) {
-                return response()->json(['message' => 'Пользователь с таким ID не найден!'], 400);
+                return response()->json(['message' => 'Пользователь с таким ID не найден!'], 401);
             }
         }
 
@@ -115,8 +95,18 @@ class SdpoController extends Controller
         }
 
         $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
-        $admitted = null;
         $driver->date_prmo = Carbon::now();
+
+        $admitted = null;
+
+        //ПРОВЕРЯЕМ статус для поля "Заключение"
+        $ton = explode('/', $tonometer);
+        if ($proba_alko === 'Положительно' || $test_narko === 'Положительно'
+            || intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()
+            || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38) {
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
+        }
 
         if ($request->sleep_status && $request->sleep_status === 'Нет') {
             $admitted = 'Не допущен';
@@ -137,27 +127,7 @@ class SdpoController extends Controller
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
             $medic['proba_alko'] = 'Положительно';
-            $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
         }
-
-        //ПРОВЕРЯЕМ статус для поля "Заключение"
-        $ton = explode('/', $tonometer);
-        if ($proba_alko === 'Положительно' || $test_narko === 'Положительно'
-            || intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()
-            || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38) {
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-
-            if(intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()) {
-                $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfPressureBan());
-            }
-
-            if($proba_alko === 'Положительно') {
-                $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
-            }
-        }
-
-        $driver->save();
 
         if ($request->type_anketa === 'pak_queue') {
             $notifyTo = new Notify();
@@ -216,30 +186,7 @@ class SdpoController extends Controller
     * return driver by id
     */
     public function getDriver(Request $request, $id) {
-        if ($request->user('api')->blocked) {
-            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
-        }
-
-        $driver = Driver::where('hash_id', $id)
-            ->with('company')
-            ->select('hash_id', 'fio', 'dismissed', 'company_id', 'end_of_ban', 'photo')->first();
-
-        if (!$driver) {
-            return response()->json(['message' => 'Водитель с указанным ID не найден!'], 400);
-        }
-
-        if ($driver->end_of_ban && (Carbon::now() < $driver->end_of_ban)) {
-            return response()->json(['message' => 'Указанный водитель остранен до ' . $driver->end_of_ban], 400);
-        }
-
-        if ($driver->dismissed === 'Да') {
-            return response()->json(['message' => 'Водитель с указанным ID уволен!'], 303);
-        }
-
-        if ($driver->company->dismissed === 'Да') {
-            return response()->json(['message' => 'Комания указанного водителя заблокирована!'], 303);
-        }
-
+        $driver = Driver::where('hash_id', $id)->select('hash_id', 'fio')->first();
         return $driver;
     }
 
@@ -263,38 +210,10 @@ class SdpoController extends Controller
     /*
     * Inspection update type
     */
-    public function changeType(Request $request, $id)
-    {
+    public function changeType(Request $request, $id) {
         $inspection = Anketa::find($id);
         if ($inspection) {
             $inspection->update(['type_anketa' => 'medic']);
         }
-    }
-
-    /*
-    * Driver update photo
-    */
-    public function setDriverPhoto(Request $request, $id) {
-        if ($request->photo) {
-            $image = base64_decode($request->photo);
-            $hash = sha1(time());
-            $path = "elements/$hash.png";
-            $image = Storage::disk('public')->put($path, $image);
-
-            $driver = Driver::where('hash_id', $id)->update([
-                'photo' => $path
-            ]);
-        }
-    }
-
-    /**
-     * @param  \App\Http\Requests\WorkReportRequest  $request
-     * @return array
-     */
-    public function workReport(WorkReportRequest $request): array
-    {
-        $dto = new WorkReportData($request->validated());
-        $dto->user_id = $request->user('api')->id;
-        return $this->workReportService->create($dto);
     }
 }

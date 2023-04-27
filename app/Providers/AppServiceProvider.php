@@ -2,17 +2,11 @@
 
 namespace App\Providers;
 
-use App\Http\Controllers\SidebarMenuItemsController;
-use App\Http\Controllers\WorkReportsController;
-use App\Services\Contracts\BaseInspectionService;
-use App\Services\Contracts\ServiceInterface;
-use App\Services\Inspections\MedicalInspectionService;
-use App\Services\SidebarService;
-use App\Services\WorkReportService;
 use App\Settings;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,20 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->when(SidebarMenuItemsController::class)
-            ->needs(ServiceInterface::class)
-            ->give(SidebarService::class)
-        ;
-
-        $this->app->when(WorkReportsController::class)
-            ->needs(ServiceInterface::class)
-            ->give(WorkReportService::class)
-        ;
-
-        $this->app->singleton(BaseInspectionService::class, MedicalInspectionService::class);
-        $this->app->singleton(ServiceInterface::class, WorkReportService::class);
-
-
+        //
     }
 
     /**
@@ -108,6 +89,8 @@ class AppServiceProvider extends ServiceProvider
             $roles = User::$userRolesValues;
             $user_role = Auth::user()->role;
             $is_role_manager = Auth::user()->role_manager;
+
+
 
 
             $validRoles = [];

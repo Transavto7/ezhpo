@@ -25,11 +25,3 @@
     max-height: 1000px;
     overflow: scroll;
 }
-
-thead tr:nth-child(1) th {
-    background: white;
-    position: sticky;
-    top: -2px;
-    z-index: 10;
-    vertical-align: middle !important;
-}

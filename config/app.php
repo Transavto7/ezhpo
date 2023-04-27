@@ -173,14 +173,12 @@ return [
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
-//        App\Providers\TelescopeServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
         // PERMISSIONS
         Spatie\Permission\PermissionServiceProvider::class,
-        \Barryvdh\Debugbar\ServiceProvider::class
 
     ],
 
@@ -233,7 +231,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
-        'Debugbar' => \Barryvdh\Debugbar\Facade::class,
+
     ],
 
 ];

@@ -5,22 +5,10 @@ namespace App\Http\Controllers;
 use App\Anketa;
 use App\Company;
 use App\Point;
-use App\Services\Inspections\MedicalInspectionService;
 use Illuminate\Http\Request;
 
 class DocsController extends Controller
 {
-
-    /**
-     * @var \App\Services\Inspections\MedicalInspectionService
-     */
-    protected MedicalInspectionService $medicalService;
-
-    public function __construct(MedicalInspectionService $service)
-    {
-        $this->medicalService = $service;
-    }
-
     public function Get (Request $request)
     {
         $anketa_id = $request->anketa_id;
@@ -45,28 +33,28 @@ class DocsController extends Controller
             'alko' => false
         ];
 
-        $anketa = \App\Anketa::find($anketa_id);
+        $a = \App\Anketa::find($anketa_id);
 
-        if($anketa) {
-            $data['user_post'] = ProfileController::getUserRole(true, $anketa->user_id);
+        if($a) {
+            $data['user_post'] = ProfileController::getUserRole(true, $a->user_id);
 
             $fields = new Anketa();
             $fields = $fields->fillable;
 
             foreach($fields as $field) {
-                $data[$field] = $anketa[$field];
+                $data[$field] = $a[$field];
             }
 
-            if ($anketa->test_narko === 'Положительно') {
+            if ($a->test_narko === 'Положительно') {
                 $data['drugs'] = true;
             }
 
-            if ($anketa->proba_alko === 'Положительно') {
+            if ($a->proba_alko === 'Положительно') {
                 $data['alko'] = true;
             }
 
-            if($anketa->company_id) {
-                $c = Company::where('hash_id', $anketa->company_id)->first();
+            if($a->company_id) {
+                $c = Company::where('hash_id', $a->company_id)->first();
 
                 if($c) {
                     $c = Point::find($c->pv_id);
@@ -77,12 +65,10 @@ class DocsController extends Controller
                 }
             }
 
-            if ($anketa->pv_id) {
-                $point = Point::where('name', $anketa->pv_id)->with('town')->first();
+            if ($a->pv_id) {
+                $point = Point::where('name', $a->pv_id)->with('town')->first();
                 $data['town'] = $point->town->name;
             }
-
-            $data['conclusionStr'] = !MedicalInspectionService::acceptConclusion($anketa)? "Наличие признаков заболевания" : "Здоров";
         }
 
         if(view()->exists("docs.$type")) {

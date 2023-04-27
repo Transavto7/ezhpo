@@ -3,51 +3,10 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Query\Builder;
 
-/**
- * App\Product
- *
- * @property int $id
- * @property string $hash_id
- * @property string $name
- * @property string|null $type_product
- * @property string $unit
- * @property int $price_unit
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $type_anketa
- * @property string|null $type_view
- * @property int|null $essence
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property string|null $deleted_id
- * @property-read \App\User|null $deleted_user
- * @property-read \App\Discount|null $discount
- * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Product newQuery()
- * @method static Builder|Product onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|Product query()
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereDeletedId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereEssence($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereHashId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product wherePriceUnit($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereTypeAnketa($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereTypeProduct($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereTypeView($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereUnit($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereUpdatedAt($value)
- * @method static Builder|Product withTrashed()
- * @method static Builder|Product withoutTrashed()
- * @mixin \Eloquent
- */
 class Product extends Model
 {
-    use SoftDeletes;
+    use \Illuminate\Database\Eloquent\SoftDeletes;
 
 //    protected $table = 'services';
     protected $table = 'products';

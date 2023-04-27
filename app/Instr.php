@@ -3,52 +3,10 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Query\Builder;
 
-/**
- * App\Instr
- *
- * @property int $id
- * @property string $hash_id
- * @property string $type_briefing
- * @property string $name
- * @property string|null $descr
- * @property string|null $photos
- * @property string|null $youtube
- * @property int $active
- * @property int|null $sort
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property string|null $deleted_id
- * @property int $is_default Is this briefing default?
- * @property-read \App\User|null $deleted_user
- * @method static \Illuminate\Database\Eloquent\Builder|Instr newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Instr newQuery()
- * @method static Builder|Instr onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|Instr query()
- * @method static \Illuminate\Database\Eloquent\Builder|Instr whereActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Instr whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Instr whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Instr whereDeletedId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Instr whereDescr($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Instr whereHashId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Instr whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Instr whereIsDefault($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Instr whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Instr wherePhotos($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Instr whereSort($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Instr whereTypeBriefing($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Instr whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Instr whereYoutube($value)
- * @method static Builder|Instr withTrashed()
- * @method static Builder|Instr withoutTrashed()
- * @mixin \Eloquent
- */
 class Instr extends Model
 {
-    use SoftDeletes;
+    use \Illuminate\Database\Eloquent\SoftDeletes;
 
     public $fillable = [
         'hash_id',

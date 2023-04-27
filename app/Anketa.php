@@ -2,156 +2,11 @@
 
 namespace App;
 
+use App\Models\Contract;
 use App\Models\ContractAnketaSnapshot;
-use App\Services\Helpers\ArrayObject;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * App\Anketa
- *
- * @property string tonometer
- * @property ArrayObject tonometer_data
- * @property array tonometer_data_int
- * @property float t_people voodoo people
- * @property int $id
- * @property string $type_anketa
- * @property int $user_id
- * @property string|null $user_eds
- * @property string|null $user_name
- * @property string|null $pv_id
- * @property int|null $driver_id
- * @property string|null $driver_group_risk
- * @property string|null $driver_fio
- * @property string|null $driver_gender
- * @property string|null $driver_year_birthday
- * @property string|null $car_id
- * @property string|null $car_mark_model
- * @property string|null $car_gos_number
- * @property string $complaint
- * @property string $condition_visible_sliz
- * @property string $condition_koj_pokr
- * @property string|null $date
- * @property string|null $number_list_road
- * @property string|null $date_number_list_road
- * @property string $type_view
- * @property int|null $company_id
- * @property string|null $company_name
- * @property string $proba_alko
- * @property string $test_narko
- * @property string $med_view
- * @property string $admitted
- * @property int|null $pulse
- * @property int $alcometer_mode
- * @property int|null $alcometer_result
- * @property string|null $type_trip
- * @property string|null $questions
- * @property string|null $odometer
- * @property string $point_reys_control
- * @property int $in_cart
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $date_pechat_pl
- * @property int $count_pl
- * @property string|null $type_briefing
- * @property string|null $photos
- * @property int $is_pak
- * @property string|null $protokol_path
- * @property string|null $comments
- * @property string $added_to_dop
- * @property string|null $period_pl
- * @property string|null $flag_pak
- * @property string|null $realy
- * @property string|null $added_to_mo
- * @property string|null $videos
- * @property int|null $is_dop
- * @property string|null $result_dop
- * @property string|null $connected_hash
- * @property string|null $signature
- * @property mixed|null $deleted_at
- * @property string|null $deleted_id
- * @property int|null $contract_id
- * @property int|null $contract_snapshot_id
- * @property int|null $terminal_id
- * @property int|null $point_id
- * @property string|null $briefing_name
- * @property-read \App\Car|null $car
- * @property-read \App\Company|null $company
- * @property-read ContractAnketaSnapshot|null $contract_snapshot
- * @property-read \App\User|null $deleted_user
- * @property-read \App\Driver|null $driver
- * @property-read \App\Req $our_company
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Product[] $services_snapshot
- * @property-read int|null $services_snapshot_count
- * @property-read \App\User $user
- * @method static Builder|Anketa newModelQuery()
- * @method static Builder|Anketa newQuery()
- * @method static Builder|Anketa query()
- * @method static Builder|Anketa whereAddedToDop($value)
- * @method static Builder|Anketa whereAddedToMo($value)
- * @method static Builder|Anketa whereAdmitted($value)
- * @method static Builder|Anketa whereAlcometerMode($value)
- * @method static Builder|Anketa whereAlcometerResult($value)
- * @method static Builder|Anketa whereBriefingName($value)
- * @method static Builder|Anketa whereCarGosNumber($value)
- * @method static Builder|Anketa whereCarId($value)
- * @method static Builder|Anketa whereCarMarkModel($value)
- * @method static Builder|Anketa whereComments($value)
- * @method static Builder|Anketa whereCompanyId($value)
- * @method static Builder|Anketa whereCompanyName($value)
- * @method static Builder|Anketa whereComplaint($value)
- * @method static Builder|Anketa whereConditionKojPokr($value)
- * @method static Builder|Anketa whereConditionVisibleSliz($value)
- * @method static Builder|Anketa whereConnectedHash($value)
- * @method static Builder|Anketa whereContractId($value)
- * @method static Builder|Anketa whereContractSnapshotId($value)
- * @method static Builder|Anketa whereCountPl($value)
- * @method static Builder|Anketa whereCreatedAt($value)
- * @method static Builder|Anketa whereDate($value)
- * @method static Builder|Anketa whereDateNumberListRoad($value)
- * @method static Builder|Anketa whereDatePechatPl($value)
- * @method static Builder|Anketa whereDeletedAt($value)
- * @method static Builder|Anketa whereDeletedId($value)
- * @method static Builder|Anketa whereDriverFio($value)
- * @method static Builder|Anketa whereDriverGender($value)
- * @method static Builder|Anketa whereDriverGroupRisk($value)
- * @method static Builder|Anketa whereDriverId($value)
- * @method static Builder|Anketa whereDriverYearBirthday($value)
- * @method static Builder|Anketa whereFlagPak($value)
- * @method static Builder|Anketa whereId($value)
- * @method static Builder|Anketa whereInCart($value)
- * @method static Builder|Anketa whereIsDop($value)
- * @method static Builder|Anketa whereIsPak($value)
- * @method static Builder|Anketa whereMedView($value)
- * @method static Builder|Anketa whereNumberListRoad($value)
- * @method static Builder|Anketa whereOdometer($value)
- * @method static Builder|Anketa wherePeriodPl($value)
- * @method static Builder|Anketa wherePhotos($value)
- * @method static Builder|Anketa wherePointId($value)
- * @method static Builder|Anketa wherePointReysControl($value)
- * @method static Builder|Anketa whereProbaAlko($value)
- * @method static Builder|Anketa whereProtokolPath($value)
- * @method static Builder|Anketa wherePulse($value)
- * @method static Builder|Anketa wherePvId($value)
- * @method static Builder|Anketa whereQuestions($value)
- * @method static Builder|Anketa whereRealy($value)
- * @method static Builder|Anketa whereResultDop($value)
- * @method static Builder|Anketa whereSignature($value)
- * @method static Builder|Anketa whereTPeople($value)
- * @method static Builder|Anketa whereTerminalId($value)
- * @method static Builder|Anketa whereTestNarko($value)
- * @method static Builder|Anketa whereTonometer($value)
- * @method static Builder|Anketa whereTypeAnketa($value)
- * @method static Builder|Anketa whereTypeBriefing($value)
- * @method static Builder|Anketa whereTypeTrip($value)
- * @method static Builder|Anketa whereTypeView($value)
- * @method static Builder|Anketa whereUpdatedAt($value)
- * @method static Builder|Anketa whereUserEds($value)
- * @method static Builder|Anketa whereUserId($value)
- * @method static Builder|Anketa whereUserName($value)
- * @method static Builder|Anketa whereVideos($value)
- * @mixin \Eloquent
- */
 class Anketa extends Model
 {
     // archive
@@ -568,7 +423,7 @@ class Anketa extends Model
             'medic' => [
                 // ID
                 'company_id'             => 'Компания',
-                'driver_fio'              => 'Водитель',
+                'driver_id'              => 'Водитель',
 
                 'date'                   => 'Дата и время осмотра',
                 'period_pl'              => 'Период выдачи ПЛ',
@@ -607,7 +462,7 @@ class Anketa extends Model
              */
             'tech'      => [
                 'company_id'     => 'Компания',
-                'driver_fio'      => 'Водитель',
+                'driver_id'      => 'Водитель',
                 'car_id'         => 'Гос. регистрационный номер ТС',
                 'date'           => 'Дата, время проведения контроля',
                 'period_pl'      => 'Период выдачи ПЛ',
@@ -695,14 +550,14 @@ class Anketa extends Model
             'pak_queue' => [
                 'created_at' => 'Дата создания',
                 'driver_fio' => 'Водитель',
-                'pv_id' => 'Пункт выпуска',
-                'tonometer' => "Артериальное давление",
-                't_people' => 'Температура тела',
+                'pv_id'      => 'Пункт выпуска',
+                'tonometer'  => "Артериальное давление",
+                't_people'   => 'Температура тела',
                 'proba_alko' => 'Признаки опьянения', // Проба на алкоголь
-                'complaint' => 'Жалобы',
-                'admitted' => 'Заключение о результатах осмотра',
-                'photos' => 'Фото',
-                'videos' => 'Видео',
+                'complaint'  => 'Жалобы',
+                'admitted'   => 'Заключение о результатах осмотра',
+                'photos'     => 'Фото',
+                'videos'     => 'Видео',
             ],
         ];
 
@@ -710,50 +565,5 @@ class Anketa extends Model
     public static function getAll()
     {
         return self::all();
-    }
-
-    public const BLOOD_PRESSURE_THRESHOLDS = [
-        'systolic' => [50, 220],
-        'diastolic' => [40, 160],
-    ];
-
-    public const HUMAN_BODY_TEMPERATURE_THRESHOLDS = [35.5, 37.0];
-
-    /**
-     * Mutator
-     * @property array tonometer_data_int
-     * @property string tonometer
-     */
-    public function getTonometerDataIntAttribute(): ArrayObject
-    {
-        return new ArrayObject(explode('/', tonometer_sanitizing($this->tonometer ?? '120/80')));
-    }
-
-    /**
-     * Mutator
-     * @return array
-     * @throws \Exception
-     * @property string tonometer
-     */
-    public function getTonometerDataAttribute(): array
-    {
-        return [
-            'systolic' => trim($this->tonometer_data_int[0] ?? ''),
-            'diastolic' => trim($this->tonometer_data_int[1] ?? '')
-        ];
-
-    }
-
-    public function checkTemperatureFine(array $thresholds = self::HUMAN_BODY_TEMPERATURE_THRESHOLDS): bool
-    {
-        return in_array_thresholds($this->t_people, $thresholds);
-    }
-
-    public function checkBloodPressureFine(array $thresholds = self::BLOOD_PRESSURE_THRESHOLDS): bool
-    {
-        return (
-            in_array_thresholds($this->tonometer_data['systolic'], $thresholds['systolic']) and
-            in_array_thresholds($this->tonometer_data['diastolic'], $thresholds['diastolic'])
-        );
     }
 }

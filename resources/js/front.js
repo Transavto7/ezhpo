@@ -559,15 +559,14 @@ $(document).ready(function () {
                                }
                            }
                        // }
-                        if(i !== 'products_id') {
-                            msg += `
+
+                       msg += `
                         <p style="${i === 'dismissed' ? data[i].toUpperCase() === 'ДА' ? 'color: red; font-weight: bold;' : '' : ''}" data-field-card="${model}_${i}" class="text-small m-0">${fvItem.label}:<br/>
                             ${otherHtmlItems}
                             <div class="form-group ${inputClass}">
                                 ${field}
                             </div>
                         </p>`
-                        }
 
                     }
                 }
@@ -635,8 +634,7 @@ $(document).ready(function () {
     // Проверка свойства по модели на бэкенда
     window.checkInputProp = async (prop = '0', model = '0', val = '0', label, parent, is_dop) => {
         let PARENT_ELEM;
-        //console.log('---------------')
-        if(!val) return;
+        console.log('---------------')
         if(parent){
             PARENT_ELEM = parent;
         }else{

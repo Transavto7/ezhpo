@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Services\UserService;
+use App\Http\Controllers\HomeController;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 
@@ -20,10 +20,7 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers {
-        attemptLogin as parentAttempt;
-    }
-
+    use AuthenticatesUsers;
 
     /**
      * Where to redirect users after login.
@@ -58,31 +55,6 @@ class LoginController extends Controller
 
         return $this->sendFailedLoginResponse($request);
     }
-
-    /**
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    public function attemptLogin(Request $request)
-    {
-        if ($this->isBlocked($request)) {
-            $this->incrementLoginAttempts($request);
-            return $this->sendFailedLoginResponse($request);
-        }
-
-        return $this->parentAttempt($request);
-    }
-
-
-
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    private function isBlocked(Request $request): bool
-    {
-        return UserService::checksIsBlockedByLogin($request->get('login'));
-    }
-
     /**
      * Create a new controller instance.
      *

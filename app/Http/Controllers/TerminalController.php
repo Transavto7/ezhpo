@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Anketa;
 use App\FieldPrompt;
+use App\Req;
+use App\Role;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -13,12 +15,11 @@ class TerminalController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::with(['roles', 'pv', 'company', 'pv.town'])->where(function ($query) {
-            $query->whereHas('roles', function ($q) {
+        $date = Carbon::now()->subMonth()->startOfMonth()->startOfDay();
+        $users = User::with(['roles', 'pv', 'company', 'pv.town'])
+            ->whereHas('roles', function ($q) use ($request) {
                 $q->where('roles.id', 9);
-            })->orWhere('role', 778);
-        });
-
+            });
 
         if ($request->get('deleted')) {
             $users->with(['deleted_user'])->onlyTrashed();
@@ -48,7 +49,6 @@ class TerminalController extends Controller
                     ->where('created_at', '<', Carbon::now()->startOfMonth())->count();
             }
 
-
             return response([
                 'total_rows'   => $res->total(),
                 'current_page' => $res->currentPage(),
@@ -57,6 +57,7 @@ class TerminalController extends Controller
         }
 
         $fields = FieldPrompt::where('type', 'terminals')->get();
+
         return view('admin.users_v2.terminal')
             ->with([
                 'users' => $res,

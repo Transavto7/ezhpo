@@ -103,10 +103,8 @@
         <div class="form-group">
             <label class="form-control-label">Дата и время осмотра:</label>
             <article>
-                <input min="1900-02-20T20:20" id="dosm"
-                       max="2999-02-20T20:20" type="datetime-local" value="{{ $default_current_date ?? '' }}"
-                       name="anketa[0][date]"
-                       class="form-control">
+                <input min="1900-02-20T20:20"
+                       max="2999-02-20T20:20" type="datetime-local" value="{{ $default_current_date ?? '' }}" name="anketa[0][date]" class="form-control">
             </article>
         </div>
 

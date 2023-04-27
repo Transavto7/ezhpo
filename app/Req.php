@@ -3,56 +3,10 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Query\Builder;
 
-/**
- * App\Req
- *
- * @property int $id
- * @property string $hash_id
- * @property string $name
- * @property string|null $inn
- * @property string|null $bik
- * @property string|null $kc
- * @property string|null $rc
- * @property string|null $banks
- * @property string|null $director
- * @property string|null $director_fio
- * @property string|null $signature
- * @property string|null $seal
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_id
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \App\User|null $deleted_user
- * @method static \Illuminate\Database\Eloquent\Builder|Req newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Req newQuery()
- * @method static Builder|Req onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|Req query()
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereBanks($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereBik($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereDeletedId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereDirector($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereDirectorFio($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereHashId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereInn($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereKc($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereRc($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereSeal($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereSignature($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Req whereUpdatedAt($value)
- * @method static Builder|Req withTrashed()
- * @method static Builder|Req withoutTrashed()
- * @mixin \Eloquent
- */
 class Req extends Model
 {
-    use SoftDeletes;
+    use \Illuminate\Database\Eloquent\SoftDeletes;
 
     public $fillable
         = [
