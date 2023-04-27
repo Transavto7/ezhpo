@@ -1210,7 +1210,6 @@ class IndexController extends Controller
                 foreach ($request->allFiles() as $file_key => $file) {
                     if (isset($data[$file_key]) && !isset($data[$file_key.'_base64'])) {
                         Storage::disk('public')->delete($element[$file_key]);
-
                         $file_path = Storage::disk('public')->putFile('elements', $file);
 
                         $element[$file_key] = $file_path;
@@ -1233,7 +1232,6 @@ class IndexController extends Controller
                             $base64_image = substr($v, strpos($v, ',') + 1);
                             $base64_image = base64_decode($base64_image);
 
-                            $hash = sha1(time());
                             $name = $model . '_' . $element->id;
                             $path = "elements/$name.png";
 
