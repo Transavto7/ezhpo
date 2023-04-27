@@ -273,12 +273,16 @@ class SdpoController extends Controller
     public function setDriverPhoto(Request $request, $id)
     {
         if ($request->photo) {
-            $image = base64_decode($request->photo);
-            $hash = sha1(time());
-            $path = "elements/$hash.png";
-            $image = Storage::disk('public')->put($path, $image);
+            $driver = Driver::where('hash_id', $id)->first();
+            if (!$driver) {
+                return;
+            }
 
-            $driver = Driver::where('hash_id', $id)->update([
+            $image = base64_decode($request->photo);
+            $path = "elements/driver_photo_" . $id . ".png";
+            Storage::disk('public')->put($path, $image);
+
+            $driver->update([
                 'photo' => $path
             ]);
         }

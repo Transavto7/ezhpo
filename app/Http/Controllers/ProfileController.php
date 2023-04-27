@@ -103,7 +103,7 @@ class ProfileController extends Controller
 
             $photo = $user->photo;
             Storage::disk('public')->delete($photo);
-            $path = 'elements/' . md5($request->photo_base64) . '.png';
+            $path = 'elements/user_avatar_' . $user->id . '.png';
             Storage::disk('public')->put($path, base64_decode($base64_image));
             $user->photo = $path;
         }

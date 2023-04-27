@@ -1234,7 +1234,8 @@ class IndexController extends Controller
                             $base64_image = base64_decode($base64_image);
 
                             $hash = sha1(time());
-                            $path = "elements/$hash.png";
+                            $name = $model . '_' . $element->id;
+                            $path = "elements/$name.png";
 
                             $base64_image = Storage::disk('public')->put($path, $base64_image);
 
