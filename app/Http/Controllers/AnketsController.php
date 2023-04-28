@@ -537,7 +537,13 @@ class AnketsController extends Controller
                             $errorsAnketa[] = 'Не найдена компания.';
                         }
                     }
-                    if(!Driver::where('hash_id', $data['driver_id'])->count()){
+                    if($driver = Driver::where('hash_id', $data['driver_id'])->first()){
+                        if($driver->end_of_ban){
+                            if(Carbon::now() < $driver->end_of_ban){
+                                $errorsAnketa[] = 'Водитель отстранен до '.Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban;
+                            }
+                        }
+                    } else{
                         $errorsAnketa[] = 'Не найден водитель.';
                     }
                 }
@@ -773,6 +779,15 @@ class AnketsController extends Controller
                     $anketa['admitted'] = 'Допущен';
                 } else {
                     $anketa['admitted'] = 'Не допущен';
+
+                    if(!($tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic)){
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfPressureBan()); 
+                        $Driver->save();
+                    }
+                    if($proba_alko === "Положительно"){
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
+                        $Driver ->save();
+                    }
                 }
 
                 /**
@@ -1400,9 +1415,23 @@ class AnketsController extends Controller
                         $anketa['admitted'] = 'Не допущен';
                         $anketa['med_view'] = 'Отстранение';
                     }
+                    if ($driver->end_of_ban > Carbon::now()){
+                        $anketa['admitted'] = 'Не допущен';
+                        $anketa['med_view'] = 'Отстранение';
+                    }
                 } else {
                     $anketa['med_view'] = 'Отстранение';
                     $anketa['admitted'] = 'Не допущен';
+
+                    if(!(intval($tonometer[0]) < $Driver->getPressureSystolic()
+                    && intval($tonometer[1]) < $Driver->getPressureDiastolic())){
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan());
+                        $Driver->save();
+                    }
+                    if($proba_alko === "Положительно"){
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfAlcoholBan());
+                        $Driver->save();
+                    }
                 }
 
                 /**

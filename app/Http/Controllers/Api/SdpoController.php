@@ -35,6 +35,10 @@ class SdpoController extends Controller
             return response()->json(['message' => 'Указанный водитель остранен до ' . $driver->end_of_ban . "!"], 400);
         }
 
+        if (!is_null($driver->end_of_ban) && (Carbon::now() < $driver->end_of_ban)) {
+            return response()->json(['message' => 'Указанный водитель остранен до '.$driver->end_of_ban."!"], 401);
+        }
+
         if ($request->user('api')->blocked) {
             return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
         }
