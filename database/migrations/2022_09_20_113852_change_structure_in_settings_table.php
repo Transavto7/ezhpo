@@ -30,7 +30,10 @@ class ChangeStructureInSettingsTable extends Migration
         $this->createSetting('sms_text_default', null);
         $this->createSetting('id_auto', 0);
         $this->createSetting('id_auto_required', 0);
-        $settings->delete();
+
+        if($settings){
+            $settings->delete();
+        }
 
         Schema::table('settings', function (Blueprint $table) {
             $table->dropColumn('logo');
