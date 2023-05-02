@@ -781,11 +781,11 @@ class AnketsController extends Controller
                     $anketa['admitted'] = 'Не допущен';
 
                     if(!($tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic)){
-                        $Driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfPressureBan()); 
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan()); 
                         $Driver->save();
                     }
                     if($proba_alko === "Положительно"){
-                        $Driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfAlcoholBan());
                         $Driver ->save();
                     }
                 }
