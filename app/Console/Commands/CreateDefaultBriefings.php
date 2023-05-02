@@ -74,7 +74,7 @@ class CreateDefaultBriefings extends Command
                                "driver_year_birthday" => $driver->year_birthday,
                                "complaint" => "Нет",
                                "type_briefing" => 'Специальный',
-                               "signature" => "Подписано простой ЭЦП",
+                               "signature" => "Подписано простой электронной подписью (ПЭП)",
                                "condition_visible_sliz" => "Без особенностей",
                                "condition_koj_pokr" => "Без особенностей",
                                "date" => Carbon::now(),

@@ -88,7 +88,7 @@ class BddDriversinstructionsSetting extends Command
                         'pv_id' => $point->name ?? null,
                         'date' => $bddDate,
                         'type_briefing' => 'Специальный',
-                        'signature' => 'Подписано простой ЭЦП',
+                        'signature' => 'Подписано простой электронной подписью (ПЭП)',
                         'user_eds' => $bddUser->eds,
                         'driver_id' => $driver->id,
                         'driver_fio' => $driver->fio,

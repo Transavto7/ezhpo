@@ -20,9 +20,20 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
 
     public function view(): View
     {
+        //array_unshift($this->fields, $this->fields['driver_fio'] = "ФИО водителя");
+        $fields = [];
+
+        foreach ($this->fields as $key => $value) {
+            if($key === "driver_id"){
+                $fields['driver_fio'] = $value;
+            }else{
+                $fields[$key] = $value;
+            }   
+        }
+
         return view('home-export', [
             'data' => $this->anketas,
-            'fields' => $this->fields,
+            'fields' => $fields,
         ]);
     }
 
