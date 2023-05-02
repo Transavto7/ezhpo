@@ -89,7 +89,7 @@
                                                    name="anketa[0][type_briefing]">
                                             <input type="hidden" value="{{ date('Y-m-d\TH:i', time()) }}"
                                                    name="anketa[0][date]">
-                                            <input type="hidden" value="Подписано простой ЭЦП"
+                                            <input type="hidden" value="Подписано простой электронной подписью"
                                                    name="anketa[0][signature]">
                                             <input type="hidden" value="{{ $instr->name }}"
                                                    name="anketa[0][briefing_name]">

@@ -461,7 +461,7 @@ class IndexController extends Controller
                         'values'   => 'Models\Service',
                     ],
 
-                    /*'products_id' => [
+                    'products_id' => [
                         'label'    => 'Услуги [старые]',
                         'multiple' => 1,
                         'noRequired' => 1,
@@ -472,7 +472,7 @@ class IndexController extends Controller
                             ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
                             ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
                         ],
-                    ],*/
+                    ],
 
                     'where_call'      => [
                         'label'      => 'Номер телефона при отстранении',
