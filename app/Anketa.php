@@ -186,7 +186,8 @@ class Anketa extends Model
             'medic' => [
                 'date'         => 'Дата осмотра',
                 'company_id'   => 'Компания',
-                'driver_id'    => 'Водитель',
+                'driver_id'    => 'ID Водителя',
+                'driver_fio'    => 'ФИО Водителя',
                 'period_pl'    => 'Период выдачи ПЛ',
                 'realy'        => 'Осмотр реальный?',
                 'driver_group_risk'      => 'Группа риска',
@@ -197,8 +198,10 @@ class Anketa extends Model
             ],
             'tech' => [
                 'company_id'     => 'Компания',
-                'driver_id'      => 'Водитель',
-                'car_id'         => 'Гос. регистрационный номер ТС',
+                'driver_id'      => 'ID водителя',
+                'driver_fio'    => 'ФИО Водителя',
+                'car_id'         => 'ID Автомобиля',
+                'car_gos_number' => 'Гос. регистрационный номер ТС',
                 'date'           => 'Дата осмотра',
                 'period_pl'      => 'Период выдачи ПЛ',
                 'realy'          => 'Осмотр реальный?',
@@ -423,7 +426,8 @@ class Anketa extends Model
             'medic' => [
                 // ID
                 'company_id'             => 'Компания',
-                'driver_id'              => 'Водитель',
+                'driver_id'              => 'ID Водителя',
+                'driver_fio'              => 'ФИО Водителя',
 
                 'date'                   => 'Дата и время осмотра',
                 'period_pl'              => 'Период выдачи ПЛ',

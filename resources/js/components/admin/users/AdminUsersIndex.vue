@@ -63,7 +63,7 @@
                             {{ row.value.name }}
                         </template>
                         <template #cell(blocked)="row">
-                            {{ row.value === '1' ? 'Да' : 'Нет' }}
+                            {{ row.value == '1' ? 'Да' : 'Нет' }}
                         </template>
                         <template #cell(roles)="row">
                             <template v-for="role in row.value">

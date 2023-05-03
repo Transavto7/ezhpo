@@ -992,6 +992,7 @@ class AnketsController extends Controller
                 $anketa['pulse'] = isset($anketa['pulse']) ? $anketa['pulse'] : mt_rand(60,80);
 
                 $anketa['pv_id'] = Point::where('id', $pv_id)->first();
+                $anketa['point_id'] = $pv_id;
 
                 // Проверка ПВ
                 if($anketa['pv_id'])
@@ -1161,6 +1162,7 @@ class AnketsController extends Controller
     public function AddFormTemp(Request $request, $isApiRoute = false)
     {
         $user = ($isApiRoute) ? $request->user('api') : Auth::user();
+ 
         $sms = new SmsController();
 
         $data = $request->all();
@@ -1613,12 +1615,14 @@ class AnketsController extends Controller
                  */
                 $anketa['user_id'] = $user->id;
                 $anketa['user_name'] = $user->name;
+                
 
                 $anketa['user_eds'] = isset($anketa['user_eds']) ? $anketa['user_eds'] : $user->eds;
 
                 $anketa['pulse'] = isset($anketa['pulse']) ? $anketa['pulse'] : mt_rand(60,80);
 
                 $anketa['pv_id'] = Point::where('id', $pv_id)->first();
+                $anketa['terminal_id'] = $request->user('api')->id;
 
                 // Проверка ПВ
                 if($anketa['pv_id'])
