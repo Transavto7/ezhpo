@@ -88,7 +88,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('anketa/{id}', function ($id) {
         $anketa = \App\Anketa::find($id);
 
-        if ($anketa) {
+        if ($anketa && $anketa->type_anketa == 'pak_queue') {
             if (Carbon::now()->getTimestamp() - Carbon::parse($anketa->created_at)->getTimestamp() > 12) {
                 $anketa->type_anketa = 'medic';
                 $anketa->save();
