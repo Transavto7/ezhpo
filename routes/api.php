@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Route;
@@ -86,6 +87,14 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('anketa/{id}', function ($id) {
         $anketa = \App\Anketa::find($id);
+
+        if ($anketa) {
+            if (Carbon::now()->getTimestamp() - Carbon::parse($anketa->created_at)->getTimestamp() > 12) {
+                $anketa->type_anketa = 'medic';
+                $anketa->proba_alko = Carbon::now()->getTimestamp() - Carbon::parse($anketa->created_at)->getTimestamp();
+                $anketa->save();
+            }
+        }
 
         return response()->json($anketa);
     });

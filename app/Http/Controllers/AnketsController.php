@@ -770,6 +770,17 @@ class AnketsController extends Controller
 
 
                 /**
+                 * ПРОВЕРЯЕМ СТАТУС для поля "Заключение" - от ПАК
+                 */
+                if(isset($anketa['sleep_status']) && isset($anketa['people_status']) && isset($anketa['alcometer_result'])) {
+                    if($anketa['sleep_status'] === 'Да' && $anketa['people_status'] === 'Да' && $anketa['alcometer_result'] <= 0) {
+                        $anketa['admitted'] = 'Допущен';
+                    } else {
+                        $anketa['admitted'] = 'Не допущен';
+                    }
+                }
+
+                /**
                  * ПРОВЕРЯЕМ статус для поля "Заключение"
                  */
                 $tonometer = explode('/', $anketa['tonometer']);
@@ -781,23 +792,12 @@ class AnketsController extends Controller
                     $anketa['admitted'] = 'Не допущен';
 
                     if(!($tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic)){
-                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan()); 
+                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan());
                         $Driver->save();
                     }
-                    if($proba_alko === "Положительно"){
+                    if($proba_alko === "Положительно") {
                         $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfAlcoholBan());
                         $Driver ->save();
-                    }
-                }
-
-                /**
-                 * ПРОВЕРЯЕМ СТАТУС для поля "Заключение" - от ПАК
-                 */
-                if(isset($anketa['sleep_status']) && isset($anketa['people_status']) && isset($anketa['alcometer_result'])) {
-                    if($anketa['sleep_status'] === 'Да' && $anketa['people_status'] === 'Да' && $anketa['alcometer_result'] <= 0) {
-                        $anketa['admitted'] = 'Допущен';
-                    } else {
-                        $anketa['admitted'] = 'Не допущен';
                     }
                 }
 
@@ -1162,7 +1162,7 @@ class AnketsController extends Controller
     public function AddFormTemp(Request $request, $isApiRoute = false)
     {
         $user = ($isApiRoute) ? $request->user('api') : Auth::user();
- 
+
         $sms = new SmsController();
 
         $data = $request->all();
@@ -1615,7 +1615,7 @@ class AnketsController extends Controller
                  */
                 $anketa['user_id'] = $user->id;
                 $anketa['user_name'] = $user->name;
-                
+
 
                 $anketa['user_eds'] = isset($anketa['user_eds']) ? $anketa['user_eds'] : $user->eds;
 
