@@ -178,10 +178,10 @@ class IndexController extends Controller
                 'fields' => [
                     'company_id'    => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company', 'getField' => 'name',
                         'concatField' => 'hash_id', 'getFieldKey' => 'id'],
-                    'hash_id'       => ['label' => 'Водитель',
+                    'hash_id'       => ['label' => 'ID водителя',
                         'type' => 'select', 'values' => 'Driver',
                         'getField' => 'fio', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id'],
-                    'fio' => ['label' => 'ФИО', 'type' => 'text', 'hideFilter' => true],
+                    'fio' => ['label' => 'ФИО', 'type' => 'text'],
                     'year_birthday' => ['label' => 'Дата рождения', 'type' => 'date', 'noRequired' => 1],
                     'photo'         => ['label' => 'Фото', 'type' => 'file', 'resize' => 1, 'noRequired' => 1],
                     'phone'         => [
@@ -215,14 +215,14 @@ class IndexController extends Controller
                         'type'   => 'select',
                         'values' => 'Models\Contract',
                     ],
-                    /*'products_id'        => [
+                    'products_id'        => [
                         'label'      => 'Услуги[старые]',
                         'multiple'   => 1,
                         'type'       => 'select',
                         'values'     => 'Product',
                         'concatField' => 'hash_id',
                         'noRequired' => 1,
-                    ],*/
+                    ],
 
                     //                'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1, 'saveToHistory' => 1],
                     'note'               => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
@@ -315,9 +315,9 @@ class IndexController extends Controller
                 'fields' => [
                     'company_id' => ['label' => 'Компания', 'type' => 'select', 'values' => 'Company',
                         'getField' => 'name', 'getFieldKey' => 'id', 'concatField' => 'hash_id'],
-                    'hash_id'    => ['label' => 'Гос.номер', 'type' => 'select',
+                    'hash_id'    => ['label' => 'ID автомобиля', 'type' => 'select',
                         'values' => 'Car', 'getField' => 'gos_number', 'concatField' => 'hash_id', 'getFieldKey' => 'hash_id'],
-                    'gos_number' => ['label' => 'Гос.номер', 'type' => 'text', 'hideFilter' => true],
+                    'gos_number' => ['label' => 'Гос.номер', 'type' => 'text'],
                     'mark_model' => ['label' => 'Марка и модель', 'type' => 'text'],
                     'type_auto'  => [
                         'label'        => 'Тип автомобиля',
@@ -331,14 +331,14 @@ class IndexController extends Controller
                         'defaultValue' => 'Не установлено',
                     ],
 
-                    /*'products_id' => [
+                    'products_id' => [
                         'label'      => 'Услуги[старые]',
                         'multiple'   => 1,
                         'type'       => 'select',
                         'values'     => 'Product',
                         'concatField' => 'hash_id',
                         'noRequired' => 1,
-                    ],*/
+                    ],
 
                     'trailer'         => [
                         'label'        => 'Прицеп',

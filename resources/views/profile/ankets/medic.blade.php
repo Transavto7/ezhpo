@@ -225,7 +225,7 @@
         <article class="col-md-9">
             <input type="text" min="4" minlength="4" max="7" maxlength="7" placeholder="90/120 или 120/80 (пример)"
                    name="anketa[0][tonometer]" value="{{ $tonometer ?? '' }}" class="form-control">
-            <small>Недопустимо верхнее давление < 50 или > 220 , нижнее < 40 или > 160</small>
+            <small></small>
         </article>
     </div>
 @endif

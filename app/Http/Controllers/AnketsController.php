@@ -1415,7 +1415,7 @@ class AnketsController extends Controller
                         $anketa['admitted'] = 'Не допущен';
                         $anketa['med_view'] = 'Отстранение';
                     }
-                    if ($driver->end_of_ban > Carbon::now()){
+                    if ($Driver->end_of_ban > Carbon::now()){
                         $anketa['admitted'] = 'Не допущен';
                         $anketa['med_view'] = 'Отстранение';
                     }

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\HomeController;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use App\Services\UserService;
+use Illuminate\Support\Facades\Lang;
 
 class LoginController extends Controller
 {
@@ -20,7 +22,9 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers;
+    use AuthenticatesUsers {
+        attemptLogin as parentAttempt;
+    }
 
     /**
      * Where to redirect users after login.
@@ -55,6 +59,48 @@ class LoginController extends Controller
 
         return $this->sendFailedLoginResponse($request);
     }
+
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function attemptLogin(Request $request)
+    {
+        if ($this->isBlocked($request)) {
+            $this->incrementLoginAttempts($request);
+            return $this->sendFailedLoginResponse($request);
+        }
+
+        return $this->parentAttempt($request);
+    }
+
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        if($this->isBlocked($request)){
+            return redirect()->back()
+            ->withInput($request->only($this->username(), 'remember'))
+            ->withErrors([
+                $this->username() => Lang::get('auth.blocked'),
+            ]);
+        }
+        
+        return redirect()->back()
+            ->withInput($request->only($this->username(), 'remember'))
+            ->withErrors([
+                $this->username() => Lang::get('auth.failed'),
+            ]);
+    }
+
+
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    private function isBlocked(Request $request): bool
+    {
+        return UserService::checksIsBlockedByLogin($request->get('login'));
+    }
+
     /**
      * Create a new controller instance.
      *
