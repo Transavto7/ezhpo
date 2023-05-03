@@ -44,13 +44,8 @@ Route::get('/sync-fields/{model}/{id}', function ($model, $id) {
 
 Route::middleware('auth:api')->get('/users/{role}', function (Request $request) {
     $user = $request->user();
-    $roleRequest = $request->role;
 
-    $validRoles = [
-        '2' => true // medic
-    ];
-
-    if($user->role >= 777 && isset($validRoles[$roleRequest])) {
+    if ($user->hasRole('terminal')) {
         $user = User::with('roles')->whereHas('roles', function ($q) use ($request) {
             $q->where('roles.id', 2);
         })->get();
