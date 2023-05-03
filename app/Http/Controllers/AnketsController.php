@@ -786,12 +786,12 @@ class AnketsController extends Controller
                 $tonometer = explode('/', $anketa['tonometer']);
                 if($proba_alko === 'Отрицательно' && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
                     && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38
-                    && $tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic) {
+                    && intval($tonometer[0]) < $pressure_systolic && intval($tonometer[1]) < $pressure_diastolic) {
                     $anketa['admitted'] = 'Допущен';
                 } else {
                     $anketa['admitted'] = 'Не допущен';
 
-                    if(!($tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic)){
+                    if(!($tonometer[0] > $pressure_systolic || $tonometer[1] > $pressure_diastolic)){
                         $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan());
                         $Driver->save();
                     }
@@ -1426,24 +1426,14 @@ class AnketsController extends Controller
                     $anketa['admitted'] = 'Не допущен';
 
                     if(!(intval($tonometer[0]) < $Driver->getPressureSystolic()
-                    && intval($tonometer[1]) < $Driver->getPressureDiastolic())){
+                        && intval($tonometer[1]) < $Driver->getPressureDiastolic())) {
                         $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan());
                         $Driver->save();
                     }
-                    if($proba_alko === "Положительно"){
+
+                    if($proba_alko === "Положительно") {
                         $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfAlcoholBan());
                         $Driver->save();
-                    }
-                }
-
-                /**
-                 * ПРОВЕРЯЕМ СТАТУС для поля "Заключение" - от ПАК
-                 */
-                if(isset($anketa['sleep_status']) && isset($anketa['people_status']) && isset($anketa['alcometer_result'])) {
-                    if($anketa['sleep_status'] === 'Да' && $anketa['people_status'] === 'Да' && doubleval($anketa['alcometer_result']) <= 0) {
-                        $anketa['admitted'] = 'Допущен';
-                    } else {
-                        $anketa['admitted'] = 'Не допущен';
                     }
                 }
 

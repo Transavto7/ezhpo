@@ -91,7 +91,6 @@ Route::middleware('auth:api')->group(function () {
         if ($anketa) {
             if (Carbon::now()->getTimestamp() - Carbon::parse($anketa->created_at)->getTimestamp() > 12) {
                 $anketa->type_anketa = 'medic';
-                $anketa->proba_alko = Carbon::now()->getTimestamp() - Carbon::parse($anketa->created_at)->getTimestamp();
                 $anketa->save();
             }
         }
