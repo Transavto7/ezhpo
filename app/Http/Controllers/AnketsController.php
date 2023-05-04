@@ -780,18 +780,19 @@ class AnketsController extends Controller
                     }
                 }
 
+                
                 /**
                  * ПРОВЕРЯЕМ статус для поля "Заключение"
                  */
                 $tonometer = explode('/', $anketa['tonometer']);
                 if($proba_alko === 'Отрицательно' && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
                     && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38
-                    && intval($tonometer[0]) < $pressure_systolic && intval($tonometer[1]) < $pressure_diastolic) {
+                    && $tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic) {
                     $anketa['admitted'] = 'Допущен';
                 } else {
                     $anketa['admitted'] = 'Не допущен';
-
-                    if(!($tonometer[0] > $pressure_systolic || $tonometer[1] > $pressure_diastolic)){
+                    
+                    if(!($tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic)){
                         $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan());
                         $Driver->save();
                     }
@@ -1430,12 +1431,13 @@ class AnketsController extends Controller
                         $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan());
                         $Driver->save();
                     }
-
+                    
                     if($proba_alko === "Положительно") {
                         $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfAlcoholBan());
                         $Driver->save();
                     }
                 }
+
 
                 if(!empty($d_id) || !empty($c_id) || !empty($anketa['number_list_road'])) {
                     /**
