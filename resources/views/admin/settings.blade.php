@@ -239,7 +239,7 @@
                             </div>
 
                             <div class="form-group col-lg-6">
-                                <label for="time_of_pressure_ban" class="mb-1">Время запрета на прохождение повторного обследования при положительной пробе на алкоголь, (мин.)</label>
+                                <label for="time_of_pressure_ban" class="mb-1">Время запрета на прохождение повторного обследования при отстранении по давлению, (мин.)</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="time_of_pressure_ban">
