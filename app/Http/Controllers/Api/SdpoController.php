@@ -32,7 +32,10 @@ class SdpoController extends Controller
         }
 
         if ($driver->end_of_ban && (Carbon::now() < $driver->end_of_ban)) {
-            return response()->json(['message' => 'Указанный водитель остранен до ' . $driver->end_of_ban . "!"], 400);
+            return response()->json(
+                ['message' => 'Указанный водитель остранен до ' . Carbon::parse($driver->end_of_ban)->addHours(Auth::user()->timezone) . "!"],
+                400
+            );
         }
 
         if (!is_null($driver->end_of_ban) && (Carbon::now() < $driver->end_of_ban)) {
@@ -131,7 +134,7 @@ class SdpoController extends Controller
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
             $medic['proba_alko'] = 'Положительно';
-            $driver->end_of_ban = Carbon::now('GMT+'.strval($timezone))->addMinutes($driver->getTimeOfAlcoholBan());
+            $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
         }
 
         //ПРОВЕРЯЕМ статус для поля "Заключение"
@@ -143,11 +146,11 @@ class SdpoController extends Controller
             $medic['med_view'] = 'Отстранение';
 
             if (intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()) {
-                $driver->end_of_ban = Carbon::now('GMT+'.strval($timezone))->addMinutes($driver->getTimeOfPressureBan());
+                $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfPressureBan());
             }
 
             if ($proba_alko === 'Положительно') {
-                $driver->end_of_ban = Carbon::now('GMT+'.strval($timezone))->addMinutes($driver->getTimeOfAlcoholBan());
+                $driver->end_of_ban = Carbon::now()->addMinutes($driver->getTimeOfAlcoholBan());
             }
         }
 
