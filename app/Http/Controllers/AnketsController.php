@@ -540,7 +540,7 @@ class AnketsController extends Controller
                     if($driver = Driver::where('hash_id', $data['driver_id'])->first()){
                         if($driver->end_of_ban){
                             if(Carbon::now() < $driver->end_of_ban){
-                                $errorsAnketa[] = 'Водитель отстранен до '.Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban;
+                                $errorsAnketa[] = 'Водитель отстранен до '.Carbon::parse(Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban)->addHours(Auth::user()->timezone);
                             }
                         }
                     } else{
@@ -793,6 +793,7 @@ class AnketsController extends Controller
                     $anketa['admitted'] = 'Не допущен';
                     
                     if(!($tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic)){
+                        
                         $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan());
                         $Driver->save();
                     }
