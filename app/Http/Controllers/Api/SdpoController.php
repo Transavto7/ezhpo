@@ -135,7 +135,6 @@ class SdpoController extends Controller
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
             $medic['proba_alko'] = 'Положительно';
-            $driver->end_of_ban = Carbon::now("GMT")->addMinutes($driver->getTimeOfAlcoholBan());
         }
 
         //ПРОВЕРЯЕМ статус для поля "Заключение"
