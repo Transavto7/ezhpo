@@ -799,7 +799,7 @@ class AnketsController extends Controller
                     }
                     if($proba_alko === "Положительно") {
                         $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfAlcoholBan());
-                        $Driver ->save();
+                        $Driver->save();
                     }
                 }
 
