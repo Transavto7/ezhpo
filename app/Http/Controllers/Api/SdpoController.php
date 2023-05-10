@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Anketa;
 use App\Driver;
 use App\Http\Controllers\SmsController;
+use Illuminate\Support\Facades\Auth;
 use App\Notify;
 use App\Point;
 use App\Settings;
@@ -31,12 +32,15 @@ class SdpoController extends Controller
             return response()->json(['message' => 'Указанный водитель не найден!'], 400);
         }
 
-        if ($driver->end_of_ban && (Carbon::now() < $driver->end_of_ban)) {
-            return response()->json(['message' => 'Указанный водитель остранен до ' . $driver->end_of_ban . "!"], 400);
+        if ($driver->end_of_ban && (Carbon::now("GMT") < $driver->end_of_ban)) {
+            return response()->json(
+                ['message' => 'Указанный водитель остранен до ' . Carbon::parse($driver->end_of_ban)->addHours(Auth::user()->timezone) . "!"],
+                400
+            );
         }
 
-        if (!is_null($driver->end_of_ban) && (Carbon::now() < $driver->end_of_ban)) {
-            return response()->json(['message' => 'Указанный водитель остранен до '.$driver->end_of_ban."!"], 401);
+        if(!is_null($driver->end_of_ban) && (Carbon::now("GMT") < $driver->end_of_ban)){
+            return response()->json(['message' => 'Указанный водитель остранен до '.Carbon::parse($driver->end_of_ban)->addHours(Auth::user()->timezone)."!"], 400);
         }
 
         if ($request->user('api')->blocked) {
@@ -131,7 +135,6 @@ class SdpoController extends Controller
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
             $medic['proba_alko'] = 'Положительно';
-            $driver->end_of_ban = Carbon::now('GMT+'.strval($timezone))->addMinutes($driver->getTimeOfAlcoholBan());
         }
 
         //ПРОВЕРЯЕМ статус для поля "Заключение"
@@ -143,11 +146,11 @@ class SdpoController extends Controller
             $medic['med_view'] = 'Отстранение';
 
             if (intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()) {
-                $driver->end_of_ban = Carbon::now('GMT+'.strval($timezone))->addMinutes($driver->getTimeOfPressureBan());
+                $driver->end_of_ban = Carbon::now("GMT")->addMinutes($driver->getTimeOfPressureBan());
             }
 
             if ($proba_alko === 'Положительно') {
-                $driver->end_of_ban = Carbon::now('GMT+'.strval($timezone))->addMinutes($driver->getTimeOfAlcoholBan());
+                $driver->end_of_ban = Carbon::now("GMT")->addMinutes($driver->getTimeOfAlcoholBan());
             }
         }
 
@@ -226,8 +229,11 @@ class SdpoController extends Controller
             return response()->json(['message' => 'Водитель с указанным ID не найден!'], 400);
         }
 
-        if ($driver->end_of_ban && (Carbon::now() < $driver->end_of_ban)) {
-            return response()->json(['message' => 'Указанный водитель остранен до ' . $driver->end_of_ban], 400);
+        if ($driver->end_of_ban && (Carbon::now("GMT") < $driver->end_of_ban)) {
+            return response()->json(
+                ['message' => 'Указанный водитель остранен до ' . Carbon::parse($driver->end_of_ban)->addHours(Auth::user()->timezone) . "!"],
+                400
+            );
         }
 
         if ($driver->dismissed === 'Да') {
