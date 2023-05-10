@@ -150,7 +150,7 @@ class SdpoController extends Controller
             }
 
             if ($proba_alko === 'Положительно') {
-                $driver->end_of_ban = Carbon::now("GMT")->addMinutes(60);
+                $driver->end_of_ban = Carbon::now("GMT")->addMinutes($driver->getTimeOfAlcoholBan());
             }
         }
 

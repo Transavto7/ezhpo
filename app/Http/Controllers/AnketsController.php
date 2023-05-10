@@ -1429,12 +1429,12 @@ class AnketsController extends Controller
 
                     if(!(intval($tonometer[0]) < $Driver->getPressureSystolic()
                         && intval($tonometer[1]) < $Driver->getPressureDiastolic())) {
-                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan());
+                        $Driver->end_of_ban = Carbon::now("GMT")->addMinutes($Driver->getTimeOfPressureBan());
                         $Driver->save();
                     }
                     
                     if($proba_alko === "Положительно") {
-                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfAlcoholBan());
+                        $Driver->end_of_ban = Carbon::now("GMT")->addMinutes($Driver->getTimeOfAlcoholBan());
                         $Driver->save();
                     }
                 }
