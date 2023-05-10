@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Anketa;
 use App\Driver;
 use App\Http\Controllers\SmsController;
+use Illuminate\Support\Facades\Auth;
 use App\Notify;
 use App\Point;
 use App\Settings;
@@ -38,8 +39,8 @@ class SdpoController extends Controller
             );
         }
 
-        if (!is_null($driver->end_of_ban) && (Carbon::now("GMT") < $driver->end_of_ban)) {
-            return response()->json(['message' => 'Указанный водитель остранен до '.Carbon::parse($driver->end_of_ban)->addHours(Auth::user()->timezone)."!"], 401);
+        if(!is_null($driver->end_of_ban) && (Carbon::now("GMT") < $driver->end_of_ban)){
+            return response()->json(['message' => 'Указанный водитель остранен до '.Carbon::parse($driver->end_of_ban)->addHours(Auth::user()->timezone)."!"], 400);
         }
 
         if ($request->user('api')->blocked) {
@@ -229,8 +230,11 @@ class SdpoController extends Controller
             return response()->json(['message' => 'Водитель с указанным ID не найден!'], 400);
         }
 
-        if ($driver->end_of_ban && (Carbon::now() < $driver->end_of_ban)) {
-            return response()->json(['message' => 'Указанный водитель остранен до ' . $driver->end_of_ban], 400);
+        if ($driver->end_of_ban && (Carbon::now("GMT") < $driver->end_of_ban)) {
+            return response()->json(
+                ['message' => 'Указанный водитель остранен до ' . Carbon::parse($driver->end_of_ban)->addHours(Auth::user()->timezone) . "!"],
+                400
+            );
         }
 
         if ($driver->dismissed === 'Да') {
