@@ -7,13 +7,12 @@ use App\Driver;
 use App\Http\Controllers\SmsController;
 use Illuminate\Support\Facades\Auth;
 use App\Notify;
-use App\Point;
 use App\Settings;
 use App\User;
-use http\Env\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Matrix\Exception;
 
 class SdpoController extends Controller
@@ -23,7 +22,7 @@ class SdpoController extends Controller
      * Creating anketa by sdpo request
      */
     public function createAnketa(Request $request)
-    {      
+    {
         $driver = Driver::where('hash_id', $request->driver_id)->first();
         $user = $request->user('api');
         $sms = new SmsController();
