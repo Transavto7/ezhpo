@@ -181,6 +181,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::any('/field/prompt/filter', 'FieldPromptController@getAll');
     Route::resource('field/prompt', 'FieldPromptController');
+
+    Route::any('/stamp/filter', 'StampController@getAll');
+    Route::resource('/stamp', 'StampController');
 });
 
 
