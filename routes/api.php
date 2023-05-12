@@ -143,11 +143,13 @@ Route::middleware('auth:api')->group(function () {
 
 Route::middleware('auth:api')->prefix('sdpo')->name('sdpo')->group(function () {
     Route::post('/anketa', 'Api\SdpoController@createAnketa');
+    Route::post('/work/report', [SdpoController::class, 'workReport']);
     Route::post('/anketa/{id}', 'Api\SdpoController@changeType');
     Route::get('/anketa/{id}', 'Api\SdpoController@getInspection');
     Route::get('/pv', 'Api\SdpoController@getPoint');
     Route::get('/medics', 'Api\SdpoController@getMedics');
     Route::get('/driver/{id}', 'Api\SdpoController@getDriver');
+    Route::post('/driver/{id}/photo', 'Api\SdpoController@setDriverPhoto');
     Route::get('/drivers', 'Api\SdpoController@getDrivers');
     Route::get('/check', 'Api\SdpoController@checkConnaction');
 });
