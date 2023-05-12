@@ -16,7 +16,7 @@ class TerminalController extends Controller
     public function index(Request $request)
     {
         $date = Carbon::now()->subMonth()->startOfMonth()->startOfDay();
-        $users = User::with(['roles', 'pv', 'company', 'pv.town'])
+        $users = User::with(['roles', 'pv', 'company', 'pv.town', 'stamp'])
             ->whereHas('roles', function ($q) use ($request) {
                 $q->where('roles.id', 9);
             });
@@ -90,6 +90,7 @@ class TerminalController extends Controller
             $user->company_id = $request->get('company_id', null);
             $user->blocked  = $request->get('blocked', 0);
             $user->pv_id = $request->get('pv', null);
+            $user->stamp_id = $request->get('stamp_id', null);
             $user->save();
         } else {
             $api_token = Hash::make(date('H:i:s'));
@@ -104,6 +105,7 @@ class TerminalController extends Controller
                 'email' => time() . '@ta-7.ru',
                 'login' => time() . '@ta-7.ru',
                 'pv_id' => $request->get('pv', null),
+                'stamp_id' => $request->get('stamp_id', null),
             ]);
         }
 

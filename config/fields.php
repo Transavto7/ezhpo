@@ -261,6 +261,7 @@ return [
             'hash_id' => 'ID',
             'name' => 'AnyDesk',
             'company_id' => 'Компания',
+            'stamp_id' => 'Штамп',
             'town' => 'Город',
             'pv' => 'ПВ',
             'timez  one' => 'GMT',

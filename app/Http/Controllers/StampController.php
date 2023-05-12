@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\FieldPrompt;
+use App\Req;
 use App\Stamp;
 use Illuminate\Http\Request;
 
@@ -30,11 +31,11 @@ class StampController extends Controller
         }
 
         if ($request->company_name) {
-            $prompts->like('company_name', '%' . $request->company_name . '%');
+            $prompts->where('company_name', 'like', '%' . $request->company_name . '%');
         }
 
         if ($request->licence) {
-            $prompts->like('licence', '%' . $request->field . '%');
+            $prompts->where('licence', 'like', '%' . $request->field . '%');
         }
 
         if ($request->sortBy) {
@@ -105,5 +106,15 @@ class StampController extends Controller
         } else {
             $stamp->delete();
         }
+    }
+
+    /**
+     * List stamp by find string
+     */
+    public function find(Request $request) {
+        $query = $request->search ?? '';
+
+        return Stamp::query()->where('name', 'like', '%' . $query . '%')
+            ->limit(100)->get();
     }
 }

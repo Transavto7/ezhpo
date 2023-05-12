@@ -183,6 +183,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('field/prompt', 'FieldPromptController');
 
     Route::any('/stamp/filter', 'StampController@getAll');
+    Route::any('/stamp/find', 'StampController@find');
     Route::resource('/stamp', 'StampController');
 });
 

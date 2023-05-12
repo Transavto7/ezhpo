@@ -67,6 +67,10 @@
                             {{ item.company ? item.company.name : 'Неизвестно' }}
                         </template>
 
+                        <template #cell(stamp_id)="{ item }">
+                            {{ item.stamp ? item.stamp.name : 'Неизвестно' }}
+                        </template>
+
                         <template #cell(blocked)="row">
                             {{ row.value === '1' ? 'Да' : 'Нет' }}
                         </template>
@@ -161,6 +165,30 @@
 
                 <b-row class="mb-3">
                     <b-col lg="12">
+                        <label class="mb-1" for="stamp">
+                            Штамп
+                        </label>
+                        <multiselect
+                            v-model="infoModalUser.stamp"
+                            @search-change="searchStamp"
+                            @select="(stamp) => infoModalUser.stamp_id = stamp.id"
+                            @remove="infoModalUser.stamp_id = null"
+                            :options="stamps"
+                            :searchable="true"
+                            :close-on-select="true"
+                            :show-labels="false"
+                            placeholder="Выберите штамп"
+                            label="name"
+                            class="is-invalid"
+                        >
+                            <span slot="noResult">Результатов не найдено</span>
+                            <span slot="noOptions">Список пуст</span>
+                        </multiselect>
+                    </b-col>
+                </b-row>
+
+                <b-row class="mb-3">
+                    <b-col lg="12">
                         <label>
                             <b class="text-danger text-bold">* </b>
                             Часовой пояс:
@@ -223,6 +251,7 @@ export default {
             infoModalUser_roles: [],
             busy: false,
             companies: [],
+            stamps: [],
 
             currentPage: 1,
             totalRows: 0,
@@ -413,6 +442,7 @@ export default {
                 pv: this.infoModalUser.pv_id,
                 company_id: this.infoModalUser.company_id,
                 blocked:  this.infoModalUser.blocked,
+                stamp_id: this.infoModalUser.stamp_id
             }).then(({data}) => {
                 if (data.status) {
                     this.items.forEach((item, i, arr) => {
@@ -476,10 +506,24 @@ export default {
                 this.companies = data;
             });
         },
+
+        searchStamp(query = '') {
+            axios.get('/stamp/find', {
+                params: {
+                    search: query
+                }
+            }).then(({ data }) => {
+                data.forEach(stamp => {
+                    stamp.name = `[${stamp.id}] ${stamp.name}`;
+                });
+                this.stamps = data;
+            });
+        }
     },
     mounted() {
         this.loadData()
         this.searchCompany();
+        this.searchStamp();
         this.optionsPvs = this.points;
         this.optionsRoles = this.roles.filter((item) => {
             return ![3, 9, 6].includes(item.id)
