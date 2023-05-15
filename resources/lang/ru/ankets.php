@@ -45,5 +45,6 @@ return [
     'req' => 'Реквизиты компании',
     'field_prompts' => 'Подсказки полей',
     'contracts' => 'Договоры',
-    'terminals' => 'Терминалы'
+    'terminals' => 'Терминалы',
+    'stamps' => 'Штампы'
 ];

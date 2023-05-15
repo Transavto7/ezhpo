@@ -24,18 +24,18 @@ class StampController extends Controller
      * Axios get all rows in table
      */
     public function getAll(Request $request) {
-        $prompts = Stamp::query();
+        $stamps = Stamp::query();
 
         if ($request->trash) {
-            $prompts->with(['deleted_user'])->onlyTrashed();
+            $stamps->with(['deleted_user'])->onlyTrashed();
         }
 
         if ($request->company_name) {
-            $prompts->where('company_name', 'like', '%' . $request->company_name . '%');
+            $stamps->where('company_name', 'like', '%' . $request->company_name . '%');
         }
 
         if ($request->licence) {
-            $prompts->where('licence', 'like', '%' . $request->field . '%');
+            $stamps->where('licence', 'like', '%' . $request->licence . '%');
         }
 
         if ($request->sortBy) {
@@ -44,10 +44,10 @@ class StampController extends Controller
                 $sort = 'desc';
             }
 
-            $prompts->orderBy($request->sortBy, $sort);
+            $stamps->orderBy($request->sortBy, $sort);
         }
 
-        return $prompts->paginate(15);
+        return $stamps->paginate(15);
     }
 
     /**
