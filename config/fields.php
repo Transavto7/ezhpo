@@ -261,6 +261,7 @@ return [
             'hash_id' => 'ID',
             'name' => 'AnyDesk',
             'company_id' => 'Компания',
+            'stamp_id' => 'Штамп',
             'town' => 'Город',
             'pv' => 'ПВ',
             'timez  one' => 'GMT',
@@ -331,6 +332,13 @@ return [
             'date_of_start' => 'Дата начала договора',
             'date_of_end' => 'Дата окончания договора',
             'created_at' => 'Дата создания'
+        ],
+
+        'stamps' => [
+            'id' => 'ID',
+            'name' => 'Название',
+            'company_name' => 'Заголовок',
+            'licence' => 'Лицензия'
         ]
     ],
 

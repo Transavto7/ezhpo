@@ -274,6 +274,10 @@
                         <li><a href="{{ route('terminals') }}">Терминалы</a></li>
                     @endif
 
+                    @if(user()->access('stamp_read'))
+                        <li><a href="{{ route('stamp.index') }}">Штампы</a></li>
+                    @endif
+
                     @if(user()->access('date_control_read', 'date_control_create'))
                         <li><a href="{{ route('renderElements', 'DDates') }}">Контроль дат</a></li>
                     @endif
