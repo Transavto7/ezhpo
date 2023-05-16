@@ -173,6 +173,12 @@ class SdpoController extends Controller
         $timeout = Settings::setting('timeout');
         $anketa['timeout'] = $timeout ?? 20;
 
+        $stamp = $request->user('api')->stamp;
+        if ($stamp) {
+            $anketa['stamp_head'] = $stamp->company_name;
+            $anketa['stamp_licence'] = $stamp->licence;
+        }
+
         return response()->json($anketa);
     }
 

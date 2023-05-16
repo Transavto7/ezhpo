@@ -40,7 +40,8 @@ class User extends Authenticatable
             'user_post',
             'company_id',
             'deleted_id',
-            'last_connection_at'
+            'last_connection_at',
+            'stamp_id'
         ];
 
     protected $hidden
@@ -220,6 +221,11 @@ class User extends Authenticatable
         }
 
         return -1;
+    }
+
+    public function stamp()
+    {
+        return $this->belongsTo(Stamp::class, 'stamp_id', 'id');
     }
 
     /**

@@ -466,7 +466,7 @@ class AnketsController extends Controller
 
         // Проверяем дефолтные значения
         $defaultDatas = [
-            'tonometer' => rand(118,129) .'/'. rand(70,90),
+            'tonometer' => (Settings::setting('pressure_systolic')-1) .'/'. (Settings::setting('pressure_diastolic')-1),
             't_people' => mt_rand_float(35.9,36.7),
             'date' => date('Y-m-d H:i:s')
         ];

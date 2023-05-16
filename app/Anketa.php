@@ -186,7 +186,7 @@ class Anketa extends Model
             'medic' => [
                 'date'         => 'Дата осмотра',
                 'company_id'   => 'Компания',
-                'driver_id'    => 'ФИО Водителя',
+                'driver_id'    => 'ID Водителя',
                 'period_pl'    => 'Период выдачи ПЛ',
                 'realy'        => 'Осмотр реальный?',
                 'driver_group_risk'      => 'Группа риска',
@@ -197,7 +197,7 @@ class Anketa extends Model
             ],
             'tech' => [
                 'company_id'     => 'Компания',
-                'driver_id'      => 'ФИО Водителя',
+                'driver_id'      => 'ID Водителя',
                 'car_id'         => 'ID Автомобиля',
                 'car_gos_number' => 'Гос. регистрационный номер ТС',
                 'date'           => 'Дата осмотра',
@@ -423,9 +423,9 @@ class Anketa extends Model
 
             'medic' => [
                 // ID
-                'company_id'             => 'Компания',
+                'company_name'             => 'Компания',
                 'driver_id'              => 'ID Водителя',
-                'driver_fio'              => 'ФИО Водителя',
+                //'driver_fio'              => 'ФИО Водителя',
 
                 'date'                   => 'Дата и время осмотра',
                 'period_pl'              => 'Период выдачи ПЛ',
@@ -463,10 +463,10 @@ class Anketa extends Model
              * Технический осмотр (параметры полей)
              */
             'tech'      => [
-                'company_id'     => 'Компания',
+                'company_name'     => 'Компания',
                 'driver_id'      => 'Водитель',
                 'car_id'         => 'Гос. регистрационный номер ТС',
-                'date'           => 'Дата, время проведения контроля',
+                'created_at'           => 'Дата, время проведения контроля',
                 'period_pl'      => 'Период выдачи ПЛ',
                 'created_at'     => 'Дата создания',
                 'realy'          => 'Осмотр реальный?',
@@ -486,7 +486,7 @@ class Anketa extends Model
                 'is_dop'             => 'Режим ввода ПЛ',
             ],
             'bdd' => [
-                'company_id'    => 'Компания',
+                'company_name'    => 'Компания',
                 'driver_id'     => 'Водитель',
                 'date'          => 'Дата, время',
                 'created_at'    => 'Дата внесения в журнал',
@@ -497,8 +497,8 @@ class Anketa extends Model
                 'signature'     => 'ЭЛ подпись водителя',
             ],
             'pechat_pl' => [
-                'company_id'   => 'Компания',
-                'driver_id'    => 'Водитель',
+                'company_name'   => 'Компания',
+                'driver_fio'    => 'Водитель',
                 'date'         => 'Дата распечатки ПЛ',
                 'count_pl'     => 'Количество распечатанных ПЛ',
                 'user_name'    => 'Ф.И.О сотрудника, который готовил ПЛ',
@@ -509,7 +509,7 @@ class Anketa extends Model
              * ЖУРНАЛЫ
              */
             'report_cart' => [
-                'company_id'   => 'Компания',
+                'company_name'   => 'Компания',
                 'driver_id'    => 'Водитель',
                 'date'         => 'Дата снятия отчета',
                 'user_name'    => 'Ф.И.О (при наличии) лица, проводившего снятие',

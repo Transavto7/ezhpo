@@ -612,4 +612,26 @@ return [
         'name'        => 'companies_access_field_note',
         'description' => 'Компании - Редактирование договоренности с клиентом',
     ],
+
+    //============== Штампы =============//
+    [
+        'name'       => 'stamp_read',
+        'description' => 'Штампы - Просмотр',
+    ],
+    [
+        'name'       => 'stamp_edit',
+        'description' => 'Штампы - Редактирование',
+    ],
+    [
+        'name'       => 'stamp_delete',
+        'description' => 'Штампы - Удаление',
+    ],
+    [
+        'name'       => 'stamp_trash',
+        'description' => 'Штампы - Корзина',
+    ],
+    [
+        'name'       => 'stamp_create',
+        'description' => 'Штампы - Создание',
+    ],
 ];

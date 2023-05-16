@@ -16,7 +16,6 @@ use Psy\Util\Json;
 
 class ApiController extends Controller
 {
-
     public function modelList(Request $request, $model) {
         $mainContentFields = [
             "Company" => "name",
@@ -52,10 +51,6 @@ class ApiController extends Controller
         if ($request->get('trashed') === 'true') {
             $query = $query->withTrashed();
         }
-        
-//        if (in_array($model, array_keys($mainContentFields)) && $field == "concat" && ($key == "hash_id" || $key == 'id')) {
-//            return $query->select(DB::raw("CONCAT('[', `hash_id`, '] ', `$mainContentFields[$model]`) as concat"), $key)->limit(100)->get();
-//        }
 
         return $query->select('id', 'hash_id', $field, $key)->limit(100)->get();
     }
