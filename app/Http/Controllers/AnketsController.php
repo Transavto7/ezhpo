@@ -464,12 +464,23 @@ class AnketsController extends Controller
             'expired' => date('d.m')
         ]]);
 
-        // Проверяем дефолтные значения
-        $defaultDatas = [
-            'tonometer' => (intval(Driver::query()->where('hash_id', $d_id)->first()->getPressureSystolic())-1) .'/'. (intval(Driver::query()->where('hash_id', $d_id)->first()->getPressureDiastolic())-1),
-            't_people' => mt_rand_float(35.9,36.7),
-            'date' => date('Y-m-d H:i:s')
-        ];
+        $defaultDatas;
+        if($d_id == null){
+            // Проверяем дефолтные значения
+            $defaultDatas = [
+                'tonometer' => rand(118,129) .'/'. rand(70,90),
+                't_people' => mt_rand_float(35.9,36.7),
+                'date' => date('Y-m-d H:i:s')
+            ];
+        }else{
+            // Проверяем дефолтные значения
+            $defaultDatas = [
+                'tonometer' => (intval(Driver::query()->where('hash_id', $d_id)->first()->getPressureSystolic())-1) .'/'. (intval(Driver::query()->where('hash_id', $d_id)->first()->getPressureDiastolic())-1),
+                't_people' => mt_rand_float(35.9,36.7),
+                'date' => date('Y-m-d H:i:s')
+            ];
+        }
+        
 
         $test_narko = $data['test_narko'] ?? 'Отрицательно';
         $proba_alko = $data['proba_alko'] ?? 'Отрицательно';

@@ -1195,6 +1195,11 @@ class IndexController extends Controller
 
         if($model) {
             $data         = $request->all();
+
+            if($data['comment'] == null){
+                $data['comment'] = "";
+            }
+            
             $oldDataModel = [];
             $element      = $model->find($id);
 
@@ -1238,7 +1243,7 @@ class IndexController extends Controller
                             $base64_image = Storage::disk('public')->put($path, $base64_image);
 
                             $element->$k = $path;
-                        } else {
+                        } else { 
                             if (isset($v) && !$request->hasFile($k)) {
                                 $element[$k] = $v;
                             } else if ($k === 'pressure_systolic' || $k === 'pressure_diastolic') {
@@ -1281,7 +1286,6 @@ class IndexController extends Controller
                 }
 
                 if ($model_text === 'Company') {
-
                     if (isset($element->products_id)) {
                         $this->syncDataFunc([
                             'model'          => 'Driver',
