@@ -93,12 +93,12 @@ class SdpoController extends Controller
         $time += $timezone * 3600;
         $time = date('Y-m-d H:i:s', $time);
 
-        if ($driver->end_of_ban && (Carbon::parse($time) < $driver->end_of_ban)) {
+        /*if ($driver->end_of_ban && (Carbon::parse($time) < $driver->end_of_ban)) {
             return response()->json(
                 ['message' => 'Указанный водитель остранен до ' . Carbon::parse($driver->end_of_ban)->addHours(Auth::user()->timezone) . "!"],
                 400
             );
-        }
+        }*/
 
         $medic['created_at'] = $request->created_at ?? $time;
         $medic['date'] = $request->date ?? $medic['created_at'];
@@ -242,7 +242,7 @@ class SdpoController extends Controller
         $time += $timezone * 3600;
         $time = date('Y-m-d H:i:s', $time);
 
-        if ($driver->end_of_ban && (Carbon::parse($time) < $driver->end_of_ban)) {
+        if ($driver->end_of_ban && (Carbon::parse($time) < Carbon::parse($driver->end_of_ban))) {
             return response()->json(
                 ['message' => 'Указанный водитель остранен до ' . Carbon::parse($driver->end_of_ban) . "!"],
                 400
