@@ -423,7 +423,7 @@ class Anketa extends Model
 
             'medic' => [
                 // ID
-                'company_name'             => 'Компания',
+                'company_id'             => 'Компания',
                 'driver_id'              => 'ID Водителя',
                 //'driver_fio'              => 'ФИО Водителя',
 
@@ -463,10 +463,10 @@ class Anketa extends Model
              * Технический осмотр (параметры полей)
              */
             'tech'      => [
-                'company_name'     => 'Компания',
+                'company_id'     => 'Компания',
                 'driver_id'      => 'Водитель',
                 'car_id'         => 'Гос. регистрационный номер ТС',
-                'created_at'           => 'Дата, время проведения контроля',
+                'date'           => 'Дата, время проведения контроля',
                 'period_pl'      => 'Период выдачи ПЛ',
                 'created_at'     => 'Дата создания',
                 'realy'          => 'Осмотр реальный?',
@@ -486,7 +486,7 @@ class Anketa extends Model
                 'is_dop'             => 'Режим ввода ПЛ',
             ],
             'bdd' => [
-                'company_name'    => 'Компания',
+                'company_id'    => 'Компания',
                 'driver_id'     => 'Водитель',
                 'date'          => 'Дата, время',
                 'created_at'    => 'Дата внесения в журнал',
@@ -497,7 +497,7 @@ class Anketa extends Model
                 'signature'     => 'ЭЛ подпись водителя',
             ],
             'pechat_pl' => [
-                'company_name'   => 'Компания',
+                'company_id'   => 'Компания',
                 'driver_fio'    => 'Водитель',
                 'date'         => 'Дата распечатки ПЛ',
                 'count_pl'     => 'Количество распечатанных ПЛ',
@@ -509,7 +509,7 @@ class Anketa extends Model
              * ЖУРНАЛЫ
              */
             'report_cart' => [
-                'company_name'   => 'Компания',
+                'company_id'   => 'Компания',
                 'driver_id'    => 'Водитель',
                 'date'         => 'Дата снятия отчета',
                 'user_name'    => 'Ф.И.О (при наличии) лица, проводившего снятие',
