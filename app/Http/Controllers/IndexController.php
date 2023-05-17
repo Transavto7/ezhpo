@@ -1196,10 +1196,10 @@ class IndexController extends Controller
         if($model) {
             $data         = $request->all();
 
-            if($data['comment'] == null){
+            if(array_key_exists('comment', $data) && $data['comment'] == null){
                 $data['comment'] = "";
             }
-            
+
             $oldDataModel = [];
             $element      = $model->find($id);
 
