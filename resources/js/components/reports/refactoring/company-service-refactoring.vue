@@ -9,7 +9,7 @@
                     <div class="form-group col-lg-8">
                         <label class="mb-1" for="company">Компании</label>
                         <multiselect
-                            :disabled="client"
+                            :disabled="true"
                             v-model="company"
                             @search-change="searchCompany"
                             @select="(company) => company_id = company.hash_id"
@@ -138,7 +138,7 @@ import Total from "./Total";
 
 export default {
     name: "company-service-refactoring",
-
+    props: ['default_company', 'client_company'],
     components: {
         ReportJournalTechOther,
         ReportJournalOther,

@@ -4,7 +4,11 @@
 @section('sidebar', 1)
 
 @section('content')
-    <company-service-refactoring>
-
+    <company-service-refactoring 
+        @if (user()->hasRole('client'))
+            :client_company="{{ json_encode(auth()->user()->company->only('hash_id', 'name')) }}"
+        @endif
+    >
+        
     </company-service-refactoring>
 @endsection
