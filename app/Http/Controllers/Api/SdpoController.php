@@ -31,9 +31,9 @@ class SdpoController extends Controller
             return response()->json(['message' => 'Указанный водитель не найден!'], 400);
         }
 
-        if(!is_null($driver->end_of_ban) && (Carbon::now("GMT") < $driver->end_of_ban)){
+        /*if(!is_null($driver->end_of_ban) && (Carbon::now("GMT") < $driver->end_of_ban)){
             return response()->json(['message' => 'Указанный водитель остранен до '.Carbon::parse($driver->end_of_ban)->addHours(Auth::user()->timezone)."!"], 400);
-        }
+        }*/
 
         if ($request->user('api')->blocked) {
             return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
