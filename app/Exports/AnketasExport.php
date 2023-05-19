@@ -22,20 +22,91 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
     {
         //array_unshift($this->fields, $this->fields['driver_fio'] = "ФИО водителя");
         $fields = [];
-        //dd('test');
-        foreach ($this->fields as $key => $value) {
-            if($key === "driver_id"){
-                $fields['driver_fio'] = $value;
-            }elseif ($key === "car_id"){
-                $fields['car_gos_number'] = $value;
-            }elseif ($key === "company_id"){
-                $fields['company_name'] = $value;
-            }else{
-                $fields[$key] = $value;
-            }   
-        }
 
-        //dd($fields);
+        // Определить тип анкет
+        //dd($this->anketas[0]['type_anketa']);
+
+
+        if($this->anketas[0]['type_anketa'] === "medic"){
+            $fields['id'] = "ID записи";
+
+            foreach ($this->fields as $key => $value) {
+                if($key === "driver_id"){
+                    $fields['driver_id'] = "ID водителя";
+                    $fields['driver_fio'] = "ФИО водителя";
+                }elseif ($key === "car_id"){
+                    $fields['car_gos_number'] = $value;
+                }elseif ($key === "company_id"){
+                    $fields['company_name'] = $value;
+                    $fields['company_id'] = "ID компании";
+                }else{
+                    $fields[$key] = $value;
+                }   
+            }
+        } elseif ($this->anketas[0]['type_anketa'] === "tech"){
+            $fields['id'] = "ID записи";
+            foreach ($this->fields as $key => $value) {
+                if($key === "driver_id"){
+                    $fields['driver_id'] = "ID водителя";
+                    $fields['driver_fio'] = "ФИО водителя";
+                }elseif ($key === "car_id"){
+                    $fields['car_gos_number'] = $value;
+                    $fields['car_id'] = "ID автомобиля";
+                }elseif ($key === "company_id"){
+                    $fields['company_name'] = $value;
+                    $fields['company_id'] = "ID компании";
+                }else{
+                    $fields[$key] = $value;
+                }   
+            }
+        }elseif ($this->anketas[0]['type_anketa'] === "bdd"){
+            $fields['id'] = "ID записи";
+            foreach ($this->fields as $key => $value) {
+                if($key === "driver_id"){
+                    $fields['driver_id'] = "ID водителя";
+                    $fields['driver_fio'] = "ФИО водителя";
+                }elseif ($key === "car_id"){
+                    $fields['car_gos_number'] = $value;
+                    $fields['car_id'] = "ID автомобиля";
+                }elseif ($key === "company_id"){
+                    $fields['company_name'] = $value;
+                    $fields['company_id'] = "ID компании";
+                }else{
+                    $fields[$key] = $value;
+                }   
+            }
+        }elseif ($this->anketas[0]['type_anketa'] === "pechat_pl"){
+            $fields['id'] = "ID записи";
+            foreach ($this->fields as $key => $value) {
+                if($key === "driver_id"){
+                    $fields['driver_id'] = "ID водителя";
+                    $fields['driver_fio'] = "ФИО водителя";
+                }elseif ($key === "car_id"){
+                    $fields['car_gos_number'] = $value;
+                    $fields['car_id'] = "ID автомобиля";
+                }elseif ($key === "company_id"){
+                    $fields['company_name'] = $value;
+                    $fields['company_id'] = "ID компании";
+                }else{
+                    $fields[$key] = $value;
+                }   
+            }
+        }else{
+            $fields['id'] = "ID записи";
+            foreach ($this->fields as $key => $value) {
+                if($key === "driver_id"){
+                    $fields['driver_id'] = $value;
+                    $fields['driver_fio'] = "ФИО водителя";
+                }elseif ($key === "car_id"){
+                    $fields['car_gos_number'] = $value;
+                }elseif ($key === "company_id"){
+                    $fields['company_name'] = $value;
+                    $fields['company_id'] = "ID компании";
+                }else{
+                    $fields[$key] = $value;
+                }   
+            }
+        }
 
         return view('home-export', [
             'data' => $this->anketas,
