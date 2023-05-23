@@ -20,13 +20,11 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
 
     public function view(): View
     {
-        //array_unshift($this->fields, $this->fields['driver_fio'] = "ФИО водителя");
         $fields = null;
 
         // Определить тип анкет
         //dd($this->anketas[0]['type_anketa']);
-
-        if(is_array($this->anketas)){
+        try {
             $fields = [];
             if($this->anketas[0]['type_anketa'] === "medic"){
                 $fields['id'] = "ID записи";
@@ -108,20 +106,17 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
                     }   
                 }
             }
-        }
-        
 
-        if(!is_array($this->anketas)){
+            return view('home-export', [
+                'data' => $this->anketas,
+                'fields' => $fields,
+            ]);
+        } catch (\Throwable $th) {
             return view('home-export', [
                 'data' => $this->anketas,
                 'fields' => $this->fields,
-            ]);  
+            ]);
         }
-
-        return view('home-export', [
-            'data' => $this->anketas,
-            'fields' => $fields,
-        ]);
     }
 
     public function batchSize(): int
