@@ -6,6 +6,7 @@
 @section('content')
     <company-service-refactoring 
         @if (user()->hasRole('client'))
+            :client="{{user()->hasRole('client')}}"
             :client_company="{{ json_encode(auth()->user()->company->only('hash_id', 'name')) }}"
         @endif
     >
