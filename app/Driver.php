@@ -309,7 +309,7 @@ class Driver extends Model
             return $setting;
         }
 
-        return 120;
+        return 0;
     }
 
     public function getTimeOfPressureBan(){
@@ -319,6 +319,6 @@ class Driver extends Model
             return $setting;
         }
 
-        return 20;
+        return 0;
     }
 }
