@@ -162,6 +162,8 @@ class Anketa extends Model
             //системные поля
             'in_cart',
             'protokol_path',
+            'is_medic',
+            'closing_path',
             'comments',
             'connected_hash',
             'contract_id',

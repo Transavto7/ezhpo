@@ -18,6 +18,12 @@ export class ApiController {
         })
     }
 
+    saveDoc(docType, data) {
+        return this.client.put(`/api/update-doc/${docType}`, data).then(response => {
+            return response.data
+        })
+    }
+
     getNotify () {
         return this.client.get(`/api/notify`).then(response => {
             const data = response.data

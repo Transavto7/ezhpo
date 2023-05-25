@@ -453,15 +453,41 @@ $permissionToExportPrikazPL = (
                                                         <a href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'gos_number' => $anketa[$field->field] ]) }}">
                                                             {{ $anketa[$field->field] }}
                                                         </a>
+                                                    @elseif($field->field === 'protokol_path')
+                                                        @if ($anketa->proba_alko === 'Положительно')
+                                                            <a class="btn primary btn-sm btn-table"
+                                                               href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">
+                                                                Протокол отстранения
+                                                            </a>
+                                                        @else
+                                                            Отсутствует
+                                                        @endif
                                                     @else
 
                                                         {{ $anketa[$field->field] }}
 
-                                                        @if($type_ankets === 'medic' && $field->field === 'admitted' && $anketa[$field->field] === 'Не допущен')
-                                                            @if ($anketa->proba_alko === 'Положительно')
-                                                                <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
+                                                        @if($type_ankets === 'medic' && $field->field === 'admitted' && $anketa[$field->field] === 'Не допущен' && user()->access('medic_closing_view'))
+                                                            @if(user()->access('medic_closing_edit'))
+                                                                <div class="row d-flex" style="gap: 3px">
+                                                                    <a class="btn primary btn-sm btn-table"
+                                                                       href="{{ route('docs.get', ['type' => 'closing', 'anketa_id' => $anketa->id]) }}">
+                                                                        Мед. заключение
+                                                                    </a>
+
+                                                                    @if($anketa['closing_path'])
+                                                                        <a target="_blank" class="btn primary btn-sm btn-table"
+                                                                           href="{{ route('docs.get.pdf', ['type' => 'closing', 'anketa_id' => $anketa->id]) }}">
+                                                                            <i class="fa fa-eye"></i>
+                                                                        </a>
+                                                                    @endif
+                                                                </div>
                                                             @else
-                                                                <a href="{{ route('docs.get', ['type' => 'other', 'anketa_id' => $anketa->id]) }}">Протокол отстранения</a>
+                                                                <div class="row d-flex" style="gap: 3px">
+                                                                    <a target="_blank" class="btn primary btn-sm btn-table"
+                                                                       href="{{ route('docs.get.pdf', ['type' => 'closing', 'anketa_id' => $anketa->id]) }}">
+                                                                        Мед. заключение
+                                                                    </a>
+                                                                </div>
                                                             @endif
                                                         @endif
                                                     @endif

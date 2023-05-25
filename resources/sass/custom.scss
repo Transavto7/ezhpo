@@ -115,9 +115,13 @@
         padding: 0;
         background: transparent;
         width: 100%;
-        min-width: 350px;
+        min-width: 200px;
         border: none;
         border-bottom: 1px solid #000;
+
+        &.large {
+            min-width: 350px;
+        }
 
         &--row {
             width: auto;
@@ -790,6 +794,19 @@ input:checked + .slider:before {
 .multiselect__tags {
     min-height: 31px;
     border-radius: 0;
+}
+
+.btn-table {
+    background-color: rgba(23, 162, 184, 0.8);
+    color: #ffffff;
+    font-size: 12px;
+    padding: 2px 4px;
+    transition: ease-in-out 0.2s;
+
+    &:hover {
+        color: #ffffff;
+        background-color: rgba(23, 162, 184, 1);
+    }
 }
 
 @keyframes lds-ring {
