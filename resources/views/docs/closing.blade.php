@@ -67,7 +67,16 @@
                 <tr>
                     <td class="head">Результат осмотра</td>
                     <td colspan="3">
-                        <textarea rows="1" class="doc-input" name="result">Здоров</textarea>
+                        @php
+                            $result = 'Наличие признаков заболевания';
+
+                            $tonometer = explode('/', $tonometer);
+                            if ($t_people < 38 && $med_view === 'В норме' && $driver
+                                && $tonometer[0] < $driver->getPressureSystolic() && $tonometer->getPressureDiastolic()) {
+                                $result = 'Здоров';
+                            }
+                        @endphp
+                        <textarea rows="1" class="doc-input" name="result">{{ $result }}</textarea>
                     </td>
                 </tr>
                 <tr>

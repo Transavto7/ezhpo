@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Anketa;
 use App\Company;
+use App\Driver;
 use App\Point;
 use App\Req;
 use Barryvdh\DomPDF\Facade as PDF;
@@ -47,6 +48,9 @@ class DocsController extends Controller
             foreach($fields as $field) {
                 $data[$field] = $a[$field];
             }
+
+            $driver = Driver::where('hash_id', $a->driver_id)->first();
+            $data['driver'] = $driver;
 
             if ($a->test_narko === 'Положительно') {
                 $data['drugs'] = true;
@@ -155,6 +159,9 @@ class DocsController extends Controller
                 if ($anketa->proba_alko === 'Положительно') {
                     $data['alko'] = true;
                 }
+
+                $driver = Driver::where('hash_id', $anketa->driver_id)->first();
+                $data['driver'] = $driver;
 
                 if($anketa->company_id) {
                     $c = Company::where('hash_id', $anketa->company_id)->first();

@@ -89,8 +89,17 @@
         </tr>
         <tr>
             <td class="head">Результат осмотра</td>
+            @php
+                $result = 'Наличие признаков заболевания';
+
+                $tonometer = explode('/', $tonometer);
+                if ($t_people < 38 && $med_view === 'В норме' && $driver
+                    && $tonometer[0] < $driver->getPressureSystolic() && $tonometer->getPressureDiastolic()) {
+                    $result = 'Здоров';
+                }
+            @endphp
             <td colspan="3">
-                Здоров
+                {{ $result }}
             </td>
         </tr>
         <tr>
