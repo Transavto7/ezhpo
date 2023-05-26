@@ -540,7 +540,11 @@ class AnketsController extends Controller
                         $errorsAnketa[] = 'Не найден водитель.';
                     }
                 }
-
+                date_default_timezone_set('UTC');
+                $time = time();
+                $timezone = $user->timezone ? $user->timezone : 3;
+                $time += $timezone * 3600;
+                $time = date('Y-m-d H:i:s', $time);
                 // medic
                 if($data['type_anketa'] === 'medic'){
                     if($data['is_dop'] == 1){
@@ -550,8 +554,8 @@ class AnketsController extends Controller
                     }
                     if($driver = Driver::where('hash_id', $data['driver_id'])->first()){
                         if($driver->end_of_ban){
-                            if(Carbon::now() < $driver->end_of_ban){
-                                $errorsAnketa[] = 'Водитель отстранен до '.Carbon::parse(Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban)->addHours(Auth::user()->timezone);
+                            if($time < $driver->end_of_ban){
+                                $errorsAnketa[] = 'Водитель отстранен до '.Carbon::parse(Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban);
                             }
                         }
                     } else{
@@ -805,11 +809,11 @@ class AnketsController extends Controller
                     
                     if(!($tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic)){
                         
-                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan());
+                        $Driver->end_of_ban = Carbon::parse($time)->addMinutes($Driver->getTimeOfPressureBan());
                         $Driver->save();
                     }
                     if($proba_alko === "Положительно") {
-                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfAlcoholBan());
+                        $Driver->end_of_ban = Carbon::parse($time)->addMinutes($Driver->getTimeOfAlcoholBan());
                         $Driver->save();
                     }
                 }
