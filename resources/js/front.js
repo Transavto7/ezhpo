@@ -321,6 +321,7 @@ $(document).ready(function () {
                     let data = {}
 
                     let id = this.id.value;
+                    let field = this.field?.value || 'protokol';
 
                     $(this).find('input,textarea').each(function () {
                         if(this.name) {
@@ -328,13 +329,8 @@ $(document).ready(function () {
                         }
                     })
 
-                    API_CONTROLLER.updateModelProperty({
-                        item_model: 'Anketa',
-                        item_field: 'protokol_path',
-                        item_id: id,
-                        new_value: JSON.stringify(data)
-                    }).then(response => {
-                        window.print()
+                    API_CONTROLLER.saveDoc(field, data).then(response => {
+                        location.reload();
                     })
                 })
             })

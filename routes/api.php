@@ -137,6 +137,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/check-prop/{prop}/{model}/{val}', 'ApiController@CheckProperty');
 
     Route::put('/update-ddate/{item_model}/{item_id}/{item_field}', 'ApiController@UpdateProperty')->name('updateDDate');
+    Route::put('/update-doc/{type}', 'DocsController@update')->name('docs.update');
 
     Route::post('/fields/visible', 'ApiController@saveFieldsVisible');
 });
