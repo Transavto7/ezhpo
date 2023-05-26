@@ -454,11 +454,18 @@ $permissionToExportPrikazPL = (
                                                             {{ $anketa[$field->field] }}
                                                         </a>
                                                     @elseif($field->field === 'protokol_path')
-                                                        @if ($anketa->proba_alko === 'Положительно')
-                                                            <a class="btn primary btn-sm btn-table"
-                                                               href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">
-                                                                Протокол отстранения
-                                                            </a>
+                                                        @if ($anketa->proba_alko === 'Положительно' && user()->access('medic_protokol_view'))
+                                                            @if(user()->access('medic_protokol_edit'))
+                                                                <a class="btn primary btn-sm btn-table"
+                                                                   href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">
+                                                                    Протокол отстранения
+                                                                </a>
+                                                            @else
+                                                                <a class="btn primary btn-sm btn-table" target="_blank"
+                                                                   href="{{ route('docs.get.pdf', ['type' => 'protokol', 'anketa_id' => $anketa->id]) }}">
+                                                                    Протокол отстранения
+                                                                </a>
+                                                            @endif
                                                         @else
                                                             Отсутствует
                                                         @endif

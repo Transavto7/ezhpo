@@ -198,9 +198,10 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
     });
 
     Route::prefix('docs')->group(function () {
-        Route::get('{type}/{anketa_id}', 'DocsController@Get')->name('docs.get');
         Route::get('{type}/{anketa_id}/pdf', 'DocsController@getPdf')->name('docs.get.pdf');
+        Route::post('{type}/{anketa_id}/set', 'DocsController@setPdf')->name('docs.add.pdf');
         Route::any('{type}/{anketa_id}/delete', 'DocsController@delete')->name('docs.delete');
+        Route::get('{type}/{anketa_id}', 'DocsController@Get')->name('docs.get');
     });
 
     // Рендер элемента (водитель, компания и т.д.)

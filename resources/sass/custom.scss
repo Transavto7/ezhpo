@@ -802,6 +802,7 @@ input:checked + .slider:before {
     font-size: 12px;
     padding: 2px 4px;
     transition: ease-in-out 0.2s;
+    line-height: 14px;
 
     &:hover {
         color: #ffffff;

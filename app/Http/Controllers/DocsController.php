@@ -8,6 +8,7 @@ use App\Point;
 use App\Req;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\File;
 use Illuminate\Support\Facades\Storage;
 
 class DocsController extends Controller
@@ -69,7 +70,9 @@ class DocsController extends Controller
 
             if ($a->pv_id) {
                 $point = Point::where('name', $a->pv_id)->with('town')->first();
-                $data['town'] = $point->town->name;
+                if ($point) {
+                    $data['town'] = $point->town->name;
+                }
             }
         }
 
@@ -85,8 +88,9 @@ class DocsController extends Controller
             return response()->json(['message' => 'Осмотр не найден']);
         }
 
-        $pdf = Pdf::loadView('docs.exports.' . $type, $request);
-        $path = 'closing/Мед. заключение №' . $request->id . '.pdf';
+        $data = array_merge($request->all(), $anketa->toArray());
+        $pdf = Pdf::loadView('docs.exports.' . $type, $data);
+        $path = $type . '/Документ осмотра №' . $request->id . '.pdf';
         Storage::disk('public')->put($path, $pdf->output());
 
         $anketa->update([
@@ -166,7 +170,9 @@ class DocsController extends Controller
 
                 if ($anketa->pv_id) {
                     $point = Point::where('name', $anketa->pv_id)->with('town')->first();
-                    $data['town'] = $point->town->name;
+                    if ($point) {
+                        $data['town'] = $point->town->name;
+                    }
                 }
             }
 
@@ -175,5 +181,28 @@ class DocsController extends Controller
             $response->header('Content-Type', 'application/pdf');
             return $response;
         }
+    }
+
+    public function setPdf(Request $request, $type, $anketa_id) {
+        $anketa = Anketa::find($anketa_id);
+        $request->validate([
+            'pdf' => ['required', 'mimes:pdf']
+        ]);
+
+        if (!$anketa) {
+            return response('Осмотр не найден');
+        }
+
+        $pdf = $request->file('pdf');
+        if (!$pdf) {
+            return response('Файл не найден');
+        }
+
+        $path = Storage::disk('public')->putFileAs($type, $pdf, 'Документ осмотра №' . $anketa_id . '.pdf');
+        $anketa->update([
+            $type . '_path' => $path
+        ]);
+
+        return back();
     }
 }
