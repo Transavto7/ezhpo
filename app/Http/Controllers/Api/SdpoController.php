@@ -255,7 +255,7 @@ class SdpoController extends Controller
         }
 
         if ($driver->company->dismissed === 'Да') {
-            return response()->json(['message' => 'Комания указанного водителя заблокирована!'], 303);
+            return response()->json(['message' => 'Компания указанного водителя заблокирована!'], 303);
         }
 
         return response()->json($driver);

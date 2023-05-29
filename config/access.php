@@ -31,6 +31,22 @@ return [
         'name'        => 'medic_export_prikaz',
         'description' => 'Медосмотры - Экспорт приказ',
     ],
+    [
+        'name'        => 'medic_closing_view',
+        'description' => 'Медосмотры - Просмотр мед. заключения',
+    ],
+    [
+        'name'        => 'medic_closing_edit',
+        'description' => 'Медосмотры - Редактирование мед. заключения',
+    ],
+    [
+        'name'        => 'medic_protokol_view',
+        'description' => 'Медосмотры - Просмотр протокола отстранения',
+    ],
+    [
+        'name'        => 'medic_protokol_edit',
+        'description' => 'Медосмотры - Редактирование протокола отстранения',
+    ],
 
     //============== Техосмотр =====================//
     [

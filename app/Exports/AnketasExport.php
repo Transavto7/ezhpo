@@ -21,13 +21,14 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
     public function view(): View
     {
         $fields = null;
-
         // Определить тип анкет
         //dd($this->anketas[0]['type_anketa']);
         try {
             $fields = [];
             if($this->anketas[0]['type_anketa'] === "medic"){
-                $fields['id'] = "ID записи";
+                if(!$_GET['exportPrikaz']){
+                    $fields['id'] = "ID записи";
+                }
     
                 foreach ($this->fields as $key => $value) {
                     if($key === "driver_id"){
@@ -43,7 +44,10 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
                     }   
                 }
             } elseif ($this->anketas[0]['type_anketa'] === "tech"){
-                $fields['id'] = "ID записи";
+                if(!$_GET['exportPrikaz']){
+                    $fields['id'] = "ID записи";
+                }
+                
                 foreach ($this->fields as $key => $value) {
                     if($key === "driver_id"){
                         $fields['driver_id'] = "ID водителя";
