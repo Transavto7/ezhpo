@@ -949,7 +949,6 @@ class IndexController extends Controller
                     $data['hash_id'] = mt_rand(100000, 499999);
 
                     $pv_id = isset($data['company_id']) ? Company::where('id', $data['company_id'])->first()->pv_id : 0;
-
                     /**
                      * <Проврка на дубликат по НАЗВАНИЮ/НОМЕРУ>
                      */
@@ -1195,6 +1194,10 @@ class IndexController extends Controller
 
         if($model) {
             $data         = $request->all();
+
+            if(array_key_exists('town_id', $data) && $data['town_id'] == null){
+                $data['town_id'] = "";
+            }
 
             if(array_key_exists('comment', $data) && $data['comment'] == null){
                 $data['comment'] = "";
