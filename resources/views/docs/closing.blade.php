@@ -71,8 +71,11 @@
                             $result = 'Наличие признаков заболевания';
 
                             $tonometer = explode('/', $tonometer);
+                            $pressure_systolic = $driver->getPressureSystolic();
+                            $pressure_diastolic = $driver->getPressureDiastolic();
+
                             if ($t_people < 38 && $med_view === 'В норме' && $driver
-                                && $tonometer[0] < $driver->getPressureSystolic() && $tonometer->getPressureDiastolic()) {
+                                && $tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic) {
                                 $result = 'Здоров';
                             }
                         @endphp
