@@ -80,10 +80,11 @@
                                                 @endif
 
                                                 @if($anketa->admitted === 'Не допущен')
-                                                    @if ($anketa->proba_alko === 'Положительно')
-                                                        <a href="{{ route('docs.get', ['type' => 'protokol', 'anketa_id' => $cId]) }}">Протокол отстранения</a>
-                                                    @else
-                                                        <a href="{{ route('docs.get', ['type' => 'other', 'anketa_id' => $cId]) }}">Протокол отстранения</a>
+                                                    @if(user()->access('medic_closing_edit'))
+                                                        <a class="btn primary btn-sm btn-table"
+                                                           href="{{ route('docs.get', ['type' => 'closing', 'anketa_id' => $cId]) }}">
+                                                            Мед. заключение
+                                                        </a>
                                                     @endif
                                                 @endif
                                             @else
