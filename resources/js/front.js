@@ -169,7 +169,7 @@ $(document).ready(function () {
 
     const LIBS = {
         docFields: {
-            'особенности_поведения': [
+            'features': [
                 'напряженность, раздражительность, суетливость',
                 'иногда речь приобретает скандальный оттенок',
                 'повышенная отвлекаемость',
@@ -182,32 +182,32 @@ $(document).ready(function () {
                 'агрессия'
             ],
 
-            'жалобы': [
+            'complaints': [
                 'отсутствуют',
                 'наличие следов от инъекций',
                 'присутствие расчесов, ссадин'
             ],
 
-            'кп_окраска': [
+            'coloring': [
                 'гиперемированы',
                 'бледные',
                 'без особенностей'
             ],
 
-            'кп_наличие_повреждений': [
+            'damage': [
                 'отсутствуют',
                 'наличие следов от инъекций',
                 'присутствие расчесов, ссадин'
             ],
 
-            'слизистые': [
+            'mucous': [
                 'гиперемированы',
                 'инъецированы',
                 'желтушность',
                 'без особенностей'
             ],
 
-            'особенности_походки': [
+            'gait': [
                 'шаткая',
                 'разбрасывание при ходьбе',
                 'походка ровная',
@@ -215,22 +215,22 @@ $(document).ready(function () {
                 'отчетливые нарушения координации движений'
             ],
 
-            'оп_точность': [
+            'accuracy': [
                 'неточность выполнения движений и координарных проб',
                 'точное выполнение движений и координарных проб'
             ],
 
-            'оп_тремор_пальцев': [
+            'tremor_fingers': [
                 'присутствует',
                 'отсутствует'
             ],
 
-            'оп_тремор_век': [
+            'tremor_eyelid': [
                 'присутствует',
                 'отсутствует'
             ],
 
-            'оп_наличие_запаха': [
+            'smell': [
                 'запах алкоголя изо рта',
                 'ацетона',
                 'жженой резины или пластмассы',
@@ -239,21 +239,21 @@ $(document).ready(function () {
                 'отсутствует',
             ],
 
-            'экспресс_тест_мочи': [
+            'urine_test': [
                 'не проводились',
                 'в приложении протокол тестирования наркотических веществ в моче №',
             ],
 
-            'предв_закл': [
+            'closing': [
                 'алкогольное опьянение',
                 'установлен факт потребления алкоголя',
                 'трезв',
             ],
 
-            'примечания': [
+            'notice': [
                 'особых отметок нет.',
                 'водителю протокол контроля трезвости был зачитан вслух, от подписи отказался',
-            ]
+            ],
         },
 
         initChosen () {
@@ -282,14 +282,16 @@ $(document).ready(function () {
                 let name = this.name
 
                 $(this).click(async function () {
-                    if(LIBS.docFields[name]) {
+                    if(LIBS.docFields[name] && this.classList.contains('open-modal')) {
                         let df = LIBS.docFields[name]
 
                         const { value: dataField } = await swal.fire({
                             input: 'select',
                             inputOptions: df,
                             inputPlaceholder: 'Выберите опцию',
-                            showCancelButton: true
+                            showCancelButton: true,
+                            confirmButtonText: "Применить",
+                            cancelButtonText: "Отмена",
                         })
 
                         if(dataField) {
@@ -323,7 +325,7 @@ $(document).ready(function () {
                     let id = this.id.value;
                     let field = this.field?.value || 'protokol';
 
-                    $(this).find('input,textarea').each(function () {
+                    $(this).find('input,textarea,select').each(function () {
                         if(this.name) {
                             data[this.name] = this.value
                         }
