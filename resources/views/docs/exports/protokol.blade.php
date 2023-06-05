@@ -10,14 +10,18 @@
             font-size: 16px;
         }
 
+        h2, h3 {
+            font-size: 12px;
+            margin: 0;
+        }
+
         .Doc {
             padding: 25px;
             background: white;
-            font-size: 14px;
+            font-size: 10px;
         }
 
         b {
-            font-size: 13px;
             font-weight: normal;
         }
 
@@ -47,7 +51,7 @@
             <b>{{ $features ?? '-' }}</b>
             <br><br>
 
-            3. Жалобы:<br>
+            3. Жалобы:
             <b>{{ $complaints ?? '-' }}</b>
             <br><br>
 
@@ -64,7 +68,7 @@
             <b>{{ $respiratory ?? '-' }}</b>
             <br><br>
 
-            7. Особенности походки:<br>
+            7. Особенности походки:
             <b>{{ $gait ?? '-' }}</b>
             <br><br>
 
@@ -89,7 +93,7 @@
             - экспресс-тесты мочи: <b>{{ $urine_test ?? '-' }}</b>
             <br><br>
 
-            10. Предварительное заключение:<br>
+            10. Предварительное заключение:
             <b>{{ $closing ?? '-' }}</b>
             <br><br>
 
@@ -118,7 +122,7 @@
                 </tbody>
             </table>
             <br>
-            12. Примечания<br>
+            12. Примечания:
             <b>{{ $notice ?? '-' }}</b>
             <br>
             <table>
