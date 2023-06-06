@@ -92,7 +92,7 @@ class DocsController extends Controller
             return response()->json(['message' => 'Осмотр не найден']);
         }
 
-        $data = array_merge($request->all(), $anketa->toArray());
+        $data = array_merge($anketa->toArray(), $request->all());
         $pdf = Pdf::loadView('docs.exports.' . $type, $data);
         $path = $type . '/Документ осмотра №' . $request->id . '.pdf';
         Storage::disk('public')->put($path, $pdf->output());

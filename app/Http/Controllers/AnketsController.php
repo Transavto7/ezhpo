@@ -475,7 +475,7 @@ class AnketsController extends Controller
         }else{
             // Проверяем дефолтные значения
             $defaultDatas = [
-                'tonometer' => (intval(Driver::query()->where('hash_id', $d_id)->first()->getPressureSystolic())-1) .'/'. (intval(Driver::query()->where('hash_id', $d_id)->first()->getPressureDiastolic())-1),
+                'tonometer' => (intval(Driver::query()->where('hash_id', $d_id)->first()->getPressureSystolic())-rand(1, 10)) .'/'. (intval(Driver::query()->where('hash_id', $d_id)->first()->getPressureDiastolic())-rand(1, 10)),
                 't_people' => mt_rand_float(35.9,36.7),
                 'date' => date('Y-m-d H:i:s')
             ];

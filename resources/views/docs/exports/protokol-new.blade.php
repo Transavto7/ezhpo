@@ -10,14 +10,18 @@
             font-size: 16px;
         }
 
+        h2, h3 {
+            font-size: 12px;
+            margin: 0;
+        }
+
         .Doc {
             padding: 25px;
             background: white;
-            font-size: 14px;
+            font-size: 10px;
         }
 
         b {
-            font-size: 13px;
             font-weight: normal;
         }
 

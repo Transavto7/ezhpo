@@ -22,52 +22,52 @@
             <textarea rows="1" readonly class="doc-input" name="control_info">{{ $user_post ? $user_post . ',' : '' }} {{ $user_name }}, {{ $date }}</textarea>
 
             <p>2. Особенности поведения обследуемого:</p>
-            <textarea rows="1" class="doc-input" name="features"></textarea>
+            <textarea rows="1" class="doc-input open-modal" name="features"></textarea>
 
             <p>3. Жалобы:</p>
-            <textarea rows="1" name="complaints" class="doc-input">{{ $complaint }}</textarea>
+            <textarea rows="1" name="complaints" class="doc-input open-modal">{{ $complaint }}</textarea>
 
             <p>4. Кожные покровы:</p>
-            а) окраска: <textarea rows="1" name="coloring" class="doc-input doc-input--row"></textarea>
+            а) окраска: <textarea rows="1" name="coloring" class="doc-input doc-input--row open-modal"></textarea>
             <br/>
             б) наличие повреждений, расчесов, следов от инъекций , "дорожек" по ходу поверхности вен:
-            <textarea rows="1" name="damage" class="doc-input">{{ $condition_koj_pokr }}</textarea>
+            <textarea rows="1" name="damage" class="doc-input open-modal">{{ $condition_koj_pokr }}</textarea>
 
             <p>5. Состояние слизистых глаз:</p>
-            <textarea rows="1" name="mucous" class="doc-input">{{ $condition_visible_sliz }}</textarea>
+            <textarea rows="1" name="mucous" class="doc-input open-modal">{{ $condition_visible_sliz }}</textarea>
 
-            <p>6. Частота дыхательных движений: 	</p>
+            <p>6. Частота дыхательных движений:</p>
             <textarea name="respiratory" rows="1" class="doc-input">__ движ/мин, пульс: {{ $pulse }} уд/мин, артериальное давление: {{ $tonometer }} мм.рт.ст.</textarea>
 
             <p>7. Особенности походки:	</p>
-            <textarea rows="1" name="gait" class="doc-input"></textarea>
+            <textarea rows="1" name="gait" class="doc-input open-modal"></textarea>
 
             <p>точность движения:
-                <textarea name="accuracy" rows="1" class="doc-input"></textarea></p>
+                <textarea name="accuracy" rows="1" class="doc-input open-modal"></textarea></p>
             <p>тремор пальцев рук:
-                <textarea name="tremor_fingers" rows="1" class="doc-input"></textarea></p>
+                <textarea name="tremor_fingers" rows="1" class="doc-input open-modal"></textarea></p>
             <p>тремор век:
-                <textarea name="tremor_eyelid" rows="1" class="doc-input"></textarea></p>
+                <textarea name="tremor_eyelid" rows="1" class="doc-input open-modal"></textarea></p>
 
             <p>8.Наличие запаха алкоголя или другого вещества изо рта:	</p>
-            <textarea name="smell" rows="1" class="doc-input"></textarea>
+            <textarea name="smell" rows="1" class="doc-input open-modal"></textarea>
 
             <p>9. Данные лабораторного исследования:</p>
             <p>а) на алкоголь</p>
             <p>- выдыхаемый воздух (алкометр)</p>
-            <textarea name="alcometer" rows="1" class="doc-input doc-input--row">DRIVESAFE II</textarea>
-            <p>время проведения контроля трезвости: <textarea name="time" rows="1" class="doc-input doc-input--row">{{ \Carbon\Carbon::parse($date)->format('H:i') }}</textarea></p>
-            <p>результат: <textarea name="result" rows="1" class="doc-input doc-input--row">0,00 мг/л</textarea></p>
+            <textarea name="alcometer" rows="1" class="doc-input doc-input--row open-modal">DRIVESAFE II</textarea>
+            <p>время проведения контроля трезвости: <textarea name="time" rows="1" class="doc-input doc-input--row open-modal">{{ \Carbon\Carbon::parse($date)->format('H:i') }}</textarea></p>
+            <p>результат: <textarea name="result" rows="1" class="doc-input doc-input--row open-modal">0,00 мг/л</textarea></p>
 
             <p>б) на наркотические средства</p>
             <p>- экспресс-тесты мочи</p>
-            <textarea name="urine_test" rows="1" class="doc-input"></textarea>
+            <textarea name="urine_test" rows="1" class="doc-input open-modal"></textarea>
 
             <p>10. Предварительное заключение:</p>
-            <textarea name="closing" rows="1" class="doc-input">{{ $admitted }}</textarea>
+            <textarea name="closing" rows="1" class="doc-input open-modal"></textarea>
 
             <p>11. Запись тестируемого об ознакомлении с результатами тестирования:</p>
-            <textarea name="record" rows="1" class="doc-input"></textarea>
+            <textarea name="record" rows="1" class="doc-input open-modal"></textarea>
 
             <br>
 
@@ -93,7 +93,7 @@
             </table>
 
             <p>12. Примечания</p>
-            <textarea name="notice" class="doc-input">особых отметок нет.</textarea>
+            <textarea name="notice" class="doc-input open-modal">особых отметок нет.</textarea>
             <br><br>
             <table>
                 <tbody>
