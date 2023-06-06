@@ -26,7 +26,7 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
         try {
             $fields = [];
             if($this->anketas[0]['type_anketa'] === "medic"){
-                if(!$_GET['exportPrikaz']){
+                if(!isset($_GET['exportPrikaz'])){
                     $fields['id'] = "ID записи";
                 }
     
@@ -44,7 +44,7 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
                     }   
                 }
             } elseif ($this->anketas[0]['type_anketa'] === "tech"){
-                if(!$_GET['exportPrikaz']){
+                if(!isset($_GET['exportPrikaz'])){
                     $fields['id'] = "ID записи";
                 }
                 
@@ -116,6 +116,8 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
                 'fields' => $fields,
             ]);
         } catch (\Throwable $th) {
+
+            dd($th);
             return view('home-export', [
                 'data' => $this->anketas,
                 'fields' => $this->fields,

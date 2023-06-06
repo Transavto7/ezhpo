@@ -982,7 +982,7 @@ class IndexController extends Controller
 
                     $user = User::create($userData);
                     $user->roles()->attach(3);
-
+                  
                     // СИНХРОНИЗАЦИЯ ПОЛЕЙ
                     if (isset($data['company_id'])) {
                         $fieldsSync = isset($data['autosync_fields']) ? $data['autosync_fields'] : [];
@@ -1088,6 +1088,8 @@ class IndexController extends Controller
                         "briefing_name" => $briefing->name ?? ''
                     ]);
                 }
+
+               
             }
 
 
@@ -1106,13 +1108,24 @@ class IndexController extends Controller
 
                     $user->roles()->attach(6);
                 }else if($model_type === 'Car' || $model_type === 'Driver'){
-                    if($created->company_id){
-                        $contracts_ids = Contract::where('company_id', $created->company_id)
-                                                 ->forDate(Carbon::now())
-                                                 ->main()
-                                                 ->get(['id']);
+ 
+                    if($company){
+                        if(Contract::query()
+                            ->where('company_id', $data['company_id'])
+                            ->where('main_for_company', 1)->first()
+                        ){
+                            $contract = Contract::query()
+                                ->where('company_id', $data['company_id'])
+                                ->where('main_for_company', 1)->first();
+                            
+                            if($model_type === 'Driver'){
+                                $contract->drivers()->attach($created->id);
+                            }
 
-                        $created->contracts()->sync($contracts_ids->pluck('id'));
+                            if($model_type === 'Car'){
+                                $contract->cars()->attach($created->id);
+                            }
+                        }
                     }
                 }
 
