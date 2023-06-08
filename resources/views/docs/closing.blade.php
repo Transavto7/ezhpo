@@ -124,7 +124,7 @@
                     <td colspan="3" style="height: 0;">
                         <select rows="2" class="doc-input" name="docs">
                             <option value="0" selected>
-                                Отсутствует
+                                Отсутствуют
                             </option>
                             <option value="1">
                                 Выдана справка для обращения к врачу в медицинскую организацию для решения вопроса о
