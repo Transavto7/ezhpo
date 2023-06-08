@@ -57,7 +57,7 @@ Route::middleware('auth:api')->get('/users/{role}', function (Request $request) 
 Route::middleware('auth:api')->post('/get-user-from-token', function (Request $request) {
     $user = $request->user();
 
-    if($user->role >= 777) {
+    if($user->hasRole('terminal')) {
         $token = $request->all();
         $token = isset($token['token']) ? $token['token'] : '';
         $user = User::where('api_token', $token)->first();
@@ -70,7 +70,7 @@ Route::middleware('auth:api')->post('/get-user-from-token', function (Request $r
 Route::middleware('auth:api')->post('/get-user/{user_id}', function (Request $request) {
     $user = $request->user();
 
-    if($user->role >= 777) {
+    if($user->hasRole('terminal')) {
         $user_id = $request->user_id;
         $user = User::find($user_id);
 
