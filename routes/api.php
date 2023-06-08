@@ -58,9 +58,9 @@ Route::middleware('auth:api')->post('/get-user-from-token', function (Request $r
     $user = $request->user();
 
     if($user->hasRole('terminal')) {
-        $token = $request->all();
-        $token = isset($token['token']) ? $token['token'] : '';
-        $user = User::where('api_token', $token)->first();
+        if (isset($request->token)) {
+            $user = User::where('api_token', $request->token)->first();
+        };
 
         return response()->json($user);
     }
