@@ -116,8 +116,6 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
                 'fields' => $fields,
             ]);
         } catch (\Throwable $th) {
-
-            dd($th);
             return view('home-export', [
                 'data' => $this->anketas,
                 'fields' => $this->fields,

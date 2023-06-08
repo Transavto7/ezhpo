@@ -7,7 +7,8 @@
             <div class="text-center">
                 <h2>ПРОТОКОЛ<br/>
                     КОНТРОЛЯ ТРЕЗВОСТИ ВОДИТЕЛЯ АВТОТРАНСПОРТНОГО СРЕДСТВА</h2>
-                <h3>№ <input style="min-width: 50px;width: 100px;" type="number" value="{{ $id }}" class="doc-input doc-input--row">
+                <h3>
+                    № <input style="min-width: 50px;width: 100px;" type="number" name="doc_id" value="{{ $id }}" class="doc-input doc-input--row">
                     от {{ date('d.m.Y', strtotime($date)) }} года
                 </h3>
             </div>
