@@ -77,6 +77,8 @@
                             if ($t_people < 38 && $med_view === 'В норме' && $driver
                                 && $tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic) {
                                 $result = 'Здоров';
+                            } else if ($proba_alko === 'Положительно') {
+                                $result = 'Здоров';
                             }
                         @endphp
                         <textarea rows="1" class="doc-input" name="result">{{ $result }}</textarea>
