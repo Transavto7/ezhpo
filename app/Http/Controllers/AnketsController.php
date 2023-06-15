@@ -480,7 +480,7 @@ class AnketsController extends Controller
                 'date' => date('Y-m-d H:i:s')
             ];
         }
-        
+
 
         $test_narko = $data['test_narko'] ?? 'Отрицательно';
         $proba_alko = $data['proba_alko'] ?? 'Отрицательно';
@@ -795,7 +795,7 @@ class AnketsController extends Controller
                     }
                 }
 
-                
+
                 /**
                  * ПРОВЕРЯЕМ статус для поля "Заключение"
                  */
@@ -806,9 +806,9 @@ class AnketsController extends Controller
                     $anketa['admitted'] = 'Допущен';
                 } else {
                     $anketa['admitted'] = 'Не допущен';
-                    
+
                     if(!($tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic)){
-                        
+
                         $Driver->end_of_ban = Carbon::parse($time)->addMinutes($Driver->getTimeOfPressureBan());
                         $Driver->save();
                     }
@@ -1447,7 +1447,7 @@ class AnketsController extends Controller
                         $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan());
                         $Driver->save();
                     }
-                    
+
                     if($proba_alko === "Положительно") {
                         $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfAlcoholBan());
                         $Driver->save();
@@ -1699,7 +1699,7 @@ class AnketsController extends Controller
                 $timezone = $user->timezone ?? 3;
                 $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($anketa['date'] ?? null);
 
-                if($diffDateCheck <= 60*12 && $anketa['date'] ?? null) {
+                if($diffDateCheck <= 60 * 12 && $anketa['date'] ?? null) {
                     $anketa['realy'] = 'да';
                 } else {
                     $anketa['realy'] = 'нет';
