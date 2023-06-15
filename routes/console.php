@@ -270,12 +270,12 @@ Artisan::command('drivers_birthday:fix', function () {
 
 Artisan::command('crm:fix', function () {
     $count = \App\Anketa::whereIn('type_anketa', ['medic', 'tech'])
-        ->where('realy', 'like', '%да%')->update(['realy', 'да']);
+        ->where('realy', 'like', '%да%')->update(['realy' => 'да']);
 
     $this->comment('anketas da ' . $count);
 
     $count = \App\Anketa::whereIn('type_anketa', ['medic', 'tech'])
-        ->where('realy', 'like', '%нет%')->update(['realy', 'нет']);
+        ->where('realy', 'like', '%нет%')->update(['realy' => 'нет']);
     $this->comment('anketas net ' . $count);
 
     $count = \App\Anketa::whereIn('type_anketa', ['medic', 'tech'])
