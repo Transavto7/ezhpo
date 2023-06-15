@@ -270,19 +270,24 @@ Artisan::command('drivers_birthday:fix', function () {
 
 Artisan::command('crm:fix', function () {
     $count = \App\Anketa::whereIn('type_anketa', ['medic', 'tech'])
-        ->where('realy', 'like', '%да%')->count();
+        ->where('realy', 'like', '%да%')->update(['realy', 'да']);
 
     $this->comment('anketas da ' . $count);
 
     $count = \App\Anketa::whereIn('type_anketa', ['medic', 'tech'])
-        ->where('realy', 'like', '%нет%')->count();
+        ->where('realy', 'like', '%нет%')->update(['realy', 'нет']);
     $this->comment('anketas net ' . $count);
 
     $count = \App\Anketa::whereIn('type_anketa', ['medic', 'tech'])
         ->whereNull('realy')->orWhere(function ($query) {
             $query->where('realy', 'not like', '%да%')->where('realy', 'not like', '%нет%');
-        })->update(['realy' => 'нет']);
+        })->whereNotNull('flag_pak')->update(['realy' => 'да']);
     $this->comment('anketas other ' . $count);
+
+    $count = \App\Anketa::whereIn('type_anketa', ['medic', 'tech'])
+        ->whereNull('realy')->orWhere(function ($query) {
+            $query->where('realy', 'not like', '%да%')->where('realy', 'not like', '%нет%');
+        })->update(['realy' => 'нет']);
 
     \App\Anketa::whereIn('type_anketa', ['medic', 'tech'])
         ->where('type_view', '!=', 'Послерейсовый/Послесменный')

@@ -162,7 +162,7 @@ class SdpoController extends Controller
         }
 
         $medic['admitted'] = $admitted ?? 'Допущен';
-        $medic['realy'] = "Да";
+        $medic['realy'] = "да";
         $anketa = Anketa::create($medic);
 
         // ОТПРАВКА SMS
