@@ -514,6 +514,12 @@ class IndexController extends Controller
                         'noRequired' => 1,
                     ],
 
+                    'link_waybill' => [
+                        'label'      => 'Ссылка на ПЛ',
+                        'type'       => 'text',
+                        'noRequired' => 1,
+                    ],
+
                     'document_bdd' => [
                         'label'      => 'Ссылка на таблицу с документами по бдд',
                         'type'       => 'text',
@@ -982,7 +988,7 @@ class IndexController extends Controller
 
                     $user = User::create($userData);
                     $user->roles()->attach(3);
-                  
+
                     // СИНХРОНИЗАЦИЯ ПОЛЕЙ
                     if (isset($data['company_id'])) {
                         $fieldsSync = isset($data['autosync_fields']) ? $data['autosync_fields'] : [];
@@ -1089,7 +1095,7 @@ class IndexController extends Controller
                     ]);
                 }
 
-               
+
             }
 
 
@@ -1108,7 +1114,7 @@ class IndexController extends Controller
 
                     $user->roles()->attach(6);
                 }else if($model_type === 'Car' || $model_type === 'Driver'){
- 
+
                     if($company){
                         if(Contract::query()
                             ->where('company_id', $data['company_id'])
@@ -1117,7 +1123,7 @@ class IndexController extends Controller
                             $contract = Contract::query()
                                 ->where('company_id', $data['company_id'])
                                 ->where('main_for_company', 1)->first();
-                            
+
                             if($model_type === 'Driver'){
                                 $contract->drivers()->attach($created->id);
                             }
@@ -1259,7 +1265,7 @@ class IndexController extends Controller
                             $base64_image = Storage::disk('public')->put($path, $base64_image);
 
                             $element->$k = $path;
-                        } else { 
+                        } else {
                             if (isset($v) && !$request->hasFile($k)) {
                                 $element[$k] = $v;
                             } else if ($k === 'pressure_systolic' || $k === 'pressure_diastolic') {

@@ -585,7 +585,7 @@ $permissionToViewContract = user()->access('contract_read');
                                                         </h5>
                                                     @endforeach
                                                 @endforeach
-                                            @elseif ($field->field === 'document_bdd' || $field->field === 'bitrix_link')
+                                            @elseif ($field->field === 'document_bdd' || $field->field === 'bitrix_link' || $field->field === 'link_waybill')
                                                 <a href="{{ $el[$field->field] }}">{{ $el[$field->field] }}</a>
                                             @elseif ($field->field === 'photo')
                                                 @if(Storage::disk('public')->exists($el[$field->field]) && $el[$field->field] !== '<' && $el[$field->field] !== '>')
