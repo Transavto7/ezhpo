@@ -117,10 +117,14 @@ class ApiController extends Controller
         $item_model = $item_model->find($item_id);
 
         if($item_model) {
+            if ($request->item_model === 'Company' && !$request->user()->access('company_update')) {
+                if ((!$request->user()->hasRole('medic') && !$request->user()->hasRole('tech')) || $item_field !== 'link_waybill') {
+                    return ApiController::r(['exists' => false, 'data' => [], 'message' => 'Значение не обновлено',0]);
+                }
+            }
+
             $item_field = str_replace('[]', '', $item_field);
-
             $item_model[$item_field] = is_array($new_value) ? join(',', $new_value) : $new_value;
-
             if($item_model->save()) {
                 return ApiController::r(['exists' => true, 'data' => $item_model, 'message' => 'Значение обновлено',0]);
             }

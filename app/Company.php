@@ -23,7 +23,8 @@ class Company extends Model
         'document_bdd',
         'deleted_id',
         'pressure_systolic',
-        'pressure_diastolic'
+        'pressure_diastolic',
+        'link_waybill'
     ];
 
 
