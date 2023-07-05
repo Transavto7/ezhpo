@@ -62,9 +62,10 @@
 
         @if(user()->access('approval_queue_view', 'approval_queue_clear'))
             @php
-                $countPakQueue = \App\Anketa::where('type_anketa', 'pak_queue')->count();
+                $countPakQueue = \App\Anketa::where('type_anketa', 'pak_queue')
+                ->where('user_id', auth()->user()->id)->count();
             @endphp
-            <li><a href="{{ route('home', 'pak_queue') }}"><i class="fa fa-users"></i>Очередь утверждения <span
+            <li><a href="{{ route('pak.index') }}"><i class="fa fa-users"></i>Очередь утверждения <span
                         class="badge bg-primary text-white">{{ $countPakQueue < 99 ? $countPakQueue : '99+' }}</span></a>
             </li>
         @endif
