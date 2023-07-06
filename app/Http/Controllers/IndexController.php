@@ -186,7 +186,6 @@ class IndexController extends Controller
                     'photo'         => ['label' => 'Фото', 'type' => 'file', 'resize' => 1, 'noRequired' => 1],
                     'phone'         => [
                         'label'      => 'Телефон',
-                        'classes'    => 'MASK_PHONE',
                         'type'       => 'text',
                         'noRequired' => 1,
                     ],
@@ -476,7 +475,6 @@ class IndexController extends Controller
 
                     'where_call'      => [
                         'label'      => 'Номер телефона при отстранении',
-                        'classes'    => 'MASK_PHONE',
                         'type'       => 'text',
                         'noRequired' => 1,
                     ],
@@ -1094,8 +1092,6 @@ class IndexController extends Controller
                         "briefing_name" => $briefing->name ?? ''
                     ]);
                 }
-
-
             }
 
 
@@ -1113,9 +1109,10 @@ class IndexController extends Controller
                      ]);
 
                     $user->roles()->attach(6);
-                }else if($model_type === 'Car' || $model_type === 'Driver'){
+                }else if ($model_type === 'Car' || $model_type === 'Driver') {
+                    $company = Company::where("id", $data['company_id'])->first();
 
-                    if($company){
+                    if($company) {
                         if(Contract::query()
                             ->where('company_id', $data['company_id'])
                             ->where('main_for_company', 1)->first()
