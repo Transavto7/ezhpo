@@ -31,10 +31,6 @@ class SdpoController extends Controller
             return response()->json(['message' => 'Указанный водитель не найден!'], 400);
         }
 
-        /*if(!is_null($driver->end_of_ban) && (Carbon::now("GMT") < $driver->end_of_ban)){
-            return response()->json(['message' => 'Указанный водитель остранен до '.Carbon::parse($driver->end_of_ban)->addHours(Auth::user()->timezone)."!"], 400);
-        }*/
-
         if ($request->user('api')->blocked) {
             return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
         }
@@ -46,7 +42,26 @@ class SdpoController extends Controller
             }
         }
 
-        $tonometer = $request->tonometer ?? rand(118, 129) . '/' . rand(70, 90);
+        if ($request->tonometer) {
+            $tonometer = $request->tonometer;
+        } else if ($driver) {
+            $systolic = rand(100, 139);
+            $diastolic = rand(60, 89);
+
+            if ($systolic >= intval($driver->getPressureSystolic())) {
+                $systolic = intval($driver->getPressureSystolic()) - rand(1, 10);
+            }
+
+
+            if ($diastolic >= intval($driver->getPressureDiastolic())) {
+                $diastolic = intval($driver->getPressureDiastolic()) - rand(1, 10);
+            }
+
+            $tonometer = $systolic . '/' . $diastolic;
+        } else {
+            $tonometer = rand(100, 139) . '/' . rand(60, 89);
+        }
+
         $test_narko = $request->test_narko ?? 'Отрицательно';
         $proba_alko = $request->proba_alko ?? 'Отрицательно';
         $company = $driver->company;

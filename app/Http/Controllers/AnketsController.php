@@ -464,23 +464,6 @@ class AnketsController extends Controller
             'expired' => date('d.m')
         ]]);
 
-        $defaultDatas;
-        if($d_id == null){
-            // Проверяем дефолтные значения
-            $defaultDatas = [
-                'tonometer' => rand(118,129) .'/'. rand(70,90),
-                't_people' => mt_rand_float(35.9,36.7),
-                'date' => date('Y-m-d H:i:s')
-            ];
-        }else{
-            // Проверяем дефолтные значения
-            $defaultDatas = [
-                'tonometer' => (intval(Driver::query()->where('hash_id', $d_id)->first()->getPressureSystolic())-rand(1, 10)) .'/'. (intval(Driver::query()->where('hash_id', $d_id)->first()->getPressureDiastolic())-rand(1, 10)),
-                't_people' => mt_rand_float(35.9,36.7),
-                'date' => date('Y-m-d H:i:s')
-            ];
-        }
-
 
         $test_narko = $data['test_narko'] ?? 'Отрицательно';
         $proba_alko = $data['proba_alko'] ?? 'Отрицательно';
@@ -632,6 +615,31 @@ class AnketsController extends Controller
 
                 $Car = Car::where('hash_id', $c_id)->first();
                 $Driver = Driver::where('hash_id', $d_id)->first();
+
+                $systolic = rand(100, 139);
+                $diastolic = rand(60, 89);
+
+                if ($Driver)  {
+                    // Проверяем дефолтные значения
+                    $systolic = rand(100, 139);
+                    $diastolic = rand(60, 89);
+
+                    if ($systolic >= intval($Driver->getPressureSystolic())) {
+                        $systolic = intval($Driver->getPressureSystolic()) - rand(1, 10);
+                    }
+
+
+                    if ($diastolic >= intval($Driver->getPressureDiastolic())) {
+                        $diastolic = intval($Driver->getPressureDiastolic()) - rand(1, 10);
+                    }
+                }
+
+
+                $defaultDatas = [
+                    'tonometer' => $systolic . '/' . $diastolic,
+                    't_people' => mt_rand_float(35.9,36.7),
+                    'date' => date('Y-m-d H:i:s')
+                ];
 
                 // Тонометр
                 $tonometer = $anketa['tonometer'] ?? $defaultDatas['tonometer'];
