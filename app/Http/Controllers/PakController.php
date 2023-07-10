@@ -23,7 +23,11 @@ class PakController extends Controller
     }
 
     public function list(Request $request) {
-        $anketas = Anketa::where('type_anketa', 'pak_queue')->where('user_id', $request->user()->id);
+        $anketas = Anketa::where('type_anketa', 'pak_queue');
+
+        if (!$request->user()->hasRole('admin')) {
+            $anketas = $anketas->where('user_id', $request->user()->id);
+        }
 
         if ($request->order_key) {
             $anketas = $anketas->orderBy($request->order_key, $request->order_by ?? 'ASC');
