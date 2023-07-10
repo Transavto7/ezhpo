@@ -1,6 +1,7 @@
 <?php
 
 use App\Driver;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Hash;
@@ -299,3 +300,42 @@ Artisan::command('crm:fix', function () {
         ->where('proba_alko', '!=', 'Положительно')
         ->update(['proba_alko' => 'Отрицательно']);
 })->describe('Fiix data in anketas');
+
+Artisan::command('inspections:import', function () {
+    $json = file_get_contents(storage_path() . "/inspections.json");
+    $inspections = json_decode($json);
+    $created = [];
+
+    foreach($inspections as $inspection) {
+        $user = User::find($inspection->user_id);
+        $driver = \App\Driver::where('hash_id', $inspection->driver_id)->first();
+
+        $created[] = \App\Anketa::create([
+            'type_anketa' => 'medic',
+            'user_id' => $inspection->user_id,
+            'user_name' => $user->name,
+            'user_eds' => $inspection->user_eds,
+            'pulse' => mt_rand(60, 80),
+            'pv_id' => 'Кооперативная, 19',
+            'point_id' => 2,
+            'tonometer' => rand(118, 129) . '/' . rand(70, 90),
+            'driver_id' => $inspection->driver_id,
+            'driver_fio' => $driver->fio,
+            'driver_gender' => $driver->gender,
+            'driver_group_risk' => $driver->group_risk,
+            'company_id' => $driver->company->hash_id,
+            'company_name' => $driver->company->name,
+            'med_view' => 'В норме',
+            't_people' => rand(360, 370) / 10,
+            'type_view' => 'Предрейсовый/Предсменный',
+            'flag_pak' => 'СДПО А',
+            'terminal_id' => 2889,
+            'created_at' => Carbon::parse($inspection->created_at),
+            'date' => Carbon::parse($inspection->created_at),
+            'realy' => 'да',
+            'proba_alko' => 'Отрицательно'
+        ])->id;
+    }
+
+    $this->comment(implode(", ", $created));
+})->describe('Import inspections');
