@@ -71,10 +71,15 @@ class SdpoController extends Controller
             return response()->json(['message' => 'Компания в черном списке. Необходимо связаться с руководителем!', 401]);
         }
 
+        $userMedic = $user;
+        if ($request->user_id) {
+            $userMedic = User::find($request->user_id) ?? $user;
+        }
+
         $medic['type_anketa'] = $request->type_anketa ?? 'medic';
-        $medic['user_id'] = $request->user_id ?? $user->id;
-        $medic['user_name'] = $user->name;
-        $medic['user_eds'] = $user->eds;
+        $medic['user_id'] = $userMedic->id;
+        $medic['user_name'] = $userMedic->name;
+        $medic['user_eds'] = $userMedic->eds;
         $medic['pulse'] = $request->pulse ?? mt_rand(60, 80);
         $medic['pv_id'] = $request->user('api')->pv->name;
         $medic['point_id'] = $request->user('api')->pv->id;
@@ -107,13 +112,6 @@ class SdpoController extends Controller
         $timezone = $request->user('api')->timezone ? $request->user('api')->timezone : 3;
         $time += $timezone * 3600;
         $time = date('Y-m-d H:i:s', $time);
-
-        /*if ($driver->end_of_ban && (Carbon::parse($time) < $driver->end_of_ban)) {
-            return response()->json(
-                ['message' => 'Указанный водитель остранен до ' . Carbon::parse($driver->end_of_ban)->addHours(Auth::user()->timezone) . "!"],
-                400
-            );
-        }*/
 
         $medic['created_at'] = $request->created_at ?? $time;
         $medic['date'] = $request->date ?? $medic['created_at'];

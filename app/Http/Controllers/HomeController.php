@@ -339,6 +339,8 @@ class HomeController extends Controller
         } else if ($validTypeAnkets == 'pak') {
             $anketas = $anketas->leftJoin('points', 'anketas.pv_id', '=', 'points.id')->select('anketas.*',
                                                                                                'points.name as pv_id');
+        } else if ($validTypeAnkets == 'medic') {
+            $anketas = $anketas->with('operator');
         }
 
         /**

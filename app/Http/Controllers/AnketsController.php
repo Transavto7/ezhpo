@@ -93,7 +93,7 @@ class AnketsController extends Controller
         return view('profile.anketa', $data);
     }
 
-    public function ChangePakQueue ($id, $admitted)
+    public function ChangePakQueue (Request $request, $id, $admitted)
     {
         $anketa = Anketa::find($id);
 
@@ -101,6 +101,7 @@ class AnketsController extends Controller
             $anketa->type_anketa = 'medic';
             $anketa->flag_pak = 'СДПО Р';
             $anketa->admitted = $admitted;
+            $anketa->operator_id = $request->user()->id;
             $anketa->save();
         }
 
@@ -620,10 +621,6 @@ class AnketsController extends Controller
                 $diastolic = rand(60, 89);
 
                 if ($Driver)  {
-                    // Проверяем дефолтные значения
-                    $systolic = rand(100, 139);
-                    $diastolic = rand(60, 89);
-
                     if ($systolic >= intval($Driver->getPressureSystolic())) {
                         $systolic = intval($Driver->getPressureSystolic()) - rand(1, 10);
                     }
