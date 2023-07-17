@@ -49,9 +49,17 @@ class CreateDefaultBriefings extends Command
         $entersInto = 0;
         /** @var $companiesWithAutoBriefing array Массив с hash ID компаний, где требуется базовый инструктаж */
         $companiesWithAutoBriefing = Company::where("required_type_briefing", true)->select('name', 'id', 'hash_id', 'pv_id')->get();
+
+        /** @var $drivers Массив ID водителей, у которых были осмотры в этом месяце */
+        $drivers = Anketa::whereBetween('date', [
+            Carbon::now()->startOfMonth(),
+            Carbon::now()
+        ])->pluck('driver_id')->unique();
+
         /** @var $drivers Driver Данные водителей, которым нужно прописать инструктаж */
         $drivers = Driver::select(["hash_id", "fio", "gender", "year_birthday", 'company_id'])
-            ->whereIn("company_id", $companiesWithAutoBriefing->pluck("id"))->get();
+            ->whereIn("company_id", $companiesWithAutoBriefing->pluck("id"))->whereIn('hash_id', $drivers)->get();
+
         $briefing = Instr::where('is_default', true)->where('type_briefing', 'Специальный')->first();
 
         $bddUser = User::with(['roles'])->whereHas('roles', function (Builder $queryBuilder) {
