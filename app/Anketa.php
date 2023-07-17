@@ -312,6 +312,7 @@ class Anketa extends Model
             'med_view',
             'flag_pak',
             'is_dop',
+            'operator_id'
         ],
         'tech' => [
             'company_id',
@@ -418,6 +419,7 @@ class Anketa extends Model
                 // ID
                 'company_id'             => 'Компания',
                 'driver_id'              => 'ID Водителя',
+                'operator_id'            => 'ID оператора',
                 //'driver_fio'              => 'ФИО Водителя',
 
                 'date'                   => 'Дата и время осмотра',
