@@ -27,22 +27,7 @@ class Anketa extends Model
             'id',
             'id'
         )->withPivot('service_cost');
-//        return $this->belongsTo(ContractAnketaSnapshot::class, 'contract_snapshot_id', 'id')
-//                    ->withDefault();
     }
-
-
-//    public function contract()
-//    {
-////        return $this->belongsTo(Contract::class, 'contract_id', 'id')
-////                    ->withDefault();
-//        return $this->hasOne(
-//            Contract::class,
-//            'contract_id',
-//            'id'
-//        )
-//                    ->withDefault();
-//    }
 
     public function our_company()
     {
@@ -63,6 +48,11 @@ class Anketa extends Model
     {
         return $this->belongsTo(Company::class, 'company_id', 'hash_id')
                     ->withDefault();
+    }
+
+    public function operator()
+    {
+        return $this->belongsTo(User::class, 'operator_id');
     }
     public function car()
     {
@@ -109,6 +99,7 @@ class Anketa extends Model
             'driver_fio',
             'driver_group_risk',
 
+            'operator_id',
             'user_id',
             'user_eds',
             'user_name',
@@ -321,6 +312,7 @@ class Anketa extends Model
             'med_view',
             'flag_pak',
             'is_dop',
+            'operator_id'
         ],
         'tech' => [
             'company_id',
@@ -427,6 +419,7 @@ class Anketa extends Model
                 // ID
                 'company_id'             => 'Компания',
                 'driver_id'              => 'ID Водителя',
+                'operator_id'            => 'ID оператора',
                 //'driver_fio'              => 'ФИО Водителя',
 
                 'date'                   => 'Дата и время осмотра',

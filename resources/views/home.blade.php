@@ -445,6 +445,14 @@ $permissionToExportPrikazPL = (
                                                         <a href="{{ route('users', ['name' => $anketa[$field->field] ]) }}">
                                                             {{ $anketa[$field->field] }}
                                                         </a>
+                                                    @elseif($field->field === 'operator_id' && user()->access('employee_read'))
+                                                        @if($anketa->operator_id)
+                                                            <a href="{{ route('users', ['id' => $anketa[$field->field] ]) }}">
+                                                                {{ $anketa->operator ? $anketa->operator->name : 'Отсутствует' }}
+                                                            </a>
+                                                        @else
+                                                            Отсутствует
+                                                        @endif
                                                     @elseif($field->field === 'driver_fio' && user()->access('drivers_read'))
                                                         <a href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'fio' => $anketa[$field->field] ]) }}">
                                                             {{ $anketa[$field->field] }}
