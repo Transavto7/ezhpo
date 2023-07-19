@@ -25,7 +25,7 @@ class PakController extends Controller
     public function list(Request $request) {
         $anketas = Anketa::where('type_anketa', 'pak_queue');
 
-        if (!$request->user()->hasRole('admin')) {
+        if (!$request->user()->access('approval_queue_view_all')) {
             $anketas = $anketas->where('user_id', $request->user()->id);
         }
 
