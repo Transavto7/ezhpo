@@ -183,6 +183,10 @@ return [
         'name'        => 'approval_queue_clear',
         'description' => 'Очередь утверждения - Очистка',
     ],
+    [
+        'name'        => 'approval_queue_view_all',
+        'description' => 'Очередь утверждения - Просмотр всего',
+    ],
 
     //============== Клиент =============//
     [
