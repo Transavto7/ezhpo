@@ -7,7 +7,6 @@ use App\Car;
 use App\Company;
 use App\DDates;
 use App\Driver;
-use App\Notify;
 use App\Point;
 use App\Settings;
 use App\User;
@@ -16,9 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\Routing\Matcher\RedirectableUrlMatcher;
 
 class AnketsController extends Controller
 {
@@ -677,15 +674,6 @@ class AnketsController extends Controller
                 }
 
                 /**
-                 * ОЧЕРЕДЬ ПАК
-                 */
-
-                if($anketa['type_anketa'] == 'pak_queue') {
-                    $notifyTo = new Notify();
-                    $notifyTo->sendMsgToUsersFrom('role', '4', 'Новый осмотр в очереди СДПО');
-                }
-
-                /**
                  * Компания
                  */
                 if(isset($anketa['company_id'])) {
@@ -1297,14 +1285,6 @@ class AnketsController extends Controller
                             $anketa[$dfKey] = $dfData;
                         }
                     }
-                }
-
-                /**
-                 * ОЧЕРЕДЬ ПАК
-                 */
-                if($anketa['type_anketa'] == 'pak_queue') {
-                    $notifyTo = new Notify();
-                    $notifyTo->sendMsgToUsersFrom('role', '4', 'Новый осмотр в очереди СДПО');
                 }
 
                 /**

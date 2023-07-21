@@ -169,8 +169,6 @@ class SdpoController extends Controller
         $driver->save();
 
         if ($request->type_anketa === 'pak_queue') {
-            $notifyTo = new Notify();
-            $notifyTo->sendMsgToUsersFrom('role', '4', 'Новый осмотр в очереди СДПО');
             $medic['flag_pak'] = 'СДПО Р';
         }
 
