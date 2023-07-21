@@ -10,6 +10,7 @@ use App\Driver;
 use App\Point;
 use App\Settings;
 use App\User;
+use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -1757,5 +1758,29 @@ class AnketsController extends Controller
 
             return redirect()->route('forms', $responseData);
         }
+    }
+
+    public function print(Request $request, $id) {
+       $anketa = Anketa::find($id);
+
+       if (!$anketa) {
+           return abort(404);
+       }
+
+       $terminal = User::find($anketa->terminal_id);
+       $stamp = null;
+
+        if ($terminal) {
+            $stamp = $terminal->stamp;
+        }
+
+        $pdf = Pdf::loadView('docs.print', [
+            'anketa' => $anketa,
+            'stamp' => $stamp
+        ]);
+
+        $response = response()->make($pdf->output(), 200);
+        $response->header('Content-Type', 'application/pdf');
+        return $response;
     }
 }
