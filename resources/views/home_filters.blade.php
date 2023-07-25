@@ -34,7 +34,7 @@
 
             @foreach($anketsFields as $field)
                 @isset($fieldsGroupFirst[$field])
-                    @if (in_array($field, $exclude))
+                    @if (auth()->user()->hasRole('client') && in_array($field, $exclude))
                         @continue
                     @endif
 
@@ -105,7 +105,7 @@
                         if ($field === 'company_name') continue;
                     @endphp
 
-                    @if (in_array($field, $exclude))
+                    @if (auth()->user()->hasRole('client') && in_array($field, $exclude))
                         @continue
                     @endif
 
