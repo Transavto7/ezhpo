@@ -338,7 +338,7 @@ class ReportController extends Controller
                               });
                         })
                         ->select('driver_fio', 'driver_id', 'type_anketa', 'type_view', 'result_dop', 'products_id', 'pv_id',
-                                 'is_dop')
+                                 'is_dop', 'anketas.count_pl')
                         ->get();
 
         $result = [];
@@ -402,7 +402,11 @@ class ReportController extends Controller
 
             foreach ($driver->groupBy('type_anketa') as $rows) {
                 $type = $rows->first()->type_anketa;
-                $total = $rows->count();
+                if ($type === 'pechat_pl') {
+                    $total = $rows->sum('count_pl');
+                } else {
+                    $total = $rows->count();
+                }
                 $result[$id]['types'][$type]['total'] = $total;
 
                 $services = explode(',', $driver->first()->products_id);

@@ -46,6 +46,7 @@ return [
             'date' => 'Дата, время проведения контроля',
             'period_pl' => 'Период выдачи ПЛ',
             'created_at' => 'Дата создания',
+            'date_prto' => 'Дата ПРТО',
             'car_gos_number' => 'Гос.регистрационный номер ТС',
             'realy' => 'Осмотр реальный?',
             'car_type_auto' => 'Категория ТС',
@@ -145,7 +146,6 @@ return [
             'gender' => 'Пол',
             'group_risk' => 'Группа риска',
             'company_id' => 'Компания',
-            //'products_id' => 'Услуги[старые]',
             'contracts' => 'Договоры',
             'services' => 'Услуги',
             'note' => 'Примечание',
@@ -168,7 +168,6 @@ return [
             'gos_number' => 'Гос.номер',
             'mark_model' => 'Марка и модель',
             'type_auto' => 'Тип автомобиля',
-            //'products_id' => 'Услуги[старые]',
             'contracts' => 'Договоры',
             'services' => 'Услуги',
             'trailer' => 'Прицеп',
@@ -419,6 +418,29 @@ return [
             'type_view' => true,
             'comments' => true,
             'flag_pak' => true,
+        ]
+    ],
+
+    'client_exclude' => [
+        'medic' => [
+            'company_name',
+            'company_id',
+            'realy',
+            'created_at',
+            'flag_pak',
+            'is_dop',
+        ],
+        'tech' => [
+            'company_id',
+            'company_name',
+            'created_at',
+            'realy',
+            'is_dop',
+        ],
+        'bdd' => [
+            'company_id',
+            'company_name',
+            'created_at',
         ]
     ]
 ];

@@ -34,6 +34,10 @@
 
             @foreach($anketsFields as $field)
                 @isset($fieldsGroupFirst[$field])
+                    @if (in_array($field, $exclude))
+                        @continue
+                    @endif
+
                     <div class="col-md-3">
                         <div class="form-group">
                             @if($field === 'date' || strpos($field, '_at') > 0)
@@ -44,7 +48,7 @@
 
                             @php $field_view_key = join('_', explode('.', $field)); @endphp
                             @php $field_view = 'profile.ankets.fields.' . $field_view_key; @endphp
-                          
+
                             @if(View::exists($field_view))
                                 @include($field_view, [
                                     'field_default_value' => !empty(request()->get($field_view_key)) ? request()->get($field_view_key) : 'Не установлено'
@@ -52,7 +56,7 @@
                             @else
                                 {{--ИЗНАЧАЛЬНОЕ ПОЛЕ ФИЛЬТР--}}
                                 <input
-                                        @if($field === 'date' || strpos($field, '_at') > 0)
+                                        @if($field === 'date' || $field === 'date_prto' || strpos($field, '_at') > 0)
                                             type="date"
                                         @else
                                             type="search"
@@ -76,7 +80,6 @@
                             </div>
                         </div>
                     @endif
-
                 @endisset
             @endforeach
         </div>
@@ -101,6 +104,10 @@
                     @php
                         if ($field === 'company_name') continue;
                     @endphp
+
+                    @if (in_array($field, $exclude))
+                        @continue
+                    @endif
 
                     <div class="col-md-3">
                         <div class="form-group">

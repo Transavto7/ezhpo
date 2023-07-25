@@ -212,6 +212,7 @@ class HomeController extends Controller
                     unset($date_to);
                     continue;
                 }
+
                 if ($fk == 'created_at' && $fv) {
                     $anketas = $anketas->where('anketas.created_at', '>=', Carbon::parse($fv)->startOfDay());
                     continue;
@@ -291,9 +292,14 @@ class HomeController extends Controller
                         }
                     }
                 } else {
-                    if ( !empty($fv)) {
+                    if (!empty($fv)) {
                         if ($fk === 'car_type_auto') {
                             $anketas = $anketas->whereIn('cars.type_auto', $fv);
+                        } else if ($fk === 'date_prto') {
+                            $date_from = $fv ? Carbon::parse($fv)->startOfDay() : Carbon::now()->subYears(10);
+                            $date_to   = $fv ? Carbon::parse($fv)->endOfDay() : Carbon::now()->addYears(10);
+
+                            $anketas = $anketas->whereBetween('cars.date_prto', [$date_from, $date_to]);
                         } else {
                             if ($fk === 'straight_company_id') continue;
                             $anketas = $anketas->where('anketas.' . $fk, 'LIKE', '%'.$fv.'%');
@@ -334,8 +340,8 @@ class HomeController extends Controller
         }
 
         if ($validTypeAnkets == 'tech') {
-            $anketas = $anketas->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')->select('anketas.*',
-                                                                                                 'cars.type_auto as car_type_auto');
+            $anketas = $anketas->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')
+                ->select('anketas.*', 'cars.type_auto as car_type_auto', 'cars.date_prto as date_prto');
         } else if ($validTypeAnkets == 'pak') {
             $anketas = $anketas->leftJoin('points', 'anketas.pv_id', '=', 'points.id')->select('anketas.*',
                                                                                                'points.name as pv_id');
@@ -412,9 +418,18 @@ class HomeController extends Controller
 
         }
         $table = $orderKey === 'car_type_auto' ? '' : 'anketas.';
-//        dd(
-//            $anketas->toSql(), $typeAnkets
-//        );
+
+        if ($request->user()->hasRole('client')) {
+            $anketas = $anketas->whereNotNull('date')
+                ->where('date', '<=', Carbon::now());
+
+            if (in_array($validTypeAnkets, ['medic', 'pechat_pl', 'bdd', 'report_cart'])) {
+                $anketas = $anketas->whereNotNull('driver_fio');
+            } else if ($validTypeAnkets === 'tech') {
+                $anketas = $anketas->whereNotNull('car_gos_number');
+            }
+        }
+
         $anketas = ($filter_activated || $typeAnkets === 'pak_queue')
             ? $anketas->orderBy($table . $orderKey, $orderBy)->paginate($take) : [];
 
@@ -441,6 +456,17 @@ class HomeController extends Controller
         }
 
         $fieldPrompts = FieldPrompt::where('type', $validTypeAnkets)->get();
+
+        if ($request->user()->hasRole('client')) {
+            $exclude = config('fields.client_exclude.' . $validTypeAnkets) ?? [];
+            $fieldPrompts = $fieldPrompts->filter(function ($field) use ($validTypeAnkets, $exclude) {
+                if (in_array($field->field, $exclude)) {
+                    return false;
+                }
+
+                return true;
+            });
+        }
 
         return view($_view, [
             'title'                 => Anketa::$anketsKeys[$validTypeAnkets],
@@ -493,11 +519,14 @@ class HomeController extends Controller
             unset($fieldsKeys['is_pak']);
         }
 
+        $exclude = config('fields.client_exclude.' . $validTypeAnkets) ?? [];
+
         return view('home_filters', [
             'anketsFields'     => $anketsFields,
             'type_ankets'      => $validTypeAnkets,
             'fieldsKeys'       => $fieldsKeys,
             'fieldsGroupFirst' => $fieldsGroupFirst,
+            'exclude' => $exclude
         ]);
     }
 }
