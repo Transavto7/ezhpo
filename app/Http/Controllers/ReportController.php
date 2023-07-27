@@ -574,10 +574,10 @@ class ReportController extends Controller
 
         foreach ($reports as $report) {
             try {
-                if ($report->period_pl) {
-                    $date = Carbon::parse($report->period_pl);
-                } else {
+                if ($report->date) {
                     $date = Carbon::parse($report->date);
+                } else {
+                    $date = Carbon::parse($report->period_pl);
                 }
             } catch (Exception $e) {
                 continue;
@@ -702,10 +702,10 @@ class ReportController extends Controller
 
         foreach ($reports as $report) {
             try {
-                if ($report->period_pl) {
-                    $date = Carbon::parse($report->period_pl);
-                } else {
+                if ($report->date) {
                     $date = Carbon::parse($report->date);
+                } else {
+                    $date = Carbon::parse($report->period_pl);
                 }
             } catch (Exception $e) {
                 continue;

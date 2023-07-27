@@ -1273,8 +1273,6 @@ $(document).ready(function () {
     field.change(function(e, { selected }){
 
         if(selected === 'Абонентская плата без реестров'){
-            // field.closest('.modal-body').find('select[name=essence]').prop("disabled", false);
-
             field.closest('.modal-body').find('select[name=type_anketa]').prop( "disabled", true);
             field.closest('.modal-body').find('select[name="type_view[]"]').prop( "disabled", true);
 

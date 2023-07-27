@@ -29,7 +29,7 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
                 if(!isset($_GET['exportPrikaz'])){
                     $fields['id'] = "ID записи";
                 }
-    
+
                 foreach ($this->fields as $key => $value) {
                     if($key === "driver_id"){
                         $fields['driver_id'] = "ID водителя";
@@ -41,13 +41,13 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
                         $fields['company_id'] = "ID компании";
                     }else{
                         $fields[$key] = $value;
-                    }   
+                    }
                 }
             } elseif ($this->anketas[0]['type_anketa'] === "tech"){
                 if(!isset($_GET['exportPrikaz'])){
                     $fields['id'] = "ID записи";
                 }
-                
+
                 foreach ($this->fields as $key => $value) {
                     if($key === "driver_id"){
                         $fields['driver_id'] = "ID водителя";
@@ -60,7 +60,7 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
                         $fields['company_id'] = "ID компании";
                     }else{
                         $fields[$key] = $value;
-                    }   
+                    }
                 }
             }elseif ($this->anketas[0]['type_anketa'] === "bdd"){
                 $fields['id'] = "ID записи";
@@ -76,7 +76,7 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
                         $fields['company_id'] = "ID компании";
                     }else{
                         $fields[$key] = $value;
-                    }   
+                    }
                 }
             }elseif ($this->anketas[0]['type_anketa'] === "pechat_pl"){
                 $fields['id'] = "ID записи";
@@ -92,7 +92,7 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
                         $fields['company_id'] = "ID компании";
                     }else{
                         $fields[$key] = $value;
-                    }   
+                    }
                 }
             }else{
                 $fields['id'] = "ID записи";
@@ -107,7 +107,7 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
                         $fields['company_id'] = "ID компании";
                     }else{
                         $fields[$key] = $value;
-                    }   
+                    }
                 }
             }
 

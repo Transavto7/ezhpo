@@ -357,29 +357,93 @@ class HomeController extends Controller
         if ($is_export && $filter_activated) {
             if ($validTypeAnkets == 'tech') {
                 if ($request->get('exportPrikaz')) {
-                    $techs = $anketas->where('type_anketa', 'tech')
-                        ->get();
+                    $techs = $anketas->where('type_anketa', 'tech');
 
-                    return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_to']),
+                    $fields = collect(Anketa::$fieldsKeys['tech_export_to']);
+                    if ($request->user()->hasRole('client')) {
+                        $techs = $techs->whereNotNull('date')
+                            ->where('date', '<=', Carbon::now());
+
+                        if (in_array($validTypeAnkets, ['medic', 'pechat_pl', 'bdd', 'report_cart'])) {
+                            $techs = $techs->whereNotNull('driver_fio');
+                        } else if ($validTypeAnkets === 'tech') {
+                            $techs = $techs->whereNotNull('car_gos_number');
+                        }
+
+                        $exclude = config('fields.client_exclude.' . $validTypeAnkets) ?? [];
+                        $fields = $fields->filter(function ($field) use ($exclude) {
+                            if (in_array($field, $exclude)) {
+                                return false;
+                            }
+
+                            return true;
+                        });
+                    }
+                    $techs = $techs->get();
+
+                    return Excel::download(new AnketasExport($techs, $fields),
                         'ЭЖ ПРТО.xlsx');
                 }
 
                 if ($request->get('exportPrikazPL')) {
-                    $techs = $anketas->where(['type_view' => 'Предрейсовый/Предсменный'])
-                        ->cursor()
-                    ;
+                    $techs = $anketas->where(['type_view' => 'Предрейсовый/Предсменный']);
 
-                    return Excel::download(new AnketasExport($techs, Anketa::$fieldsKeys['tech_export_pl']),
+                    $fields = collect(Anketa::$fieldsKeys['medic_export_pl']);
+                    if ($request->user()->hasRole('client')) {
+                        $techs = $techs->whereNotNull('date')
+                            ->where('date', '<=', Carbon::now());
+
+                        if (in_array($validTypeAnkets, ['medic', 'pechat_pl', 'bdd', 'report_cart'])) {
+                            $techs = $techs->whereNotNull('driver_fio');
+                        } else if ($validTypeAnkets === 'tech') {
+                            $techs = $techs->whereNotNull('car_gos_number');
+                        }
+
+                        $exclude = config('fields.client_exclude.' . $validTypeAnkets) ?? [];
+                        $fields = $fields->filter(function ($field) use ($exclude) {
+                            if (in_array($field, $exclude)) {
+                                return false;
+                            }
+
+                            return true;
+                        });
+                    }
+
+                    $techs = $techs->cursor();
+
+                    return Excel::download(new AnketasExport($techs, $fields),
                         'ЭЖ учета ПЛ.xlsx');
                 }
             }
 
             if ($validTypeAnkets == 'medic') {
                 if ($request->get('exportPrikaz')) {
-                    $medic = $anketas->where('type_anketa', 'medic')
-                                     ->get();
+                    $medic = $anketas->where('type_anketa', 'medic');
 
-                    return Excel::download(new AnketasExport($medic, Anketa::$fieldsKeys['medic_export_pl']),
+                    $fields = collect(Anketa::$fieldsKeys['medic_export_pl']);
+                    if ($request->user()->hasRole('client')) {
+                        $medic = $medic->whereNotNull('date')
+                            ->where('date', '<=', Carbon::now());
+
+                        if (in_array($validTypeAnkets, ['medic', 'pechat_pl', 'bdd', 'report_cart'])) {
+                            $medic = $medic->whereNotNull('driver_fio');
+                        } else if ($validTypeAnkets === 'tech') {
+                            $medic = $medic->whereNotNull('car_gos_number');
+                        }
+
+                        $exclude = config('fields.client_exclude.' . $validTypeAnkets) ?? [];
+                        $fields = $fields->filter(function ($field) use ($exclude) {
+                            if (in_array($field, $exclude)) {
+                                return false;
+                            }
+
+                            return true;
+                        });
+                    }
+
+                    $medic = $medic->get();
+
+                    return Excel::download(new AnketasExport($medic, $fields),
                                            'ЭЖ ПРМО.xlsx');
                 }
             }
@@ -387,21 +451,67 @@ class HomeController extends Controller
             if ($validTypeAnkets == 'bdd') {
                 if ($request->get('exportPrikaz')) {
                     $bdd = $anketas->where('type_anketa', 'bdd')
-                                   ->with(['user.roles'])
-                                   ->get()
-                                   ->map(function ($q) {
-                                       $q->user_id = !isset($q->user->roles[0]) ? '' : $q->user->roles[0]->guard_name;
-                                       unset($q->user);
-                                       return $q;
-                                   });
+                                   ->with(['user.roles']);
 
-                    return Excel::download(new AnketasExport($bdd, Anketa::$fieldsKeys['bdd_export_prikaz']),
+                    $fields = collect(Anketa::$fieldsKeys['bdd_export_prikaz']);
+                    if ($request->user()->hasRole('client')) {
+                        $bdd = $bdd->whereNotNull('date')
+                            ->where('date', '<=', Carbon::now());
+
+                        if (in_array($validTypeAnkets, ['medic', 'pechat_pl', 'bdd', 'report_cart'])) {
+                            $bdd = $bdd->whereNotNull('driver_fio');
+                        } else if ($validTypeAnkets === 'tech') {
+                            $bdd = $bdd->whereNotNull('car_gos_number');
+                        }
+
+                        $exclude = config('fields.client_exclude.' . $validTypeAnkets) ?? [];
+                        $fields = $fields->filter(function ($field) use ($exclude) {
+                            if (in_array($field, $exclude)) {
+                                return false;
+                            }
+
+                            return true;
+                        });
+                    }
+
+                   $bdd->get()->map(function ($q) {
+                       $q->user_id = !isset($q->user->roles[0]) ? '' : $q->user->roles[0]->guard_name;
+                       unset($q->user);
+                       return $q;
+                   });
+
+                    return Excel::download(new AnketasExport($bdd, $fields->toArray()),
                                            'ЭЖ инструктажей БДД.xlsx');
                 }
             }
 
-            return Excel::download(new AnketasExport($anketas->where('type_anketa', $validTypeAnkets)
-                                                             ->get(), Anketa::$fieldsKeys[$validTypeAnkets]),
+
+            $anketas = $anketas->where('type_anketa', $validTypeAnkets);
+
+            $fields = collect(Anketa::$fieldsKeys[$validTypeAnkets]);
+            if ($request->user()->hasRole('client')) {
+                $anketas = $anketas->whereNotNull('date')
+                    ->where('date', '<=', Carbon::now());
+
+                if (in_array($validTypeAnkets, ['medic', 'pechat_pl', 'bdd', 'report_cart'])) {
+                    $anketas = $anketas->whereNotNull('driver_fio');
+                } else if ($validTypeAnkets === 'tech') {
+                    $anketas = $anketas->whereNotNull('car_gos_number');
+                }
+
+                $exclude = config('fields.client_exclude.' . $validTypeAnkets) ?? [];
+                $fields = $fields->filter(function ($field) use ($exclude) {
+                    if (in_array($field, $exclude)) {
+                        return false;
+                    }
+
+                    return true;
+                });
+            }
+
+            $anketas = $anketas->get();
+
+            return Excel::download(new AnketasExport($anketas, Anketa::$fieldsKeys[$validTypeAnkets]),
                                    'ЭЖ.xlsx');
         }
 

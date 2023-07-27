@@ -509,8 +509,8 @@ class AnketsController extends Controller
 
                 //================== VALIDATE company/driver/car ===================//
                 // tech
-                if($data['type_anketa'] === 'tech'){
-                    if($data['is_dop'] == 1){
+                if($data['type_anketa'] === 'tech') {
+                    if($data['is_dop'] == 1) {
                         if(!Company::where('hash_id', $data['company_id'])->count()){
                             $errorsAnketa[] = 'Не найдена компания.';
                         }
@@ -540,7 +540,7 @@ class AnketsController extends Controller
                                 $errorsAnketa[] = 'Водитель отстранен до '.Carbon::parse(Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban);
                             }
                         }
-                    } else{
+                    } else {
                         $errorsAnketa[] = 'Не найден водитель.';
                     }
                 }
@@ -548,13 +548,6 @@ class AnketsController extends Controller
                 // Журнал снятия отчетов с карт
                 if($data['type_anketa'] === 'report_cart'){
                     if(!Driver::where('hash_id', $data['driver_id'])->count()){
-                        $errorsAnketa[] = 'Не найден водитель.';
-                    }
-                }
-
-                // Журнал печати путевых листов
-                if($data['type_anketa'] === 'pechat_pl'){
-                    if(!Driver::where('hash_id', $data['anketa'][0]['driver_id'])->count()){
                         $errorsAnketa[] = 'Не найден водитель.';
                     }
                 }
