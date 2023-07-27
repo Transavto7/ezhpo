@@ -76,12 +76,6 @@
     <div id="app" class="page @yield('class-page')">
         @include('layouts.header')
 
-        @auth
-            @if(auth()->user()->role === 4)
-                <notify></notify>
-            @endif
-        @endauth
-
         <main class="page-content d-flex align-items-stretch @if (user() && (user()->hasRole('driver') || user()->hasRole('client'))) blue @endif">
 
             @if (user() && !user()->hasRole('driver'))

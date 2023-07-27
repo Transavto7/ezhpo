@@ -173,8 +173,13 @@ class ReportContractRefactoringController extends Controller
                     $total['types'][$inspection->type_anketa]['price'] = 0;
                 }
 
-                $total['types'][$inspection->type_anketa]['count'] += 1;
-                $result[$driver_id]['types'][$inspection->type_anketa]['count'] += 1;
+                if ($inspection->type_anketa === 'pechat_pl') {
+                    $total['types'][$inspection->type_anketa]['count'] += $inspection->count_pl;
+                    $result[$driver_id]['types'][$inspection->type_anketa]['count'] += $inspection->count_pl;
+                } else {
+                    $total['types'][$inspection->type_anketa]['count'] += 1;
+                    $result[$driver_id]['types'][$inspection->type_anketa]['count'] += 1;
+                }
             }
 
             if ($inspection->is_dop && $inspection->result_dop == null) {
@@ -492,10 +497,10 @@ class ReportContractRefactoringController extends Controller
 
             foreach ($inspections as $report) {
                 try {
-                    if ($report->period_pl) {
-                        $date = Carbon::parse($report->period_pl);
-                    } else {
+                    if ($report->date) {
                         $date = Carbon::parse($report->date);
+                    } else {
+                        $date = Carbon::parse($report->period_pl);
                     }
                 } catch (Exception $e) {
                     continue;
@@ -665,10 +670,10 @@ class ReportContractRefactoringController extends Controller
 
             foreach ($inspections as $report) {
                 try {
-                    if ($report->period_pl) {
-                        $date = Carbon::parse($report->period_pl);
-                    } else {
+                    if ($report->date) {
                         $date = Carbon::parse($report->date);
+                    } else {
+                        $date = Carbon::parse($report->period_pl);
                     }
                 } catch (Exception $e) {
                     continue;

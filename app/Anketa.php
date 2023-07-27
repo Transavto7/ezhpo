@@ -199,6 +199,7 @@ class Anketa extends Model
                 'car_type_auto'  => 'Категория ТС',
                 'type_view'      => 'Тип осмотра',
                 'pv_id'          => 'Пункт выпуска',
+                'date_prto'      => 'Дата ПРТО',
             ],
             'bdd' => [
                 'company_id'          => 'Компания',
@@ -240,17 +241,6 @@ class Anketa extends Model
                 'videos'     => 'Видео',
 
             ],
-            /*'vid_pl' => [
-                'date' => 'Дата выдачи ПЛ',
-                'company_name' => 'Компания',
-                'count_pl' => 'Количество выданных ПЛ',
-                'user_name' => 'Ф.И.О сотрудника, который выдал ПЛ',
-                'pv_id' => 'Пункт выпуска',
-                'added_to_dop' => 'Внесено в журнал ТО',
-                'added_to_mo' => 'Внесено в журнал МО',
-                'period_pl' => 'Комментарий',
-                'car_gos_number' => 'Госномер автомобиля'
-            ]*/
         ];
 
     public static $blockedToExportFields
@@ -331,6 +321,7 @@ class Anketa extends Model
             'user_eds',
             'is_dop',
             'user_name',
+            'date_prto'
         ],
         'bdd' => [
             'company_id',
@@ -468,13 +459,14 @@ class Anketa extends Model
                 'car_type_auto'  => 'Категория ТС',
                 'car_mark_model' => 'Марка автомобиля',
                 'type_view'          => 'Тип осмотра',
+                'date_prto'      => 'Дата ПРТО',
 
                 // Доп поля
 
                 'number_list_road'   => 'Номер ПЛ',
                 //'date_number_list_road' => 'Срок действия путевого листа',
                 'odometer'           => 'Показания одометра',
-                'point_reys_control' => 'Отметка о прохождении контроля',
+                'point_rseys_control' => 'Отметка о прохождении контроля',
                 'user_name'          => 'ФИО ответственного',
                 'user_eds'           => 'Подпись лица, проводившего контроль',
                 'pv_id'              => 'Пункт выпуска',

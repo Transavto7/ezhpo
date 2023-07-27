@@ -239,6 +239,8 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
         'IndexController@SyncDataElement')->name('syncDataElement');
 
     Route::prefix('anketa')->group(function () {
+        Route::get('/print/{id}', 'AnketsController@Print')->name('forms.print');
+
         Route::delete('/{id}', 'AnketsController@Delete')->name('forms.delete');
         Route::post('/{id}', 'AnketsController@Update')->name('forms.update');
         Route::get('/{id}', 'AnketsController@Get')->name('forms.get');

@@ -32,7 +32,7 @@
         <article class="col-md-9">
             <input value="{{ $driver_id ?? '' }}" type="number"
                    oninput="if(this.value.length >= 6) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent())"
-                   required min="6" name="anketa[0][driver_id]" class="MASK_ID_ELEM form-control">
+                   min="6" name="anketa[0][driver_id]" class="MASK_ID_ELEM form-control">
             <div class="app-checker-prop"></div>
         </article>
     </div>

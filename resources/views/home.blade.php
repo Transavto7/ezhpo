@@ -555,25 +555,18 @@ $permissionToExportPrikazPL = (
                                                 </td>
                                             @endif
 
+                                            @if($type_ankets === 'medic')
+                                                    <td class="td-option not-export">
+                                                        <a href="{{ route('forms.print', [
+                                                            'id' => $anketa->id,
+                                                        ]) }}" target="_blank" class="btn btn-success btn-sm">
+                                                            <i class="fa fa-print"></i>
+                                                        </a>
+                                                    </td>
+                                            @endif
+
                                             @if($type_ankets !== 'pak_queue')
                                                 <td class="td-option not-export">
-
-                                                    {{--  poka ne nado--}}
-    {{--                                                @if(false)--}}
-    {{--                                                    @if(--}}
-    {{--                                                        $type_ankets == 'medic' && user()->access('medic_delete')--}}
-    {{--                                                        || $type_ankets == 'tech' && user()->access('tech_delete')--}}
-    {{--                                                        || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_delete')--}}
-    {{--                                                        )--}}
-    {{--                                                    <form action="{{ route('forms.delete', $anketa->id) }}" onsubmit="if(!confirm('Хотите удалить?')) return false;" method="POST">--}}
-    {{--                                                        @csrf--}}
-    {{--                                                        {{ method_field('DELETE') }}--}}
-    {{--                                                        <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-remove"></i></button>--}}
-    {{--                                                    </form>--}}
-    {{--                                                    @endif--}}
-    {{--                                                @endif--}}
-
-
                                                     @if($permissionToDelete)
                                                     <a href="{{ route('forms.trash', [
                                                         'id' => $anketa->id,
@@ -586,7 +579,6 @@ $permissionToExportPrikazPL = (
                                                         @endisset
                                                     </a>
                                                     @endif
-
                                                 </td>
                                             @endif
 

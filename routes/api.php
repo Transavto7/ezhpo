@@ -108,30 +108,6 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($points);
     });
 
-    Route::prefix('notify')->group(function () {
-
-        Route::get('/', function () {
-            $user = request()->user();
-
-            $notifies = \Illuminate\Support\Facades\DB::select('select * from notifies where role=? and id NOT IN (select notify_id from notify_statuses where user_id=?)', [$user->role, $user->id]);
-
-            return response()->json($notifies);
-        })->name('api.notify.get');
-
-        Route::post('clear', function () {
-            $user = request()->user();
-            $notifies = \App\Notify::where('role', $user->role)->get();
-
-            foreach($notifies as $notify) {
-                \App\NotifyStatuse::create([
-                    'user_id' => $user->id,
-                    'notify_id' => $notify->id
-                ]);
-            }
-        })->name('api.notify.clear');
-
-    });
-
     Route::post('/anketa', 'AnketsController@ApiAddForm')->name('api.addform');
     Route::get('/check-prop-one/{prop}/{model}/{val}', 'ApiController@OneCheckProperty');
     Route::get('/check-prop/{prop}/{model}/{val}', 'ApiController@CheckProperty');

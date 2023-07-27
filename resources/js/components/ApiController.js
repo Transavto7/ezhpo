@@ -24,13 +24,6 @@ export class ApiController {
         })
     }
 
-    getNotify () {
-        return this.client.get(`/api/notify`).then(response => {
-            const data = response.data
-
-            return data
-        })
-    }
 
     getGraphReport ({ pv_id, date_from, date_to, date_from_time, date_to_time, type_anketa }) {
         let pv_id_str = ''
@@ -47,10 +40,6 @@ export class ApiController {
 
             return data
         })
-    }
-
-    clearNotifies () {
-        return this.client.post(`/api/notify/clear`);
     }
 
     getFieldHTML ({ field, model, default_value }) {

@@ -7,18 +7,16 @@ use App\Car;
 use App\Company;
 use App\DDates;
 use App\Driver;
-use App\Notify;
 use App\Point;
 use App\Settings;
 use App\User;
+use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\Routing\Matcher\RedirectableUrlMatcher;
 
 class AnketsController extends Controller
 {
@@ -511,8 +509,8 @@ class AnketsController extends Controller
 
                 //================== VALIDATE company/driver/car ===================//
                 // tech
-                if($data['type_anketa'] === 'tech'){
-                    if($data['is_dop'] == 1){
+                if($data['type_anketa'] === 'tech') {
+                    if($data['is_dop'] == 1) {
                         if(!Company::where('hash_id', $data['company_id'])->count()){
                             $errorsAnketa[] = 'Не найдена компания.';
                         }
@@ -542,7 +540,7 @@ class AnketsController extends Controller
                                 $errorsAnketa[] = 'Водитель отстранен до '.Carbon::parse(Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban);
                             }
                         }
-                    } else{
+                    } else {
                         $errorsAnketa[] = 'Не найден водитель.';
                     }
                 }
@@ -550,13 +548,6 @@ class AnketsController extends Controller
                 // Журнал снятия отчетов с карт
                 if($data['type_anketa'] === 'report_cart'){
                     if(!Driver::where('hash_id', $data['driver_id'])->count()){
-                        $errorsAnketa[] = 'Не найден водитель.';
-                    }
-                }
-
-                // Журнал печати путевых листов
-                if($data['type_anketa'] === 'pechat_pl'){
-                    if(!Driver::where('hash_id', $data['anketa'][0]['driver_id'])->count()){
                         $errorsAnketa[] = 'Не найден водитель.';
                     }
                 }
@@ -674,15 +665,6 @@ class AnketsController extends Controller
                             $anketa[$dfKey] = $dfData;
                         }
                     }
-                }
-
-                /**
-                 * ОЧЕРЕДЬ ПАК
-                 */
-
-                if($anketa['type_anketa'] == 'pak_queue') {
-                    $notifyTo = new Notify();
-                    $notifyTo->sendMsgToUsersFrom('role', '4', 'Новый осмотр в очереди СДПО');
                 }
 
                 /**
@@ -1300,14 +1282,6 @@ class AnketsController extends Controller
                 }
 
                 /**
-                 * ОЧЕРЕДЬ ПАК
-                 */
-                if($anketa['type_anketa'] == 'pak_queue') {
-                    $notifyTo = new Notify();
-                    $notifyTo->sendMsgToUsersFrom('role', '4', 'Новый осмотр в очереди СДПО');
-                }
-
-                /**
                  * Компания
                  */
                 if(isset($anketa['company_id'])) {
@@ -1777,5 +1751,29 @@ class AnketsController extends Controller
 
             return redirect()->route('forms', $responseData);
         }
+    }
+
+    public function print(Request $request, $id) {
+       $anketa = Anketa::find($id);
+
+       if (!$anketa) {
+           return abort(404);
+       }
+
+       $terminal = User::find($anketa->terminal_id);
+       $stamp = null;
+
+        if ($terminal) {
+            $stamp = $terminal->stamp;
+        }
+
+        $pdf = Pdf::loadView('docs.print', [
+            'anketa' => $anketa,
+            'stamp' => $stamp
+        ]);
+
+        $response = response()->make($pdf->output(), 200);
+        $response->header('Content-Type', 'application/pdf');
+        return $response;
     }
 }
