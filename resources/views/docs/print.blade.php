@@ -68,7 +68,7 @@
         <span class="name">{{ $anketa->driver_fio }}</span><br>
         прошел {{ $anketa->type_view }}<br>
         Медицинский осмотр<br>
-        @if(Str::contains(Str::lower($anketa->type_view), 'после'))
+        @if(Str::contains(Str::lower($anketa->type_view), 'пред'))
             к исполнению трудовых обязаностей<br>
             допущен<br>
             <br>

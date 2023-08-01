@@ -386,9 +386,9 @@ class HomeController extends Controller
                 }
 
                 if ($request->get('exportPrikazPL')) {
-                    $techs = $anketas->where(['type_view' => 'Предрейсовый/Предсменный']);
+                    $techs = $anketas->where('type_anketa', 'tech')->where(['type_view' => 'Предрейсовый/Предсменный']);
 
-                    $fields = collect(Anketa::$fieldsKeys['medic_export_pl']);
+                    $fields = collect(Anketa::$fieldsKeys['tech_export_pl']);
                     if ($request->user()->hasRole('client')) {
                         $techs = $techs->whereNotNull('date')
                             ->where('date', '<=', Carbon::now());
