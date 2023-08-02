@@ -80,11 +80,11 @@ class AnketsController extends Controller
         $data['proba_alko'] = $anketa->proba_alko;
         $data['test_narko'] = $anketa->test_narko;
         $data['med_view'] = $anketa->med_view;
-        $data['default_point'] = $point;
+        $data['default_point'] = $anketa->point_id ?? $point;
         $data['points'] = $points;
         $data['is_dop'] = $anketa->is_dop;
         $data['anketa_view'] = 'profile.ankets.' . $anketa->type_anketa;
-        $data['default_pv_id'] = $anketa->pv_id;
+        $data['default_pv_id'] = $anketa->point_id ?? $anketa->pv_id;
         $data['anketa_route'] = 'forms.update';
         $data['company_fields'] = $company_fields;
 
