@@ -622,8 +622,10 @@ $permissionToViewContract = user()->access('contract_read');
                                             @elseif ($field->field === 'pressure_diastolic' && $model === 'Driver')
                                                 {{ $el->getPressureDiastolic() }}
                                             @else
+                                                @if($field->field === 'driver_license_issued_at')
+                                                    {{ $el[$field->field] }}
                                                 {{--ПРОВЕРКА ДАТЫ--}}
-                                                @if($field->field === 'date' || strpos($field->field, '_at') > 0)
+                                                @elseif($field->field === 'date' || strpos($field->field, '_at') > 0)
                                                     {{ date('d-m-Y H:i:s', strtotime($el[$field->field])) }}
                                                 @elseif($field->field === 'autosync_fields')
                                                     @foreach(explode(',', $el[$field->field]) as $aSyncData)
@@ -638,9 +640,9 @@ $permissionToViewContract = user()->access('contract_read');
                                                 @else
                                                     @foreach(explode(',', htmlspecialchars($el[$field->field])) as $keyElK => $valElK)
                                                         @if($keyElK !== 0), @endif
-                                    {{ htmlspecialchars_decode(__($valElK)) }}
-                                    @endforeach
-                                    @endif
+                                                    {{ htmlspecialchars_decode(__($valElK)) }}
+                                                    @endforeach
+                                                @endif
                                     @endif
                                 </td>
                             @endforeach
