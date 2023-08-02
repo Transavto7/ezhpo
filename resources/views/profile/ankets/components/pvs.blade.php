@@ -12,12 +12,12 @@
                         @foreach($point['pvs'] as $child)
                             @php
                                 if(is_array($child)) {
-                                $child = (object)$child;
-                                dd($child);
-                            }
+                                    $child = (object)$child;
+                                    dd($child);
+                                }
                             @endphp
                             <option
-                                @if (isset($default_point) && $default_point === $child->name)
+                                @if (isset($default_point) && ($default_point === $child->id || $default_point === $child->name))
                                     selected
                                 @elseif(session()->has('anketa_pv_id'))
                                     @if(!isset($default_point) && $child->id == session('anketa_pv_id')['value'])

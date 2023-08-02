@@ -25,6 +25,9 @@ class Driver extends Model
             'procedure_pv',
             'date_bdd',
             'date_prmo',
+            'snils',
+            'driver_license',
+            'driver_license_issued_at',
             'date_driver_license',
             'date_narcotic_test',
             'date_report_driver',
@@ -36,7 +39,7 @@ class Driver extends Model
             'contract_id',
             'deleted_id',
             'pressure_systolic',
-            'pressure_diastolic'
+            'pressure_diastolic',
         ];
 
     protected $casts

@@ -239,6 +239,12 @@ class IndexController extends Controller
                     ],
                     'date_bdd'           => ['label' => 'Дата БДД', 'type' => 'date', 'noRequired' => 1],
                     'date_prmo'          => ['label' => 'Дата ПРМО', 'type' => 'date', 'noRequired' => 1],
+                    'driver_license_issued_at' => ['label' => 'Дата выдачи ВУ',
+                        'type' => 'date', 'noRequired' => 1],
+                    'driver_license' => ['label' => 'Серия/номер ВУ',
+                        'type' => 'text', 'noRequired' => 1],
+                    'snils' => ['label' => 'СНИЛС',
+                        'type' => 'text', 'noRequired' => 1],
                     'date_driver_license'=> [
                         'label' => 'Срок действия водительского удостоверения',
                         'type' => 'date',
