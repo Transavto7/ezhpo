@@ -75,7 +75,6 @@
         @else
             <br><br>
         @endif
-        {{ $anketa->terminal_id }}
         {{ $anketa->date ?? '0000-00-00 00:00:00' }}<br>
         {{ $anketa->user_name ?? 'неизвестный сотрудник' }}<br>
         ЭЦП {{ $anketa->user_eds ?? 'неизвестная-подпись' }}<br>
