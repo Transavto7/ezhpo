@@ -39,6 +39,20 @@ class AnketsController extends Controller
 
         if($anketa) {
             $anketa->in_cart = $action;
+            if ($anketa->type_anketa === 'medic' && $anketa->driver_id) {
+                $driver = Driver::where('hash_id', $anketa->driver_id)->first();
+
+                if ($driver->end_of_ban) {
+                    $last = Anketa::orderBy('created_at', 'desc')
+                        ->where('driver_id', $anketa->driver_id)
+                        ->select('driver_id', 'created_at', 'id')->first();
+
+                    if ($last->id === $anketa->id) {
+                        $driver->end_of_ban = null;
+                        $driver->save();
+                    }
+                }
+            }
             $anketa->deleted_id = user()->id;
             $anketa->deleted_at = \Carbon\Carbon::now();
 

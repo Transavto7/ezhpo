@@ -350,7 +350,6 @@ class IndexController extends Controller
                         'type'         => 'select',
                         'values'       => ['Нет' => 'Нет', 'Да' => 'Да'],
                         'defaultValue' => '',
-                        'noRequired'   => 1,
                     ],
                     'contract_id'     => [
                         'label'  => 'Договор',
@@ -916,10 +915,16 @@ class IndexController extends Controller
                      */
 
                     $data['hash_id'] = mt_rand(1000, 9999).date('s');
+                    while(Company::where('hash_id', $data['hash_id'])->first()) {
+                        $data['hash_id'] = mt_rand(1000, 9999).date('s');
+                    }
                     break;
 
                 case 'Car':
                     $data['hash_id'] = mt_rand(500000, 999999);
+                    while(Car::where('hash_id', $data['hash_id'])->first()) {
+                        $data['hash_id'] = mt_rand(1000, 9999).date('s');
+                    }
 
                     // СИНХРОНИЗАЦИЯ ПОЛЕЙ
                     if (isset($data['company_id'])) {
@@ -957,6 +962,9 @@ class IndexController extends Controller
 
                 case 'Driver':
                     $data['hash_id'] = mt_rand(100000, 499999);
+                    while(Driver::where('hash_id', $data['hash_id'])->first()) {
+                        $data['hash_id'] = mt_rand(1000, 9999).date('s');
+                    }
 
                     $pv_id = isset($data['company_id']) ? Company::where('id', $data['company_id'])->first()->pv_id : 0;
                     /**

@@ -116,14 +116,6 @@ class SdpoController extends Controller
         $medic['created_at'] = $request->created_at ?? $time;
         $medic['date'] = $request->date ?? $medic['created_at'];
 
-        if ($request->number_list_road) {
-            $medic['number_list_road'] = $request->number_list_road;
-        } else {
-            $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->count();
-            $suffix_anketa = $findCurrentPL > 0 ? '/' . ($findCurrentPL + 1) : '';
-            $medic['number_list_road'] = $driver->hash_id . '-' . date('d.m.Y', strtotime($medic['date'])) . $suffix_anketa;
-        }
-
         $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
         $admitted = null;
         $driver->date_prmo = Carbon::now();
