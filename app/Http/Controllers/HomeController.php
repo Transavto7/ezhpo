@@ -361,8 +361,7 @@ class HomeController extends Controller
 
                     $fields = collect(Anketa::$fieldsKeys['tech_export_to']);
                     if ($request->user()->hasRole('client')) {
-                        $techs = $techs->whereNotNull('date')
-                            ->where('date', '<=', Carbon::now());
+                        $techs = $techs->whereNotNull('date');
 
                         if (in_array($validTypeAnkets, ['medic', 'pechat_pl', 'bdd', 'report_cart'])) {
                             $techs = $techs->whereNotNull('driver_fio');
@@ -390,8 +389,7 @@ class HomeController extends Controller
 
                     $fields = collect(Anketa::$fieldsKeys['tech_export_pl']);
                     if ($request->user()->hasRole('client')) {
-                        $techs = $techs->whereNotNull('date')
-                            ->where('date', '<=', Carbon::now());
+                        $techs = $techs->whereNotNull('date');
 
                         if (in_array($validTypeAnkets, ['medic', 'pechat_pl', 'bdd', 'report_cart'])) {
                             $techs = $techs->whereNotNull('driver_fio');
@@ -422,8 +420,7 @@ class HomeController extends Controller
 
                     $fields = collect(Anketa::$fieldsKeys['medic_export_pl']);
                     if ($request->user()->hasRole('client')) {
-                        $medic = $medic->whereNotNull('date')
-                            ->where('date', '<=', Carbon::now());
+                        $medic = $medic->whereNotNull('date');
 
                         if (in_array($validTypeAnkets, ['medic', 'pechat_pl', 'bdd', 'report_cart'])) {
                             $medic = $medic->whereNotNull('driver_fio');
@@ -455,8 +452,7 @@ class HomeController extends Controller
 
                     $fields = collect(Anketa::$fieldsKeys['bdd_export_prikaz']);
                     if ($request->user()->hasRole('client')) {
-                        $bdd = $bdd->whereNotNull('date')
-                            ->where('date', '<=', Carbon::now());
+                        $bdd = $bdd->whereNotNull('date');
 
                         if (in_array($validTypeAnkets, ['medic', 'pechat_pl', 'bdd', 'report_cart'])) {
                             $bdd = $bdd->whereNotNull('driver_fio');
@@ -490,8 +486,7 @@ class HomeController extends Controller
 
             $fields = collect(Anketa::$fieldsKeys[$validTypeAnkets]);
             if ($request->user()->hasRole('client')) {
-                $anketas = $anketas->whereNotNull('date')
-                    ->where('date', '<=', Carbon::now());
+                $anketas = $anketas->whereNotNull('date');
 
                 if (in_array($validTypeAnkets, ['medic', 'pechat_pl', 'bdd', 'report_cart'])) {
                     $anketas = $anketas->whereNotNull('driver_fio');
@@ -530,8 +525,7 @@ class HomeController extends Controller
         $table = $orderKey === 'car_type_auto' ? '' : 'anketas.';
 
         if ($request->user()->hasRole('client')) {
-            $anketas = $anketas->whereNotNull('date')
-                ->where('date', '<=', Carbon::now());
+            $anketas = $anketas->whereNotNull('date');
 
             if (in_array($validTypeAnkets, ['medic', 'pechat_pl', 'bdd', 'report_cart'])) {
                 $anketas = $anketas->whereNotNull('driver_fio');
