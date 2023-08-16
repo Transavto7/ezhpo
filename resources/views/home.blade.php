@@ -555,7 +555,7 @@ $permissionToExportPrikazPL = (
                                                 </td>
                                             @endif
 
-                                            @if($type_ankets === 'medic')
+                                            @if($type_ankets === 'medic' && mb_strtolower($anketa->admitted ?? '') === 'допущен')
                                                     <td class="td-option not-export">
                                                         <a href="{{ route('forms.print', [
                                                             'id' => $anketa->id,

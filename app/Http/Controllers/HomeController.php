@@ -470,7 +470,7 @@ class HomeController extends Controller
                         });
                     }
 
-                   $bdd->get()->map(function ($q) {
+                    $bdd = $bdd->get()->map(function ($q) {
                        $q->user_id = !isset($q->user->roles[0]) ? '' : $q->user->roles[0]->guard_name;
                        unset($q->user);
                        return $q;
