@@ -27,6 +27,7 @@ class ApiController extends Controller
 
         $field = 'name';
         $key = 'id';
+        $user = $request->user('api');
 
         if ($request->get('field')) {
             $field = $request->get('field');
@@ -44,15 +45,21 @@ class ApiController extends Controller
                       'like', '%' . $request->search . '%')
                          ->orWhere("hash_id", "like", "%" . $request->search . "%");
         } else {
-            $query = app("App\\" . $model)::where($searchingIn, 'like', '%' . $request->search . '%')
-                                          ->orWhere("hash_id", "like", "%" . $request->search . "%");
+            $query = app("App\\" . $model)::where(function ($query) use ($request, $searchingIn) {
+                $query->where($searchingIn, 'like', '%' . $request->search . '%')
+                ->orWhere("hash_id", "like", "%" . $request->search . "%");
+            });
+
+            if ($user->hasRole('client') && ($model === 'Driver' || $model === 'Car')) {
+                $query = $query->where('company_id', $user->company_id);
+            }
         }
 
         if ($request->get('trashed') === 'true') {
             $query = $query->withTrashed();
         }
 
-        return $query->select('id', 'hash_id', $field, $key)->limit(100)->get();
+        return $query->select('id', 'hash_id', 'company_id', $field, $key)->limit(100)->get();
     }
 
     // Response
