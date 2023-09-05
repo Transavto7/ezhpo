@@ -400,7 +400,11 @@ $permissionToExportPrikazPL = (
                                                 >
                                                     @if($field->field === 'date' || strpos($field->field, '_at') > 0)
                                                         @if($anketa[$field->field])
-                                                            {{ date('d-m-Y H:i:s', strtotime($anketa[$field->field])) }}
+                                                            @if ($field->field === 'date' && $type_ankets === 'bdd')
+                                                                {{ date('d-m-Y', strtotime($anketa[$field->field])) }}
+                                                            @else
+                                                                {{ date('d-m-Y H:i:s', strtotime($anketa[$field->field])) }}
+                                                            @endif
                                                         @endif
                                                     @elseif($field->field === 'photos')
 
