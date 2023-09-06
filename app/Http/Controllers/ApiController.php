@@ -41,25 +41,26 @@ class ApiController extends Controller
         if ($model === 'User') {
             $query = User::with('roles')->whereHas('roles', function ($q) use ($request) {
                 $q->whereNotIn('roles.id', [3, 6, 9]);
-            })->where($searchingIn,
-                      'like', '%' . $request->search . '%')
+            })->where($searchingIn, 'like', '%' . $request->search . '%')
                          ->orWhere("hash_id", "like", "%" . $request->search . "%");
         } else {
             $query = app("App\\" . $model)::where(function ($query) use ($request, $searchingIn) {
                 $query->where($searchingIn, 'like', '%' . $request->search . '%')
-                ->orWhere("hash_id", "like", "%" . $request->search . "%");
+                    ->orWhere("hash_id", "like", "%" . $request->search . "%");
             });
+        }
 
-            if ($user->hasRole('client') && ($model === 'Driver' || $model === 'Car')) {
-                $query = $query->where('company_id', $user->company_id);
-            }
+        if ($user->hasRole('client') && ($model === 'Driver' || $model === 'Car')) {
+            $query = $query->select('id', 'hash_id', $field, $key)->where('company_id', $user->company_id);
+        } else {
+            $query = $query->select('id', 'hash_id', $field, $key);
         }
 
         if ($request->get('trashed') === 'true') {
             $query = $query->withTrashed();
         }
 
-        return $query->select('id', 'hash_id', 'company_id', $field, $key)->limit(100)->get();
+        return $query->limit(100)->get();
     }
 
     // Response
