@@ -1309,12 +1309,6 @@ class IndexController extends Controller
                     if ($element->type_product === 'Абонентская плата без реестров') {
                         $element->type_anketa = null;
                         $element->type_view   = null;
-
-                        if ( !isset($data['essence'])) {
-//                            $element->essence = null;
-                        }
-                    } else {
-//                        $element->essence = null;
                     }
                 }
 
@@ -1362,9 +1356,29 @@ class IndexController extends Controller
         }
 
         if($element->save()){
-            if (($model_text == 'Driver' && user()->access('contract_edit_driver'))
-                || ($model_text == 'Car' && user()->access('contract_edit_car'))){
+            if ($model_text == 'Driver' || $model_text == 'Car'){
                 $element->contracts()->sync($data['contract_ids'] ?? []);
+
+                $company = Company::where("id", $data['company_id'])->first();
+
+                if($company) {
+                    if(Contract::query()
+                        ->where('company_id', $data['company_id'])
+                        ->where('main_for_company', 1)->first()
+                    ){
+                        $contract = Contract::query()
+                            ->where('company_id', $data['company_id'])
+                            ->where('main_for_company', 1)->first();
+
+                        if($model_text === 'Driver'){
+                            $contract->drivers()->attach($element->id);
+                        }
+
+                        if($model_text === 'Car'){
+                            $contract->cars()->attach($element->id);
+                        }
+                    }
+                }
             }
         }
 

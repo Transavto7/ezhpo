@@ -226,7 +226,7 @@ class HomeController extends Controller
                     // Поиск по дефолтным полям в таблице Anketas
 
                     // Проверяем пустые поля
-                    if (isset($fv)) { //  && !is_null($fv)
+                    if (isset($fv)) {
                         if ($fk == 'is_dop' && !$fv){
                             $anketas = $anketas->where(function ($q){
                                 $q->whereNull('is_dop')
@@ -263,7 +263,6 @@ class HomeController extends Controller
                                 /**
                                  * Проверяем что данные есть (повлияло на ФЛАГ СДПО)
                                  */
-
                                 if ($explodeData) {
                                     // Для строгих значений
                                     if (in_array($fk, ['company_name', 'driver_fio']) || strpos($fk, '_id')
@@ -283,10 +282,8 @@ class HomeController extends Controller
                                     else {
                                         $anketas = $anketas->where('anketas.' . $fk, 'LIKE', '%'.$explodeData.'%');
                                     }
-                                } else {
-                                    if ($explodeData === null) {
-                                        $anketas = $anketas->where('anketas.' . $fk, null);
-                                    }
+                                } else if ($explodeData === null) {
+                                    $anketas = $anketas->where('anketas.' . $fk, null);
                                 }
                             }
                         }
@@ -470,7 +467,7 @@ class HomeController extends Controller
                         });
                     }
 
-                   $bdd->get()->map(function ($q) {
+                    $bdd = $bdd->get()->map(function ($q) {
                        $q->user_id = !isset($q->user->roles[0]) ? '' : $q->user->roles[0]->guard_name;
                        unset($q->user);
                        return $q;

@@ -13,7 +13,11 @@
     @foreach($data as $item)
         <tr>
             @foreach($fields as $key => $field)
-                <td>{{ $item[$key] }}</td>
+                @if ($item['type_anketa'] === 'bdd' && $key === 'date')
+                    <td>{{ date('d-m-Y', strtotime($item[$key])) }}</td>
+                @else
+                    <td>{{ $item[$key] }}</td>
+                @endif
             @endforeach
         </tr>
     @endforeach

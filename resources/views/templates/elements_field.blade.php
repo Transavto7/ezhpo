@@ -173,7 +173,15 @@
                     @endif
                 </option>
             @endforeach
-            @foreach(app("App\\" . $v['values'])::whereNotIn($key, $default_value)->limit(100)->get() as $option)
+            @php
+                $model = app("App\\" . $v['values']);
+                $options = $model::whereNotIn($key, $default_value)->limit(100);
+                if (auth()->user()->hasRole("client") && ($v['values'] === 'Driver' || $v['values'] === 'Car')) {
+                    $options = $options->where('company_id', auth()->user()->company_id);
+                }
+            @endphp
+
+            @foreach($options->get() as $option)
                 <option value="{{ $option[$key] }}">
                     @if ($concatField)
                         [{{ $option[$concatField] }}] {{ $option[$value] }}

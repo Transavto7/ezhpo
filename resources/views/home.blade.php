@@ -400,7 +400,11 @@ $permissionToExportPrikazPL = (
                                                 >
                                                     @if($field->field === 'date' || strpos($field->field, '_at') > 0)
                                                         @if($anketa[$field->field])
-                                                            {{ date('d-m-Y H:i:s', strtotime($anketa[$field->field])) }}
+                                                            @if ($field->field === 'date' && $type_ankets === 'bdd')
+                                                                {{ date('d-m-Y', strtotime($anketa[$field->field])) }}
+                                                            @else
+                                                                {{ date('d-m-Y H:i:s', strtotime($anketa[$field->field])) }}
+                                                            @endif
                                                         @endif
                                                     @elseif($field->field === 'photos')
 
@@ -555,7 +559,7 @@ $permissionToExportPrikazPL = (
                                                 </td>
                                             @endif
 
-                                            @if($type_ankets === 'medic')
+                                            @if($type_ankets === 'medic' && mb_strtolower($anketa->admitted ?? '') === 'допущен')
                                                     <td class="td-option not-export">
                                                         <a href="{{ route('forms.print', [
                                                             'id' => $anketa->id,
