@@ -485,7 +485,7 @@ class Anketa extends Model
             ],
             'pechat_pl' => [
                 'company_id'   => 'Компания',
-                'driver_fio'    => 'Водитель',
+                'driver_id'    => 'Водитель',
                 'date'         => 'Дата распечатки ПЛ',
                 'count_pl'     => 'Количество распечатанных ПЛ',
                 'user_name'    => 'Ф.И.О сотрудника, который готовил ПЛ',
