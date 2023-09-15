@@ -117,8 +117,8 @@ class SdpoController extends Controller
         $medic['date'] = $request->date ?? $medic['created_at'];
 
         $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
+        $driver->date_prmo = $medic['created_at'];
         $admitted = null;
-        $driver->date_prmo = Carbon::now();
 
         if ($request->sleep_status && $request->sleep_status === 'Нет') {
             $admitted = 'Не допущен';
