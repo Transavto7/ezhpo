@@ -76,6 +76,17 @@
                                         </div>
                                     @endif
                                 </div>
+
+                                <div class="download-app mobile-download" style="display: none">
+                                    <span>
+                                        Теперь пройти осмотр это - просто!<br>
+                                        Скачай карту, построй маршрут.
+                                    </span>
+
+                                    <a href="https://apps.rustore.ru/app/org.transauto.main" target="_blank">
+                                        <img src="/img/rustore.svg" alt="RuStore">
+                                    </a>
+                                </div>
                             </form>
                         </div>
                     </div>
