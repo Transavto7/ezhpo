@@ -1638,6 +1638,15 @@ class AnketsController extends Controller
                     $anketa['car_gos_number'] = $Car->gos_number;
                 }
 
+                // Конвертация текущего времени Юзера
+                date_default_timezone_set('UTC');
+                $time = time();
+                $timezone = $user->timezone ? $user->timezone : 3;
+                $time += $timezone * 3600;
+                $time = date('Y-m-d H:i:s', $time);
+
+                $anketa['created_at'] = isset($anketa['created_at']) ? $anketa['created_at'] : $time;
+
                 /**
                  * Проверка дат при вводе БДД и Отчета
                  */
@@ -1657,20 +1666,11 @@ class AnketsController extends Controller
                     $anketa['driver_gender'] = isset($Driver->gender) ? $Driver->gender : '';
 
                     if ($isApiRoute && $anketa['type_anketa'] === 'medic') {
-                        $Driver->date_prmo = Carbon::now();
+                        $Driver->date_prmo = $anketa['created_at'];
                     }
 
                     $Driver->save();
                 }
-
-                // Конвертация текущего времени Юзера
-                date_default_timezone_set('UTC');
-                $time = time();
-                $timezone = $user->timezone ? $user->timezone : 3;
-                $time += $timezone * 3600;
-                $time = date('Y-m-d H:i:s', $time);
-
-                $anketa['created_at'] = isset($anketa['created_at']) ? $anketa['created_at'] : $time;
 
                 $connected_hash = sha1(time() . rand(99,9999));
 
@@ -1781,9 +1781,12 @@ class AnketsController extends Controller
             $stamp = $terminal->stamp;
         }
 
+        $user = User::find($anketa->user_id);
+
         $pdf = Pdf::loadView('docs.print', [
             'anketa' => $anketa,
-            'stamp' => $stamp
+            'stamp' => $stamp,
+            'user' => $user
         ]);
 
         $response = response()->make($pdf->output(), 200);

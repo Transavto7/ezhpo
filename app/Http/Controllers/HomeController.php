@@ -468,7 +468,7 @@ class HomeController extends Controller
                     }
 
                     $bdd = $bdd->get()->map(function ($q) {
-                       $q->user_id = !isset($q->user->roles[0]) ? '' : $q->user->roles[0]->guard_name;
+                       $q->user_id = 'Инженер по безопасности дорожного движения';
                        unset($q->user);
                        return $q;
                    });
