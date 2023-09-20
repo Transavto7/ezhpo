@@ -35,7 +35,7 @@
             font-size: 7.7px;
             width: 215px;
             padding-top: 5.5px;
-            line-height: 7px;
+            line-height: 6px;
         }
 
         .title {
@@ -51,8 +51,13 @@
             display: inline-block;
         }
 
+        .validity {
+            font-size: 7px;
+            line-height: 5px;
+            display: inline-block;
+        }
+
         .name {
-            margin-bottom: 1.5px;
             display: inline-block;
         }
 
@@ -70,14 +75,21 @@
         Медицинский осмотр<br>
         @if(Str::contains(Str::lower($anketa->type_view), 'пред'))
             к исполнению трудовых обязаностей<br>
-            допущен<br>
-            <br>
-        @else
-            <br><br>
+            допущен
         @endif
+
+        <br><br>
         {{ $anketa->date ?? '0000-00-00 00:00:00' }}<br>
         {{ $anketa->user_name ?? 'неизвестный сотрудник' }}<br>
         ЭЦП {{ $anketa->user_eds ?? 'неизвестная-подпись' }}<br>
+        @if ($user->validity_eds_start && $user->validity_eds_end)
+            <span class="validity">
+                Срок действия: c
+                {{ \Carbon\Carbon::parse($user->validity_eds_start)->format('d.m.Y') }}
+                по
+                {{ \Carbon\Carbon::parse($user->validity_eds_end)->format('d.m.Y') }}
+            </span>
+        @endif
     </div>
 </body>
 </html>

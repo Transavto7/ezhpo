@@ -183,6 +183,11 @@ class SdpoController extends Controller
             $anketa['stamp_licence'] = $stamp->licence;
         }
 
+        if ($userMedic->validity_eds_start && $userMedic->validity_eds_end) {
+            $anketa['validity'] = 'Срок действия: c' . Carbon::parse($user->validity_eds_start)->format('d.m.Y')
+                 .'по' . Carbon::parse($user->validity_eds_end)->format('d.m.Y');
+        }
+
         return response()->json($anketa);
     }
 

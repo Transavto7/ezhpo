@@ -1781,9 +1781,12 @@ class AnketsController extends Controller
             $stamp = $terminal->stamp;
         }
 
+        $user = User::find($anketa->user_id);
+
         $pdf = Pdf::loadView('docs.print', [
             'anketa' => $anketa,
-            'stamp' => $stamp
+            'stamp' => $stamp,
+            'user' => $user
         ]);
 
         $response = response()->make($pdf->output(), 200);

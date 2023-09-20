@@ -174,13 +174,23 @@
                 </b-row>
                 <b-row class="my-1">
                     <b-col lg="2">
-                        <label>"ЭЦП":</label>
+                        <label>ЭЦП:</label>
                     </b-col>
                     <b-col lg="5">
                         <b-form-input v-model="infoModalUser.eds"
                                       size="sm"
                                       placeholder="Введите эл. подпись"
                         />
+                    </b-col>
+                </b-row>
+                <b-row class="my-1">
+                    <b-col lg="2">
+                        <label>Срок действия ЭЦП:</label>
+                    </b-col>
+                    <b-col lg="5" class="d-flex align-items-baseline" style="gap: 5px">
+                        с <input v-model="infoModalUser.validity_eds_start" type="date" name="date" class="form-control">
+                        по
+                        <input v-model="infoModalUser.validity_eds_end" type="date" name="date" class="form-control">
                     </b-col>
                 </b-row>
                 <b-row class="my-1">
@@ -488,6 +498,8 @@ export default {
                         return item.id;
                     }),
                     blocked:  this.infoModalUser.blocked,
+                    validity_eds_start: this.infoModalUser.validity_eds_start,
+                    validity_eds_end: this.infoModalUser.validity_eds_end,
                     permissions: this.infoModalUser.permissions.filter((item) => {
                         return !(this.allPermissions.filter((all_prm) => {
                             return all_prm.id == item
@@ -535,6 +547,8 @@ export default {
                 this.infoModalUser_roles = data.roles;
                 this.infoModalUser.blocked = data.blocked;
                 this.infoModalUser.company = data.company.name;
+                this.infoModalUser.validity_eds_start = data.validity_eds_start;
+                this.infoModalUser.validity_eds_end = data.validity_eds_end;
 
                 // не редактируемые
                 this.allPermissions.map((item, index) => {
