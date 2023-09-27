@@ -42,7 +42,7 @@ class AnketsController extends Controller
             if ($anketa->type_anketa === 'medic' && $anketa->driver_id) {
                 $driver = Driver::where('hash_id', $anketa->driver_id)->first();
 
-                if ($driver->end_of_ban) {
+                if ($driver && $driver->end_of_ban) {
                     $last = Anketa::orderBy('created_at', 'desc')
                         ->where('driver_id', $anketa->driver_id)
                         ->select('driver_id', 'created_at', 'id')->first();

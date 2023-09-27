@@ -49,20 +49,20 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
                 }
 
                 foreach ($this->fields as $key => $value) {
-                    if($key === "driver_id"){
+                    if ($key === "driver_id"){
                         $fields['driver_id'] = "ID водителя";
                         $fields['driver_fio'] = "ФИО водителя";
-                    }elseif ($key === "car_id"){
+                    } elseif ($key === "car_id"){
                         $fields['car_gos_number'] = $value;
                         $fields['car_id'] = "ID автомобиля";
-                    }elseif ($key === "company_id"){
+                    } elseif ($key === "company_id"){
                         $fields['company_name'] = $value;
                         $fields['company_id'] = "ID компании";
-                    }else{
+                    } else {
                         $fields[$key] = $value;
                     }
                 }
-            }elseif ($this->anketas[0]['type_anketa'] === "bdd"){
+            }elseif ($this->anketas[0]['type_anketa'] === "bdd") {
                 $fields['id'] = "ID записи";
                 foreach ($this->fields as $key => $value) {
                     if($key === "driver_id"){
