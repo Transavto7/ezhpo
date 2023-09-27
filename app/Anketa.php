@@ -385,6 +385,7 @@ class Anketa extends Model
                 'point_reys_control' => 'Отметка о прохождении контроля',
                 'user_name'          => 'ФИО лица, проводившего контроль',
                 'user_eds'           => 'Подпись лица, проводившего контроль (ЭЦП)',
+                'pv_id' => 'Пункт выпуска'
             ],
             'tech_export_pl' => [
                 'number_list_road' => 'Номер ПЛ',
@@ -550,6 +551,9 @@ class Anketa extends Model
             ],
         ];
 
+    public function point() {
+        return $this->belongsTo(Point::class, 'point_id', 'id');
+    }
 
     public static function getAll()
     {

@@ -18,7 +18,10 @@
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,700">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;800&display=swap" rel="stylesheet">
 
     <!-- Styles -->
     <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
@@ -26,9 +29,9 @@
     <link href="https://cdn.jsdelivr.net/npm/suggestions-jquery@21.12.0/dist/css/suggestions.min.css" rel="stylesheet" />
     <link href="{{ mix('css/app.css') }}?v={{ time() }}" rel="stylesheet" type="text/css">
     <link rel="shortcut icon" href="/favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
 
-    @auth
+
+@auth
         <script type="text/javascript">
             window.API_TOKEN = '{{ Auth::user()->api_token }}';
             window.userRole = function () {
@@ -53,9 +56,6 @@
 
             const mobileDownload = document.querySelector('.mobile-download');
             if (isAndroid() && mobileDownload) {
-                mobileDownload.querySelector('.close').addEventListener('click', () => {
-                    mobileDownload.style.display = 'none';
-                });
                 mobileDownload.style.display = 'flex';
             }
         });
@@ -84,18 +84,6 @@
 
             @guest
                 @yield('content')
-
-                @if(file_exists(public_path('TransAvto7.apk')))
-                        <div class="mobile-download" style="display: none">
-                            <button class="close">
-                                <i class="fa fa-close"></i>
-                            </button>
-                            <a href="/TransAvto7.apk" class="link">
-                                Скачать наше приложение
-                                <span>Нажмите для начала загрузки</span>
-                            </a>
-                        </div>
-                @endif
             @endguest
 
             @auth

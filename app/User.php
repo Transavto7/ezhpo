@@ -41,7 +41,9 @@ class User extends Authenticatable
             'company_id',
             'deleted_id',
             'last_connection_at',
-            'stamp_id'
+            'stamp_id',
+            'validity_eds_start',
+            'validity_eds_end'
         ];
 
     protected $hidden

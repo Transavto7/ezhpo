@@ -141,7 +141,8 @@ class UserController extends Controller
             $user->eds      = $request->get('eds', null);
             $user->timezone = $request->get('timezone', null);
             $user->blocked  = $request->get('blocked', 0);
-
+            $user->validity_eds_start  = $request->get('validity_eds_start', null);
+            $user->validity_eds_end  = $request->get('validity_eds_end', null);
         } else {
             $validator = Validator::make($request->all(), [
                 'password' => ['required', 'string', 'min:1', 'max:255'],
@@ -150,19 +151,21 @@ class UserController extends Controller
 
             if ($validator->fails()) {
                 return response([
-                                    'message' => $validator->errors(),
-                                    'status'  => false,
-                                ]);
+                    'message' => $validator->errors(),
+                    'status'  => false,
+                ]);
             }
 
             $user = User::create([
-                                     'name'     => $request->get('name', null),
-                                     'email'    => $request->get('email', null),
-                                     'hash_id'  => mt_rand(1000, 9999).date('s'),
-                                     'eds'      => $request->get('eds', null),
-                                     'timezone' => $request->get('timezone', null),
-                                     'blocked'  => $request->get('blocked', null),
-                                 ]);
+                 'name'     => $request->get('name', null),
+                 'email'    => $request->get('email', null),
+                 'hash_id'  => mt_rand(1000, 9999).date('s'),
+                 'eds'      => $request->get('eds', null),
+                 'timezone' => $request->get('timezone', null),
+                 'blocked'  => $request->get('blocked', null),
+                 'validity_eds_start' => $request->get('validity_eds_start', null),
+                 'validity_eds_end'  => $request->get('validity_eds_end', null),
+            ]);
         }
 
         if ($login = $request->get('login', null)) {

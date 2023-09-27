@@ -117,8 +117,8 @@ class SdpoController extends Controller
         $medic['date'] = $request->date ?? $medic['created_at'];
 
         $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
+        $driver->date_prmo = $medic['created_at'];
         $admitted = null;
-        $driver->date_prmo = Carbon::now();
 
         if ($request->sleep_status && $request->sleep_status === 'Нет') {
             $admitted = 'Не допущен';
@@ -181,6 +181,11 @@ class SdpoController extends Controller
         if ($stamp) {
             $anketa['stamp_head'] = $stamp->company_name;
             $anketa['stamp_licence'] = $stamp->licence;
+        }
+
+        if ($userMedic->validity_eds_start && $userMedic->validity_eds_end) {
+            $anketa['validity'] = 'Срок действия: c ' . Carbon::parse($user->validity_eds_start)->format('d.m.Y')
+                 .' по ' . Carbon::parse($user->validity_eds_end)->format('d.m.Y');
         }
 
         return response()->json($anketa);
