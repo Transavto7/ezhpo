@@ -67,6 +67,27 @@ Artisan::command('companies:procedure_pv-fix', function () {
 
 })->describe('Display an inspiring quote');
 
+Artisan::command('anketas:clear', function () {
+    $date = Carbon::parse('2023-09-15');
+    $anketas = \App\Anketa::where('driver_id', 217543)->whereBetween('date', [
+        $date->startOfDay(),
+        $date->endOfDay()
+    ]);
+
+    $saved = $anketas->first();
+
+    if ($saved) {
+        $anketas = $anketas->where('id', '!=', $saved->id);
+    }
+
+    $count = $anketas->count();
+
+    //$anketas->forceDelete();
+
+    $this->comment('delete ' . $count . ' anketas');
+
+})->describe('Display an inspiring quote');
+
 Artisan::command('anketas:fix', function () {
     $anketas = \App\Anketa::where('created_at', '>=', Carbon::parse('01-07-2022')->startOfDay())
         ->where('created_at', '<=', Carbon::now())->whereNull('realy')->get();
