@@ -20,7 +20,7 @@
             <textarea rows="1" class="doc-input" name="driver_info">{{ $driver_fio ? $driver_fio . ',' : '' }} {{ $driver_year_birthday }} г.р., {{ $driver_pv }}, {{ app('app\Company')->getName($company_id, 'hash_id') }}</textarea>
             <br>
             кем и когда (точное время) произведен контроль трезвости
-            <textarea rows="1" readonly class="doc-input" name="control_info">{{ $user_post ? $user_post . ',' : '' }} {{ $user_name }}, {{ $date }}</textarea>
+            <textarea rows="1" class="doc-input" name="control_info">{{ $user_post ? $user_post . ',' : 'Медицинский сотрудник' }} {{ $user_name }}, {{ $date }}</textarea>
 
             <p>2. Особенности поведения обследуемого:</p>
             <textarea rows="1" class="doc-input open-modal" name="features"></textarea>

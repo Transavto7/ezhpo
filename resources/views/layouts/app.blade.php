@@ -124,6 +124,33 @@
         </main>
     </div>
 
+    @if(user() && !user()->accepted_agreement)
+        <div class="modal_agreement">
+            <div class="modal_agreement__inner">
+                <div class="modal_agreement__header">
+                    Пользовательское соглашение
+                </div>
+
+                <div class="modal_agreement__content">
+                    Перед началом использования вы должны <br>
+                    прочитать и принять принять наше<br>
+                    <a href="/agreement" target="_blank">пользовательское соглашение</a>
+                </div>
+
+                <div class="modal_agreement__buttons">
+                    <button class="btn btn-success" onclick="event.preventDefault();
+                        document.getElementById('agreement-form').submit();">Принимаю</button>
+                    <button class="btn btn-danger" onclick="event.preventDefault();
+                        document.getElementById('logout-form').submit();">Выйти</button>
+                </div>
+            </div>
+        </div>
+
+        <form id="agreement-form" action="/agreement" method="POST" style="display: none;">
+            @csrf
+        </form>
+    @endif
+
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>

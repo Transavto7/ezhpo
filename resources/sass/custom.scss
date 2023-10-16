@@ -792,6 +792,64 @@ input:checked + .slider:before {
     gap: 10px;
 }
 
+.modal_agreement {
+    display: flex;
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.7);
+    width: 100%;
+    height: 100vh;
+    z-index: 20;
+    top: 0;
+    left: 0;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal_agreement__inner {
+    background-color: #FFFFFF;
+    padding: 30px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.modal_agreement__header {
+    font-weight: bold;
+}
+
+.modal_agreement__content {
+    text-align: center;
+}
+
+.modal_agreement__buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.agreement__title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.agreement__end {
+    margin-top: 10px;
+    font-size: 12px;
+    text-align: justify;
+}
+
+.agreement__page {
+    max-width: 900px;
+    margin: 50px auto;
+    font-size: 14px;
+    text-align: justify;
+
+}
+
 @keyframes lds-ring {
     0% {
         transform: rotate(0deg);

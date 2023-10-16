@@ -43,7 +43,8 @@ class User extends Authenticatable
             'last_connection_at',
             'stamp_id',
             'validity_eds_start',
-            'validity_eds_end'
+            'validity_eds_end',
+            'accepted_agreement'
         ];
 
     protected $hidden
