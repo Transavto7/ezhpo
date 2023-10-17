@@ -531,11 +531,20 @@ class HomeController extends Controller
             }
         }
 
-        $anketas = ($filter_activated || $typeAnkets === 'pak_queue')
-            ? $anketas->orderBy($table . $orderKey, $orderBy)->paginate($take) : [];
+        if ($filter_activated || $typeAnkets === 'pak_queue') {
+            if ($orderKey === 'result_dop') {
+                $anketas = $anketas->orderBy($table . $orderKey, $orderBy)->orderBy($table . 'is_dop', $orderBy === 'ASC' ? 'DESC' : 'ASC');
+            } else {
+                $anketas = $anketas->orderBy($table . $orderKey, $orderBy);
+            }
 
-        $anketasCountResult = ($filter_activated || $typeAnkets === 'pak_queue')
-            ? $anketas->total() : 0;
+            $anketas = $anketas->paginate($take);
+            $anketasCountResult = $anketas->total();
+        } else {
+            $anketas = [];
+            $anketasCountResult = 0;
+        }
+
 
         $anketsFields = array_keys($fieldsKeys);
         if (isset(Anketa::$fieldsKeysTable[$fieldsKeysTypeAnkets])) {
