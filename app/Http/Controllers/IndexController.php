@@ -119,6 +119,7 @@ class IndexController extends Controller
                             'time_card_driver'    => 'Срок действия карты водителя (водитель)',
                             'date_osago'          => 'Дата осаго (автомобиль)',
                             'date_driver_license' => 'Срок действия водительского удостоверения (водитель)',
+                            'date_narcotic_test'  => 'Дата тестирования на наркотики (водитель)'
                         ],
                     ],
                     'days'       => ['label' => 'Кол-во дней', 'type' => 'number'],
