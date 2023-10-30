@@ -185,6 +185,9 @@ Route::middleware(['auth'])->group(function () {
     Route::any('/stamp/filter', 'StampController@getAll');
     Route::any('/stamp/find', 'StampController@find');
     Route::resource('/stamp', 'StampController');
+
+    Route::get('/agreement', 'IndexController@agreement');
+    Route::post('/agreement', 'IndexController@acceptAgreement');
 });
 
 

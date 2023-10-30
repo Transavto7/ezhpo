@@ -14,6 +14,7 @@ use App\Instr;
 use App\Models\Contract;
 use App\Point;
 use App\Product;
+use App\Req;
 use App\Town;
 use App\User;
 use Carbon\Carbon;
@@ -118,6 +119,7 @@ class IndexController extends Controller
                             'time_card_driver'    => 'Срок действия карты водителя (водитель)',
                             'date_osago'          => 'Дата осаго (автомобиль)',
                             'date_driver_license' => 'Срок действия водительского удостоверения (водитель)',
+                            'date_narcotic_test'  => 'Дата тестирования на наркотики (водитель)'
                         ],
                     ],
                     'days'       => ['label' => 'Кол-во дней', 'type' => 'number'],
@@ -1677,5 +1679,17 @@ class IndexController extends Controller
         }
 
         return view('profile.anketa', $anketa);
+    }
+
+    public function agreement(Request $request) {
+        return view('agreement.index');
+    }
+
+    public function acceptAgreement(Request $request) {
+        $request->user()->update([
+            'accepted_agreement' => true
+        ]);
+
+        return back();
     }
 }

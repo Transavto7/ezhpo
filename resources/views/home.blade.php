@@ -365,7 +365,15 @@ $permissionToExportPrikazPL = (
 
                                         {{-- redactirovanie --}}
                                         @if($permissionToUpdate)
-                                            <th class="not-export">#</th>
+                                            @if($type_ankets === 'medic')
+                                                    <th class="not-export">#
+                                                        <a class="not-export" href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=result_dop{{ $queryString }}">
+                                                            <i class="fa fa-sort"></i>
+                                                        </a>
+                                                    </th>
+                                            @else
+                                                <th class="not-export">#</th>
+                                            @endif
                                         @endif
 
                                         {{-- УДАЛЕНИЕ--}}
@@ -556,6 +564,7 @@ $permissionToExportPrikazPL = (
                                                             </button>
                                                         @endif
                                                     @endif
+                                                    {{ $anketa->result_dop }}
                                                 </td>
                                             @endif
 
