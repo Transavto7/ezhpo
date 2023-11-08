@@ -305,6 +305,24 @@ class Driver extends Model
         return 100;
     }
 
+    public function getPulseLower() {
+        $setting = Settings::setting('pulse_lower');
+        if ($setting) {
+            return $setting;
+        }
+
+        return PHP_INT_MIN;
+    }
+
+    public function getPulseUpper() {
+        $setting = Settings::setting('pulse_upper');
+        if ($setting) {
+            return $setting;
+        }
+
+        return PHP_INT_MAX;
+    }
+
     public function getTimeOfAlcoholBan(){
         $setting = Settings::setting('time_of_alcohol_ban');
 
