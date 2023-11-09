@@ -94,7 +94,7 @@
 
                 $tonometer = explode('/', $tonometer);
                 if ($t_people < 38 && $med_view === 'В норме' && $driver
-                    && $tonometer[0] < $driver->getPressureSystolic() && $tonometer->getPressureDiastolic()) {
+                    && $tonometer[0] < $driver->getPressureSystolic() && $tonometer[1] < $driver->getPressureDiastolic()) {
                     $result = 'Здоров';
                 }
             @endphp
