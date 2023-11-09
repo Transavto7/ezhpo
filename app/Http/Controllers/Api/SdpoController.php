@@ -63,7 +63,6 @@ class SdpoController extends Controller
         }
 
         $test_narko = $request->test_narko ?? 'Отрицательно';
-        $proba_alko = $request->proba_alko ?? 'Отрицательно';
         $company = $driver->company;
         $medic = [];
 
@@ -78,6 +77,7 @@ class SdpoController extends Controller
 
         $medic['type_anketa'] = $request->type_anketa ?? 'medic';
         $medic['user_id'] = $userMedic->id;
+        $medic['operator_id'] = $userMedic->id;
         $medic['user_name'] = $userMedic->name;
         $medic['user_eds'] = $userMedic->eds;
         $medic['pulse'] = $request->pulse ?? mt_rand(60, 80);
@@ -116,7 +116,6 @@ class SdpoController extends Controller
         $medic['created_at'] = $request->created_at ?? $time;
         $medic['date'] = $request->date ?? $medic['created_at'];
 
-        $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
         $driver->date_prmo = $medic['created_at'];
         $admitted = null;
 
@@ -136,14 +135,14 @@ class SdpoController extends Controller
         }
 
         if (doubleval($request->alcometer_result) > 0) {
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
             $medic['proba_alko'] = 'Положительно';
         }
 
+        $driver->checkGroupRisk($tonometer, $test_narko, $medic['proba_alko']);
+
         //ПРОВЕРЯЕМ статус для поля "Заключение"
         $ton = explode('/', $tonometer);
-        if ($proba_alko === 'Положительно' || $test_narko === 'Положительно'
+        if ($medic['proba_alko'] === 'Положительно' || $test_narko === 'Положительно'
             || intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()
             || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38) {
             $admitted = 'Не допущен';
@@ -153,7 +152,7 @@ class SdpoController extends Controller
                 $driver->end_of_ban = Carbon::parse($time)->addMinutes($driver->getTimeOfPressureBan());
             }
 
-            if ($proba_alko === 'Положительно') {
+            if ($medic['proba_alko'] === 'Положительно') {
                 $driver->end_of_ban = Carbon::parse($time)->addMinutes($driver->getTimeOfAlcoholBan());
             }
         }
