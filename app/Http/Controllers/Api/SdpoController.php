@@ -145,7 +145,8 @@ class SdpoController extends Controller
         $ton = explode('/', $tonometer);
         if ($proba_alko === 'Положительно' || $test_narko === 'Положительно'
             || intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()
-            || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38) {
+            || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38
+            || intval($medic['pulse']) <= $driver->getPulseLower() || intval($medic['pulse']) >= $driver->getPulseUpper()) {
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
 

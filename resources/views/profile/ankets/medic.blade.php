@@ -228,6 +228,15 @@
             <small></small>
         </article>
     </div>
+
+    <div class="form-group row">
+        <label class="col-md-3 form-control-label">Пульс:</label>
+        <article class="col-md-9">
+            <input type="number" maxlength="7"
+                   name="anketa[0][pulse]" value="{{ $pulse ?? '' }}" class="form-control">
+            <small></small>
+        </article>
+    </div>
 @endif
 
 
