@@ -94,6 +94,11 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/imports.log'),
             'level' => 'debug'
+        ],
+
+        'admitting' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/admitting.log')
         ]
     ],
 

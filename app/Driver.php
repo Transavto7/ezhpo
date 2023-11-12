@@ -253,10 +253,8 @@ class Driver extends Model
 
         if ($test_narko === 'Положительно') {
             $group_risk = 'Наркотики';
-        } else {
-            if ($proba_alko === 'Положительно') {
-                $group_risk = 'Алкоголь';
-            }
+        } else if ($proba_alko === 'Положительно') {
+            $group_risk = 'Алкоголь';
         }
 
         $this->group_risk = $group_risk;
