@@ -210,6 +210,7 @@ class SdpoController extends Controller
             Log::channel('admitting')->info(json_encode(
                 [
                     'id' => $anketa->id,
+                    'medic' => $medic,
                     'anketa' => $anketa->toArray(),
                     'request' => $request->all(),
                     'source' => 'SdpoController',
