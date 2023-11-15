@@ -198,6 +198,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(function () {
     Route::get('/home/filters', 'HomeController@getFilters');
     Route::get('/home/{type_ankets?}/filters', 'HomeController@getFilters')->name('home.filters');
+    Route::get('/home/pak_queue', 'PakController@index');
     Route::get('/home/{type_ankets?}', 'HomeController@index')->name('home');
 
     Route::get('/pak', 'PakController@index')->name('pak.index');

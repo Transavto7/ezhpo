@@ -80,11 +80,14 @@
     <article class="col-md-9">
         <select name="proba_alko" required class="form-control">
             @isset($proba_alko)
-                <option disabled selected value="{{ $proba_alko }}">{{ $proba_alko }}</option>
+                <option selected value="{{ $proba_alko }}">{{ $proba_alko }}</option>
+                <option value="{{ $proba_alko == 'Положительно' ? 'Отрицательно' : 'Положительно' }}">
+                    {{ $proba_alko == 'Положительно' ? 'Отрицательно' : 'Положительно' }}
+                </option>
+            @else
+                <option selected value="Отрицательно">Отрицательно</option>
+                <option value="Положительно">Положительно</option>
             @endisset
-
-            <option selected value="Отрицательно">Отрицательно</option>
-            <option value="Положительно">Положительно</option>
         </select>
     </article>
 </div>
