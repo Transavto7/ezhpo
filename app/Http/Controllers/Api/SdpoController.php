@@ -111,11 +111,20 @@ class SdpoController extends Controller
 
         $test_narko = $request->test_narko ?? 'Отрицательно';
         $proba_alko = $request->proba_alko ?? 'Отрицательно';
-        $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
         $driver->date_prmo = $medic['created_at'];
 
         $admitted = 'Допущен';
         $notAdmittedReasons = [];
+
+        if (doubleval($request->alcometer_result) > 0) {
+            $notAdmittedReasons[] = ['Алкоголь в крови'];
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
+            $medic['proba_alko'] = 'Положительно';
+            $proba_alko = $request->proba_alko ?? 'Положительно';
+        }
+
+        $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
 
         if ($request->sleep_status === 'Нет') {
             $notAdmittedReasons[] = ['sleep_status - нет'];
@@ -127,13 +136,6 @@ class SdpoController extends Controller
             $notAdmittedReasons[] = ['people_status - нет'];
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
-        }
-
-        if (doubleval($request->alcometer_result) > 0) {
-            $notAdmittedReasons[] = ['Алкоголь в крови'];
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-            $medic['proba_alko'] = 'Положительно';
         }
 
         if ($proba_alko === 'Положительно') {
