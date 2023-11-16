@@ -222,6 +222,11 @@ class HomeController extends Controller
                     continue;
                 }
 
+                if ($fk === 'pulse' && $fv) {
+                    $anketas = $anketas->where('anketas.pulse', $fv);
+                    continue;
+                }
+
                 if ((in_array($fk, $anketasModel->fillable))) {
                     // Поиск по дефолтным полям в таблице Anketas
 
@@ -304,7 +309,6 @@ class HomeController extends Controller
                     }
                 }
             }
-
         }
 
         if (auth()->user()->hasRole('client')) {
