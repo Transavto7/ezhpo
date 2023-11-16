@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Anketa;
 use App\Driver;
 use App\Http\Controllers\SmsController;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Notify;
 use App\Settings;
@@ -12,26 +13,21 @@ use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Matrix\Exception;
+use Throwable;
 
 class SdpoController extends Controller
 {
-
     /*
      * Creating anketa by sdpo request
      */
-    public function createAnketa(Request $request)
+    public function createAnketa(Request $request): JsonResponse
     {
-        $driver = Driver::where('hash_id', $request->driver_id)->first();
+        /** @var User $user */
         $user = $request->user('api');
-        $sms = new SmsController();
-
-        if (!$driver) {
-            return response()->json(['message' => 'Указанный водитель не найден!'], 400);
-        }
-
-        if ($request->user('api')->blocked) {
+        $apiClient = $user;
+        if ($user->blocked) {
             return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
         }
 
@@ -42,9 +38,20 @@ class SdpoController extends Controller
             }
         }
 
+        /** @var Driver $driver */
+        $driver = Driver::where('hash_id', $request->driver_id)->first();
+        if (!$driver) {
+            return response()->json(['message' => 'Указанный водитель не найден!'], 400);
+        }
+
+        $company = $driver->company;
+        if ($company->dismissed === 'Да') {
+            return response()->json(['message' => 'Компания в черном списке. Необходимо связаться с руководителем!', 401]);
+        }
+
         if ($request->tonometer) {
             $tonometer = $request->tonometer;
-        } else if ($driver) {
+        } else {
             $systolic = rand(100, 139);
             $diastolic = rand(60, 89);
 
@@ -52,37 +59,22 @@ class SdpoController extends Controller
                 $systolic = intval($driver->getPressureSystolic()) - rand(1, 10);
             }
 
-
             if ($diastolic >= intval($driver->getPressureDiastolic())) {
                 $diastolic = intval($driver->getPressureDiastolic()) - rand(1, 10);
             }
 
             $tonometer = $systolic . '/' . $diastolic;
-        } else {
-            $tonometer = rand(100, 139) . '/' . rand(60, 89);
         }
 
-        $test_narko = $request->test_narko ?? 'Отрицательно';
-        $proba_alko = $request->proba_alko ?? 'Отрицательно';
-        $company = $driver->company;
         $medic = [];
-
-        if ($company->dismissed === 'Да') {
-            return response()->json(['message' => 'Компания в черном списке. Необходимо связаться с руководителем!', 401]);
-        }
-
-        $userMedic = $user;
-        if ($request->user_id) {
-            $userMedic = User::find($request->user_id) ?? $user;
-        }
-
         $medic['type_anketa'] = $request->type_anketa ?? 'medic';
-        $medic['user_id'] = $userMedic->id;
-        $medic['user_name'] = $userMedic->name;
-        $medic['user_eds'] = $userMedic->eds;
+        $medic['user_id'] = $user->id;
+        $medic['operator_id'] = $user->id;
+        $medic['user_name'] = $user->name;
+        $medic['user_eds'] = $user->eds;
         $medic['pulse'] = $request->pulse ?? mt_rand(60, 80);
-        $medic['pv_id'] = $request->user('api')->pv->name;
-        $medic['point_id'] = $request->user('api')->pv->id;
+        $medic['pv_id'] = $apiClient->pv->name;
+        $medic['point_id'] = $apiClient->pv->id;
         $medic['tonometer'] = $tonometer;
         $medic['driver_id'] = $driver->hash_id;
         $medic['driver_fio'] = $driver->fio;
@@ -92,8 +84,9 @@ class SdpoController extends Controller
         $medic['med_view'] = $request->med_view ?? 'В норме';
         $medic['t_people'] = $request->t_people ?? 36.6;
         $medic['type_view'] = $request->type_view ?? 'Предрейсовый/Предсменный';
-        $medic['flag_pak'] = 'СДПО А';
-        $medic['terminal_id'] = $request->user('api')->id;
+        $medic['flag_pak'] = $request->type_anketa === 'pak_queue' ? 'СДПО Р' : 'СДПО А';
+        $medic['terminal_id'] = $apiClient->id;
+        $medic['realy'] = "да";
 
         if ($driver->year_birthday !== '' && $driver->year_birthday !== '0000-00-00') {
             $medic['driver_year_birthday'] = $driver->year_birthday;
@@ -109,87 +102,123 @@ class SdpoController extends Controller
 
         date_default_timezone_set('UTC');
         $time = time();
-        $timezone = $request->user('api')->timezone ? $request->user('api')->timezone : 3;
+        $timezone = $apiClient->timezone ?? 3;
         $time += $timezone * 3600;
         $time = date('Y-m-d H:i:s', $time);
 
         $medic['created_at'] = $request->created_at ?? $time;
         $medic['date'] = $request->date ?? $medic['created_at'];
 
-        $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
+        $test_narko = $request->test_narko ?? 'Отрицательно';
+        $proba_alko = $request->proba_alko ?? 'Отрицательно';
         $driver->date_prmo = $medic['created_at'];
-        $admitted = null;
 
-        if ($request->sleep_status && $request->sleep_status === 'Нет') {
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-        }
-
-        if ($request->people_status && $request->people_status === 'Нет') {
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-        }
-
-        if ($request->people_status && $request->people_status === 'Нет') {
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-        }
+        $admitted = 'Допущен';
+        $notAdmittedReasons = [];
 
         if (doubleval($request->alcometer_result) > 0) {
+            $notAdmittedReasons[] = ['Алкоголь в крови'];
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
             $medic['proba_alko'] = 'Положительно';
+            $proba_alko = $request->proba_alko ?? 'Положительно';
         }
 
-        //ПРОВЕРЯЕМ статус для поля "Заключение"
-        $ton = explode('/', $tonometer);
-        if ($proba_alko === 'Положительно' || $test_narko === 'Положительно'
-            || intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()
-            || $medic['med_view'] !== 'В норме' || doubleval($medic['t_people']) >= 38) {
+        $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
+
+        if ($request->sleep_status === 'Нет') {
+            $notAdmittedReasons[] = ['sleep_status - нет'];
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
+        }
 
-            if (intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()) {
-                $driver->end_of_ban = Carbon::parse($time)->addMinutes($driver->getTimeOfPressureBan());
-            }
+        if ( $request->people_status === 'Нет') {
+            $notAdmittedReasons[] = ['people_status - нет'];
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
+        }
 
-            if ($proba_alko === 'Положительно') {
-                $driver->end_of_ban = Carbon::parse($time)->addMinutes($driver->getTimeOfAlcoholBan());
-            }
+        if ($proba_alko === 'Положительно') {
+            $notAdmittedReasons[] = ['Положительный тест на алкоголь'];
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
+            $driver->end_of_ban = Carbon::parse($time)->addMinutes($driver->getTimeOfAlcoholBan());
+        }
+
+        if ($test_narko === 'Положительно') {
+            $notAdmittedReasons[] = ['Положительный тест на наркотики'];
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
+        }
+
+        if ($medic['med_view'] !== 'В норме') {
+            $notAdmittedReasons[] = ['med_view не в норме'];
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
+        }
+
+        if (doubleval($medic['t_people']) >= 38) {
+            $notAdmittedReasons[] = ['Высокая температура'];
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
+        }
+
+        if (intval($medic['pulse']) <= $driver->getPulseLower() || intval($medic['pulse']) >= $driver->getPulseUpper())
+        {
+            $notAdmittedReasons[] = ['Слишком высокий или низкий пульс'];
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
+        }
+
+        $ton = explode('/', $tonometer);
+        if (intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()) {
+            $notAdmittedReasons[] = ['Высокое давление'];
+            $admitted = 'Не допущен';
+            $medic['med_view'] = 'Отстранение';
+            $driver->end_of_ban = Carbon::parse($time)->addMinutes($driver->getTimeOfPressureBan());
         }
 
         $driver->save();
 
-        if ($request->type_anketa === 'pak_queue') {
-            $medic['flag_pak'] = 'СДПО Р';
-        }
-
-        $medic['admitted'] = $admitted ?? 'Допущен';
-        $medic['realy'] = "да";
+        $medic['admitted'] = $admitted;
         try {
             $anketa = Anketa::create($medic);
-        } catch (\Throwable $e) {
-            return abort(500);
+        } catch (Throwable $e) {
+            abort(500);
         }
 
         // ОТПРАВКА SMS
-        if ($anketa['admitted'] == 'Не допущен') {
+        if ($anketa['admitted'] === 'Не допущен') {
             $phone_to_call = Settings::setting('sms_text_phone');
+            $sms = new SmsController();
             $sms->sms($company->where_call, Settings::setting('sms_text_driver') . " $driver->fio . $phone_to_call");
         }
 
-        $timeout = Settings::setting('timeout');
-        $anketa['timeout'] = $timeout ?? 20;
+        $anketa['timeout'] = Settings::setting('timeout') ?? 20;
 
-        $stamp = $request->user('api')->stamp;
+        $stamp = $apiClient->stamp;
         if ($stamp) {
             $anketa['stamp_head'] = $stamp->company_name;
             $anketa['stamp_licence'] = $stamp->licence;
         }
 
-        if ($userMedic->validity_eds_start && $userMedic->validity_eds_end) {
+        if ($user->validity_eds_start && $user->validity_eds_end) {
             $anketa['validity'] = 'Срок действия: c ' . Carbon::parse($user->validity_eds_start)->format('d.m.Y')
                  .' по ' . Carbon::parse($user->validity_eds_end)->format('d.m.Y');
+        }
+
+        /** @var Anketa $anketa */
+        if ($anketa['admitted'] === 'Не допущен') {
+            Log::channel('admitting')->info(json_encode(
+                [
+                    'id' => $anketa->id,
+                    'medic' => $medic,
+                    'anketa' => $anketa->toArray(),
+                    'request' => $request->all(),
+                    'source' => 'SdpoController',
+                    'reasons' => $notAdmittedReasons,
+                ]
+            ));
         }
 
         return response()->json($anketa);
@@ -203,6 +232,7 @@ class SdpoController extends Controller
         $user = $request->user('api');
         $user->last_connection_at = Carbon::now();
         $user->save();
+
         return response()->json(true);
     }
 
@@ -212,6 +242,7 @@ class SdpoController extends Controller
     public function getPoint(Request $request)
     {
         $user = $request->user('api');
+
         return response()->json($user->pv->name);
     }
 
@@ -223,9 +254,10 @@ class SdpoController extends Controller
         $users = User::with(['roles', 'pv:id,name,pv_id', 'pv.town:id,name'])
             ->whereHas('roles', function ($q) use ($request) {
                 $q->where('roles.id', 2);
-            })->select('id', 'name', 'eds', 'pv_id')->get();
-
-        $users = $users->groupBy(['pv.town.name', 'pv.name']);
+            })
+            ->select(['id', 'name', 'eds', 'pv_id'])
+            ->get()
+            ->groupBy(['pv.town.name', 'pv.name']);
 
         return response()->json($users);
     }
@@ -233,17 +265,25 @@ class SdpoController extends Controller
     /*
     * return driver by id
     */
-    public function getDriver(Request $request, $id)
+    public function getDriver(Request $request, $id): JsonResponse
     {
-        if ($request->user('api')->blocked) {
+        $apiClient = $request->user('api');
+
+        if ($apiClient->blocked) {
             return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
         }
 
         $driver = Driver::where('hash_id', $id)
             ->with('company')
-            ->select('hash_id', 'fio', 'dismissed', 'company_id', 'end_of_ban', 'photo')->first();
-
-        //return response()->json(['message' => Carbon::now("GMT")->addMinutes($driver->getTimeOfAlcoholBan())], 400);
+            ->select([
+                'hash_id',
+                'fio',
+                'dismissed',
+                'company_id',
+                'end_of_ban',
+                'photo'
+            ])
+            ->first();
 
         if (!$driver) {
             return response()->json(['message' => 'Водитель с указанным ID не найден!'], 400);
@@ -251,13 +291,13 @@ class SdpoController extends Controller
 
         date_default_timezone_set('UTC');
         $time = time();
-        $timezone = $request->user('api')->timezone ? $request->user('api')->timezone : Auth::user()->timezone;
+        $timezone = $apiClient->timezone ?? Auth::user()->timezone;
         $time += $timezone * 3600;
         $time = date('Y-m-d H:i:s', $time);
 
         if ($driver->end_of_ban && (Carbon::parse($time) < Carbon::parse($driver->end_of_ban))) {
             return response()->json(
-                ['message' => 'Указанный водитель остранен до ' . Carbon::parse($driver->end_of_ban) . "!"],
+                ['message' => 'Указанный водитель отстранен до ' . Carbon::parse($driver->end_of_ban) . "!"],
                 400
             );
         }
@@ -276,19 +316,20 @@ class SdpoController extends Controller
     /*
     * return all drivers
     */
-    public function getDrivers(Request $request)
+    public function getDrivers(): JsonResponse
     {
         $drivers = Driver::select('hash_id', 'fio')->get();
+
         return response()->json($drivers);
     }
-
 
     /*
     * Return inspection info
     */
-    public function getInspection(Request $request, $id)
+    public function getInspection(Request $request, $id): JsonResponse
     {
         $inspection = Anketa::find($id);
+
         return response()->json($inspection);
     }
 
@@ -309,18 +350,20 @@ class SdpoController extends Controller
     public function setDriverPhoto(Request $request, $id)
     {
         if ($request->photo) {
-            $driver = Driver::where('hash_id', $id)->first();
-            if (!$driver) {
-                return;
-            }
-
-            $image = base64_decode($request->photo);
-            $path = "elements/driver_photo_" . $id . ".png";
-            Storage::disk('public')->put($path, $image);
-
-            $driver->update([
-                'photo' => $path
-            ]);
+            return;
         }
+
+        $driver = Driver::where('hash_id', $id)->first();
+        if (!$driver) {
+            return;
+        }
+
+        $image = base64_decode($request->photo);
+        $path = "elements/driver_photo_" . $id . ".png";
+        Storage::disk('public')->put($path, $image);
+
+        $driver->update([
+            'photo' => $path
+        ]);
     }
 }

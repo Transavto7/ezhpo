@@ -216,14 +216,6 @@ class IndexController extends Controller
                         'type'   => 'select',
                         'values' => 'Models\Contract',
                     ],
-                    'products_id'        => [
-                        'label'      => 'Услуги[старые]',
-                        'multiple'   => 1,
-                        'type'       => 'select',
-                        'values'     => 'Product',
-                        'concatField' => 'hash_id',
-                        'noRequired' => 1,
-                    ],
 
                     //                'count_pl' => ['label' => 'Количество выданных ПЛ', 'type' => 'text', 'noRequired' => 1, 'saveToHistory' => 1],
                     'note'               => ['label' => 'Примечание', 'type' => 'text', 'noRequired' => 1],
@@ -336,15 +328,6 @@ class IndexController extends Controller
                             'E'                                 => 'E',
                         ],
                         'defaultValue' => 'Не установлено',
-                    ],
-
-                    'products_id' => [
-                        'label'      => 'Услуги[старые]',
-                        'multiple'   => 1,
-                        'type'       => 'select',
-                        'values'     => 'Product',
-                        'concatField' => 'hash_id',
-                        'noRequired' => 1,
                     ],
 
                     'trailer'         => [
@@ -465,19 +448,6 @@ class IndexController extends Controller
                         'multiple' => 1,
                         'type'     => 'select',
                         'values'   => 'Models\Service',
-                    ],
-
-                    'products_id' => [
-                        'label'    => 'Услуги [старые]',
-                        'multiple' => 1,
-                        'noRequired' => 1,
-                        'concatField' => 'hash_id',
-                        'type'     => 'select',
-                        'values'   => 'Product',
-                        'syncData' => [
-                            ['model' => 'Car', 'fieldFind' => 'company_id', 'text' => 'Автомобиль'],
-                            ['model' => 'Driver', 'fieldFind' => 'company_id', 'text' => 'Водитель'],
-                        ],
                     ],
 
                     'where_call'      => [

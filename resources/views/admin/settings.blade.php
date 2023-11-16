@@ -219,6 +219,46 @@
                             </div>
 
                             <div class="form-group col-lg-6">
+                                <label for="pulse_upper" class="mb-1">Верхний порог пульса</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="pulse_upper">
+                                            <i class="fa fa-sort-numeric-asc"></i>
+                                        </span>
+                                    </div>
+                                    <input type="number"
+                                           class="form-control"
+                                           id="pulse_upper"
+                                           style="height: auto"
+                                           placeholder="Введите верхний порог пульса"
+                                           name="pulse_upper"
+                                           aria-describedby="pulse_upper"
+                                           value="{{ $pulse_upper }}"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-6">
+                                <label for="pulse_lower" class="mb-1">Нижний порог пульса</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="pulse_lower">
+                                            <i class="fa fa-sort-numeric-asc"></i>
+                                        </span>
+                                    </div>
+                                    <input type="number"
+                                           class="form-control"
+                                           id="pulse_lower"
+                                           style="height: auto"
+                                           placeholder="Введите нижний порог пульса"
+                                           name="pulse_lower"
+                                           aria-describedby="pulse_lower"
+                                           value="{{ $pulse_lower }}"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-6">
                                 <label for="time_of_alcohol_ban" class="mb-1">Время запрета на прохождение повторного обследования при положительной пробе на алкоголь, (мин.)</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">

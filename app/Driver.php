@@ -253,10 +253,8 @@ class Driver extends Model
 
         if ($test_narko === 'Положительно') {
             $group_risk = 'Наркотики';
-        } else {
-            if ($proba_alko === 'Положительно') {
-                $group_risk = 'Алкоголь';
-            }
+        } else if ($proba_alko === 'Положительно') {
+            $group_risk = 'Алкоголь';
         }
 
         $this->group_risk = $group_risk;
@@ -303,6 +301,24 @@ class Driver extends Model
         }
 
         return 100;
+    }
+
+    public function getPulseLower() {
+        $setting = Settings::setting('pulse_lower');
+        if ($setting) {
+            return $setting;
+        }
+
+        return PHP_INT_MIN;
+    }
+
+    public function getPulseUpper() {
+        $setting = Settings::setting('pulse_upper');
+        if ($setting) {
+            return $setting;
+        }
+
+        return PHP_INT_MAX;
     }
 
     public function getTimeOfAlcoholBan(){

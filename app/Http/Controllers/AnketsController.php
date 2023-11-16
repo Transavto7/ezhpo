@@ -105,7 +105,7 @@ class AnketsController extends Controller
         return view('profile.anketa', $data);
     }
 
-    public function ChangePakQueue (Request $request, $id, $admitted)
+    public function ChangePakQueue(Request $request, $id, $admitted)
     {
         $anketa = Anketa::find($id);
 
@@ -645,6 +645,7 @@ class AnketsController extends Controller
 
                 // Тонометр
                 $tonometer = $anketa['tonometer'] ?? $defaultDatas['tonometer'];
+                $anketa['pulse'] = $anketa['pulse'] ?? mt_rand(60,80);
 
                 if(!isset($anketa['med_view'])) {
                     $anketa['med_view'] = 'В норме';
@@ -778,10 +779,14 @@ class AnketsController extends Controller
 
                 $pressure_systolic = 150;
                 $pressure_diastolic = 100;
+                $pulse_lower = PHP_INT_MAX;
+                $pulse_upper = PHP_INT_MIN;
 
                 if ($Driver) {
                     $pressure_systolic = $Driver->getPressureSystolic();
                     $pressure_diastolic = $Driver->getPressureDiastolic();
+                    $pulse_lower = $Driver->getPulseLower();
+                    $pulse_upper = $Driver->getPulseUpper();
                 }
 
 
@@ -803,7 +808,8 @@ class AnketsController extends Controller
                 $tonometer = explode('/', $anketa['tonometer']);
                 if($proba_alko === 'Отрицательно' && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
                     && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38
-                    && $tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic) {
+                    && $tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic
+                    && intval($anketa['pulse']) < $pulse_upper && intval($anketa['pulse']) > $pulse_lower) {
                     $anketa['admitted'] = 'Допущен';
                 } else {
                     $anketa['admitted'] = 'Не допущен';
@@ -1004,10 +1010,9 @@ class AnketsController extends Controller
                  */
                 $anketa['user_id'] = $user->id;
                 $anketa['user_name'] = $user->name;
+                $anketa['operator_id'] = $user->id;
 
                 $anketa['user_eds'] = isset($anketa['user_eds']) ? $anketa['user_eds'] : $user->eds;
-
-                $anketa['pulse'] = isset($anketa['pulse']) ? $anketa['pulse'] : mt_rand(60,80);
 
                 $anketa['pv_id'] = Point::where('id', $pv_id)->first();
                 $anketa['point_id'] = $pv_id;
@@ -1259,6 +1264,7 @@ class AnketsController extends Controller
 
                 // Тонометр
                 $tonometer = isset($anketa['tonometer']) ? $anketa['tonometer'] : $defaultDatas['tonometer'];
+                $anketa['pulse'] = $anketa['pulse'] ?? mt_rand(60,80);
 
                 if(!isset($anketa['med_view'])) {
                     $anketa['med_view'] = 'В норме';
@@ -1410,7 +1416,8 @@ class AnketsController extends Controller
                     && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
                     && doubleval($anketa['t_people']) < 38
                     && intval($tonometer[0]) < $Driver->getPressureSystolic()
-                    && intval($tonometer[1]) < $Driver->getPressureDiastolic()) {
+                    && intval($tonometer[1]) < $Driver->getPressureDiastolic()
+                    && intval($anketa['pulse']) < $Driver->getPulseUpper() && intval($anketa['pulse']) > $Driver->getPulseLower()) {
                     $anketa['med_view'] = 'В норме';
                     $anketa['admitted'] = 'Допущен';
 
@@ -1616,11 +1623,10 @@ class AnketsController extends Controller
                  */
                 $anketa['user_id'] = $user->id;
                 $anketa['user_name'] = $user->name;
+                $anketa['operator_id'] = $user->id;
 
 
                 $anketa['user_eds'] = isset($anketa['user_eds']) ? $anketa['user_eds'] : $user->eds;
-
-                $anketa['pulse'] = isset($anketa['pulse']) ? $anketa['pulse'] : mt_rand(60,80);
 
                 $anketa['pv_id'] = Point::where('id', $pv_id)->first();
                 $anketa['terminal_id'] = $request->user('api')->id;

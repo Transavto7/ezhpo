@@ -24,6 +24,8 @@ class SettingsController extends Controller
             'telegram' => Settings::setting('telegram') ?? null,
             'pressure_systolic' => Settings::setting('pressure_systolic') ?? null,
             'pressure_diastolic' => Settings::setting('pressure_diastolic') ?? null,
+            'pulse_lower' => Settings::setting('pulse_lower') ?? null,
+            'pulse_upper' => Settings::setting('pulse_upper') ?? null,
             'time_of_pressure_ban' => Settings::setting('time_of_pressure_ban') ?? 20,
             'time_of_alcohol_ban' => Settings::setting('time_of_alcohol_ban') ?? 120,
             'timeout' => Settings::setting('timeout') ?? null
@@ -49,6 +51,8 @@ class SettingsController extends Controller
         Settings::set('telegram', $request->telegram);
         Settings::set('pressure_systolic', $request->pressure_systolic);
         Settings::set('pressure_diastolic', $request->pressure_diastolic);
+        Settings::set('pulse_lower', $request->pulse_lower);
+        Settings::set('pulse_upper', $request->pulse_upper);
         Settings::set('time_of_pressure_ban', $request->time_of_pressure_ban);
         Settings::set('time_of_alcohol_ban', $request->time_of_alcohol_ban);
         Settings::set('timeout', $request->timeout);
