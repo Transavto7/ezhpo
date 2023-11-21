@@ -348,7 +348,7 @@ class SdpoController extends Controller
     */
     public function setDriverPhoto(Request $request, $id)
     {
-        if ($request->photo) {
+        if (!$request->photo) {
             return;
         }
 
