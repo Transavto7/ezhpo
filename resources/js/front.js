@@ -469,11 +469,11 @@ $(document).ready(function () {
                            otherHtmlItems = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
                        }
 
-                       if(i === 'contract' || i === 'contracts'){
+                       if(i === 'contract_id', i === 'contract' || i === 'contracts'){
                            continue;
                        }
 
-                       if(i === 'contract_id') {
+                       if((i === 'note' && model === 'Driver') || (i === 'where_call' && model === 'Company')) {
                            if (data.contract) {
                                // driver & auto
                                msg += `
@@ -528,8 +528,6 @@ $(document).ready(function () {
                                <p class="text-small">-- Отсутствует --</p>`;
                                }
                            }
-
-                           continue;
                        }
 
                        if(fvItem['type'] === 'select') {
