@@ -69,7 +69,6 @@ class SdpoController extends Controller
         $medic = [];
         $medic['type_anketa'] = $request->type_anketa ?? 'medic';
         $medic['user_id'] = $user->id;
-        $medic['operator_id'] = $user->id;
         $medic['user_name'] = $user->name;
         $medic['user_eds'] = $user->eds;
         $medic['pulse'] = $request->pulse ?? mt_rand(60, 80);

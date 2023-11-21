@@ -998,7 +998,6 @@ class AnketsController extends Controller
                  */
                 $anketa['user_id'] = $user->id;
                 $anketa['user_name'] = $user->name;
-                $anketa['operator_id'] = $user->id;
 
                 $anketa['user_eds'] = isset($anketa['user_eds']) ? $anketa['user_eds'] : $user->eds;
 
@@ -1611,7 +1610,6 @@ class AnketsController extends Controller
                  */
                 $anketa['user_id'] = $user->id;
                 $anketa['user_name'] = $user->name;
-                $anketa['operator_id'] = $user->id;
 
 
                 $anketa['user_eds'] = isset($anketa['user_eds']) ? $anketa['user_eds'] : $user->eds;

@@ -2,6 +2,7 @@
 
 <input type="hidden" name="type_anketa" value="medic">
 <input type="hidden" name="flag_pak" value="СДПО Р">
+<input type="hidden" name="operator_id" value="{{ user()->id }}">
 
 <div class="form-group row">
     <label class="col-md-3 form-control-label">ID водителя:</label>

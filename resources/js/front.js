@@ -468,75 +468,68 @@ $(document).ready(function () {
                        if(isBlocked === ''){
                            otherHtmlItems = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
                        }
-                       if(i === 'contract_id' || i === 'contract' || i === 'contracts'){
-                           // fvItem['type'] = 'text';
+
+                       if(i === 'contract' || i === 'contracts'){
                            continue;
                        }
 
-                       if(i === 'products_id'){
-                           // for company
-                           // if(fieldsValues.contracts){
-                           //     fieldsValues.contracts
-                           // }
-
-                       }
-
-                       if(i === 'products_id' && data.contract){
-                           // driver & auto
-                           msg += `
+                       if(i === 'contract_id') {
+                           if (data.contract) {
+                               // driver & auto
+                               msg += `
                                <p class="text-small m-0">Договор:</p>`;
-                           if(data.contract.length != 0){
-                               msg +=  `
+                               if(data.contract.length != 0){
+                                   msg +=  `
                             <ul class="list-group my-2">
                                 <li style="padding: 0;" class="text-small list-group-item list-group-item-action list-group-item-success">
                                 <b>${data.contract.name_with_dates}</b>
 
                             <ul class="list-group">`;
-                               if(data.contract.services){
+                                   if(data.contract.services){
 
-                                   data.contract.services.map((service) => {
-                                       msg +=  `<li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">${service.name}</li>`;
-                                   })
-                               }
+                                       data.contract.services.map((service) => {
+                                           msg +=  `<li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">${service.name}</li>`;
+                                       })
+                                   }
 
-                               msg +=  `
+                                   msg +=  `
                             </ul></li>
                             </ul>`;
-                           }else{
-                               msg += `
+                               } else {
+                                   msg += `
                                <p class="text-small">-- Отсутствует --</p>`;
-                           }
-
-                           // continue;
-                         }else if (i === 'products_id' && data.contracts) {
-                           // copmany
-                           msg += `
+                               }
+                           } else if (data.contracts) {
+                               // copmany
+                               msg += `
                                <p class="text-small m-0">Договор:</p>`;
-                           if(data.contracts.length != 0) {
+                               if(data.contracts.length != 0) {
 
-                               msg += `<ul class="list-group my-2">`;
-                               data.contracts.map((contract) => {
-                                   if(contract.services){
+                                   msg += `<ul class="list-group my-2">`;
+                                   data.contracts.map((contract) => {
+                                       if(contract.services){
 
-                                       msg += `
+                                           msg += `
 
                                     <li style="padding: 0;" class=" text-small list-group-item list-group-item-action list-group-item-success"><ul class="list-group">
                                     <b>${contract.name_with_dates}</b>`;
-                                       contract.services.map((service) => {
-                                           msg += `
+                                           contract.services.map((service) => {
+                                               msg += `
                                     <li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">
                                     ${service.name}</li>`;
-                                       })
-                                       msg += `</ul></li>`;
-                                   }
+                                           })
+                                           msg += `</ul></li>`;
+                                       }
 
-                               })
-                               msg += `</ul>`;
-                           } else {
-                               msg += `
+                                   })
+                                   msg += `</ul>`;
+                               } else {
+                                   msg += `
                                <p class="text-small">-- Отсутствует --</p>`;
+                               }
                            }
-                           // continue;
+
+                           continue;
                        }
 
                        if(fvItem['type'] === 'select') {
