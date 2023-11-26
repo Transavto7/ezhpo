@@ -219,6 +219,17 @@ class SdpoController extends Controller
             ));
         }
 
+        //TODO: вынести в мидлвар или ивент позже
+        if ($request->has('logs')) {
+            Log::channel('sdpo')->info(json_encode(
+                [
+                    'id' => $anketa->id,
+                    'request' => $request->all(),
+                    'ip' => $request->getClientIp() ?? null
+                ]
+            ));
+        }
+
         return response()->json($anketa);
     }
 

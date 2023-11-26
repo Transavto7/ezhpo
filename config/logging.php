@@ -99,6 +99,11 @@ return [
         'admitting' => [
             'driver' => 'single',
             'path' => storage_path('logs/admitting.log')
+        ],
+
+        'sdpo' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/sdpo.log')
         ]
     ],
 
