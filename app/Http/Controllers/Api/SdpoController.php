@@ -339,7 +339,15 @@ class SdpoController extends Controller
     {
         $inspection = Anketa::find($id);
 
-        return response()->json($inspection);
+        $data = $inspection->toArray();
+
+        $stamp = optional(optional($inspection->terminal))->stamp;
+        if ($stamp) {
+            $data['stamp_head'] = $stamp->company_name;
+            $data['stamp_licence'] = $stamp->licence;
+        }
+
+        return response()->json($data);
     }
 
     /*
