@@ -205,8 +205,13 @@ class SdpoController extends Controller
                  .' по ' . Carbon::parse($user->validity_eds_end)->format('d.m.Y');
         }
 
+        $anketa['sleep_status'] = $request->sleep_status;
+        $anketa['people_status'] = $request->people_status;
+
         /** @var Anketa $anketa */
         if ($anketa['admitted'] === 'Не допущен') {
+            $anketa['reasons'] = $notAdmittedReasons;
+
             Log::channel('admitting')->info(json_encode(
                 [
                     'id' => $anketa->id,
