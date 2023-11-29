@@ -206,8 +206,13 @@ class SdpoController extends Controller
                  .' по ' . Carbon::parse($user->validity_eds_end)->format('d.m.Y');
         }
 
+        $anketa['sleep_status'] = $request->sleep_status;
+        $anketa['people_status'] = $request->people_status;
+
         /** @var Anketa $anketa */
         if ($anketa['admitted'] === 'Не допущен') {
+            $anketa['reasons'] = $notAdmittedReasons;
+
             Log::channel('admitting')->info(json_encode(
                 [
                     'id' => $anketa->id,
@@ -216,6 +221,17 @@ class SdpoController extends Controller
                     'request' => $request->all(),
                     'source' => 'SdpoController',
                     'reasons' => $notAdmittedReasons,
+                ]
+            ));
+        }
+
+        //TODO: вынести в мидлвар или ивент позже
+        if ($request->has('logs')) {
+            Log::channel('sdpo')->info(json_encode(
+                [
+                    'id' => $anketa->id,
+                    'request' => $request->all(),
+                    'ip' => $request->getClientIp() ?? null
                 ]
             ));
         }
@@ -329,7 +345,15 @@ class SdpoController extends Controller
     {
         $inspection = Anketa::find($id);
 
-        return response()->json($inspection);
+        $data = $inspection->toArray();
+
+        $stamp = optional(optional($inspection->terminal))->stamp;
+        if ($stamp) {
+            $data['stamp_head'] = $stamp->company_name;
+            $data['stamp_licence'] = $stamp->licence;
+        }
+
+        return response()->json($data);
     }
 
     /*
