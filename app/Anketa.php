@@ -2,10 +2,9 @@
 
 namespace App;
 
-use App\Models\Contract;
 use App\Models\ContractAnketaSnapshot;
-use App\Models\Service;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Anketa extends Model
 {
@@ -15,7 +14,6 @@ class Anketa extends Model
         return $this->belongsTo(ContractAnketaSnapshot::class, 'contract_snapshot_id', 'id')
                     ->withDefault();
     }
-
 
     public function services_snapshot()
     {
@@ -38,6 +36,11 @@ class Anketa extends Model
         )->withDefault();
     }
 
+    public function terminal(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'terminal_id', 'id');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id')
@@ -54,6 +57,7 @@ class Anketa extends Model
     {
         return $this->belongsTo(User::class, 'operator_id');
     }
+
     public function car()
     {
         return $this->belongsTo(Car::class, 'car_id', 'hash_id')
@@ -71,6 +75,7 @@ class Anketa extends Model
         return $this->belongsTo(User::class, 'deleted_id', 'id')
                     ->withDefault();
     }
+
     protected $casts = [
         'deleted_at' => 'datetime:d-m-Y H:i:s'
     ];
@@ -160,7 +165,6 @@ class Anketa extends Model
             'contract_id',
             'contract_snapshot_id',
         ];
-
 
     public static $anketsKeys
         = [
@@ -551,7 +555,8 @@ class Anketa extends Model
             ],
         ];
 
-    public function point() {
+    public function point()
+    {
         return $this->belongsTo(Point::class, 'point_id', 'id');
     }
 
