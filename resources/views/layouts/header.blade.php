@@ -27,8 +27,13 @@
                         </li>--}}
                     @endif
                 @else
+                    @if (!user()->hasRole('driver') && !user()->hasRole('client'))
+                        <a href="https://crmta7.ru/" style="font-size: 18px; font-weight: bold" class="mr-3" target="_blank">Полезная информация</a>
+                    @endif
+
+
                     @php
-                        if(user()->photo){
+                        if(user()->photo) {
                             $user_avatar = asset("storage/". user()->photo);
                         }else{
                             $user_avatar = asset("img/default_profile.jpg");
@@ -42,10 +47,11 @@
                                     <img src="{{ $user_avatar }}" width="50" alt="avatar">
                                 </span>
                             </span>
-
-                            <span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp; {{ __(user()->name) }} <i class="fa fa-user"></i></span>
                             @if(user()->hasRole('driver'))
-                            <span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp; {{ user()->login }} </span>
+                                <span class="d-none d-sm-inline ml-3">{{ ($driver = \App\Driver::where('hash_id', user()->login)->first()) ? $driver->fio : '' }}<i class="fa fa-user ml-1"></i></span>
+                                <span class="d-none d-sm-inline ml-3">{{ user()->login }}</span>
+                            @else
+                                <span class="d-none d-sm-inline ml-3">{{ user()->name }}<i class="fa fa-user ml-1"></i></span>
                             @endif
                         </a>
                     </li>

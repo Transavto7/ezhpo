@@ -105,20 +105,6 @@
                             @yield('content')
                         </div>
                     </section>
-
-                        @if (user() && !user()->hasRole('driver') && !user()->hasRole('client'))
-                            <footer class="footer no-print" style="background-color: rgb(255, 255, 255)">
-                                <div class="d-flex justify-content-between footer-inner">
-                                    <div class="text-center" style="vertical-align: middle">
-        {{--                                Сделано в--}}
-        {{--                                <a href="https://nozdratenko.ru" target="_blank" class="cp-logo">nozdr<span>a</span>tenko</a>--}}
-                                    </div>
-                                    <div class="d-flex align-items-center">
-                                            <a href="https://crmta7.ru/" target="_blank">Полезная информация</a>
-                                    </div>
-                                </div>
-                            </footer>
-                        @endif
                 </div>
             @endauth
         </main>
