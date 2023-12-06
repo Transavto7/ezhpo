@@ -473,7 +473,35 @@ $(document).ready(function () {
                            continue;
                        }
 
-                       if((i === 'note' && model === 'Driver') || (i === 'where_call' && model === 'Company')) {
+                       if(fvItem['type'] === 'select') {
+                           await API_CONTROLLER.getFieldHTML({ field: i, model, default_value: encodeURIComponent(data[i]) }).then(response => {
+                               field = response.data
+                           })
+                       } else {
+                           if(i === 'note' || i === 'comment') {
+                               field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${(data[i] ? data[i] : '').trim()}</textarea>`
+                           } else if(i === 'photo') {
+                               otherHtmlItems = ''
+
+                               if(data[i]) {
+                                   field = `<img src="/storage/${data[i]}" width="60%" />`
+                               }
+                           } else {
+                               field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${data[i] ? data[i] : ''}' name="${i}" />`
+                           }
+                       }
+
+                        if(i !== 'products_id') {
+                            msg += `
+                                <p style="${i === 'dismissed' ? data[i].toUpperCase() === 'ДА' ? 'color: red; font-weight: bold;' : '' : ''}" data-field-card="${model}_${i}" class="text-small m-0">${fvItem.label}:<br/>
+                                    ${otherHtmlItems}
+                                    <div class="form-group ${inputClass}">
+                                        ${field}
+                                    </div>
+                                </p>`
+                        }
+
+                       if((i === 'company_id' && model === 'Driver') || (i === 'town_id' && model === 'Company')) {
                            if (data.contract) {
                                // driver & auto
                                msg += `
@@ -529,34 +557,6 @@ $(document).ready(function () {
                                }
                            }
                        }
-
-                       if(fvItem['type'] === 'select') {
-                           await API_CONTROLLER.getFieldHTML({ field: i, model, default_value: encodeURIComponent(data[i]) }).then(response => {
-                               field = response.data
-                           })
-                       } else {
-                           if(i === 'note' || i === 'comment') {
-                               field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${(data[i] ? data[i] : '').trim()}</textarea>`
-                           } else if(i === 'photo') {
-                               otherHtmlItems = ''
-
-                               if(data[i]) {
-                                   field = `<img src="/storage/${data[i]}" width="60%" />`
-                               }
-                           } else {
-                               field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${data[i] ? data[i] : ''}' name="${i}" />`
-                           }
-                       }
-
-                        if(i !== 'products_id') {
-                            msg += `
-                                <p style="${i === 'dismissed' ? data[i].toUpperCase() === 'ДА' ? 'color: red; font-weight: bold;' : '' : ''}" data-field-card="${model}_${i}" class="text-small m-0">${fvItem.label}:<br/>
-                                    ${otherHtmlItems}
-                                    <div class="form-group ${inputClass}">
-                                        ${field}
-                                    </div>
-                                </p>`
-                        }
                     }
                 }
             }

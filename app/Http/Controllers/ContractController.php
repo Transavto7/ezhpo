@@ -56,11 +56,14 @@ class ContractController extends Controller
                       ->orderBy('companies.name',
                           ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC')
                       ->select('contracts.*');
-        } elseif ($filters['sortBy'] == 'our_company.name') {
+        } else if ($filters['sortBy'] == 'our_company.name') {
             $contracts->leftJoin('reqs', 'our_company_id', 'reqs.id')
                       ->orderBy('reqs.name',
                           ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC')
                       ->select('contracts.*');
+        } else if ($filters['sortBy'] === 'services') {
+            $contracts->withCount('services')->orderBy('services_count',
+                ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC');
         } else {
             $contracts->orderBy($filters['sortBy'],
                 ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC');
