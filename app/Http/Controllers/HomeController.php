@@ -523,7 +523,6 @@ class HomeController extends Controller
             $fieldsKeys['id'] = true;
 
         }
-        $table = $orderKey === 'car_type_auto' ? '' : 'anketas.';
 
         if ($request->user()->hasRole('client')) {
             $anketas = $anketas->whereNotNull('date');
@@ -536,6 +535,12 @@ class HomeController extends Controller
         }
 
         if ($filter_activated || $typeAnkets === 'pak_queue') {
+            $table = 'anketas.';
+
+            if ($orderKey === 'car_type_auto' || $orderKey === 'date_prto') {
+                $table = '';
+            }
+
             if ($orderKey === 'result_dop') {
                 $anketas = $anketas->orderBy($table . $orderKey, $orderBy)->orderBy($table . 'is_dop', $orderBy === 'ASC' ? 'DESC' : 'ASC');
             } else {
