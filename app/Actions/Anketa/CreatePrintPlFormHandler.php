@@ -14,7 +14,7 @@ class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements Crea
 
     protected function createForm(array $form)
     {
-        $driverId = $anketa['driver_id'] ?? ($data['driver_id'] ?? 0);
+        $driverId = $form['driver_id'] ?? ($this->data['driver_id'] ?? 0);
         $driver = Driver::where('hash_id', $driverId)->first();
 
         $defaultData = [
@@ -46,6 +46,8 @@ class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements Crea
             if ($driverDop) {
                 $form['driver_id'] = $driverDop->hash_id;
                 $form['driver_fio'] = $driverDop->fio;
+
+                $driver = $driverDop;
             }
         }
 

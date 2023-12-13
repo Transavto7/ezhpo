@@ -29,7 +29,7 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
 
     protected function createForm(array $form)
     {
-        $driverId = $form['driver_id'];
+        $driverId = $form['driver_id'] ?? ($this->data['driver_id'] ?? 0);
         $driver = Driver::where('hash_id', $driverId)->first();
 
         $defaultData = [
@@ -49,6 +49,8 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
             if ($driverDop) {
                 $form['driver_id'] = $driverDop->hash_id;
                 $form['driver_fio'] = $driverDop->fio;
+
+                $driver = $driverDop;
             }
         }
 

@@ -7,7 +7,7 @@ use App\Car;
 use App\Company;
 use App\Driver;
 use App\Enums\FormTypeEnum;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
 class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -54,11 +54,13 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
     protected function createForm(array $form)
     {
-        $carId = $anketa['car_id'] ?? 0;
+        $carId = $form['car_id'] ?? 0;
         $car = Car::where('hash_id', $carId)->first();
 
-        $driverId = $anketa['driver_id'] ?? ($data['driver_id'] ?? 0);
+        $driverId = $form['driver_id'] ?? ($this->data['driver_id'] ?? 0);
         $driver = Driver::where('hash_id', $driverId)->first();
+
+        $company = null;
 
         $defaultData = [
             'date' => date('Y-m-d H:i:s'),
@@ -77,6 +79,8 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             if ($companyDop) {
                 $form['company_id'] = $companyDop->hash_id;
                 $form['company_name'] = $companyDop->name;
+
+                $company = $companyDop;
             }
         }
 
@@ -89,6 +93,8 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             if ($driverDop) {
                 $form['driver_id'] = $driverDop->hash_id;
                 $form['driver_fio'] = $driverDop->fio;
+
+                $driver = $driverDop;
             }
         }
 
@@ -147,6 +153,8 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
             $form['company_id'] = $carCompany->hash_id;
             $form['company_name'] = $carCompany->name;
+
+            $company = $carCompany;
         }
 
         if ($car) {

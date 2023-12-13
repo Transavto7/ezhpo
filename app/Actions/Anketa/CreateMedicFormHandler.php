@@ -14,7 +14,7 @@ use App\ValueObjects\Pulse;
 use App\ValueObjects\PulseLimits;
 use App\ValueObjects\Temperature;
 use App\ValueObjects\Tonometer;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
 class CreateMedicFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -23,7 +23,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
 
     protected function fetchExistForms()
     {
-        $drivers = [$data['driver_id'] ?? 0];
+        $drivers = [$this->data['driver_id'] ?? 0];
 
         $this->existForms = Anketa::query()
             ->where('driver_id', $drivers)
@@ -43,7 +43,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
     {
         if ($this->data['is_dop'] ?? 0 === 1) return;
 
-        $driverId = $data['driver_id'] ?? null;
+        $driverId = $this->data['driver_id'] ?? null;
         if (!$driverId) {
             $this->errors[] = 'Не указан водитель.';
             return;
@@ -57,6 +57,8 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
 
         if ($driverExist->end_of_ban && $this->time < $driverExist->end_of_ban) {
             $this->errors[] = 'Водитель отстранен до '.Carbon::parse($driverExist->end_of_ban);
+            $this->errors[] = $driverExist->end_of_ban;
+            $this->errors[] = $this->time;
         }
     }
 
@@ -84,11 +86,11 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
          * Компания
          */
         if (isset($form['company_id'])) {
-            $CompanyDop = Company::where('hash_id', $form['company_id'])->first();
+            $companyDop = Company::where('hash_id', $form['company_id'])->first();
 
-            if ($CompanyDop) {
-                $form['company_id'] = $CompanyDop->hash_id;
-                $form['company_name'] = $CompanyDop->name;
+            if ($companyDop) {
+                $form['company_id'] = $companyDop->hash_id;
+                $form['company_name'] = $companyDop->name;
             }
         }
 
@@ -96,11 +98,13 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
          * Водитель
          */
         if (isset($form['driver_id'])) {
-            $DriverDop = Driver::where('hash_id', $form['driver_id'])->first();
+            $driverDop = Driver::where('hash_id', $form['driver_id'])->first();
 
-            if ($DriverDop) {
-                $form['driver_id'] = $DriverDop->hash_id;
-                $form['driver_fio'] = $DriverDop->fio;
+            if ($driverDop) {
+                $form['driver_id'] = $driverDop->hash_id;
+                $form['driver_fio'] = $driverDop->fio;
+
+                $driver = $driverDop;
             }
         }
 
@@ -256,17 +260,17 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             $admitted = false;
         }
 
-        if (Tonometer::fromString($form['tonometer'])->isAdmitted(PressureLimits::create($driver))) {
+        if (!Tonometer::fromString($form['tonometer'])->isAdmitted(PressureLimits::create($driver))) {
             $admitted = false;
             $driver->end_of_ban = Carbon::parse($this->time)->addMinutes($driver->getTimeOfPressureBan());
             $driver->save();
         }
 
-        if ((new Pulse(intval($form['pulse'])))->isAdmitted(PulseLimits::create($driver))) {
+        if (!(new Pulse(intval($form['pulse'])))->isAdmitted(PulseLimits::create($driver))) {
             $admitted = false;
         }
 
-        if ((new Temperature(floatval($form['t_people'])))->isAdmitted()) {
+        if (!(new Temperature(floatval($form['t_people'])))->isAdmitted()) {
             $admitted = false;
         }
 
