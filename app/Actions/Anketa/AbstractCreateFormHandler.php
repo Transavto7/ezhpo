@@ -6,6 +6,8 @@ use App\DDates;
 use App\Enums\FormTypeEnum;
 use App\Point;
 use App\User;
+use DateTime;
+use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -34,7 +36,11 @@ abstract class AbstractCreateFormHandler
 
     public function handle(array $data, Authenticatable $user): array
     {
+        $this->init();
+
         $this->data = $data;
+
+        $this->createAdditionalForms();
 
         /** @var User $user */
         $this->data['user_id'] = $user->id;
@@ -53,26 +59,24 @@ abstract class AbstractCreateFormHandler
         $this->time = date('Y-m-d H:i:s', time() + ($user->timezone ?: 3) * 3600);
 
         $this->validateData();
-        if (count($this->errors)) {
+        if (count($this->errors ?? [])) {
             return [
-                'errors' => $this->errors,
-                'type' => self::FORM_TYPE
+                'errors' => $this->errors
             ];
         }
 
         $this->fetchExistForms();
 
-        foreach ($data['anketa'] as $form) {
+        foreach ($this->data['anketa'] as $form) {
             $this->createForm($form);
         }
 
         $responseData = [
             'createdId' => $this->createdForms->pluck('id')->toArray(),
-            'errors' => array_unique($this->errors),
-            'type' => self::FORM_TYPE
+            'errors' => array_unique($this->errors)
         ];
 
-        if (count($this->redDates) > 0) {
+        if (count($this->redDates ?? []) > 0) {
             $responseData['redDates'] = $this->redDates;
         }
 
@@ -81,6 +85,53 @@ abstract class AbstractCreateFormHandler
         }
 
         return $responseData;
+    }
+
+    protected function init()
+    {
+        $this->errors = [];
+        $this->redDates = [];
+        $this->existForms = collect([]);
+        $this->createdForms = collect([]);
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function createAdditionalForms()
+    {
+        $mainForms = $this->data['anketa'] ?? [];
+
+        foreach ($mainForms ?? [] as $form) {
+            $additionalDates = explode(', ', $form['dates'] ?? '') ?? [];
+
+            $maxDatesCount = 31;
+            if (count($additionalDates) > 31) {
+                throw new Exception("Нельзя вносить осмотры более чем за $maxDatesCount день");
+            }
+
+            $baseDateTime = new DateTime($form['date']);
+            $baseTime = $baseDateTime->format('H:i');
+            $baseDate = $baseDateTime->format('Y-m-d');
+
+            foreach ($additionalDates as $additionalDate) {
+                if ($additionalDate === $baseDate) continue;
+
+                if (strlen($additionalDate) === 0) continue;
+
+                $additionalDateTime = "$additionalDate"."T"."$baseTime";
+
+                $additionalForm = $form;
+
+                $additionalForm['date'] = $additionalDateTime;
+
+                $this->data['anketa'][] = $additionalForm;
+            }
+        }
+
+        foreach ($this->data['anketa'] ?? [] as &$form) {
+            unset($form['dates']);
+        }
     }
 
     protected function validateData()
@@ -176,10 +227,10 @@ abstract class AbstractCreateFormHandler
 
         $formTimestamp = Carbon::parse($form['date'])->timestamp;
 
-        foreach ($this->data['anketas'] as $otherForm) {
+        foreach ($this->data['anketa'] as $otherForm) {
             $diffInHours = round(($formTimestamp - Carbon::parse($otherForm['date'])->timestamp)/60, 1);
 
-            if ($diffInHours < 1 && $diffInHours >= 0) {
+            if ($diffInHours < 1 && $diffInHours > 0) {
                 $this->errors[] = "Найден дубликат осмотра при добавлении (Дата: $otherForm[date])";
 
                 return false;
