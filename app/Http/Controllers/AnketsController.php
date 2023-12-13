@@ -465,11 +465,12 @@ class AnketsController extends Controller
         } catch (Throwable $exception) {
             $responseData = [
                 'errors' => [$exception->getMessage()],
-                'type' => $formType
             ];
 
             DB::rollBack();
         }
+
+        $responseData['type'] = $formType;
 
         return redirect()->route('forms', $responseData);
     }
