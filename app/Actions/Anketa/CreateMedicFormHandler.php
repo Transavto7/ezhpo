@@ -243,6 +243,10 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
 
     protected function admit(array $form, Driver $driver = null): bool
     {
+        if ($form['is_dop'] ?? 0 === 1) {
+            return true;
+        }
+
         $admitted = true;
         if ($form['med_view'] !== 'В норме') {
             $admitted = false;
