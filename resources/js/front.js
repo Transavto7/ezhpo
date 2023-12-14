@@ -988,7 +988,10 @@ $(document).ready(function () {
             this.name = this.name.replace('anketa['+(count_anketa-1)+']', 'anketa['+count_anketa+']')
         })
 
-        initDatePicker(clone.find(".date-range")[0])
+        const datePickerElement = clone.find(".date-range");
+        if (datePickerElement[0]) {
+            initDatePicker(clone.find(".date-range")[0])
+        }
 
         count_anketa++
 
