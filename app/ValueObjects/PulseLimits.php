@@ -29,8 +29,8 @@ class PulseLimits
 
     public static function create(Driver $driver = null): self
     {
-        $minPulse = PHP_INT_MAX;
-        $maxPulse = PHP_INT_MIN;
+        $minPulse = PHP_INT_MIN;
+        $maxPulse = PHP_INT_MAX;
 
         if ($driver) {
             $minPulse = $driver->getPulseLower();

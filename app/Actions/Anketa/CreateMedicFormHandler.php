@@ -270,7 +270,9 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             $driver->save();
         }
 
-        if (!(new Pulse(intval($form['pulse'])))->isAdmitted(PulseLimits::create($driver))) {
+        $pulse = new Pulse(intval($form['pulse']));
+        $pulseLimits = PulseLimits::create($driver);
+        if (!$pulse->isAdmitted($pulseLimits)) {
             $admitted = false;
         }
 

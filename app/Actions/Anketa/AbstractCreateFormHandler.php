@@ -150,7 +150,7 @@ abstract class AbstractCreateFormHandler
     {
         $excludedFieldsToMerge = [
             '_token',
-            'ankets'
+            'anketa'
         ];
 
         $is_dop = $form['is_dop'] ?? 0;
@@ -170,7 +170,9 @@ abstract class AbstractCreateFormHandler
          * Проверяем дефолтные значения
          */
         foreach ($defaultData as $dk => $dv) {
-            if (empty($form[$dk]) && !($dk === 'date' && $is_dop)) {
+            if ($dk === 'date' && $is_dop) continue;
+
+            if (empty($form[$dk])) {
                 $form[$dk] = $dv;
             }
         }

@@ -471,6 +471,7 @@ class AnketsController extends Controller
         }
 
         $responseData['type'] = $formType;
+        $responseData['is_dop'] = $responseData['is_dop'] ?? $request->input('is_dop', 0);
 
         return redirect()->route('forms', $responseData);
     }
