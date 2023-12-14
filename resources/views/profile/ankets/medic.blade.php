@@ -91,6 +91,14 @@
             </article>
         </div>
 
+        <div class="row form-group">
+            <label class="col-md-3 form-control-label">Доп. даты:</label>
+            <article class="col-md-9">
+                <input type="date"
+                       name="anketa[0][dates]" class="form-control date-range">
+            </article>
+        </div>
+
         @accessSetting('id_auto')
             <div class="form-group row">
                 <label class="form-control-label col-md-3">ID автомобиля:</label>

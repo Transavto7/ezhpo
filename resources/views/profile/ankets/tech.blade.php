@@ -117,6 +117,14 @@
         </div>
 
         <div class="form-group">
+            <label class="form-control-label">Доп. даты:</label>
+            <article>
+                <input type="date"
+                       name="anketa[0][dates]" class="form-control date-range">
+            </article>
+        </div>
+
+        <div class="form-group">
             <label class="form-control-label">ID автомобиля:</label>
             <article>
                 <input required value="{{ $car_id ?? '' }}" type="number" required oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})" min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control car-input">
