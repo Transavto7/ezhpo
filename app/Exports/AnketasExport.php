@@ -22,7 +22,7 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
     {
         $fields = null;
         // Определить тип анкет
-        //dd($this->anketas[0]['type_anketa']);
+
         try {
             $fields = [];
             if($this->anketas[0]['type_anketa'] === "medic"){
