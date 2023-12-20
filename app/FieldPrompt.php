@@ -51,8 +51,11 @@ class FieldPrompt extends Model
 
     public function delete()
     {
-        $this->deleted_id = user()->id;
-        $this->save();
+        $user = user();
+        if ($user) {
+            $this->deleted_id = $user->id;
+            $this->save();
+        }
 
         return parent::delete();
     }
