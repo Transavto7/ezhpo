@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Anketa\CreateFormHandlerFactory;
+use App\Actions\Anketa\UpdateFormHandler;
 use App\Anketa;
-use App\Car;
 use App\Company;
 use App\DDates;
 use App\Driver;
 use App\Point;
+use App\Settings;
 use App\User;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Http\RedirectResponse;
@@ -107,14 +108,38 @@ class AnketsController extends Controller
 
     public function ChangePakQueue(Request $request, $id, $admitted)
     {
-        $anketa = Anketa::find($id);
+        //TODO: нет никакой проверки на
+        // - состояние анкеты (может уже устаовили флаг)
+        // - тип анкеты (СДПО ли вообще она)
+        /** @var User $user */
+        $user = Auth::user();
 
-        if($anketa) {
-            $anketa->type_anketa = 'medic';
-            $anketa->flag_pak = 'СДПО Р';
-            $anketa->admitted = $admitted;
-            $anketa->operator_id = $request->user()->id;
-            $anketa->save();
+        $form = Anketa::find($id);
+
+        if (!$form) {
+            return back();
+        }
+
+        $form->type_anketa = 'medic';
+        $form->flag_pak = 'СДПО Р';
+        $form->admitted = $admitted;
+
+        $form->user_id = $user->id;
+        $form->user_name = $user->name;
+        $form->operator_id = $user->id;
+        $form->eds = $user->eds;
+
+        $form->save();
+
+        //TODO: заменить ивентом
+        if (!$admitted) {
+            //TODO: заменить такие поиски на скоупы или на отношение
+            $company = Company::query()->where('hash_id', $form->company_id);
+            $driver = Driver::query()->where('hash_id', $form->driver_id);
+
+            $phoneToCall = Settings::setting('sms_text_phone');
+            $sms = new SmsController();
+            $sms->sms($company->where_call, Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall");
         }
 
         return back();
@@ -195,219 +220,39 @@ class AnketsController extends Controller
         return back();
     }
 
-    public function Update (Request $request)
+    public function Update(Request $request, UpdateFormHandler $handler): RedirectResponse
     {
+        DB::beginTransaction();
+
         $id = $request->id;
-        $anketa = Anketa::find($id);
-        $hourdiff = 1;
-        $anketaDublicate = [
-            'id' => 0,
-            'date' => ''
-        ];
 
-        $data = $request->all();
+        try {
+            //TODO: нет проверки на существование формы
+            $form = Anketa::find($id);
 
-        $REFERER = $data['REFERER'] ?? '';
+            $handler->handle($form, $request->all(), Auth::user());
 
-        if(isset($data['REFERER'])) {
-            unset($data['REFERER']);
-        }
-
-        $point = Point::where('id', $data['pv_id'])->first();
-        $data['pv_id'] = $point->name;
-        $data['point_id'] = $point->id;
-        $type_anketa = $data['type_anketa'];
-
-        if(isset($data['anketa'])) {
-            if($anketa->type_anketa === 'medic' && (!$anketa->is_dop || $anketa->result_dop != null)) {
-                $anketaMedic = Anketa::where('driver_id', $data['driver_id'])
-                    ->where('type_anketa', 'medic')
-                    ->where('type_view', $data['anketa'][0]['type_view'])
-                    ->where('in_cart', 0)
-                    ->orderBy('date', 'desc')
-                    ->get();
-
-                foreach($anketaMedic as $aM) {
-                    if (!$aM->date || $aM->id === $anketa->id || ($aM->is_dop && $aM->result_dop == null)) {
-                        continue;
-                    }
-
-                    $hourdiff_check = round((Carbon::parse($data['anketa'][0]['date'])->timestamp - Carbon::parse($aM->date)->timestamp)/60, 1);
-
-                    if($hourdiff_check < 1 && $hourdiff_check >= 0) {
-                        $anketaDublicate['id'] = $aM->id;
-                        $anketaDublicate['date'] = $aM->date;
-                        $hourdiff = $hourdiff_check;
-                    }
-                }
-            } else if($anketa->type_anketa === 'tech' && (!$anketa->is_dop || $anketa->result_dop != null)) {
-                $anketasTech = Anketa::where('car_id', $data['anketa'][0]['car_id'])
-                    ->where('type_anketa', 'tech')
-                    ->where('type_view', $data['anketa'][0]['type_view'] ?? '')
-                    ->where('in_cart', 0)
-                    ->orderBy('date', 'desc')
-                    ->get();
-
-                foreach($anketasTech as $aT) {
-                    if (!$aT->date || $aT->id === $anketa->id || ($aT->is_dop && $aT->result_dop == null)) {
-                        continue;
-                    }
-
-                    $hourdiff_check = round((Carbon::parse($data['anketa'][0]['date'])->timestamp - Carbon::parse($aT->date)->timestamp)/60, 1);
-
-                    if($hourdiff_check < 1 && $hourdiff_check >= 0) {
-                        $anketaDublicate['id'] = $aT->id;
-                        $anketaDublicate['date'] = $aT->date;
-                        $hourdiff = $hourdiff_check;
-                    }
-                }
-            }
-
-            if($hourdiff < 1 && $hourdiff >= 0) {
-                return redirect(route('forms.get', [
-                    'id' => $anketa->id,
-                    'errors' => ["Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])"]
+            $referer = $request->input('REFERER');
+            if ($referer) {
+                $response = redirect( $referer );
+            } else {
+                $response = redirect(route('forms.get', [
+                    'id' => $id,
+                    'msg' => 'Осмотр успешно обновлён!'
                 ]));
             }
 
-            foreach($data['anketa'][0] as $daK => $daV) {
-                $company_id = null;
-
-                switch($daK) {
-                    case 'driver_id':
-
-                        if($daV) {
-                            $driver = Driver::where('hash_id', $daV)->first();
-
-                            if($driver) {
-
-                                $data['driver_fio'] = $driver->fio;
-                                $data['driver_group_risk'] = $driver->group_risk;
-                                $data['driver_gender'] = $driver->gender;
-                                $data['driver_year_birthday'] = $driver->year_birthday;
-
-                                $company_id = $driver->company_id;
-                            }
-                        }
-
-                        break;
-
-                    case 'car_id':
-
-                        if($daV) {
-                            $car = Car::where('hash_id', $daV)->first();
-
-                            if($car) {
-                                $data['car_mark_model'] = $car->mark_model;
-                                $data['car_gos_number'] = $car->gos_number;
-
-                                $company_id = $car->company_id;
-                            }
-                        }
-
-                        break;
-                }
-
-                if($company_id) {
-                    $Company = Company::where('id', $company_id)->first();
-
-                    if($Company) {
-                        $data['company_id'] = $Company->hash_id;
-                        $data['company_name'] = $Company->name;
-                    } else {
-                        $data['company_id'] = '';
-                        $data['company_name'] = '';
-                    }
-                }
-
-                $data[$daK] = $daV;
-            }
-            unset($data['anketa']);
-        }
-
-        unset($data['_token']);
-        foreach($data as $dK => $dV) {
-            $company_id = null;
-
-            switch($dK) {
-                case 'driver_id':
-
-                    $driver = Driver::where('hash_id', $dV)->first();
-
-                    if($driver) {
-                        $anketa['driver_fio'] = $driver->fio;
-                        $anketa['driver_group_risk'] = $driver->group_risk;
-                        $anketa['driver_gender'] = $driver->gender;
-                        $anketa['driver_year_birthday'] = $driver->year_birthday;
-
-                        $company_id = $driver->company_id;
-                    }
-
-                    break;
-
-                case 'car_id':
-
-                    $car = Car::where('hash_id', $dV)->first();
-
-                    if($car) {
-                        $anketa['car_mark_model'] = $car->mark_model;
-                        $anketa['car_gos_number'] = $car->gos_number;
-
-                        $company_id = $car->company_id;
-                    }
-
-                    break;
-            }
-
-            if($company_id) {
-                $Company = Company::where('id', $company_id)->first();
-
-                if($Company) {
-                    $anketa['company_id'] = $Company->hash_id;
-                    $anketa['company_name'] = $Company->name;
-                } else {
-                    $anketa['company_id'] = '';
-                    $anketa['company_name'] = '';
-                }
-            }
-
-            $timezone      = $user->timezone ?? 3;
-            $diffDateCheck = Carbon::parse($anketa['created_at'])->addHours($timezone)->diffInMinutes($data['date'] ?? null);
-
-            if ($diffDateCheck <= 60 * 12 && $anketa['date'] ?? null) {
-                $anketa['realy'] = 'да';
-            } else {
-                $anketa['realy'] = 'нет';
-            }
-
-            $anketa[$dK] = $dV;
-        }
-
-        $anketa->save();
-
-        if($anketa->connected_hash) {
-            $anketaCopy = Anketa::where('connected_hash', $anketa->connected_hash)->where('type_anketa', '!=', $anketa->type_anketa)->first();
-
-            if($anketaCopy) {
-
-                foreach($anketa->fillable as $i => $key) {
-                    if($key !== 'type_anketa' && $key !== 'id' && $key !== 'created_at' && $key !== 'updated_at') {
-                        $anketaCopy->$key = $anketa[$key];
-                    }
-                }
-
-                $anketaCopy->save();
-            }
-        }
-
-        if($REFERER) {
-            return redirect( $REFERER );
-        } else {
-            return redirect(route('forms.get', [
+            DB::commit();
+        } catch (Throwable $exception) {
+            $response = redirect(route('forms.get', [
                 'id' => $id,
-                'msg' => 'Осмотр успешно обновлён!'
+                'errors' => [$exception->getMessage()],
             ]));
+
+            DB::rollBack();
         }
+
+        return $response;
     }
 
     public static function ddateCheck ($dateAnketa, $dateModel, $id)
