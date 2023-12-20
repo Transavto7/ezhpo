@@ -38,13 +38,15 @@
             </article>
         </div>
 
-        <div class="row form-group">
-            <label class="col-md-3 form-control-label">Доп. даты:</label>
-            <article class="col-md-9">
-                <input type="date"
-                       name="anketa[0][dates]" class="form-control date-range">
-            </article>
-        </div>
+        @if(empty($id))
+            <div class="form-group">
+                <label class="form-control-label">Доп. даты:</label>
+                <article>
+                    <input type="date"
+                           name="anketa[0][dates]" class="form-control date-range">
+                </article>
+            </div>
+        @endif
 
         <div class="form-group row">
             <label class="col-md-3 form-control-label">Период выдачи ПЛ:</label>
@@ -88,14 +90,6 @@
                 <input min="1900-02-20T20:20"
                        max="2999-02-20T20:20" type="datetime-local" required value="{{ $default_current_date ?? '' }}"
                        name="anketa[0][date]" class="form-control">
-            </article>
-        </div>
-
-        <div class="row form-group">
-            <label class="col-md-3 form-control-label">Доп. даты:</label>
-            <article class="col-md-9">
-                <input type="date"
-                       name="anketa[0][dates]" class="form-control date-range">
             </article>
         </div>
 
