@@ -187,10 +187,11 @@ class SdpoController extends Controller
         }
 
         // ОТПРАВКА SMS
-        if ($anketa['admitted'] === 'Не допущен') {
-            $phone_to_call = Settings::setting('sms_text_phone');
+        $needNotify = $anketa['admitted'] === 'Не допущен' && $anketa['flag_pak'] !== 'СДПО Р';
+        if ($needNotify) {
+            $phoneToCall = Settings::setting('sms_text_phone');
             $sms = new SmsController();
-            $sms->sms($company->where_call, Settings::setting('sms_text_driver') . " $driver->fio . $phone_to_call");
+            $sms->sms($company->where_call, Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall");
         }
 
         $anketa['timeout'] = Settings::setting('timeout') ?? 20;
