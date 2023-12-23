@@ -185,6 +185,7 @@ return [
          * Modules
          */
         \Src\ExternalSystem\Providers\ExternalSystemServiceProvider::class,
+        \Src\MedicalReference\Providers\MedicalReferenceServiceProvider::class,
     ],
 
     /*
