@@ -376,6 +376,10 @@ $permissionToExportPrikazPL = (
                                             @endif
                                         @endif
 
+                                        @if(auth()->user()->hasRole('admin'))
+                                            <th class="not-export">#</th>
+                                        @endif
+
                                         {{-- УДАЛЕНИЕ--}}
     {{--                                    @if($permissionToDelete)--}}
     {{--                                        <th class="not-export">#</th>--}}
@@ -576,6 +580,24 @@ $permissionToExportPrikazPL = (
                                                             <i class="fa fa-print"></i>
                                                         </a>
                                                     </td>
+                                            @endif
+
+                                            @if(auth()->user()->hasRole('admin'))
+                                                <td class="not-export">
+                                                    @if($anketa->driver_id === null || $anketa->type_anketa !== 'medic')
+                                                        <a class="btn btn-outline-dark btn-sm disabled">
+                                                            <i class="fa fa-download"></i>
+                                                        </a>
+                                                    @elseif(array_key_exists($anketa->id, $mis))
+                                                        <a class="btn btn-success btn-sm disabled" title="Анкета уже отправлена">
+                                                            <i class="fa fa-download"></i>
+                                                        </a>
+                                                    @else
+                                                        <a href="{{ route('external-system.send', $anketa->id) }}" class="btn btn-info btn-sm anketa-send-btn">
+                                                            <i class="fa fa-download"></i>
+                                                        </a>
+                                                    @endif
+                                                </td>
                                             @endif
 
                                             @if($type_ankets !== 'pak_queue')

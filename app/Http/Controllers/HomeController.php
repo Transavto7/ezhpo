@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Anketa;
 use App\Exports\AnketasExport;
 use App\FieldPrompt;
+use App\MisAnketa;
 use App\Point;
 use App\User;
 use Auth;
@@ -589,10 +590,17 @@ class HomeController extends Controller
             });
         }
 
+        $misIds = MisAnketa::query()
+            ->select('anketa_id', 'id_mis')
+            ->get()
+            ->pluck('id_mis', 'anketa_id')
+            ->toArray();
+
         return view($_view, [
             'title'                 => Anketa::$anketsKeys[$validTypeAnkets],
             'name'                  => $user->name,
             'ankets'                => $anketas,
+            'mis'                   => $misIds,
             'filter_activated'      => $filter_activated,
             'type_ankets'           => $validTypeAnkets,
             'anketsFields'          => $anketsFields,

@@ -181,6 +181,10 @@ return [
         // PERMISSIONS
         Spatie\Permission\PermissionServiceProvider::class,
 
+        /*
+         * Modules
+         */
+        \Src\ExternalSystem\Providers\ExternalSystemServiceProvider::class,
     ],
 
     /*
