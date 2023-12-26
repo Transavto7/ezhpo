@@ -39,9 +39,9 @@
         </div>
 
         @if(empty($id))
-            <div class="form-group">
-                <label class="form-control-label">Доп. даты:</label>
-                <article>
+            <div class="form-group row">
+                <label class="col-md-3 form-control-label">Доп. даты:</label>
+                <article class="col-md-9">
                     <input type="date"
                            name="anketa[0][dates]" class="form-control date-range">
                 </article>
