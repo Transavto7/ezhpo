@@ -136,6 +136,8 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
             $form['company_id'] = $driverCompany->hash_id;
             $form['company_name'] = $driverCompany->name;
+
+            $company = $driverCompany;
         } else if ($car) {
             $carCompany = Company::find($car->company_id);
 
