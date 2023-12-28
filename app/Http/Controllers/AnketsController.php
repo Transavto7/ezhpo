@@ -127,7 +127,7 @@ class AnketsController extends Controller
         $form->user_id = $user->id;
         $form->user_name = $user->name;
         $form->operator_id = $user->id;
-        $form->eds = $user->eds;
+        $form->user_eds = $user->eds;
 
         $form->save();
 

@@ -152,8 +152,6 @@ abstract class AbstractCreateFormHandler
             'anketa'
         ];
 
-        $is_dop = $form['is_dop'] ?? 0;
-
         /**
          * Парсим данные в анкете, удаляем главную анкету и ставим актуальную
          */
@@ -165,11 +163,13 @@ abstract class AbstractCreateFormHandler
             $form[$dk] = $dv;
         }
 
+        $isDop = $form['is_dop'] ?? 0;
+
         /**
          * Проверяем дефолтные значения
          */
         foreach ($defaultData as $dk => $dv) {
-            if ($dk === 'date' && $is_dop) continue;
+            if ($dk === 'date' && $isDop) continue;
 
             if (empty($form[$dk])) {
                 $form[$dk] = $dv;

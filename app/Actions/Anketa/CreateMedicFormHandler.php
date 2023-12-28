@@ -57,8 +57,6 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
 
         if ($driverExist->end_of_ban && $this->time < $driverExist->end_of_ban) {
             $this->errors[] = 'Водитель отстранен до '.Carbon::parse($driverExist->end_of_ban);
-            $this->errors[] = $driverExist->end_of_ban;
-            $this->errors[] = $this->time;
         }
     }
 
@@ -112,8 +110,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
          * Проверка водителя по: тесту наркотиков, возрасту
          */
         if ($driver) {
-            Driver::DriverChecker(
-                $driverId,
+            $driver->checkGroupRisk(
                 $form['tonometer'],
                 $form['test_narko'],
                 $form['proba_alko']
