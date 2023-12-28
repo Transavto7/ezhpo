@@ -2,8 +2,9 @@
 
 namespace App\Actions\Anketa;
 
+use App\Car;
 use App\DDates;
-use App\Enums\FormTypeEnum;
+use App\Driver;
 use App\Point;
 use App\User;
 use DateTime;
@@ -14,8 +15,6 @@ use Illuminate\Support\Collection;
 
 abstract class AbstractCreateFormHandler
 {
-    const FORM_TYPE = null;
-
     /** @var array */
     protected $data;
 
@@ -180,10 +179,22 @@ abstract class AbstractCreateFormHandler
         return $form;
     }
 
+    /**
+     * @throws Exception
+     */
     protected function checkRedDates(string $date, $dateCheckModel)
     {
-        $itemModelName = self::FORM_TYPE === FormTypeEnum::MEDIC ? 'Driver' : 'Car';
-
+        $dateCheckModelClass = get_class($dateCheckModel);
+        switch ($dateCheckModelClass) {
+            case Driver::class:
+                $itemModelName = 'Driver';
+                break;
+            case Car::class:
+                $itemModelName = 'Car';
+                break;
+            default:
+                throw new Exception("Попытка контроля дат для неизвестной модели - {$dateCheckModelClass}");
+        }
         $dateCheck = DDates::where('item_model', $itemModelName)->get();
 
         foreach ($dateCheck ?? [] as $dateCheckItem) {
