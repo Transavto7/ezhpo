@@ -240,12 +240,19 @@ abstract class AbstractCreateFormHandler
 
         $formTimestamp = Carbon::parse($form['date'])->timestamp;
 
+        $formDuplicates = 0;
+        $errorMessage = null;
         foreach ($this->data['anketa'] as $otherForm) {
             if ($this->isDuplicate($formTimestamp, $otherForm['date'])) {
-                $this->errors[] = "Найден дубликат осмотра при добавлении (Дата: $otherForm[date])";
-
-                return false;
+                $errorMessage = "Найден дубликат осмотра при добавлении (Дата: $otherForm[date])";
+                $formDuplicates++;
             }
+        }
+
+        if ($formDuplicates > 1) {
+           $this->errors[] = $errorMessage;
+
+            return false;
         }
 
         foreach($this->existForms as $existForm) {
