@@ -15,7 +15,7 @@ class FixDriverYearBirthdayFieldPrompts extends Migration
         DB::table('field_prompts')
             ->where('type', 'medic')
             ->where('name', 'Дата рождения')
-            ->update(['field' => 'year_birthday']);
+            ->update(['field' => 'driver_year_birthday']);
     }
 
     /**
