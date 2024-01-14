@@ -44,6 +44,19 @@ class SdpoController extends Controller
             return response()->json(['message' => 'Указанный водитель не найден!'], 400);
         }
 
+        date_default_timezone_set('UTC');
+        $time = time();
+        $timezone = $apiClient->timezone ?? 3;
+        $time += $timezone * 3600;
+        $time = date('Y-m-d H:i:s', $time);
+
+        if ($driver->end_of_ban && (Carbon::parse($time) < Carbon::parse($driver->end_of_ban))) {
+            return response()->json(
+                ['message' => 'Указанный водитель отстранен до ' . Carbon::parse($driver->end_of_ban) . "!"],
+                400
+            );
+        }
+
         $company = $driver->company;
         if ($company->dismissed === 'Да') {
             return response()->json(['message' => 'Компания в черном списке. Необходимо связаться с руководителем!', 401]);
@@ -98,12 +111,6 @@ class SdpoController extends Controller
         if ($request->video) {
             $medic['videos'] = $request->video;
         }
-
-        date_default_timezone_set('UTC');
-        $time = time();
-        $timezone = $apiClient->timezone ?? 3;
-        $time += $timezone * 3600;
-        $time = date('Y-m-d H:i:s', $time);
 
         $medic['created_at'] = $request->created_at ?? $time;
         $medic['date'] = $request->date ?? $medic['created_at'];
