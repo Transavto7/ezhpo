@@ -241,9 +241,7 @@ abstract class AbstractCreateFormHandler
         $formTimestamp = Carbon::parse($form['date'])->timestamp;
 
         foreach ($this->data['anketa'] as $otherForm) {
-            $diffInHours = round(($formTimestamp - Carbon::parse($otherForm['date'])->timestamp)/60, 1);
-
-            if ($diffInHours < 1 && $diffInHours > 0) {
+            if ($this->isDuplicate($formTimestamp, $otherForm['date'])) {
                 $this->errors[] = "Найден дубликат осмотра при добавлении (Дата: $otherForm[date])";
 
                 return false;
@@ -251,9 +249,7 @@ abstract class AbstractCreateFormHandler
         }
 
         foreach($this->existForms as $existForm) {
-            $diffInHours = round(($formTimestamp - Carbon::parse($existForm->date)->timestamp)/60, 1);
-
-            if ($diffInHours < 1 && $diffInHours >= 0) {
+            if ($this->isDuplicate($formTimestamp, $existForm->date)) {
                 $this->errors[] = "Найден дубликат осмотра (ID: $existForm->id, Дата: $existForm->date)";
 
                 return false;
@@ -261,5 +257,12 @@ abstract class AbstractCreateFormHandler
         }
 
         return true;
+    }
+
+    protected function isDuplicate($first, $second): bool
+    {
+        $diffInMinutes = round(($first - Carbon::parse($second)->timestamp)/60, 1);
+
+        return $diffInMinutes < 1 && $diffInMinutes >= 0;
     }
 }

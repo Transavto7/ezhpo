@@ -74,10 +74,12 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             'proba_alko' => 'Отрицательно',
             'med_view' => 'В норме',
             'admitted' => 'Допущен',
-            'realy' => 'нет'
+            'realy' => 'нет',
+            'created_at' => $this->time
         ];
 
         $form = $this->mergeFormData($form, $defaultData);
+        $form['is_dop'] = $form['is_dop'] ?? 0;
 
         $company = null;
         /**
@@ -110,6 +112,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
          * Проверка водителя по: тесту наркотиков, возрасту
          */
         if ($driver) {
+            /** @var Driver $driver */
             $driver->checkGroupRisk(
                 $form['tonometer'],
                 $form['test_narko'],

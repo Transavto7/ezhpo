@@ -65,10 +65,12 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         $defaultData = [
             'date' => date('Y-m-d H:i:s'),
             'admitted' => 'Допущен',
-            'realy' => 'нет'
+            'realy' => 'нет',
+            'created_at' => $this->time
         ];
 
         $form = $this->mergeFormData($form, $defaultData);
+        $form['is_dop'] = $form['is_dop'] ?? 0;
 
         /**
          * Компания

@@ -35,7 +35,8 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
         $defaultData = [
             'date' => date('Y-m-d H:i:s'),
             'admitted' => 'Допущен',
-            'realy' => 'нет'
+            'realy' => 'нет',
+            'created_at' => $this->time
         ];
 
         $form = $this->mergeFormData($form, $defaultData);
