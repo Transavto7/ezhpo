@@ -109,20 +109,28 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             }
 
             if (!$driver->company_id) {
-                $this->errors[] = 'У Водителя не найдена компания';
+                $message = 'У Водителя не найдена компания';
+
+                $this->errors[] = $message;
+
+                $this->saveSdpoFormWithError($form, $message);
 
                 return;
             }
 
-            $driverCompany = Company::find($driver->company_id);
+            $company = Company::find($driver->company_id);
 
-            if (!$driverCompany) {
-                $this->errors[] = 'У Водителя не верно указано ID компании';
+            if (!$company) {
+                $message = 'У Водителя не верно указано ID компании';
+
+                $this->errors[] = $message;
+
+                $this->saveSdpoFormWithError($form, $message);
 
                 return;
             }
 
-            if ($driverCompany->dismissed === 'Да') {
+            if ($company->dismissed === 'Да') {
                 $this->errors[] = 'Компания в черном списке. Необходимо связаться с руководителем!';
 
                 return;
@@ -136,15 +144,17 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             $form['driver_fio'] = $driver->fio;
             $form['driver_group_risk'] = $driver->group_risk;
 
-            $form['company_id'] = $driverCompany->hash_id;
-            $form['company_name'] = $driverCompany->name;
-
-            $company = $driverCompany;
+            $form['company_id'] = $company->hash_id;
+            $form['company_name'] = $company->name;
         } else if ($car) {
             $carCompany = Company::find($car->company_id);
 
             if (!$carCompany) {
-                $this->errors[] = 'У Автомобиля не найдена компания';
+                $message = 'У Автомобиля не найдена компания';
+
+                $this->errors[] = $message;
+
+                $this->saveSdpoFormWithError($form, $message);
 
                 return;
             }

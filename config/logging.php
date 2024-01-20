@@ -104,6 +104,11 @@ return [
         'sdpo' => [
             'driver' => 'single',
             'path' => storage_path('logs/sdpo.log')
+        ],
+
+        'deprecated-api' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/deprecated-api.log')
         ]
     ],
 

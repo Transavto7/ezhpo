@@ -55,6 +55,16 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
             }
         }
 
+        if (!$driver) {
+            $errMsg = 'Водитель не найден';
+
+            $this->errors[] = $errMsg;
+
+            $this->saveSdpoFormWithError($form, $errMsg);
+
+            return;
+        }
+
         /**
          * Проверка водителя по: тесту наркотиков, возрасту
          */
@@ -63,16 +73,24 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
                 $this->errors[] = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
             }
 
-            if(!$driver->company_id) {
-                $this->errors[] = 'У Водителя не найдена компания';
+            if (!$driver->company_id) {
+                $message = 'У Водителя не найдена компания';
+
+                $this->errors[] = $message;
+
+                $this->saveSdpoFormWithError($form, $message);
 
                 return;
             }
 
-            $company = Company::where('id', $driver->company_id)->first();
+            $company = Company::find($driver->company_id);
 
             if (!$company) {
-                $this->errors[] = 'У Водителя не верно указано ID компании';
+                $message = 'У Водителя не верно указано ID компании';
+
+                $this->errors[] = $message;
+
+                $this->saveSdpoFormWithError($form, $message);
 
                 return;
             }
