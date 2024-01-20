@@ -2,6 +2,7 @@
 
 namespace App\Actions\Anketa;
 
+use App\Anketa;
 use App\Car;
 use App\DDates;
 use App\Driver;
@@ -131,6 +132,18 @@ abstract class AbstractCreateFormHandler
         foreach ($this->data['anketa'] ?? [] as &$form) {
             unset($form['dates']);
         }
+    }
+
+    protected function saveSdpoFormWithError(array $form, string $comment = '')
+    {
+        if (!isset($form['is_pak'])) {
+            return;
+        }
+
+        $form['type_anketa'] = 'pak';
+        $form['comments'] = $comment;
+
+        Anketa::create($form);
     }
 
     protected function validateData()

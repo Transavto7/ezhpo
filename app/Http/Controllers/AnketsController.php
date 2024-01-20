@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Anketa\CreateFormHandlerFactory;
+use App\Actions\Anketa\CreateSdpoFormHandler;
 use App\Actions\Anketa\UpdateFormHandler;
 use App\Anketa;
 use App\Company;
@@ -12,11 +13,14 @@ use App\Point;
 use App\Settings;
 use App\User;
 use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class AnketsController extends Controller
@@ -319,6 +323,61 @@ class AnketsController extends Controller
         $responseData['is_dop'] = $responseData['is_dop'] ?? $request->input('is_dop', 0);
 
         return redirect()->route('forms', $responseData);
+    }
+
+    /**
+     * @deprecated
+     * API ROUTE FOR SDPO
+     */
+    public function ApiAddForm(Request $request, CreateSdpoFormHandler $handler): JsonResponse
+    {
+        try {
+            DB::beginTransaction();
+
+            $data = $request->all();
+
+            if ($request->hasFile('photos')) {
+                $photos = $request->file('photos');
+                $photosPaths = [];
+
+                foreach($photos as $photo) {
+                    $photosPaths[] = Storage::disk('public')
+                        ->putFile('ankets', $photo);
+                }
+
+                $data['photos'] = implode(',', $photosPaths);
+            }
+
+            $responseData = $handler->handle($data, $request->user('api'));
+
+            DB::commit();
+
+            Log::channel('deprecated-api')->info(json_encode(
+                [
+                    'request' => $request->all(),
+                    'ip' => $request->getClientIp() ?? null,
+                    'response' => $responseData
+                ]
+            ));
+
+            return response()->json($responseData);
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            $responseData = [
+                'errors' => [$exception->getMessage()],
+            ];
+
+            Log::channel('deprecated-api')->info(json_encode(
+                [
+                    'request' => $request->all(),
+                    'ip' => $request->getClientIp() ?? null,
+                    'response' => $responseData
+                ]
+            ));
+
+            return response()->json($responseData, 500);
+        }
     }
 
     public function print(Request $request, $id) {

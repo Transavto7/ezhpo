@@ -52,26 +52,44 @@ class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements Crea
             }
         }
 
+        if (!$driver) {
+            $errMsg = 'Водитель не найден';
+
+            $this->errors[] = $errMsg;
+
+            $this->saveSdpoFormWithError($form, $errMsg);
+
+            return;
+        }
+
         if ($driver) {
             if ($driver->dismissed === 'Да') {
                 $this->errors[] = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
             }
 
             if (!$driver->company_id) {
-                $this->errors[] = 'У Водителя не найдена компания';
+                $message = 'У Водителя не найдена компания';
+
+                $this->errors[] = $message;
+
+                $this->saveSdpoFormWithError($form, $message);
 
                 return;
             }
 
-            $driverCompany = Company::find($driver->company_id);
+            $company = Company::find($driver->company_id);
 
-            if (!$driverCompany) {
-                $this->errors[] = 'У Водителя не верно указано ID компании';
+            if (!$company) {
+                $message = 'У Водителя не верно указано ID компании';
+
+                $this->errors[] = $message;
+
+                $this->saveSdpoFormWithError($form, $message);
 
                 return;
             }
 
-            if ($driverCompany->dismissed === 'Да') {
+            if ($company->dismissed === 'Да') {
                 $this->errors[] = 'Компания в черном списке. Необходимо связаться с руководителем!';
 
                 return;
@@ -85,8 +103,8 @@ class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements Crea
             $form['driver_fio'] = $driver->fio;
             $form['driver_group_risk'] = $driver->group_risk;
 
-            $form['company_id'] = $driverCompany->hash_id;
-            $form['company_name'] = $driverCompany->name;
+            $form['company_id'] = $company->hash_id;
+            $form['company_name'] = $company->name;
         }
 
         /**
