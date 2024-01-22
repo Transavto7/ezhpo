@@ -86,7 +86,7 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
             'flag_pak' => 'СДПО А'
         ];
 
-        $this->mergeFormData($form, $defaultDatas);
+        $form = $this->mergeFormData($form, $defaultDatas);
 
         if (isset($form['driver_id'])) {
             $driverDop = Driver::where('hash_id', $form['driver_id'])->first();
