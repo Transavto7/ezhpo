@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class BddController extends Controller
@@ -55,9 +56,13 @@ class BddController extends Controller
 
             $responseData = $handler->handle($request->all(), Auth::user());
 
+            $code = count($responseData['errors'] ?? []) ?
+                Response::HTTP_UNPROCESSABLE_ENTITY :
+                Response::HTTP_OK;
+
             DB::commit();
 
-            return response()->json($responseData);
+            return response()->json($responseData, $code);
         } catch (Throwable $exception) {
             DB::rollBack();
 
@@ -65,7 +70,7 @@ class BddController extends Controller
                 'errors' => [$exception->getMessage()],
             ];
 
-            return response()->json($responseData);
+            return response()->json($responseData, 500);
         }
     }
 }
