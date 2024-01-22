@@ -360,7 +360,7 @@ class AnketsController extends Controller
                 ]
             ));
 
-            return response()->json($responseData);
+            return response()->json(response()->json($responseData));
         } catch (Throwable $exception) {
             DB::rollBack();
 
@@ -376,7 +376,7 @@ class AnketsController extends Controller
                 ]
             ));
 
-            return response()->json($responseData, 500);
+            return response()->json(response()->json($responseData), 500);
         }
     }
 
