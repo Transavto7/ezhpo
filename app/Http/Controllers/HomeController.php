@@ -356,6 +356,8 @@ class HomeController extends Controller
 
         // Экспорт из техосмотров и БДД
         if ($is_export && $filter_activated) {
+            $anketas = $anketas->orderBy('date');
+
             if ($validTypeAnkets == 'tech') {
                 if ($request->get('exportPrikaz')) {
                     $techs = $anketas->where('type_anketa', 'tech');

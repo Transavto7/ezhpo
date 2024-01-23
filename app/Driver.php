@@ -235,29 +235,32 @@ class Driver extends Model
         return false;
     }
 
-    public function checkGroupRisk($tonometer, $test_narko, $proba_alko)
-    {
-        $y = date('Y');
-
-        $year_birthday = date('Y', strtotime($this->year_birthday));
-        $age           = $y - $year_birthday;
-        $group_risk    = '';
-
+    public function checkGroupRisk(
+        string $tonometer = null,
+        string $testDrugs = null,
+        string $testAlko = null
+    ) {
+        $currentYear = date('Y');
+        $birthdayYear = date('Y', strtotime($this->getAttribute('year_birthday')));
+        $age          = $currentYear - $birthdayYear;
+        $groupRisk    = '';
         if ($age > 50) {
-            $group_risk = 'Возраст';
+            $groupRisk = 'Возраст';
         }
 
         if ($tonometer > 140) {
-            $group_risk = 'А\Д';
+            $groupRisk = 'А\Д';
         }
 
-        if ($test_narko === 'Положительно') {
-            $group_risk = 'Наркотики';
-        } else if ($proba_alko === 'Положительно') {
-            $group_risk = 'Алкоголь';
+        if ($testDrugs === 'Положительно') {
+            $groupRisk = 'Наркотики';
         }
 
-        $this->group_risk = $group_risk;
+        if ($testAlko === 'Положительно') {
+            $groupRisk = 'Алкоголь';
+        }
+
+        $this->setAttribute('group_risk', $groupRisk);
         $this->save();
     }
 

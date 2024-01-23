@@ -131,27 +131,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/add-client', 'IndexController@RenderAddClient')->name('pages.add_client');
 
-    Route::get('driver-bdd', function () {
-        $instrs = \App\Instr::where('active', 1)->orderBy('sort', 'asc')->get();
-        $pv_id = \App\Driver::where('hash_id', auth()->user()->id)->first();
-
-        if($pv_id) {
-            $pv_id = \App\Company::find($pv_id->company_id);
-
-            if($pv_id) {
-                $pv_id = $pv_id->pv_id;
-            } else {
-                $pv_id = 0;
-            }
-        } else {
-            $pv_id = 0;
-        }
-
-        return view('pages.driver_bdd', [
-            'instrs' => $instrs,
-            'pv_id' => $pv_id
-        ]);
-    })->name('page.driver_bdd');
+    Route::get('driver-bdd', 'BddController@get')->name('page.driver_bdd');
+    Route::post('driver-bdd', 'BddController@store')->name('bdd.store');
 
     Route::prefix('profile')->group(function () {
         Route::post('/anketa', 'AnketsController@AddForm')->name('addAnket');

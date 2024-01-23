@@ -38,6 +38,16 @@
             </article>
         </div>
 
+        @if(empty($id))
+            <div class="form-group row">
+                <label class="col-md-3 form-control-label">Доп. даты:</label>
+                <article class="col-md-9">
+                    <input type="date"
+                           name="anketa[0][dates]" class="form-control date-range">
+                </article>
+            </div>
+        @endif
+
         <div class="form-group row">
             <label class="col-md-3 form-control-label">Период выдачи ПЛ:</label>
             <article class="col-md-9">

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Anketa\CreateFormHandlerFactory;
+use App\Actions\Anketa\CreateSdpoFormHandler;
+use App\Actions\Anketa\UpdateFormHandler;
 use App\Anketa;
-use App\Car;
 use App\Company;
 use App\DDates;
 use App\Driver;
@@ -11,12 +13,15 @@ use App\Point;
 use App\Settings;
 use App\User;
 use Barryvdh\DomPDF\Facade as PDF;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class AnketsController extends Controller
 {
@@ -107,14 +112,38 @@ class AnketsController extends Controller
 
     public function ChangePakQueue(Request $request, $id, $admitted)
     {
-        $anketa = Anketa::find($id);
+        //TODO: нет никакой проверки на
+        // - состояние анкеты (может уже устаовили флаг)
+        // - тип анкеты (СДПО ли вообще она)
+        /** @var User $user */
+        $user = Auth::user();
 
-        if($anketa) {
-            $anketa->type_anketa = 'medic';
-            $anketa->flag_pak = 'СДПО Р';
-            $anketa->admitted = $admitted;
-            $anketa->operator_id = $request->user()->id;
-            $anketa->save();
+        $form = Anketa::find($id);
+
+        if (!$form) {
+            return back();
+        }
+
+        $form->type_anketa = 'medic';
+        $form->flag_pak = 'СДПО Р';
+        $form->admitted = $admitted;
+
+        $form->user_id = $user->id;
+        $form->user_name = $user->name;
+        $form->operator_id = $user->id;
+        $form->user_eds = $user->eds;
+
+        $form->save();
+
+        //TODO: заменить ивентом
+        if (!$admitted) {
+            //TODO: заменить такие поиски на скоупы или на отношение
+            $company = Company::query()->where('hash_id', $form->company_id);
+            $driver = Driver::query()->where('hash_id', $form->driver_id);
+
+            $phoneToCall = Settings::setting('sms_text_phone');
+            $sms = new SmsController();
+            $sms->sms($company->where_call, Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall");
         }
 
         return back();
@@ -195,219 +224,39 @@ class AnketsController extends Controller
         return back();
     }
 
-    public function Update (Request $request)
+    public function Update(Request $request, UpdateFormHandler $handler): RedirectResponse
     {
+        DB::beginTransaction();
+
         $id = $request->id;
-        $anketa = Anketa::find($id);
-        $hourdiff = 1;
-        $anketaDublicate = [
-            'id' => 0,
-            'date' => ''
-        ];
 
-        $data = $request->all();
+        try {
+            //TODO: нет проверки на существование формы
+            $form = Anketa::find($id);
 
-        $REFERER = $data['REFERER'] ?? '';
+            $handler->handle($form, $request->all(), Auth::user());
 
-        if(isset($data['REFERER'])) {
-            unset($data['REFERER']);
-        }
-
-        $point = Point::where('id', $data['pv_id'])->first();
-        $data['pv_id'] = $point->name;
-        $data['point_id'] = $point->id;
-        $type_anketa = $data['type_anketa'];
-
-        if(isset($data['anketa'])) {
-            if($anketa->type_anketa === 'medic' && (!$anketa->is_dop || $anketa->result_dop != null)) {
-                $anketaMedic = Anketa::where('driver_id', $data['driver_id'])
-                    ->where('type_anketa', 'medic')
-                    ->where('type_view', $data['anketa'][0]['type_view'])
-                    ->where('in_cart', 0)
-                    ->orderBy('date', 'desc')
-                    ->get();
-
-                foreach($anketaMedic as $aM) {
-                    if (!$aM->date || $aM->id === $anketa->id || ($aM->is_dop && $aM->result_dop == null)) {
-                        continue;
-                    }
-
-                    $hourdiff_check = round((Carbon::parse($data['anketa'][0]['date'])->timestamp - Carbon::parse($aM->date)->timestamp)/60, 1);
-
-                    if($hourdiff_check < 1 && $hourdiff_check >= 0) {
-                        $anketaDublicate['id'] = $aM->id;
-                        $anketaDublicate['date'] = $aM->date;
-                        $hourdiff = $hourdiff_check;
-                    }
-                }
-            } else if($anketa->type_anketa === 'tech' && (!$anketa->is_dop || $anketa->result_dop != null)) {
-                $anketasTech = Anketa::where('car_id', $data['anketa'][0]['car_id'])
-                    ->where('type_anketa', 'tech')
-                    ->where('type_view', $data['anketa'][0]['type_view'] ?? '')
-                    ->where('in_cart', 0)
-                    ->orderBy('date', 'desc')
-                    ->get();
-
-                foreach($anketasTech as $aT) {
-                    if (!$aT->date || $aT->id === $anketa->id || ($aT->is_dop && $aT->result_dop == null)) {
-                        continue;
-                    }
-
-                    $hourdiff_check = round((Carbon::parse($data['anketa'][0]['date'])->timestamp - Carbon::parse($aT->date)->timestamp)/60, 1);
-
-                    if($hourdiff_check < 1 && $hourdiff_check >= 0) {
-                        $anketaDublicate['id'] = $aT->id;
-                        $anketaDublicate['date'] = $aT->date;
-                        $hourdiff = $hourdiff_check;
-                    }
-                }
-            }
-
-            if($hourdiff < 1 && $hourdiff >= 0) {
-                return redirect(route('forms.get', [
-                    'id' => $anketa->id,
-                    'errors' => ["Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])"]
+            $referer = $request->input('REFERER');
+            if ($referer) {
+                $response = redirect( $referer );
+            } else {
+                $response = redirect(route('forms.get', [
+                    'id' => $id,
+                    'msg' => 'Осмотр успешно обновлён!'
                 ]));
             }
 
-            foreach($data['anketa'][0] as $daK => $daV) {
-                $company_id = null;
-
-                switch($daK) {
-                    case 'driver_id':
-
-                        if($daV) {
-                            $driver = Driver::where('hash_id', $daV)->first();
-
-                            if($driver) {
-
-                                $data['driver_fio'] = $driver->fio;
-                                $data['driver_group_risk'] = $driver->group_risk;
-                                $data['driver_gender'] = $driver->gender;
-                                $data['driver_year_birthday'] = $driver->year_birthday;
-
-                                $company_id = $driver->company_id;
-                            }
-                        }
-
-                        break;
-
-                    case 'car_id':
-
-                        if($daV) {
-                            $car = Car::where('hash_id', $daV)->first();
-
-                            if($car) {
-                                $data['car_mark_model'] = $car->mark_model;
-                                $data['car_gos_number'] = $car->gos_number;
-
-                                $company_id = $car->company_id;
-                            }
-                        }
-
-                        break;
-                }
-
-                if($company_id) {
-                    $Company = Company::where('id', $company_id)->first();
-
-                    if($Company) {
-                        $data['company_id'] = $Company->hash_id;
-                        $data['company_name'] = $Company->name;
-                    } else {
-                        $data['company_id'] = '';
-                        $data['company_name'] = '';
-                    }
-                }
-
-                $data[$daK] = $daV;
-            }
-            unset($data['anketa']);
-        }
-
-        unset($data['_token']);
-        foreach($data as $dK => $dV) {
-            $company_id = null;
-
-            switch($dK) {
-                case 'driver_id':
-
-                    $driver = Driver::where('hash_id', $dV)->first();
-
-                    if($driver) {
-                        $anketa['driver_fio'] = $driver->fio;
-                        $anketa['driver_group_risk'] = $driver->group_risk;
-                        $anketa['driver_gender'] = $driver->gender;
-                        $anketa['driver_year_birthday'] = $driver->year_birthday;
-
-                        $company_id = $driver->company_id;
-                    }
-
-                    break;
-
-                case 'car_id':
-
-                    $car = Car::where('hash_id', $dV)->first();
-
-                    if($car) {
-                        $anketa['car_mark_model'] = $car->mark_model;
-                        $anketa['car_gos_number'] = $car->gos_number;
-
-                        $company_id = $car->company_id;
-                    }
-
-                    break;
-            }
-
-            if($company_id) {
-                $Company = Company::where('id', $company_id)->first();
-
-                if($Company) {
-                    $anketa['company_id'] = $Company->hash_id;
-                    $anketa['company_name'] = $Company->name;
-                } else {
-                    $anketa['company_id'] = '';
-                    $anketa['company_name'] = '';
-                }
-            }
-
-            $timezone      = $user->timezone ?? 3;
-            $diffDateCheck = Carbon::parse($anketa['created_at'])->addHours($timezone)->diffInMinutes($data['date'] ?? null);
-
-            if ($diffDateCheck <= 60 * 12 && $anketa['date'] ?? null) {
-                $anketa['realy'] = 'да';
-            } else {
-                $anketa['realy'] = 'нет';
-            }
-
-            $anketa[$dK] = $dV;
-        }
-
-        $anketa->save();
-
-        if($anketa->connected_hash) {
-            $anketaCopy = Anketa::where('connected_hash', $anketa->connected_hash)->where('type_anketa', '!=', $anketa->type_anketa)->first();
-
-            if($anketaCopy) {
-
-                foreach($anketa->fillable as $i => $key) {
-                    if($key !== 'type_anketa' && $key !== 'id' && $key !== 'created_at' && $key !== 'updated_at') {
-                        $anketaCopy->$key = $anketa[$key];
-                    }
-                }
-
-                $anketaCopy->save();
-            }
-        }
-
-        if($REFERER) {
-            return redirect( $REFERER );
-        } else {
-            return redirect(route('forms.get', [
+            DB::commit();
+        } catch (Throwable $exception) {
+            $response = redirect(route('forms.get', [
                 'id' => $id,
-                'msg' => 'Осмотр успешно обновлён!'
+                'errors' => [$exception->getMessage()],
             ]));
+
+            DB::rollBack();
         }
+
+        return $response;
     }
 
     public static function ddateCheck ($dateAnketa, $dateModel, $id)
@@ -444,1318 +293,90 @@ class AnketsController extends Controller
         return $redDates;
     }
 
-    public function savePakForm ($anketa, $comments = '') {
-        if(isset($anketa['is_pak'])) {
-            $anketa['type_anketa'] = 'pak';
-            $anketa['comments'] = $comments;
-
-            Anketa::create($anketa);
-        }
-    }
-
-    public function AddForm(Request $request, $isApiRoute = false)
+    public function AddForm(Request $request, CreateFormHandlerFactory $factory): RedirectResponse
     {
-        $user = ($isApiRoute) ? $request->user('api') : Auth::user();
-        $sms = new SmsController();
+        DB::beginTransaction();
 
-        $data = $request->all();
-        $d_id = $request->get('driver_id', 0); // Driver
+        $formType = $request->input('type_anketa');
 
-        $pv_id = $request->get('pv_id', 0);
+        try {
+            // TODO: добавить время действия
+            session(['anketa_pv_id' => [
+                'value' => $request->get('pv_id', 0),
+                'expired' => date('d.m')
+            ]]);
 
-        function mt_rand_float($min, $max, $countZero = '0') {
-            $countZero = +('1'.$countZero);
-            $min = floor($min * $countZero);
-            $max = floor($max * $countZero);
-            $rand = mt_rand($min, $max) / $countZero;
-            return $rand;
-        }
+            $handler = $factory->make($formType);
 
-        // TODO: добавить время действия
-        session(['anketa_pv_id' => [
-            'value' => $pv_id,
-            'expired' => date('d.m')
-        ]]);
+            $responseData = $handler->handle($request->all(), Auth::user());
 
-
-        $test_narko = $data['test_narko'] ?? 'Отрицательно';
-        $proba_alko = $data['proba_alko'] ?? 'Отрицательно';
-        $is_dop = $data['is_dop'] ?? 0;
-
-        // Выставляем оптимальные параметры
-        unset($data['_token']);
-
-        // ЕСЛИ ЗАПРОС С API/ПАК
-        if(isset($data['user_id']) && $isApiRoute) {
-            $user = User::find($data['user_id']);
-        }
-
-        $data['user_id'] = $user->id;
-
-        // Фотографии с ПАК
-        if($request->hasFile('photos')) {
-            // Парсим файлы
-            $photos = $request->file('photos');
-            $photos_path = '';
-
-            foreach($photos as $photoIndex => $photo) {
-                $file_path = Storage::disk('public')->putFile('ankets', $photo);
-
-                $photos_path .= ($photoIndex == 0 ? '' : ',') . $file_path;
-            }
-
-            $data['photos'] = $photos_path;
-        }
-
-        // Анкета
-        if (isset($data['anketa'])) {
-            // Клонируем анкету
-            $createdAnketas = [];
-            $createdAnketasDataResponseApi = [];
-            $data_anketa = $data['anketa'];
-            $errorsAnketa = array();
-
-            $cars = [];
-            $drivers = [];
-
-            // Только обычные осмотры валидируем
-            if(($data['is_dop'] ?? 0) != 1){
-
-                //================== VALIDATE company/driver/car ===================//
-                // tech
-                if($data['type_anketa'] === 'tech') {
-                    if($data['is_dop'] == 1) {
-                        if(!Company::where('hash_id', $data['company_id'])->count()){
-                            $errorsAnketa[] = 'Не найдена компания.';
-                        }
-                    }
-                    if(!Car::where('hash_id', $data['anketa'][0]['car_id'])->count()){
-                        $errorsAnketa[] = 'Не найдена машина.';
-                    }
-                    if(!Driver::where('hash_id', $data['driver_id'])->count()){
-                        $errorsAnketa[] = 'Не найден водитель.';
-                    }
-                }
-                date_default_timezone_set('UTC');
-                $time = time();
-                $timezone = $user->timezone ? $user->timezone : 3;
-                $time += $timezone * 3600;
-                $time = date('Y-m-d H:i:s', $time);
-                // medic
-                if($data['type_anketa'] === 'medic'){
-                    if($data['is_dop'] == 1){
-                        if(!Company::where('hash_id', $data['company_id'])->count()){
-                            $errorsAnketa[] = 'Не найдена компания.';
-                        }
-                    }
-                    if($driver = Driver::where('hash_id', $data['driver_id'])->first()){
-                        if($driver->end_of_ban){
-                            if($time < $driver->end_of_ban){
-                                $errorsAnketa[] = 'Водитель отстранен до '.Carbon::parse(Driver::where('hash_id', $data['driver_id'])->first()->end_of_ban);
-                            }
-                        }
-                    } else {
-                        $errorsAnketa[] = 'Не найден водитель.';
-                    }
-                }
-
-                // Журнал снятия отчетов с карт
-                if($data['type_anketa'] === 'report_cart'){
-                    if(!Driver::where('hash_id', $data['driver_id'])->count()){
-                        $errorsAnketa[] = 'Не найден водитель.';
-                    }
-                }
-
-                // Журнал инструктажей по БДД
-                if($data['type_anketa'] === 'bdd'){
-                    if ($data['driver_id']){
-                        if(!Driver::where('hash_id', $data['driver_id'])->count()){
-                            $errorsAnketa[] = 'Не найден водитель.';
-                        }
-                    } else {
-                        $errorsAnketa[] = 'Не указана машина.';
-                    }
-                }
-
-                if(count($errorsAnketa)){
-                    return redirect()->route('forms', [
-                        'errors' => $errorsAnketa,
-                        'type' => $data['type_anketa']
-                    ]);
-                }
-            }
-
-            if (isset($data['car_id'])) {
-                $cars[] = $data['car_id'];
-            }
-            if (isset($data['driver_id'])) {
-                $drivers[] = $data['driver_id'];
-            }
-
-            foreach ($data_anketa as $anketa) {
-                $cars[] = $anketa['car_id'] ?? 0;
-                $drivers[] = $anketa['driver_id'] ?? 0;
-            }
-
-            if ($data['type_anketa'] === 'medic' || $data['type_anketa'] === 'pak') {
-                $anketasMedic = Anketa::whereIn('driver_id', $drivers)
-                    ->where('type_anketa', 'medic')
-                    ->where('in_cart', 0)
-                    ->orderBy('date', 'desc')
-                    ->get();
-            } else if ($data['type_anketa'] === 'tech' || $data['type_anketa'] === 'vid_pl') {
-                $anketasTech = Anketa::whereIn('car_id', $cars)
-                    ->where('type_anketa', 'tech')
-                    ->where('in_cart', 0)
-                    ->orderBy('date', 'desc')
-                    ->get();
-            }
-
-            foreach($data_anketa as $anketa) {
-                // Выделение красных дат
-                $redDates = [];
-
-                // ID автомобиля
-                $c_id = $anketa['car_id'] ?? 0;
-                $d_id = $anketa['driver_id'] ?? $d_id;
-
-                $Car = Car::where('hash_id', $c_id)->first();
-                $Driver = Driver::where('hash_id', $d_id)->first();
-
-                $systolic = rand(100, 139);
-                $diastolic = rand(60, 89);
-
-                if ($Driver)  {
-                    if ($systolic >= intval($Driver->getPressureSystolic())) {
-                        $systolic = intval($Driver->getPressureSystolic()) - rand(1, 10);
-                    }
-
-
-                    if ($diastolic >= intval($Driver->getPressureDiastolic())) {
-                        $diastolic = intval($Driver->getPressureDiastolic()) - rand(1, 10);
-                    }
-                }
-
-
-                $defaultDatas = [
-                    'tonometer' => $systolic . '/' . $diastolic,
-                    't_people' => mt_rand_float(35.9,36.7),
-                    'date' => date('Y-m-d H:i:s')
-                ];
-
-                // Тонометр
-                $tonometer = $anketa['tonometer'] ?? $defaultDatas['tonometer'];
-                $anketa['pulse'] = $anketa['pulse'] ?? mt_rand(60,80);
-
-                if(!isset($anketa['med_view'])) {
-                    $anketa['med_view'] = 'В норме';
-                }
-
-                /**
-                 * Парсим данные в анкете, удаляем главную анкету и ставим актуальную
-                 */
-                unset($data['anketa']);
-                foreach($data as $dk => $dv) {
-                    $dv_item = $dv;
-
-                    if(empty($dv_item) && isset($defaultDatas[$dk])) {
-                        if($dk === 'date' && $is_dop) {
-
-                        } else {
-                            $dv_item = $defaultDatas[$dk];
-                        }
-                    }
-
-                    $anketa[$dk] = $dv_item;
-                }
-
-                /**
-                 * Проверяем дефолтные значения
-                 */
-                foreach($defaultDatas as $dfKey => $dfData) {
-                    if(empty($anketa[$dfKey])) {
-                        if($is_dop && $dfKey === 'date') {
-
-                        } else {
-                            $anketa[$dfKey] = $dfData;
-                        }
-                    }
-                }
-
-                /**
-                 * Компания
-                 */
-                if(isset($anketa['company_id'])) {
-                    $CompanyDop = Company::where('hash_id', $anketa['company_id'])->first();
-
-                    if($CompanyDop) {
-                        $anketa['company_id'] = $CompanyDop->hash_id;
-                        $anketa['company_name'] = $CompanyDop->name;
-                    }
-                }
-
-                if (isset($anketa['driver_id'])) {
-                    $DriverDop = Driver::where('hash_id', $anketa['driver_id'])->first();
-
-                    if ($DriverDop) {
-                        $anketa['driver_id'] = $DriverDop->hash_id;
-                        $anketa['driver_fio'] = $DriverDop->fio;
-                    }
-                }
-
-                /**
-                 * Проверка водителя по: тесту наркотиков, возрасту
-                 */
-                if($d_id || isset($Driver)) {
-                    if(!Driver::DriverChecker($d_id, $tonometer, $test_narko, $proba_alko) && !in_array($anketa['type_anketa'], ['bdd', 'pechat_pl', 'vid_pl', 'report_cart'])) {
-
-                        if($anketa['type_anketa'] !== 'tech') {
-                            $errMsg = 'Водитель не найден';
-
-                            $errorDriverFind = [
-                                'errors' => [$errMsg]
-                            ];
-
-                            $this->savePakForm($anketa, $errMsg);
-
-                            if($isApiRoute) {
-                                return response()->json($errorDriverFind);
-                            }
-
-                            return redirect()->route('forms', $errorDriverFind);
-                        } else {
-                            $anketa['driver_id'] = 0;
-                        }
-                    } else {
-                        $anketa['driver_fio'] = $Driver->fio;
-                        $anketa['driver_group_risk'] = $Driver->group_risk;
-
-                        if($Driver->dismissed === 'Да') {
-                            $errMsg = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
-                            $errorsAnketa[] = $errMsg;
-//                            continue;
-                        }
-
-                        /**
-                         * Добавляем Компанию
-                         */
-                        if($Driver->company_id) {
-                            $Company = Company::where('id', $Driver->company_id)->first();
-
-                            if($Company) {
-
-                                $anketa['company_id'] = $Company->hash_id;
-                                $anketa['company_name'] = $Company->name;
-
-                                if($Company->dismissed === 'Да') {
-                                    $errorsAnketa[] = 'Компания в черном списке. Необходимо связаться с руководителем!';
-                                    continue;
-                                }
-
-                            } else {
-                                $errorsAnketa[] = 'У Водителя не верно указано ID компании';
-                                $this->savePakForm($anketa, $errMsg);
-                                continue;
-                            }
-
-                        } else {
-                            $errorsAnketa[] = 'У Водителя не найдена компания';
-                            $this->savePakForm($anketa, $errMsg);
-                            continue;
-                        }
-                    }
-                }
-
-                /**
-                 * Проверка данных анкеты (добавляем в доп.осмотр или нет)
-                 * Техосмотр:
-                 *  - если ПЛ то добавляем доп
-                 *
-                 * Медосмотр:
-                 *    - ID авто и номер ПЛ то добавляем доп
-                 */
-                $is_med_dop = $anketa['type_anketa'] === 'medic';
-                $is_tech_dop = $anketa['type_anketa'] === 'tech';
-
-                $pressure_systolic = 150;
-                $pressure_diastolic = 100;
-                $pulse_lower = PHP_INT_MIN;
-                $pulse_upper = PHP_INT_MAX;
-
-                if ($Driver) {
-                    $pressure_systolic = $Driver->getPressureSystolic();
-                    $pressure_diastolic = $Driver->getPressureDiastolic();
-                    $pulse_lower = $Driver->getPulseLower();
-                    $pulse_upper = $Driver->getPulseUpper();
-                }
-
-                /**
-                 * ПРОВЕРЯЕМ статус для поля "Заключение"
-                 */
-                $tonometer = explode('/', $anketa['tonometer']);
-                if ($is_dop) {
-                    $anketa['admitted'] = 'Допущен';
-                } else if ($proba_alko === 'Отрицательно' && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
-                    && $anketa['med_view'] === 'В норме' && $anketa['t_people'] < 38
-                    && $tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic
-                    && intval($anketa['pulse']) < $pulse_upper && intval($anketa['pulse']) > $pulse_lower) {
-                    $anketa['admitted'] = 'Допущен';
-                } else {
-                    $anketa['admitted'] = 'Не допущен';
-
-                    if (!($tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic)) {
-                        $Driver->end_of_ban = Carbon::parse($time)->addMinutes($Driver->getTimeOfPressureBan());
-                        $Driver->save();
-                    }
-                    if ($proba_alko === "Положительно") {
-                        $Driver->end_of_ban = Carbon::parse($time)->addMinutes($Driver->getTimeOfAlcoholBan());
-                        $Driver->save();
-                    }
-                }
-
-                if(!empty($d_id) || !empty($c_id) || !empty($anketa['number_list_road'])) {
-                    /**
-                     * <КОНТРОЛЬ-ДАТ>
-                     */
-                    $dateCheckModel = null;
-
-                    if($anketa['type_anketa'] === 'medic') {
-                        $dateCheckModel = $Driver;
-                        $dateCheck = DDates::where('item_model', 'Driver')->get();
-                    } else {
-                        $dateCheckModel = $Car;
-                        $dateCheck = DDates::where('item_model', 'Car')->get();
-                    }
-
-                    if($dateCheck && $dateCheckModel) {
-                        foreach($dateCheck as $dateCheckItem) {
-                            $fieldDateCheck = $dateCheckItem->field;
-
-                            if(isset($dateCheckModel[$fieldDateCheck])) {
-                                $fieldDateItemValue = $dateCheckModel[$fieldDateCheck];
-
-                                $dateAction = $dateCheckItem->action . ' ' . $dateCheckItem->days . ' days';
-
-                                $dateCheckWithAnketa = date('Y-m-d', strtotime($fieldDateItemValue . ' ' . $dateAction));
-                                $anketaDate = date('Y-m-d', strtotime($anketa['date']));
-
-                                if($dateCheckWithAnketa <= $anketaDate) {
-                                    $redDates[$fieldDateCheck] = [
-                                        'value' => $fieldDateItemValue,
-                                        'item_model' => $dateCheckItem->item_model,
-                                        'item_id' => $dateCheckModel->id,
-                                        'item_field' => $fieldDateCheck
-                                    ];
-                                }
-                            }
-                        }
-                    }
-                    /**
-                     * </КОНТРОЛЬ-ДАТ>
-                     */
-                }
-
-                /**
-                 * Проверка на дубликат из ТЗ
-                 *
-                 * Мы должны дать техническую возможность внесение осмотров любой даты (год назад, месяц назад.
-                 * При внесении осмотра, система должна смотреть, есть ли подобный.
-                 *
-                 * Например сегодня 13.02.21 в 09.00 до 10.00.
-                 */
-                $hourdiff = 1;
-                $anketaDublicate = [
-                    'id' => 0,
-                    'date' => ''
-                ];
-
-                if(isset($anketasMedic) && !$anketa['is_dop']) {
-                    $anketaMedic = $anketasMedic;
-
-                    $count = 0;
-
-                    foreach ($data_anketa as $aM) {
-                        $hourdiff_check = round((Carbon::parse($anketa['date'])->timestamp - Carbon::parse($aM['date'])->timestamp)/60, 1);
-
-                        if($hourdiff_check < 1 && $hourdiff_check >= 0) {
-                            $count++;
-                        }
-                    }
-
-                    if ($count > 1) {
-                        $hourdiff = $hourdiff_check;
-                        $anketaDublicate['date'] = $aM['date'];
-                    }
-
-                    foreach($anketaMedic as $aM) {
-                        if (!$aM->date || ($aM->is_dop && $aM->result_dop == null)) {
-                            continue;
-                        }
-
-                        $hourdiff_check = round((Carbon::parse($anketa['date'])->timestamp - Carbon::parse($aM->date)->timestamp)/60, 1);
-
-
-                        if($hourdiff_check < 1 && $hourdiff_check >= 0) {
-                            $anketaDublicate['id'] = $aM->id;
-                            $anketaDublicate['date'] = $aM->date;
-                            $hourdiff = $hourdiff_check;
-                        }
-                    }
-                } else if (isset($anketasTech)) {
-                    $anketaTech = $anketasTech;
-
-                    /**
-                     * Уволенный АВТО
-                     */
-                    if($Car) {
-                        if($Car->dismissed === 'Да') {
-                            $errorsAnketa[] = 'Автомобиль уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
-                        }
-                    }
-
-                    // Если нет водителя И есть Авто - то ставим компанию из Авто
-
-                    if(!isset($Driver->id) && $Car) {
-                        $Company_Car = Company::where('id', $Car->company_id)->first();
-
-                        if($Company_Car) {
-
-                            $anketa['company_id'] = $Company_Car->hash_id;
-                            $anketa['company_name'] = $Company_Car->name;
-
-                            if($Company_Car->dismissed === 'Да') {
-                                $errorsAnketa[] = 'Компания в черном списке. Необходимо связаться с руководителем!';
-                                continue;
-                            }
-                        } else {
-                            $errorsAnketa[] = 'У Автомобиля не найдена компания';
-                            $this->savePakForm($anketa, $errMsg);
-
-                            continue;
-                        }
-                    }
-
-                    if($anketaTech && !$anketa['is_dop']) {
-                        $count = 0;
-
-                        foreach ($data_anketa as $aT) {
-                            if ($aT['car_id'] != $anketa['car_id']) {
-                                continue;
-                            }
-
-                            $hourdiff_check = round((Carbon::parse($anketa['date'])->timestamp - Carbon::parse($aT['date'])->timestamp)/60, 1);
-
-                            if($hourdiff_check < 1 && $hourdiff_check >= 0) {
-                                $count++;
-                            }
-                        }
-
-                        if ($count > 1) {
-                            $hourdiff = $hourdiff_check;
-                            $anketaDublicate['date'] = $aT['date'];
-                        }
-
-                        foreach($anketaTech as $aT) {
-                            if (!$aT->date || ($aT->is_dop && $aT->result_dop == null)) {
-                                continue;
-                            }
-
-                            $hourdiff_check = round((Carbon::parse($anketa['date'])->timestamp - Carbon::parse($aT->date)->timestamp)/60, 1);
-
-                            if($hourdiff_check < 1 && $hourdiff_check >= 0) {
-                                $anketaDublicate['id'] = $aT->id;
-                                $anketaDublicate['date'] = $aT->date;
-                                $hourdiff = $hourdiff_check;
-                            }
-                        }
-                    }
-                }
-
-                if(($hourdiff < 1 && $hourdiff >= 0)) {
-                    if ($anketaDublicate['id'] != 0) {
-                        $errMsg = "Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])";
-                    } else {
-                        $errMsg = "Найден дубликат осмотра при добавлении (Дата: $anketaDublicate[date])";
-                    }
-
-                    $errorsAnketa[] = $errMsg;
-                    continue;
-                }
-
-                /**
-                 * Генерация номера ПЛ
-                 */
-                if(empty($anketa['number_list_road'])) {
-                    if($anketa['type_anketa'] === 'tech' && !$anketa['is_dop']) {
-                        // Генерируем номер ПЛ
-                        $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id)
-                            . '-' . date('d.m.Y', strtotime($anketa['date']));
-                    }
-                }
-
-                /**
-                 * Добавляем доп поля
-                 */
-                $anketa['user_id'] = $user->id;
-                $anketa['user_name'] = $user->name;
-
-                $anketa['user_eds'] = isset($anketa['user_eds']) ? $anketa['user_eds'] : $user->eds;
-
-                $anketa['pv_id'] = Point::where('id', $pv_id)->first();
-                $anketa['point_id'] = $pv_id;
-
-                // Проверка ПВ
-                if($anketa['pv_id'])
-                    $anketa['pv_id'] = $anketa['pv_id']->name;
-                else
-                    $anketa['pv_id'] = '';
-
-                // Проверка АВТО
-                if($Car) {
-                    $anketa['car_id'] = $Car->hash_id;
-                    $anketa['car_mark_model'] = $Car->mark_model;
-                    $anketa['car_gos_number'] = $Car->gos_number;
-                }
-
-                /**
-                 * Проверка дат при вводе БДД и Отчета
-                 */
-                if($Driver) {
-                    if($anketa['type_anketa'] === 'bdd') {
-                        $Driver->date_bdd = $anketa['date'];
-                    } else if ($anketa['type_anketa'] === 'report_cart') {
-                        $Driver->date_report_driver = $anketa['date'];
-                    }
-
-                    if($Driver->year_birthday) {
-                        if($Driver->year_birthday !== '' && $Driver->year_birthday !== '0000-00-00') {
-                            $anketa['driver_year_birthday'] = $Driver->year_birthday;
-                        }
-                    }
-
-                    $anketa['driver_gender'] = isset($Driver->gender) ? $Driver->gender : '';
-
-                    $Driver->save();
-                }
-
-                // Конвертация текущего времени Юзера
-                date_default_timezone_set('UTC');
-                $time = time();
-                $timezone = $user->timezone ? $user->timezone : 3;
-                $time += $timezone * 3600;
-                $time = date('Y-m-d H:i:s', $time);
-
-                $anketa['created_at'] = isset($anketa['created_at']) ? $anketa['created_at'] : $time;
-
-                $connected_hash = sha1(time() . rand(99,9999));
-
-
-
-                /**
-                 * Проверяем ПАК на наличие осмотра
-                 * Выставляем автоматический режим если осмотр пришел с ПАК
-                 */
-                if(isset($anketa['is_pak'])) {
-                    if($anketa['is_pak'] && $anketa['type_anketa'] === 'pak_queue') {
-                        $anketa['flag_pak'] = 'СДПО Р';
-                    } else {
-                        $anketa['flag_pak'] = 'СДПО А';
-                    }
-                }
-
-                if ($anketa['type_anketa'] === 'tech' && $is_dop) {
-                    $anketa['point_reys_control'] = 'Пройден';
-                }
-
-                /**
-                 * Создаем анкету
-                 */
-//                $createdAnketa = Anketa::create($anketa);
-//                array_push($createdAnketas, $createdAnketa->id);
-//                $anketaCreated = Anketa::find($createdAnketa->id);
-
-                /**
-                 * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
-                 */
-                $timezone = $user->timezone ?? 3;
-                $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($anketa['date'] ?? null);
-
-                if($diffDateCheck <= 60*12 && ($anketa['date'] ?? null)) {
-                    $anketa['realy'] = 'да';
-                } else {
-                    $anketa['realy'] = 'нет';
-                }
-
-                /**
-                 * ОТПРАВКА SMS
-                 */
-                if($anketa['admitted'] == 'Не допущен' && isset($Company)) {
-                    $phone_to_call = Settings::setting('sms_text_phone');
-
-                    if(isset($Driver)) {
-                        $sms->sms($Company->where_call, Settings::setting('sms_text_driver') . " $Driver->fio. $phone_to_call");
-                    } else if (isset($Car)) {
-                        $sms->sms($Company->where_call, Settings::setting('sms_text_car') . " $Car->gos_number. $phone_to_call");
-                    } else {
-                        $sms->sms($Company->where_call, Settings::setting('sms_text_default') . ' ' . new Anketa($anketa) . '.' . ' ' . $phone_to_call);
-                    }
-                }
-
-//                dd();
-                // ДОГОВОР СНЕПШОТ
-//                if($anketa['type_anketa'] == 'medic'){
-//                dd($Driver);
-//                    if($Driver){
-//                        $servicesToSync = [];
-//                        foreach ($Driver->contract->services as $service) {
-//                            $servicesToSync[$service['id']] = ['service_cost' => $service['price_unit']];
-//                        }
-//
-//                        $anketa['contract_id'] = $Driver->contract_id;
-//                    }
-////                }
-////                if($anketa['type_anketa'] == 'tech'){
-//                    if($Car){
-//                        $anketa['contract_id'] = $Car->contract_id;
-//                    }
-//                }
-
-                $ank = new Anketa();
-                $createdAnketas[] = Arr::only($anketa, $ank->getFillable());
-            }
-
-            Anketa::insert($createdAnketas);
-            $createdAnketas = Anketa::with(['services_snapshot'])->where('type_anketa', $data['type_anketa'])
-                ->limit(count($createdAnketas))->orderBy('id', 'desc')->get();
-
-            if(isset($servicesToSync)){
-//                dd($createdAnketas->toArray());
-                foreach ($createdAnketas as $createdAnketa){
-                    $createdAnketa->services_snapshot()->sync($servicesToSync);
-                }
-            }
-
+            DB::commit();
+        } catch (Throwable $exception) {
             $responseData = [
-                'createdId' => $createdAnketas->pluck('id')->toArray(),
-                'errors' => array_unique($errorsAnketa),
-                'type' => $data['type_anketa']
+                'errors' => [$exception->getMessage()],
             ];
 
-            if($isApiRoute) {
-                $responseData['ankets'] = $createdAnketas;
-                return response()->json($responseData);
-            }
-
-            if(count($redDates) > 0) {
-                $responseData['redDates'] = $redDates;
-            }
-
-            if($is_dop) {
-                $responseData['is_dop'] = 1;
-            }
-
-            return redirect()->route('forms', $responseData);
+            DB::rollBack();
         }
+
+        $responseData['type'] = $formType;
+        $responseData['is_dop'] = $responseData['is_dop'] ?? $request->input('is_dop', 0);
+
+        return redirect()->route('forms', $responseData);
     }
 
     /**
-     * API ROUTES
+     * @deprecated
+     * API ROUTE FOR SDPO
      */
-    public function ApiAddForm(Request $request)
+    public function ApiAddForm(Request $request, CreateSdpoFormHandler $handler): JsonResponse
     {
-        $addForm = $this->AddFormTemp($request, true);
+        try {
+            DB::beginTransaction();
 
-        return response()->json($addForm);
-    }
+            $data = $request->all();
 
-    // Временный метод для фикса СДПО
-    public function AddFormTemp(Request $request, $isApiRoute = false)
-    {
-        $user = ($isApiRoute) ? $request->user('api') : Auth::user();
+            if ($request->hasFile('photos')) {
+                $photos = $request->file('photos');
+                $photosPaths = [];
 
-        $sms = new SmsController();
+                foreach($photos as $photo) {
+                    $photosPaths[] = Storage::disk('public')
+                        ->putFile('ankets', $photo);
+                }
 
-        $data = $request->all();
-        $d_id = $request->get('driver_id', 0); // Driver
-        $pv_id = $request->get('pv_id', 0);
-
-        function mt_rand_float($min, $max, $countZero = '0') {
-            $countZero = +('1'.$countZero);
-            $min = floor($min*$countZero);
-            $max = floor($max*$countZero);
-            $rand = mt_rand($min, $max) / $countZero;
-            return $rand;
-        }
-
-        // TODO: добавить время действия
-        session(['anketa_pv_id' => [
-            'value' => $pv_id,
-            'expired' => date('d.m')
-        ]]);
-
-        // Проверяем дефолтные значения
-        $defaultDatas = [
-            'termometr' => '36,3 - 36,9',
-            'tonometer' => rand(118,129) .'/'. rand(70,90),
-            't_people' => mt_rand_float(35.9,36.7),
-            'date' => date('Y-m-d H:i:s')
-        ];
-
-        $test_narko = isset($data['test_narko']) ? $data['test_narko'] : 'Отрицательно';
-        $proba_alko = isset($data['proba_alko']) ? $data['proba_alko'] : 'Отрицательно';
-        $is_dop = isset($data['is_dop']) ? ($data['is_dop'] === '1') : 0;
-
-        // Выставляем оптимальные параметры
-        unset($data['_token']);
-
-        // ЕСЛИ ЗАПРОС С API/ПАК
-        if(isset($data['user_id']) && $isApiRoute) {
-            $user = User::find($data['user_id']);
-        }
-
-        $data['user_id'] = $user->id;
-
-        // Фотографии с ПАК
-        if($request->hasFile('photos')) {
-            // Парсим файлы
-            $photos = $request->file('photos');
-            $photos_path = '';
-
-            foreach($photos as $photoIndex => $photo) {
-                $file_path = Storage::disk('public')->putFile('ankets', $photo);
-
-                $photos_path .= ($photoIndex == 0 ? '' : ',') . $file_path;
+                $data['photos'] = implode(',', $photosPaths);
             }
 
-            $data['photos'] = $photos_path;
-        }
-
-        // Анкета
-        if(isset($data['anketa'])) {
-            // Клонируем анкету
-            $createdAnketas = [];
-            $createdAnketasDataResponseApi = [];
-            $data_anketa = $data['anketa'];
-            $errorsAnketa = array();
-
-            foreach($data_anketa as $anketa) {
-                // Выделение красных дат
-                $redDates = [];
-
-                // ID автомобиля
-                $c_id = isset($anketa['car_id']) ? $anketa['car_id'] :
-                    (isset($data['car_id']) ? $data['car_id'] : 0);
-
-                $Car = Car::where('hash_id', $c_id)->first();
-                $Driver = Driver::where('hash_id', $d_id)->first();
-
-                // Тонометр
-                $tonometer = isset($anketa['tonometer']) ? $anketa['tonometer'] : $defaultDatas['tonometer'];
-                $anketa['pulse'] = $anketa['pulse'] ?? mt_rand(60,80);
-
-                if(!isset($anketa['med_view'])) {
-                    $anketa['med_view'] = 'В норме';
-                }
-
-                /**
-                 * Парсим данные в анкете, удаляем главную анкету и ставим актуальную
-                 */
-                unset($data['anketa']);
-                foreach($data as $dk => $dv) {
-                    $dv_item = $dv;
-
-                    if(empty($dv_item) && isset($defaultDatas[$dk])) {
-                        if($dk === 'date' && $is_dop) {
-
-                        } else {
-                            $dv_item = $defaultDatas[$dk];
-                        }
-                    }
-
-                    $anketa[$dk] = $dv_item;
-                }
-
-                /**
-                 * Проверяем дефолтные значения
-                 */
-                foreach($defaultDatas as $dfKey => $dfData) {
-                    if(empty($anketa[$dfKey])) {
-                        if($is_dop && $dfKey === 'date') {
-
-                        } else {
-                            $anketa[$dfKey] = $dfData;
-                        }
-                    }
-                }
-
-                /**
-                 * Компания
-                 */
-                if(isset($anketa['company_id'])) {
-                    $CompanyDop = Company::where('hash_id', $anketa['company_id'])->first();
-
-                    if($CompanyDop) {
-                        $anketa['company_id'] = $CompanyDop->hash_id;
-                        $anketa['company_name'] = $CompanyDop->name;
-                    }
-                }
-
-                if (isset($anketa['driver_id'])) {
-                    $DriverDop = Driver::where('hash_id', $anketa['driver_id'])->first();
-
-                    if ($DriverDop) {
-                        $anketa['driver_id'] = $DriverDop->hash_id;
-                        $anketa['driver_fio'] = $DriverDop->fio;
-                    }
-                }
-
-                /**
-                 * Проверка водителя по: тесту наркотиков, возрасту
-                 */
-                if($d_id || isset($Driver)) {
-                    if(!Driver::DriverChecker($d_id, $tonometer, $test_narko, $proba_alko) && !in_array($anketa['type_anketa'], ['bdd', 'pechat_pl', 'vid_pl', 'report_cart'])) {
-
-                        if($anketa['type_anketa'] !== 'tech') {
-                            $errMsg = 'Водитель не найден';
-
-                            $errorDriverFind = [
-                                'errors' => [$errMsg]
-                            ];
-
-                            $this->savePakForm($anketa, $errMsg);
-
-                            if($isApiRoute) {
-                                return response()->json($errorDriverFind);
-                            }
-
-                            return redirect()->route('forms', $errorDriverFind);
-                        } else {
-                            $anketa['driver_id'] = 0;
-                        }
-                    } else {
-                        $anketa['driver_fio'] = $Driver->fio;
-                        $anketa['driver_group_risk'] = $Driver->group_risk;
-
-                        if($Driver->dismissed === 'Да') {
-                            $errMsg = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
-
-                            array_push($errorsAnketa, $errMsg);
-//                            continue;
-                        }
-
-                        /**
-                         * Добавляем Компанию
-                         */
-                        if($Driver->company_id) {
-                            $Company = Company::where('id', $Driver->company_id)->first();
-
-                            if($Company) {
-
-                                $anketa['company_id'] = $Company->hash_id;
-                                $anketa['company_name'] = $Company->name;
-
-                                if($Company->dismissed === 'Да') {
-                                    $errMsg = 'Компания в черном списке. Необходимо связаться с руководителем!';
-
-                                    array_push($errorsAnketa, $errMsg);
-
-                                    continue;
-                                }
-
-                            } else {
-                                $errMsg = "У Водителя не верно указано ID компании";
-
-                                array_push($errorsAnketa, $errMsg);
-
-                                $this->savePakForm($anketa, $errMsg);
-
-                                continue;
-                            }
-
-                        } else {
-                            $errMsg = "У Водителя не найдена компания";
-
-                            array_push($errorsAnketa, $errMsg);
-
-                            $this->savePakForm($anketa, $errMsg);
-
-                            continue;
-                        }
-                    }
-                }
-
-                /**
-                 * Проверка данных анкеты (добавляем в доп.осмотр или нет)
-                 * Техосмотр:
-                 *  - если ПЛ то добавляем доп
-                 *
-                 * Медосмотр:
-                 *    - ID авто и номер ПЛ то добавляем доп
-                 */
-                $is_med_dop = $anketa['type_anketa'] === 'medic';
-                $is_tech_dop = $anketa['type_anketa'] === 'tech';
-
-                /**
-                 * ПРОВЕРЯЕМ статус для поля "Заключение"
-                 */
-                $tonometer = explode('/', $anketa['tonometer']);
-                if($proba_alko === 'Отрицательно'
-                    && ($test_narko === 'Отрицательно' || $test_narko === 'Не проводился')
-                    && doubleval($anketa['t_people']) < 38
-                    && intval($tonometer[0]) < $Driver->getPressureSystolic()
-                    && intval($tonometer[1]) < $Driver->getPressureDiastolic()
-                    && intval($anketa['pulse']) < $Driver->getPulseUpper() && intval($anketa['pulse']) > $Driver->getPulseLower()) {
-                    $anketa['med_view'] = 'В норме';
-                    $anketa['admitted'] = 'Допущен';
-
-                    //ПРОВЕРЯЕМ СТАТУС для поля "Заключение" - от ПАК
-                    if (isset($anketa['sleep_status']) && $anketa['sleep_status'] !== 'Да') {
-                        $anketa['admitted'] = 'Не допущен';
-                        $anketa['med_view'] = 'Отстранение';
-                    }
-                    if (isset($anketa['people_status']) && $anketa['people_status'] !== 'Да') {
-                        $anketa['admitted'] = 'Не допущен';
-                        $anketa['med_view'] = 'Отстранение';
-                    }
-                    if (isset($anketa['alcometer_result']) && $anketa['alcometer_result'] > 0) {
-                        $anketa['admitted'] = 'Не допущен';
-                        $anketa['med_view'] = 'Отстранение';
-                    }
-                    if ($Driver->end_of_ban > Carbon::now()){
-                        $anketa['admitted'] = 'Не допущен';
-                        $anketa['med_view'] = 'Отстранение';
-                    }
-                } else {
-                    $anketa['med_view'] = 'Отстранение';
-                    $anketa['admitted'] = 'Не допущен';
-
-                    if(!(intval($tonometer[0]) < $Driver->getPressureSystolic()
-                        && intval($tonometer[1]) < $Driver->getPressureDiastolic())) {
-                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfPressureBan());
-                        $Driver->save();
-                    }
-
-                    if($proba_alko === "Положительно") {
-                        $Driver->end_of_ban = Carbon::now()->addMinutes($Driver->getTimeOfAlcoholBan());
-                        $Driver->save();
-                    }
-                }
-
-
-                if(!empty($d_id) || !empty($c_id) || !empty($anketa['number_list_road'])) {
-                    /**
-                     * <КОНТРОЛЬ-ДАТ>
-                     */
-                    $dateCheckModel = null;
-
-                    if($anketa['type_anketa'] === 'medic') {
-                        $dateCheckModel = $Driver;
-                        $dateCheck = DDates::where('item_model', 'Driver')->get();
-                    } else {
-                        $dateCheckModel = $Car;
-                        $dateCheck = DDates::where('item_model', 'Car')->get();
-                    }
-
-                    if($dateCheck && $dateCheckModel) {
-                        foreach($dateCheck as $dateCheckItem) {
-                            $fieldDateCheck = $dateCheckItem->field;
-
-                            if(isset($dateCheckModel[$fieldDateCheck])) {
-                                $fieldDateItemValue = $dateCheckModel[$fieldDateCheck];
-
-                                $dateAction = $dateCheckItem->action . ' ' . $dateCheckItem->days . ' days';
-
-                                $dateCheckWithAnketa = date('Y-m-d', strtotime($fieldDateItemValue . ' ' . $dateAction));
-                                $anketaDate = date('Y-m-d', strtotime($anketa['date']));
-
-                                if($dateCheckWithAnketa <= $anketaDate) {
-                                    $redDates[$fieldDateCheck] = [
-                                        'value' => $fieldDateItemValue,
-                                        'item_model' => $dateCheckItem->item_model,
-                                        'item_id' => $dateCheckModel->id,
-                                        'item_field' => $fieldDateCheck
-                                    ];
-                                }
-                            }
-                        }
-                    }
-                    /**
-                     * </КОНТРОЛЬ-ДАТ>
-                     */
-                }
-
-                /**
-                 * Проверка на дубликат из ТЗ
-                 *
-                 * Мы должны дать техническую возможность внесение осмотров любой даты (год назад, месяц назад.
-                 * При внесении осмотра, система должна смотреть, есть ли подобный.
-                 *
-                 * Например сегодня 13.02.21 в 09.00 до 10.00.
-                 */
-                $hourdiff = 1;
-                $anketaDublicate = [
-                    'id' => 0,
-                    'date' => ''
-                ];
-
-                if ($anketa['type_anketa'] === 'medic' || $anketa['type_anketa'] === 'pak') {
-                    $anketaMedic = Anketa::where('driver_id', $d_id)
-                        ->where('type_anketa', 'medic')
-                        ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '')
-                        ->where('in_cart', 0)
-                        ->orderBy('date', 'desc')
-                        ->get();
-
-                    if($anketaMedic) {
-                        foreach($anketaMedic as $aM) {
-                            if (!$aM->date || ($aM->is_dop && $aM->result_dop == null)) {
-                                continue;
-                            }
-
-                            $hourdiff_check = round((strtotime($anketa['date']) - Carbon::parse($aM->date)->timestamp)/60, 1);
-
-                            if($hourdiff_check < 1 && $hourdiff_check >= 0) {
-                                $anketaDublicate['id'] = $aM->id;
-                                $anketaDublicate['date'] = $aM->date;
-                                $hourdiff = $hourdiff_check;
-                            }
-                        }
-                    }
-                } else if ($anketa['type_anketa'] === 'tech' || $anketa['type_anketa'] === 'vid_pl') {
-                    $anketaTech = Anketa::where('car_id', $c_id)
-                        ->where('type_anketa', 'tech')
-                        ->where('type_view', isset($anketa['type_view']) ? $anketa['type_view'] : '')
-                        ->where('in_cart', 0)
-                        ->orderBy('date', 'desc')
-                        ->get();
-
-
-                    /**
-                     * Уволенный АВТО
-                     */
-                    if($Car) {
-                        if($Car->dismissed === 'Да') {
-                            $errMsg = 'Автомобиль уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
-
-                            array_push($errorsAnketa, $errMsg);
-                        }
-                    }
-
-                    // Если нет водителя И есть Авто - то ставим компанию из Авто
-
-                    if(!isset($Driver->id) && $Car) {
-                        $Company_Car = Company::where('id', $Car->company_id)->first();
-
-                        if($Company_Car) {
-
-                            $anketa['company_id'] = $Company_Car->hash_id;
-                            $anketa['company_name'] = $Company_Car->name;
-
-                            if($Company_Car->dismissed === 'Да') {
-                                $errMsg = 'Компания в черном списке. Необходимо связаться с руководителем!';
-
-                                array_push($errorsAnketa, $errMsg);
-
-                                continue;
-                            }
-                        } else {
-                            $errMsg = "У Автомобиля не найдена компания";
-
-                            array_push($errorsAnketa, $errMsg);
-
-                            $this->savePakForm($anketa, $errMsg);
-
-                            continue;
-                        }
-                    }
-
-                    if($anketaTech && !$anketa['is_dop']) {
-                        foreach($anketaTech as $aT) {
-                            if (!$aT->date || ($aT->is_dop && $aT->result_dop == null)) {
-                                continue;
-                            }
-
-                            $hourdiff_check = round((strtotime($anketa['date']) - Carbon::parse($aT->date)->timestamp)/60, 1);
-
-                            if($hourdiff_check < 1 && $hourdiff_check >= 0) {
-                                $anketaDublicate['id'] = $aT->id;
-                                $anketaDublicate['date'] = $aT->date;
-                                $hourdiff = $hourdiff_check;
-                            }
-                        }
-                    }
-                }
-
-                if(($hourdiff < 1 && $hourdiff >= 0)) {
-                    $errMsg = "Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])";
-
-                    array_push($errorsAnketa, $errMsg);
-                    continue;
-                }
-
-                /**
-                 * Генерация номера ПЛ
-                 */
-                if(empty($anketa['number_list_road'])) {
-                    if($anketa['type_anketa'] !== 'medic') {
-                        // Генерируем номер ПЛ
-
-                        $anketa['number_list_road'] = ((isset($d_id) && $anketa['type_anketa'] === 'medic') ? $d_id : $c_id)
-                            . '-' . date('d.m.Y', strtotime($anketa['date']));
-                    }
-                }
-
-                /**
-                 * Добавляем доп поля
-                 */
-                $anketa['user_id'] = $user->id;
-                $anketa['user_name'] = $user->name;
-
-
-                $anketa['user_eds'] = isset($anketa['user_eds']) ? $anketa['user_eds'] : $user->eds;
-
-                $anketa['pv_id'] = Point::where('id', $pv_id)->first();
-                $anketa['terminal_id'] = $request->user('api')->id;
-
-                // Проверка ПВ
-                if($anketa['pv_id'])
-                    $anketa['pv_id'] = $anketa['pv_id']->name;
-                else
-                    $anketa['pv_id'] = '';
-
-                // Проверка АВТО
-                if($Car) {
-                    $anketa['car_id'] = $Car->hash_id;
-                    $anketa['car_mark_model'] = $Car->mark_model;
-                    $anketa['car_gos_number'] = $Car->gos_number;
-                }
-
-                // Конвертация текущего времени Юзера
-                date_default_timezone_set('UTC');
-                $time = time();
-                $timezone = $user->timezone ? $user->timezone : 3;
-                $time += $timezone * 3600;
-                $time = date('Y-m-d H:i:s', $time);
-
-                $anketa['created_at'] = isset($anketa['created_at']) ? $anketa['created_at'] : $time;
-
-                /**
-                 * Проверка дат при вводе БДД и Отчета
-                 */
-                if($Driver) {
-                    if($anketa['type_anketa'] === 'bdd') {
-                        $Driver->date_bdd = $anketa['date'];
-                    } else if ($anketa['type_anketa'] === 'report_cart') {
-                        $Driver->date_report_driver = $anketa['date'];
-                    }
-
-                    if($Driver->year_birthday) {
-                        if($Driver->year_birthday !== '' && $Driver->year_birthday !== '0000-00-00') {
-                            $anketa['driver_year_birthday'] = $Driver->year_birthday;
-                        }
-                    }
-
-                    $anketa['driver_gender'] = isset($Driver->gender) ? $Driver->gender : '';
-
-                    if ($isApiRoute && $anketa['type_anketa'] === 'medic') {
-                        $Driver->date_prmo = $anketa['created_at'];
-                    }
-
-                    $Driver->save();
-                }
-
-                $connected_hash = sha1(time() . rand(99,9999));
-
-                /**
-                 * Проверяем ПАК на наличие осмотра
-                 * Выставляем автоматический режим если осмотр пришел с ПАК
-                 */
-                if(isset($anketa['is_pak'])) {
-                    if($anketa['is_pak'] && $anketa['type_anketa'] === 'pak_queue') {
-                        $anketa['flag_pak'] = 'СДПО Р';
-                    } else {
-                        $anketa['flag_pak'] = 'СДПО А';
-                    }
-                }
-
-                /**
-                 * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
-                 */
-                $timezone = $user->timezone ?? 3;
-                $diffDateCheck = Carbon::now()->addHours($timezone)->diffInMinutes($anketa['date'] ?? null);
-
-                if($diffDateCheck <= 60 * 12 && $anketa['date'] ?? null) {
-                    $anketa['realy'] = 'да';
-                } else {
-                    $anketa['realy'] = 'нет';
-                }
-
-                if ($anketa['type_anketa'] === 'bdd') {
-                    $bddUser = User::with(['roles'])->whereHas('roles', function (Builder $queryBuilder) {
-                        return $queryBuilder->where('id', 7);
-                    })->get()->random();
-
-                    if ($Driver) {
-                        $point = Company::find($Driver->company_id)->point;
-
-                        if ($point) {
-                            $anketa['pv_id'] = $point->name;
-                            $anketa['point_id'] = $point->id;
-                        }
-                    }
-
-                    $anketa['user_id'] = $bddUser->id;
-                    $anketa['user_name'] = $bddUser->name;
-                    $anketa['user_eds'] = $bddUser->eds;
-                }
-
-                /**
-                 * Создаем анкету
-                 */
-                $createdAnketa = Anketa::create($anketa);
-                array_push($createdAnketas, $createdAnketa->id);
-
-
-                /**
-                 * ОТПРАВКА SMS
-                 */
-                if($anketa['admitted'] == 'Не допущен' && isset($Company)) {
-                    $phone_to_call = Settings::setting('sms_text_phone');
-
-                    if(isset($Driver)) {
-                        $sms->sms($Company->where_call, Settings::setting('sms_text_driver') . " $Driver->fio. $phone_to_call");
-                    } else if (isset($Car)) {
-                        $sms->sms($Company->where_call, Settings::setting('sms_text_car') . " $Car->gos_number. $phone_to_call");
-                    } else {
-                        $sms->sms($Company->where_call, Settings::setting('sms_text_default') . " $createdAnketa. $phone_to_call");
-                    }
-                }
-
-                if($isApiRoute) {
-                    array_push($createdAnketasDataResponseApi, $createdAnketa);
-                }
-            }
+            $responseData = $handler->handle($data, $request->user('api'));
+
+            DB::commit();
+
+            Log::channel('deprecated-api')->info(json_encode(
+                [
+                    'request' => $request->all(),
+                    'ip' => $request->getClientIp() ?? null,
+                    'response' => $responseData
+                ]
+            ));
+
+            return response()->json(response()->json($responseData));
+        } catch (Throwable $exception) {
+            DB::rollBack();
 
             $responseData = [
-                'createdId' => $createdAnketas,
-                'errors' => $errorsAnketa,
-                'type' => $data['type_anketa']
+                'errors' => [$exception->getMessage()],
             ];
 
-            if($isApiRoute) {
-                $responseData['ankets'] = $createdAnketasDataResponseApi;
-                return response()->json($responseData);
-            }
+            Log::channel('deprecated-api')->info(json_encode(
+                [
+                    'request' => $request->all(),
+                    'ip' => $request->getClientIp() ?? null,
+                    'response' => $responseData
+                ]
+            ));
 
-            if(count($redDates) > 0) {
-                $responseData['redDates'] = $redDates;
-            }
-
-            if($is_dop) {
-                $responseData['is_dop'] = 1;
-            }
-
-            return redirect()->route('forms', $responseData);
+            return response()->json(response()->json($responseData), 500);
         }
     }
 

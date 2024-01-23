@@ -28,7 +28,70 @@ function toggleAnketaCloneButton(state) {
     return button.show();
 }
 
+function initDatePicker(selector) {
+    selector.flatpickr({
+        mode: "multiple",
+        dateFormat: "Y-m-d",
+        locale: {
+            weekdays: {
+                shorthand: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+                longhand: [
+                    "Воскресенье",
+                    "Понедельник",
+                    "Вторник",
+                    "Среда",
+                    "Четверг",
+                    "Пятница",
+                    "Суббота",
+                ],
+            },
+            months: {
+                shorthand: [
+                    "Янв",
+                    "Фев",
+                    "Март",
+                    "Апр",
+                    "Май",
+                    "Июнь",
+                    "Июль",
+                    "Авг",
+                    "Сен",
+                    "Окт",
+                    "Ноя",
+                    "Дек",
+                ],
+                longhand: [
+                    "Январь",
+                    "Февраль",
+                    "Март",
+                    "Апрель",
+                    "Май",
+                    "Июнь",
+                    "Июль",
+                    "Август",
+                    "Сентябрь",
+                    "Октябрь",
+                    "Ноябрь",
+                    "Декабрь",
+                ],
+            },
+            firstDayOfWeek: 1,
+            rangeSeparator: " — ",
+            weekAbbreviation: "Нед.",
+            scrollTitle: "Прокрутите для увеличения",
+            toggleTitle: "Нажмите для переключения",
+            amPM: ["ДП", "ПП"],
+            yearAriaLabel: "Год",
+            time_24hr: true,
+        },
+    });
+}
+
 $(document).ready(function () {
+    const datesSelector = $("input[name='anketa[0][dates]']")
+    if (datesSelector[0]) {
+        initDatePicker(datesSelector[0])
+    }
 
     $('div.form-group').each(function (i, el) {
         let requiredInput = $(el).has(':input[required]');
@@ -924,6 +987,11 @@ $(document).ready(function () {
         clone.find('input,select').each(function () {
             this.name = this.name.replace('anketa['+(count_anketa-1)+']', 'anketa['+count_anketa+']')
         })
+
+        const datePickerElement = clone.find(".date-range");
+        if (datePickerElement[0]) {
+            initDatePicker(clone.find(".date-range")[0])
+        }
 
         count_anketa++
 
