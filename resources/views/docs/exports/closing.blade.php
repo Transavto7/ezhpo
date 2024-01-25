@@ -45,10 +45,10 @@
             <td class="head" colspan="2">Пункт осмотра</td>
         </tr>
         <tr>
-            <td>
+            <td rowspan="2">
                 {{ $date }}
             </td>
-            <td>
+            <td rowspan="2">
                 {{ $time }}
             </td>
 
@@ -56,8 +56,6 @@
             <td class="head">Адрес</td>
         </tr>
         <tr>
-            <td></td>
-            <td></td>
             <td>
                 {{ $town }}
             </td>
@@ -82,57 +80,53 @@
             <td class="head">Должность</td>
         </tr>
         <tr>
-            <td colspan="3">{{ $company_id }}</td>
+            <td colspan="3">{{ $company_name }}</td>
+            <td>{{ $post }}</td>
+        </tr>
+        <tr>
+            <td class="head">Жалобы</td>
+            <td class="head">Артериальное давление</td>
+            <td class="head">Пульс</td>
+            <td class="head">Температура</td>
+        </tr>
+        <tr>
             <td>
-                {{ $post }}
+                Результат осмотра
             </td>
-        </tr>
-        <tr>
-            <td class="head">Результат осмотра</td>
-            <td colspan="3">
-                {{ $result }}
+            <td>
+                {{ $tonometer }}
             </td>
-        </tr>
-        <tr>
-            <td class="head" colspan="4">Контроль трезвости</td>
+            <td>
+                {{ $pulse }}
+            </td>
+            <td>
+                {{ $t_people }}
+            </td>
         </tr>
         <tr>
             <td>Проба на алкоголь</td>
             <td colspan="3">
-                {{ $alco }}
+                {{ $alko }}
             </td>
         </tr>
         <tr>
-            <td>Проба на наркотические средства и психотропные вещества</td>
-            <td colspan="3">
-                {{ $drugs }}
-            </td>
-        </tr>
-        <tr>
-            <td>Заключение</td>
+            <td>Медицинское заключение</td>
             <td colspan="3">
                 {{ $closing }}
             </td>
         </tr>
         <tr>
-            <td>Примечание</td>
+            <td>Рекомендации</td>
             <td colspan="3">
-                {{ $note }}
+                {{ $recommendations }}
             </td>
         </tr>
         <tr>
-            <td>Сопроводительные документы</td>
+            <td>
+                ФИО медицинского работника
+            </td>
             <td colspan="3">
-                @if ($docs == 1)
-                    Выдана справка для обращения к врачу в медицинскую организацию для решения вопроса о
-                    наличии у работника признаков временной нетрудоспособности
-                @elseif ($docs == 2)
-                    Составлен протокол контроля трезвости
-                @elseif ($docs == 3)
-                    На основании клинических признаков опьянения направлен на медицинского освидетельствование
-                @else
-                    Отсутствуют
-                @endif
+                {{ $user_name }}
             </td>
         </tr>
         <tr>
@@ -140,6 +134,11 @@
             <td colspan="3">{{ $user_eds }}</td>
         </tr>
     </table>
+    <div class="mt-3">
+        <p class="mx-5">
+            {{ $comment ?? null }}
+        </p>
+    </div>
 </div>
 </body>
 </html>

@@ -107,6 +107,8 @@ class Anketa extends Model
             'operator_id',
             'user_id',
             'user_eds',
+            'user_validity_eds_start',
+            'user_validity_eds_end',
             'user_name',
 
             'company_id',
