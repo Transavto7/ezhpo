@@ -106,7 +106,7 @@ class DocDataService
             $closingRows[] = $descriptionRow;
         }
 
-        $data['closing'] = implode($closingRows, "\n");
+        $data['closing'] = implode("\n", $closingRows);
 
         return $data;
     }
@@ -127,7 +127,7 @@ class DocDataService
             ];
         }
 
-        $data['comment'] = implode($commentRows, "\n");
+        $data['comment'] = implode("\n", $commentRows);
         $data['comment_rows'] = count($commentRows);
 
         return $data;
@@ -153,7 +153,7 @@ class DocDataService
             $userEdsRows[] = $userEdsPeriodRow;
         }
 
-        $data['user_eds'] = implode($userEdsRows, "\n");
+        $data['user_eds'] = implode("\n", $userEdsRows);
 
         return $data;
     }
