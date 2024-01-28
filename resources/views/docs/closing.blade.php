@@ -69,7 +69,7 @@
                 </tr>
                 <tr>
                     <td>
-                        Результат осмотра
+                        <textarea rows="1" class="doc-input" name="status">{{ $status }}</textarea>
                     </td>
                     <td>
                         <textarea rows="1" class="doc-input" name="tonometer">{{ $tonometer }}</textarea>

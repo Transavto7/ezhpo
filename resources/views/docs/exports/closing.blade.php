@@ -91,7 +91,7 @@
         </tr>
         <tr>
             <td>
-                Результат осмотра
+                {{ $status }}
             </td>
             <td>
                 {{ $tonometer }}

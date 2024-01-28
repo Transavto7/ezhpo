@@ -23,7 +23,8 @@ class DocDataService
             'date' => '',
             'town' => '',
             'drugs' => false,
-            'alko' => false
+            'alko' => false,
+            'status' => 'Нет'
         ];
 
         foreach ($form->fillable as $field) {
@@ -39,6 +40,10 @@ class DocDataService
 
         if ($form->proba_alko === 'Положительно') {
             $data['alko'] = true;
+        }
+
+        if ($form->med_view === 'Отстранение') {
+            $data['status'] = 'Есть жалобы';
         }
 
         $data['user_post'] = ProfileController::getUserRole(true, $form->user_id);
