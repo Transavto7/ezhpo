@@ -56,27 +56,27 @@ class AnketsController extends Controller
 
     public function MassTrash(Request $request, TrashFormHandler $handler)
     {
-        DB::beginTransaction();
         $ids = $request->input('ids');
         $action = $request->input('action');
+        $notDeletedAnkets = [];
 
-        try {
-            foreach ($ids as $id) {
-                $anketa = Anketa::find($id);
+        foreach ($ids as $id) {
+            try {
+                $anketa = Anketa::findOrFail($id);
 
                 if ($anketa) {
                     $handler->handle($anketa, $action);
                 }
+            } catch (Throwable $exception) {
+                $notDeletedAnkets[] = $id;
             }
-
-            $response = response('Анкеты успешно удалены', 200);
-            DB::commit();
-        } catch (Throwable $exception) {
-            $response = response('Ошибка при удалении анкет', 403);
-            DB::rollBack();
         }
 
-        return $response;
+        if (count($notDeletedAnkets)) {
+            session()->flash('not_deleted_ankets', $notDeletedAnkets);
+        }
+
+        return response();
     }
 
     public function Get (Request $request)

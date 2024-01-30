@@ -12,6 +12,27 @@
             width: 20px;
             height: 20px;
         }
+
+        .hv-mass-deletion-alert-error {
+            font-size: 12px;
+        }
+
+        .hv-mass-deletion-alert-error code {
+            font-size: 13px;
+            border-radius: 3px;
+            background-color: #f4b2b0;
+            padding: .21rem .4rem;
+
+        }
+
+        #hv-alert-error-close {
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 @endsection
 
@@ -119,7 +140,7 @@
     </script>
 
     <script type="text/javascript">
-        const SELECTED_ANKETS_ITEM = ('{{ $type_ankets }}' ?? 'default') + 'SelectedAnkets'
+        const SELECTED_ANKETS_ITEM = 'selectedAnkets'
         const anketsApi = {
             massTrash: '{{ route('forms.mass-trash') }}'
         }
@@ -218,8 +239,8 @@
         }
 
         $(document).ready(function () {
+            clearAnketsStorage()
             updateAnketsControl()
-            updateAnketsCheckbox()
 
             $('.hv-checkbox-mass-deletion').click(function () {
                 const id = $(this).attr('data-id')
@@ -251,22 +272,24 @@
                             ids: anketsStorage.items
                         }
                     })
-                    .then((response) => {
+                    .then(() => {
                         clearAnketsStorage()
                         window.location.reload()
                     })
-                    .catch((error) => {
-
-                    })
+                    .catch(() => {})
             })
 
             $('.hv-btn-trash').click(function (e) {
                 e.stopPropagation()
                 const id = $(this).attr('data-id')
 
-                // todo: непонятно, что произойдет, если при удалении записи будет ошибка
                 removeAnketaFromStorage(id)
                 updateAnketsControl()
+            })
+
+            $('#hv-alert-error-close').click(function () {
+                $('#hv-alert-error').addClass('d-none')
+                $('#hv-alert-error').removeClass('d-flex')
             })
         })
     </script>
@@ -361,7 +384,7 @@ $permissionToExportPrikazPL = (
     $type_ankets == 'tech' && user()->access('tech_export_prikaz_pl')
 );
 
-
+$notDeletedItems = session('not_deleted_ankets');
 @endphp
 
 
@@ -477,10 +500,30 @@ $permissionToExportPrikazPL = (
                         <div class="alert alert-danger" role="alert">{{ session()->get('error') }}</div>
                     @endif
 
-                    <div id="selected-ankets-control" class="d-none align-items-center mt-4 mb-2">
-                        <button id="selected-ankets-control-btn-delete" class="btn btn-danger btn-sm"></button>
-                        <button id="selected-ankets-control-btn-unset" class="btn btn-success btn-sm ml-2">Снять выделение</button>
-                    </div>
+                    @if(count($ankets) > 0 && $permissionToView && $permissionToDelete)
+                        <div id="selected-ankets-control" class="d-none align-items-center mt-4 mb-2">
+                            <button id="selected-ankets-control-btn-delete" class="btn btn-danger btn-sm"></button>
+                            <button id="selected-ankets-control-btn-unset" class="btn btn-success btn-sm ml-2">Снять выделение</button>
+                        </div>
+                    @endif
+
+                    @if($notDeletedItems)
+                        <div id="hv-alert-error" class="alert alert-danger hv-mass-deletion-alert-error d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center" style="gap: 10px;">
+                                <div>Не удалось удалить анкеты с ID:</div>
+                                <div class="d-flex align-items-center flex-wrap" style="gap: 5px;">
+                                    @foreach($notDeletedItems as $item)
+                                        <code>{{ $item }}</code>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div>
+                                <div id="hv-alert-error-close">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                    @endisset
 
                     <div class="table-responsive">
                         @if((count($ankets) > 0) && $permissionToView)
