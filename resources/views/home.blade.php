@@ -144,6 +144,35 @@
         const anketsApi = {
             massTrash: '{{ route('forms.mass-trash') }}'
         }
+        const data = {
+            items: [],
+            total: 0
+        }
+
+        function updateAnketsCheckbox() {
+            const anketsStorage = getAnketsStorage()
+
+            $('.hv-checkbox-mass-deletion').prop('checked', false)
+            anketsStorage.items.forEach(function (item) {
+                $(`.hv-checkbox-mass-deletion[data-id="${item}"]`).prop('checked', true)
+            })
+        }
+
+        function getAnketsStorage() {
+            if (data === null) {
+                return {
+                    items: [],
+                    total: 0
+                }
+            }
+
+            return data
+        }
+
+        function setAnketsStorage(value) {
+            data.items = value.items
+            data.total = value.total
+        }
 
         function pronunciationWithNumber(number, one, two, eleven) {
             const lastTwo = Math.abs(number) % 100
@@ -183,37 +212,9 @@
             }
         }
 
-        function updateAnketsCheckbox() {
-            const anketsStorage = getAnketsStorage()
-
-            $('.hv-checkbox-mass-deletion').prop('checked', false)
-            anketsStorage.items.forEach(function (item) {
-                $(`.hv-checkbox-mass-deletion[data-id="${item}"]`).prop('checked', true)
-            })
-        }
-
-        function getAnketsStorage() {
-            const item = window.localStorage.getItem(SELECTED_ANKETS_ITEM)
-
-            if (item === null) {
-                return {
-                    items: [],
-                    total: 0
-                }
-            }
-
-            return JSON.parse(item)
-        }
-
-        function setAnketsStorage(data) {
-            window.localStorage.setItem(SELECTED_ANKETS_ITEM, JSON.stringify(data))
-        }
-
         function clearAnketsStorage() {
-            setAnketsStorage({
-                items: [],
-                total: 0
-            })
+            data.items = []
+            data.total = 0
         }
 
         function pushAnketaToStorage(id) {
@@ -241,6 +242,7 @@
         $(document).ready(function () {
             clearAnketsStorage()
             updateAnketsControl()
+            updateAnketsCheckbox()
 
             $('.hv-checkbox-mass-deletion').click(function () {
                 const id = $(this).attr('data-id')

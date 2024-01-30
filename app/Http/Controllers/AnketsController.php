@@ -56,7 +56,7 @@ class AnketsController extends Controller
 
     public function MassTrash(Request $request, TrashFormHandler $handler)
     {
-        $ids = $request->input('ids');
+        $ids = $request->input('ids') ?? [];
         $action = $request->input('action');
         $notDeletedAnkets = [];
 
@@ -64,7 +64,7 @@ class AnketsController extends Controller
             try {
                 $anketa = Anketa::findOrFail($id);
 
-                if ($anketa) {
+                if ($anketa && !$anketa->deleted_at) {
                     $handler->handle($anketa, $action);
                 }
             } catch (Throwable $exception) {
@@ -76,7 +76,7 @@ class AnketsController extends Controller
             session()->flash('not_deleted_ankets', $notDeletedAnkets);
         }
 
-        return response();
+        return response()->json();
     }
 
     public function Get (Request $request)
