@@ -19,20 +19,17 @@
                     <td class="head" colspan="2">Пункт осмотра</td>
                 </tr>
                 <tr>
-                    <td>
+                    <td rowspan="2">
                         <textarea rows="1" class="doc-input" name="date">от {{ date('d.m.Y', strtotime($date)) }} года</textarea>
                     </td>
-                    <td>
+                    <td rowspan="2">
                         <textarea rows="1" class="doc-input" name="time">{{ date('Hч iмин', strtotime($date)) }}</textarea>
-
                     </td>
 
                     <td class="head" style="width: 50px">Город</td>
                     <td class="head">Адрес</td>
                 </tr>
                 <tr>
-                    <td></td>
-                    <td></td>
                     <td>
                         <textarea rows="1" class="doc-input" name="town">{{ $town }}</textarea>
                     </td>
@@ -58,93 +55,73 @@
                 </tr>
                 <tr>
                     <td colspan="3">
-                        <textarea rows="1" class="doc-input" name="company_id">{{ app('app\Company')->getName($company_id, 'hash_id') }}</textarea>
+                        <textarea rows="1" class="doc-input" name="company_id">{{ $company_name }}</textarea>
                     </td>
                     <td>
                         <textarea rows="1" class="doc-input" name="post">Водитель</textarea>
                     </td>
                 </tr>
                 <tr>
-                    <td class="head">Результат осмотра</td>
-                    <td colspan="3">
-                        @php
-                            $result = 'Наличие признаков заболевания';
-
-                            $tonometer = explode('/', $tonometer);
-                            $pressure_systolic = $driver->getPressureSystolic();
-                            $pressure_diastolic = $driver->getPressureDiastolic();
-
-                            if ($t_people < 38 && $med_view === 'В норме' && $driver
-                                && $tonometer[0] < $pressure_systolic && $tonometer[1] < $pressure_diastolic) {
-                                $result = 'Здоров';
-                            } else if ($proba_alko === 'Положительно') {
-                                $result = 'Здоров';
-                            }
-                        @endphp
-                        <textarea rows="1" class="doc-input" name="result">{{ $result }}</textarea>
+                    <td class="head">Жалобы</td>
+                    <td class="head">Артериальное давление</td>
+                    <td class="head">Пульс</td>
+                    <td class="head">Температура</td>
+                </tr>
+                <tr>
+                    <td>
+                        <textarea rows="1" class="doc-input" name="status">{{ $status }}</textarea>
+                    </td>
+                    <td>
+                        <textarea rows="1" class="doc-input" name="tonometer">{{ $tonometer }}</textarea>
+                    </td>
+                    <td>
+                        <textarea rows="1" class="doc-input" name="pulse">{{ $pulse }}</textarea>
+                    </td>
+                    <td>
+                        <textarea rows="1" class="doc-input" name="t_people">{{ $t_people }}</textarea>
                     </td>
                 </tr>
                 <tr>
-                    <td class="head" colspan="4">Контроль трезвости</td>
-                </tr>
-                <tr>
-                    <td>Проба на алкоголь</td>
+                    <td>
+                        Проба на алкоголь
+                    </td>
                     <td colspan="3">
-                        @if($alko)
-                            <textarea rows="1" class="doc-input" name="alco">ПОЛОЖИТЕЛЬНА   _____  МГ/Л</textarea>
-                        @else
-                            <textarea rows="1" class="doc-input" name="alco">ОТРИЦАТЕЛЬНА</textarea>
-                        @endif
+                        <textarea rows="1" name="alko" class="doc-input">{{ $alko_description }}</textarea>
                     </td>
                 </tr>
                 <tr>
-                    <td>Проба на наркотические средства и психотропные вещества</td>
+                    <td>Медицинское заключение</td>
                     <td colspan="3">
-                        @if($drugs)
-                            <textarea rows="4" class="doc-input center" name="drugs">ПОЛОЖИТЕЛЬНА
-
-результат иммунохроматографического экспресс теста на наличие наркотического средства/психотропного вещества</textarea>
-                        @else
-                            <textarea rows="1" class="doc-input" name="drugs">НЕ ПРОВОДИЛАСЬ</textarea>
-                        @endif
+                        <textarea rows="5" name="closing" class="doc-input">{{ $closing }}</textarea>
                     </td>
                 </tr>
                 <tr>
-                    <td>Заключение</td>
+                    <td>Рекомендации</td>
                     <td colspan="3">
-                        <textarea rows="4" class="doc-input" name="closing">наличие признаков воздействия вредных и (или) опасных производственных факторов, состояний и заболеваний, препятствующих выполнению трудовых обязанностей, в том числе алкогольного, наркотического или иного токсического опьянения и остаточных явлений такого опьянения</textarea>
+                        <textarea rows="1" name="recommendations" class="doc-input">{{ $recommendations }}</textarea>
                     </td>
                 </tr>
                 <tr>
-                    <td>Примечание</td>
-                    <td colspan="3">
-                        <textarea rows="2" class="doc-input" name="note"></textarea>
+                    <td>
+                        ФИО медицинского работника
                     </td>
-                </tr>
-                <tr>
-                    <td>Сопроводительные документы</td>
-                    <td colspan="3" style="height: 0;">
-                        <select rows="2" class="doc-input" name="docs">
-                            <option value="0" selected>
-                                Отсутствуют
-                            </option>
-                            <option value="1">
-                                Выдана справка для обращения к врачу в медицинскую организацию для решения вопроса о
-                                наличии у работника признаков временной нетрудоспособности
-                            </option>
-                            <option value="2">
-                                Составлен протокол контроля трезвости
-                            </option>
-                            <option value="3">
-                                На основании клинических признаков опьянения направлен на медицинского освидетельствование
-                            </option>
-                        </select>
+                    <td colspan="3">
+                        <textarea rows="1" name="user_name" class="doc-input">{{ $user_name }}</textarea>
                     </td>
                 </tr>
                 <tr>
                     <td>Медицинский работник</td>
-                    <td colspan="3"><textarea rows="1" name="user_eds" class="doc-input">{{ $user_eds }}</textarea></td>
+                    <td colspan="3">
+                        <textarea rows="2" name="user_eds" class="doc-input">{{ $user_eds }}</textarea>
+                    </td>
                 </tr>
+                @if($comment_rows)
+                <tr>
+                    <td colspan="4" style="border:0;">
+                        <textarea rows="{{ $comment_rows }}" name="comment" class="doc-input">{{ $comment }}</textarea>
+                    </td>
+                </tr>
+                @endif
             </table>
             <div class="mt-3">
                 @if($closing_path)

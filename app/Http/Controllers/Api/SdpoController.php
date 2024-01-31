@@ -83,6 +83,8 @@ class SdpoController extends Controller
         $medic['type_anketa'] = $request->type_anketa ?? 'medic';
         $medic['user_id'] = $user->id;
         $medic['user_name'] = $user->name;
+        $medic['user_validity_eds_start'] = $user->validity_eds_start;
+        $medic['user_validity_eds_end'] = $user->validity_eds_end;
         $medic['user_eds'] = $user->eds;
         $medic['pulse'] = $request->pulse ?? mt_rand(60, 80);
         $medic['pv_id'] = $apiClient->pv->name;

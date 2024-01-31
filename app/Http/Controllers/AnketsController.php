@@ -132,6 +132,8 @@ class AnketsController extends Controller
         $form->user_name = $user->name;
         $form->operator_id = $user->id;
         $form->user_eds = $user->eds;
+        $form->user_validity_eds_start = $user->validity_eds_start;
+        $form->user_validity_eds_end = $user->validity_eds_end;
 
         $form->save();
 
