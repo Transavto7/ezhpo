@@ -255,6 +255,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckDriver::class])->group(func
     Route::post('/save-fields-home/{type_ankets}', 'HomeController@SaveCheckedFieldsFilter')->name('home.save-fields');
 
     Route::get('/anketa-trash/{id}/{action}', 'AnketsController@Trash')->name('forms.trash');
+    Route::get('/anketa-mass-trash', 'AnketsController@MassTrash')->name('forms.mass-trash');
 });
 
 /**
