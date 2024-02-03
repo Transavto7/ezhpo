@@ -4,7 +4,7 @@
         : explode(',', $default_value);
     $key = $v['getFieldKey'] ?? 'id';
     $value = $v['getField'] ?? 'name';
-    $company = \Illuminate\Support\Facades\Auth::user()->company
+    $company = $user->company
 @endphp
 <select
     disabled

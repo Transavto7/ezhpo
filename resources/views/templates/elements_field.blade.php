@@ -1,11 +1,15 @@
-@php $default_value = isset($default_value) ? $default_value : ''; @endphp
-@php $uniqueInputId = sha1(time() + rand(999, 99999)); @endphp
+@php
+    $default_value = isset($default_value) ? $default_value : '';
+    /** @var \App\User $user */
+    $user = \Illuminate\Support\Facades\Auth::user();
+    $uniqueInputId = sha1(time() + rand(999, 99999));
+@endphp
 
 @if($v['type'] !== 'select')
     @include('templates.components.linear-elements-field')
-@elseif (\Illuminate\Support\Facades\Auth::user()->hasRole('driver') && $k === 'company_name')
+@elseif ($user->hasRole('driver') && $k === 'company_name')
     @include('templates.components.driver-company-select')
-@elseif (\Illuminate\Support\Facades\Auth::user()->hasRole('client') && ($k === 'company_id' || $k === 'company_name'))
+@elseif ($user->hasRole('client') && ($k === 'company_id' || $k === 'company_name'))
     @include('templates.components.client-company-select')
 @else
     @include('templates.components.base-select')
