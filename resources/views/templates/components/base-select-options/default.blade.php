@@ -1,15 +1,25 @@
 @php
     $model = app("App\\" . $v['values']);
     $options = $model::query();
-    $user = \Illuminate\Support\Facades\Auth::user();
+    $selectedOptions = $model::query();
     if ($user->hasRole("client") && in_array($v['values'], ['Driver', 'Car'])) {
-        $options = $options->where('company_id', $user->company_id);
+        $options->where('company_id', $user->company_id);
+        $selectedOptions->where('company_id', $user->company_id);
     }
-    $options = $options->get()
 @endphp
 
-@foreach($options as $option)
-    <option @if(in_array($key, $default_value)) selected @endif value="{{ $option[$key] }}">
+@foreach($selectedOptions->whereIn($key, $default_value)->get() ?? [] as $option)
+    <option selected value="{{ $option[$key] }}">
+        @if ($concatField)
+            [{{ $option[$concatField] }}] {{ $option[$value] }}
+        @else
+            {{ $option[$value] }}
+        @endif
+    </option>
+@endforeach
+
+@foreach($options->whereNotIn($key, $default_value)->limit(100)->get() ?? [] as $option)
+    <option value="{{ $option[$key] }}">
         @if ($concatField)
             [{{ $option[$concatField] }}] {{ $option[$value] }}
         @else
