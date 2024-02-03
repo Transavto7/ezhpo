@@ -3,9 +3,9 @@
 
 @if($v['type'] !== 'select')
     @include('templates.components.linear-elements-field')
-@elseif (\Illuminate\Support\Facades\Auth::user()->hasRole('driver') && $k === 'company_name')
+@elseif (user()->hasRole('driver') && $k === 'company_name')
     @include('templates.components.driver-company-select')
-@elseif (\Illuminate\Support\Facades\Auth::user()->hasRole('client') && ($k === 'company_id' || $k === 'company_name'))
+@elseif (user()->hasRole('client') && ($k === 'company_id' || $k === 'company_name'))
     @include('templates.components.client-company-select')
 @else
     @include('templates.components.base-select')
