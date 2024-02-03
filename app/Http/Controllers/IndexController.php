@@ -91,8 +91,13 @@ class IndexController extends Controller
             Log::channel('deprecated-api')->info(json_encode(
                 [
                     'request' => $request->all(),
+                    'headers' => $request->headers->all(),
+                    'user-web' => Auth::guard('web')->user(),
+                    'user-api' => Auth::guard('api')->user(),
                     'user' => Auth::user(),
-                    'url' => $request->url()
+                    'url' => $request->url(),
+                    'full-url' => $request->fullUrl(),
+                    'ip' => $request->getClientIp() ?? null,
                 ]
             ));
 
