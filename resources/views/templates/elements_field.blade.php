@@ -2,7 +2,6 @@
     $default_value = $default_value ?? '';
     /** @var \App\User $user */
     $user = \Illuminate\Support\Facades\Auth::user();
-    $uniqueInputId = sha1(time() + rand(999, 99999));
 @endphp
 
 @if($v['type'] !== 'select')
