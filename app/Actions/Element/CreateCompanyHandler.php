@@ -4,6 +4,7 @@ namespace App\Actions\Element;
 
 use App\Company;
 use App\User;
+use App\ValueObjects\Phone;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 
@@ -19,6 +20,17 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
             ->first();
         if ($existItem) {
             throw new Exception('Найден дубликат по названию компании');
+        }
+
+        $phoneNumber = $data['where_call'] ?? null;
+        if ($phoneNumber) {
+            $phone = new Phone($phoneNumber);
+
+            if (!$phone->isValid()) {
+                throw new Exception('Некорректный формат телефона, введите телефон в формате 8ХХХХХХХХХХ');
+            }
+
+            $data['where_call'] = $phone->getSanitized();
         }
 
         $validator = function (int $hashId) {
