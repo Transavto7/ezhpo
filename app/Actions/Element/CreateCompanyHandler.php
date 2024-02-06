@@ -27,7 +27,7 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
             $phone = new Phone($phoneNumber);
 
             if (!$phone->isValid()) {
-                throw new Exception('Некорректный формат телефона, введите телефон в формате 8ХХХХХХХХХХ');
+                throw new Exception('Некорректный формат телефона, введите телефон в формате 7ХХХХХХХХХХ');
             }
 
             $data['where_call'] = $phone->getSanitized();

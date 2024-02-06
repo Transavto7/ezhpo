@@ -69,8 +69,8 @@ class Phone implements Stringable
             return;
         }
 
-        if ($firstNumber === '7') {
-            $phone[0] = '8';
+        if ($firstNumber === '8') {
+            $phone[0] = '7';
         }
 
         $this->sanitized = $phone;
