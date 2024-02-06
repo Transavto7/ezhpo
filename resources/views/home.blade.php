@@ -4,6 +4,38 @@
 @section('sidebar', 1)
 @section('class-page', 'anketa-' . $type_ankets)
 
+@section('custom-styles')
+    <style>
+        .hv-checkbox-mass-deletion {
+            accent-color: #138496;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+        }
+
+        .hv-mass-deletion-alert-error {
+            font-size: 12px;
+        }
+
+        .hv-mass-deletion-alert-error code {
+            font-size: 13px;
+            border-radius: 3px;
+            background-color: #f4b2b0;
+            padding: .21rem .4rem;
+
+        }
+
+        #hv-alert-error-close {
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+@endsection
+
 @section('custom-scripts')
     <script type="text/javascript">
         window.onload = function () {
@@ -107,6 +139,163 @@
         }
     </script>
 
+    <script type="text/javascript">
+        const SELECTED_ANKETS_ITEM = 'selectedAnkets'
+        const anketsApi = {
+            massTrash: '{{ route('forms.mass-trash') }}'
+        }
+        const data = {
+            items: [],
+            total: 0
+        }
+
+        function updateAnketsCheckbox() {
+            const anketsStorage = getAnketsStorage()
+
+            $('.hv-checkbox-mass-deletion').prop('checked', false)
+            anketsStorage.items.forEach(function (item) {
+                $(`.hv-checkbox-mass-deletion[data-id="${item}"]`).prop('checked', true)
+            })
+        }
+
+        function getAnketsStorage() {
+            if (data === null) {
+                return {
+                    items: [],
+                    total: 0
+                }
+            }
+
+            return data
+        }
+
+        function setAnketsStorage(value) {
+            data.items = value.items
+            data.total = value.total
+        }
+
+        function pronunciationWithNumber(number, one, two, eleven) {
+            const lastTwo = Math.abs(number) % 100
+            const lastOne = Math.abs(number) % 10
+
+            if (lastTwo > 10 && lastTwo < 20) {
+                return eleven
+            }
+
+            if (lastOne > 1 && lastOne < 5) {
+                return two
+            }
+
+            if (lastOne === 1) {
+                return one
+            }
+
+            return eleven
+        }
+
+        function updateAnketsControl() {
+            const control = $('#selected-ankets-control')
+            const controlBtnDelete = $('#selected-ankets-control-btn-delete')
+
+            const anketsStorage = getAnketsStorage()
+
+            if (anketsStorage.total) {
+                const records = pronunciationWithNumber(anketsStorage.total, 'анкету', 'анкеты', 'анкет')
+                const label = "Удалить " + anketsStorage.total + " " + records
+
+                controlBtnDelete.html(label)
+                control.addClass('d-flex')
+                control.removeClass('d-none')
+            } else {
+                control.addClass('d-none')
+                control.removeClass('d-flex')
+            }
+        }
+
+        function clearAnketsStorage() {
+            data.items = []
+            data.total = 0
+        }
+
+        function pushAnketaToStorage(id) {
+            const anketsStorage = getAnketsStorage()
+
+            if (anketsStorage.items.filter(item => item === id).length) {
+                return
+            }
+
+            anketsStorage.total++
+            anketsStorage.items.push(id)
+
+            setAnketsStorage(anketsStorage)
+        }
+
+        function removeAnketaFromStorage(id) {
+            const anketsStorage = getAnketsStorage()
+
+            anketsStorage.items = anketsStorage.items.filter(item => item !== id)
+            anketsStorage.total = anketsStorage.items.length
+
+            setAnketsStorage(anketsStorage)
+        }
+
+        $(document).ready(function () {
+            clearAnketsStorage()
+            updateAnketsControl()
+            updateAnketsCheckbox()
+
+            $('.hv-checkbox-mass-deletion').click(function () {
+                const id = $(this).attr('data-id')
+                const checked = $(this).is(':checked')
+
+                if (checked) {
+                    pushAnketaToStorage(id)
+                }
+                else {
+                    removeAnketaFromStorage(id)
+                }
+
+                updateAnketsControl()
+            })
+
+            $('#selected-ankets-control-btn-unset').click(function () {
+                clearAnketsStorage()
+                updateAnketsControl()
+                updateAnketsCheckbox()
+            })
+
+            $('#selected-ankets-control-btn-delete').click(function () {
+                const anketsStorage = getAnketsStorage()
+
+                axios
+                    .get(anketsApi.massTrash, {
+                        params: {
+                            action: '{{ isset($_GET['trash']) ? 0 : 1 }}',
+                            ids: anketsStorage.items
+                        }
+                    })
+                    .then(() => {
+                        clearAnketsStorage()
+                        window.location.reload()
+                    })
+                    .catch(() => {})
+            })
+
+            $('.hv-btn-trash').click(function (e) {
+                e.stopPropagation()
+                const id = $(this).attr('data-id')
+
+                removeAnketaFromStorage(id)
+                updateAnketsControl()
+            })
+
+            $('#hv-alert-error-close').click(function () {
+                $('#hv-alert-error').addClass('d-none')
+                $('#hv-alert-error').removeClass('d-flex')
+            })
+        })
+    </script>
+
 @endsection
 
 @php
@@ -197,7 +386,7 @@ $permissionToExportPrikazPL = (
     $type_ankets == 'tech' && user()->access('tech_export_prikaz_pl')
 );
 
-
+$notDeletedItems = session('not_deleted_ankets');
 @endphp
 
 
@@ -313,11 +502,40 @@ $permissionToExportPrikazPL = (
                         <div class="alert alert-danger" role="alert">{{ session()->get('error') }}</div>
                     @endif
 
+                    @if(count($ankets) > 0 && $permissionToView && $permissionToDelete)
+                        <div id="selected-ankets-control" class="d-none align-items-center mt-4 mb-2">
+                            <button id="selected-ankets-control-btn-delete" class="btn btn-danger btn-sm"></button>
+                            <button id="selected-ankets-control-btn-unset" class="btn btn-success btn-sm ml-2">Снять выделение</button>
+                        </div>
+                    @endif
+
+                    @if($notDeletedItems)
+                        <div id="hv-alert-error" class="alert alert-danger hv-mass-deletion-alert-error d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center" style="gap: 10px;">
+                                <div>Не удалось удалить анкеты с ID:</div>
+                                <div class="d-flex align-items-center flex-wrap" style="gap: 5px;">
+                                    @foreach($notDeletedItems as $item)
+                                        <code>{{ $item }}</code>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div>
+                                <div id="hv-alert-error-close">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                    @endisset
+
                     <div class="table-responsive">
                         @if((count($ankets) > 0) && $permissionToView)
                             <table id="ankets-table" class="ankets-table table table-striped table-sm">
                                 <thead>
                                     <tr>
+                                        @if($permissionToDelete)
+                                            <th>#</th>
+                                        @endif
+
                                         @if($type_ankets === 'pak_queue')
                                             <th class="not-export">
                                                 Таймер
@@ -391,6 +609,12 @@ $permissionToExportPrikazPL = (
                                 <tbody>
                                     @foreach($ankets as $anketaKey => $anketa)
                                         <tr data-field="{{ $anketaKey }}">
+
+                                            @if($permissionToDelete)
+                                                <td>
+                                                    <input type="checkbox" data-id="{{ $anketa->id }}" class="hv-checkbox-mass-deletion">
+                                                </td>
+                                            @endif
 
                                             @if($type_ankets === 'pak_queue')
                                                 <td class="not-export">
@@ -584,7 +808,10 @@ $permissionToExportPrikazPL = (
                                                     <a href="{{ route('forms.trash', [
                                                         'id' => $anketa->id,
                                                         'action' => isset($_GET['trash']) ? 0 : 1
-                                                    ]) }}" class="btn btn-warning btn-sm">
+                                                    ]) }}"
+                                                       class="btn btn-warning btn-sm hv-btn-trash"
+                                                       data-id="{{ $anketa->id }}"
+                                                    >
                                                         @isset($_GET['trash'])
                                                             <i class="fa fa-undo"></i>
                                                         @else

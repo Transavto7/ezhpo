@@ -6,7 +6,7 @@ use App\Anketa;
 use App\Company;
 use App\Driver;
 use App\Point;
-use App\Req;
+use App\Services\DocDataService;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\File;
@@ -14,78 +14,30 @@ use Illuminate\Support\Facades\Storage;
 
 class DocsController extends Controller
 {
-    public function Get (Request $request)
+    public function Get (Request $request, DocDataService $service)
     {
-        $anketa_id = $request->anketa_id;
+        $formId = $request->anketa_id;
         $type = $request->type;
 
-        $data = [
-            'type' => $type,
-            'anketa_id' => $anketa_id,
-
-            'driver_fio' => '',
-            'driver_yb' => '',
-            'driver_pv' => '',
-
-            'user_name' => '',
-            'user_post' => '',
-            'user_fio' => '',
-            'user_company' => '',
-            'date' => '',
-            'town' => '',
-            'drugs' => false,
-            'alko' => false
-        ];
-
-        $a = \App\Anketa::find($anketa_id);
-
-        if($a) {
-            $data['user_post'] = ProfileController::getUserRole(true, $a->user_id);
-
-            $fields = new Anketa();
-            $fields = $fields->fillable;
-
-            foreach($fields as $field) {
-                $data[$field] = $a[$field];
-            }
-
-            $driver = Driver::where('hash_id', $a->driver_id)->first();
-            $data['driver'] = $driver;
-
-            if ($a->test_narko === 'Положительно') {
-                $data['drugs'] = true;
-            }
-
-            if ($a->proba_alko === 'Положительно') {
-                $data['alko'] = true;
-            }
-
-            if($a->company_id) {
-                $c = Company::where('hash_id', $a->company_id)->first();
-
-                if($c) {
-                    $c = Point::find($c->pv_id);
-
-                    if($c) {
-                        $data['driver_pv'] = $c->name;
-                    }
-                }
-            }
-
-            if ($a->pv_id) {
-                $point = Point::where('name', $a->pv_id)->with('town')->first();
-                if ($point) {
-                    $data['town'] = $point->town->name;
-                }
-            }
+        if (!view()->exists("docs.$type")) {
+            return view("docs.default");
         }
 
-        if(view()->exists("docs.$type")) {
-            return view("docs.$type", $data);
+        /** @var Anketa $form */
+        $form = Anketa::find($formId);
+
+        if (empty($form)) {
+            return view("docs.undefined");
         }
+
+        $data = $service->get($form);
+        $data['type'] = $type;
+
+        return view("docs.$type", $data);
     }
 
-    public function update(Request $request, $type) {
+    public function update(Request $request, $type)
+    {
         $anketa = Anketa::find($request->id);
 
         if (!$anketa) {
@@ -102,7 +54,8 @@ class DocsController extends Controller
         ]);
     }
 
-    public function delete(Request $request, $type, $anketa_id) {
+    public function delete(Request $request, $type, $anketa_id)
+    {
         Anketa::find($anketa_id)->update([
             $type. '_path' => null
         ]);
@@ -110,7 +63,8 @@ class DocsController extends Controller
         return back();
     }
 
-    public function getPdf(Request $request, $type, $anketa_id) {
+    public function getPdf(Request $request, $type, $anketa_id)
+    {
         $anketa = Anketa::find($anketa_id);
 
         if (!$anketa) {
@@ -190,7 +144,8 @@ class DocsController extends Controller
         }
     }
 
-    public function setPdf(Request $request, $type, $anketa_id) {
+    public function setPdf(Request $request, $type, $anketa_id)
+    {
         $anketa = Anketa::find($anketa_id);
         $request->validate([
             'pdf' => ['required', 'mimes:pdf']

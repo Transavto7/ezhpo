@@ -46,6 +46,8 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
         $this->data['user_name'] = $user->name;
         $this->data['operator_id'] = $user->id;
         $this->data['user_eds'] = $user->eds;
+        $this->data['user_validity_eds_start'] = $user->validity_eds_start;
+        $this->data['user_validity_eds_end'] = $user->validity_eds_end;
 
         $this->data['pv_id'] = $apiClient->pv->name;
         $this->data['point_id'] = $apiClient->pv->id;
