@@ -26,7 +26,7 @@ class Phone implements Stringable
      */
     protected $sanitized = '';
 
-    public function __construct(string $native)
+    public function __construct(string $native = '')
     {
         $this->native = $native;
         $this->sanitize();
