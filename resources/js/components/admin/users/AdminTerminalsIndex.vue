@@ -72,7 +72,19 @@
                         </template>
 
                         <template #cell(serial_number)="{ item }">
-                            {{ item.serial_number }}
+                            {{ item.terminal_check ? item.terminal_check.serial_number : '' }}
+                        </template>
+
+                        <template #cell(date_check)="{ item }">
+                            {{ item.terminal_check ? formatDate(item.terminal_check.date_check) : '' }}
+                        </template>
+
+                        <template #cell(devices)="{ item }">
+                            <div v-if="item.terminal_devices">
+                                <div v-for="device of formatDevices(item.terminal_devices)">
+                                    {{ device.name }} ({{ device.serialNumber }})
+                                </div>
+                            </div>
                         </template>
 
                         <template #cell(blocked)="row">
@@ -531,6 +543,9 @@ export default {
             this.infoModalUser.blocked = 0;
             this.infoModalUser.company = null;
             this.infoModalUser.permissions = [];
+            this.infoModalUser.serialNumber = null;
+            this.infoModalUser.dateCheck = null;
+            this.infoModalUser.devices = [];
             this.permission_collapse = false;
 
             this.allPermissions = this.allPermissions.map((item) => {
@@ -569,6 +584,18 @@ export default {
                 });
                 this.stamps = data;
             });
+        },
+
+        formatDate(date) {
+            const dateObject = new Date(date)
+            return `${String(dateObject.getDate()).padStart(2, '0')}.${String(dateObject.getMonth() + 1).padStart(2, '0')}.${dateObject.getFullYear()}`
+        },
+
+        formatDevices(devices) {
+            return devices.map(item => ({
+                name: this.devicesOptions.filter(option => option.id === item.device_name)[0].text,
+                serialNumber: item.device_serial_number
+            }))
         }
     },
     mounted() {
@@ -580,8 +607,6 @@ export default {
             return ![3, 9, 6].includes(item.id)
         });
         this.allPermissions = this.all_permissions;
-
-        console.log(this.devices)
 
         this.fields.forEach(field =>{
             this.columns.push({

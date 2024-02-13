@@ -24,7 +24,7 @@ class TerminalController extends Controller
     public function index(Request $request)
     {
         $date = Carbon::now()->subMonth()->startOfMonth()->startOfDay();
-        $users = User::with(['roles', 'pv', 'company', 'pv.town', 'stamp'])
+        $users = User::with(['roles', 'pv', 'company', 'pv.town', 'stamp', 'terminalDevices', 'terminalCheck'])
             ->whereHas('roles', function ($q) use ($request) {
                 $q->where('roles.id', 9);
             });
@@ -135,7 +135,7 @@ class TerminalController extends Controller
                     ));
                 }
 
-                // todo: temp
+                // todo(hv): temp
                 $user = User::find($userId);
             }
 
