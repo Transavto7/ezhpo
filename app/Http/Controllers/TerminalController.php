@@ -2,16 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Terminal\Update\Dto\TerminalCheckUpdateAction;
+use App\Actions\Terminal\Update\Dto\TerminalDeviceUpdateAction;
 use App\Actions\Terminal\Store\Dto\TerminalCheckStoreAction;
 use App\Actions\Terminal\Store\Dto\TerminalDeviceStoreAction;
 use App\Actions\Terminal\Store\TerminalCheckStoreHandler;
 use App\Actions\Terminal\Store\TerminalDeviceStoreHandler;
 use App\Actions\Terminal\Store\TerminalStoreHandler;
+use App\Actions\Terminal\Update\TerminalCheckUpdateHandler;
+use App\Actions\Terminal\Update\TerminalUpdateHandler;
 use App\Anketa;
 use App\Enums\DeviceEnum;
 use App\FieldPrompt;
 use App\Req;
 use App\Role;
+use App\TerminalCheck;
+use App\TerminalDevice;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -104,41 +110,47 @@ class TerminalController extends Controller
         try {
             DB::beginTransaction();
 
-            if ($userId = $request->get('user_id')) {
-                // todo(hv): update handler
+            $terminalStoreHandler = new TerminalStoreHandler();
+            $terminalUpdateHandler = new TerminalUpdateHandler();
+            $terminalCheckStoreHandler = new TerminalCheckStoreHandler();
+            $terminalCheckUpdateHandler = new TerminalCheckUpdateHandler();
+            $terminalDeviceStoreHandler = new TerminalDeviceStoreHandler();
 
-                $user           = User::find($userId);
-                $user->name     = $request->get('name', null);
-                $user->timezone = $request->get('timezone', null);
-                $user->company_id = $request->get('company_id', null);
-                $user->blocked  = $request->get('blocked', 0);
-                $user->pv_id = $request->get('pv', null);
-                $user->stamp_id = $request->get('stamp_id', null);
-                $user->save();
-            } else {
-                $terminalStoreHandler = new TerminalStoreHandler();
-                $terminalCheckStoreHandler = new TerminalCheckStoreHandler();
-                $terminalDeviceStoreHandler = new TerminalDeviceStoreHandler();
-
+            if ($request->has('user_id')) {
+                $userId = $request->input('user_id');
+                $terminalUpdateHandler->handle($request);
+            }
+            else {
                 $userId = $terminalStoreHandler->handle($request);
+            }
+
+            if (TerminalCheck::where('user_id', '=', $userId)->get()->count()) {
+                $terminalCheckUpdateHandler->handle(
+                    new TerminalCheckUpdateAction(
+                        $userId,
+                        $request->input('serial_number'),
+                        Carbon::parse($request->input('date_check'))
+                    )
+                );
+            }
+            else {
                 $terminalCheckStoreHandler->handle(new TerminalCheckStoreAction(
                     $userId,
                     $request->input('serial_number'),
                     Carbon::parse($request->input('date_check'))
                 ));
-
-                foreach ($request->input('devices') as  $device) {
-                    $terminalDeviceStoreHandler->handle(new TerminalDeviceStoreAction(
-                        $userId,
-                        $device['id'],
-                        $device['serial_number']
-                    ));
-                }
-
-                // todo(hv): temp
-                $user = User::find($userId);
             }
 
+            TerminalDevice::where('user_id', '=', $userId)->delete();
+            foreach ($request->input('devices') as  $device) {
+                $terminalDeviceStoreHandler->handle(new TerminalDeviceStoreAction(
+                    $userId,
+                    $device['id'],
+                    $device['serial_number']
+                ));
+            }
+
+            $user = User::find($userId);
             $user->roles()->sync([9]);
 
             DB::commit();
@@ -154,7 +166,7 @@ class TerminalController extends Controller
             return response([
                 'status' => 422,
                 'errors' => [$exception->getMessage()]
-            ]);
+            ], 422);
         }
     }
 }

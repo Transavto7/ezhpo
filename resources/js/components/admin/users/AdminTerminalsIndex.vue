@@ -229,11 +229,11 @@
                     <b-col lg="12">
                         <label>
                             <b class="text-danger text-bold">* </b>
-                            Дата проверки:
+                            Дата поверки:
                         </label>
                         <b-form-datepicker v-model="infoModalUser.dateCheck"
                                            size="sm"
-                                           placeholder="Укажите дату проверки"
+                                           placeholder="Укажите дату поверки"
                                            locale="ru"
                         />
                     </b-col>
@@ -506,27 +506,54 @@ export default {
                 serial_number: this.infoModalUser.serialNumber,
                 date_check: this.infoModalUser.dateCheck,
                 devices: this.infoModalUser.devices,
-            }).then(({data}) => {
-                if (data.status) {
-                    this.items.forEach((item, i, arr) => {
-                        if (item.id == data.user_info.id) {
-                            this.items[i] = data.user_info // Новый объект с новыми свойствами
-                        }
-                    })
-                    Swal2.fire('Сохранено', 'Данные были успешно записаны', 'success');
-                    this.$refs.users_table.refresh()
-                    this.enableModal = false
-                    location.reload()
+            })
+                .then(({data}) => {
+                    if (data.status) {
+                        this.items.forEach((item, i, arr) => {
+                            if (item.id == data.user_info.id) {
+                                this.items[i] = data.user_info // Новый объект с новыми свойствами
+                            }
+                        })
+                        Swal2.fire('Сохранено', 'Данные были успешно записаны', 'success');
+                        this.$refs.users_table.refresh()
+                        this.enableModal = false
+                        location.reload()
 
-                }
+                    }
+                })
+                .catch((error) => {
+                    let errorText = 'Произошла ошибка. Попробуйте, пожалуйста, позже'
+                    if (error?.response?.data?.errors?.length) {
+                        errorText = error?.response?.data?.errors.join('\n')
+                    }
 
-            }).finally(() => {
-                this.loading = false;
-            });
+                    Swal2.fire('Ошибка', errorText, 'error');
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
 
         editUserData(user) {
-            this.infoModalUser = { ...user };
+            const data = { ...user }
+
+            data.dateCheck = null
+            data.serialNumber = null
+            if (user.terminal_check) {
+                data.dateCheck = user.terminal_check.date_check
+                data.serialNumber = user.terminal_check.serial_number
+            }
+
+            data.devices = []
+            if (user.terminal_devices) {
+                data.devices = user.terminal_devices.map(item => ({
+                    id: item.device_name,
+                    serial_number: item.device_serial_number,
+                }))
+            }
+
+            this.infoModalUser = data
+
             this.showModal();
         },
         resetModal() {

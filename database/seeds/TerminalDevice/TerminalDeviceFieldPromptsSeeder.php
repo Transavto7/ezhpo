@@ -11,7 +11,7 @@ final class TerminalDeviceFieldPromptsSeeder extends Seeder
         ],
         [
             'field' => 'date_check',
-            'name' => 'Дата проверки'
+            'name' => 'Дата поверки'
         ],
         [
             'field' => 'devices',
