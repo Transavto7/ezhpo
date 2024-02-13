@@ -271,6 +271,23 @@ class SdpoController extends Controller
         return response()->json($user->pv->name);
     }
 
+    public function getCheck(Request $request)
+    {
+        $user = $request->user('api');
+
+        if (!$user->terminalCheck) {
+            return response()->json([
+                'serial_number' => null,
+                'date_check' => null,
+            ]);
+        }
+
+        return response()->json([
+            'serial_number' => $user->terminalCheck->serial_number,
+            'date_check' => $user->terminalCheck->date_check,
+        ]);
+    }
+
     /*
      * return all medics
      */
