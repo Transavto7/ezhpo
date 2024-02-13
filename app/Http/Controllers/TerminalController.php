@@ -116,7 +116,7 @@ class TerminalController extends Controller
             $terminalCheckUpdateHandler = new TerminalCheckUpdateHandler();
             $terminalDeviceStoreHandler = new TerminalDeviceStoreHandler();
 
-            if ($request->has('user_id')) {
+            if ($request->input('user_id')) {
                 $userId = $request->input('user_id');
                 $terminalUpdateHandler->handle($request);
             }

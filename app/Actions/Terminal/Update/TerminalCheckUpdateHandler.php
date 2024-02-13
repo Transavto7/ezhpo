@@ -4,6 +4,8 @@ namespace App\Actions\Terminal\Update;
 
 use App\Actions\Terminal\Update\Dto\TerminalCheckUpdateAction;
 use App\TerminalCheck;
+use App\User;
+use Carbon\Carbon;
 use Exception;
 
 final class TerminalCheckUpdateHandler
@@ -15,8 +17,10 @@ final class TerminalCheckUpdateHandler
      */
     public function handle(TerminalCheckUpdateAction $action)
     {
-        if (!$this->validateSerialNumberUnique($action->getSerialNumber(), $action->getUserId())) {
-            throw new Exception('Указанный серийный номер терминала уже используется');
+        $this->validateSerialNumberUnique($action->getSerialNumber(), $action->getUserId());
+
+        if (!$this->validateDateCheck($action->getDateCheck())) {
+            throw new Exception('Дата поверки должна быть датой не позже сегодняшней даты или равной ей');
         }
 
         $terminalCheck = TerminalCheck::query()
@@ -33,12 +37,31 @@ final class TerminalCheckUpdateHandler
         return $terminalCheck->id;
     }
 
-    private function validateSerialNumberUnique(string $serialNumber, string $userId): bool
+    /**
+     * @param string $serialNumber
+     * @param string $userId
+     * @return void
+     * @throws Exception
+     */
+    private function validateSerialNumberUnique(string $serialNumber, string $userId)
     {
-        return !TerminalCheck::query()
+        $terminals = TerminalCheck::query()
             ->where('serial_number', '=', $serialNumber)
             ->where('user_id', '!=', $userId)
-            ->get()
-            ->count();
+            ->get();
+
+        if ($terminals->count()) {
+            $terminal = User::find($terminals[0]->user_id);
+
+            $hashId = $terminal->hash_id;
+            $name = $terminal->name;
+
+            throw new Exception('Указанный серийный номер терминала уже используется.<br><br>Терминал: '.$name.' ('.$hashId.').');
+        }
+    }
+
+    private function validateDateCheck(Carbon $dateCheck): bool
+    {
+        return $dateCheck->lessThanOrEqualTo(Carbon::now());
     }
 }
