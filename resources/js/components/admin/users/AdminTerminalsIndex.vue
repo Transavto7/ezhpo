@@ -71,6 +71,10 @@
                             {{ item.stamp ? item.stamp.name : 'Неизвестно' }}
                         </template>
 
+                        <template #cell(serial_number)="{ item }">
+                            {{ item.serial_number }}
+                        </template>
+
                         <template #cell(blocked)="row">
                             {{ row.value === '1' ? 'Да' : 'Нет' }}
                         </template>
@@ -211,6 +215,40 @@
                 </b-row>
                 <b-row class="mb-3">
                     <b-col lg="12">
+                        <label>
+                            <b class="text-danger text-bold">* </b>
+                            Дата проверки:
+                        </label>
+                        <b-form-datepicker v-model="infoModalUser.dateCheck"
+                                           size="sm"
+                                           placeholder="Укажите дату проверки"
+                                           locale="ru"
+                        />
+                    </b-col>
+                </b-row>
+                <b-row class="mb-3">
+                    <b-col lg="12">
+                        <label>
+                            <b class="text-danger text-bold">* </b>
+                            Серийный номер:
+                        </label>
+                        <b-form-input v-model="infoModalUser.serialNumber"
+                                      size="sm"
+                                      placeholder="Введите серийный номер"
+                        />
+                    </b-col>
+                </b-row>
+                <b-row class="mb-3">
+                    <b-col lg="12">
+                        <label class="mb-2">
+                            <b class="text-danger text-bold">* </b>
+                            Комплектующие:
+                        </label>
+                        <devices-input v-model="infoModalUser.devices" :options="devicesOptions"/>
+                    </b-col>
+                </b-row>
+                <b-row class="mb-3">
+                    <b-col lg="12">
                         <b-form-checkbox
                             id="checkbox-1"
                             v-model="infoModalUser.blocked"
@@ -236,11 +274,12 @@
 import vSelect from "vue-select";
 import 'vue-select/dist/vue-select.css';
 import Swal2 from "sweetalert2";
+import DevicesInput from "./ui/DevicesInput.vue";
 
 export default {
     name: "AdminTerminalsIndex",
-    props: ['users', 'deleted', 'roles', 'points', 'all_permissions', 'current_user_permissions', 'options_company', 'fields'],
-    components: { Swal2, vSelect },
+    props: ['users', 'deleted', 'roles', 'points', 'all_permissions', 'current_user_permissions', 'options_company', 'fields', 'devicesOptions'],
+    components: {DevicesInput, Swal2, vSelect },
 
     data() {
         return {
@@ -271,6 +310,9 @@ export default {
                 blocked: 0,
                 company: null,
                 permissions: [],
+                serialNumber: null,
+                dateCheck: null,
+                devices: []
             },
             optionsPvs: [],
             optionsRoles: [],
@@ -424,13 +466,19 @@ export default {
             });
         },
 
+        validateDevices() {
+            return !!this.infoModalUser.devices.length && !this.infoModalUser.devices.filter(item => !item.serial_number).length
+        },
         saveUser() {
             this.loading = true;
 
             if (!this.infoModalUser.name ||
-                    !this.infoModalUser.timezone ||
-                    !this.infoModalUser.pv_id ||
-                    !this.infoModalUser.company_id) {
+                !this.infoModalUser.timezone ||
+                !this.infoModalUser.pv_id ||
+                !this.infoModalUser.company_id ||
+                !this.infoModalUser.serialNumber ||
+                !this.infoModalUser.dateCheck ||
+                !this.validateDevices()) {
                 this.$toast('Не все поля указаны', { type: 'error' });
                 return;
             }
@@ -442,7 +490,10 @@ export default {
                 pv: this.infoModalUser.pv_id,
                 company_id: this.infoModalUser.company_id,
                 blocked:  this.infoModalUser.blocked,
-                stamp_id: this.infoModalUser.stamp_id
+                stamp_id: this.infoModalUser.stamp_id,
+                serial_number: this.infoModalUser.serialNumber,
+                date_check: this.infoModalUser.dateCheck,
+                devices: this.infoModalUser.devices,
             }).then(({data}) => {
                 if (data.status) {
                     this.items.forEach((item, i, arr) => {
@@ -529,6 +580,8 @@ export default {
             return ![3, 9, 6].includes(item.id)
         });
         this.allPermissions = this.all_permissions;
+
+        console.log(this.devices)
 
         this.fields.forEach(field =>{
             this.columns.push({
