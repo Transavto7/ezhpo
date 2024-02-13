@@ -124,7 +124,7 @@ Route::middleware('auth:api')->prefix('sdpo')->name('sdpo')->group(function () {
     Route::post('/anketa/{id}', 'Api\SdpoController@changeType');
     Route::get('/anketa/{id}', 'Api\SdpoController@getInspection');
     Route::get('/pv', 'Api\SdpoController@getPoint');
-    Route::get('/check', 'Api\SdpoController@getCheck');
+    Route::get('/terminal/verification', 'Api\SdpoController@getTerminalVerification');
     Route::get('/medics', 'Api\SdpoController@getMedics');
     Route::get('/driver/{id}', 'Api\SdpoController@getDriver');
     Route::post('/driver/{id}/photo', 'Api\SdpoController@setDriverPhoto');

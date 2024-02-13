@@ -271,7 +271,7 @@ class SdpoController extends Controller
         return response()->json($user->pv->name);
     }
 
-    public function getCheck(Request $request)
+    public function getTerminalVerification(Request $request)
     {
         $user = $request->user('api');
 
