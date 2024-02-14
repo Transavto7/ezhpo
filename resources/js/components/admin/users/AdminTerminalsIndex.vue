@@ -36,6 +36,7 @@
                         :sort-by.sync="sortBy"
                         :sort-desc.sync="sortDesc"
                         :current-page="currentPage"
+                        :tbody-tr-class="tableRowClass"
                         responsive
                         @sort-changed="sortChanged"
                     >
@@ -365,6 +366,35 @@ export default {
             console.log(this.items);
           });
         },
+        tableRowClass(item, type) {
+            if (item && type === 'row') {
+                if (item?.need_check?.in_a_month) {
+                    return 'row-check-in-a-month'
+                }
+                else if (item?.need_check?.expired) {
+                    return 'row-check-expired'
+                }
+                else {
+                    return ''
+                }
+            } else {
+                return null
+            }
+        },
+        async fetchTerminalsToCheck() {
+            axios.get('/terminals/to-check')
+                .then(response => {
+                    this.items = this.items.map(item => ({
+                        ...item,
+                        need_check: {
+                            in_a_month: response.data.less_month.includes(item.hash_id),
+                            expired: response.data.expired.includes(item.hash_id),
+                        }
+                    }))
+
+                    console.log('need', [...this.items.map(item => ({...item.need_check}))])
+                })
+        },
         loadData() {
             this.busy = true;
             this.loading = true;
@@ -383,6 +413,7 @@ export default {
                 this.totalRows = data.total_rows;
                 this.busy = false;
                 this.loadConnectionStatus();
+                this.fetchTerminalsToCheck()
             }).finally(() => {
                 this.loading = false;
             });
@@ -712,5 +743,13 @@ export default {
 .modal-dialog.modal-xl {
     max-width: 90%;
     margin: 1.75rem auto;
+}
+
+.row-check-in-a-month {
+    background-color: #fbf1d3!important;
+}
+
+.row-check-expired {
+    background-color: #fbd3d3 !important;
 }
 </style>

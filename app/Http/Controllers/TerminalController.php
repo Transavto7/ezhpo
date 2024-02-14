@@ -15,6 +15,7 @@ use App\Enums\DeviceEnum;
 use App\FieldPrompt;
 use App\Req;
 use App\Role;
+use App\Services\Terminals\TerminalsToCheckService;
 use App\TerminalCheck;
 use App\TerminalDevice;
 use App\User;
@@ -168,5 +169,15 @@ class TerminalController extends Controller
                 'errors' => [$exception->getMessage()]
             ], 422);
         }
+    }
+
+    public function terminalsToCheck(TerminalsToCheckService $service)
+    {
+        $data = $service->getIds();
+
+        return response()->json([
+            'less_month' => $data['less_month'],
+            'expired' => $data['expired']
+        ]);
     }
 }

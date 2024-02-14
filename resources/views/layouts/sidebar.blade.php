@@ -275,7 +275,24 @@
                     @endif
 
                     @if(user()->access('pak_sdpo_read', 'pak_sdpo_create'))
-                        <li><a href="{{ route('terminals') }}">Терминалы</a></li>
+                        @php
+                            $service = new \App\Services\Terminals\TerminalsToCheckService();
+                            $needToCheck = $service->getIds();
+
+                            $lessMonthCount = count($needToCheck['less_month']);
+                            $expiredCount = count($needToCheck['expired']);
+                        @endphp
+                        <li>
+                            <a href="{{ route('terminals') }}">
+                                Терминалы
+                                @if($lessMonthCount)
+                                    <span class="badge bg-warning text-white">{{ $lessMonthCount < 99 ? $lessMonthCount : '99+' }}</span>
+                                @endif
+                                @if($expiredCount)
+                                    <span class="badge bg-primary text-white">{{ $expiredCount < 99 ? $expiredCount : '99+' }}</span>
+                                @endif
+                            </a>
+                        </li>
                     @endif
 
                     @if(user()->access('stamp_read'))

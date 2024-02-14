@@ -19,6 +19,7 @@ class TerminalCheck extends Model
 
     protected $casts = [
         'date_check' => 'date',
+        'date_end_check' => 'date',
     ];
 
     public function user(): BelongsTo
