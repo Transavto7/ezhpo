@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Terminal\Update\Dto\TerminalCheckUpdateAction;
-use App\Actions\Terminal\Update\Dto\TerminalDeviceUpdateAction;
 use App\Actions\Terminal\Store\Dto\TerminalCheckStoreAction;
 use App\Actions\Terminal\Store\Dto\TerminalDeviceStoreAction;
 use App\Actions\Terminal\Store\TerminalCheckStoreHandler;
@@ -141,7 +140,8 @@ class TerminalController extends Controller
                 ));
             }
 
-            TerminalDevice::where('user_id', '=', $userId)->delete();
+            // todo(hv): вынести в action
+            TerminalDevice::where('user_id', '=', $userId)->forceDelete();
             foreach ($request->input('devices') as  $device) {
                 $terminalDeviceStoreHandler->handle(new TerminalDeviceStoreAction(
                     $userId,

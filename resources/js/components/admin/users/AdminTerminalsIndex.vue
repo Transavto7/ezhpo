@@ -484,6 +484,8 @@ export default {
         saveUser() {
             this.loading = true;
 
+            const deviceSerialNumbers = this.infoModalUser.devices.map(item => item.serial_number)
+
             if (!this.infoModalUser.name ||
                 !this.infoModalUser.timezone ||
                 !this.infoModalUser.pv_id ||
@@ -492,6 +494,11 @@ export default {
                 !this.infoModalUser.dateCheck ||
                 !this.validateDevices()) {
                 this.$toast('Не все поля указаны', { type: 'error' });
+                return;
+            }
+
+            if ([...(new Set(deviceSerialNumbers))].length !== deviceSerialNumbers.length) {
+                this.$toast('Серийные номера комплектующих не должны совпадать', { type: 'error' })
                 return;
             }
 

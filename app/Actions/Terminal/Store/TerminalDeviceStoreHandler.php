@@ -15,9 +15,7 @@ final class TerminalDeviceStoreHandler
      */
     public function handle(TerminalDeviceStoreAction $action)
     {
-        if (!$this->validateDevicesUnique($action->getDeviceSerialNumber())) {
-            throw new Exception('Указанный серийный номер оборудования уже используется');
-        }
+        $this->validateDevicesUnique($action->getDeviceSerialNumber());
 
         $terminalDevice = TerminalDevice::create([
             'user_id' => $action->getUserId(),
@@ -28,8 +26,29 @@ final class TerminalDeviceStoreHandler
         return $terminalDevice->id;
     }
 
-    private function validateDevicesUnique(string $serialNumber): bool
+    /**
+     * @param string $serialNumber
+     * @return void
+     * @throws Exception
+     */
+    private function validateDevicesUnique(string $serialNumber)
     {
-        return !TerminalDevice::where('device_serial_number','=', $serialNumber)->get()->count();
+        $terminalDevices = TerminalDevice::query()
+            ->where('device_serial_number','=', $serialNumber)
+            ->whereNull('deleted_at')
+            ->get();
+
+        if ($terminalDevices->count()) {
+            $terminal = $terminalDevices[0]->user;
+
+            $message = 'Указанный серийный номер оборудования уже используется';
+
+            if ($terminal) {
+                $message .= '<br><br>Терминал: ' . $terminal->hash_id . ' (' . $terminal->name . ')';
+            }
+
+            throw new Exception($message);
+        }
+
     }
 }

@@ -31,6 +31,7 @@ final class TerminalCheckStoreHandler
             'user_id' => $action->getUserId(),
             'serial_number' => $action->getSerialNumber(),
             'date_check' => $action->getDateCheck(),
+            'date_end_check' => $action->getDateCheck()->copy()->addYear()
         ]);
 
         return $terminalCheck->id;
@@ -38,7 +39,11 @@ final class TerminalCheckStoreHandler
 
     private function validateUserUnique(int $userId): bool
     {
-        return !TerminalCheck::where('user_id', '=', $userId)->get()->count();
+        return !TerminalCheck::query()
+            ->where('user_id', '=', $userId)
+            ->whereNull('deleted_at')
+            ->get()
+            ->count();
     }
 
     /**
@@ -50,15 +55,19 @@ final class TerminalCheckStoreHandler
     {
         $terminals = TerminalCheck::query()
             ->where('serial_number', '=', $serialNumber)
+            ->whereNull('deleted_at')
             ->get();
 
         if ($terminals->count()) {
-            $terminal = User::find($terminals[0]->user_id);
+            $terminal = $terminals[0]->user;
 
-            $hashId = $terminal->hash_id;
-            $name = $terminal->name;
+            $message = 'Указанный серийный номер терминала уже используется';
 
-            throw new Exception('Указанный серийный номер терминала уже используется.<br><br>Терминал: '.$name.' ('.$hashId.').');
+            if ($terminal) {
+                $message .= '<br><br>Терминал: ' . $terminal->hash_id . ' (' . $terminal->name . ')';
+            }
+
+            throw new Exception($message);
         }
     }
 
