@@ -284,7 +284,7 @@ class SdpoController extends Controller
 
         return response()->json([
             'serial_number' => $user->terminalCheck->serial_number,
-            'date_check' => $user->terminalCheck->date_check,
+            'date_check' => $user->terminalCheck->date_check->format('Y-m-d'),
         ]);
     }
 
