@@ -30,6 +30,7 @@
                 return $res;
             }))'
             :fields='@json($fields)'
+            :devices-options='@json($devicesOptions)'
     >
         <div class="card mb-3">
             <div class="card-body">

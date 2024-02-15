@@ -2,21 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Terminal\Update\Dto\TerminalCheckUpdateAction;
+use App\Actions\Terminal\Store\Dto\TerminalCheckStoreAction;
+use App\Actions\Terminal\Store\Dto\TerminalDeviceStoreAction;
+use App\Actions\Terminal\Store\TerminalCheckStoreHandler;
+use App\Actions\Terminal\Store\TerminalDeviceStoreHandler;
+use App\Actions\Terminal\Store\TerminalStoreHandler;
+use App\Actions\Terminal\Update\TerminalCheckUpdateHandler;
+use App\Actions\Terminal\Update\TerminalUpdateHandler;
 use App\Anketa;
+use App\Enums\DeviceEnum;
 use App\FieldPrompt;
 use App\Req;
 use App\Role;
+use App\Services\Terminals\TerminalsToCheckService;
+use App\TerminalCheck;
+use App\TerminalDevice;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Throwable;
 
 class TerminalController extends Controller
 {
     public function index(Request $request)
     {
         $date = Carbon::now()->subMonth()->startOfMonth()->startOfDay();
-        $users = User::with(['roles', 'pv', 'company', 'pv.town', 'stamp'])
+        $users = User::with(['roles', 'pv', 'company', 'pv.town', 'stamp', 'terminalDevices', 'terminalCheck'])
             ->whereHas('roles', function ($q) use ($request) {
                 $q->where('roles.id', 9);
             });
@@ -58,10 +72,20 @@ class TerminalController extends Controller
 
         $fields = FieldPrompt::where('type', 'terminals')->get();
 
+        $devicesOptions = collect(DeviceEnum::labels())
+            ->map(function ($value, $key) {
+                return [
+                    'id' => $key,
+                    'text' => $value
+                ];
+            })
+            ->values();
+
         return view('admin.users_v2.terminal')
             ->with([
                 'users' => $res,
-                'fields' => $fields
+                'fields' => $fields,
+                'devicesOptions' => $devicesOptions
             ]);
     }
 
@@ -83,38 +107,77 @@ class TerminalController extends Controller
 
     public function update(Request $request)
     {
-        if ($userId = $request->get('user_id')) {
-            $user           = User::find($userId);
-            $user->name     = $request->get('name', null);
-            $user->timezone = $request->get('timezone', null);
-            $user->company_id = $request->get('company_id', null);
-            $user->blocked  = $request->get('blocked', 0);
-            $user->pv_id = $request->get('pv', null);
-            $user->stamp_id = $request->get('stamp_id', null);
-            $user->save();
-        } else {
-            $api_token = Hash::make(date('H:i:s'));
-            $user = User::create([
-                'name'     => $request->get('name', null),
-                'hash_id'  => mt_rand(1000, 9999).date('s'),
-                'timezone' => $request->get('timezone', null),
-                'company_id' => $request->get('company_id', null),
-                'blocked'  => $request->get('blocked', 0),
-                'password' => $api_token,
-                'api_token' => $api_token,
-                'email' => time() . '@ta-7.ru',
-                'login' => time() . '@ta-7.ru',
-                'pv_id' => $request->get('pv', null),
-                'stamp_id' => $request->get('stamp_id', null),
+        try {
+            DB::beginTransaction();
+
+            $terminalStoreHandler = new TerminalStoreHandler();
+            $terminalUpdateHandler = new TerminalUpdateHandler();
+            $terminalCheckStoreHandler = new TerminalCheckStoreHandler();
+            $terminalCheckUpdateHandler = new TerminalCheckUpdateHandler();
+            $terminalDeviceStoreHandler = new TerminalDeviceStoreHandler();
+
+            if ($request->input('user_id')) {
+                $userId = $request->input('user_id');
+                $terminalUpdateHandler->handle($request);
+            }
+            else {
+                $userId = $terminalStoreHandler->handle($request);
+            }
+
+            if (TerminalCheck::where('user_id', '=', $userId)->get()->count()) {
+                $terminalCheckUpdateHandler->handle(
+                    new TerminalCheckUpdateAction(
+                        $userId,
+                        $request->input('serial_number'),
+                        Carbon::parse($request->input('date_check'))
+                    )
+                );
+            }
+            else {
+                $terminalCheckStoreHandler->handle(new TerminalCheckStoreAction(
+                    $userId,
+                    $request->input('serial_number'),
+                    Carbon::parse($request->input('date_check'))
+                ));
+            }
+
+            // todo(hv): вынести в action
+            TerminalDevice::where('user_id', '=', $userId)->forceDelete();
+            foreach ($request->input('devices') as  $device) {
+                $terminalDeviceStoreHandler->handle(new TerminalDeviceStoreAction(
+                    $userId,
+                    $device['id'],
+                    $device['serial_number']
+                ));
+            }
+
+            $user = User::find($userId);
+            $user->roles()->sync([9]);
+
+            DB::commit();
+
+            return response([
+                'status'    => true,
+                'user_info' => User::with(['company'])
+                    ->find($user->id),
             ]);
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            return response([
+                'status' => 422,
+                'errors' => [$exception->getMessage()]
+            ], 422);
         }
+    }
 
-        $user->roles()->sync([9]);
+    public function terminalsToCheck(TerminalsToCheckService $service)
+    {
+        $data = $service->getIds();
 
-        return response([
-            'status'    => true,
-            'user_info' => User::with(['company'])
-                ->find($user->id),
+        return response()->json([
+            'less_month' => $data['less_month'],
+            'expired' => $data['expired']
         ]);
     }
 }
