@@ -144,12 +144,6 @@ class UpdateElementHandler implements UpdateElementHandlerInterface
                 continue;
             }
 
-            if (in_array($key, ['pressure_systolic', 'pressure_diastolic'])) {
-                $element[$key] = null;
-
-                continue;
-            }
-
             if (is_array($value)) {
                 $element[$key] = join(',', $value);
 
@@ -173,6 +167,12 @@ class UpdateElementHandler implements UpdateElementHandlerInterface
 
             if (isset($value) && !isset($this->files[$key])) {
                 $element[$key] = $value;
+
+                continue;
+            }
+
+            if (in_array($key, ['pressure_systolic', 'pressure_diastolic'])) {
+                $element[$key] = null;
             }
         }
 
