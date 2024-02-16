@@ -34,21 +34,20 @@ abstract class AbstractCreateFormHandler
     /** @var string */
     protected $time;
 
+    /**
+     * @var Authenticatable
+     */
+    protected $user;
+
     public function handle(array $data, Authenticatable $user): array
     {
         $this->init();
 
         $this->data = $data;
+        $this->user = $user;
 
         $this->createAdditionalForms();
-
-        /** @var User $user */
-        $this->data['user_id'] = $user->id;
-        $this->data['user_name'] = $user->name;
-        $this->data['operator_id'] = $user->id;
-        $this->data['user_eds'] = $user->eds;
-        $this->data['user_validity_eds_start'] = $user->validity_eds_start;
-        $this->data['user_validity_eds_end'] = $user->validity_eds_end;
+        $this->addUserInfo();
 
         $pointId = $data['pv_id'] ?? 0;
         $this->data['point_id'] = $pointId;
@@ -87,6 +86,19 @@ abstract class AbstractCreateFormHandler
         }
 
         return $responseData;
+    }
+
+    protected function addUserInfo()
+    {
+        $user = $this->user;
+
+        /** @var User $user */
+        $this->data['user_id'] = $user->id;
+        $this->data['user_name'] = $user->name;
+        $this->data['operator_id'] = $user->id;
+        $this->data['user_eds'] = $user->eds;
+        $this->data['user_validity_eds_start'] = $user->validity_eds_start;
+        $this->data['user_validity_eds_end'] = $user->validity_eds_end;
     }
 
     protected function init()
