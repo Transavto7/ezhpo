@@ -60,8 +60,6 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         $driverId = $form['driver_id'] ?? ($this->data['driver_id'] ?? 0);
         $driver = Driver::where('hash_id', $driverId)->first();
 
-        $company = null;
-
         $defaultData = [
             'date' => date('Y-m-d H:i:s'),
             'admitted' => 'Допущен',
@@ -81,8 +79,6 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             if ($companyDop) {
                 $form['company_id'] = $companyDop->hash_id;
                 $form['company_name'] = $companyDop->name;
-
-                $company = $companyDop;
             }
         }
 
@@ -167,8 +163,6 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
             $form['company_id'] = $carCompany->hash_id;
             $form['company_name'] = $carCompany->name;
-
-            $company = $carCompany;
         }
 
         if ($car) {
@@ -195,7 +189,7 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
          * Генерация номера ПЛ
          */
         if (empty($form['number_list_road']) && !$form['is_dop']) {
-            $form['number_list_road'] = $company->id . '-' . date('d.m.Y', strtotime($form['date']));
+            $form['number_list_road'] = $car->hash_id . '-' . date('d.m.Y', strtotime($form['date']));
         }
 
         if ($form['is_dop']) {

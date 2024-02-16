@@ -156,6 +156,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/terminals', 'TerminalController@index')->name('terminals');
     Route::get('/terminals/status', 'TerminalController@getConnectionStatus')->name('terminals.status');
     Route::post('/terminals', 'TerminalController@update')->name('terminals.update');
+    Route::get('/terminals/to-check', 'TerminalController@terminalsToCheck')->name('terminals.to-check');
 
     Route::resource('roles', 'RoleController');
     Route::post('roles/return_trash', 'RoleController@returnTrash');

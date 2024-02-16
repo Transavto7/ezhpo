@@ -36,6 +36,7 @@
                         :sort-by.sync="sortBy"
                         :sort-desc.sync="sortDesc"
                         :current-page="currentPage"
+                        :tbody-tr-class="tableRowClass"
                         responsive
                         @sort-changed="sortChanged"
                     >
@@ -69,6 +70,22 @@
 
                         <template #cell(stamp_id)="{ item }">
                             {{ item.stamp ? item.stamp.name : 'Неизвестно' }}
+                        </template>
+
+                        <template #cell(serial_number)="{ item }">
+                            {{ item.terminal_check ? item.terminal_check.serial_number : '' }}
+                        </template>
+
+                        <template #cell(date_check)="{ item }">
+                            {{ item.terminal_check ? formatDate(item.terminal_check.date_check) : '' }}
+                        </template>
+
+                        <template #cell(devices)="{ item }">
+                            <div v-if="item.terminal_devices">
+                                <div v-for="device of formatDevices(item.terminal_devices)">
+                                    {{ device.name }} ({{ device.serialNumber }})
+                                </div>
+                            </div>
                         </template>
 
                         <template #cell(blocked)="row">
@@ -211,6 +228,40 @@
                 </b-row>
                 <b-row class="mb-3">
                     <b-col lg="12">
+                        <label>
+                            <b class="text-danger text-bold">* </b>
+                            Дата поверки:
+                        </label>
+                        <b-form-datepicker v-model="infoModalUser.dateCheck"
+                                           size="sm"
+                                           placeholder="Укажите дату поверки"
+                                           locale="ru"
+                        />
+                    </b-col>
+                </b-row>
+                <b-row class="mb-3">
+                    <b-col lg="12">
+                        <label>
+                            <b class="text-danger text-bold">* </b>
+                            Серийный номер:
+                        </label>
+                        <b-form-input v-model="infoModalUser.serialNumber"
+                                      size="sm"
+                                      placeholder="Введите серийный номер"
+                        />
+                    </b-col>
+                </b-row>
+                <b-row class="mb-3">
+                    <b-col lg="12">
+                        <label class="mb-2">
+                            <b class="text-danger text-bold">* </b>
+                            Комплектующие:
+                        </label>
+                        <devices-input v-model="infoModalUser.devices" :options="devicesOptions"/>
+                    </b-col>
+                </b-row>
+                <b-row class="mb-3">
+                    <b-col lg="12">
                         <b-form-checkbox
                             id="checkbox-1"
                             v-model="infoModalUser.blocked"
@@ -236,11 +287,12 @@
 import vSelect from "vue-select";
 import 'vue-select/dist/vue-select.css';
 import Swal2 from "sweetalert2";
+import DevicesInput from "./ui/DevicesInput.vue";
 
 export default {
     name: "AdminTerminalsIndex",
-    props: ['users', 'deleted', 'roles', 'points', 'all_permissions', 'current_user_permissions', 'options_company', 'fields'],
-    components: { Swal2, vSelect },
+    props: ['users', 'deleted', 'roles', 'points', 'all_permissions', 'current_user_permissions', 'options_company', 'fields', 'devicesOptions'],
+    components: {DevicesInput, Swal2, vSelect },
 
     data() {
         return {
@@ -271,6 +323,9 @@ export default {
                 blocked: 0,
                 company: null,
                 permissions: [],
+                serialNumber: null,
+                dateCheck: null,
+                devices: []
             },
             optionsPvs: [],
             optionsRoles: [],
@@ -311,6 +366,35 @@ export default {
             console.log(this.items);
           });
         },
+        tableRowClass(item, type) {
+            if (item && type === 'row') {
+                if (item?.need_check?.in_a_month) {
+                    return 'row-check-in-a-month'
+                }
+                else if (item?.need_check?.expired) {
+                    return 'row-check-expired'
+                }
+                else {
+                    return ''
+                }
+            } else {
+                return null
+            }
+        },
+        async fetchTerminalsToCheck() {
+            axios.get('/terminals/to-check')
+                .then(response => {
+                    this.items = this.items.map(item => ({
+                        ...item,
+                        need_check: {
+                            in_a_month: response.data.less_month.includes(item.hash_id),
+                            expired: response.data.expired.includes(item.hash_id),
+                        }
+                    }))
+
+                    console.log('need', [...this.items.map(item => ({...item.need_check}))])
+                })
+        },
         loadData() {
             this.busy = true;
             this.loading = true;
@@ -329,6 +413,7 @@ export default {
                 this.totalRows = data.total_rows;
                 this.busy = false;
                 this.loadConnectionStatus();
+                this.fetchTerminalsToCheck()
             }).finally(() => {
                 this.loading = false;
             });
@@ -424,14 +509,27 @@ export default {
             });
         },
 
+        validateDevices() {
+            return !!this.infoModalUser.devices.length && !this.infoModalUser.devices.filter(item => !item.serial_number).length
+        },
         saveUser() {
             this.loading = true;
 
+            const deviceSerialNumbers = this.infoModalUser.devices.map(item => item.serial_number)
+
             if (!this.infoModalUser.name ||
-                    !this.infoModalUser.timezone ||
-                    !this.infoModalUser.pv_id ||
-                    !this.infoModalUser.company_id) {
+                !this.infoModalUser.timezone ||
+                !this.infoModalUser.pv_id ||
+                !this.infoModalUser.company_id ||
+                !this.infoModalUser.serialNumber ||
+                !this.infoModalUser.dateCheck ||
+                !this.validateDevices()) {
                 this.$toast('Не все поля указаны', { type: 'error' });
+                return;
+            }
+
+            if ([...(new Set(deviceSerialNumbers))].length !== deviceSerialNumbers.length) {
+                this.$toast('Серийные номера комплектующих не должны совпадать', { type: 'error' })
                 return;
             }
 
@@ -442,28 +540,58 @@ export default {
                 pv: this.infoModalUser.pv_id,
                 company_id: this.infoModalUser.company_id,
                 blocked:  this.infoModalUser.blocked,
-                stamp_id: this.infoModalUser.stamp_id
-            }).then(({data}) => {
-                if (data.status) {
-                    this.items.forEach((item, i, arr) => {
-                        if (item.id == data.user_info.id) {
-                            this.items[i] = data.user_info // Новый объект с новыми свойствами
-                        }
-                    })
-                    Swal2.fire('Сохранено', 'Данные были успешно записаны', 'success');
-                    this.$refs.users_table.refresh()
-                    this.enableModal = false
-                    location.reload()
+                stamp_id: this.infoModalUser.stamp_id,
+                serial_number: this.infoModalUser.serialNumber,
+                date_check: this.infoModalUser.dateCheck,
+                devices: this.infoModalUser.devices,
+            })
+                .then(({data}) => {
+                    if (data.status) {
+                        this.items.forEach((item, i, arr) => {
+                            if (item.id == data.user_info.id) {
+                                this.items[i] = data.user_info // Новый объект с новыми свойствами
+                            }
+                        })
+                        Swal2.fire('Сохранено', 'Данные были успешно записаны', 'success');
+                        this.$refs.users_table.refresh()
+                        this.enableModal = false
+                        location.reload()
 
-                }
+                    }
+                })
+                .catch((error) => {
+                    let errorText = 'Произошла ошибка. Попробуйте, пожалуйста, позже'
+                    if (error?.response?.data?.errors?.length) {
+                        errorText = error?.response?.data?.errors.join('\n')
+                    }
 
-            }).finally(() => {
-                this.loading = false;
-            });
+                    Swal2.fire('Ошибка', errorText, 'error');
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
 
         editUserData(user) {
-            this.infoModalUser = { ...user };
+            const data = { ...user }
+
+            data.dateCheck = null
+            data.serialNumber = null
+            if (user.terminal_check) {
+                data.dateCheck = user.terminal_check.date_check
+                data.serialNumber = user.terminal_check.serial_number
+            }
+
+            data.devices = []
+            if (user.terminal_devices) {
+                data.devices = user.terminal_devices.map(item => ({
+                    id: item.device_name,
+                    serial_number: item.device_serial_number,
+                }))
+            }
+
+            this.infoModalUser = data
+
             this.showModal();
         },
         resetModal() {
@@ -480,6 +608,9 @@ export default {
             this.infoModalUser.blocked = 0;
             this.infoModalUser.company = null;
             this.infoModalUser.permissions = [];
+            this.infoModalUser.serialNumber = null;
+            this.infoModalUser.dateCheck = null;
+            this.infoModalUser.devices = [];
             this.permission_collapse = false;
 
             this.allPermissions = this.allPermissions.map((item) => {
@@ -518,6 +649,18 @@ export default {
                 });
                 this.stamps = data;
             });
+        },
+
+        formatDate(date) {
+            const dateObject = new Date(date)
+            return `${String(dateObject.getDate()).padStart(2, '0')}.${String(dateObject.getMonth() + 1).padStart(2, '0')}.${dateObject.getFullYear()}`
+        },
+
+        formatDevices(devices) {
+            return devices.map(item => ({
+                name: this.devicesOptions.filter(option => option.id === item.device_name)[0].text,
+                serialNumber: item.device_serial_number
+            }))
         }
     },
     mounted() {
@@ -600,5 +743,13 @@ export default {
 .modal-dialog.modal-xl {
     max-width: 90%;
     margin: 1.75rem auto;
+}
+
+.row-check-in-a-month {
+    background-color: #fbf1d3!important;
+}
+
+.row-check-expired {
+    background-color: #fbd3d3 !important;
 }
 </style>
