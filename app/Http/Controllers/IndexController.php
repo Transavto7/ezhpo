@@ -14,11 +14,14 @@ use App\Imports\CompanyImport;
 use App\Imports\DriverImport;
 use App\Point;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class IndexController extends Controller
@@ -63,6 +66,31 @@ class IndexController extends Controller
     public function __construct()
     {
         $this->elements = config('elements');
+    }
+
+    public function deprecated(Request $request): JsonResponse
+    {
+        Log::channel('deprecated-api')->info(json_encode(
+            [
+                'request' => $request->all(),
+                'headers' => $request->headers->all(),
+                'user' => Auth::user(),
+                'ip' => $request->getClientIp() ?? null,
+            ]
+        ));
+
+        return response()->json(
+            ['message' => 'Метод не поддерживается, воспользуйтесь консольной командой'],
+            Response::HTTP_METHOD_NOT_ALLOWED
+        );
+    }
+
+    public function showVideo(): View
+    {
+        //TODO: это гет параметр?
+        return view('showVideo', [
+            'video' => $_GET['url'] ?? ''
+        ]);
     }
 
     public function GetFieldHTML(Request $request)
