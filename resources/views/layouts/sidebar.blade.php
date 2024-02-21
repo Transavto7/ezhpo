@@ -62,14 +62,15 @@
 
         @if(user()->access('approval_queue_view', 'approval_queue_clear'))
             @php
-                $countPakQueue = \App\Anketa::where('type_anketa', 'pak_queue');
-                if (!auth()->user()->access('approval_queue_view_all')) {
-                    $countPakQueue = $countPakQueue->where('user_id', auth()->user()->id);
-                }
-                $countPakQueue = $countPakQueue->count();
+                $countPakQueue = \App\Anketa::pakQueueCount(auth()->user());
             @endphp
-            <li><a href="{{ route('pak.index') }}"><i class="fa fa-users"></i>Очередь утверждения <span
-                        class="badge bg-primary text-white">{{ $countPakQueue < 99 ? $countPakQueue : '99+' }}</span></a>
+            <li>
+                <a href="{{ route('pak.index') }}">
+                    <i class="fa fa-users"></i>Очередь утверждения
+                    <span class="badge bg-primary text-white">
+                        {{ $countPakQueue < 99 ? $countPakQueue : '99+' }}
+                    </span>
+                </a>
             </li>
         @endif
 
@@ -283,7 +284,7 @@
                             $expiredCount = count($needToCheck['expired']);
                         @endphp
                         <li>
-                            <a href="{{ route('terminals') }}">
+                            <a href="{{ route('terminals.index') }}">
                                 Терминалы
                                 @if($lessMonthCount)
                                     <span class="badge bg-warning text-white">{{ $lessMonthCount < 99 ? $lessMonthCount : '99+' }}</span>
