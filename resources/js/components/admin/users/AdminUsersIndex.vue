@@ -26,7 +26,6 @@
             <div class="card">
                 <div class="card-body pt-0">
                     <b-table
-                        id="users_table"
                         v-if="current_user_permissions.permission_to_view"
                         :items="items"
                         :fields="columns"
@@ -625,8 +624,8 @@ export default {
         this.fetchCompanies()
         this.loadData()
         this.optionsPvs = this.points;
-        this.allPvs = this.points.map((pvGroups) => {
-            return pvGroups.options.map((pv) => {
+        this.allPvs = (this.points ?? []).map((pvGroups) => {
+            return (pvGroups.options ?? []).map((pv) => {
                 return {
                     id: pv.value,
                     name: `${pvGroups.label} - ${pv.text}`
