@@ -4,19 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Company;
 use App\FieldPrompt;
+use App\GenerateHashIdTrait;
 use App\User;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Routing\ResponseFactory;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
-use function foo\func;
 
 class UserController extends Controller
 {
+    use GenerateHashIdTrait;
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -90,30 +91,38 @@ class UserController extends Controller
     /**
      * Получает данные о пользователе по id
      * */
-    public function fetchUserData(Request $request)
+    public function fetchUserData(Request $request): JsonResponse
     {
-        $result = User::with(['roles', 'pv', 'company'])
-                      ->find($request->get('user_id'));
+        $result = User::query()
+            ->with([
+                'roles',
+                'roles.permissions',
+                'permissions',
+                'pv',
+                'company',
+                'points'
+            ])
+            ->find($request->get('user_id'));
 
-        $disablePermissions = collect();
-        $result->roles()
-               ->with(['permissions'])
-               ->get()
-               ->map(function ($q) use (&$disablePermissions) {
-                   $disablePermissions = $disablePermissions->merge($q->permissions);
-               });
+        $result->disable = $result->roles
+            ->reduce(function ($carry, $role) {
+                $carry->merge($role->permissions);
 
-        $result->disable = $disablePermissions
+                return $carry;
+            }, collect())
             ->unique('id')
             ->pluck('id')
             ->values();
 
-        $result->permission_user = $result->permissions()
-                                          ->get(['id'])
-                                          ->pluck('id')
-                                          ->values();
+        $result->permission_user = $result->permissions
+            ->pluck('id')
+            ->values();
 
-        return response($result);
+        $result->pvs = $result->points
+            ->pluck('id')
+            ->values();
+
+        return response()->json($result);
     }
 
     /**
@@ -121,60 +130,55 @@ class UserController extends Controller
      *
      * @param Request $request
      *
-     * @return Application|ResponseFactory|Response
+     * @return JsonResponse
+     * @throws Exception
      */
-    public function saveUser(Request $request)
+    public function saveUser(Request $request): JsonResponse
     {
-        if (array_search(6, $request->get('roles', []))) {
-            $pv      = null;
-            $company = $request->get('company', null);
+        $userIsClient = array_search(6, $request->get('roles', []));
+        if ($userIsClient) {
+            $pv = null;
+            $company = $request->get('company');
         } else {
             $company = null;
-            $pv      = $request->get('pv', null);
+            $pv = $request->get('pv');
         }
 
-        if ($userId = $request->get('user_id')) {
-            $user           = User::find($userId);
-            $user->name     = $request->get('name', null);
-            $user->login    = $request->get('login', null);
-            $user->email    = $request->get('email', null);
-            $user->eds      = $request->get('eds', null);
-            $user->timezone = $request->get('timezone', null);
-            $user->blocked  = $request->get('blocked', 0);
-            $user->validity_eds_start  = $request->get('validity_eds_start', null);
-            $user->validity_eds_end  = $request->get('validity_eds_end', null);
-        } else {
+        $userId = $request->get('user_id');
+        if (empty($userId)) {
             $validator = Validator::make($request->all(), [
                 'password' => ['required', 'string', 'min:1', 'max:255'],
                 'email'    => ['required', 'string', 'min:1', 'max:255'],
             ]);
 
             if ($validator->fails()) {
-                return response([
-                    'message' => $validator->errors(),
+                return response()->json([
                     'status'  => false,
+                    'message' => $validator->errors(),
                 ]);
             }
 
-            $user = User::create([
-                 'name'     => $request->get('name', null),
-                 'email'    => $request->get('email', null),
-                 'hash_id'  => mt_rand(1000, 9999).date('s'),
-                 'eds'      => $request->get('eds', null),
-                 'timezone' => $request->get('timezone', null),
-                 'blocked'  => $request->get('blocked', null),
-                 'validity_eds_start' => $request->get('validity_eds_start', null),
-                 'validity_eds_end'  => $request->get('validity_eds_end', null),
-            ]);
-        }
+            $user = new User();
 
-        if ($login = $request->get('login', null)) {
-            $user->login = $login;
+            $validator = function (int $hashId) {
+                if (User::where('hash_id', $hashId)->first()) {
+                    return false;
+                }
+
+                return true;
+            };
+
+            $user->hash_id = $this->generateHashId(
+                $validator,
+                config('app.hash_generator.user.min'),
+                config('app.hash_generator.user.max'),
+                config('app.hash_generator.user.tries')
+            );
         } else {
-            $user->login = $user->email;
+            $user = User::find($userId);
         }
 
-        if ($password = $request->get('password', null)) {
+        if ($password = $request->get('password')) {
             $password  = Hash::make($password);
             $api_token = Hash::make(date('H:i:s').sha1($password));
 
@@ -182,21 +186,38 @@ class UserController extends Controller
             $user->api_token = $api_token;
         }
 
+        $user->name = $request->get('name');
+        $user->login = $request->get('login');
+        $user->email = $request->get('email');
+        $user->eds = $request->get('eds');
+        $user->timezone = $request->get('timezone');
+        $user->blocked = $request->get('blocked', 0);
+        $user->validity_eds_start = $request->get('validity_eds_start');
+        $user->validity_eds_end = $request->get('validity_eds_end');
+        $user->login = $request->get('login', $user->email);
+
+        $user->save();
+
         $user->roles()->sync($request->get('roles', []));
         $user->permissions()->sync($request->get('permissions', []));
-
-
+        $user->points()->sync($request->get('pvs', []));
         $user->company()->associate($company);
         $user->pv()->associate($pv);
         $user->save();
 
-        return response([
-                'status'    => true,
-                'user_info' => User::with(['roles', 'permissions', 'pv'])
-                                   ->find($user->id),
-            ]);
-        }
+        $user = User::query()
+            ->with([
+                'roles',
+                'permissions',
+                'pv'
+            ])
+            ->find($user->id);
 
+        return response()->json([
+            'status'    => true,
+            'user_info' => $user,
+        ]);
+    }
 
     /**
      * Show the form for editing the specified resource.
