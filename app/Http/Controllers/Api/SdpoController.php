@@ -390,7 +390,10 @@ class SdpoController extends Controller
     {
         $inspection = Anketa::find($id);
         if ($inspection) {
-            $inspection->update(['type_anketa' => 'medic']);
+            $inspection->update([
+                'type_anketa' => 'medic',
+                'flag_pak' => 'СДПО-А'
+            ]);
         }
     }
 
