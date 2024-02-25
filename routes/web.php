@@ -89,7 +89,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('return_trash', 'RoleController@returnTrash');
     });
 
-    Route::resource('/', 'FieldPromptController');
+    Route::resource('field/prompt', 'FieldPromptController');
     Route::prefix('field/prompt')->as('prompt.')->group(function () {
         Route::any('filter', 'FieldPromptController@getAll');
     });
