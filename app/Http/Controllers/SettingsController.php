@@ -13,6 +13,7 @@ class SettingsController extends Controller
     {
         return view('admin.settings', [
             'logo' => Settings::setting('logo') ?? null,
+            'not_identify_text' => Settings::setting('not_identify_text') ?? null,
             'sms_api_key' => Settings::setting('sms_api_key') ?? null,
             'sms_text_phone' => Settings::setting('sms_text_phone') ?? null,
             'sms_text_driver' => Settings::setting('sms_text_driver') ?? null,
@@ -43,6 +44,7 @@ class SettingsController extends Controller
         }
 
         Settings::set('sms_api_key', $request->sms_api_key);
+        Settings::set('not_identify_text', $request->not_identify_text);
         Settings::set('sms_text_phone', $request->sms_text_phone);
         Settings::set('sms_text_driver', $request->sms_text_driver);
         Settings::set('sms_text_car', $request->sms_text_car);

@@ -765,6 +765,7 @@ $notDeletedItems = session('not_deleted_ankets');
                                                 </td>
 
                                                 <td class="td-option not-export">
+                                                    <a href="{{ route('changePakQueue', ['admitted' => 'Не идентифицирован', 'id' => $anketa->id]) }}" class="btn btn-secondary btn-sm mr-1"><i class="fa fa-question"></i></a>
                                                     <a href="{{ route('changePakQueue', ['admitted' => 'Не допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-danger"><i class="fa fa-close"></i></a>
                                                 </td>
                                             @endif

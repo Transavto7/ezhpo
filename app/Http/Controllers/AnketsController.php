@@ -10,6 +10,7 @@ use App\Anketa;
 use App\Company;
 use App\DDates;
 use App\Driver;
+use App\Enums\FormTypeEnum;
 use App\Point;
 use App\Settings;
 use App\User;
@@ -120,23 +121,33 @@ class AnketsController extends Controller
         return view('profile.anketa', $data);
     }
 
-    public function ChangePakQueue(Request $request, $id, $admitted)
+    public function ChangePakQueue(Request $request, $id, $admitted): RedirectResponse
     {
-        //TODO: нет никакой проверки на
-        // - состояние анкеты (может уже устаовили флаг)
-        // - тип анкеты (СДПО ли вообще она)
+        $allowedAdmitted = ['Допущен', 'Не идентифицирован', 'Не допущен'];
+        if (!in_array($admitted, $allowedAdmitted)) {
+            return back()->with('error', 'Недопустимый результат осмотра');
+        }
+
         /** @var User $user */
         $user = Auth::user();
 
         $form = Anketa::find($id);
 
         if (!$form) {
-            return back();
+            return back()->with('error', 'Осмотр не найден');
+        }
+
+        if ($form->type_anketa !== FormTypeEnum::PAK_QUEUE) {
+            return back()->with('error', 'Осмотр не находится в очереди утверждения');
         }
 
         $form->type_anketa = 'medic';
         $form->flag_pak = 'СДПО Р';
         $form->admitted = $admitted;
+
+        if ($form->admitted === 'Не идентифицирован') {
+            $form->comments = Settings::setting('not_identify_text') ?? 'Водитель не идентифицирован';
+        }
 
         $form->user_id = $user->id;
         $form->user_name = $user->name;
@@ -148,7 +159,7 @@ class AnketsController extends Controller
         $form->save();
 
         //TODO: заменить ивентом
-        if (!$admitted) {
+        if ($admitted === 'Не допущен') {
             //TODO: заменить такие поиски на скоупы или на отношение
             $company = Company::query()->where('hash_id', $form->company_id);
             $driver = Driver::query()->where('hash_id', $form->driver_id);
