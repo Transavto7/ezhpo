@@ -165,7 +165,7 @@ class SdpoController extends Controller
             $medic['med_view'] = 'Отстранение';
         }
 
-        if (doubleval($medic['t_people']) >= 38) {
+        if (doubleval($medic['t_people']) >= 37) {
             $notAdmittedReasons[] = ['Высокая температура'];
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';

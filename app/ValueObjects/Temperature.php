@@ -21,7 +21,7 @@ class Temperature
 
     public function isAdmitted(): bool
     {
-        if ($this->temperature >= 38) {
+        if ($this->temperature >= 37) {
             return false;
         }
 
