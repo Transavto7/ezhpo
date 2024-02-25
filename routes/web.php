@@ -84,18 +84,18 @@ Route::middleware(['auth'])->group(function () {
         Route::get('to-check', 'TerminalController@terminalsToCheck')->name('to-check');
     });
 
+    Route::resource('roles', 'RoleController');
     Route::prefix('roles')->as('roles.')->group(function () {
-        Route::resource('/', 'RoleController');
         Route::post('return_trash', 'RoleController@returnTrash');
     });
 
+    Route::resource('/', 'FieldPromptController');
     Route::prefix('field/prompt')->as('prompt.')->group(function () {
-        Route::resource('/', 'FieldPromptController');
         Route::any('filter', 'FieldPromptController@getAll');
     });
 
+    Route::resource('stamp', 'StampController');
     Route::prefix('stamp')->as('stamp.')->group(function () {
-        Route::resource('/', 'StampController');
         Route::any('filter', 'StampController@getAll');
         Route::any('find', 'StampController@find');
     });
