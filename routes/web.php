@@ -121,7 +121,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('list', 'PakController@list')->name('list');
         });
 
-        Route::prefix('éprofile')->group(function () {
+        Route::prefix('profile')->group(function () {
             Route::get('anketa', 'IndexController@RenderForms')->name('forms');
         });
 
