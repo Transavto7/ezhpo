@@ -158,15 +158,18 @@ class AnketsController extends Controller
 
         $form->save();
 
-        //TODO: заменить ивентом
+        /**
+         * ОТПРАВКА SMS
+         */
         if ($admitted === 'Не допущен') {
-            //TODO: заменить такие поиски на скоупы или на отношение
-            $company = Company::query()->where('hash_id', $form->company_id);
-            $driver = Driver::query()->where('hash_id', $form->driver_id);
+            $company = Company::query()->where('hash_id', $form->company_id)->first();
+            $driver = Driver::query()->where('hash_id', $form->driver_id)->first();
 
             $phoneToCall = Settings::setting('sms_text_phone');
+            $message = Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall";
+
             $sms = new SmsController();
-            $sms->sms($company->where_call, Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall");
+            $sms->sms($company->where_call, $message);
         }
 
         return back();

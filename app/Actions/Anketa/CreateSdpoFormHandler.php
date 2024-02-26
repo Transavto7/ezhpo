@@ -192,9 +192,11 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
          */
         $needNotify = $form['admitted'] === 'Не допущен' && $form['flag_pak'] !== 'СДПО Р';
         if($needNotify) {
-            $phone_to_call = Settings::setting('sms_text_phone');
+            $phoneToCall = Settings::setting('sms_text_phone');
+            $message = Settings::setting('sms_text_driver') . " $driver->fio. $phoneToCall";
+
             $sms = new SmsController();
-            $sms->sms($company->where_call, Settings::setting('sms_text_driver') . " $driver->fio. $phone_to_call");
+            $sms->sms($company->where_call, $message);
         }
     }
 }

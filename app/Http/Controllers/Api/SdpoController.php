@@ -195,12 +195,16 @@ class SdpoController extends Controller
             abort(500);
         }
 
-        // ОТПРАВКА SMS
+        /**
+         * ОТПРАВКА SMS
+         */
         $needNotify = $anketa['admitted'] === 'Не допущен' && $anketa['flag_pak'] !== 'СДПО Р';
         if ($needNotify) {
             $phoneToCall = Settings::setting('sms_text_phone');
+            $message = Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall";
+
             $sms = new SmsController();
-            $sms->sms($company->where_call, Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall");
+            $sms->sms($company->where_call, $message);
         }
 
         $anketa['timeout'] = Settings::setting('timeout') ?? 20;
@@ -222,17 +226,6 @@ class SdpoController extends Controller
         /** @var Anketa $anketa */
         if ($anketa['admitted'] === 'Не допущен') {
             $anketa['reasons'] = $notAdmittedReasons;
-
-            Log::channel('admitting')->info(json_encode(
-                [
-                    'id' => $anketa->id,
-                    'medic' => $medic,
-                    'anketa' => $anketa->toArray(),
-                    'request' => $request->all(),
-                    'source' => 'SdpoController',
-                    'reasons' => $notAdmittedReasons,
-                ]
-            ));
         }
 
         //TODO: вынести в мидлвар или ивент позже
