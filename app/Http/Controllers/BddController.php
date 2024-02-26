@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Anketa\CreateBddFormHandler;
+use App\Actions\Anketa\CreateSelfBddFormHandler;
 use App\Company;
 use App\Driver;
 use App\Instr;
@@ -49,7 +49,7 @@ class BddController extends Controller
         ]);
     }
 
-    public function store(Request $request, CreateBddFormHandler $handler): JsonResponse
+    public function store(Request $request, CreateSelfBddFormHandler $handler): JsonResponse
     {
         try {
             DB::beginTransaction();

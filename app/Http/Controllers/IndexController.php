@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Element\CreateElementHandlerFactory;
+use App\Actions\Element\SyncFieldsHandler;
+use App\Actions\Element\Update\UpdateElementHandlerFactory;
 use App\Car;
 use App\Company;
 use App\Driver;
@@ -10,8 +12,6 @@ use App\FieldPrompt;
 use App\Imports\CarImport;
 use App\Imports\CompanyImport;
 use App\Imports\DriverImport;
-use App\Instr;
-use App\Models\Contract;
 use App\Point;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -105,71 +105,42 @@ class IndexController extends Controller
         }
     }
 
-    public function syncDataFunc($data)
+    public function SyncDataElement(Request $request, SyncFieldsHandler $syncFieldsHandler)
     {
-        $model = app("App\\$data[model]");
+        $modelName = $request->model;
+        $eloquentModel = app("App\\$modelName");
+        $isApi = $request->get('api', 0);
 
-        if ($model) {
-            $model = $model->where($data['fieldFind'], $data['fieldFindId']);
-
-            if ($data['model'] === 'Driver' || $data['model'] === 'Car') {
-                $model->where('autosync_fields', 'LIKE', "%$data[fieldSync]%");
-            }
-
-            $model = $model->update([$data['fieldSync'] => $data['fieldSyncValue']]);
-
-            return $model;
-        }
-
-        return 0;
-    }
-
-    public function SyncDataElement(Request $request)
-    {
-        $fieldFind      = $request->fieldFind;
-        $model          = $request->model;
-        $fieldSync      = $request->fieldSync;
-        $fieldSyncValue = $request->fieldSyncValue ? $request->fieldSyncValue : '';
-        $fieldFindId    = $request->fieldFindId;
-
-        $model_text = $model;
-        $model      = app("App\\$model");
-
-        $is_api = $request->get('api', 0);
-
-        if ($model) {
-            $model = $this->syncDataFunc([
-                                             'model'          => $model_text,
-                                             'fieldFind'      => $fieldFind,
-                                             'fieldFindId'    => $fieldFindId,
-                                             'fieldSync'      => $fieldSync,
-                                             'fieldSyncValue' => $fieldSyncValue,
-                                         ]);
-
-            if ($model) {
-                if ( !$is_api) {
-                    return view('pages.success', [
-                        'text' => "Поля успешно синхронизированы. Кол-во элементов: $model",
-                    ]);
-                }
-
-                return $model;
-            } else {
-                if ( !$is_api) {
-                    return view('pages.warning', [
-                        'text' => "Модель $model_text не найдена",
-                    ]);
-                }
-
-                return 0;
-            }
-        }
-
-        if ($is_api) {
+        if (!$eloquentModel && $isApi) {
             return 0;
         }
 
-        return abort(500, 'Не найдена модель');
+        if (!$eloquentModel) {
+            abort(500, 'Не найдена модель');
+        }
+
+        $updatedModelsCount = $syncFieldsHandler->handle([
+            'model'          => $modelName,
+            'fieldFind'      => $request->fieldFind,
+            'fieldFindId'    => $request->fieldFindId,
+            'fieldSync'      => $request->fieldSync,
+            'fieldSyncValue' => $request->fieldSyncValue ?? '',
+        ]);
+
+        if ($isApi) {
+            return $updatedModelsCount ?? 0;
+        }
+
+        if ($updatedModelsCount) {
+            return view('pages.success', [
+                'text' => "Поля успешно синхронизированы. Кол-во элементов: $updatedModelsCount",
+            ]);
+        } else {
+            //TODO: очень странное поведение, если нет записей для обновления - выводит такое
+            return view('pages.warning', [
+                'text' => "Модель $modelName не найдена",
+            ]);
+        }
     }
 
     public function getElements()
@@ -298,25 +269,15 @@ class IndexController extends Controller
         return redirect( $_SERVER['HTTP_REFERER'] );
     }
 
-    public function UpdateElement (Request $request)
+    public function UpdateElement(Request $request, UpdateElementHandlerFactory $factory)
     {
-        $model_text = $request->type;
-        $model = app("App\\$model_text");
-        $id = $request->id;
+        try {
+            DB::beginTransaction();
 
-        if($model) {
-            $data         = $request->all();
+            $handler = $factory->make($request->type);
 
-            if(array_key_exists('town_id', $data) && $data['town_id'] == null){
-                $data['town_id'] = "";
-            }
-
-            if(array_key_exists('comment', $data) && $data['comment'] == null){
-                $data['comment'] = "";
-            }
-
-            $oldDataModel = [];
-            $element      = $model->find($id);
+            $data = $request->all();
+            $data['files_from_request'] = $request->allFiles();
 
             unset($data['_token']);
 
@@ -324,148 +285,18 @@ class IndexController extends Controller
                 $data['company_id'] = $request->user()->company_id;
             }
 
-            // Обновляем данные
-            if ($element) {
-                // Парсим файлы
-                foreach ($request->allFiles() as $file_key => $file) {
-                    if (isset($data[$file_key]) && !isset($data[$file_key.'_base64'])) {
-                        Storage::disk('public')->delete($element[$file_key]);
-                        $file_path = Storage::disk('public')->putFile('elements', $file);
+            $handler->handle($request->id, $data);
 
-                        $element[$file_key] = $file_path;
-                    }
-                }
+            DB::commit();
+        } catch (Throwable $exception) {
+            DB::rollBack();
 
-                foreach ($data as $k => $v) {
-                    $oldDataModel[$k] = $element[$k];
-
-                    if ($k === 'contracts' || $k === 'contract_id' || $k === 'contract_ids') {
-                        continue;
-                    }
-
-                    if (is_array($v)) {
-                        $element[$k] = join(',', $v);
-                    } else {
-                        if (preg_match('/^data:image\/(\w+);base64,/', $v)) {
-                            $k = str_replace('_base64', '', $k);
-
-                            $base64_image = substr($v, strpos($v, ',') + 1);
-                            $base64_image = base64_decode($base64_image);
-
-                            $name = $model . '_' . $element->id;
-                            $path = "elements/$name.png";
-
-                            $base64_image = Storage::disk('public')->put($path, $base64_image);
-
-                            $element->$k = $path;
-                        } else {
-                            if (isset($v) && !$request->hasFile($k)) {
-                                $element[$k] = $v;
-                            } else if ($k === 'pressure_systolic' || $k === 'pressure_diastolic') {
-                                $element[$k] = null;
-                            }
-                        }
-                    }
-                }
-
-
-                //АВТО <- КОМПАНИЯ (СИНХРОНИЗАЦИЯ ПОЛЕЙ)
-                if ($model_text === 'Driver' || $model_text === 'Car') {
-                    if (isset($element->company_id)) {
-                        if ($element->company_id) {
-                            if ($oldDataModel['company_id'] != $element->company_id) {
-                                $aSyncFields = explode(',', $element->autosync_fields);
-
-                                foreach ($aSyncFields as $fSync) {
-                                    $company = Company::find($element->company_id);
-                                    if ($company) {
-                                        $element->$fSync = $company->$fSync;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if ($model_text === 'Product' || $model_text === 'Service') {
-                    if ($element->type_product === 'Абонентская плата без реестров') {
-                        $element->type_anketa = null;
-                        $element->type_view   = null;
-                    }
-                }
-
-                if ($model_text === 'Company') {
-                    if (isset($element->products_id)) {
-                        $this->syncDataFunc([
-                            'model'          => 'Driver',
-                            'fieldFind'      => 'company_id',
-                            'fieldFindId'    => $element->id,
-                            'fieldSync'      => 'products_id',
-                            'fieldSyncValue' => $element->products_id
-                        ]);
-
-                        $this->syncDataFunc([
-                            'model'          => 'Car',
-                            'fieldFind'      => 'company_id',
-                            'fieldFindId'    => $element->id,
-                            'fieldSync'      => 'products_id',
-                            'fieldSyncValue' => $element->products_id
-                        ]);
-                    }
-
-                    $requiredBriefing = isset($data['required_type_briefing']) && $data['required_type_briefing'] == 'on';
-                    $element->required_type_briefing = $requiredBriefing;
-                }
-
-            }
-
-            if ($model_text === 'Instr') {
-                $isDefault = isset($data['is_default']) && $data['is_default'] == 'on';
-                Instr::where('type_briefing', $element->type_briefing)->where('is_default', 1)->update(["is_default" => 0]);
-                $element->is_default = $isDefault;
-            }
-
-            /**
-             * Пустые поля обновляем (На самом деле нет)
-             */
-            foreach ($oldDataModel as $oldDataItemKey => $oldDataItemValue) {
-                if ( !isset($data[$oldDataItemKey])
-                     && ($oldDataItemKey == 'note'
-                         || $oldDataItemKey == 'document_bdd')) {
-                    $element[$oldDataItemKey] = '';
-                }
-            }
+            return back()->withErrors([
+                'errors' => $exception->getMessage()
+            ]);
         }
 
-        if($element->save()){
-            if ($model_text == 'Driver' || $model_text == 'Car'){
-                $element->contracts()->sync($data['contract_ids'] ?? []);
-
-                $company = Company::where("id", $data['company_id'])->first();
-
-                if($company) {
-                    if(Contract::query()
-                        ->where('company_id', $data['company_id'])
-                        ->where('main_for_company', 1)->first()
-                    ){
-                        $contract = Contract::query()
-                            ->where('company_id', $data['company_id'])
-                            ->where('main_for_company', 1)->first();
-
-                        if($model_text === 'Driver'){
-                            $contract->drivers()->attach($element->id);
-                        }
-
-                        if($model_text === 'Car'){
-                            $contract->cars()->attach($element->id);
-                        }
-                    }
-                }
-            }
-        }
-
-
-        return redirect($_SERVER['HTTP_REFERER']);
+        return redirect($request->headers->get('referer'));
     }
 
     public function showEditModal($model, $id)
