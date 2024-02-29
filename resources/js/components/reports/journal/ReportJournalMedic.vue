@@ -11,8 +11,8 @@
                         <th class="text-center" width="150">Предрейсовый/Предсменный</th>
                         <th class="text-center" width="150">Послерейсовый/Послесменный</th>
                         <th class="text-center" width="150">Несогласованные осмотры</th>
-
                         <th class="text-center" width="150">БДД</th>
+                        <th class="text-center" width="150">Не идентифицирован</th>
                         <th class="text-center" width="150">Отчёты с карт</th>
                         <th class="text-center" width="150">Печать ПЛ</th>
                     </tr>
@@ -81,6 +81,10 @@
                         </td>
 
                         <td class="text-center" width="150">
+                            {{ getTotal(item, 'Не идентифицирован') }}
+                        </td>
+
+                        <td class="text-center" width="150">
                             {{ getTotal(item, 'report_cart') }}
 
                             <div class="text-red font-weight-bold" v-if="getSum(item, 'report_cart') == null">
@@ -146,6 +150,12 @@
                             {{ getTotalAll(reports, 'bdd') }}
 
                             <div class="font-weight-bold" v-if="getSumAll(reports, 'bdd') != null"> {{ getSumAll(reports, 'bdd') }}₽ </div>
+                        </td>
+
+                        <td class="text-center" width="150">
+                            {{ getTotalAll(reports, 'Не идентифицирован') }}
+
+                            <div class="font-weight-bold" v-if="getSumAll(reports, 'Не идентифицирован') != null"> {{ getSumAll(reports, 'Не идентифицирован') }}₽ </div>
                         </td>
 
                         <td class="text-center" width="150">
