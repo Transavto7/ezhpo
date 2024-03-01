@@ -18,7 +18,6 @@ class SmsController extends Controller
             $apiKey = Settings::setting('sms_api_key');
             if (empty($apiKey)) return '';
 
-            $to = '79875066080';
             $phone = new Phone($to);
             if (!$phone->isValid()) {
                 $errorMessage = 'Не валидный номер телефона';
