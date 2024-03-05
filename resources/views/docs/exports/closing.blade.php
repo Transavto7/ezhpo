@@ -46,7 +46,7 @@
         </tr>
         <tr>
             <td rowspan="2">
-                {{ $date }}
+                {{ $date_str }}
             </td>
             <td rowspan="2">
                 {{ $time }}
