@@ -94,7 +94,7 @@ Route::middleware(['auth'])->group(function () {
         Route::any('filter', 'FieldPromptController@getAll');
     });
 
-    Route::resource('stamp', 'StampController');
+    Route::resource('stamp', 'StampController')->except(['show']);
     Route::prefix('stamp')->as('stamp.')->group(function () {
         Route::any('filter', 'StampController@getAll');
         Route::any('find', 'StampController@find');
