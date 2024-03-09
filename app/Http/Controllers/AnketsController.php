@@ -13,6 +13,7 @@ use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Point;
 use App\Settings;
+use App\Traits\UserEdsTrait;
 use App\User;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Http\JsonResponse;
@@ -425,7 +426,8 @@ class AnketsController extends Controller
         $pdf = Pdf::loadView('docs.print', [
             'anketa' => $anketa,
             'stamp' => $stamp,
-            'user' => $user
+            'user' => $user,
+            'validity' => UserEdsTrait::getValidityString()
         ]);
 
         $response = response()->make($pdf->output(), 200);
