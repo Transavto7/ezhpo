@@ -433,6 +433,9 @@ return [
             'created_at',
             'flag_pak',
             'is_dop',
+            't_people',
+            'tonometer',
+            'pulse'
         ],
         'tech' => [
             'company_id',

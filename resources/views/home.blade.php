@@ -22,7 +22,6 @@
             border-radius: 3px;
             background-color: #f4b2b0;
             padding: .21rem .4rem;
-
         }
 
         #hv-alert-error-close {
@@ -41,7 +40,7 @@
         window.onload = function () {
             @if($filter_activated)
                 $.get(location.href + '&getCounts=1').done(data => {
-                    if(data) {
+                    if (data) {
                         $('#COUNTS_ANKETAS').html(`
                             <p class="text-success">Кол-во Автомобилей: <b>${data.anketasCountCars}</b></p>
                             <p class="text-success">Кол-во Водителей: <b>${data.anketasCountDrivers}</b></p>
@@ -53,24 +52,16 @@
         };
 
         $(document).ready(function () {
-            @if (user()->fields_visible)
-                let fieldsVisible = JSON.parse(`{!! user()->fields_visible !!}`);
-            @else
-                let fieldsVisible = JSON.parse(`{!! json_encode(config('fields.visible')) !!}`);
-            @endif
+            let fieldsVisible = @json(user()->fields_visible ?? config('fields.visible'));
 
             $('.ankets-form input').each(function () {
                 const type = $(this).parents('.ankets-form').attr('anketa');
                 const name = $(this).attr('name');
-                if (fieldsVisible[type] && fieldsVisible[type][name]) {
-                    $(this).prop("checked", true);
-                } else {
-                    $(this).prop("checked", false);
-                }
+                $(this).prop("checked", Boolean(fieldsVisible[type] && fieldsVisible[type][name]));
             });
 
             const showTableData = el => {
-                if(el) {
+                if (el) {
                     const id = el.attr('name');
                     const prop_checked = el.prop('checked');
 
@@ -295,7 +286,6 @@
             })
         })
     </script>
-
 @endsection
 
 @php
@@ -327,7 +317,6 @@ function checkChangeResult($anketa) {
     return true;
 }
 
-//dd($type_ankets);
 $permissionToView = (
     user()->access('medic_read') && $type_ankets == 'medic'
     || user()->access('tech_read') && $type_ankets == 'tech'
@@ -338,7 +327,6 @@ $permissionToView = (
     || user()->access('approval_queue_view') && $type_ankets == 'pak_queue'
 );
 
-
 $permissionToTrashView = (
     user()->access('medic_trash') && $type_ankets == 'medic'
     || user()->access('tech_trash') && $type_ankets == 'tech'
@@ -347,26 +335,26 @@ $permissionToTrashView = (
     || user()->access('map_report_trash') && $type_ankets == 'report_cart'
     || user()->access('errors_sdpo_trash') && $type_ankets == 'pak'
 );
+
 $permissionToDelete = (
-        $type_ankets == 'medic' && user()->access('medic_delete')
-        || $type_ankets == 'tech' && user()->access('tech_delete')
-        || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_delete')
-        || user()->access('journal_pl_delete') && $type_ankets == 'pechat_pl'
-        || user()->access('map_report_delete') && $type_ankets == 'report_cart'
-        || user()->access('errors_sdpo_delete') && $type_ankets == 'pak'
+    $type_ankets == 'medic' && user()->access('medic_delete')
+    || $type_ankets == 'tech' && user()->access('tech_delete')
+    || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_delete')
+    || user()->access('journal_pl_delete') && $type_ankets == 'pechat_pl'
+    || user()->access('map_report_delete') && $type_ankets == 'report_cart'
+    || user()->access('errors_sdpo_delete') && $type_ankets == 'pak'
 );
 
 $permissionToUpdate = (
-            $type_ankets == 'medic' && user()->access('medic_update')
-            || $type_ankets == 'tech' && user()->access('tech_update')
-            || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_update')
-        || user()->access('journal_pl_update') && $type_ankets == 'pechat_pl'
-        || user()->access('map_report_update') && $type_ankets == 'report_cart'
-        || user()->access('errors_sdpo_update') && $type_ankets == 'pak'
+    $type_ankets == 'medic' && user()->access('medic_update')
+    || $type_ankets == 'tech' && user()->access('tech_update')
+    || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_update')
+    || user()->access('journal_pl_update') && $type_ankets == 'pechat_pl'
+    || user()->access('map_report_update') && $type_ankets == 'report_cart'
+    || user()->access('errors_sdpo_update') && $type_ankets == 'pak'
 );
 
-
-$permissionToExport = (
+$permissionToExport = !user()->hasRole('client') && (
     $type_ankets == 'tech' && user()->access('tech_export')
     || $type_ankets == 'medic' && user()->access('medic_export')
     || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_export')
@@ -374,7 +362,7 @@ $permissionToExport = (
     || $type_ankets == 'report_cart' && user()->access('map_report_export')
 );
 
-$permissionToExportPrikaz = (
+$permissionToExportPrikaz = !user()->hasRole('client') && (
     $type_ankets == 'tech' && user()->access('tech_export_prikaz')
     || $type_ankets == 'medic' && user()->access('medic_export_prikaz')
     || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_export_prikaz')
@@ -382,16 +370,12 @@ $permissionToExportPrikaz = (
     || $type_ankets == 'report_cart' && user()->access('map_report_export_prikaz')
 );
 
-$permissionToExportPrikazPL = (
+$permissionToExportPrikazPL = !user()->hasRole('client') && (
     $type_ankets == 'tech' && user()->access('tech_export_prikaz_pl')
 );
 
 $notDeletedItems = session('not_deleted_ankets');
 @endphp
-
-
-
-
 
 @section('content')
     <div class="col-md-12">
@@ -420,13 +404,13 @@ $notDeletedItems = session('not_deleted_ankets');
                                     @if($type_ankets === 'tech')
                                         <div class="col-md-8 text-right">
                                             @if($permissionToExport)
-                                            <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
+                                            <a href="?export=1&{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
                                             @endif
                                             @if($permissionToExportPrikaz)
-                                                <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ТО <i class="fa fa-download"></i></a>
+                                                <a href="?export=1&{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ТО <i class="fa fa-download"></i></a>
                                             @endif
                                             @if($permissionToExportPrikazPL)
-                                                <a href="?export=1{{ $queryString }}&exportPrikazPL=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ПЛ <i class="fa fa-download"></i></a>
+                                                <a href="?export=1&{{ $queryString }}&exportPrikazPL=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ПЛ <i class="fa fa-download"></i></a>
                                             @endif
                                         </div>
                                     @else
@@ -434,10 +418,10 @@ $notDeletedItems = session('not_deleted_ankets');
                                             <!--                                    <button type="button" onclick="exportTable('ankets-table', true)" class="btn btn-default">Экспорт результатов <i class="fa fa-download"></i></button>-->
                                             <!--                                    <button type="button" onclick="exportTable('ankets-table')" class="btn btn-default">Экспорт результатов по приказу <i class="fa fa-download"></i></button>-->
                                             @if($permissionToExport)
-                                                <a href="?export=1{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
+                                                <a href="?export=1&{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
                                             @endif
                                             @if($permissionToExportPrikaz)
-                                                <a href="?export=1{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу <i class="fa fa-download"></i></a>
+                                                <a href="?export=1&{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу <i class="fa fa-download"></i></a>
                                             @endif
                                         </div>
                                     @endif
@@ -489,16 +473,12 @@ $notDeletedItems = session('not_deleted_ankets');
                             </div>
                         </form>
                         @endif
-                    @else
+                    @elseif(user()->access('approval_queue_clear'))
                         {{-- ОЧИСТКА ОЧЕРЕДИ СДПО --}}
-                        @if($type_ankets === 'pak_queue')
-                            @if(user()->access('approval_queue_clear'))
-                                <a href="?clear=1&type_anketa={{ $type_ankets }}" class="btn btn-warning mb-2">Очистить очередь</a>
-                            @endif
-                        @endif
+                        <a href="?clear=1&type_anketa={{ $type_ankets }}" class="btn btn-warning mb-2">Очистить очередь</a>
                     @endif
 
-                    @if (session()->has('error'))
+                    @if(session()->has('error'))
                         <div class="alert alert-danger" role="alert">{{ session()->get('error') }}</div>
                     @endif
 
@@ -593,11 +573,6 @@ $notDeletedItems = session('not_deleted_ankets');
                                                 <th class="not-export">#</th>
                                             @endif
                                         @endif
-
-                                        {{-- УДАЛЕНИЕ--}}
-    {{--                                    @if($permissionToDelete)--}}
-    {{--                                        <th class="not-export">#</th>--}}
-    {{--                                    @endif--}}
 
                                         @if($type_ankets !== 'pak_queue')
                                                 @if($permissionToDelete)
@@ -846,10 +821,6 @@ $notDeletedItems = session('not_deleted_ankets');
 
                 </div>
             </div>
-
         </div>
     </div>
-
-    {{--@include('templates.dashboard')--}}
-
 @endsection
