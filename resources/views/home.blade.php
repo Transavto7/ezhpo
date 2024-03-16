@@ -39,46 +39,54 @@
     <script type="text/javascript">
         window.onload = function () {
             @if($filter_activated)
-                $.get(location.href + '&getCounts=1').done(data => {
-                    if (data) {
-                        $('#COUNTS_ANKETAS').html(`
+            $.get(location.href + '&getCounts=1').done(data => {
+                if (data) {
+                    $('#COUNTS_ANKETAS').html(`
                             <p class="text-success">Кол-во Автомобилей: <b>${data.anketasCountCars}</b></p>
                             <p class="text-success">Кол-во Водителей: <b>${data.anketasCountDrivers}</b></p>
                             <p class="text-success">Кол-во Компаний: <b>${data.anketasCountCompany}</b></p>
                         `);
-                    }
-                })
+                }
+            })
             @endif
         };
 
-        $(document).ready(function () {
-            let fieldsVisible = @json(user()->fields_visible ?? config('fields.visible'));
+        let fieldsVisible = JSON.parse(`{!! user()->fields_visible ?? json_encode(config('fields.visible')) !!}`);
+        const type = $('.ankets-form').attr('anketa');
 
+        function setVisibleInputs() {
             $('.ankets-form input').each(function () {
-                const type = $(this).parents('.ankets-form').attr('anketa');
                 const name = $(this).attr('name');
-                $(this).prop("checked", Boolean(fieldsVisible[type] && fieldsVisible[type][name]));
+                let checked = false;
+                if (fieldsVisible[type] && fieldsVisible[type][name]) {
+                    checked = true;
+                }
+                $(this).prop("checked", checked);
+                $(this).trigger('change');
             });
+        }
+
+        $(document).ready(function () {
+            setVisibleInputs();
 
             const showTableData = el => {
                 if (el) {
                     const id = el.attr('name');
                     const prop_checked = el.prop('checked');
 
-                    let anketsTable = $(`.ankets-table thead th[data-field-key="${id}"], .ankets-table tbody tr td[data-field-key="${id}"]`),
-                        displayProp = (!prop_checked ? 'none' : 'table-cell')
+                    const anketsTable = $(`.ankets-table thead th[data-field-key="${id}"], .ankets-table tbody tr td[data-field-key="${id}"]`)
+                    const displayProp = !prop_checked ? 'none' : 'table-cell'
 
                     anketsTable.attr('hidden', !prop_checked).css({'display': displayProp })
-                } else {
-                    $('.ankets-form input').each(function () {
-                        let $t = $(this)
 
-                        if(this.name !== '_token') {
-                            showTableData($t)
-                        }
-
-                    })
+                    return
                 }
+
+                $('.ankets-form input').each(function () {
+                    if (this.name !== '_token') {
+                        showTableData($(this))
+                    }
+                })
             }
 
             showTableData()
@@ -87,13 +95,12 @@
                 let el = $(e.target)
                 const type = el.parents('.ankets-form').attr('anketa');
                 const id = el.attr('name');
-                const prop_checked = el.prop('checked');
 
                 if (!fieldsVisible[type]) {
                     fieldsVisible[type] = {};
                 }
 
-                fieldsVisible[type][id] = prop_checked;
+                fieldsVisible[type][id] = el.prop('checked');
 
                 showTableData(el)
             });
@@ -106,15 +113,7 @@
             $('#resetFieldsBtn').click(async function () {
                 fieldsVisible = JSON.parse(`{!! json_encode(config('fields.visible')) !!}`);
 
-                $('.ankets-form input').each(function () {
-                    const type = $(this).parents('.ankets-form').attr('anketa');
-                    const name = $(this).attr('name');
-                    if (fieldsVisible[type] && fieldsVisible[type][name]) {
-                        $(this).prop("checked", true);
-                    } else {
-                        $(this).prop("checked", false);
-                    }
-                });
+                setVisibleInputs();
 
                 await saveFieldsVisible(null);
                 $('.toast-reset-checks').toast('show');
