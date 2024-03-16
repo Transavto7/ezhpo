@@ -55,7 +55,7 @@ class SdpoController extends Controller
             ->where('driver_id', $id)
             ->where('type_anketa', FormTypeEnum::MEDIC)
             ->where('admitted', 'Допущен')
-            ->where('is_pak', 1)
+            ->whereNotNull('flag_pak')
             ->whereDate('date', '<=', Carbon::now()->toDateTime())
             ->whereDate('date', '>=', Carbon::now()->startOfMonth()->subMonth()->toDateString())
             ->get()
