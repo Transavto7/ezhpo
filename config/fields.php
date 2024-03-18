@@ -433,6 +433,10 @@ return [
             'created_at',
             'flag_pak',
             'is_dop',
+            't_people',
+            'tonometer',
+            'pulse',
+            'period_pl'
         ],
         'tech' => [
             'company_id',
@@ -440,6 +444,8 @@ return [
             'created_at',
             'realy',
             'is_dop',
+            'date_prto',
+            'period_pl'
         ],
         'bdd' => [
             'company_id',

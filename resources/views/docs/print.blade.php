@@ -82,13 +82,8 @@
         {{ $anketa->date ?? '0000-00-00 00:00:00' }}<br>
         {{ $anketa->user_name ?? 'неизвестный сотрудник' }}<br>
         ЭЦП {{ $anketa->user_eds ?? 'неизвестная-подпись' }}<br>
-        @if ($user->validity_eds_start && $user->validity_eds_end)
-            <span class="validity">
-                Срок действия: c
-                {{ \Carbon\Carbon::parse($user->validity_eds_start)->format('d.m.Y') }}
-                по
-                {{ \Carbon\Carbon::parse($user->validity_eds_end)->format('d.m.Y') }}
-            </span>
+        @if ($validity)
+            <span class="validity">{{ $validity }}</span>
         @endif
     </div>
 </body>

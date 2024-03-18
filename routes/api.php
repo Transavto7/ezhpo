@@ -1,6 +1,8 @@
 <?php
 
+use App\Anketa;
 use App\Http\Controllers\Api\SdpoController;
+use App\Http\Controllers\ReportContractRefactoringController;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -23,66 +25,64 @@ use App\Point;
 Route::get('/companies/find', 'ApiController@companiesList');
 Route::get('/find/{model}', 'ApiController@modelList');
 
-Route::get('reports/journal', 'ReportController@getJournalData')->name('api.reports.journal');
-Route::get('reports/contract/journal', 'ReportControllerContract@getJournalData')->name('api.reports.journal');
-Route::get('reports/journal/export', 'ReportController@exportJournalData')->name('api.reports.journal.export');
-Route::get('reports/contract/journal/export', 'ReportController@exportJournalData');
-Route::get('reports/getContractsForCompany', 'ReportControllerContract@getContractsForCompany')->name('api.reports.journal');
-//Route::get('reports/contract/getContractsForCompany', 'ReportControllerContract@getContractsForCompany')->name('api.reports.journal');
-
-Route::get('reports/contract/journal_v2',[
-    \App\Http\Controllers\ReportContractRefactoringController::class, 'getReport'
-]);
-Route::get('reports/contract/export/journal_v2',[
-    \App\Http\Controllers\ReportContractRefactoringController::class, 'export'
-]);
+Route::prefix('reports')->group(function () {
+    Route::prefix('journal')->group(function () {
+        Route::get('/', 'ReportController@getJournalData')->name('api.reports.journal');
+        Route::get('/export', 'ReportController@exportJournalData')->name('api.reports.journal.export');
+    });
+    Route::prefix('contract')->group(function () {
+        Route::get('/journal', 'ReportControllerContract@getJournalData')->name('api.reports.journal');
+        Route::get('/journal/export', 'ReportController@exportJournalData');
+        Route::get('/journal_v2',[ReportContractRefactoringController::class, 'getReport']);
+        Route::get('/export/journal_v2',[ReportContractRefactoringController::class, 'export']);
+    });
+    Route::get('getContractsForCompany', 'ReportControllerContract@getContractsForCompany')->name('api.reports.journal');
+});
 
 Route::get('/sync-fields/{model}/{id}', function ($model, $id) {
-    $data = app("App\\$model")->getAutoSyncFieldsFromHashId($id);
-
-    return $data;
-});
-
-Route::middleware('auth:api')->get('/users/{role}', function (Request $request) {
-    $user = $request->user();
-
-    if ($user->hasRole('terminal')) {
-        $user = User::with('roles')->whereHas('roles', function ($q) use ($request) {
-            $q->where('roles.id', 2);
-        })->get();
-
-        return response()->json($user);
-    }
-});
-
-Route::middleware('auth:api')->post('/get-user-from-token', function (Request $request) {
-    $user = $request->user();
-
-    if($user->hasRole('terminal')) {
-        if (isset($request->token)) {
-            $user = User::where('api_token', $request->token)->first();
-        };
-
-        return response()->json($user);
-    }
-});
-
-
-Route::middleware('auth:api')->post('/get-user/{user_id}', function (Request $request) {
-    $user = $request->user();
-
-    if($user->hasRole('terminal')) {
-        $user_id = $request->user_id;
-        $user = User::find($user_id);
-
-        return response()->json($user);
-    }
+    return app("App\\$model")->getAutoSyncFieldsFromHashId($id);
 });
 
 Route::middleware('auth:api')->group(function () {
+    Route::get('/users/{role}', function (Request $request) {
+        $user = $request->user();
 
-    Route::get('anketa/{id}', function ($id) {
-        $anketa = \App\Anketa::find($id);
+        if ($user->hasRole('terminal')) {
+            $user = User::with('roles')->whereHas('roles', function ($q) use ($request) {
+                $q->where('roles.id', 2);
+            })->get();
+
+            return response()->json($user);
+        }
+    });
+
+    Route::post('/get-user-from-token', function (Request $request) {
+        $user = $request->user();
+
+        if($user->hasRole('terminal')) {
+            if (isset($request->token)) {
+                $user = User::where('api_token', $request->token)->first();
+            }
+
+            return response()->json($user);
+        }
+    });
+
+    Route::post('/get-user/{user_id}', function (Request $request) {
+        $user = $request->user();
+
+        if($user->hasRole('terminal')) {
+            $user_id = $request->user_id;
+            $user = User::find($user_id);
+
+            return response()->json($user);
+        }
+    });
+
+    Route::post('/anketa', 'AnketsController@ApiAddForm')->name('api.addform');
+
+    Route::get('/anketa/{id}', function ($id) {
+        $anketa = Anketa::find($id);
 
         if ($anketa && $anketa->type_anketa == 'pak_queue') {
             if (Carbon::now()->getTimestamp() - Carbon::parse($anketa->created_at)->getTimestamp() > 12) {
@@ -109,7 +109,6 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($points);
     });
 
-    Route::post('/anketa', 'AnketsController@ApiAddForm')->name('api.addform');
     Route::get('/check-prop-one/{prop}/{model}/{val}', 'ApiController@OneCheckProperty');
     Route::get('/check-prop/{prop}/{model}/{val}', 'ApiController@CheckProperty');
 
@@ -120,16 +119,24 @@ Route::middleware('auth:api')->group(function () {
 });
 
 Route::middleware('auth:api')->prefix('sdpo')->name('sdpo')->group(function () {
-    Route::post('/anketa', 'Api\SdpoController@createAnketa');
-    Route::post('/work/report', [SdpoController::class, 'workReport']);
-    Route::post('/anketa/{id}', 'Api\SdpoController@changeType');
-    Route::get('/anketa/{id}', 'Api\SdpoController@getInspection');
+    Route::prefix('anketa')->group(function () {
+        Route::post('/', 'Api\SdpoController@createAnketa');
+        Route::post('/{id}', 'Api\SdpoController@changeType');
+        Route::get('/{id}', 'Api\SdpoController@getInspection');
+    });
+
+    Route::get('/drivers', 'Api\SdpoController@getDrivers');
+    Route::prefix('driver')->group(function () {
+        Route::get('/{id}', 'Api\SdpoController@getDriver');
+        Route::get('/{id}/prints', 'Api\SdpoController@getPrints');
+        Route::post('/{id}/photo', 'Api\SdpoController@setDriverPhoto');
+    });
+
     Route::get('/pv', 'Api\SdpoController@getPoint');
     Route::get('/terminal/verification', 'Api\SdpoController@getTerminalVerification');
     Route::get('/medics', 'Api\SdpoController@getMedics');
-    Route::get('/driver/{id}', 'Api\SdpoController@getDriver');
-    Route::post('/driver/{id}/photo', 'Api\SdpoController@setDriverPhoto');
-    Route::get('/drivers', 'Api\SdpoController@getDrivers');
+
     Route::get('/check', 'Api\SdpoController@checkConnaction');
+    Route::post('/work/report', [SdpoController::class, 'workReport']);
 });
 
