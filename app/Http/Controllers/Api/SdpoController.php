@@ -41,7 +41,7 @@ class SdpoController extends Controller
             ->select([
                 'anketas.driver_fio',
                 'anketas.admitted',
-                'anketas.created_at',
+                'anketas.date as created_at',
                 'anketas.user_eds',
                 'anketas.user_name',
                 'anketas.type_view',
@@ -373,7 +373,8 @@ class SdpoController extends Controller
                 'dismissed',
                 'company_id',
                 'end_of_ban',
-                'photo'
+                'photo',
+                'phone'
             ])
             ->first();
 
