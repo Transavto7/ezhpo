@@ -141,7 +141,7 @@ class HomeController extends Controller
                     continue;
                 }
 
-                if (!$filterValue) continue;
+                if ($filterValue === null) continue;
 
                 if ($filterKey == 'hour_from') {
                     $forms->whereTime('date', '>=', $filterValue.':00');
@@ -167,7 +167,7 @@ class HomeController extends Controller
                 if (in_array($filterKey, $formModel->fillable)) {
                     if (in_array($filterKey, ['date', 'created_at'])) continue;
 
-                    if ($filterKey == 'is_dop'){
+                    if ($filterKey == 'is_dop' && !$filterValue){
                         $forms = $forms->where(function ($query){
                             $query->whereNull('is_dop')->orWhere('is_dop', 0);
                         });
@@ -422,7 +422,7 @@ class HomeController extends Controller
         $defaultOrderBy = $validTypeForm === 'pak_queue' ? 'ASC' : 'DESC';
         $orderKey = $request->get('orderKey', 'date');
         $orderBy = $request->get('orderBy', $defaultOrderBy);
-        $take = $request->get('take', 500);
+        $take = $request->get('take') ?? 500;
         if ($request->get('export')) {
             $take = 10000;
         }
