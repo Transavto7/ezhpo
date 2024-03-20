@@ -216,7 +216,7 @@ class HomeController extends Controller
                             continue;
                         }
 
-                        $strictFilter = in_array($filterKey, ['company_name', 'driver_fio'])
+                        $strictFilter = in_array($filterKey, ['company_name', 'driver_fio', 'admitted'])
                             || strpos($filterKey, '_id')
                             || $filterKey === 'id';
 

@@ -52,7 +52,7 @@
         };
 
         @if (user()->fields_visible)
-        let fieldsVisible = JSON.parse({!! user()->fields_visible !!});
+        let fieldsVisible = {!! user()->fields_visible !!};;
         @else
         let fieldsVisible = @json(config('fields.visible'));
         @endif
