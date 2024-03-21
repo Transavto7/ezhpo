@@ -7,6 +7,7 @@ use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Http\Controllers\SmsController;
 use App\Traits\UserEdsTrait;
+use App\ValueObjects\Phone;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Notify;
@@ -404,6 +405,45 @@ class SdpoController extends Controller
         }
 
         return response()->json($driver);
+    }
+
+    public function setDriverPhone(Request $request, $id): JsonResponse
+    {
+        $apiClient = $request->user('api');
+
+        if ($apiClient->blocked) {
+            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
+        }
+
+        /** @var Driver $driver */
+        $driver = Driver::query()
+            ->with(['company'])
+            ->where('hash_id', $id)
+            ->first();
+
+        if (!$driver) {
+            return response()->json(['message' => 'Водитель с указанным ID не найден!'], 400);
+        }
+
+        if ($driver->dismissed === 'Да') {
+            return response()->json(['message' => 'Водитель с указанным ID уволен!'], 303);
+        }
+
+        if ($driver->company->dismissed === 'Да') {
+            return response()->json(['message' => 'Компания указанного водителя заблокирована!'], 303);
+        }
+
+        $phone = new Phone($request->input('phone'));
+        if (!$phone->isValid()) {
+            return response()->json(['message' => 'Некорректный номер телефона!', 422]);
+        }
+
+        $driver->setAttribute('phone', $phone->getSanitized());
+        $driver->save();
+
+        return response()->json([
+            'message' => 'Номер телефона водителя успешно обновлен!'
+        ]);
     }
 
     /*
