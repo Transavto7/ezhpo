@@ -547,7 +547,7 @@ $notDeletedItems = session('not_deleted_ankets');
                                                     {{ $field->name }}
                                                 </span>
 
-                                                <a class="not-export" href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field }}{{ $queryString }}">
+                                                <a class="not-export" href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field }}&{{ $queryString }}">
                                                     <i class="fa fa-sort"></i>
                                                 </a>
                                             </th>
@@ -569,7 +569,7 @@ $notDeletedItems = session('not_deleted_ankets');
                                         @if($permissionToUpdate)
                                             @if($type_ankets === 'medic')
                                                     <th class="not-export">#
-                                                        <a class="not-export" href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=result_dop{{ $queryString }}">
+                                                        <a class="not-export" href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=result_dop&{{ $queryString }}">
                                                             <i class="fa fa-sort"></i>
                                                         </a>
                                                     </th>
