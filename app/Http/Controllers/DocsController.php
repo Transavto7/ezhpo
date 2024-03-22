@@ -63,85 +63,40 @@ class DocsController extends Controller
         return back();
     }
 
-    public function getPdf(Request $request, $type, $anketa_id)
+    public function getPdf(Request $request, $type, $formId, DocDataService $service)
     {
-        $anketa = Anketa::find($anketa_id);
+        $form = Anketa::find($formId);
 
-        if (!$anketa) {
+        if (!$form) {
             return response('Осмотр не найден');
         }
 
-        $path = $anketa[$type . '_path'];
+        $path = $form[$type . '_path'];
         if (Storage::disk('public')->exists($path)) {
             $file = Storage::disk('public')->get($path);
-            $response = response()->make($file, 200);
-            $response->header('Content-Type', 'application/pdf');
-            return $response;
-        } else {
-            $data = [
-                'type' => $type,
-                'anketa_id' => $anketa_id,
 
-                'driver_fio' => '',
-                'driver_yb' => '',
-                'driver_pv' => '',
-
-                'user_name' => '',
-                'user_post' => '',
-                'user_fio' => '',
-                'user_company' => '',
-                'date' => '',
-                'town' => '',
-                'drugs' => false,
-                'alko' => false
-            ];
-
-            if($anketa) {
-                $data['user_post'] = ProfileController::getUserRole(true, $anketa->user_id);
-
-                $fields = new Anketa();
-                $fields = $fields->fillable;
-
-                foreach($fields as $field) {
-                    $data[$field] = $anketa[$field];
-                }
-
-                if ($anketa->test_narko === 'Положительно') {
-                    $data['drugs'] = true;
-                }
-
-                if ($anketa->proba_alko === 'Положительно') {
-                    $data['alko'] = true;
-                }
-
-                $driver = Driver::where('hash_id', $anketa->driver_id)->first();
-                $data['driver'] = $driver;
-
-                if($anketa->company_id) {
-                    $c = Company::where('hash_id', $anketa->company_id)->first();
-
-                    if($c) {
-                        $c = Point::find($c->pv_id);
-
-                        if($c) {
-                            $data['driver_pv'] = $c->name;
-                        }
-                    }
-                }
-
-                if ($anketa->pv_id) {
-                    $point = Point::where('name', $anketa->pv_id)->with('town')->first();
-                    if ($point) {
-                        $data['town'] = $point->town->name;
-                    }
-                }
-            }
-
-            $pdf = Pdf::loadView('docs.exports.' . $type . '-new', $data);
-            $response = response()->make($pdf->output(), 200);
-            $response->header('Content-Type', 'application/pdf');
-            return $response;
+            return response()
+                ->make($file, 200)
+                ->header('Content-Type', 'application/pdf');
         }
+
+        $data = $service->get($form);
+        $data['time'] = date('Hч iмин', strtotime($data['date']));
+        $data['date_str'] = 'от ' . date('d.m.Y', strtotime($data['date'])) . ' года';
+        $data['post'] = 'Водитель';
+        $data['alko'] = $data['alko_description'];
+
+        //TODO: фикс для протокола, при необходимости - можно привести к 1 шаблону
+        $view = 'docs.exports.' . $type;
+        if (view()->exists("docs.exports.$type-new")) {
+            $view = "docs.exports.$type-new";
+        }
+
+        $file = Pdf::loadView($view, $data);
+
+        return response()
+            ->make($file->output(), 200)
+            ->header('Content-Type', 'application/pdf');
     }
 
     public function setPdf(Request $request, $type, $anketa_id)

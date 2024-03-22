@@ -125,7 +125,6 @@
                 hide-footer
                 :title="'Добавление сотрудника'"
             >
-
                 <b-row class="my-1">
                     <b-col lg="2">
                         <label>ФИО:</label>
@@ -204,7 +203,7 @@
                         />
                     </b-col>
                 </b-row>
-                <b-row class="my-1" v-if="!infoModalUser_roles.filter((item) => {return item.id == 6})[0]">
+                <b-row class="my-1" v-if="isNotClient">
                     <b-col lg="2">
                         <label>Пункт выпуска:</label>
                     </b-col>
@@ -227,8 +226,7 @@
                     </b-col>
                 </b-row>
                 <b-row class="my-1">
-                    <b-col lg="2" />
-                    <b-col lg="10">
+                    <b-col lg="10" offset-lg="2">
                         <b-form-checkbox
                             id="checkbox-1"
                             v-model="infoModalUser.blocked"
@@ -260,7 +258,6 @@
                             <div class="col-lg-5 mx-0 px-0 mb-3">
                                 <b-form-input v-model="searchPermissions" placeholder="Поиск прав" />
                             </div>
-
                             <b-card>
                                 <b-form-group label="Доступы:" v-slot="{ ariaDescribedby }">
                                     <b-form-checkbox-group
@@ -287,7 +284,18 @@
                                 </b-form-group>
                             </b-card>
                         </b-collapse>
-
+                    </b-col>
+                </b-row>
+                <b-row class="my-1" v-if="isHeadOperator">
+                    <user-pvs-list
+                        :all-items="allPvs"
+                        :selected-items="infoModalUser.pvs"
+                        @input="handlePvsSelect"
+                    >
+                    </user-pvs-list>
+                </b-row>
+                <b-row class="my-1">
+                    <b-col>
                         <div class="row mt-2 mx-2 d-flex justify-content-end">
                             <b-button variant="danger" @click="hideModal">Закрыть</b-button>
                             <b-button class="ml-2" variant="success" @click="saveUser">Сохранить</b-button>
@@ -303,15 +311,26 @@
 import vSelect from "vue-select";
 import 'vue-select/dist/vue-select.css';
 import Swal2 from "sweetalert2";
+import UserPvsList from "./components/UserPvsList";
 
 export default {
     name: "AdminUsersIndex",
-    props: ['users', 'deleted', 'roles', 'points', 'all_permissions', 'current_user_permissions', 'options_company', 'fields'],
-    components: { Swal2, vSelect },
+    props: [
+        'users',
+        'deleted',
+        'roles',
+        'points',
+        'all_permissions',
+        'current_user_permissions',
+        'options_company',
+        'fields'
+    ],
+    components: {UserPvsList, Swal2, vSelect },
 
     data() {
         return {
             allPermissions: [],
+            allPvs: [],
             enableModal: false,
             permission_collapse: false,
             searchPermissions: '',
@@ -334,6 +353,7 @@ export default {
                 eds: null,
                 timezone: null,
                 pv: null,
+                pvs: [],
                 blocked: 0,
                 company: null,
                 permissions: [],
@@ -345,8 +365,12 @@ export default {
             loading: false,
         }
     },
+
     methods: {
-        fetchCompanies(search, loading) {
+        handlePvsSelect(data) {
+            this.infoModalUser.pvs = data
+        },
+        fetchCompanies(search) {
             let data = {
                 params: {
                     query: search,
@@ -356,8 +380,7 @@ export default {
                 .then(response => {
                     this.optionsCompany = response.data;
                 })
-
-                .catch(error => {
+                .catch(() => {
                     Swal.fire({ title: "Неизвестная ошибка", icon:  "error" });
                 });
         },
@@ -379,7 +402,6 @@ export default {
                     api: 1,
                 },
             }).then(({data}) => {
-                console.log(data)
                 this.items = data.items;
                 this.currentPage = data.current_page;
                 this.totalRows = data.total_rows;
@@ -444,42 +466,40 @@ export default {
                 confirmButtonText: 'Да, удалить!',
                 cancelButtonText: 'Отмена',
             }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.post('/users', {
-                        id: id,
-                    }).then(({data}) => {
-                        if (data.status) {
-                            Swal2.fire('Удалено', 'Данные были успешно удалены', 'success');
-                            this.items = this.items.filter((item) => {
-                                return item.id != id;
-                            })
-                        } else {
-                            Swal2.fire('Ошибка', data.message, 'warning');
-                        }
-
-                    }).finally(() => {
-                        this.loading = false;
-                    });
+                if (!result.isConfirmed) {
+                    return;
                 }
+
+                axios.post('/users', {
+                    id: id,
+                }).then(({data}) => {
+                    if (!data.status) {
+                        Swal2.fire('Ошибка', data.message, 'warning');
+                        return;
+                    }
+
+                    Swal2.fire('Удалено', 'Данные были успешно удалены', 'success');
+                    this.items = this.items.filter((item) => (item.id != id))
+                }).finally(() => {
+                    this.loading = false;
+                });
             })
         },
         returnTrash(id) {
             axios.post('/users/return_trash', {
                 id: id,
             }).then(({data}) => {
-                if (data.status) {
-                    Swal2.fire('Восстановлено', 'Данные были успешно восстановлены', 'success');
-                    this.items = this.items.filter((item) => {
-                        return item.id != id;
-                    })
-                } else {
+                if (!data.status) {
                     Swal2.fire('Ошибка', data.message, 'warning');
+                    return;
                 }
+
+                Swal2.fire('Восстановлено', 'Данные были успешно восстановлены', 'success');
+                this.items = this.items.filter((item) => (item.id != id))
             }).finally(() => {
                 this.loading = false;
             });
         },
-
         saveUser() {
             this.loading = true;
 
@@ -493,6 +513,7 @@ export default {
                     timezone: this.infoModalUser.timezone,
                     password: this.infoModalUser.password,
                     pv: this.infoModalUser.pv,
+                    pvs: this.infoModalUser.pvs,
                     company: this.infoModalUser.company?.id,
                     roles: this.infoModalUser_roles.map((item) => {
                         return item.id;
@@ -507,28 +528,33 @@ export default {
                     }),
                 },
             }).then(({data}) => {
-                if (data.status) {
-                    this.items.forEach((item, i, arr) => {
-                        if (item.id == data.user_info.id) {
-                            this.items[i] = data.user_info // Новый объект с новыми свойствами
-                        }
-                    })
-                    Swal2.fire('Сохранено', 'Данные были успешно записаны', 'success');
-                    this.$refs.users_table.refresh()
-                    this.enableModal = false
-                    location.reload()
-
+                if (!data.status) {
+                    return
                 }
 
+                if (this.infoModalUser.id) {
+                    this.items = this.items.map((item) => {
+                        if (item.id == data.user_info.id) {
+                            console.log(data.user_info)
+
+                            return data.user_info
+                        }
+
+                        return item
+                    })
+                } else {
+                    this.items.push(data.user_info)
+                }
+
+                Swal2.fire('Сохранено', 'Данные были успешно записаны', 'success');
+                this.enableModal = false
             }).finally(() => {
                 this.loading = false;
             });
         },
-
         editUserData(id) {
             this.fetchUserData(id)
         },
-
         fetchUserData(id) {
             this.loading = true;
 
@@ -544,21 +570,18 @@ export default {
                 this.infoModalUser.eds = data.eds;
                 this.infoModalUser.timezone = data.timezone;
                 this.infoModalUser.pv = data.pv.id;
+                this.infoModalUser.pvs = data.pvs;
                 this.infoModalUser_roles = data.roles;
                 this.infoModalUser.blocked = data.blocked;
                 this.infoModalUser.company = data.company.name;
                 this.infoModalUser.validity_eds_start = data.validity_eds_start;
                 this.infoModalUser.validity_eds_end = data.validity_eds_end;
-
-                // не редактируемые
                 this.allPermissions.map((item, index) => {
                     if (data.disable.includes(item.id)) {
                         this.allPermissions[index].disable = true;
                         this.infoModalUser.permissions.push(item.id)
                     }
                 })
-
-                // редактируемые
                 data.permission_user.map((item) => {
                     this.infoModalUser.permissions.push(item)
                 })
@@ -577,12 +600,12 @@ export default {
             this.infoModalUser.eds = null;
             this.infoModalUser.timezone = null;
             this.infoModalUser.pv = null;
+            this.infoModalUser.pvs = [];
             this.infoModalUser_roles = [];
             this.infoModalUser.blocked = 0;
             this.infoModalUser.company = null;
             this.infoModalUser.permissions = [];
             this.permission_collapse = false;
-
             this.allPermissions = this.allPermissions.map((item) => {
                 item.disable = false;
 
@@ -596,10 +619,20 @@ export default {
             this.enableModal = false
         },
     },
+
     mounted() {
         this.fetchCompanies()
         this.loadData()
         this.optionsPvs = this.points;
+        this.allPvs = (this.points ?? []).map((pvGroups) => {
+            return (pvGroups.options ?? []).map((pv) => {
+                return {
+                    id: pv.value,
+                    name: `${pvGroups.label} - ${pv.text}`
+                }
+            })
+        }).flat()
+
         this.optionsRoles = this.roles.filter((item) => {
             return ![3, 9, 6].includes(item.id)
         });
@@ -634,6 +667,7 @@ export default {
             })
         }
     },
+
     watch: {
         searchPermissions(val){
             if(val === ''){
@@ -657,6 +691,19 @@ export default {
             this.loadData();
         }
     },
+
+    computed: {
+        isNotClient: function () {
+            const clientRole = this.infoModalUser_roles.filter((item) => (item.name === 'client'))[0];
+
+            return clientRole === undefined;
+        },
+        isHeadOperator: function () {
+            const headOperatorRole = this.infoModalUser_roles.filter((item) => (item.name === 'head_operator_sdpo'))[0]
+
+            return headOperatorRole !== undefined
+        }
+    }
 }
 </script>
 

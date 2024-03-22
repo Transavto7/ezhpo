@@ -16,5 +16,7 @@ class FormTypeEnum
 
     const PAK = 'pak';
 
+    const PAK_QUEUE = 'pak_queue';
+
     const VID_PL = 'vid_pl';
 }

@@ -3,36 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Anketa;
+use App\Enums\FormTypeEnum;
 use App\FieldPrompt;
 use Illuminate\Http\Request;
 
 class PakController extends Controller
 {
     public function index(Request $request) {
-        $fields = FieldPrompt::where('type', 'pak_queue')->get();
-
         if ($request->clear) {
-            Anketa::where('type_anketa', 'pak_queue')
-                ->where('user_id', $request->user()->id)->delete();
+            Anketa::query()->pakQueueByUser($request->user())->delete();
+
             return redirect(route('pak.index'));
         }
 
         return view('pak.index', [
-            'fields' => $fields
+            'fields' => FieldPrompt::where('type', FormTypeEnum::PAK_QUEUE)->get()
         ]);
     }
 
     public function list(Request $request) {
-        $anketas = Anketa::where('type_anketa', 'pak_queue');
+        $forms = Anketa::query();
 
-        if (!$request->user()->access('approval_queue_view_all')) {
-            $anketas = $anketas->where('user_id', $request->user()->id);
-        }
+        $forms->pakQueueByUser($request->user());
 
         if ($request->order_key) {
-            $anketas = $anketas->orderBy($request->order_key, $request->order_by ?? 'ASC');
+            $forms = $forms->orderBy($request->order_key, $request->order_by ?? 'ASC');
         }
 
-        return response()->json($anketas->get());
+        return response()->json($forms->get());
     }
 }

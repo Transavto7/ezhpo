@@ -10,14 +10,11 @@ use App\Driver;
 use App\Exports\ReportJournalExport;
 use App\Point;
 use App\Product;
-use App\Req;
 use App\Town;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
@@ -316,30 +313,40 @@ class ReportController extends Controller
     public function getJournalMedic($company, $date_from, $date_to, $products, $discounts) {
         // Get table info by filters
         $medics = Anketa::whereIn('type_anketa', ['medic', 'bdd', 'report_cart', 'pechat_pl'])
-                        ->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
-                        ->where(function ($query) use ($company) {
-                            $query->where('anketas.company_id', $company->hash_id)
-                                  ->orWhere('anketas.company_name', $company->name);
-                        })
-                        ->where('anketas.in_cart', 0)
-                        ->where(function ($q) use ($date_from, $date_to) {
-                            $q->where(function ($q) use ($date_from, $date_to) {
-                                $q->whereNotNull('anketas.date')
-                                  ->whereBetween('anketas.date', [
-                                      $date_from,
-                                      $date_to,
-                                  ]);
-                            })
-                              ->orWhere(function ($q) use ($date_from, $date_to) {
-                                  $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
-                                      $date_from->format('Y-m'),
-                                      $date_to->format('Y-m'),
-                                  ]);
-                              });
-                        })
-                        ->select('driver_fio', 'driver_id', 'type_anketa', 'type_view', 'result_dop', 'products_id', 'pv_id',
-                                 'is_dop', 'anketas.count_pl')
-                        ->get();
+            ->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
+            ->where(function ($query) use ($company) {
+                $query->where('anketas.company_id', $company->hash_id)
+                      ->orWhere('anketas.company_name', $company->name);
+            })
+            ->where('anketas.in_cart', 0)
+            ->where(function ($q) use ($date_from, $date_to) {
+                $q->where(function ($q) use ($date_from, $date_to) {
+                    $q->whereNotNull('anketas.date')
+                      ->whereBetween('anketas.date', [
+                          $date_from,
+                          $date_to,
+                      ]);
+                })
+                  ->orWhere(function ($q) use ($date_from, $date_to) {
+                      $q->whereNull('anketas.date')->whereBetween('anketas.period_pl', [
+                          $date_from->format('Y-m'),
+                          $date_to->format('Y-m'),
+                      ]);
+                  });
+            })
+            ->select([
+                'driver_fio',
+                'driver_id',
+                'type_anketa',
+                'type_view',
+                'result_dop',
+                'products_id',
+                'pv_id',
+                'is_dop',
+                'anketas.count_pl',
+                'admitted'
+            ])
+            ->get();
 
         $result = [];
 
@@ -350,7 +357,7 @@ class ReportController extends Controller
 
             $result[$id]['pv_id'] = implode('; ', array_unique($driver->pluck('pv_id')->toArray()));
 
-            foreach ($driver->where('type_anketa', 'medic')->groupBy('type_view') as $rows) {
+            foreach ($driver->where('type_anketa', 'medic')->where('admitted', '!=', 'Не идентифицирован')->groupBy('type_view') as $rows) {
                 $type = $rows->first()->type_view;
                 $total = $rows->count();
                 $result[$id]['types'][$type]['total'] = $total;
@@ -439,9 +446,18 @@ class ReportController extends Controller
                 }
             }
 
+            $result[$id]['types']['is_dop']['total'] = $driver
+                ->where('type_anketa', 'medic')
+                ->where('result_dop', null)
+                ->where('is_dop', 1)
+                ->count();
 
-            $result[$id]['types']['is_dop']['total'] = $driver->where('type_anketa', 'medic')
-                                                              ->where('result_dop', null)->where('is_dop', 1)->count();
+            $result[$id]['types']['Не идентифицирован'] = [
+                'total' => $driver
+                    ->where('type_anketa', 'medic')
+                    ->where('admitted', 'Не идентифицирован')
+                    ->count()
+            ];
         }
 
         return $result;

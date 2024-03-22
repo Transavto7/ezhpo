@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Enums\FormTypeEnum;
 use App\Models\ContractAnketaSnapshot;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -564,5 +565,35 @@ class Anketa extends Model
     public static function getAll()
     {
         return self::all();
+    }
+
+    public static function pakQueueCount(User $user = null): int
+    {
+        $query = self::query();
+
+        if ($user) {
+            $query->pakQueueByUser($user);
+        }
+
+        return $query->count();
+    }
+
+    public function scopePakQueueByUser($query, User $user)
+    {
+        $query->where('type_anketa', FormTypeEnum::PAK_QUEUE);
+
+        if ($user->access('approval_queue_view_all')) {
+
+        } else if ($user->hasRole('head_operator_sdpo')) {
+            $query->select([
+                'anketas.*'
+            ])
+                ->join('points_to_users', function ($join) use ($user) {
+                    $join->on('anketas.point_id', '=', 'points_to_users.point_id')
+                        ->where('points_to_users.user_id', '=', $user->id);
+                });
+        } else {
+            $query->where('user_id', $user->id);
+        }
     }
 }

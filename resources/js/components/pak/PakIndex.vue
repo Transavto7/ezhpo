@@ -132,7 +132,9 @@ export default {
                     </td>
                     <td class="td-option not-export d-flex">
                         <a :href="`/anketa/${row.id}`" class="btn btn-info btn-sm mr-1"><i class="fa fa-search"></i></a>
-                        <a :href="`/anketa/change-pak-queue/${row.id}/Допущен`" class="btn btn-sm btn-success"><i class="fa fa-check"></i></a>
+                        <a :href="`/anketa/change-pak-queue/${row.id}/Допущен`" class="btn btn-sm btn-success mr-1"><i class="fa fa-check"></i></a>
+                        <a :href="`/anketa/change-pak-queue/${row.id}/Не идентифицирован`" class="btn btn-sm btn-secondary"><i class="fa fa-question"></i></a>
+
                     </td>
 
                     <td class="td-option not-export">

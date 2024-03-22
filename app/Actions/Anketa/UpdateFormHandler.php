@@ -6,7 +6,11 @@ use App\Anketa;
 use App\Car;
 use App\Company;
 use App\Driver;
+use App\Enums\FormTypeEnum;
+use App\Http\Controllers\SmsController;
 use App\Point;
+use App\Settings;
+use App\User;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
@@ -15,6 +19,8 @@ class UpdateFormHandler
 {
     public function handle(Anketa $form, array $data, Authenticatable $user)
     {
+        $isPakQueueForm = $form['type_anketa'] === FormTypeEnum::PAK_QUEUE;
+
         $point = Point::where('id', $data['pv_id'])->first();
         $data['pv_id'] = $point->name;
         $data['point_id'] = $point->id;
@@ -76,6 +82,44 @@ class UpdateFormHandler
         $form->save();
 
         $this->updateConnectedForm($form);
+
+        if ($isPakQueueForm) {
+            $this->updatePakQueueForm($form, $user);
+            $this->notifyCancel($form);
+        }
+    }
+
+    protected function updatePakQueueForm(Anketa $form, Authenticatable $user)
+    {
+        if ($form->admitted === 'Не идентифицирован') {
+            $form->comments = Settings::setting('not_identify_text') ?? 'Водитель не идентифицирован';
+        }
+
+        /** @var User $user */
+        $form->user_id = $user->id;
+        $form->user_name = $user->name;
+        $form->operator_id = $user->id;
+        $form->user_eds = $user->eds;
+        $form->user_validity_eds_start = $user->validity_eds_start;
+        $form->user_validity_eds_end = $user->validity_eds_end;
+
+        $form->save();
+    }
+
+    protected function notifyCancel(Anketa $form)
+    {
+        if ($form->admitted !== 'Не допущен') {
+            return;
+        }
+
+        $company = Company::query()->where('hash_id', $form->company_id)->first();
+        $driver = Driver::query()->where('hash_id', $form->driver_id)->first();
+
+        $phoneToCall = Settings::setting('sms_text_phone');
+        $message = Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall";
+
+        $sms = new SmsController();
+        $sms->sms($company->where_call, $message);
     }
 
     /**

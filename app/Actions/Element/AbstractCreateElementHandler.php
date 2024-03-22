@@ -4,9 +4,12 @@ namespace App\Actions\Element;
 
 use Exception;
 use Illuminate\Support\Facades\Storage;
+use App\GenerateHashIdTrait;
 
 abstract class AbstractCreateElementHandler
 {
+    use GenerateHashIdTrait;
+
     protected $model;
 
     /**
@@ -61,32 +64,5 @@ abstract class AbstractCreateElementHandler
         }
 
         return $this->model::create($data);
-    }
-
-    /**
-     * @throws Exception
-     */
-    protected function generateHashId(
-        callable $validator,
-        int $min = 0,
-        int $max = 999999,
-        int $maxTries = 2
-    ): int
-    {
-        $tries = 0;
-
-        do {
-            $value = mt_rand($min, $max);
-
-            if ($validator($value)) {
-                return $value;
-            }
-
-            $tries++;
-
-            if ($tries > $maxTries) {
-                throw new Exception('Превышен лимит попыток генерации HASH_ID');
-            }
-        } while (true);
     }
 }

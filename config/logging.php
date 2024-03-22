@@ -96,11 +96,6 @@ return [
             'level' => 'debug'
         ],
 
-        'admitting' => [
-            'driver' => 'single',
-            'path' => storage_path('logs/admitting.log')
-        ],
-
         'sdpo' => [
             'driver' => 'single',
             'path' => storage_path('logs/sdpo.log')
@@ -109,7 +104,12 @@ return [
         'deprecated-api' => [
             'driver' => 'single',
             'path' => storage_path('logs/deprecated-api.log')
-        ]
+        ],
+
+        'sms-api' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/sms-api.log')
+        ],
     ],
 
 ];

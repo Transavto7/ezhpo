@@ -20,7 +20,7 @@
                 </tr>
                 <tr>
                     <td rowspan="2">
-                        <textarea rows="1" class="doc-input" name="date">от {{ date('d.m.Y', strtotime($date)) }} года</textarea>
+                        <textarea rows="1" class="doc-input" name="date_str">от {{ date('d.m.Y', strtotime($date)) }} года</textarea>
                     </td>
                     <td rowspan="2">
                         <textarea rows="1" class="doc-input" name="time">{{ date('Hч iмин', strtotime($date)) }}</textarea>

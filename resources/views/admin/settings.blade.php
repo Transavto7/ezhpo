@@ -122,6 +122,25 @@
                             </div>
 
                             <div class="form-group col-lg-12">
+                                <label for="not_identify_text" class="mb-1">Текст при нажатии кнопки "Не идентифицирован"</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="not_identify_text_prepend">
+                                            <i class="fa fa-copy"></i>
+                                        </span>
+                                    </div>
+                                    <textarea
+                                        class="form-control"
+                                        id="not_identify_text"
+                                        style="height: auto"
+                                        placeholder="Введите Текст сообщения пользователю СДПО"
+                                        name="not_identify_text"
+                                        aria-describedby="not_identify_text_prepend"
+                                    >{{ $not_identify_text }}</textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-12">
                                 <label for="sms_text_driver" class="mb-1">Текст SMS для Водителя при непрохождении осмотра</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">

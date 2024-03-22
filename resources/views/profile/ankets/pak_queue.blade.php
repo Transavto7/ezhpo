@@ -91,15 +91,18 @@
 @section('ankets_submit')
     <div class="text-center m-center">
         <label class="btn btn-success btn-sm">
-            <i class="fa fa-check-circle"></i> Принять
+            <i class="fa fa-check-circle"></i> Допущен
             <input onchange="ANKETA_FORM.submit()" class="d-none" type="radio" value="Допущен" name="admitted" />
         </label>
 
-        &nbsp;&nbsp;&nbsp;&nbsp;
+        <label class="btn btn-secondary btn-sm">
+            <i class="fa fa-question"></i>
+            Не идентифицирован
+            <input onchange="ANKETA_FORM.submit()" class="d-none" type="radio" value="Не идентифицирован" name="admitted" />
+        </label>
 
         <label class="btn btn-danger btn-sm">
-            <i class="fa fa-close"></i>
-            Отклонить
+            <i class="fa fa-close"></i> Не допущен
             <input onchange="ANKETA_FORM.submit()" class="d-none" type="radio" value="Не допущен" name="admitted" />
         </label>
     </div>

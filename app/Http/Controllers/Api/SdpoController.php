@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Anketa;
 use App\Driver;
+use App\Enums\FormTypeEnum;
 use App\Http\Controllers\SmsController;
+use App\Traits\UserEdsTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Notify;
@@ -19,6 +21,61 @@ use Throwable;
 
 class SdpoController extends Controller
 {
+    use UserEdsTrait;
+
+    public function getPrints(Request $request, $id): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user('api');
+
+        if ($user->blocked) {
+            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
+        }
+
+        $driver = Driver::where('hash_id', $id)->first();
+        if (!$driver) {
+            return response()->json(['message' => 'Водитель с указанным ID не найден!'], 400);
+        }
+
+        $forms = Anketa::query()
+            ->select([
+                'anketas.driver_fio',
+                'anketas.admitted',
+                'anketas.date as created_at',
+                'anketas.user_eds',
+                'anketas.user_name',
+                'anketas.type_view',
+                'anketas.user_validity_eds_start',
+                'anketas.user_validity_eds_end',
+                'stamps.company_name as stamp_head',
+                'stamps.licence as stamp_licence'
+            ])
+            ->leftJoin('users', 'anketas.terminal_id', '=', 'users.id')
+            ->leftJoin('stamps', 'users.stamp_id', '=', 'stamps.id')
+            ->where('driver_id', $id)
+            ->where('type_anketa', FormTypeEnum::MEDIC)
+            ->where('admitted', 'Допущен')
+            ->whereNotNull('flag_pak')
+            ->whereDate('date', '<=', Carbon::now()->toDateTime())
+            ->whereDate('date', '>=', Carbon::now()->startOfMonth()->subMonth()->toDateString())
+            ->get()
+            ->toArray();
+
+        $forms = array_map(function ($form) {
+            $validity = UserEdsTrait::getValidityString(
+                $form['user_validity_eds_start'] ?? null,
+                    $form['user_validity_eds_end'] ?? null
+            );
+            if ($validity) {
+                $form['validity'] = $validity;
+            }
+
+            return $form;
+        }, $forms);
+
+        return response()->json($forms);
+    }
+
     /*
      * Creating anketa by sdpo request
      */
@@ -165,7 +222,7 @@ class SdpoController extends Controller
             $medic['med_view'] = 'Отстранение';
         }
 
-        if (doubleval($medic['t_people']) >= 38) {
+        if (doubleval($medic['t_people']) >= 37) {
             $notAdmittedReasons[] = ['Высокая температура'];
             $admitted = 'Не допущен';
             $medic['med_view'] = 'Отстранение';
@@ -195,12 +252,16 @@ class SdpoController extends Controller
             abort(500);
         }
 
-        // ОТПРАВКА SMS
+        /**
+         * ОТПРАВКА SMS
+         */
         $needNotify = $anketa['admitted'] === 'Не допущен' && $anketa['flag_pak'] !== 'СДПО Р';
         if ($needNotify) {
             $phoneToCall = Settings::setting('sms_text_phone');
+            $message = Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall";
+
             $sms = new SmsController();
-            $sms->sms($company->where_call, Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall");
+            $sms->sms($company->where_call, $message);
         }
 
         $anketa['timeout'] = Settings::setting('timeout') ?? 20;
@@ -211,9 +272,9 @@ class SdpoController extends Controller
             $anketa['stamp_licence'] = $stamp->licence;
         }
 
-        if ($user->validity_eds_start && $user->validity_eds_end) {
-            $anketa['validity'] = 'Срок действия: c ' . Carbon::parse($user->validity_eds_start)->format('d.m.Y')
-                 .' по ' . Carbon::parse($user->validity_eds_end)->format('d.m.Y');
+        $validity = UserEdsTrait::getValidityString($user->validity_eds_start, $user->validity_eds_end);
+        if ($validity) {
+            $anketa['validity'] = $validity;
         }
 
         $anketa['sleep_status'] = $request->sleep_status;
@@ -222,17 +283,6 @@ class SdpoController extends Controller
         /** @var Anketa $anketa */
         if ($anketa['admitted'] === 'Не допущен') {
             $anketa['reasons'] = $notAdmittedReasons;
-
-            Log::channel('admitting')->info(json_encode(
-                [
-                    'id' => $anketa->id,
-                    'medic' => $medic,
-                    'anketa' => $anketa->toArray(),
-                    'request' => $request->all(),
-                    'source' => 'SdpoController',
-                    'reasons' => $notAdmittedReasons,
-                ]
-            ));
         }
 
         //TODO: вынести в мидлвар или ивент позже
@@ -323,7 +373,8 @@ class SdpoController extends Controller
                 'dismissed',
                 'company_id',
                 'end_of_ban',
-                'photo'
+                'photo',
+                'phone'
             ])
             ->first();
 
@@ -380,6 +431,14 @@ class SdpoController extends Controller
             $data['stamp_licence'] = $stamp->licence;
         }
 
+        $validity = UserEdsTrait::getValidityString(
+            $inspection['user_validity_eds_start'] ?? null,
+            $inspection['user_validity_eds_end'] ?? null
+        );
+        if ($validity) {
+            $inspection['validity'] = $validity;
+        }
+
         return response()->json($data);
     }
 
@@ -390,7 +449,10 @@ class SdpoController extends Controller
     {
         $inspection = Anketa::find($id);
         if ($inspection) {
-            $inspection->update(['type_anketa' => 'medic']);
+            $inspection->update([
+                'type_anketa' => 'medic',
+                'flag_pak' => 'СДПО-А'
+            ]);
         }
     }
 
