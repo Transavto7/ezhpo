@@ -13,8 +13,46 @@
 
 @section('custom-scripts')
     <script type="text/javascript">
-        if(screen.width <= 700) {
+        if (screen.width <= 700) {
             ANKETA_FORM_VIEW.insertBefore(ANKETA_FORM_ROOT, ANKETA_FORM_VIEW_FIRST)
+        }
+
+        function updateAlcometerResult() {
+            const input = $('input[name="alcometer_result"]')[0]
+
+            if (input === undefined) {
+                return
+            }
+
+            const select = $('select[name="proba_alko"] option:selected')[0]
+
+            if (select === undefined) {
+                return
+            }
+
+            if (select.value === 'Отрицательно') {
+                input.value = 0
+            }
+        }
+
+        function updateProbaAlko() {
+            const input = $('input[name="alcometer_result"]')[0]
+
+            if (input === undefined) {
+                return
+            }
+
+            const select = $('select[name="proba_alko"]')[0]
+
+            if (select === undefined) {
+                return
+            }
+
+            if (input.value > 0) {
+                select.value = 'Положительно'
+            } else {
+                select.value = 'Отрицательно'
+            }
         }
     </script>
 @endsection
