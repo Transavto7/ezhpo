@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class HomeController extends Controller
@@ -318,7 +319,12 @@ class HomeController extends Controller
                     'points.name as pv_id'
                 ]);
         } else if ($validTypeForm == 'medic') {
-            $forms = $forms->with('operator');
+            $forms = $forms
+                ->select([
+                    'anketas.*',
+                    DB::raw('IF(`anketas`.alcometer_mode = 0, null, `anketas`.alcometer_result) as alcometer_result')
+                ])
+                ->with('operator');
         }
         /**
          * Обогащение данных
