@@ -130,6 +130,7 @@ Route::middleware('auth:api')->prefix('sdpo')->name('sdpo')->group(function () {
         Route::get('/{id}', 'Api\SdpoController@getDriver');
         Route::get('/{id}/prints', 'Api\SdpoController@getPrints');
         Route::post('/{id}/photo', 'Api\SdpoController@setDriverPhoto');
+        Route::post('/{id}/phone', 'Api\SdpoController@setDriverPhone');
     });
 
     Route::get('/pv', 'Api\SdpoController@getPoint');
