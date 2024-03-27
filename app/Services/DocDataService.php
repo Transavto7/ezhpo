@@ -42,9 +42,7 @@ class DocDataService
             $data['alko'] = true;
         }
 
-        if ($form->alcometer_result !== null) {
-            $data['alcometer_result'] = $form->alcometer_result;
-        }
+        $data['alcometer_result'] = $this->getAlkoResult($data);
 
         if ($form->med_view === 'Отстранение') {
             $data['status'] = 'Есть жалобы';
@@ -89,13 +87,22 @@ class DocDataService
 
     protected function getAlkoDescription(array $data): string
     {
-        if (isset($data['alcometer_result'])) {
-            return strval($data['alcometer_result']);
+        if ($data['alcometer_mode'] === 1) {
+            return $data['alcometer_result'] . ' мг/л';
         }
 
         return $data['alko'] ?
             'ПОЛОЖИТЕЛЬНА' :
             'ОТРИЦАТЕЛЬНА';
+    }
+
+    protected function getAlkoResult(array $data): float
+    {
+        if ($data['alcometer_mode'] === 1) {
+            return $data['alcometer_result'];
+        }
+
+        return 0.00;
     }
 
     protected function getClosing(array $data): array
