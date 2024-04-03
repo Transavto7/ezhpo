@@ -15,6 +15,7 @@ use App\Point;
 use App\Settings;
 use App\Traits\UserEdsTrait;
 use App\User;
+use App\ValueObjects\NotAdmittedReasons;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -83,41 +84,33 @@ class AnketsController extends Controller
 
     public function Get (Request $request)
     {
-        $id = $request->id;
-        $anketa = Anketa::where('id', $id)->first();
+        $form = Anketa::where('id', $request->id)->first();
 
         $data = [];
 
-        foreach ($anketa->fillable as $f) {
-            $data[$f] = $anketa[$f];
+        foreach ($form->fillable as $attribute) {
+            $data[$attribute] = $form[$attribute];
         }
 
-        $point = $anketa->pv_id;
-        $points = Point::getAll();
+        $companyFields = config('elements')['Driver']['fields']['company_id'];
+        $companyFields['getFieldKey'] = 'name';
 
-        $iController = new IndexController();
-
-        $company_fields = $iController->elements['Driver']['fields']['company_id'];
-        $company_fields['getFieldKey'] = 'name';
-
-        // Дефолтные значения
         $data['title'] = 'Редактирование осмотра';
 
-        if ($anketa->date) {
-            $data['default_current_date'] = date('Y-m-d\TH:i', strtotime($anketa->date)); // date('Y-m-d\TH:i')
+        if ($form->date) {
+            $data['default_current_date'] = date('Y-m-d\TH:i', strtotime($form->date));
         }
 
-        $data['date'] = $anketa->date;
-        $data['proba_alko'] = $anketa->proba_alko;
-        $data['test_narko'] = $anketa->test_narko;
-        $data['med_view'] = $anketa->med_view;
-        $data['default_point'] = $anketa->point_id ?? $point;
-        $data['points'] = $points;
-        $data['is_dop'] = $anketa->is_dop;
-        $data['anketa_view'] = 'profile.ankets.' . $anketa->type_anketa;
-        $data['default_pv_id'] = $anketa->point_id ?? $anketa->pv_id;
+        $data['default_point'] = $form->point_id ?? $form->pv_id;
+        $data['points'] = Point::getAll();
+        $data['anketa_view'] = 'profile.ankets.' . $form->type_anketa;
+        $data['default_pv_id'] = $form->point_id ?? $form->pv_id;
         $data['anketa_route'] = 'forms.update';
-        $data['company_fields'] = $company_fields;
+        $data['company_fields'] = $companyFields;
+
+        if ($form->type_anketa === FormTypeEnum::PAK_QUEUE) {
+            $data['not_admitted_reasons'] = NotAdmittedReasons::fromForm($form)->getReasons();
+        }
 
         return view('profile.anketa', $data);
     }
