@@ -194,19 +194,37 @@ class ReportController extends Controller
                                 $date_to,
                             ]);
                     })->orWhere(function ($q) use ($date_from, $date_to) {
-                        $q->whereNull('date')->whereBetween('period_pl', [
-                            $date_from->format('Y-m'),
-                            $date_to->format('Y-m'),
-                        ]);
+                        $q->whereNull('date')
+                            ->whereBetween('period_pl', [
+                                $date_from->format('Y-m'),
+                                $date_to->format('Y-m'),
+                            ]);
                     });
                 });
             }
 
             if ($request->pv_id) {
-                $anketas = $anketas->whereIn('pv_id', Point::whereIn('id', $request->pv_id)->pluck('name'));
+                $points = Point::whereIn('id', $request->pv_id)->get();
+                $anketas->where(function ($query) use ($points) {
+                    foreach ($points as $point) {
+                        $query = $query
+                            ->orWhere('anketas.pv_id', $point->name)
+                            ->orWhere('anketas.point_id', $point->id);
+                    }
+
+                    return $query;
+                });
             } else if ($request->town_id) {
-                $points = Point::whereIn('pv_id', $request->town_id)->pluck('name');
-                $anketas = $anketas->whereIn('pv_id', $points);
+                $points = Point::whereIn('pv_id', $request->town_id)->get();
+                $anketas->where(function ($query) use ($points) {
+                    foreach ($points as $point) {
+                        $query = $query
+                            ->orWhere('anketas.pv_id', $point->name)
+                            ->orWhere('anketas.point_id', $point->id);
+                    }
+
+                    return $query;
+                });
             }
 
             if ($request->company_id) {
@@ -228,7 +246,6 @@ class ReportController extends Controller
                     $date_to = Carbon::now()->subMonths($i)->lastOfMonth()->endOfDay();
                     $date = Carbon::now()->subMonths($i);
 
-
                     if ($request->order_by === 'created') {
                         $count = $anketasByCompany
                             ->whereBetween('created_at', [
@@ -237,13 +254,16 @@ class ReportController extends Controller
                             ])->count();
                     } else {
                         $count = $anketasByCompany
+                                ->where('date', '!=', null)
                                 ->whereBetween('date', [
                                     $date_from,
                                     $date_to,
                                 ])->count() +
-                            $anketasByCompany->where('date', null)->whereBetween('period_pl', [
-                                $date_from->format('Y-m'),
-                                $date_to->format('Y-m'),
+                            $anketasByCompany
+                                ->where('date', null)
+                                ->whereBetween('period_pl', [
+                                    $date_from->format('Y-m'),
+                                    $date_to->format('Y-m'),
                             ])->count();
                     }
 
