@@ -257,7 +257,7 @@ class HomeController extends Controller
                 $forms = $forms->where('anketas.' . $filterKey, 'LIKE', '%'.$filterValue.'%');
             }
 
-            if ($filterParams['date'] || $filterParams['TO_date']) {
+            if (($filterParams['date'] ?? null) || ($filterParams['TO_date'] ?? null)) {
                 $dateFrom = $filterParams['date']
                     ? Carbon::parse($filterParams['date'])->startOfDay()
                     : Carbon::now()->subYears(10);
