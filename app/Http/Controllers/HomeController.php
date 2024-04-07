@@ -104,7 +104,15 @@ class HomeController extends Controller
             $forms = $forms
                 ->where('anketas.company_id', $user->company->hash_id)
                 ->whereNotNull('date')
-                ->where('date', '<=', Carbon::now());
+                ->where(function ($query) use ($user) {
+                    $query
+                        ->where('date', '<=', Carbon::now()->addHours($user->timezone ?? 3))
+                        ->orWhere(function ($subQuery) {
+                            $subQuery
+                                ->whereNotNull('flag_pak')
+                                ->where('date', '<=', Carbon::now()->addHours(12));
+                        });
+                });
 
             if (in_array($validTypeForm, ['medic', 'pechat_pl', 'bdd', 'report_cart'])) {
                 $forms = $forms->whereNotNull('driver_fio');
