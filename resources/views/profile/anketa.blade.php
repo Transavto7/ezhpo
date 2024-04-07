@@ -16,6 +16,56 @@
         if(screen.width <= 700) {
             ANKETA_FORM_VIEW.insertBefore(ANKETA_FORM_ROOT, ANKETA_FORM_VIEW_FIRST)
         }
+
+        let notAdmittedReasons = @json($not_admitted_reasons ?? []);
+        notAdmittedReasons.filter((reason) => ['tonometer', 'proba_alko', 't_people'].includes(reason))
+
+        notAdmittedReasons.forEach((notAdmittedReason) => {
+            let input
+
+            switch (notAdmittedReason) {
+                case 'tonometer':
+                    input = $('input[name="anketa[0][tonometer]"]')
+                    break;
+                case 'proba_alko':
+                    input = $('select[name="proba_alko"]')
+                    break;
+                case 't_people':
+                    input = $('input[name="t_people"]')
+                    break;
+            }
+
+            if (input) {
+                input.css("background", "pink")
+            }
+        })
+
+        let needApproveAdmitting = notAdmittedReasons.length > 0
+        function approveAdmitting() {
+            const admitted = $("input[name='admitted']:checked");
+
+            if (!needApproveAdmitting || !admitted || (admitted.val() !== 'Допущен')) {
+                $('#ANKETA_FORM').trigger('submit')
+
+                return
+            }
+
+            window.swal.fire({
+                title: 'Отклонение от параметров!',
+                text: 'Обратите внимание, у водителя имеются отклонения от установленных предельных параметров. Подтвердите действие.',
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                confirmButtonText: 'Допустить водителя',
+                cancelButtonText: "Отмена",
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    $('#ANKETA_FORM').trigger('submit')
+                } else {
+                    admitted.removeAttr('checked')
+                }
+            })
+        }
     </script>
 @endsection
 
@@ -114,12 +164,6 @@
                                                             <p class="text-danger">
                                                                 {{ __('ankets.'.$redDateKey) }}: {{ $redDateVal['value'] }}
                                                             </p>
-                                                                {{--<input type="date" id="field_{{ $redDateKey }}" name="{{ $redDateKey }}" value="{{ $redDateVal['value'] }}">--}}
-                                                               {{-- <a href="{{ route('updateDDate', [
-                                                                'item_model' => $redDateVal['item_model'],
-                                                                'item_id' => $redDateVal['item_id'],
-                                                                'item_field' => $redDateVal['item_field']
-                                                            ]) }}" data-field="#field_{{ $redDateKey }}" class="JS_CHANGE_FIELD_MODEL text-success text-bold"><i class="fa fa-save"></i></a></p>--}}
                                                         @endforeach
                                                     @endif
                                                 @endif

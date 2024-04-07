@@ -15,7 +15,10 @@
                         <div class="alert alert-danger" role="alert">{{ session()->get('error') }}</div>
                     @endif
 
-                <pak-index :fields='@json($fields)' time="{{ \Carbon\Carbon::now() }}" />
+                <pak-index
+                    :fields='@json($fields)'
+                    time="{{ \Carbon\Carbon::now() }}"
+                    :reload-interval="1000" />
             </div>
         </div>
     </div>

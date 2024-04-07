@@ -1,6 +1,9 @@
 <script>
+import Swal from "sweetalert2";
+import axios from "axios";
+
 export default {
-    props: [ 'fields', 'time' ],
+    props: [ 'fields', 'time', 'reloadInterval' ],
     data() {
         return {
             order: {
@@ -30,7 +33,7 @@ export default {
 
            setTimeout(() => {
                promise().then(resolve).catch(reject);
-           }, 1000);
+           }, this.reloadInterval);
        });
        promise();
 
@@ -41,7 +44,6 @@ export default {
               this.setTimer(row);
           });
           this.$forceUpdate();
-          console.log(this.$refs);
       }, 1000);
     },
     methods: {
@@ -77,8 +79,56 @@ export default {
             row.timer = hours < 10 ? '0' + hours : hours;
             row.timer += ':' + (minutes < 10 ? '0' + minutes : minutes);
             row.timer += ':' + (seconds < 10 ? '0' + seconds : seconds);
+        },
+        notAdmittedField(row, field) {
+            const reasons = row.not_admitted_reasons ?? [];
+
+            if (reasons.includes(field)) {
+                return {
+                    backgroundColor: 'pink'
+                }
+            }
+
+            return {}
+        },
+        approveAdmitting(row) {
+            if (row.not_admitted_reasons.length === 0) {
+                this.admit(row.id)
+
+                return
+            }
+
+            Swal.fire({
+                title: 'Отклонение от параметров!',
+                text: 'Обратите внимание, у водителя имеются отклонения от установленных предельных параметров. Подтвердите действие.',
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                confirmButtonText: 'Допустить водителя',
+                cancelButtonText: "Отмена",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.admit(row.id)
+                }
+            })
+        },
+        admit(id) {
+            const url = `/anketa/change-pak-queue/${id}/Допущен`
+
+            axios.get(url)
+                .then((response) => {
+                    this.rows = this.rows.filter((row) => row.id !== id)
+                })
+                .catch((error) => {
+                    console.log(error)
+                    Swal.fire(
+                        'Ошибка принятия осмотра!',
+                        error.response.data.message,
+                        'error'
+                    )
+                })
         }
-    }
+    },
 }
 </script>
 
@@ -104,10 +154,8 @@ export default {
                         <a href="javascript:void(0);" class="not-export" @click="order.key = field.field; order.by = !order.by">
                             <i class="fa fa-sort"></i>
                         </a>
-
-                        <th class="not-export">#</th>
-                        <th class="not-export">#</th>
                     </th>
+                    <th class="not-export">#</th>
                 </tr>
             </thead>
 
@@ -118,7 +166,7 @@ export default {
                             {{ row.timer }}
                         </div>
                     </td>
-                    <td v-for="field in fields" :key="field.id">
+                    <td v-for="field in fields" :key="field.id" :style="notAdmittedField(row, field.field)">
                         <a :href="row[field.field]" v-if="field.field === 'photos' && row[field.field]">
                             <i class="fa fa-camera"></i>
                         </a>
@@ -131,14 +179,23 @@ export default {
                         <span v-else>{{ row[field.field] }}</span>
                     </td>
                     <td class="td-option not-export d-flex">
-                        <a :href="`/anketa/${row.id}`" class="btn btn-info btn-sm mr-1"><i class="fa fa-search"></i></a>
-                        <a :href="`/anketa/change-pak-queue/${row.id}/Допущен`" class="btn btn-sm btn-success mr-1"><i class="fa fa-check"></i></a>
-                        <a :href="`/anketa/change-pak-queue/${row.id}/Не идентифицирован`" class="btn btn-sm btn-secondary"><i class="fa fa-question"></i></a>
-
-                    </td>
-
-                    <td class="td-option not-export">
-                        <a :href="`/anketa/change-pak-queue/${row.id}/Не допущен`" class="btn btn-sm btn-danger"><i class="fa fa-close"></i></a>
+                        <a :href="`/anketa/${row.id}`"
+                           class="btn btn-info btn-sm mr-1">
+                            <i class="fa fa-search"></i>
+                        </a>
+                        <a :href="`#`"
+                           class="btn btn-sm btn-success mr-1"
+                           @click.prevent="approveAdmitting(row)">
+                            <i class="fa fa-check"></i>
+                        </a>
+                        <a :href="`/anketa/change-pak-queue/${row.id}/Не идентифицирован`"
+                           class="btn btn-sm btn-secondary mr-1">
+                            <i class="fa fa-question"></i>
+                        </a>
+                        <a :href="`/anketa/change-pak-queue/${row.id}/Не допущен`"
+                           class="btn btn-sm btn-danger">
+                            <i class="fa fa-close"></i>
+                        </a>
                     </td>
                 </tr>
             </tbody>
