@@ -74,17 +74,6 @@ class NotAdmittedReasons
             }
         }
 
-//        //TODO: убрать после теста
-//        $reasons = [
-//            't_people',
-//            'med_view',
-//            'test_narko',
-//            'proba_alko',
-//            'alcometer_result',
-//            'pulse',
-//            'tonometer'
-//        ];
-
         return $reasons;
     }
 }

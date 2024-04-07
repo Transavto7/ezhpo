@@ -6,13 +6,12 @@ use App\Actions\Anketa\CreateFormHandlerFactory;
 use App\Actions\Anketa\CreateSdpoFormHandler;
 use App\Actions\Anketa\TrashFormHandler;
 use App\Actions\Anketa\UpdateFormHandler;
+use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueAction;
+use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueHandler;
 use App\Anketa;
-use App\Company;
 use App\DDates;
-use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Point;
-use App\Settings;
 use App\Traits\UserEdsTrait;
 use App\User;
 use App\ValueObjects\NotAdmittedReasons;
@@ -25,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class AnketsController extends Controller
@@ -115,58 +115,34 @@ class AnketsController extends Controller
         return view('profile.anketa', $data);
     }
 
-    public function ChangePakQueue(Request $request, $id, $admitted): RedirectResponse
+    public function ChangePakQueue(Request $request, $id, $admitted, ChangePakQueueHandler $handler)
     {
-        $allowedAdmitted = ['Допущен', 'Не идентифицирован', 'Не допущен'];
-        if (!in_array($admitted, $allowedAdmitted)) {
-            return back()->with('error', 'Недопустимый результат осмотра');
+        try {
+            DB::beginTransaction();
+
+            $handler->handle(new ChangePakQueueAction($id, $admitted, Auth::user()));
+
+            DB::commit();
+
+            if ($request->wantsJson()) {
+                return response()->json(
+                    ['message' => 'Осмотр успешно принят']
+                );
+            } else {
+                return back();
+            }
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            if ($request->wantsJson()) {
+                return response()->json(
+                    ['message' => $exception->getMessage()],
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+            } else {
+                return back()->with('error', $exception->getMessage());
+            }
         }
-
-        /** @var User $user */
-        $user = Auth::user();
-
-        $form = Anketa::find($id);
-
-        if (!$form) {
-            return back()->with('error', 'Осмотр не найден');
-        }
-
-        if ($form->type_anketa !== FormTypeEnum::PAK_QUEUE) {
-            return back()->with('error', 'Осмотр не находится в очереди утверждения');
-        }
-
-        $form->type_anketa = 'medic';
-        $form->flag_pak = 'СДПО Р';
-        $form->admitted = $admitted;
-
-        if ($form->admitted === 'Не идентифицирован') {
-            $form->comments = Settings::setting('not_identify_text') ?? 'Водитель не идентифицирован';
-        }
-
-        $form->user_id = $user->id;
-        $form->user_name = $user->name;
-        $form->operator_id = $user->id;
-        $form->user_eds = $user->eds;
-        $form->user_validity_eds_start = $user->validity_eds_start;
-        $form->user_validity_eds_end = $user->validity_eds_end;
-
-        $form->save();
-
-        /**
-         * ОТПРАВКА SMS
-         */
-        if ($admitted === 'Не допущен') {
-            $company = Company::query()->where('hash_id', $form->company_id)->first();
-            $driver = Driver::query()->where('hash_id', $form->driver_id)->first();
-
-            $phoneToCall = Settings::setting('sms_text_phone');
-            $message = Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall";
-
-            $sms = new SmsController();
-            $sms->sms($company->where_call, $message);
-        }
-
-        return back();
     }
 
     public function ChangeResultDop ($id, $result_dop)
