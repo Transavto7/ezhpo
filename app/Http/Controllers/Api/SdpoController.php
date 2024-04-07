@@ -182,6 +182,14 @@ class SdpoController extends Controller
         $admitted = 'Допущен';
         $notAdmittedReasons = [];
 
+        if ($request->filled('alcometer_result')) {
+            $medic['alcometer_result'] = $request->input('alcometer_result');
+        }
+
+        if ($request->filled('alcometer_mode')) {
+            $medic['alcometer_mode'] = $request->input('alcometer_mode');
+        }
+
         if (doubleval($request->alcometer_result) > 0) {
             $notAdmittedReasons[] = ['Алкоголь в крови'];
             $admitted = 'Не допущен';

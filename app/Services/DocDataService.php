@@ -42,15 +42,13 @@ class DocDataService
             $data['alko'] = true;
         }
 
+        $data['alcometer_result'] = $this->getAlkoResult($data);
+
         if ($form->med_view === 'Отстранение') {
             $data['status'] = 'Есть жалобы';
         }
 
         $data['user_post'] = ProfileController::getUserRole(true, $form->user_id);
-
-        $data['alko_description'] = $data['alko'] ?
-            'ПОЛОЖИТЕЛЬНА' :
-            'ОТРИЦАТЕЛЬНА';
 
         if ($data['alko']) {
             $recommendations = 'Пройдите медицинское освидетельствование на состояние алкогольного опьянения';
@@ -85,9 +83,18 @@ class DocDataService
         return $this->getComment($data);
     }
 
+    protected function getAlkoResult(array $data): float
+    {
+        if ($data['alcometer_mode'] === 1) {
+            return $data['alcometer_result'];
+        }
+
+        return 0.00;
+    }
+
     protected function getClosing(array $data): array
     {
-        if ($data['type_view'] !== 'Предрейсовый/Предсменный') {
+        if ($data['type_view'] === 'Предрейсовый/Предсменный') {
             $closingRows = [
                 "прошел предсменный (предрейсовый) медицинский осмотр, к исполнению трудовых обязанностей НЕ допущен",
             ];

@@ -65,7 +65,6 @@
                 <select name="anketa[0][type_view]" class="form-control">
                     <option value="Предрейсовый/Предсменный" @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>Предрейсовый/Предсменный</option>
                     <option value="Послерейсовый/Послесменный" @if(strcasecmp($type_view ?? '', 'Послерейсовый/Послесменный') == 0) selected @endif>Послерейсовый/Послесменный</option>
-{{--                    <option value="Послерейсовый/Послесменный" @if(($type_view ?? '') == "Послерейсовый/Послесменный") selected @endif>Послерейсовый/Послесменный</option>--}}
                 </select>
             </article>
         </div>
@@ -121,8 +120,6 @@
                     <select name="anketa[0][type_view]" required class="form-control">
                         <option value="Предрейсовый/Предсменный" @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>Предрейсовый/Предсменный</option>
                         <option value="Послерейсовый/Послесменный" @if(strcasecmp($type_view ?? '', 'Послерейсовый/Послесменный') == 0) selected @endif>Послерейсовый/Послесменный</option>
-{{--                        <option value="Предрейсовый/Предсменный" @if(($type_view ?? '') == "Предрейсовый/Предсменный") selected @endif>Предрейсовый/Предсменный</option>--}}
-{{--                        <option value="Послерейсовый/Послесменный" @if(($type_view ?? '') == "Послерейсовый/Послесменный") selected @endif>Послерейсовый/Послесменный</option>--}}
                     </select>
                 </article>
             </div>
@@ -142,27 +139,27 @@
     <div class="form-group row">
         <label class="col-md-3 form-control-label">Проба на алкоголь:</label>
         <article class="col-md-9">
-            <select name="proba_alko" required class="form-control">
-                @if($proba_alko ?? false)
-                    <option
-                        @if ($proba_alko === 'Отрицательно') selected @endif
-                        value="Отрицательно"
-                    >
-                        Отрицательно
-                    </option>
-
-                    <option
-                        @if ($proba_alko === 'Положительно') selected @endif
-                        value="Положительно"
-                    >
-                        Положительно
-                    </option>
-                @else
-                    <option selected value="Отрицательно">Отрицательно</option>
-                    <option value="Положительно">Положительно</option>
-                @endif
-
+            <select name="proba_alko"
+                    class="form-control"
+                    required
+                    onchange="updateAlcometerResult()">
+                <option @if (($proba_alko ?? false) === 'Отрицательно') selected @endif value="Отрицательно">Отрицательно</option>
+                <option @if ((($proba_alko ?? false) === 'Положительно') || !isset($proba_alko)) selected @endif value="Положительно">Положительно</option>
             </select>
+        </article>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-md-3 form-control-label">Уровень алкоголя в крови :</label>
+        <article class="col-md-9">
+            <input type="number"
+                   step="0.01"
+                   min="0"
+                   value="{{ $alcometer_result ?? 0 }}"
+                   name="alcometer_result"
+                   class="form-control"
+                   @if (($proba_alko ?? false) === 'Отрицательно') disabled @endif
+                   onchange="updateProbaAlko()">
         </article>
     </div>
 

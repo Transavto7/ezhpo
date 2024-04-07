@@ -379,6 +379,7 @@ class Anketa extends Model
                 'tonometer' => 'АРТЕРИАЛЬНОЕ ДАВЛЕНИЕ',
                 'pulse' => 'ПУЛЬС',
                 'proba_alko' => 'ПРИЗНАКИ ОПЬЯНЕНИЯ',
+                'alcometer_result' => 'УРОВЕНЬ АЛКОГОЛЯ В ВЫДЫХАЕМОМ ВОЗДУХЕ',
                 'test_narko' => 'Тест на наркотики',
                 'admitted' => 'ЗАКЛЮЧЕНИЕ О РЕЗУЛЬТАТАХ ОСМОТРА',
                 'user_name' => 'ФИО медицинского работника',
@@ -427,6 +428,7 @@ class Anketa extends Model
                 'driver_group_risk'      => 'Группа риска',
                 'type_view'              => 'Тип осмотра',
                 'proba_alko'             => 'Признаки опьянения', // Проба на алкоголь
+                'alcometer_result'       => 'Уровень алкоголя в выдыхаемом воздухе',
                 'test_narko'             => 'Тест на наркотики',
                 'driver_gender'          => 'Пол',
                 'driver_year_birthday'   => 'Дата рождения',

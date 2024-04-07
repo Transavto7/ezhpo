@@ -58,7 +58,7 @@
             <p>- выдыхаемый воздух (алкометр)</p>
             <textarea name="alcometer" rows="1" class="doc-input doc-input--row open-modal">DRIVESAFE II</textarea>
             <p>время проведения контроля трезвости: <textarea name="time" rows="1" class="doc-input doc-input--row open-modal">{{ \Carbon\Carbon::parse($date)->format('H:i') }}</textarea></p>
-            <p>результат: <textarea name="result" rows="1" class="doc-input doc-input--row open-modal">0,00 мг/л</textarea></p>
+            <p>результат: <textarea name="result" rows="1" class="doc-input doc-input--row open-modal">{{ $alcometer_result }} мг/л</textarea></p>
 
             <p>б) на наркотические средства</p>
             <p>- экспресс-тесты мочи</p>

@@ -42,17 +42,28 @@
 <div class="form-group row">
     <label class="col-md-3 form-control-label">Проба на алкоголь:</label>
     <article class="col-md-9">
-        <select name="proba_alko" required class="form-control">
-            @isset($proba_alko)
-                <option selected value="{{ $proba_alko }}">{{ $proba_alko }}</option>
-                <option value="{{ $proba_alko == 'Положительно' ? 'Отрицательно' : 'Положительно' }}">
-                    {{ $proba_alko == 'Положительно' ? 'Отрицательно' : 'Положительно' }}
-                </option>
-            @else
-                <option selected value="Отрицательно">Отрицательно</option>
-                <option value="Положительно">Положительно</option>
-            @endisset
+        <select name="proba_alko"
+                class="form-control"
+                required
+                onchange="updateAlcometerResult()">
+            <option @if (($proba_alko ?? false) === 'Отрицательно') selected @endif value="Отрицательно">Отрицательно</option>
+            <option @if ((($proba_alko ?? false) === 'Положительно') || !isset($proba_alko)) selected @endif value="Положительно">Положительно</option>
         </select>
+    </article>
+</div>
+
+<div class="form-group row">
+    <label class="col-md-3 form-control-label">Уровень алкоголя в крови :</label>
+    <article class="col-md-9">
+        <input type="number"
+               step="0.01"
+               min="0"
+               value="{{ $alcometer_result ?? 0 }}"
+               name="alcometer_result"
+               class="form-control"
+               @if (($proba_alko ?? false) === 'Отрицательно') disabled @endif
+               onchange="updateProbaAlko()"
+        >
     </article>
 </div>
 
