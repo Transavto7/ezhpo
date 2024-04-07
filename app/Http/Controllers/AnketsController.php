@@ -6,15 +6,15 @@ use App\Actions\Anketa\CreateFormHandlerFactory;
 use App\Actions\Anketa\CreateSdpoFormHandler;
 use App\Actions\Anketa\TrashFormHandler;
 use App\Actions\Anketa\UpdateFormHandler;
+use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueAction;
+use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueHandler;
 use App\Anketa;
-use App\Company;
 use App\DDates;
-use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Point;
-use App\Settings;
 use App\Traits\UserEdsTrait;
 use App\User;
+use App\ValueObjects\NotAdmittedReasons;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class AnketsController extends Controller
@@ -83,97 +84,65 @@ class AnketsController extends Controller
 
     public function Get (Request $request)
     {
-        $id = $request->id;
-        $anketa = Anketa::where('id', $id)->first();
+        $form = Anketa::where('id', $request->id)->first();
 
         $data = [];
 
-        foreach ($anketa->fillable as $f) {
-            $data[$f] = $anketa[$f];
+        foreach ($form->fillable as $attribute) {
+            $data[$attribute] = $form[$attribute];
         }
 
-        $point = $anketa->pv_id;
-        $points = Point::getAll();
+        $companyFields = config('elements')['Driver']['fields']['company_id'];
+        $companyFields['getFieldKey'] = 'name';
 
-        $iController = new IndexController();
-
-        $company_fields = $iController->elements['Driver']['fields']['company_id'];
-        $company_fields['getFieldKey'] = 'name';
-
-        // Дефолтные значения
         $data['title'] = 'Редактирование осмотра';
 
-        if ($anketa->date) {
-            $data['default_current_date'] = date('Y-m-d\TH:i', strtotime($anketa->date)); // date('Y-m-d\TH:i')
+        if ($form->date) {
+            $data['default_current_date'] = date('Y-m-d\TH:i', strtotime($form->date));
         }
 
-        $data['date'] = $anketa->date;
-        $data['proba_alko'] = $anketa->proba_alko;
-        $data['test_narko'] = $anketa->test_narko;
-        $data['med_view'] = $anketa->med_view;
-        $data['default_point'] = $anketa->point_id ?? $point;
-        $data['points'] = $points;
-        $data['is_dop'] = $anketa->is_dop;
-        $data['anketa_view'] = 'profile.ankets.' . $anketa->type_anketa;
-        $data['default_pv_id'] = $anketa->point_id ?? $anketa->pv_id;
+        $data['default_point'] = $form->point_id ?? $form->pv_id;
+        $data['points'] = Point::getAll();
+        $data['anketa_view'] = 'profile.ankets.' . $form->type_anketa;
+        $data['default_pv_id'] = $form->point_id ?? $form->pv_id;
         $data['anketa_route'] = 'forms.update';
-        $data['company_fields'] = $company_fields;
+        $data['company_fields'] = $companyFields;
+
+        if ($form->type_anketa === FormTypeEnum::PAK_QUEUE) {
+            $data['not_admitted_reasons'] = NotAdmittedReasons::fromForm($form)->getReasons();
+        }
 
         return view('profile.anketa', $data);
     }
 
-    public function ChangePakQueue(Request $request, $id, $admitted): RedirectResponse
+    public function ChangePakQueue(Request $request, $id, $admitted, ChangePakQueueHandler $handler)
     {
-        $allowedAdmitted = ['Допущен', 'Не идентифицирован', 'Не допущен'];
-        if (!in_array($admitted, $allowedAdmitted)) {
-            return back()->with('error', 'Недопустимый результат осмотра');
+        try {
+            DB::beginTransaction();
+
+            $handler->handle(new ChangePakQueueAction($id, $admitted, Auth::user()));
+
+            DB::commit();
+
+            if ($request->wantsJson()) {
+                return response()->json(
+                    ['message' => 'Осмотр успешно принят']
+                );
+            } else {
+                return back();
+            }
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            if ($request->wantsJson()) {
+                return response()->json(
+                    ['message' => $exception->getMessage()],
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+            } else {
+                return back()->with('error', $exception->getMessage());
+            }
         }
-
-        /** @var User $user */
-        $user = Auth::user();
-
-        $form = Anketa::find($id);
-
-        if (!$form) {
-            return back()->with('error', 'Осмотр не найден');
-        }
-
-        if ($form->type_anketa !== FormTypeEnum::PAK_QUEUE) {
-            return back()->with('error', 'Осмотр не находится в очереди утверждения');
-        }
-
-        $form->type_anketa = 'medic';
-        $form->flag_pak = 'СДПО Р';
-        $form->admitted = $admitted;
-
-        if ($form->admitted === 'Не идентифицирован') {
-            $form->comments = Settings::setting('not_identify_text') ?? 'Водитель не идентифицирован';
-        }
-
-        $form->user_id = $user->id;
-        $form->user_name = $user->name;
-        $form->operator_id = $user->id;
-        $form->user_eds = $user->eds;
-        $form->user_validity_eds_start = $user->validity_eds_start;
-        $form->user_validity_eds_end = $user->validity_eds_end;
-
-        $form->save();
-
-        /**
-         * ОТПРАВКА SMS
-         */
-        if ($admitted === 'Не допущен') {
-            $company = Company::query()->where('hash_id', $form->company_id)->first();
-            $driver = Driver::query()->where('hash_id', $form->driver_id)->first();
-
-            $phoneToCall = Settings::setting('sms_text_phone');
-            $message = Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall";
-
-            $sms = new SmsController();
-            $sms->sms($company->where_call, $message);
-        }
-
-        return back();
     }
 
     public function ChangeResultDop ($id, $result_dop)

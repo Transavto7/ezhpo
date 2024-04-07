@@ -4,6 +4,7 @@ namespace App;
 
 use App\Enums\FormTypeEnum;
 use App\Models\ContractAnketaSnapshot;
+use App\ValueObjects\NotAdmittedReasons;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -597,5 +598,10 @@ class Anketa extends Model
         } else {
             $query->where('user_id', $user->id);
         }
+    }
+
+    public function getNotAdmittedReasonsAttribute(): array
+    {
+        return NotAdmittedReasons::fromForm($this)->getReasons();
     }
 }

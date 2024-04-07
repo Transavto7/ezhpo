@@ -103,7 +103,7 @@
     <div class="text-center m-center">
         <label class="btn btn-success btn-sm">
             <i class="fa fa-check-circle"></i> Допущен
-            <input onchange="ANKETA_FORM.submit()" class="d-none" type="radio" value="Допущен" name="admitted" />
+            <input onclick="approveAdmitting()" class="d-none" type="radio" value="Допущен" name="admitted" />
         </label>
 
         <label class="btn btn-secondary btn-sm">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Anketa;
 use App\Enums\FormTypeEnum;
 use App\FieldPrompt;
+use App\ValueObjects\NotAdmittedReasons;
 use Illuminate\Http\Request;
 
 class PakController extends Controller
@@ -30,6 +31,14 @@ class PakController extends Controller
             $forms = $forms->orderBy($request->order_key, $request->order_by ?? 'ASC');
         }
 
-        return response()->json($forms->get());
+        $forms->get();
+
+        $data = $forms->get()->map(function (Anketa $form) {
+            $form->append('not_admitted_reasons');
+
+            return $form;
+        });
+
+        return response()->json($data);
     }
 }
