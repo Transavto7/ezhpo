@@ -50,8 +50,6 @@ class DocDataService
 
         $data['user_post'] = ProfileController::getUserRole(true, $form->user_id);
 
-        $data['alko_description'] = $this->getAlkoDescription($data);
-
         if ($data['alko']) {
             $recommendations = 'Пройдите медицинское освидетельствование на состояние алкогольного опьянения';
         } else {
@@ -83,17 +81,6 @@ class DocDataService
         $data = $this->getClosing($data);
 
         return $this->getComment($data);
-    }
-
-    protected function getAlkoDescription(array $data): string
-    {
-        if ($data['alcometer_mode'] === 1) {
-            return $data['alcometer_result'] . ' мг/л';
-        }
-
-        return $data['alko'] ?
-            'ПОЛОЖИТЕЛЬНА' :
-            'ОТРИЦАТЕЛЬНА';
     }
 
     protected function getAlkoResult(array $data): float

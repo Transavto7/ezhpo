@@ -319,12 +319,7 @@ class HomeController extends Controller
                     'points.name as pv_id'
                 ]);
         } else if ($validTypeForm == 'medic') {
-            $forms = $forms
-                ->select([
-                    'anketas.*',
-                    DB::raw('IF(`anketas`.alcometer_mode = 0, null, `anketas`.alcometer_result) as alcometer_result')
-                ])
-                ->with('operator');
+            $forms = $forms->with('operator');
         }
         /**
          * Обогащение данных
