@@ -86,7 +86,7 @@
                         Проба на алкоголь
                     </td>
                     <td colspan="3">
-                        <textarea rows="1" name="alko" class="doc-input">{{ $alko_description }}</textarea>
+                        <textarea rows="1" name="alko" class="doc-input">{{ $alcometer_result }} мг\л</textarea>
                     </td>
                 </tr>
                 <tr>
