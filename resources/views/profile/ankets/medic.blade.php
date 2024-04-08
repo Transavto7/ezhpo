@@ -150,7 +150,7 @@
     </div>
 
     <div class="form-group row">
-        <label class="col-md-3 form-control-label">Уровень алкоголя в крови :</label>
+        <label class="col-md-3 form-control-label">Уровень алкоголя в выдыхаемом воздухе:</label>
         <article class="col-md-9">
             <input type="number"
                    step="0.01"
@@ -158,7 +158,6 @@
                    value="{{ $alcometer_result ?? 0 }}"
                    name="alcometer_result"
                    class="form-control"
-                   @if (($proba_alko ?? false) === 'Отрицательно') disabled @endif
                    onchange="updateProbaAlko()">
         </article>
     </div>
