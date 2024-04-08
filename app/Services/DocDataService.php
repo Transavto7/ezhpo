@@ -42,7 +42,7 @@ class DocDataService
             $data['alko'] = true;
         }
 
-        $data['alcometer_result'] = $this->getAlkoResult($data);
+        $data['alcometer_result'] = $data['alcometer_result'] ?? 0;
 
         if ($form->med_view === 'Отстранение') {
             $data['status'] = 'Есть жалобы';
@@ -81,15 +81,6 @@ class DocDataService
         $data = $this->getClosing($data);
 
         return $this->getComment($data);
-    }
-
-    protected function getAlkoResult(array $data): float
-    {
-        if ($data['alcometer_mode'] === 1) {
-            return $data['alcometer_result'];
-        }
-
-        return 0.00;
     }
 
     protected function getClosing(array $data): array
