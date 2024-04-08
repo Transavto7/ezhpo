@@ -143,8 +143,8 @@
                     class="form-control"
                     required
                     onchange="updateAlcometerResult()">
-                <option @if (($proba_alko ?? false) === 'Отрицательно') selected @endif value="Отрицательно">Отрицательно</option>
-                <option @if ((($proba_alko ?? false) === 'Положительно') || !isset($proba_alko)) selected @endif value="Положительно">Положительно</option>
+                <option @if (($proba_alko ?? 'Отрицательно') === 'Отрицательно') selected @endif value="Отрицательно">Отрицательно</option>
+                <option @if (($proba_alko ?? 'Отрицательно') === 'Положительно') selected @endif value="Положительно">Положительно</option>
             </select>
         </article>
     </div>
