@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use Illuminate\Support\Collection;
+
 final class DeviceEnum
 {
     const ALCOHOL_METER = 'alcohol_meter';
@@ -23,6 +25,18 @@ final class DeviceEnum
             self::CAMERA => 'Камера',
             self::USB_MODEM => 'USB модем',
         ];
+    }
+
+    public static function options(): Collection
+    {
+        return collect(self::labels())
+            ->map(function ($value, $key) {
+                return [
+                    'id' => $key,
+                    'text' => $value
+                ];
+            })
+            ->values();
     }
 
     public static function label(string $value): string
