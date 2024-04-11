@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class HomeController extends Controller
@@ -465,6 +464,15 @@ class HomeController extends Controller
             $currentRole = 'operator_sdpo';
         }
 
+        $fieldPrompts = $filterFields(
+            FieldPrompt::query()
+                ->where('type', $validTypeForm)
+                ->orderBy('sort')
+                ->orderBy('id')
+                ->get(),
+            true
+        );
+
         $view = $request->get('getFormFilter') ? 'home_filters' : 'home';
         return view($view, [
             'title'                 => Anketa::$anketsKeys[$validTypeForm],
@@ -475,7 +483,7 @@ class HomeController extends Controller
             'anketsFields'          => $formsFields,
             'anketsFieldsTable'     => Anketa::$fieldsKeysTable[$validTypeForm] ?? $formsFields,
             'fieldsKeys'            => $fieldsKeys,
-            'fieldPrompts'          => $filterFields(FieldPrompt::where('type', $validTypeForm)->get(), true),
+            'fieldPrompts'          => $fieldPrompts,
             'fieldsGroupFirst'      => Anketa::$fieldsGroupFirst[$validTypeForm] ?? [],
             'blockedToExportFields' => Anketa::$blockedToExportFields[$validTypeForm] ?? [],
             'anketasCountResult'    => $formsCountResult,
