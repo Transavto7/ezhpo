@@ -5,8 +5,6 @@
 
 @php
     $selectedTerminals = request()->get('hash_id') ?? [];
-    $selectedTowns = request()->get('town_id') ?? [];
-    $selectedCompanies = request()->get('company_id') ?? [];
     $selectedPoints = request()->get('point_id') ?? []
 @endphp
 
@@ -19,7 +17,7 @@
                         <input type="hidden" value="1" name="deleted">
                     @endif
 
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col-lg-3">
                             <label for="hash_id">Терминал (ID/AnyDesk/SN):</label>
                             <select multiple
@@ -63,42 +61,54 @@
 
                         <div class="col-lg-3 form-group">
                             <label for="town_id">Город:</label>
-                            <select multiple
-                                    name="town_id[]"
-                                    data-label="hash_id"
-                                    data-field="Town_hash_id"
-                                    data-allow-clear="true"
-                                    class="filled-select2 filled-select select2-hidden-accessible"
-                                    aria-hidden="true">
-
-                                @foreach($towns ?? [] as $option)
-                                    <option
-                                        @if(in_array($option['id'], $selectedTowns)) selected @endif
-                                        value="{{ $option['id'] }}">
-                                        {{ $option['text'] }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            @include('templates.elements_field', [
+                                'v' => [
+                                    'label' => 'Город',
+                                    'type' => 'select',
+                                    'values' => 'Town',
+                                    'noRequired' => 1,
+                                    'getFieldKey' => 'id',
+                                    'multiple' => true
+                                ],
+                                'k' => 'town_id',
+                                'is_required' => '',
+                                'model' => 'Company',
+                                'default_value' => request()->get('town_id')
+                            ])
                         </div>
 
                         <div class="col-lg-3 form-group">
-                            <label for="town_id">Компания:</label>
-                            <select multiple
-                                    name="company_id[]"
-                                    data-label="hash_id"
-                                    data-field="Company_hash_id"
-                                    data-allow-clear="true"
-                                    class="filled-select2 filled-select select2-hidden-accessible"
-                                    aria-hidden="true">
+                            <label for="company_id">Компания:</label>
+                            @include('templates.elements_field', [
+                                'v' => [
+                                    'label' => 'Компания',
+                                    'type' => 'select',
+                                    'values' => 'Company',
+                                    'noRequired' => 1,
+                                    'getFieldKey' => 'id',
+                                    'multiple' => true
+                                ],
+                                'k' => 'company_id',
+                                'is_required' => '',
+                                'model' => 'Company',
+                                'default_value' => request()->get('company_id')
+                            ])
+                        </div>
 
-                                @foreach($companies ?? [] as $option)
-                                    <option
-                                        @if(in_array($option['id'], $selectedCompanies)) selected @endif
-                                    value="{{ $option['id'] }}">
-                                        {{ $option['text'] }}
-                                    </option>
-                                @endforeach
-                            </select>
+                        <div class="col-lg-3">
+                            <label for="date_check">Срок поверки:</label>
+                            <input type="date"
+                                   value="{{ request()->get('date_check') }}"
+                                   name="date_check"
+                                   class="form-control"/>
+                        </div>
+
+                        <div class="col-lg-3">
+                            <label for="TO_date_check">Срок поверки до:</label>
+                            <input type="date"
+                                   value="{{ request()->get('TO_date_check') }}"
+                                    name="TO_date_check"
+                                    class="form-control"/>
                         </div>
                     </div>
                     <div class="row">

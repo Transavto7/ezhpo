@@ -11,7 +11,6 @@ use App\Actions\Terminal\Store\TerminalStoreHandler;
 use App\Actions\Terminal\Update\TerminalCheckUpdateHandler;
 use App\Actions\Terminal\Update\TerminalUpdateHandler;
 use App\Anketa;
-use App\Company;
 use App\Enums\DeviceEnum;
 use App\FieldPrompt;
 use App\Role;
@@ -33,6 +32,14 @@ class TerminalController extends Controller
     {
         if ($request->get('api')) {
             $terminals = User::query()
+                ->select([
+                    'users.*',
+                    'terminal_checks.serial_number',
+                    'terminal_checks.date_check',
+                    'terminal_checks.date_service_start',
+                    'terminal_checks.date_service_end',
+                    'terminal_checks.failures_count',
+                ])
                 ->with([
                     'roles',
                     'pv',
@@ -42,6 +49,7 @@ class TerminalController extends Controller
                     'terminalDevices',
                     'terminalCheck'
                 ])
+                ->leftJoin('terminal_checks', 'users.id', '=', 'terminal_checks.user_id')
                 ->leftJoin('model_has_roles', function ($join) {
                     $join->on('users.id', '=', 'model_has_roles.model_id')
                         ->where('model_has_roles.role_id', '=', 9);
@@ -52,12 +60,22 @@ class TerminalController extends Controller
                 $terminals->with(['deleted_user'])->onlyTrashed();
             }
 
-            if ($pv_id = $request->get('pv_id')) {
-                $terminals->where('pv_id', $pv_id);
+            if ($pvId = $request->get('point_id')) {
+                $terminals->whereIn('users.pv_id', $pvId);
+            }
+
+            if ($companyId = $request->get('company_id')) {
+                $terminals->whereIn('users.company_id', $companyId);
             }
 
             if ($id = $request->get('hash_id')) {
-                $terminals->whereIn('hash_id', $id);
+                $terminals->whereIn('users.hash_id', $id);
+            }
+
+            if ($townId = $request->get('town_id')) {
+                $terminals
+                    ->leftJoin('points', 'users.pv_id', '=', 'points.id')
+                    ->whereIn('points.pv_id', $townId);
             }
 
             if ($sortBy = $request->get('sortBy', 'id')) {
@@ -129,19 +147,6 @@ class TerminalController extends Controller
             ->orderBy('towns.name')
             ->get();
 
-        $towns = $points
-            ->map(function ($model) {
-                return [
-                    'id' => $model->hash_id,
-                    'text' => sprintf(
-                        '[%s] %s',
-                        $model->hash_id,
-                        $model->name
-                    )
-                ];
-            })
-            ->toArray();
-
         $pointsToTable = $points->map(function ($model) {
             $option['label'] = $model->name;
 
@@ -181,24 +186,16 @@ class TerminalController extends Controller
             'permission_to_trash' => $user->access('employee_trash'),
         ];
 
-        $companies = Company::query()
-            ->get()
-            ->map(function ($model) {
-                return [
-                    'id' => $model->hash_id,
-                    'text' => sprintf(
-                        '[%s] %s',
-                        $model->hash_id,
-                        $model->name
-                    )
-                ];
-            })
-            ->toArray();
+        $fields = FieldPrompt::query()
+            ->where('type', 'terminals')
+            ->orderBy('sort')
+            ->orderBy('id')
+            ->get();
 
         return view('admin.users_v2.terminal')
             ->with([
 
-                'fields' => FieldPrompt::query()->where('type', 'terminals')->get(),
+                'fields' => $fields,
                 'devicesOptions' => DeviceEnum::options(),
                 'pointsToTable' => $pointsToTable,
 
@@ -207,8 +204,6 @@ class TerminalController extends Controller
 
                 'terminals' => $terminals,
                 'points' => $points,
-                'towns' => $towns,
-                'companies' => $companies,
 
                 'roles' => Role::whereNull('deleted_at')->get(),
             ]);
@@ -254,7 +249,10 @@ class TerminalController extends Controller
                     new TerminalCheckUpdateAction(
                         $userId,
                         $request->input('serial_number'),
-                        Carbon::parse($request->input('date_check'))
+                        Carbon::parse($request->input('date_check')),
+                        Carbon::parse($request->input('date_service_start')),
+                        Carbon::parse($request->input('date_service_end')),
+                        $request->input('failures_count')
                     )
                 );
             }
@@ -262,7 +260,10 @@ class TerminalController extends Controller
                 $terminalCheckStoreHandler->handle(new TerminalCheckStoreAction(
                     $userId,
                     $request->input('serial_number'),
-                    Carbon::parse($request->input('date_check'))
+                    Carbon::parse($request->input('date_check')),
+                    Carbon::parse($request->input('date_service_start')),
+                    Carbon::parse($request->input('date_service_end')),
+                    $request->input('failures_count')
                 ));
             }
 
@@ -283,7 +284,8 @@ class TerminalController extends Controller
 
             return response([
                 'status'    => true,
-                'user_info' => User::with(['company'])
+                'user_info' => User::query()
+                    ->with(['company'])
                     ->find($user->id),
             ]);
         } catch (Throwable $exception) {

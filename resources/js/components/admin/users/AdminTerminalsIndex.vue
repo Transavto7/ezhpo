@@ -325,6 +325,9 @@ export default {
                 permissions: [],
                 serialNumber: null,
                 dateCheck: null,
+                dateServiceEnd: null,
+                dateServiceStart: null,
+                failuresCount: 0,
                 devices: []
             },
             optionsPvs: [],
@@ -523,6 +526,9 @@ export default {
                 !this.infoModalUser.company_id ||
                 !this.infoModalUser.serialNumber ||
                 !this.infoModalUser.dateCheck ||
+                !this.infoModalUser.dateServiceStart ||
+                !this.infoModalUser.dateServiceEnd ||
+                (this.infoModalUser.failuresCount === null) ||
                 !this.validateDevices()) {
                 this.$toast('Не все поля указаны', { type: 'error' });
                 return;
@@ -543,6 +549,9 @@ export default {
                 stamp_id: this.infoModalUser.stamp_id,
                 serial_number: this.infoModalUser.serialNumber,
                 date_check: this.infoModalUser.dateCheck,
+                date_service_start: this.infoModalUser.dateServiceStart,
+                date_service_end: this.infoModalUser.dateServiceEnd,
+                failures_count: this.infoModalUser.failuresCount,
                 devices: this.infoModalUser.devices,
             })
                 .then(({data}) => {
@@ -579,7 +588,10 @@ export default {
             data.serialNumber = null
             if (user.terminal_check) {
                 data.dateCheck = user.terminal_check.date_check
+                data.dateServiceStart = user.terminal_check.date_service_start
+                data.dateServiceEnd = user.terminal_check.date_service_end
                 data.serialNumber = user.terminal_check.serial_number
+                data.failuresCount = user.terminal_check.failures_count
             }
 
             data.devices = []
@@ -610,6 +622,9 @@ export default {
             this.infoModalUser.permissions = [];
             this.infoModalUser.serialNumber = null;
             this.infoModalUser.dateCheck = null;
+            this.infoModalUser.dateServiceStart = null;
+            this.infoModalUser.dateServiceEnd = null;
+            this.infoModalUser.failuresCount = 0;
             this.infoModalUser.devices = [];
             this.permission_collapse = false;
 

@@ -4,7 +4,6 @@ namespace App\Actions\Terminal\Store;
 
 use App\Actions\Terminal\Store\Dto\TerminalCheckStoreAction;
 use App\TerminalCheck;
-use App\User;
 use Carbon\Carbon;
 use Exception;
 
@@ -27,11 +26,16 @@ final class TerminalCheckStoreHandler
 
         $this->validateSerialNumberUnique($action->getSerialNumber());
 
+        //TODO: валидация дат?
+
         $terminalCheck = TerminalCheck::create([
             'user_id' => $action->getUserId(),
             'serial_number' => $action->getSerialNumber(),
             'date_check' => $action->getDateCheck(),
-            'date_end_check' => $action->getDateCheck()->copy()->addYear()
+            'date_end_check' => $action->getDateCheck()->copy()->addYear(),
+            'date_service_start' => $action->getDateServiceStart(),
+            'date_service_end' => $action->getDateServiceEnd(),
+            'failures_count' => $action->getFailuresCount()
         ]);
 
         return $terminalCheck->id;
