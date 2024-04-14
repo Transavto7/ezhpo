@@ -53,7 +53,7 @@
 </div>
 
 <div class="form-group row">
-    <label class="col-md-3 form-control-label">Уровень алкоголя в крови :</label>
+    <label class="col-md-3 form-control-label">Уровень алкоголя в выдыхаемом воздухе:</label>
     <article class="col-md-9">
         <input type="number"
                step="0.01"
