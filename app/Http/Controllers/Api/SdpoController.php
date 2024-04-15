@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Anketa;
 use App\Driver;
+use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
 use App\Http\Controllers\SmsController;
 use App\Traits\UserEdsTrait;
@@ -117,7 +118,9 @@ class SdpoController extends Controller
 
         $company = $driver->company;
         if ($company->dismissed === 'Да') {
-            return response()->json(['message' => 'Компания в черном списке. Необходимо связаться с руководителем!', 401]);
+            return response()->json([
+                'message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK)
+            ], 401);
         }
 
         if ($request->tonometer) {

@@ -15,6 +15,7 @@ class FieldPrompt extends Model
         'name',
         'content',
         'deleted_id',
+        'sort'
     ];
 
     public static function getTypes(): array

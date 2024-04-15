@@ -6,6 +6,7 @@ use App\Anketa;
 use App\Car;
 use App\Company;
 use App\Driver;
+use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -127,7 +128,7 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             }
 
             if ($company->dismissed === 'Да') {
-                $this->errors[] = 'Компания в черном списке. Необходимо связаться с руководителем!';
+                $this->errors[] = BlockActionReasonsEnum::COMPANY_BLOCK;
 
                 return;
             }
@@ -156,7 +157,7 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             }
 
             if ($carCompany->dismissed === 'Да') {
-                $this->errors[] = 'Компания в черном списке. Необходимо связаться с руководителем!';
+                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
 
                 return;
             }

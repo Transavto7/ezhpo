@@ -5,6 +5,7 @@ namespace App\Actions\Anketa;
 use App\Anketa;
 use App\Company;
 use App\Driver;
+use App\Enums\BlockActionReasonsEnum;
 use App\Http\Controllers\SmsController;
 use App\Settings;
 use App\User;
@@ -143,7 +144,7 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
         }
 
         if ($company->dismissed === 'Да') {
-            $this->errors[] = 'Компания в черном списке. Необходимо связаться с руководителем!';
+            $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
 
             return;
         }
