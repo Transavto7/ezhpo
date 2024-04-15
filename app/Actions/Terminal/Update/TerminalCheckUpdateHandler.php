@@ -27,8 +27,6 @@ final class TerminalCheckUpdateHandler
             ->get()
             ->first();
 
-        //TODO: валидация дат?
-
         $terminalCheck->update([
             'user_id' => $action->getUserId(),
             'serial_number' => $action->getSerialNumber(),

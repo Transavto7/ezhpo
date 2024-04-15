@@ -26,8 +26,6 @@ final class TerminalCheckStoreHandler
 
         $this->validateSerialNumberUnique($action->getSerialNumber());
 
-        //TODO: валидация дат?
-
         $terminalCheck = TerminalCheck::create([
             'user_id' => $action->getUserId(),
             'serial_number' => $action->getSerialNumber(),
