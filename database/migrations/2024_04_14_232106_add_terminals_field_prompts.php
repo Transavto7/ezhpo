@@ -16,16 +16,7 @@ class AddTerminalsFieldPrompts extends Migration
             [
                 [
                     'type' => 'terminals',
-                    'field' => 'failures_count'
-                ],
-                [
-                    'name' => 'Количество сбоев',
-                ]
-            ],
-            [
-                [
-                    'type' => 'terminals',
-                    'field' => 'date_check'
+                    'field' => 'date_end_check'
                 ],
                 [
                     'name' => 'Срок поверки терминала',
@@ -38,24 +29,6 @@ class AddTerminalsFieldPrompts extends Migration
                 ],
                 [
                     'name' => 'S/N',
-                ]
-            ],
-            [
-                [
-                    'type' => 'terminals',
-                    'field' => 'date_service_start'
-                ],
-                [
-                    'name' => 'Дата начала оказания услуг',
-                ]
-            ],
-            [
-                [
-                    'type' => 'terminals',
-                    'field' => 'date_service_end'
-                ],
-                [
-                    'name' => 'Дата окончания оказания услуг',
                 ]
             ],
         ];

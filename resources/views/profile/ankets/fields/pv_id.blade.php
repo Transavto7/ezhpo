@@ -7,6 +7,7 @@
         'multiple' => 1,
         'concatField' => 'hash_id',
         'trashed' => true,
+        'orderBy' => 'name'
     ],
     'model' => $type_ankets,
     'k' => $field,

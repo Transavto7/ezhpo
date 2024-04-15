@@ -16,7 +16,6 @@ class SortTerminalsFieldPrompts extends Migration
             'status',
             'hash_id',
             'name',
-            'failures_count',
             'date_check',
             'serial_number',
             'company_id',
@@ -27,9 +26,7 @@ class SortTerminalsFieldPrompts extends Migration
             'blocked',
             'api_token',
             'last_month_amount',
-            'month_amount',
-            'date_service_start',
-            'date_service_end',
+            'month_amount'
         ];
 
         foreach ($fields as $sort => $field) {

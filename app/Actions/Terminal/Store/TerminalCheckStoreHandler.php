@@ -32,10 +32,7 @@ final class TerminalCheckStoreHandler
             'user_id' => $action->getUserId(),
             'serial_number' => $action->getSerialNumber(),
             'date_check' => $action->getDateCheck(),
-            'date_end_check' => $action->getDateCheck()->copy()->addYear(),
-            'date_service_start' => $action->getDateServiceStart(),
-            'date_service_end' => $action->getDateServiceEnd(),
-            'failures_count' => $action->getFailuresCount()
+            'date_end_check' => $action->getDateCheck()->copy()->addYear()
         ]);
 
         return $terminalCheck->id;

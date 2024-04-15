@@ -66,9 +66,12 @@
                                     'label' => 'Город',
                                     'type' => 'select',
                                     'values' => 'Town',
-                                    'noRequired' => 1,
+                                    'getField' => 'name',
                                     'getFieldKey' => 'id',
-                                    'multiple' => true
+                                    'multiple' => true,
+                                    'trashed' => true,
+                                    'concatField' => 'hash_id',
+                                    'orderBy' => 'name'
                                 ],
                                 'k' => 'town_id',
                                 'is_required' => '',
@@ -86,7 +89,9 @@
                                     'values' => 'Company',
                                     'noRequired' => 1,
                                     'getFieldKey' => 'id',
-                                    'multiple' => true
+                                    'multiple' => true,
+                                    'concatField' => 'hash_id',
+                                    'orderBy' => 'name'
                                 ],
                                 'k' => 'company_id',
                                 'is_required' => '',

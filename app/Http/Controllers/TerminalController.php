@@ -35,10 +35,7 @@ class TerminalController extends Controller
                 ->select([
                     'users.*',
                     'terminal_checks.serial_number',
-                    'terminal_checks.date_check',
-                    'terminal_checks.date_service_start',
-                    'terminal_checks.date_service_end',
-                    'terminal_checks.failures_count',
+                    'terminal_checks.date_end_check'
                 ])
                 ->with([
                     'roles',
@@ -76,6 +73,14 @@ class TerminalController extends Controller
                 $terminals
                     ->leftJoin('points', 'users.pv_id', '=', 'points.id')
                     ->whereIn('points.pv_id', $townId);
+            }
+
+            if ($dateCheck = $request->get('date_check')) {
+                $terminals->where('terminal_checks.date_end_check', '>=', Carbon::parse($dateCheck)->startOfDay());
+            }
+
+            if ($toDateCheck = $request->input('TO_date_check')) {
+                $terminals->where('terminal_checks.date_end_check', '<=', Carbon::parse($toDateCheck)->endOfDay());
             }
 
             if ($sortBy = $request->get('sortBy', 'id')) {
@@ -166,7 +171,8 @@ class TerminalController extends Controller
                     $models[] = [
                         'id' => $point->id,
                         'text' => sprintf(
-                            '%s - %s',
+                            '[%s] %s - %s',
+                            $point->hash_id,
                             $model->name,
                             $point->name
                         )
@@ -249,10 +255,7 @@ class TerminalController extends Controller
                     new TerminalCheckUpdateAction(
                         $userId,
                         $request->input('serial_number'),
-                        Carbon::parse($request->input('date_check')),
-                        Carbon::parse($request->input('date_service_start')),
-                        Carbon::parse($request->input('date_service_end')),
-                        $request->input('failures_count')
+                        Carbon::parse($request->input('date_check'))
                     )
                 );
             }
@@ -260,10 +263,7 @@ class TerminalController extends Controller
                 $terminalCheckStoreHandler->handle(new TerminalCheckStoreAction(
                     $userId,
                     $request->input('serial_number'),
-                    Carbon::parse($request->input('date_check')),
-                    Carbon::parse($request->input('date_service_start')),
-                    Carbon::parse($request->input('date_service_end')),
-                    $request->input('failures_count')
+                    Carbon::parse($request->input('date_check'))
                 ));
             }
 
