@@ -84,7 +84,7 @@ class DocsController extends Controller
         $data['time'] = date('Hч iмин', strtotime($data['date']));
         $data['date_str'] = 'от ' . date('d.m.Y', strtotime($data['date'])) . ' года';
         $data['post'] = 'Водитель';
-        $data['alko'] = $data['alko_description'];
+        $data['alko'] = $data['alcometer_result'];
 
         //TODO: фикс для протокола, при необходимости - можно привести к 1 шаблону
         $view = 'docs.exports.' . $type;
