@@ -307,7 +307,7 @@ export default {
 
             currentPage: 1,
             totalRows: 0,
-            perPage: 15,
+            perPage: 100,
             sortBy: '',
             sortDesc: false,
 
