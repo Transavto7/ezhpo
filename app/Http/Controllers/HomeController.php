@@ -172,6 +172,14 @@ class HomeController extends Controller
                     continue;
                 }
 
+                if ($filterKey === 'town_id') {
+                    $forms = $forms
+                        //TODO: нужно делать селект anketas.pv_id
+                        ->leftJoin('points', 'anketas.point_id', '=', 'points.id')
+                        ->whereIn('points.pv_id', $filterValue);
+                    continue;
+                }
+
                 if (in_array($filterKey, $formModel->fillable)) {
                     if (in_array($filterKey, ['date', 'created_at'])) continue;
 
@@ -315,6 +323,7 @@ class HomeController extends Controller
                 ->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')
                 ->select([
                     'anketas.*',
+                    'anketas.pv_id as pv_id',
                     'cars.type_auto as car_type_auto',
                     'cars.date_prto as date_prto'
                 ]);
@@ -326,21 +335,32 @@ class HomeController extends Controller
                     'points.name as pv_id'
                 ]);
         } else if ($validTypeForm == 'medic') {
-            $forms = $forms->with('operator');
+            $forms = $forms
+                ->with('operator')
+                ->select([
+                    'anketas.*',
+                    'anketas.pv_id as pv_id',
+                ]);
+        } else {
+            $forms = $forms
+                ->select([
+                    'anketas.*',
+                    'anketas.pv_id as pv_id',
+                ]);
         }
         /**
          * Обогащение данных
          */
 
         /**
-         * Метод фильтрации полей для ЛКК
+         * Метод фильтрации полей для ЛКК и экспортов
          */
         $filterFields = function (Collection $fields, bool $itemsIsModels = false) use ($user, $validTypeForm) {
-            if (!$user->hasRole('client')) {
-                return $fields;
+            $exclude = [];
+            if ($user->hasRole('client')) {
+                $exclude = config('fields.client_exclude.' . $validTypeForm) ?? [];
             }
-
-            $exclude = config('fields.client_exclude.' . $validTypeForm) ?? [];
+            $exclude[] = 'town_id';
 
             if (count($exclude) === 0) {
                 return $fields;
@@ -387,7 +407,7 @@ class HomeController extends Controller
                 });
                 $title = 'ЭЖ инструктажей БДД.xlsx';
             } else {
-                $fields = Anketa::$fieldsKeys[$validTypeForm];
+                $fields = $filterFields(collect(Anketa::$fieldsKeys[$validTypeForm]));
                 $forms = $forms->get();
                 $title = 'ЭЖ.xlsx';
             }

@@ -4,7 +4,6 @@ namespace App\Actions\Terminal\Update;
 
 use App\Actions\Terminal\Update\Dto\TerminalCheckUpdateAction;
 use App\TerminalCheck;
-use App\User;
 use Carbon\Carbon;
 use Exception;
 

@@ -4,7 +4,6 @@ namespace App\Actions\Terminal\Store;
 
 use App\Actions\Terminal\Store\Dto\TerminalCheckStoreAction;
 use App\TerminalCheck;
-use App\User;
 use Carbon\Carbon;
 use Exception;
 

@@ -24,8 +24,11 @@ final class TerminalCheckUpdateAction
      * @param string $serialNumber
      * @param Carbon $dateCheck
      */
-    public function __construct(int $userId, string $serialNumber, Carbon $dateCheck)
-    {
+    public function __construct(
+        int $userId,
+        string $serialNumber,
+        Carbon $dateCheck
+    ) {
         $this->userId = $userId;
         $this->serialNumber = $serialNumber;
         $this->dateCheck = $dateCheck;
@@ -45,6 +48,4 @@ final class TerminalCheckUpdateAction
     {
         return $this->dateCheck;
     }
-
-
 }
