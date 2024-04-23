@@ -16,7 +16,7 @@ class Temperature
 
     public static function random(): self
     {
-        return new self(mt_rand(35.9, 36.7));
+        return new self(mt_rand(359, 367)/10);
     }
 
     public function isAdmitted(): bool
