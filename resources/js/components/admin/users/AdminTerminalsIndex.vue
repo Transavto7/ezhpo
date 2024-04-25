@@ -23,8 +23,8 @@
 
             <slot></slot>
 
-            <div class="card">
-                <div class="card-body pt-0">
+            <div class="card table-card">
+                <div class="card-body">
                     <b-table
                         v-if="current_user_permissions.permission_to_view"
                         :items="items"
@@ -37,7 +37,6 @@
                         :sort-desc.sync="sortDesc"
                         :current-page="currentPage"
                         :tbody-tr-class="tableRowClass"
-                        responsive
                         @sort-changed="sortChanged"
                     >
                         <template #cell(name)="row">
@@ -112,7 +111,11 @@
                             </b-button>
                         </template>
                     </b-table>
+                </div>
+            </div>
 
+            <div class="card">
+                <div class="card-body">
                     <b-row class="w-100 d-flex justify-content-center">
                         <b-col class="my-1 d-flex justify-content-left">
                             <b-pagination
@@ -751,5 +754,17 @@ export default {
 
 .row-check-expired {
     background-color: #fbd3d3 !important;
+}
+
+.table-card {
+    max-height: 80vh;
+    overflow: hidden;
+}
+
+.table-card > .card-body {
+    overflow: scroll;
+    padding: 0 !important;
+    margin: 15px !important;
+    overscroll-behavior: contain;
 }
 </style>

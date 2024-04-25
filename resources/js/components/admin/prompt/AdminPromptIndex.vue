@@ -71,7 +71,7 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card table-card">
             <div class="card-body pt-0">
                 <b-table
                     :items="prompts"
@@ -83,7 +83,6 @@
                     :current-page="currentPage"
                     @sort-changed="loadData"
                     :busy="loading"
-                    responsive
                     label-sort-asc=""
                     label-sort-desc=""
                     label-sort-clear=""
@@ -134,6 +133,11 @@
                         </div>
                     </template>
                 </b-table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
                 <b-row class="w-100 d-flex justify-content-start">
                     <b-col class="my-1 d-flex justify-content-start">
                         <b-pagination
@@ -183,7 +187,7 @@ export default {
     data() {
         return {
             prompts: [ ],
-            perPage: 15,
+            perPage: 25,
             sortBy: 'id',
             sortDesc: false,
             loading: false,
@@ -294,6 +298,7 @@ export default {
             const data = {
                 ...this.filters,
                 page: this.currentPage,
+                perPage: this.perPage,
                 sortBy: this.sortBy,
                 sortDesc: this.sortDesc
             };
@@ -310,5 +315,15 @@ export default {
 </script>
 
 <style scoped>
+.table-card {
+    max-height: 80vh;
+    overflow: hidden;
+}
 
+.table-card > .card-body {
+    overflow: scroll;
+    padding: 0 !important;
+    margin: 15px !important;
+    overscroll-behavior: contain;
+}
 </style>

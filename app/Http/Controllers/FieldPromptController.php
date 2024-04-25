@@ -51,7 +51,7 @@ class FieldPromptController extends Controller
             $prompts->orderBy($request->sortBy, $sort);
         }
 
-        return $prompts->paginate(15);
+        return $prompts->paginate($request->perPage);
     }
 
     /**

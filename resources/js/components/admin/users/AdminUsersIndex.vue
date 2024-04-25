@@ -23,7 +23,7 @@
 
             <slot></slot>
 
-            <div class="card">
+            <div class="card table-card">
                 <div class="card-body pt-0">
                     <b-table
                         v-if="current_user_permissions.permission_to_view"
@@ -36,7 +36,6 @@
                         :sort-by.sync="sortBy"
                         :sort-desc.sync="sortDesc"
                         :current-page="currentPage"
-                        responsive
                         @sort-changed="sortChanged"
                     >
                         <template #cell(name)="row">
@@ -95,7 +94,11 @@
                             </b-button>
                         </template>
                     </b-table>
+                </div>
+            </div>
 
+            <div class="card">
+                <div class="card-body">
                     <b-row class="w-100 d-flex justify-content-center">
                         <b-col class="my-1 d-flex justify-content-left">
                             <b-pagination
@@ -720,5 +723,17 @@ export default {
 .modal-dialog.modal-xl {
     max-width: 90%;
     margin: 1.75rem auto;
+}
+
+.table-card {
+    max-height: 80vh;
+    overflow: hidden;
+}
+
+.table-card > .card-body {
+    overflow: scroll;
+    padding: 0 !important;
+    margin: 15px !important;
+    overscroll-behavior: contain;
 }
 </style>
