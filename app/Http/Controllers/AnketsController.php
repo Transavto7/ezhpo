@@ -396,7 +396,10 @@ class AnketsController extends Controller
             'anketa' => $anketa,
             'stamp' => $stamp,
             'user' => $user,
-            'validity' => UserEdsTrait::getValidityString()
+            'validity' => UserEdsTrait::getValidityString(
+                $anketa->user_validity_eds_start,
+                $anketa->user_validity_eds_end
+            )
         ]);
 
         $response = response()->make($pdf->output(), 200);
