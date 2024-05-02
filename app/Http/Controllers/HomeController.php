@@ -489,6 +489,7 @@ class HomeController extends Controller
                 ->where('type', $validTypeForm)
                 ->orderBy('sort')
                 ->orderBy('id')
+                ->whereNotIn('field', ['hour_from', 'hour_to'])
                 ->get(),
             true
         );

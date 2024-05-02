@@ -1,5 +1,5 @@
-@foreach($_GET as $k => $v)
-    @if(is_array($_GET[$k]))
+@foreach(request()->all() as $k => $v)
+    @if(is_array($v))
         @foreach($v as $vKey => $vValue)
             <input type="hidden" name="{{ $k }}[{{ $vKey }}]" value="{{ $vValue }}" />
         @endforeach

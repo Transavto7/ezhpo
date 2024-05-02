@@ -3,6 +3,22 @@
 @section('title', $title)
 @section('sidebar', 1)
 
+@section('custom-styles')
+    <style>
+        .table-card {
+            max-height: 80vh;
+            overflow: hidden;
+        }
+
+        .table-card > .card-body {
+            overflow: scroll;
+            padding: 0 !important;
+            margin: 15px !important;
+            overscroll-behavior: contain;
+        }
+    </style>
+@endsection
+
 @section('content')
     <!-- Модалка для редактирования см front.js  -->
     <div class="modal fade editor-modal" id="modalEditor" role="dialog" aria-hidden="true">
@@ -418,14 +434,14 @@ $permissionToViewContract = user()->access('contract_read');
     @if(!$permissionToView)
         @dump('Нет доступа для просмотра')
     @else
-        <div class="card">
+        <div class="card table-card my-4">
             @error('errors')
             <div class="text-red">
                 <b>{{ $errors->first('errors') }}</b>
             </div>
             @enderror
 
-            <div class="table-responsive">
+            <div class="card-body">
                 <table id="elements-table" class="table table-striped table-sm">
                     <thead>
                     <tr>
@@ -460,9 +476,6 @@ $permissionToViewContract = user()->access('contract_read');
                             </th>
                         @endforeach
 
-                        {{--                    @if($permissionToSyncCompany && !request()->get('deleted'))--}}
-                        {{--                        <th width="60">#</th>--}}
-                        {{--                    @endif--}}
                         @if($permissionToDelete)
                             {{--УДАЛЕНИЕ--}}
                             <th width="60">#</th>
@@ -624,7 +637,7 @@ $permissionToViewContract = user()->access('contract_read');
                                             @else
                                                 @if($field->field === 'driver_license_issued_at')
                                                     {{ $el[$field->field] }}
-                                                {{--ПРОВЕРКА ДАТЫ--}}
+                                                    {{--ПРОВЕРКА ДАТЫ--}}
                                                 @elseif($field->field === 'date' || strpos($field->field, '_at') > 0)
                                                     {{ date('d-m-Y H:i:s', strtotime($el[$field->field])) }}
                                                 @elseif($field->field === 'autosync_fields')
@@ -640,21 +653,12 @@ $permissionToViewContract = user()->access('contract_read');
                                                 @else
                                                     @foreach(explode(',', htmlspecialchars($el[$field->field])) as $keyElK => $valElK)
                                                         @if($keyElK !== 0), @endif
-                                                    {{ htmlspecialchars_decode(__($valElK)) }}
-                                                    @endforeach
-                                                @endif
+                                    {{ htmlspecialchars_decode(__($valElK)) }}
+                                    @endforeach
+                                    @endif
                                     @endif
                                 </td>
                             @endforeach
-
-                            {{--                        @if($permissionToSyncCompany && !request()->get('deleted'))--}}
-                            {{--                            <td class="td-option"--}}
-                            {{--                                title="При синхронизации все услуги компании будут присвоены водителям и автомобилям компании.">--}}
-                            {{--                                <a href="{{ route('syncElement', ['type' => $model, 'id' => $el->id ]) }}"--}}
-                            {{--                                   class="btn btn-sm btn-success"><i class="fa fa-refresh"></i></a>--}}
-                            {{--                            </td>--}}
-                            {{--                        @endif--}}
-
 
                             @if($permissionToDelete)
                                 {{--УДАЛЕНИЕ--}}
@@ -686,22 +690,25 @@ $permissionToViewContract = user()->access('contract_read');
                     </tbody>
                 </table>
             </div>
+        </div>
 
+        <div class="card">
+            <div class="card-body">
+                <div class="col-md-12">
+                    @if(count($elements) > 1)
+                        {{ $elements->appends($_GET)->render() }}
+                    @endif
 
-            <div class="col-md-12">
-                @if(count($elements) > 1)
-                    {{ $elements->appends($_GET)->render() }}
-                @endif
+                    @include('templates.take_form')
 
-                @include('templates.take_form')
-
-                @if(user()->hasRole('client'))
-                    <p>Элементов найдено: {{ method_exists($elements, 'total') ? $elements->total() : '' }}</p>
-                @else
-                    <p>Элементов всего: {{ $elements_count_all }}</p>
-                    <p>Элементов
-                        найдено: {{ method_exists($elements, 'total') ? $elements->total() : $elements_count_all }}</p>
-                @endif
+                    @if(user()->hasRole('client'))
+                        <p>Элементов найдено: {{ method_exists($elements, 'total') ? $elements->total() : '' }}</p>
+                    @else
+                        <p>Элементов всего: {{ $elements_count_all }}</p>
+                        <p>Элементов
+                            найдено: {{ method_exists($elements, 'total') ? $elements->total() : $elements_count_all }}</p>
+                    @endif
+                </div>
             </div>
         </div>
     @endif
