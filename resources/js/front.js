@@ -1280,18 +1280,28 @@ $(document).ready(function () {
         triggerField()
     })
 
-    $('*[data-field="Company_name"]').suggestions({
-        token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
-        type: "PARTY",
-        /* Вызывается, когда пользователь выбирает одну из подсказок */
-        onSelect: function(suggestion) {
-            if(suggestion.data) {
+    function initCompanyNameSuggestion(companyNameInput, innInput) {
+        if (!companyNameInput) return;
+
+        if (!innInput) return;
+
+        companyNameInput.suggestions({
+            token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
+            type: "PARTY",
+            /* Вызывается, когда пользователь выбирает одну из подсказок */
+            onSelect: function(suggestion) {
+                if (!suggestion.data) {
+                    return
+                }
+
                 const { inn } = suggestion.data
 
-                $('#elements-modal-add input[name="inn"]').val(inn)
+                innInput.val(inn)
             }
-        }
-    });
+        });
+    }
+
+    initCompanyNameSuggestion($('*[data-field="Company_name"]'), $('#elements-modal-add input[name="inn"]'))
 
     $('.header #toggle-btn').each(function () {
         let localStatusSidebar = () => {
@@ -1325,6 +1335,7 @@ $(document).ready(function () {
         axios.get(route).then(({ data }) => {
             modalContent.text('').append(data);
             LIBS.initAll()
+            initCompanyNameSuggestion($('#modalEditor *[data-field="Company_name"]'), $('#modalEditor input[name="inn"]'))
         })
 
     })
