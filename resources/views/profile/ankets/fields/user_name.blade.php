@@ -4,7 +4,8 @@
         'values' => 'User',
         'getField' => 'name',
         'getFieldKey' => 'name',
-        'multiple' => 1
+        'multiple' => 1,
+        'concatField' => 'hash_id',
     ],
     'model' => $type_ankets,
     'k' => $field,
