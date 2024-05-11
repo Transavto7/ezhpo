@@ -25,57 +25,63 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $users = User::with(['roles' => function ($q) use ($request) {
-        }, 'pv', 'company'])
-                     ->where(function ($query) use ($request) {
-                         $query->whereDoesntHave('roles')
-                               ->orWhereHas('roles', function ($q) use ($request) {
-                                   $q->whereNotIn('roles.id', [3, 6, 9]);
-                               });
-                     });
+        $users = User::query()
+            ->with([
+                'roles' => function ($q) use ($request) {},
+                'pv',
+                'company'
+            ])
+            ->where(function ($query) use ($request) {
+                $query->whereDoesntHave('roles')
+                    ->orWhereHas('roles', function ($q) use ($request) {
+                        $q->whereNotIn('roles.id', [3, 6, 9]);
+                    });
+            });
 
         if ($request->get('deleted')) {
             $users->with(['deleted_user'])->onlyTrashed();
         }
+
         if ($id = $request->get('hash_id')) {
             $users->whereIn('hash_id', $id);
         }
+
         if ($email = $request->get('email')) {
             $users->where('email', 'like', "%$email%");
         }
+
         if ($pv_id = $request->get('pv_id')) {
             $users->where('pv_id', $pv_id);
         }
 
         if ($sortBy = $request->get('sortBy', 'id')) {
-            if($sortBy == 'roles'){
+            if ($sortBy == 'roles') {
                 $users->join('model_has_roles', 'users.id', 'model_has_roles.model_id')
-                      ->join('roles', function ($join) use($request) {
-                          $join->on('model_has_roles.role_id', '=', 'roles.id')
-                               ->orderBy('roles.guard_name', $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC')
-                          ;
-                      })
-                      ->orderBy('roles.guard_name', $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC')//;
-                      ->select('users.*', 'guard_name')
-                      ->groupBy('users.id');
-            }else{
+                    ->join('roles', function ($join) use ($request) {
+                        $join->on('model_has_roles.role_id', '=', 'roles.id')
+                            ->orderBy('roles.guard_name', $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC');
+                    })
+                    ->orderBy('roles.guard_name', $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC')//;
+                    ->select('users.*', 'guard_name')
+                    ->groupBy('users.id');
+            } else {
                 $users->orderBy($sortBy, $request->get('sortDesc') == 'true' ? 'DESC' : 'ASC');
             }
         }
+
         if ($role = $request->get('role')) {
-            $users->whereHas('roles', function ($q) use ($role){
+            $users->whereHas('roles', function ($q) use ($role) {
                 $q->where('id', $role);
             });
         }
 
         if ($request->get('api')) {
             $res = $users->paginate();
-            $secondRes = $users->get()->sortBy;
 
             return response([
-                'total_rows'   => $res->total(),
+                'total_rows' => $res->total(),
                 'current_page' => $res->currentPage(),
-                'items'        => $res->getCollection(),
+                'items' => $res->getCollection(),
             ]);
         }
 
@@ -83,9 +89,9 @@ class UserController extends Controller
 
         return view('admin.users_v2.index')
             ->with([
-                       'users' => $users->paginate(),
-                       'fields' => $fields
-                   ]);
+                'users' => $users->paginate(),
+                'fields' => $fields
+            ]);
     }
 
     /**
@@ -148,12 +154,12 @@ class UserController extends Controller
         if (empty($userId)) {
             $validator = Validator::make($request->all(), [
                 'password' => ['required', 'string', 'min:1', 'max:255'],
-                'email'    => ['required', 'string', 'min:1', 'max:255'],
+                'email' => ['required', 'string', 'min:1', 'max:255'],
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
-                    'status'  => false,
+                    'status' => false,
                     'message' => $validator->errors(),
                 ]);
             }
@@ -179,10 +185,10 @@ class UserController extends Controller
         }
 
         if ($password = $request->get('password')) {
-            $password  = Hash::make($password);
-            $api_token = Hash::make(date('H:i:s').sha1($password));
+            $password = Hash::make($password);
+            $api_token = Hash::make(date('H:i:s') . sha1($password));
 
-            $user->password  = $password;
+            $user->password = $password;
             $user->api_token = $api_token;
         }
 
@@ -214,7 +220,7 @@ class UserController extends Controller
             ->find($user->id);
 
         return response()->json([
-            'status'    => true,
+            'status' => true,
             'user_info' => $user,
         ]);
     }
@@ -235,7 +241,7 @@ class UserController extends Controller
      * Update the specified resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @param int                      $id
+     * @param int $id
      *
      * @return Response
      */
@@ -251,15 +257,15 @@ class UserController extends Controller
     public function destroy(Request $request)
     {
         return response([
-                            'status' => User::find($request->post('id'))->delete(),
-                        ]);
+            'status' => User::find($request->post('id'))->delete(),
+        ]);
     }
 
     public function returnTrash(Request $request)
     {
         return response([
-                            'status' => User::withTrashed()->find($request->post('id'))->restore(),
-                        ]);
+            'status' => User::withTrashed()->find($request->post('id'))->restore(),
+        ]);
     }
 
     public function fetchRoleData(Request $request)
@@ -285,8 +291,8 @@ class UserController extends Controller
         $search = $request->get("query", "");
 
         $companies = Company::whereRaw("LOWER(name) LIKE '%{$search}%'")
-                            ->limit(50)
-                            ->get();
+            ->limit(50)
+            ->get();
 
         return response($companies);
     }
