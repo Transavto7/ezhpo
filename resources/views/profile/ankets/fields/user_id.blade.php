@@ -3,7 +3,7 @@
         'type' => 'select',
         'values' => 'User',
         'getField' => 'name',
-        'getFieldKey' => 'name',
+        'getFieldKey' => 'id',
         'multiple' => 1,
         'concatField' => 'hash_id',
     ],
