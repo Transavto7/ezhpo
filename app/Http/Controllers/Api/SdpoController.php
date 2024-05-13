@@ -487,7 +487,7 @@ class SdpoController extends Controller
             $inspection['user_validity_eds_end'] ?? null
         );
         if ($validity) {
-            $inspection['validity'] = $validity;
+            $data['validity'] = $validity;
         }
 
         return response()->json($data);
