@@ -5,7 +5,7 @@
         'getField' => 'name',
         'getFieldKey' => 'id',
         'multiple' => 1,
-        'concatField' => 'id',
+        'concatField' => 'hash_id',
         'trashed' => true
     ],
     'model' => $type_ankets,
