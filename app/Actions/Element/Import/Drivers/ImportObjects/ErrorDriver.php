@@ -1,12 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Actions\Drivers\Import\ImportObjects;
+namespace App\Actions\Element\Import\Drivers\ImportObjects;
 
-use App\ValueObjects\Gender;
-use Carbon\Carbon;
+use App\Actions\Element\Import\Core\ErrorObject;
 
-final class ErrorDriver
+final class ErrorDriver implements ErrorObject
 {
     /** @var int|null */
     private $companyInn;

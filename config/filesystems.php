@@ -55,7 +55,14 @@ return [
             'visibility' => 'public',
         ],
 
-        'imports' => [
+        'export' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/export'),
+            'url' => env('APP_URL').'/storage/export',
+            'visibility' => 'public',
+        ],
+
+        'import' => [
             'driver' => 'local',
             'root' => storage_path('app/imports'),
         ],

@@ -62,7 +62,7 @@ abstract class AbstractCreateElementHandler
                 ? trim($value)
                 : $value;
         }
-        dd($data);
+
         return $this->model::create($data);
     }
 }

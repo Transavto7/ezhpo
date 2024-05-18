@@ -4,6 +4,9 @@ namespace App\Actions\Element;
 
 class CreateElementHandlerFactory
 {
+    /**
+     * @throws \Exception
+     */
     public function make(string $type): CreateElementHandlerInterface
     {
         switch ($type) {

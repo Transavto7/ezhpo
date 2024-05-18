@@ -1,16 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Actions\Drivers\Import\Reader;
+namespace App\Actions\Element\Import\Drivers;
 
+use App\Actions\Element\Import\Core\ElementValidator;
 use App\Rules\DateIsCorrectFormat;
 use App\Rules\DateIsCorrectFormatOrNull;
 use Illuminate\Support\Facades\Validator as IlluminateValidator;
 
-final class Validator
+final class DriverValidator extends ElementValidator
 {
-    private $errors = [];
-
     public function validate(array $parsedDataItem)
     {
         $this->errors = [];
@@ -27,7 +26,7 @@ final class Validator
         ];
 
         $validator = IlluminateValidator::make($parsedDataItem, [
-            'companyInn' => ['required', 'number'],
+            'companyInn' => ['required', 'integer'],
             'fullName' => ['required', 'string', 'max:255'],
             'birthday' => [
                 'required',
@@ -36,7 +35,7 @@ final class Validator
                 new DateIsCorrectFormat(),
             ],
             'companyName' => ['nullable', 'string', 'max:255'],
-            'gender' => ['nullable', 'string', 'regex:/^(муж|жен|мужской|женский|м|ж)$/i'],
+            'gender' => ['nullable', 'string', 'regex:/^(муж|жен|мужской|женский|м|ж)$/iu'],
             'phone' => ['nullable', 'string', 'max:255'],
             'snils' => ['nullable', 'string', 'max:255'],
             'license' => ['nullable', 'string', 'max:255'],
@@ -46,15 +45,5 @@ final class Validator
         if ($validator->fails()) {
             $this->errors = $validator->errors()->all();
         }
-    }
-
-    public function hasErrors(): bool
-    {
-        return ! empty($this->errors);
-    }
-
-    public function errors(): array
-    {
-        return $this->errors;
     }
 }

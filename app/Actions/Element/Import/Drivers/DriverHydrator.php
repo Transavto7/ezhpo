@@ -1,27 +1,28 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Actions\Drivers\Import\Reader;
+namespace App\Actions\Element\Import\Drivers;
 
-use App\Actions\Drivers\Import\ImportObjects\ImportedDriver;
+use App\Actions\Element\Import\Core\ElementHydrator;
+use App\Actions\Element\Import\Drivers\ImportObjects\ImportedDriver;
 use App\Services\Import\DateParser;
 use App\Services\Import\StringSanitizer;
 use App\ValueObjects\Gender;
 use Carbon\Carbon;
 
-final class Hydrator
+final class DriverHydrator extends ElementHydrator
 {
     /** @var array */
     protected $attributesMap = [
-        'companyInn' => 1,
-        'fullName' => 2,
-        'birthday' => 3,
-        'companyName' => 4,
-        'gender' => 5,
-        'phone' => 6,
-        'snils' => 7,
-        'license' => 8,
-        'licenseIssuedAt' => 9,
+        'companyInn' => 0,
+        'fullName' => 1,
+        'birthday' => 2,
+        'companyName' => 3,
+        'gender' => 4,
+        'phone' => 5,
+        'snils' => 6,
+        'license' => 7,
+        'licenseIssuedAt' => 8,
     ];
 
     /**
@@ -40,6 +41,10 @@ final class Hydrator
 
             if ($attribute === 'licenseIssuedAt') {
                 $value = DateParser::parse($value);
+            }
+
+            if ($attribute === 'phone' && is_numeric($value)) {
+                $value = (string)$value;
             }
 
             $result[$attribute] = $value;

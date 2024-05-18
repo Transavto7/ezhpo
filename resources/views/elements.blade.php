@@ -20,6 +20,13 @@
 @endsection
 
 @section('content')
+    @include('modals.driver-import-modal')
+    @if($errors->any())
+        <div class="alert alert-danger" role="alert">
+            <i class="mdi mdi-block-helper mr-2"></i> Ошибка валидации.
+            {!! implode('', $errors->all('<div>:message</div>')) !!}
+        </div>
+    @endif
     <!-- Модалка для редактирования см front.js  -->
     <div class="modal fade editor-modal" id="modalEditor" role="dialog" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -46,15 +53,15 @@
                         <div class="modal-body">
                             <p>Заполните форму внимательно и нажмите кнопку "Добавить"</p>
 
-                        @foreach ($fields as $k => $v)
-                            @php if ($k == 'hash_id') continue; @endphp
-                            @if($k == 'products_id' && user()->hasRole('client'))
-                                @continue
-                            @endif
-                            @if($k == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
-                                @continue
-                            @endif
-                            @if($k == 'where_call' && !user()->access('companies_access_field_where_call'))
+                            @foreach ($fields as $k => $v)
+                                @php if ($k == 'hash_id') continue; @endphp
+                                @if($k == 'products_id' && user()->hasRole('client'))
+                                    @continue
+                                @endif
+                                @if($k == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
+                                    @continue
+                                @endif
+                                @if($k == 'where_call' && !user()->access('companies_access_field_where_call'))
                                     @continue
                                 @endif
 
@@ -89,15 +96,19 @@
                                                 {{ $v['label'] }}
                                             </label>
 
-                                            @if ($v['label'] == 'ФИО') dd($v); @endif
+                                            @if ($v['label'] == 'ФИО')
+                                                dd($v);
+                                            @endif
                                             @include('templates.elements_field')
                                         </div>
-                                    <!-- Сортировка инструктажей доступна админу или инженеру -->
+                                        <!-- Сортировка инструктажей доступна админу или инженеру -->
                                     @elseif($model === 'Instr' && $k === 'signature')
                                     @else
                                         <div class="form-group" data-field="{{ $k }}">
                                             <label>
-                                                @if($is_required) <b class="text-danger text-bold">* </b> @endif
+                                                @if($is_required)
+                                                    <b class="text-danger text-bold">* </b>
+                                                @endif
                                                 {{ $v['label'] }}
                                             </label>
 
@@ -105,7 +116,7 @@
                                         </div>
                                     @endif
                                 @endif
-                        @endforeach
+                            @endforeach
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-sm btn-success">Добавить</button>
@@ -344,14 +355,16 @@ $permissionToViewContract = user()->access('contract_read');
                     </div>
                 @endif
 
+
+
                 @if($permissionToView)
-                        @if(!(count($elements) >= $max) || !$max)
-                    <div class=" m-2">
-                        <button type="button" data-toggle-show="#elements-filters" class="btn btn-sm btn-info">
-                            <i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры
-                        </button>
-                    </div>
-                        @endif
+                    @if(!(count($elements) >= $max) || !$max)
+                        <div class=" m-2">
+                            <button type="button" data-toggle-show="#elements-filters" class="btn btn-sm btn-info">
+                                <i class="fa fa-filter"></i> <span class="toggle-title">Показать</span> фильтры
+                            </button>
+                        </div>
+                    @endif
                 @endif
 
                 @if($permissionToTrashView)
@@ -368,8 +381,18 @@ $permissionToViewContract = user()->access('contract_read');
                     </div>
                 @endif
 
+                @if($permissionToCreate && $model == 'Driver')
+                    <div class="m-2">
+                        <button type="button" data-toggle="modal" data-target="#driver-import-modal"
+                                class="btn btn-sm btn-success">
+                            Импортировать <i class="fa fa-download"></i>
+                        </button>
+                    </div>
+                @endif
+
                 <div class="toggle-hidden col-md-12" id="elements-filters">
-                    <form onsubmit="document.querySelector('#page-preloader').classList.remove('hide')" action="" method="GET" class="elements-form-filter">
+                    <form onsubmit="document.querySelector('#page-preloader').classList.remove('hide')" action=""
+                          method="GET" class="elements-form-filter">
 
                         <input type="hidden" name="filter" value="1">
                         @if(request()->get('deleted'))
@@ -392,29 +415,29 @@ $permissionToViewContract = user()->access('contract_read');
                                         <div class="form-group">
                                             <label>{{ $fv['label'] }}</label>
 
-                                        @if($model === 'Company' && $fk === 'name')
-                                            @include('templates.elements_field', [
-                                                'v' => [
-                                                    'label' => 'Компания',
-                                                    'type' => 'select',
-                                                    'values' => 'Company',
-                                                    'noRequired' => 1,
-                                                    'getFieldKey' => 'name'
-                                                ],
-                                                'k' => $fk,
-                                                'is_required' => '',
-                                                'default_value' => request()->get($fk)
-                                            ])
-                                        @elseif($model === 'Instr' && $fk === 'sort')
-                                            <!-- Сортировка доступна только инженеру БДД и Админу -->
-                                        @else
-                                            @include('templates.elements_field', [
-                                                'v' => $fv,
-                                                'k' => $fk,
-                                                'is_required' => '',
-                                                'default_value' => request()->get($fk)
-                                            ])
-                                        @endif
+                                            @if($model === 'Company' && $fk === 'name')
+                                                @include('templates.elements_field', [
+                                                    'v' => [
+                                                        'label' => 'Компания',
+                                                        'type' => 'select',
+                                                        'values' => 'Company',
+                                                        'noRequired' => 1,
+                                                        'getFieldKey' => 'name'
+                                                    ],
+                                                    'k' => $fk,
+                                                    'is_required' => '',
+                                                    'default_value' => request()->get($fk)
+                                                ])
+                                            @elseif($model === 'Instr' && $fk === 'sort')
+                                                <!-- Сортировка доступна только инженеру БДД и Админу -->
+                                            @else
+                                                @include('templates.elements_field', [
+                                                    'v' => $fv,
+                                                    'k' => $fk,
+                                                    'is_required' => '',
+                                                    'default_value' => request()->get($fk)
+                                                ])
+                                            @endif
 
                                         </div>
                                     </div>
@@ -569,7 +592,7 @@ $permissionToViewContract = user()->access('contract_read');
                                             @elseif ($field->field === 'essence')
                                                 {{ \App\Product::$essence[$el->essence] ?? ''  }}
                                             @elseif ($field->field === 'contract' )
-                                                <a href="/contract?id={{ $el['contract']['id'] }}" >
+                                                <a href="/contract?id={{ $el['contract']['id'] }}">
                                                     {{ $el['contract']['name']  }}
 
                                                 </a>
@@ -577,7 +600,7 @@ $permissionToViewContract = user()->access('contract_read');
                                                 @foreach($el[$field->field] as $contract)
                                                     <h3>
                                                         @if($permissionToViewContract)
-                                                            <a href="/contract?id={{ $contract['id'] }}" >
+                                                            <a href="/contract?id={{ $contract['id'] }}">
                                                                 @endif
                                                                 <span class="badge badge-success">
                                                             {{ $contract['name']  }}
@@ -652,7 +675,8 @@ $permissionToViewContract = user()->access('contract_read');
                                                     {{ $el[$field->field] === '<' ? 'меньше' : 'больше'  }}
                                                 @else
                                                     @foreach(explode(',', htmlspecialchars($el[$field->field])) as $keyElK => $valElK)
-                                                        @if($keyElK !== 0), @endif
+                                                        @if($keyElK !== 0),
+                                    @endif
                                     {{ htmlspecialchars_decode(__($valElK)) }}
                                     @endforeach
                                     @endif
@@ -714,13 +738,13 @@ $permissionToViewContract = user()->access('contract_read');
     @endif
 
     @if(count($elements) <= 0)
-@section('custom-scripts')
-    <script>
-        setTimeout(function () {
-            $('[data-toggle-show*="-filters"]').trigger('click')
-        }, 500)
-    </script>
-@endsection
-@endif
+        @section('custom-scripts')
+            <script>
+                setTimeout(function () {
+                    $('[data-toggle-show*="-filters"]').trigger('click')
+                }, 500)
+            </script>
+        @endsection
+    @endif
 
 @endsection

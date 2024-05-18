@@ -7,6 +7,8 @@ use App\Company;
 use App\Driver;
 use App\Instr;
 use App\Models\Contract;
+use App\Services\BriefingService;
+use App\Services\UserService;
 use App\User;
 use Carbon\Carbon;
 use Exception;
@@ -20,12 +22,14 @@ class CreateDriverHandler extends AbstractCreateElementHandler implements Create
     public function handle($data)
     {
         $companyId = $data['company_id'];
+        /** @var Company|null $company */
         $company = Company::query()->find($companyId);
         if (!$company) {
             throw new Exception('Компания не найдена');
         }
 
-        $existItem = Driver::where('company_id', $companyId)
+        $existItem = Driver::query()
+            ->where('company_id', $companyId)
             ->where('fio', trim($data['fio']))
             ->first();
         if ($existItem) {
@@ -62,9 +66,10 @@ class CreateDriverHandler extends AbstractCreateElementHandler implements Create
             $data[$attributeName] = $attributeValue;
         }
 
+        /** @var Driver $created */
         $created = $this->createElement($data);
 
-        $this->createUser($created);
+        UserService::createUserFromDriver($created);
 
         $contract = Contract::query()
             ->where('company_id', $companyId)
@@ -76,7 +81,7 @@ class CreateDriverHandler extends AbstractCreateElementHandler implements Create
         }
 
         if ($company->required_type_briefing) {
-            $this->createFirstBriefing($created);
+            BriefingService::createFirstBriefingForDriver($created, $company);
         }
     }
 

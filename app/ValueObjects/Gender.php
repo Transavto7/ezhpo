@@ -88,7 +88,7 @@ final class Gender
     {
         $trimmed = mb_strtolower(trim($value));
 
-        return (strlen($value) === 1 && $trimmed === 'м') || (str_contains($value,'муж'));
+        return (mb_strlen($trimmed) === 1 && $trimmed === 'м') || (str_contains($trimmed,'муж'));
     }
 
     /**
@@ -99,7 +99,7 @@ final class Gender
     {
         $trimmed = mb_strtolower(trim($value));
 
-        return (strlen($value) === 1 && $trimmed === 'ж') || (str_contains($value,'жен'));
+        return (mb_strlen($trimmed) === 1 && $trimmed === 'ж') || (str_contains($trimmed,'жен'));
     }
 
     public function __toString(): string

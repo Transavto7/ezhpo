@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Actions\Drivers\Import\ImportObjects;
+namespace App\Actions\Element\Import\Drivers\ImportObjects;
 
 use App\ValueObjects\Gender;
 use Carbon\Carbon;
@@ -120,7 +120,7 @@ final class ImportedDriver
         return [
             'fio' => $this->getFullName(),
             'year_birthday' => $this->getBirthday()->format('Y-m-d'),
-            'gender' => optional($this->getGender())->value(),
+            'gender' => $this->getGender()? $this->getGender()->value() : Gender::male()->value(),
             'phone' => $this->getPhone(),
             'snils' => $this->getSnils(),
             'driver_license' => $this->getLicense(),

@@ -11,9 +11,9 @@ final class DateParser
     /**
      * @throws \Exception
      */
-    public static function parse($value): ?Carbon
+    public static function parse($value): ?string
     {
-        return Carbon::parse(self::getDateFromExcelNumeric($value));
+        return self::getDateFromExcelNumeric($value);
     }
 
     /**

@@ -13,6 +13,9 @@ use App\Imports\CarImport;
 use App\Imports\CompanyImport;
 use App\Imports\DriverImport;
 use App\Point;
+use App\Services\HashIdGenerator\DefaultHashIdValidators;
+use App\Services\HashIdGenerator\HashedType;
+use App\Services\HashIdGenerator\HashIdGenerator;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -88,6 +91,7 @@ class IndexController extends Controller
     public function showVideo(): View
     {
         //TODO: это гет параметр?
+        // Именно $request->input('url') по идее
         return view('showVideo', [
             'video' => $_GET['url'] ?? ''
         ]);

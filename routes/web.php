@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Elements\ImportElementController;
 use App\Http\Controllers\ReportContractRefactoringController;
 use App\Http\Middleware\CheckDriver;
 use Illuminate\Support\Facades\Auth;
@@ -138,6 +139,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('elements')->group(function () {
             Route::get('{type}', 'IndexController@RenderElements')->name('renderElements');
             Route::get('{type}/{id}', 'IndexController@RemoveElement')->name('removeElement');
+            Route::post('/import', 'Elements\ImportElementController')->name('importElement');
             Route::post('{type}', 'IndexController@AddElement')->name('addElement');
             Route::post('{type}/{id}', 'IndexController@updateElement')->name('updateElement');
             Route::get('{type}/sync/{id}', 'IndexController@syncElement')->name('syncElement');

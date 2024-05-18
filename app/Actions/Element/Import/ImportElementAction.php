@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Actions\Drivers\Import;
+namespace App\Actions\Element\Import;
 
-final class ImportDriverAction
+final class ImportElementAction
 {
     /** @var string */
     private $filePath;
