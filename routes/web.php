@@ -137,9 +137,11 @@ Route::middleware(['auth'])->group(function () {
          * Элементы CRM
          */
         Route::prefix('elements')->group(function () {
+            Route::get('/export/{type}', 'Elements\ExportElementController')->name('exportElement');
+            Route::post('/import', 'Elements\ImportElementController')->name('importElement');
+
             Route::get('{type}', 'IndexController@RenderElements')->name('renderElements');
             Route::get('{type}/{id}', 'IndexController@RemoveElement')->name('removeElement');
-            Route::post('/import', 'Elements\ImportElementController')->name('importElement');
             Route::post('{type}', 'IndexController@AddElement')->name('addElement');
             Route::post('{type}/{id}', 'IndexController@updateElement')->name('updateElement');
             Route::get('{type}/sync/{id}', 'IndexController@syncElement')->name('syncElement');

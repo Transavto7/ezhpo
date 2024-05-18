@@ -390,6 +390,15 @@ $permissionToViewContract = user()->access('contract_read');
                     </div>
                 @endif
 
+                @if($permissionToView && ($model == 'Driver' || $model == 'Car'))
+                    <div class="m-2">
+                        <a href="{{ route('exportElement', $model) }}"
+                                class="btn btn-sm btn-success">
+                            Экспортировать <i class="fa fa-file-excel-o"></i>
+                        </a>
+                    </div>
+                @endif
+
                 <div class="toggle-hidden col-md-12" id="elements-filters">
                     <form onsubmit="document.querySelector('#page-preloader').classList.remove('hide')" action=""
                           method="GET" class="elements-form-filter">
