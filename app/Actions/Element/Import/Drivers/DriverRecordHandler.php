@@ -25,7 +25,7 @@ final class DriverRecordHandler extends ElementRecordHandler
     /**
      * @throws \Exception
      */
-    public function handle(ImportedDriver $importedDriver)
+    public function handle(ImportedDriver $importedDriver): bool
     {
         $company = $this->fetchCompany($importedDriver->getCompanyInn());
         if (!$company) {
@@ -34,7 +34,7 @@ final class DriverRecordHandler extends ElementRecordHandler
                 sprintf('Компания с ИНН %n не найдена!', $importedDriver->getCompanyInn())
             );
 
-            return;
+            return false;
         }
 
         $driver = $this->fetchDriver($importedDriver, $company);
@@ -44,10 +44,12 @@ final class DriverRecordHandler extends ElementRecordHandler
                 'Водитель с такими данными уже существует!'
             );
 
-            return;
+            return false;
         }
 
         $this->createDriver($importedDriver, $company);
+
+        return true;
     }
 
     private function fetchCompany(int $companyInn): ?Company

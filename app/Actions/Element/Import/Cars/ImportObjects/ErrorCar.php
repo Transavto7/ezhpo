@@ -50,15 +50,15 @@ final class ErrorCar implements ErrorObject
      * @param string $description
      */
     public function __construct(
-        ?string $companyName,
-        ?int    $companyInn,
-        ?string $number,
-        ?string $markAndModel,
-        ?string $category,
-        ?string $trailer,
-        ?string $dateTechView,
-        ?string $dateOsago,
-        ?string $dateSkzi,
+        $companyName,
+        $companyInn,
+        $number,
+        $markAndModel,
+        $category,
+        $trailer,
+        $dateTechView,
+        $dateOsago,
+        $dateSkzi,
         string  $description
     )
     {

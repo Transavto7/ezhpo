@@ -15,6 +15,6 @@ final class ExportElementController extends Controller
         $handler = ExportElementHandlerFactory::make(ElementType::fromString(mb_strtolower($type)));
         $fileName = $handler->handle();
 
-        return Storage::disk('export')->download($fileName);
+        return response()->json(['url' => Storage::disk('export')->url($fileName)]);
     }
 }

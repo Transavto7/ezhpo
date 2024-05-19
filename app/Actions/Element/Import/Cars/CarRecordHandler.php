@@ -19,7 +19,7 @@ final class CarRecordHandler extends ElementRecordHandler
     /**
      * @throws \Exception
      */
-    public function handle(ImportedCar $importedCar)
+    public function handle(ImportedCar $importedCar): bool
     {
         $company = $this->fetchCompany($importedCar->getCompanyInn());
         if (!$company) {
@@ -28,7 +28,7 @@ final class CarRecordHandler extends ElementRecordHandler
                 sprintf('Компания с ИНН %n не найдена!', $importedCar->getCompanyInn())
             );
 
-            return;
+            return false;
         }
 
         $driver = $this->fetchCar($importedCar, $company);
@@ -38,10 +38,12 @@ final class CarRecordHandler extends ElementRecordHandler
                 'ТС с такими данными уже существует!'
             );
 
-            return;
+            return false;
         }
 
         $this->createCar($importedCar, $company);
+
+        return true;
     }
 
     private function fetchCompany(int $companyInn): ?Company

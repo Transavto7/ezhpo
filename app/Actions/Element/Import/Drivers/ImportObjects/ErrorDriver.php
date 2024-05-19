@@ -50,15 +50,15 @@ final class ErrorDriver implements ErrorObject
      * @param string $description
      */
     public function __construct(
-        ?int    $companyInn,
-        ?string $fullName,
-        ?string $birthday,
-        ?string $companyName,
-        ?string $gender,
-        ?string $phone,
-        ?string $snils,
-        ?string $license,
-        ?string $licenseIssuedAt,
+        $companyInn,
+        $fullName,
+        $birthday,
+        $companyName,
+        $gender,
+        $phone,
+        $snils,
+        $license,
+        $licenseIssuedAt,
         string  $description
     )
     {

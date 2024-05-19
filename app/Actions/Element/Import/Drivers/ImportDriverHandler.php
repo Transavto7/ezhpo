@@ -9,7 +9,9 @@ use App\Actions\Element\Import\Drivers\ImportObjects\ErrorDriver;
 use App\Actions\Element\Import\Exceptions\FoundedNotValidElements;
 use App\Actions\Element\Import\ImportElementAction;
 use App\Actions\Element\Import\ImportElementHandler;
+use App\Actions\Element\Import\ImportElementResponse;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 
 final class ImportDriverHandler implements ImportElementHandler
 {
@@ -56,13 +58,16 @@ final class ImportDriverHandler implements ImportElementHandler
      * @throws FoundedNotValidElements
      * @throws Exception
      */
-    public function handle(ImportElementAction $action): void
+    public function handle(ImportElementAction $action): ImportElementResponse
     {
         $reader = new ExcelReader($action->getFilePath());
         /** @var ErrorDriver[] $errors */
         $errors = [];
+        $rowsCounter = 0;
+        $acceptedRowsCounter = 0;
 
         foreach ($reader->rows() as $row) {
+            $rowsCounter++;
             $associatedRow = $this->hydrator->associate($row);
             $this->validator->validate($associatedRow);
             if ($this->validator->hasErrors()) {
@@ -76,14 +81,17 @@ final class ImportDriverHandler implements ImportElementHandler
                     $associatedRow['snils'],
                     $associatedRow['license'],
                     $associatedRow['licenseIssuedAt'],
-                    implode('. ', $this->validator->errors())
+                    implode(' ', $this->validator->errors())
                 );
 
                 continue;
             }
 
             $importedDriver = $this->hydrator->hydrate($associatedRow);
-            $this->recordHandler->handle($importedDriver);
+            $result = $this->recordHandler->handle($importedDriver);
+            if ($result) {
+                $acceptedRowsCounter++;
+            }
         }
 
         if ($this->recordHandler->hasErrors()) {
@@ -96,8 +104,15 @@ final class ImportDriverHandler implements ImportElementHandler
                 ->setDisk($this->errorFileDisk)
                 ->writeErrors($errors);
 
-            throw new FoundedNotValidElements($filePath, $this->errorFileDisk);
+            return new ImportElementResponse(
+                $rowsCounter,
+                $acceptedRowsCounter,
+                count($errors),
+                Storage::disk($this->errorFileDisk)->url($filePath)
+            );
         }
+
+        return new ImportElementResponse($rowsCounter, $acceptedRowsCounter);
     }
 
     /**
