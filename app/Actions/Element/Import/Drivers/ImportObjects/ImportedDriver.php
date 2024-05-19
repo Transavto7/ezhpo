@@ -120,11 +120,13 @@ final class ImportedDriver
         return [
             'fio' => $this->getFullName(),
             'year_birthday' => $this->getBirthday()->format('Y-m-d'),
-            'gender' => $this->getGender()? $this->getGender()->value() : Gender::male()->value(),
+            'gender' => $this->getGender() ? $this->getGender()->value() : Gender::male()->value(),
             'phone' => $this->getPhone(),
             'snils' => $this->getSnils(),
             'driver_license' => $this->getLicense(),
-            'driver_license_issued_at' => $this->getLicenseIssuedAt()->format('Y-m-d'),
+            'driver_license_issued_at' => $this->getLicenseIssuedAt() ?
+                $this->getLicenseIssuedAt()->format('Y-m-d')
+                : null,
         ];
     }
 }

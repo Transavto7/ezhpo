@@ -13,6 +13,10 @@ final class DateParser
      */
     public static function parse($value): ?string
     {
+        if ($value === null) {
+            return null;
+        }
+
         return self::getDateFromExcelNumeric($value);
     }
 

@@ -21,6 +21,7 @@
 
 @section('content')
     @include('modals.driver-import-modal')
+    @include('modals.car-import-modal')
     @if($errors->any())
         <div class="alert alert-danger" role="alert">
             <i class="mdi mdi-block-helper mr-2"></i> Ошибка валидации.
@@ -384,6 +385,15 @@ $permissionToViewContract = user()->access('contract_read');
                 @if($permissionToCreate && $model == 'Driver')
                     <div class="m-2">
                         <button type="button" data-toggle="modal" data-target="#driver-import-modal"
+                                class="btn btn-sm btn-success">
+                            Импортировать <i class="fa fa-download"></i>
+                        </button>
+                    </div>
+                @endif
+
+                @if($permissionToCreate && $model == 'Car')
+                    <div class="m-2">
+                        <button type="button" data-toggle="modal" data-target="#car-import-modal"
                                 class="btn btn-sm btn-success">
                             Импортировать <i class="fa fa-download"></i>
                         </button>
