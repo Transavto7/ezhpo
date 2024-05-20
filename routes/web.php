@@ -189,6 +189,11 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'SettingsController@index')->name('index');
             Route::post('/', 'SettingsController@update')->name('update');
         });
+
+        Route::prefix('logs')->as('logs.')->group(function () {
+            Route::get('/', 'LogController@index')->name('index');
+            Route::post('list', 'LogController@list')->name('list');
+        });
     });
 });
 

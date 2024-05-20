@@ -24,11 +24,11 @@ export default {
         return {
             fields: [
                 {key: 'user', label: 'Пользователь', class: 'text-left'},
-                {key: 'date', label: 'Дата, время', class: 'text-left'},
-                {key: 'action', label: 'Действие', class: 'text-left'},
-                {key: 'model', label: 'Модель', class: 'text-left'},
-                {key: 'id', label: 'ID Модели', class: 'text-center'},
-                {key: 'changes', label: 'Изменения', class: 'text-left'},
+                {key: 'created_at', label: 'Дата, время', class: 'text-left'},
+                {key: 'type', label: 'Действие', class: 'text-left'},
+                {key: 'model_type', label: 'Модель', class: 'text-left'},
+                {key: 'model_id', label: 'ID Модели', class: 'text-center'},
+                {key: 'data', label: 'Изменения', class: 'text-left'},
             ],
         }
     },
@@ -68,8 +68,8 @@ export default {
             responsive
             bordered
         >
-            <template #cell(changes)="{ item }">
-                <div v-for="(changeItem, index) of item.changes" :key="index" class="p-1 mb-1" style="line-height: 19px">
+            <template #cell(data)="{ item }">
+                <div v-for="(changeItem, index) of item.data" :key="index" class="p-1 mb-1" style="line-height: 19px">
                     <div>
                         <b>{{ changeItem.name }}</b>
                     </div>

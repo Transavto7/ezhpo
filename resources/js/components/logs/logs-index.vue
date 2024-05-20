@@ -17,27 +17,7 @@ export default {
                 date_start: null,
                 date_end: null,
             },
-            items: [
-                // {
-                //     user: 'thunderstruck',
-                //     date: '2018-08-10 11:09:21',
-                //     action: 'action',
-                //     model: 'Anketa',
-                //     id: 'e738b07b-1b22-429d-9856-c94fbebb75a9',
-                //     changes: [
-                //         {
-                //             name: 'note',
-                //             oldValue: '1 водитель, 1 машина (+ одна подменная на всякий случай)ПРМО ПРТО ПЛ факт., ОП Монтажная 8Счет по безналу на вайберЕсть несколько ИП которые по 1000р осмотры, тк договоренность была у них с ВН Шило, теперь новые пришли на таких же условиях.&nbsp;Согласовано с ВН 10% на ПРМО и 10% на ПРТО',
-                //             newValue: 'преемник ООО "Интер Лайф 2013'
-                //         },
-                //         {
-                //             name: 'inn',
-                //             oldValue: '6732123869',
-                //             newValue: '1238902132'
-                //         },
-                //     ],
-                // },
-            ],
+            items: [],
             page: 1,
             total: 1,
             limit: 100,
@@ -60,7 +40,12 @@ export default {
                 })
 
                 this.total = data.total
-                this.items = data.items
+                this.items = data.data.map((item) => {
+                    item.type = this.pageSetup.actionsMap[item.type];
+                    item.model_type = this.pageSetup.modelsMap[item.model_type];
+
+                    return item
+                })
             } catch (e) {
                 swal.fire({
                     title: 'Ошибка',

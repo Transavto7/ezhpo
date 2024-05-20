@@ -141,8 +141,6 @@
             <li>
                 <a href="#" data-btn-collapse="#reports" role="button"><i class="fa fa-area-chart"></i> Отчеты</a>
                 <ul id="reports" class="collapse list-unstyle">
-
-                    {{--                        @excludeRole(['client'])--}}
                     @if(user()->access('report_schedule_pv_read'))
                         <li>
                             <a href="{{ route('report.get', 'graph_pv') }}">
@@ -166,7 +164,6 @@
                             </a>
                         </li>
                     @endif
-{{--                    @if(user()->access('report_schedule_dynamic_mo'))--}}
                         <li>
                             <a href="{{ route('report.company_service') }}">
                                 <i class="fa fa-book"></i>Отчет по услугам компании
@@ -182,7 +179,6 @@
                                 </span>
                             </a>
                         </li>
-{{--                    @endif--}}
                 </ul>
             </li>
         @endif
@@ -224,18 +220,6 @@
                     @endif
                     @if(user()->access('service_read', 'service_create'))
                         <li><a href="{{ route('renderElements', 'Product') }}">Услуги</a></li>
-{{--                        <li><a href="{{ route('renderElements', 'Service') }}">--}}
-{{--                                Услуги--}}
-{{--                                <span class="--}}
-{{--                                start-100--}}
-{{--                                translate-middle--}}
-{{--                                badge--}}
-{{--                                text-white--}}
-{{--                                rounded-pill--}}
-{{--                                bg-success">--}}
-{{--                                    new--}}
-{{--                                </span>--}}
-{{--                            </a></li>--}}
                     @endif
                     @if(user()->access('discount_read', 'discount_create'))
                         <li><a href="{{ route('renderElements', 'Discount') }}">Скидки</a></li>
@@ -304,7 +288,6 @@
                         <li><a href="{{ route('renderElements', 'DDates') }}">Контроль дат</a></li>
                     @endif
 
-
                     @if(user()->access('requisites_read', 'requisites_create'))
                         <li><a href="{{ route('renderElements', 'Req') }}">Реквизиты нашей компании</a></li>
                     @endif
@@ -313,7 +296,9 @@
                         <li><a href="{{ route('prompt.index') }}">Подсказки полей</a></li>
                     @endif
 
-
+                    @if(user()->access('logs_read'))
+                        <li><a href="{{ route('logs.index') }}">Журнал действий</a></li>
+                    @endif
                 </ul>
             </li>
         @endif
