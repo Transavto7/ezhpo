@@ -62,6 +62,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'examples' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/examples'),
+            'url' => env('APP_URL').'/storage/examples',
+            'visibility' => 'public',
+        ],
+
         'import' => [
             'driver' => 'local',
             'root' => storage_path('app/imports'),
