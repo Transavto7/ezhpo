@@ -14,6 +14,6 @@ final class DateIsCorrectFormat implements Rule
 
     public function message(): string
     {
-        return 'Дата рождения должна иметь формат дд.мм.гггг.';
+        return ':attribute должна иметь формат дд.мм.гггг.';
     }
 }

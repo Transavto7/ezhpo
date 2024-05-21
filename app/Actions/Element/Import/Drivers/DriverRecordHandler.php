@@ -16,6 +16,7 @@ use App\Services\HashIdGenerator\HashedType;
 use App\Services\HashIdGenerator\HashIdGenerator;
 use App\Services\UserService;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 
 final class DriverRecordHandler extends ElementRecordHandler
@@ -81,7 +82,12 @@ final class DriverRecordHandler extends ElementRecordHandler
         /** @var Driver $driver */
         $driver = Driver::query()->create(
             array_merge(
-                ['hash_id' => $hashId, 'products_id' => $productsId, 'company_id' => $company->id],
+                [
+                    'hash_id' => $hashId,
+                    'products_id' => $productsId,
+                    'company_id' => $company->id,
+                    'date_of_employment' => Carbon::now()->format('Y-m-d'),
+                ],
                 $importedDriver->toArray()
             )
         );

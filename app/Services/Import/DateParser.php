@@ -28,7 +28,7 @@ final class DateParser
     private static function getDateFromExcelNumeric($date)
     {
         if (is_numeric($date)) {
-            return date('Y-m-d', Date::excelToTimestamp($date));
+            return date('d.m.Y', Date::excelToTimestamp($date));
         } else {
             return self::createDateFromString($date);
         }
@@ -45,7 +45,18 @@ final class DateParser
             return $matches[0];
         }
 
-        return $rawText;
+        return self::createDateFromExcelStringFormat($rawText);
     }
 
+
+    private static function createDateFromExcelStringFormat($rawText)
+    {
+        $dateArray = explode('/', $rawText);
+
+        if (count($dateArray) === 3) {
+            return sprintf("%s.%s.%s", $dateArray[1], $dateArray[0], $dateArray[2]);
+        }
+
+        return $rawText;
+    }
 }

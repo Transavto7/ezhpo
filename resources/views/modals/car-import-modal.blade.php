@@ -18,8 +18,28 @@
                     <li>B: Инн компании - обязательное поле (7727563778)</li>
                     <li>С: Гос номер - обязательное поле (А999ТЕ77)</li>
                     <li>D: Марка и модель (ГАЗ 330214)</li>
-                    <li>E: Категория ТС (С - грузовые т\с от 3.5 тн)</li>
-                    <li>F: Прицеп (если есть) (Нет)</li>
+                    <li>
+                        E: Категория ТС <br>
+                        <small>
+                            Допустимые значения:
+                            <ul>
+                                @foreach(config('elements.Car.fields.type_auto.values') as $value)
+                                    <li>{{ $value }}</li>
+                                @endforeach
+                            </ul>
+                        </small>
+                    </li>
+                    <li>
+                        F: Прицеп (если есть) <br>
+                        <small>
+                            Допустимые значения:
+                            <ul>
+                                @foreach(config('elements.Car.fields.trailer.values') as $value)
+                                    <li>{{ $value }}</li>
+                                @endforeach
+                            </ul>
+                        </small>
+                    </li>
                     <li>G: Дата ТО (12.12.2023)</li>
                     <li>H: Дата ОСАГО (12.12.2023)</li>
                     <li>I: Срок действия СКЗИ (12.12.2024)</li>

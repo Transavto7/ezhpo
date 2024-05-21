@@ -61,9 +61,9 @@ final class CarHydrator extends ElementHydrator
             $row['markAndModel'],
             $row['category'],
             $row['trailer'],
-            Carbon::parse($row['dateTechView']),
-            Carbon::parse($row['dateOsago']),
-            Carbon::parse($row['dateSkzi'])
+            $row['dateTechView'] ? Carbon::parse($row['dateTechView']) : null,
+            $row['dateOsago'] ? Carbon::parse($row['dateOsago']) : null,
+            $row['dateSkzi'] ? Carbon::parse($row['dateSkzi']) : null
         );
     }
 }

@@ -100,17 +100,17 @@ final class ImportedCar
 
     public function getDateTechView(): ?string
     {
-        return $this->dateTechView ? $this->dateTechView->format('Y-m-d') : null;
+        return $this->dateTechView ? $this->dateTechView->format('d.m.Y') : null;
     }
 
     public function getDateOsago(): ?string
     {
-        return $this->dateOsago ? $this->dateOsago->format('Y-m-d') : null;
+        return $this->dateOsago ? $this->dateOsago->format('d.m.Y') : null;
     }
 
     public function getDateSkzi(): ?string
     {
-        return $this->dateSkzi ? $this->dateSkzi->format('Y-m-d') : null;
+        return $this->dateSkzi ? $this->dateSkzi->format('d.m.Y') : null;
     }
 
     public function toArray(): array

@@ -14,6 +14,6 @@ final class DateIsCorrectFormatOrNull implements Rule
 
     public function message(): string
     {
-        return 'Срок действия ВУ должен быть пустым или иметь формат дд.мм.гггг.';
+        return ':attribute должен быть пустым или иметь формат дд.мм.гггг.';
     }
 }

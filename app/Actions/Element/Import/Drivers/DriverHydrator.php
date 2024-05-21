@@ -47,6 +47,10 @@ final class DriverHydrator extends ElementHydrator
                 $value = (string)$value;
             }
 
+            if ($attribute === 'license') {
+                $value = StringSanitizer::sanitizeDriverLicense($value);
+            }
+
             $result[$attribute] = $value;
 
             return $result;
@@ -64,7 +68,7 @@ final class DriverHydrator extends ElementHydrator
             $row['phone'],
             $row['snils'],
             $row['license'],
-            Carbon::parse($row['licenseIssuedAt'])
+            $row['licenseIssuedAt'] ? Carbon::parse($row['licenseIssuedAt']) : null
         );
     }
 }

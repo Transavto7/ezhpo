@@ -403,10 +403,6 @@ $permissionToViewContract = user()->access('contract_read');
                 @if($permissionToView && ($model == 'Driver' || $model == 'Car'))
                     <div class="m-2">
                         <export-element-button export-url="{{ route('exportElement', $model) }}" />
-{{--                        <a href=""--}}
-{{--                                class="btn btn-sm btn-success">--}}
-{{--                            Экспортировать <i class="fa fa-file-excel-o"></i>--}}
-{{--                        </a>--}}
                     </div>
                 @endif
 

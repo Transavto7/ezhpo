@@ -18,4 +18,19 @@ final class StringSanitizer
         return preg_replace(['/\s{2,}/'], ' ', trim($value, self::TRIM_CHARACTERS));
     }
 
+    public static function sanitizeDriverLicense($value)
+    {
+        if (! is_string($value)) {
+            return $value;
+        }
+
+        if (mb_strpos($value, ',') !== false) {
+            $licenses = str_replace(',', '',$value);
+
+            return substr($licenses, 0, 4) . " " . substr($licenses, 4);
+        }
+
+        return $value;
+    }
+
 }

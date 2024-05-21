@@ -7,6 +7,7 @@ use App\Actions\Element\Import\Core\ElementValidator;
 use App\Rules\DateIsCorrectFormat;
 use App\Rules\DateIsCorrectFormatOrNull;
 use Illuminate\Support\Facades\Validator as IlluminateValidator;
+use Illuminate\Validation\Rule;
 
 final class CarValidator extends ElementValidator
 {
@@ -30,8 +31,8 @@ final class CarValidator extends ElementValidator
             'companyInn' => ['required', 'integer'],
             'number' => ['required', 'string', 'max:255'],
             'markAndModel' => ['nullable', 'string', 'max:255'],
-            'category' => ['nullable', 'string', 'max:255'],
-            'trailer' => ['nullable', 'string', 'max:255'],
+            'category' => ['nullable', 'string', 'max:255', Rule::in(config('elements.Car.fields.type_auto.values'))],
+            'trailer' => ['nullable', 'string', 'max:255', Rule::in(config('elements.Car.fields.trailer.values'))],
             'dateTechView' => ['nullable', 'string', 'max:255', new DateIsCorrectFormatOrNull()],
             'dateOsago' => ['nullable', 'string', 'max:255', new DateIsCorrectFormatOrNull()],
             'dateSkzi' => ['nullable', 'string', 'max:255', new DateIsCorrectFormatOrNull()],

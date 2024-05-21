@@ -53,9 +53,9 @@ final class CarRecordHandler extends ElementRecordHandler
         return $company;
     }
 
-    private function fetchCar(ImportedCar $importedCar, Company $company): ?Driver
+    private function fetchCar(ImportedCar $importedCar, Company $company): ?Car
     {
-        /** @var Driver|null $driver */
+        /** @var Car|null $driver */
         $driver = Car::query()
             ->where('company_id', $company->id)
             ->where('gos_number', $importedCar->getNumber())
