@@ -41,7 +41,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', 'ContractController@view');
         Route::put('restore/{id}', 'ContractController@restore');
         Route::get('index', 'ContractController@index');
-        Route::get('getOne', 'ContractController@getOne');
         Route::post('update', 'ContractController@update');
         Route::get('create', 'ContractController@create');
         Route::delete('{id}', 'ContractController@destroy');

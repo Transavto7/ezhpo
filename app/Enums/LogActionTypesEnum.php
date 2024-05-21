@@ -10,6 +10,8 @@ class LogActionTypesEnum
     const UPDATING = 'updating';
     const DELETING = 'deleting';
     const RESTORING = 'restoring';
+    const DETACHING = 'detaching';
+    const ATTACHING = 'attaching';
 
     public static function labels(): array
     {
@@ -17,7 +19,9 @@ class LogActionTypesEnum
             self::CREATING => 'Создание',
             self::UPDATING => 'Редактирование',
             self::DELETING => 'Удаление',
-            self::RESTORING => 'Восстановление'
+            self::RESTORING => 'Восстановление',
+            self::ATTACHING => 'Добавление связи',
+            self::DETACHING => 'Удаление связи'
         ];
     }
 
