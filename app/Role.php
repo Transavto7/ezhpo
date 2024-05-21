@@ -2,21 +2,21 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Permission\Models\Permission;
 
 class Role extends \Spatie\Permission\Models\Role
 {
-    use \Illuminate\Database\Eloquent\SoftDeletes;
+    use SoftDeletes;
 
     public function deleted_user()
     {
         return $this->belongsTo(User::class, 'deleted_id', 'id')
-                    ->withDefault();
+            ->withDefault();
     }
 
-    public function permissions($deleted = false) : BelongsToMany
+    public function permissions($deleted = false): BelongsToMany
     {
         return $this->belongsToMany(Permission::class,
             'role_has_permissions',
@@ -25,11 +25,11 @@ class Role extends \Spatie\Permission\Models\Role
             'id',
             'id'
         )
-                    ->withPivot('deleted')
-                    ->wherePivot('deleted', $deleted ? 1 : 0);
+            ->withPivot('deleted')
+            ->wherePivot('deleted', $deleted ? 1 : 0);
     }
 
-    public function users($deleted = false) : BelongsToMany
+    public function users($deleted = false): BelongsToMany
     {
         return $this->belongsToMany(User::class,
             'model_has_roles',
@@ -38,6 +38,6 @@ class Role extends \Spatie\Permission\Models\Role
             'id',
             'id'
         )->withPivot('deleted')
-                    ->wherePivot('deleted', $deleted ? 1 : 0);
+            ->wherePivot('deleted', $deleted ? 1 : 0);
     }
 }
