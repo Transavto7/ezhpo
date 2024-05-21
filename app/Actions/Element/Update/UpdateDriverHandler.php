@@ -2,6 +2,9 @@
 
 namespace App\Actions\Element\Update;
 
+use App\Driver;
+use App\Events\Relations\Attached;
+use App\Events\Relations\Detached;
 use App\Models\Contract;
 use Exception;
 
@@ -25,10 +28,13 @@ class UpdateDriverHandler extends UpdateElementHandler
 
     protected function attachContracts()
     {
-        $this->element
+        $changes = $this->element
             ->contracts()
             ->sync($this->data['contract_ids'] ?? []);
+        event(new Attached($this->element, $changes['attached'], Contract::class));
+        event(new Detached($this->element, $changes['detached'], Contract::class));
 
+        /** @var Contract $contract */
         $contract = Contract::query()
             ->where('company_id', $this->data['company_id'])
             ->where('main_for_company', 1)
@@ -39,6 +45,7 @@ class UpdateDriverHandler extends UpdateElementHandler
         }
 
         $contract->drivers()->attach($this->element->id);
+        event(new Attached($contract, $changes['attached'], Driver::class));
 
         $contract->save();
     }
