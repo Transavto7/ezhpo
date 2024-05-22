@@ -30,26 +30,12 @@ final class ImportDriverHandler implements ImportElementHandler
     /** @var string  */
     private $errorFileDisk = 'export';
 
-    /** @var string[] */
-    private $errorColumns = [
-        'ИНН компании',
-        'ФИО',
-        'Дата рождения',
-        'Название компании',
-        'Пол',
-        'Телефон',
-        'СНИЛС',
-        'Серия/номер ВУ',
-        'Срок действия ВУ',
-        'Ошибки',
-    ];
-
     public function __construct()
     {
         $this->hydrator = new DriverHydrator();
         $this->recordHandler = new DriverRecordHandler();
         $this->validator = new DriverValidator();
-        $this->errorWriter = new ErrorExcelWriter();
+        $this->errorWriter = new ErrorExcelWriter(Storage::disk('examples')->path('drivers_example.xlsx'));
     }
 
     /**
@@ -100,7 +86,6 @@ final class ImportDriverHandler implements ImportElementHandler
 
         if (count($errors) !== 0) {
             $filePath = $this->errorWriter
-                ->setHeaders($this->errorColumns)
                 ->setDisk($this->errorFileDisk)
                 ->writeErrors($errors);
 

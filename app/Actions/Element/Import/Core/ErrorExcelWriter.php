@@ -5,6 +5,7 @@ namespace App\Actions\Element\Import\Core;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -22,9 +23,9 @@ class ErrorExcelWriter
     /** @var Spreadsheet */
     protected $spreadsheet;
 
-    public function __construct()
+    public function __construct(string $templatePath)
     {
-        $this->spreadsheet = new Spreadsheet();
+        $this->spreadsheet = IOFactory::load($templatePath);
     }
 
     /**
@@ -35,19 +36,8 @@ class ErrorExcelWriter
     public function writeErrors(array $errors): string
     {
         return $this
-            ->writeHeaders()
             ->writeBody($errors)
             ->saveFile();
-    }
-
-    /**
-     * @param array $headers
-     * @return self
-     */
-    public function setHeaders(array $headers): self
-    {
-        $this->headers = $headers;
-        return $this;
     }
 
     /**
@@ -57,14 +47,6 @@ class ErrorExcelWriter
     public function setDisk(string $disk): self
     {
         $this->disk = $disk;
-        return $this;
-    }
-
-    protected function writeHeaders(): self
-    {
-        $sheet = $this->spreadsheet->getActiveSheet();
-        $sheet->fromArray($this->headers);
-
         return $this;
     }
 
