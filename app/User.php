@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Spatie\Permission\Models\Permission;
@@ -132,20 +131,15 @@ class User extends Authenticatable
     {
         parent::boot();
 
-        if (static::hideDefaultUser() && !static::isDefaultUser()) {
+        if (static::hideDefaultUser()) {
             static::addGlobalScope('hideDefaultUser', function (Builder $builder) {
                 $builder->where('login', '!=', self::DEFAULT_USER_LOGIN);
             });
         }
     }
 
-    protected static function hideDefaultUser(): bool
-    {
-        return true;
-    }
-
     //TODO: перенести в корректный слой позже
-    protected static function isDefaultUser(): bool
+    protected static function hideDefaultUser(): bool
     {
         $user = Request::user('web');
 
@@ -155,7 +149,7 @@ class User extends Authenticatable
 
         if (!$user) return false;
 
-        return $user->login === self::DEFAULT_USER_LOGIN;
+        return $user->login !== self::DEFAULT_USER_LOGIN;
     }
 
     public function deleted_user()
