@@ -11,9 +11,8 @@ final class ExportDriverRepository
     public function getExportDrivers(bool $exportAll, ?int $companyId = null): array
     {
         $driversBuilder = DB::table('drivers')
-            ->select('drivers.fio', 'companies.name as company_name', 'users.hash_id as user_id')
-            ->leftJoin('companies', 'companies.id', '=', 'drivers.company_id')
-            ->leftJoin('users', 'users.login', '=', 'drivers.hash_id');
+            ->select('drivers.fio', 'companies.name as company_name', 'drivers.hash_id as user_id')
+            ->leftJoin('companies', 'companies.id', '=', 'drivers.company_id');
 
         if (! $exportAll) {
             if ($companyId === null) {
