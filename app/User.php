@@ -253,19 +253,30 @@ class User extends Authenticatable
         return $counter;
     }
 
-    public static function getUserCompanyId($field = 'id')
+    public static function getUserCompanyId($field = 'id', $withUserCompanyId = false)
     {
-        $point = auth()->user()->pv_id;
+        $authUser = auth()->user();
+        $point = $authUser->pv_id;
         $point = Point::find($point);
 
         if ($point) {
             $company = $point->company_id ? Company::find($point->company_id) : 0;
 
-            if ($company) {
-                return $company->$field;
-            } else {
+            if (! $company) {
                 return -1;
             }
+
+            return $company->$field;
+        }
+
+        if ($withUserCompanyId && $authUser->company_id !== null) {
+            $company = Company::find($authUser->company_id);
+
+            if (! $company) {
+                return -1;
+            }
+
+            return $company->$field;
         }
 
         return -1;

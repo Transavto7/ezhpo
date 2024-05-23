@@ -23,7 +23,11 @@ export default {
                 .then(({data}) => {
                     window.location.href = data.url;
                 })
-                .catch(() => {
+                .catch(({response}) => {
+                    if (response.status === 400) {
+                        Notify.error(response.data.message);
+                        return;
+                    }
                     Notify.error('Ошибка сервера!');
                 })
                 .finally(() => {

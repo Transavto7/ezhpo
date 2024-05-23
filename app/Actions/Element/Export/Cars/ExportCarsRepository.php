@@ -3,13 +3,20 @@ declare(strict_types=1);
 
 namespace App\Actions\Element\Export\Cars;
 
+use DomainException;
 use Illuminate\Support\Facades\DB;
 
 final class ExportCarsRepository
 {
-    public function getExportCars(): array
+    /**
+     * @param bool $exportAll
+     * @param int|null $companyId
+     * @return array
+     * @throws DomainException
+     */
+    public function getExportCars(bool $exportAll, ?int $companyId = null): array
     {
-        $drivers = DB::table('cars')
+        $carsBuilder = DB::table('cars')
             ->select(
                 'companies.name as company_name',
                 'cars.gos_number as number',
@@ -17,10 +24,17 @@ final class ExportCarsRepository
                 'cars.type_auto as category',
                 'cars.hash_id'
             )
-            ->leftJoin('companies', 'companies.id', '=', 'cars.company_id')
-            ->get();
+            ->leftJoin('companies', 'companies.id', '=', 'cars.company_id');
 
-        return $drivers->map(function ($car) {
+        if (! $exportAll) {
+            if ($companyId === null) {
+                throw new DomainException('Пользователь без привелегий не может экспортировать данные без привязки к компании!');
+            }
+
+            $carsBuilder->where('company_id', $companyId);
+        }
+
+        return $carsBuilder->get()->map(function ($car) {
             return new ExportCar(
                 $car->company_name,
                 $car->number,

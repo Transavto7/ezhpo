@@ -15,12 +15,12 @@ final class ExportElementHandlerFactory
         ElementType::CAR => ExportCarsHandler::class,
     ];
 
-    public static function make(ElementType $type): ExportElementHandler
+    public static function make(ElementType $type, ExportElementAction $action): ExportElementHandler
     {
         if (! isset(self::HANDLERS[$type->value()])) {
             throw new \DomainException('Unsupported export type: ' . $type->value());
         }
 
-        return self::HANDLERS[$type->value()]::create();
+        return self::HANDLERS[$type->value()]::create($action);
     }
 }

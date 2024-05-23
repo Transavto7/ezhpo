@@ -335,6 +335,11 @@
             || user()->access('pv_trash_read') && $model == 'Point'
         );
 
+        $permissionToExport = (
+            user()->access('drivers_export') && $model == 'Driver'
+            || user()->access('cars_export') && $model == 'Car'
+        );
+
         //$permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
 
 $permissionToViewContract = user()->access('contract_read');
@@ -400,7 +405,7 @@ $permissionToViewContract = user()->access('contract_read');
                     </div>
                 @endif
 
-                @if($permissionToView && ($model == 'Driver' || $model == 'Car'))
+                @if($permissionToExport)
                     <div class="m-2">
                         <export-element-button export-url="{{ route('exportElement', $model) }}" />
                     </div>

@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace App\Actions\Element\Export\Cars;
 
 use App\Actions\Element\Export\Core\ExcelWriter;
+use App\Actions\Element\Export\ExportElementAction;
 use App\Actions\Element\Export\ExportElementHandler;
+use DomainException;
 use PhpOffice\PhpSpreadsheet\Writer\Exception;
 
 final class ExportCarsHandler implements ExportElementHandler
@@ -15,6 +17,9 @@ final class ExportCarsHandler implements ExportElementHandler
     /** @var ExportCarsRepository */
     private $repository;
 
+    /** @var ExportElementAction */
+    private $action;
+
     private $tableHeaders= [
         'Название компании',
         'Гос. номер',
@@ -23,19 +28,24 @@ final class ExportCarsHandler implements ExportElementHandler
         'ID Т/С',
     ];
 
-    public function __construct()
+    public function __construct(ExportElementAction $action)
     {
         $this->writer = new ExcelWriter();
         $this->repository = new ExportCarsRepository();
+        $this->action = $action;
     }
 
     /**
      * @return string
+     * @throws DomainException
      * @throws Exception
      */
     public function handle(): string
     {
-        $elements = $this->repository->getExportCars();
+        $elements = $this->repository->getExportCars(
+            $this->action->exportAll(),
+            $this->action->getCompanyId()
+        );
 
         return $this->writer
             ->setHeaders($this->tableHeaders)
@@ -44,8 +54,8 @@ final class ExportCarsHandler implements ExportElementHandler
             ->write($elements);
     }
 
-    public static function create(): ExportElementHandler
+    public static function create(ExportElementAction $action): ExportElementHandler
     {
-        return new self();
+        return new self($action);
     }
 }

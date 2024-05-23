@@ -3,19 +3,27 @@ declare(strict_types=1);
 
 namespace App\Actions\Element\Export\Drivers;
 
+use DomainException;
 use Illuminate\Support\Facades\DB;
 
 final class ExportDriverRepository
 {
-    public function getExportDrivers(): array
+    public function getExportDrivers(bool $exportAll, ?int $companyId = null): array
     {
-        $drivers = DB::table('drivers')
+        $driversBuilder = DB::table('drivers')
             ->select('drivers.fio', 'companies.name as company_name', 'users.hash_id as user_id')
             ->leftJoin('companies', 'companies.id', '=', 'drivers.company_id')
-            ->leftJoin('users', 'users.login', '=', 'drivers.hash_id')
-            ->get();
+            ->leftJoin('users', 'users.login', '=', 'drivers.hash_id');
 
-        return $drivers->map(function ($driver) {
+        if (! $exportAll) {
+            if ($companyId === null) {
+                throw new DomainException('Пользователь без привелегий не может экспортировать данные без привязки к компании!');
+            }
+
+            $driversBuilder->where('drivers.company_id', $companyId);
+        }
+
+        return $driversBuilder->get()->map(function ($driver) {
             return new ExportDriver(
                 $driver->company_name,
                 $driver->fio,
