@@ -130,19 +130,15 @@ class User extends Authenticatable
     {
         parent::boot();
 
-        if (static::hideDefaultUser() && !static::isDefaultUser()) {
+        if (static::hideDefaultUser()) {
             static::addGlobalScope('hideDefaultUser', function (Builder $builder) {
                 $builder->where('login', '!=', self::DEFAULT_USER_LOGIN);
             });
         }
     }
 
+    //TODO: перенести в корректный слой позже
     protected static function hideDefaultUser(): bool
-    {
-        return true;
-    }
-
-    protected static function isDefaultUser(): bool
     {
         $user = Request::user('web');
 
@@ -152,7 +148,7 @@ class User extends Authenticatable
 
         if (!$user) return false;
 
-        return $user->login === self::DEFAULT_USER_LOGIN;
+        return $user->login !== self::DEFAULT_USER_LOGIN;
     }
 
     public function deleted_user(): BelongsTo
