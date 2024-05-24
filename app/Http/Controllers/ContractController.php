@@ -2,24 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Contract\CreateContractHandler;
+use App\Actions\Contract\UpdateContractHandler;
 use App\Car;
-use App\Company;
 use App\Driver;
 use App\FieldPrompt;
 use App\Models\Contract;
-use App\Models\Service;
-use App\Product;
-use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class ContractController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function view()
     {
         $permissions = [
@@ -29,6 +25,7 @@ class ContractController extends Controller
             'delete' => user()->access('contract_delete'),
             'edit' => user()->access('contract_edit'),
         ];
+
         $fields = FieldPrompt::where('type', 'contracts')->get();
 
         return view('contract.index', [
@@ -40,52 +37,58 @@ class ContractController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Response
      */
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $contracts = Contract::with(['company', 'our_company', 'services', 'drivers', 'cars']);
-        $filters   = $request->all();
-        $filters['sortBy']      = $filters['sortBy'] ?? 'id';
-        $filters['sortDesc']    = $filters['sortDesc'] ?? 'true';
-        $filters['perPage']     = $filters['perPage'] ?? 15;
+        $filters = $request->all();
+        $filters['sortBy'] = $filters['sortBy'] ?? 'id';
+        $filters['sortDesc'] = $filters['sortDesc'] ?? 'true';
+        $filters['perPage'] = $filters['perPage'] ?? 15;
         $filters['currentPage'] = $filters['currentPage'] ?? 1;
 
-        if ($filters['sortBy'] == 'company') {
-            $contracts->leftJoin('companies', 'company_id', 'companies.id')
-                      ->orderBy('companies.name',
-                          ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC')
-                      ->select('contracts.*');
-        } else if ($filters['sortBy'] == 'our_company.name') {
-            $contracts->leftJoin('reqs', 'our_company_id', 'reqs.id')
-                      ->orderBy('reqs.name',
-                          ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC')
-                      ->select('contracts.*');
+        $filterDirection = ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC';
+        if ($filters['sortBy'] === 'company') {
+            $contracts
+                ->leftJoin('companies', 'company_id', 'companies.id')
+                ->orderBy('companies.name', $filterDirection)
+                ->select('contracts.*');
+        } else if ($filters['sortBy'] === 'our_company.name') {
+            $contracts
+                ->leftJoin('reqs', 'our_company_id', 'reqs.id')
+                ->orderBy('reqs.name', $filterDirection)
+                ->select('contracts.*');
         } else if ($filters['sortBy'] === 'services') {
-            $contracts->withCount('services')->orderBy('services_count',
-                ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC');
+            $contracts
+                ->withCount('services')
+                ->orderBy('services_count', $filterDirection);
         } else {
-            $contracts->orderBy($filters['sortBy'],
-                ($filters['sortDesc'] == 'true' || $filters['sortDesc'] == 1) ? 'DESC' : 'ASC');
+            $contracts
+                ->orderBy($filters['sortBy'],$filterDirection);
         }
 
         if ($filters['trash'] ?? false) {
             $contracts->onlyTrashed();
         }
+
         if ($filters['date_check_main'] ?? false) {
             $sub_ids = Contract::groupBy('company_id')
-                               ->select('company_id', DB::raw('SUM(main_for_company) AS count'))
-                               ->whereDate('date_of_end', '>=', $filters['date_check_main'])
-                               ->whereDate('date_of_start', '<=', $filters['date_check_main'])
-                               ->get(['company_id', 'count'])
-                               ->filter(function ($q){
+                ->select([
+                    'company_id',
+                    DB::raw('SUM(main_for_company) AS count')
+                ])
+                ->forDate($filters['date_check_main'])
+                ->get()
+                ->filter(function ($q) {
                     return !$q->count;
                 })
-                               ->pluck('company_id');
-
+                ->pluck('company_id');
 
             $contracts->whereIn('company_id', $sub_ids);
         }
+
         if ($filters['id'] ?? false) {
             $contracts->where('id', $filters['id']);
         }
@@ -101,16 +104,19 @@ class ContractController extends Controller
         if ($filters['name'] ?? false) {
             $contracts->where('name', 'like', "%{$filters['name']}%");
         }
+
         if ($filters['service_id'] ?? false) {
             $contracts->whereHas('services', function ($q) use ($filters) {
                 $q->where('contract_service.service_id', $filters['service_id']);
             });
         }
+
         if ($filters['company_id'] ?? false) {
             $contracts->whereHas('company', function ($q) use ($filters) {
                 $q->where('companies.id', $filters['company_id']);
             });
         }
+
         if ($filters['our_company_id'] ?? false) {
             $contracts->whereHas('our_company', function ($q) use ($filters) {
                 $q->where('reqs.id', $filters['our_company_id']);
@@ -120,18 +126,23 @@ class ContractController extends Controller
         if ($filters['date_of_end_start'] ?? false) {
             $contracts->whereDate('date_of_end', '>=', $filters['date_of_end_start']);
         }
+
         if ($filters['date_of_end_end'] ?? false) {
             $contracts->whereDate('date_of_end', '<=', $filters['date_of_end_end']);
         }
+
         if ($filters['created_at_start'] ?? false) {
             $contracts->whereDate('created_at', '>=', $filters['created_at_start']);
         }
+
         if ($filters['created_at_end'] ?? false) {
             $contracts->whereDate('created_at', '<=', $filters['created_at_end']);
         }
+
         if ($filters['date_of_start'] ?? false) {
             $contracts->whereDate('date_of_start', '>=', $filters['date_of_start']);
         }
+
         if ($filters['date_of_end'] ?? false) {
             $contracts->whereDate('date_of_end', '<=', $filters['date_of_end']);
         }
@@ -143,219 +154,140 @@ class ContractController extends Controller
         }
 
         $contracts = $contracts->paginate(
-            $request->all()['mazaretto_yeban'] ?? $request->all()['or_on_soset_chlen'] ?? 500,
-            $columns = ['*'],
-            $pageName = 'page',
-            $page = $filters['currentPage']
+            500,
+            ['*'],
+            'page',
+            $filters['currentPage']
         );
 
         return response([
             'status' => true,
             'result' => [
-                'contracts'   => $contracts->getCollection(),
-                'total'       => $contracts->total(),
+                'contracts' => $contracts->getCollection(),
+                'total' => $contracts->total(),
                 'currentPage' => $contracts->currentPage(),
             ],
         ]);
     }
 
-    public function create(Request $request)
+    public function create(Request $request, CreateContractHandler $handler)
     {
-        $data_to_save = json_decode($request->get('data_to_save'), true);
-        $services = $data_to_save['services'] ?? [];
-        unset($data_to_save['services']);
+        try {
+            DB::beginTransaction();
 
-        if (
-            ($main = $data_to_save['main_for_company'] ?? 0)
-            && ($company_id = $data_to_save['company']['id'] ?? null)
-            && ($date_of_end = isset($data_to_save['date_of_end']) ? Carbon::parse($data_to_save['date_of_end'])
-                : null)
-            && ($date_of_start = isset($data_to_save['date_of_start']) ? Carbon::parse($data_to_save['date_of_start'])
-                : null)
-        ) {
-            $contractQWE = Contract::whereNotBetween(
-                'date_of_end', [
-                $date_of_start,
-                $date_of_end,
-            ])->whereNotBetween(
-                   'date_of_end', [
-                   $date_of_start,
-                   $date_of_end,
-               ])
-               ->where('main_for_company', 1)
-               ->whereCompanyId($company_id)
-               ->first();
-            if ($contractQWE) {
-                return response([
-                    'status'  => false,
-                    'message' => [
-                        'Не возможно установить главный договор, так как на данный интервал у данной компании есть главный договор',
-                    ],
-                ]);
-            }
-        }
+            $data = json_decode($request->get('data_to_save'), true);
 
-        $contract = Contract::create([
-            'name' => $data_to_save['name'] ?? null,
-            'date_of_end' => isset($data_to_save['date_of_end']) ? Carbon::parse($data_to_save['date_of_end']) : null,
-            'date_of_start' => isset($data_to_save['date_of_start']) ? Carbon::parse($data_to_save['date_of_start']) : null,
-            'company_id' => $data_to_save['company']['id'] ?? null,
-            'our_company_id' => $data_to_save['our_company']['id'] ?? null,
-            'main_for_company' => $data_to_save['main_for_company'] ?? 0,
-        ]);
+            $contract = $handler->handle($data);
 
-        $servicesToSync = [];
-        foreach ($services as $service) {
-            $servicesToSync[$service['id']] = ['service_cost' => $service['price_unit']];
-        }
+            DB::commit();
 
-        $contract->services()->sync($servicesToSync);
-        $contract->cars()->sync($data_to_save['cars'] ?? []);
-        $contract->drivers()->sync($data_to_save['drivers'] ?? []);
-
-        return response([
-            'status' => true,
-            'contract' => $contract,
-        ]);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param Contract $contract
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Contract $contract)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param Contract $contract
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Contract $contract)
-    {
-        //
-    }
-
-    public function update(Request $request)
-    {
-        $data_to_save = $request->post('data_to_save');
-
-        if ( !$contract = Contract::find($data_to_save['id'])) {
             return response([
-                'status'  => false,
-                'message' => 'Не найдено',
+                'status' => true,
+                'contract' => $contract,
+            ]);
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            return response([
+                'status' => true,
+                'message' => $exception->getMessage(),
             ]);
         }
-
-        if (
-            ($main = $data_to_save['main_for_company'] ?? 0)
-            && ($company_id = $data_to_save['company']['id'] ?? null)
-            && ($date_of_end = isset($data_to_save['date_of_end']) ? Carbon::parse($data_to_save['date_of_end'])
-                : null)
-            && ($date_of_start = isset($data_to_save['date_of_start']) ? Carbon::parse($data_to_save['date_of_start'])
-                : null)
-        ) {
-            $contractQWE = Contract::whereNotBetween(
-                'date_of_end', [
-                $date_of_start,
-                $date_of_end,
-            ])->whereNotBetween(
-                   'date_of_end', [
-                   $date_of_start,
-                   $date_of_end,
-               ])
-               ->where('main_for_company', 1)
-               ->whereCompanyId($company_id)
-               ->first();
-            if ($contractQWE) {
-                return response([
-                    'status'  => false,
-                    'message' => 'Не возможно установить главный договор, так как на данный интервал у данной компании есть главный договор',
-                ]);
-            }
-        }
-
-        $services = $data_to_save['services'] ?? [];
-        unset($data_to_save['services']);
-
-        $servicesToSync = [];
-        foreach ($services as $service) {
-            $servicesToSync[$service['id']] = [
-                'service_cost' => $service['pivot']['service_cost'] ?? $service['price_unit'],
-            ];
-        }
-
-        $contract->update([
-            'name'             => $data_to_save['name'] ?? null,
-            'date_of_start'    => isset($data_to_save['date_of_start']) ? Carbon::parse($data_to_save['date_of_start'])
-                : null,
-            'date_of_end'      => isset($data_to_save['date_of_end']) ? Carbon::parse($data_to_save['date_of_end'])
-                : null,
-            'company_id'       => $data_to_save['company']['id'] ?? null,
-            'our_company_id'   => $data_to_save['our_company']['id'] ?? null,
-            'main_for_company' => $data_to_save['main_for_company'] ?? 0,
-            'finished' => $data_to_save['finished'] ?? 0,
-        ]);
-
-        $contract->services()->sync($servicesToSync);
-        $contract->cars()->sync($data_to_save['cars'] ?? []);
-        $contract->drivers()->sync($data_to_save['drivers'] ?? []);
-
-        return response([
-            'status'   => true,
-            'contract' => $contract,
-        ]);
-
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param Contract $contract
-     *
-     * @return \Illuminate\Http\Response
+     * @throws Exception
      */
-    public function destroy($id, Request $request)
+    public function update(Request $request, UpdateContractHandler $handler)
     {
-        return response([
-            'status'   => true,
-            'contract' => Contract::find($id)->delete(),
-        ]);
+        try {
+            DB::beginTransaction();
+
+            $data = $request->input('data_to_save');
+
+            $contract = $handler->handle($data);
+
+            DB::commit();
+
+            return response([
+                'status' => true,
+                'contract' => $contract,
+            ]);
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            return response([
+                'status' => true,
+                'message' => $exception->getMessage(),
+            ]);
+        }
     }
 
-    public function restore($id, Request $request)
+    public function destroy($id)
     {
-        return response([
-            'status'   => true,
-            'contract' => Contract::withTrashed()->find($id)->restore(),
-        ]);
+        try {
+            DB::beginTransaction();
+
+            $contract = Contract::find($id);
+
+            if (empty($contract)) {
+                throw new Exception('Контракт с таким ID не найден');
+            }
+
+            $contract = $contract->delete();
+
+            DB::commit();
+
+            return response([
+                'status' => true,
+                'contract' => $contract,
+            ]);
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            return response([
+                'status' => true,
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    public function restore($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $contract = Contract::withTrashed()->find($id);
+
+            if (empty($contract)) {
+                throw new Exception('Контракт с таким ID не найден');
+            }
+
+            $contract = $contract->restore();
+
+            DB::commit();
+
+            return response([
+                'status' => true,
+                'contract' => $contract,
+            ]);
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            return response([
+                'status' => true,
+                'message' => $exception->getMessage(),
+            ]);
+        }
     }
 
     public function getTypes()
     {
         $types = [];
+
         foreach (Contract::$types as $key => $type) {
             $types[] = [
-                'id'    => $key,
+                'id' => $key,
                 'label' => $type,
             ];
         }
@@ -365,26 +297,19 @@ class ContractController extends Controller
 
     public function getAvailableForCompany(Request $request)
     {
-//        dd(Contract::where('company_id', $request->company_id)->get()->toArray());
         return response([
-            'status'    => true,
+            'status' => true,
             'contracts' => Contract::where('company_id', $request->company_id)->get(),
         ]);
     }
 
-    public function getDriversByCompany($hash_id, Request $request)
+    public function getDriversByCompany($id)
     {
-        return response(
-            Driver::where('company_id', $hash_id)
-                  ->get()
-        );
+        return response(Driver::where('company_id', $id)->get());
     }
 
-    public function getCarsByCompany($hash_id, Request $request)
+    public function getCarsByCompany($id)
     {
-        return response(
-            Car::where('company_id', $hash_id)
-               ->get()
-        );
+        return response(Car::where('company_id', $id)->get());
     }
 }

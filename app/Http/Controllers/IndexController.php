@@ -8,6 +8,7 @@ use App\Actions\Element\Update\UpdateElementHandlerFactory;
 use App\Car;
 use App\Company;
 use App\Driver;
+use App\Enums\LogActionTypesEnum;
 use App\FieldPrompt;
 use App\Imports\CarImport;
 use App\Imports\CompanyImport;
@@ -17,7 +18,9 @@ use App\Services\HashIdGenerator\DefaultHashIdValidators;
 use App\Services\HashIdGenerator\HashedType;
 use App\Services\HashIdGenerator\HashIdGenerator;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -151,26 +154,35 @@ class IndexController extends Controller
             abort(500, 'Не найдена модель');
         }
 
-        $updatedModelsCount = $syncFieldsHandler->handle([
-            'model'          => $modelName,
-            'fieldFind'      => $request->fieldFind,
-            'fieldFindId'    => $request->fieldFindId,
-            'fieldSync'      => $request->fieldSync,
-            'fieldSyncValue' => $request->fieldSyncValue ?? '',
-        ]);
+        try {
+            DB::beginTransaction();
 
-        if ($isApi) {
-            return $updatedModelsCount ?? 0;
-        }
+            $updatedModelsCount = $syncFieldsHandler->handle([
+                'model'          => $modelName,
+                'fieldFind'      => $request->fieldFind,
+                'fieldFindId'    => $request->fieldFindId,
+                'fieldSync'      => $request->fieldSync,
+                'fieldSyncValue' => $request->fieldSyncValue ?? '',
+            ]);
 
-        if ($updatedModelsCount) {
+            if (($updatedModelsCount ?? 0) === 0) {
+                throw new Exception("Нет моделей $modelName для синхронизации");
+            }
+
+            DB::commit();
+
             return view('pages.success', [
                 'text' => "Поля успешно синхронизированы. Кол-во элементов: $updatedModelsCount",
             ]);
-        } else {
-            //TODO: очень странное поведение, если нет записей для обновления - выводит такое
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            if ($isApi) {
+                return 0;
+            }
+
             return view('pages.warning', [
-                'text' => "Модель $modelName не найдена",
+                'text' => $exception->getMessage(),
             ]);
         }
     }
@@ -260,25 +272,74 @@ class IndexController extends Controller
         }
     }
 
-    // Для компаний синхронизация
-    // Ставит услуги машинам и водителям такие же, как и у компании
-    public function syncElement(Request $request)
+    public function syncElement(Request $request): RedirectResponse
     {
-        if ($request->type !== 'Company') {
-            return redirect($_SERVER['HTTP_REFERER']);
+        try {
+            $userId = Auth::id();
+
+            if ($request->type !== 'Company') {
+                return back();
+            }
+
+            $id = $request->id;
+            $company = Company::find($id);
+
+            if (!$company) {
+                throw new Exception('Компания с таким ID не найдена');
+            }
+
+            $productIds = $company->products_id;
+            if (!$productIds){
+                return back();
+            }
+
+            DB::beginTransaction();
+
+            foreach ([Car::class, Driver::class] as $class) {
+                app($class)::query()
+                    ->select([
+                        'id',
+                        'products_id'
+                    ])
+                    ->where('company_id', $id)
+                    ->get()
+                    ->each(function ($model) use ($productIds, $userId) {
+                        $oldValue = $model->products_id;
+
+                        if ($oldValue == $productIds) return;
+
+                        /** @var \App\Log $log */
+                        $log = Log::create([
+                            'user_id' => $userId,
+                            'type' => LogActionTypesEnum::UPDATING
+                        ]);
+
+                        $log->setAttribute('data', [
+                            [
+                                'name' => 'products_id',
+                                'oldValue' => $oldValue,
+                                'newValue' => $productIds
+                            ]
+                        ]);
+
+                        $log->model()->associate($model);
+
+                        $log->save();
+                    });
+
+                app($class)::where('company_id', $id)->update(['products_id' => $company->products_id]);
+            }
+
+            DB::commit();
+
+            return back();
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            return back()->withErrors([
+                'errors' => $exception->getMessage()
+            ]);
         }
-        $id      = $request->id;
-        $company = Company::find($id);
-
-        if(!$company->products_id){
-            return redirect($_SERVER['HTTP_REFERER']);
-        }
-
-        Car::where('company_id', $id)->update(['products_id' => $company->products_id]);
-        Driver::where('company_id', $id)->update(['products_id' => $company->products_id]);
-
-
-        return redirect($_SERVER['HTTP_REFERER']);
     }
 
     public function DeleteFileElement (Request $request)
