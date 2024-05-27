@@ -1,6 +1,6 @@
 <?php
 
-use App\AuthUser;
+use App\User;
 
 return [
 
@@ -70,7 +70,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => AuthUser::class,
+            'model' => User::class,
         ],
 
         // 'users' => [

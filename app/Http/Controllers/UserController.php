@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -112,9 +113,7 @@ class UserController extends Controller
 
         $result->disable = $result->roles
             ->reduce(function ($carry, $role) {
-                $carry->merge($role->permissions);
-
-                return $carry;
+                return $carry->merge($role->permissions);
             }, collect())
             ->unique('id')
             ->pluck('id')
@@ -151,19 +150,48 @@ class UserController extends Controller
         }
 
         $userId = $request->get('user_id');
-        if (empty($userId)) {
-            $validator = Validator::make($request->all(), [
-                'password' => ['required', 'string', 'min:1', 'max:255'],
-                'email' => ['required', 'string', 'min:1', 'max:255'],
+
+        $rules = [
+            'password' => [
+                'required_without:user_id',
+                'nullable',
+                'string',
+                'min:1',
+                'max:255'
+            ],
+            'email' => [
+                'required',
+                'string',
+                'min:1',
+                'max:255',
+                empty($userId)
+                    ? Rule::unique('users')
+                    : Rule::unique('users')->ignore($userId),
+                empty($userId)
+                    ? Rule::unique('users', 'login')
+                    : Rule::unique('users', 'login')->ignore($userId),
+            ],
+            'login' => [
+                'nullable',
+                'string',
+                'min:1',
+                'max:255',
+                empty($userId)
+                    ? Rule::unique('users')
+                    : Rule::unique('users')->ignore($userId),
+            ]
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors(),
             ]);
+        }
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => $validator->errors(),
-                ]);
-            }
-
+        if (empty($userId)) {
             $user = new User();
 
             $validator = function (int $hashId) {
@@ -186,21 +214,20 @@ class UserController extends Controller
 
         if ($password = $request->get('password')) {
             $password = Hash::make($password);
-            $api_token = Hash::make(date('H:i:s') . sha1($password));
+            $apiToken = Hash::make(date('H:i:s') . sha1($password));
 
             $user->password = $password;
-            $user->api_token = $api_token;
+            $user->api_token = $apiToken;
         }
 
         $user->name = $request->get('name');
-        $user->login = $request->get('login');
         $user->email = $request->get('email');
         $user->eds = $request->get('eds');
         $user->timezone = $request->get('timezone');
         $user->blocked = $request->get('blocked', 0);
         $user->validity_eds_start = $request->get('validity_eds_start');
         $user->validity_eds_end = $request->get('validity_eds_end');
-        $user->login = $request->get('login', $user->email);
+        $user->login = $request->get('login') ?? $request->get('email');
 
         $user->save();
 
@@ -270,15 +297,12 @@ class UserController extends Controller
 
     public function fetchRoleData(Request $request)
     {
-        $permissions = collect();
-        Role::with(['permissions'])
-            ->whereIn('id', $request->get('role_ids', [])) //
+        $permissions = Role::with(['permissions'])
+            ->whereIn('id', $request->get('role_ids', []))
             ->get()
-            ->map(function ($q) use (&$permissions) {
-                $permissions = $permissions->merge($q->permissions);
-            });
-
-        $permissions = $permissions
+            ->reduce(function ($carry, $role) {
+                return $carry->merge($role->permissions);
+            }, collect())
             ->unique('id')
             ->pluck('id')
             ->values();
