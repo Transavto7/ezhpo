@@ -13,11 +13,15 @@ class ProfileController extends Controller
     /**
      * Сниппеты
      */
-    public static function getUserRole($text = true, $user_id = 0)
+    public static function getUserRole($text = true, $userId = 0)
     {
         $user = Auth::user();
 
-        if ($user_id) $user = User::find($user_id);
+        if ($userId) $user = User::find($userId);
+
+        if (empty($user)) {
+            return null;
+        }
 
         switch ($user->role) {
             case 12:
