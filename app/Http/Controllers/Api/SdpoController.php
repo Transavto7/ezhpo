@@ -337,6 +337,28 @@ class SdpoController extends Controller
         return response()->json($user->pv->name);
     }
 
+    public function getStamp(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user('api');
+
+        $stamp = $user->stamp;
+
+        $data = [
+            'stamp_head' => null,
+            'stamp_licence' => null
+        ];
+
+        if ($user->stamp) {
+            $data = [
+                'stamp_head' => $stamp->company_name,
+                'stamp_licence' => $stamp->licence
+            ];
+        }
+
+        return response()->json($data);
+    }
+
     public function getTerminalVerification(Request $request)
     {
         $user = $request->user('api');
@@ -359,13 +381,28 @@ class SdpoController extends Controller
      */
     public function getMedics(Request $request)
     {
-        $users = User::with(['roles', 'pv:id,name,pv_id', 'pv.town:id,name'])
+        $users = User::query()
+            ->with([
+                'roles',
+                'pv:id,name,pv_id',
+                'pv.town:id,name'
+            ])
             ->whereHas('roles', function ($q) use ($request) {
                 $q->where('roles.id', 2);
             })
-            ->select(['id', 'name', 'eds', 'pv_id'])
+            ->select([
+                'id',
+                'name',
+                'eds',
+                'pv_id',
+                'validity_eds_start',
+                'validity_eds_end'
+            ])
             ->get()
-            ->groupBy(['pv.town.name', 'pv.name']);
+            ->groupBy([
+                'pv.town.name',
+                'pv.name'
+            ]);
 
         return response()->json($users);
     }
