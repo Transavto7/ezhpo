@@ -2,9 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Car;
+use App\Company;
+use App\Driver;
 use App\Enums\LogActionTypesEnum;
 use App\Enums\LogModelTypesEnum;
+use App\FieldPrompt;
 use App\Log;
+use App\Models\Contract;
+use App\Models\Service;
+use App\Product;
 use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -40,9 +47,37 @@ class LogController extends Controller
             ->whereNotNull('logs.user_id')
             ->get();
 
+        $fieldPromptsMap = [
+            Driver::class => 'driver',
+            Company::class => 'company',
+            Contract::class => 'contracts',
+            Service::class => 'product',
+            Product::class => 'product',
+            Car::class => 'car',
+        ];
+
+        $fieldPrompts = FieldPrompt::query()
+            ->select([
+                'field',
+                'type',
+                'name'
+            ])
+            ->whereIn('type', array_values($fieldPromptsMap))
+            ->get();
+
+        foreach ($fieldPromptsMap as &$value) {
+            $value = $fieldPrompts
+                ->where('type', $value)
+                ->pluck('name', 'field')
+                ->toArray();
+
+            $value['deleted_id'] = 'ID удалившего пользователя';
+            $value['deleted_at'] = 'Дата и время удаления';
+        }
+
         return view(
             'admin.logs.index',
-            compact('actionTypes', 'modelTypes', 'users')
+            compact('actionTypes', 'modelTypes', 'users', 'fieldPromptsMap')
         );
     }
 

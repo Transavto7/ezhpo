@@ -17,6 +17,8 @@
         window.PAGE_SETUP.actionsOption = @json($actionTypes);
         window.PAGE_SETUP.actionsMap = @json(array_column($actionTypes, 'text', 'id'))
 
+        window.PAGE_SETUP.fieldPromptsMap = @json($fieldPromptsMap);
+
         window.PAGE_SETUP.tableDataUrl = '/admin/logs/list';
     </script>
 @endpush

@@ -36,13 +36,13 @@ class LogAttachedEvent
             'type' => LogActionTypesEnum::ATTACHING
         ]);
 
-        $log->setAttribute('data', [
+        $log->data = [
             [
                 'name' => LogModelTypesEnum::label($event->getRelatedType()),
                 'oldValue' => '',
                 'newValue' => implode(",", $event->getRelated())
             ]
-        ]);
+        ];
 
         $log->model()->associate($event->getParent());
 

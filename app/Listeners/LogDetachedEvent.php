@@ -36,13 +36,13 @@ class LogDetachedEvent
             'type' => LogActionTypesEnum::DETACHING
         ]);
 
-        $log->setAttribute('data', [
+        $log->data = [
             [
                 'name' => LogModelTypesEnum::label($event->getRelatedType()),
                 'oldValue' => implode(",", $event->getRelated()),
                 'newValue' => ''
             ]
-        ]);
+        ];
 
         $log->model()->associate($event->getParent());
 

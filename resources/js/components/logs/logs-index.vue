@@ -41,6 +41,12 @@ export default {
 
                 this.total = data.total
                 this.items = data.data.map((item) => {
+                    item.data = (item.data ?? []).map((field) => {
+                        field.name = this.pageSetup.fieldPromptsMap[item.model_type][field.name] ?? field.name
+
+                        return field
+                    })
+
                     item.type = this.pageSetup.actionsMap[item.type];
                     item.model_type = this.pageSetup.modelsMap[item.model_type];
 
