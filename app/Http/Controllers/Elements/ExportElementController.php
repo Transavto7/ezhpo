@@ -16,7 +16,8 @@ final class ExportElementController extends Controller
 {
     public function __invoke(string $type)
     {
-        $userCompanyId = User::getUserCompanyId();
+        $userCompanyId = User::getUserCompanyId('id', true);
+
         $handler = ExportElementHandlerFactory::make(
             ElementType::fromString(mb_strtolower($type)),
             new ExportElementAction(
