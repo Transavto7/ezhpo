@@ -3,8 +3,10 @@
 namespace App\Actions\Element;
 
 use App\Anketa;
+use App\Car;
 use App\Company;
 use App\Driver;
+use App\Events\Relations\Attached;
 use App\Instr;
 use App\Models\Contract;
 use App\Services\BriefingService;
@@ -71,6 +73,7 @@ class CreateDriverHandler extends AbstractCreateElementHandler implements Create
 
         UserService::createUserFromDriver($created);
 
+        /** @var Contract $contract */
         $contract = Contract::query()
             ->where('company_id', $companyId)
             ->where('main_for_company', 1)
@@ -78,6 +81,7 @@ class CreateDriverHandler extends AbstractCreateElementHandler implements Create
 
         if ($contract) {
             $contract->drivers()->attach($created->id);
+            event(new Attached($contract, [$created->id], Car::class));
         }
 
         if ($company->required_type_briefing) {

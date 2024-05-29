@@ -41,7 +41,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', 'ContractController@view');
         Route::put('restore/{id}', 'ContractController@restore');
         Route::get('index', 'ContractController@index');
-        Route::get('getOne', 'ContractController@getOne');
         Route::post('update', 'ContractController@update');
         Route::get('create', 'ContractController@create');
         Route::delete('{id}', 'ContractController@destroy');
@@ -191,6 +190,11 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('settings')->as('settings.')->group(function () {
             Route::get('/', 'SettingsController@index')->name('index');
             Route::post('/', 'SettingsController@update')->name('update');
+        });
+
+        Route::prefix('logs')->as('logs.')->group(function () {
+            Route::get('/', 'LogController@index')->name('index');
+            Route::post('list', 'LogController@list')->name('list');
         });
     });
 });
