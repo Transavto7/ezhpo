@@ -38,4 +38,20 @@ class Town extends Model
         return $this->belongsTo(User::class, 'deleted_id', 'id')
                     ->withDefault();
     }
+
+    public function getName($id): string
+    {
+        $id = explode(',', $id);
+
+        $data = self::query()
+            ->select([
+                'name'
+            ])
+            ->whereIn('id', $id)
+            ->get()
+            ->pluck('name')
+            ->toArray();
+
+        return implode(', ', $data) ?? '';
+    }
 }
