@@ -405,7 +405,7 @@ $permissionToViewContract = user()->access('contract_read');
                     </div>
                 @endif
 
-                @if($permissionToExport)
+                @if($permissionToExport && ! request()->get('deleted'))
                     <div class="m-2">
                         <export-element-button export-url="{{ route('exportElement', $model) }}" />
                     </div>

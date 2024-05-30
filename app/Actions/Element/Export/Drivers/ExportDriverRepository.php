@@ -12,6 +12,7 @@ final class ExportDriverRepository
     {
         $driversBuilder = DB::table('drivers')
             ->select('drivers.fio', 'companies.name as company_name', 'drivers.hash_id as user_id')
+            ->whereNull('drivers.deleted_at')
             ->leftJoin('companies', 'companies.id', '=', 'drivers.company_id');
 
         if (! $exportAll) {

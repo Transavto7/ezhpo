@@ -24,6 +24,7 @@ final class ExportCarsRepository
                 'cars.type_auto as category',
                 'cars.hash_id'
             )
+            ->whereNull('cars.deleted_at')
             ->leftJoin('companies', 'companies.id', '=', 'cars.company_id');
 
         if (! $exportAll) {
