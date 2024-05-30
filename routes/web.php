@@ -195,6 +195,8 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('logs')->as('logs.')->group(function () {
             Route::get('/', 'LogController@index')->name('index');
             Route::post('list', 'LogController@list')->name('list');
+            Route::post('list-model', 'LogController@listByModel')->name('list-model');
+            Route::post('list-model-map', 'LogController@listByModelMaps')->name('list-model-map');
         });
     });
 });

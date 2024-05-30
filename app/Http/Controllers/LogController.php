@@ -2,16 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Car;
-use App\Company;
-use App\Driver;
 use App\Enums\LogActionTypesEnum;
 use App\Enums\LogModelTypesEnum;
 use App\FieldPrompt;
 use App\Log;
-use App\Models\Contract;
-use App\Models\Service;
-use App\Product;
 use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -47,14 +41,7 @@ class LogController extends Controller
             ->whereNotNull('logs.user_id')
             ->get();
 
-        $fieldPromptsMap = [
-            Driver::class => 'driver',
-            Company::class => 'company',
-            Contract::class => 'contracts',
-            Service::class => 'product',
-            Product::class => 'product',
-            Car::class => 'car',
-        ];
+        $fieldPromptsMap = LogModelTypesEnum::fieldPromptsTypeMap();
 
         $fieldPrompts = FieldPrompt::query()
             ->select([
@@ -103,5 +90,53 @@ class LogController extends Controller
             );
 
         return response()->json($data);
+    }
+
+    public function listByModel(Request $request): JsonResponse
+    {
+        $modelType = array_search(
+            strtolower($request->input('model', '')),
+            LogModelTypesEnum::fieldPromptsTypeMap()
+        );
+
+        if ($modelType === false || !$request->filled('id')) {
+            return response()->json([]);
+        }
+
+        $data = Log::query()
+            ->select([
+                'logs.*',
+                DB::raw("IF(ISNULL(users.hash_id), '-', CONCAT('[', users.hash_id, '] ', users.name)) as user")
+            ])
+            ->modelTypes([$modelType])
+            ->modelId($request->input('id'))
+            ->leftJoin('users', 'logs.user_id', '=', 'users.id')
+            ->get();
+
+        return response()->json($data);
+    }
+
+    public function listByModelMaps(Request $request): JsonResponse
+    {
+        $actionTypes = LogActionTypesEnum::labels();
+
+        $fieldPrompts = FieldPrompt::query()
+            ->select([
+                'field',
+                'type',
+                'name'
+            ])
+            ->where('type', strtolower($request->input('model')))
+            ->get()
+            ->pluck('name', 'field')
+            ->toArray();
+
+        $fieldPrompts['deleted_id'] = 'ID удалившего пользователя';
+        $fieldPrompts['deleted_at'] = 'Дата и время удаления';
+
+        return response()->json([
+            'actionTypes' => $actionTypes,
+            'fieldPrompts' => $fieldPrompts
+        ]);
     }
 }

@@ -20,6 +20,7 @@
 @endsection
 
 @section('content')
+    @include('modals.model-log-modal')
     @include('modals.driver-import-modal')
     @include('modals.car-import-modal')
     @if($errors->any())
@@ -254,12 +255,6 @@
         </div>
     @endif
     @php
-        // DDates
-        // Req
-        // DDates
-        // DDates
-        // DDates
-        //dd($model);
         $permissionToCreate = (
             user()->access('drivers_create') && $model == 'Driver'
             || user()->access('cars_create') && $model == 'Car'
@@ -340,11 +335,17 @@
             || user()->access('cars_export') && $model == 'Car'
         );
 
-        //$permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
+        $permissionToLogsView = (
+            user()->access('drivers_logs_read') && $model == 'Driver'
+            || user()->access('cars_logs_read') && $model == 'Car'
+            || user()->access('company_logs_read') && $model == 'Company'
+            || user()->access('service_logs_read') && $model == 'Product'
+            || user()->access('service_logs_read') && $model == 'Service'
+        );
 
-$permissionToViewContract = user()->access('contract_read');
+        $permissionToViewContract = user()->access('contract_read');
         $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
-//dd($permissionToTrashView);
+
         $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
         $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
     @endphp
@@ -360,8 +361,6 @@ $permissionToViewContract = user()->access('contract_read');
                         </button>
                     </div>
                 @endif
-
-
 
                 @if($permissionToView)
                     @if(!(count($elements) >= $max) || !$max)
@@ -520,10 +519,16 @@ $permissionToViewContract = user()->access('contract_read');
                             </th>
                         @endforeach
 
+                        @if($permissionToLogsView)
+                            {{--Логи--}}
+                            <th width="60">#</th>
+                        @endif
+
                         @if($permissionToDelete)
                             {{--УДАЛЕНИЕ--}}
                             <th width="60">#</th>
                         @endif
+
                         @if(request()->get('deleted'))
                             <th width="60">Удаливший</th>
                             <th width="60">Время удаления</th>
@@ -705,6 +710,19 @@ $permissionToViewContract = user()->access('contract_read');
                                 </td>
                             @endforeach
 
+                            @if($permissionToLogsView)
+                                {{--ЛОГИ--}}
+                                <td class="td-option">
+                                    <button type="button"
+                                            data-model-id="{{ $el->id }}"
+                                            data-toggle="modal"
+                                            data-target="#model-log-modal"
+                                            class="btn btn-sm btn-secondary">
+                                        <i class="fa fa-book"></i>
+                                    </button>
+                                </td>
+                            @endif
+
                             @if($permissionToDelete)
                                 {{--УДАЛЕНИЕ--}}
                                 <td class="td-option">
@@ -758,14 +776,27 @@ $permissionToViewContract = user()->access('contract_read');
         </div>
     @endif
 
-    @if(count($elements) <= 0)
-        @section('custom-scripts')
-            <script>
-                setTimeout(function () {
-                    $('[data-toggle-show*="-filters"]').trigger('click')
-                }, 500)
-            </script>
-        @endsection
-    @endif
+    @push('setup-scripts')
+        <script>
+            window.PAGE_SETUP.LOGS_MODAL = {
+                tableDataUrl: '{{ route('logs.list-model') }}',
+                mapDataUrl: '{{ route('logs.list-model-map') }}',
+                model: '{{ $model }}',
+            };
+        </script>
+    @endpush
 
+    @section('custom-scripts')
+        <script>
+            @if(count($elements) <= 0)
+            setTimeout(function () {
+                $('[data-toggle-show*="-filters"]').trigger('click')
+            }, 500)
+            @endif
+
+            $('#model-log-modal').on('show.bs.modal', function (event) {
+                window.PAGE_SETUP.LOGS_MODAL.id = $(event.relatedTarget).data('model-id')
+            })
+        </script>
+    @endsection
 @endsection

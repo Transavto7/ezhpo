@@ -11,6 +11,18 @@ use App\Product;
 
 class LogModelTypesEnum
 {
+    public static function fieldPromptsTypeMap(): array
+    {
+        return [
+            Driver::class => 'driver',
+            Company::class => 'company',
+            Car::class => 'car',
+            Contract::class => 'contracts',
+            Service::class => 'product',
+            Product::class => 'product',
+        ];
+    }
+
     public static function labels(): array
     {
         return [

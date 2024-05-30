@@ -24,6 +24,7 @@ class ContractController extends Controller
             'read' => user()->access('contract_read'),
             'delete' => user()->access('contract_delete'),
             'edit' => user()->access('contract_edit'),
+            'logs_read' => user()->access('contract_logs_read'),
         ];
 
         $fields = FieldPrompt::where('type', 'contracts')->get();
