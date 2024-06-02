@@ -155,7 +155,7 @@ class ContractController extends Controller
         }
 
         $contracts = $contracts->paginate(
-            500,
+            $request->input('perPage', 500),
             ['*'],
             'page',
             $filters['currentPage']
