@@ -13,7 +13,7 @@ export default {
         }
     },
     methods: {
-        async reload() {
+        async reload(modelId) {
             try {
                 this.items = []
                 if (this.maps === null) {
@@ -25,7 +25,7 @@ export default {
                 }
 
                 const {data} = await axios.post(this.pageSetup.tableDataUrl, {
-                    id: window.PAGE_SETUP.LOGS_MODAL.id,
+                    id: modelId,
                     model: this.pageSetup.model
                 })
 
@@ -49,22 +49,24 @@ export default {
             }
         },
     },
+    mounted() {
+        document.addEventListener("loadLogsModalData", (e) => {
+            this.reload(e.detail.modelId);
+        });
+    }
 }
 </script>
 
 <template>
     <div>
         <div class="col-md-12">
-            <div class="card mt-3 mb-0">
+            <div class="card my-3">
                 <div class="card-body">
                     <logs-modal-table
                         :items="items"
                     />
                 </div>
             </div>
-        </div>
-        <div class="col-md-12">
-            <button class="btn btn-success my-2" @click="reload">Обновить</button>
         </div>
     </div>
 </template>

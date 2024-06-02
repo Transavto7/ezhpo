@@ -795,7 +795,14 @@
             @endif
 
             $('#model-log-modal').on('show.bs.modal', function (event) {
-                window.PAGE_SETUP.LOGS_MODAL.id = $(event.relatedTarget).data('model-id')
+                document.dispatchEvent(new CustomEvent(
+                    "loadLogsModalData",
+                    {
+                        detail: {
+                            modelId: $(event.relatedTarget).data('model-id'),
+                        }
+                    }
+                ))
             })
         </script>
     @endsection
