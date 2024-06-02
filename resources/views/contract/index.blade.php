@@ -9,3 +9,13 @@
     >
     </contract-index>
 @endsection
+
+@push('setup-scripts')
+    <script>
+        window.PAGE_SETUP.LOGS_MODAL = {
+            tableDataUrl: '{{ route('logs.list-model') }}',
+            mapDataUrl: '{{ route('logs.list-model-map') }}',
+            model: '{{ 'contracts' }}',
+        };
+    </script>
+@endpush

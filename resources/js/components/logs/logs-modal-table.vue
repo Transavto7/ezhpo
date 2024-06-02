@@ -45,5 +45,7 @@ export default {
 </template>
 
 <style scoped>
-
+.table-responsive {
+    max-height: 50vh !important;
+}
 </style>

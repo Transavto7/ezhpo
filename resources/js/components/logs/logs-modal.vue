@@ -13,7 +13,7 @@ export default {
         }
     },
     methods: {
-        async reload(modelId) {
+        async loadData(modelId) {
             try {
                 this.items = []
                 if (this.maps === null) {
@@ -50,8 +50,9 @@ export default {
         },
     },
     mounted() {
+        //TODO: нужно удалять перед уничтожением
         document.addEventListener("loadLogsModalData", (e) => {
-            this.reload(e.detail.modelId);
+            this.loadData(e.detail.modelId);
         });
     }
 }
