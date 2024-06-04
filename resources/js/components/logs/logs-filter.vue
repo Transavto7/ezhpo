@@ -80,7 +80,7 @@ export default {
             </div>
 
             <div class="col-12 col-lg-6 col-xl-3">
-                <label class="mb-1">Id</label>
+                <label class="mb-1">ID модели</label>
                 <b-form-input
                     :value="filter.id"
                     size="sm"
@@ -89,6 +89,18 @@ export default {
                 />
             </div>
 
+            <div class="col-12 col-lg-6 col-xl-3">
+                <label class="mb-1">UUID</label>
+                <b-form-input
+                    :value="filter.uuid"
+                    size="sm"
+                    placeholder="Введите значение"
+                    @input="(value) => handleFilterUpdate('uuid', value)"
+                />
+            </div>
+        </div>
+
+        <div class="row mt-2">
             <div class="col-12 col-lg-6 col-xl-3">
                 <label class="mb-1">Действия</label>
                 <multiselect
@@ -107,9 +119,7 @@ export default {
                     <span slot="noOptions">Список пуст</span>
                 </multiselect>
             </div>
-        </div>
 
-        <div class="row mt-2">
             <div class="col-12 col-lg-6 col-xl-3">
                 <label class="mb-1">Дата с</label>
                 <b-form-datepicker

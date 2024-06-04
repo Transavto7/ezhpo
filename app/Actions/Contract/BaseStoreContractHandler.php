@@ -10,6 +10,7 @@ use App\Models\Contract;
 use App\Models\Service;
 use Carbon\Carbon;
 use Exception;
+use Ramsey\Uuid\Uuid;
 
 class BaseStoreContractHandler
 {
@@ -56,17 +57,19 @@ class BaseStoreContractHandler
             ];
         }
 
+        $syncEventUuid = Uuid::uuid4();
+
         $changes = $contract->services()->sync($servicesToSync);
-        event(new Attached($contract, $changes['attached'], Service::class));
-        event(new Detached($contract, $changes['detached'], Service::class));
+        event(new Attached($contract, $changes['attached'], Service::class, $syncEventUuid));
+        event(new Detached($contract, $changes['detached'], Service::class, $syncEventUuid));
 
         $changes = $contract->cars()->sync($data['cars'] ?? []);
-        event(new Attached($contract, $changes['attached'], Car::class));
-        event(new Detached($contract, $changes['detached'], Car::class));
+        event(new Attached($contract, $changes['attached'], Car::class, $syncEventUuid));
+        event(new Detached($contract, $changes['detached'], Car::class, $syncEventUuid));
 
         $changes = $contract->drivers()->sync($data['drivers'] ?? []);
-        event(new Attached($contract, $changes['attached'], Driver::class));
-        event(new Detached($contract, $changes['detached'], Driver::class));
+        event(new Attached($contract, $changes['attached'], Driver::class, $syncEventUuid));
+        event(new Detached($contract, $changes['detached'], Driver::class, $syncEventUuid));
 
         $contract->save();
 

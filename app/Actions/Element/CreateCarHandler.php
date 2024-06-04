@@ -5,7 +5,6 @@ namespace App\Actions\Element;
 use App\Car;
 use App\Company;
 use App\Events\Relations\Attached;
-use App\Events\Relations\Detached;
 use App\Models\Contract;
 use Exception;
 

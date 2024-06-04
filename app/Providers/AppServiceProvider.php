@@ -10,6 +10,8 @@ use App\Observers\CompanyObserver;
 use App\Observers\ContractObserver;
 use App\Observers\DriverObserver;
 use App\Observers\CarObserver;
+use App\Services\ElementsSearch\ElementSearchService;
+use App\Services\ElementsSearch\ElementsSearchServiceInterface;
 use App\Services\HashIdGenerator\HashIdGeneratorService;
 use App\Settings;
 use App\User;
@@ -30,6 +32,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('hash-id-generator', function () {
             return new HashIdGeneratorService();
         });
+
+        $this->app->bind(ElementsSearchServiceInterface::class, ElementSearchService::class);
     }
 
     /**

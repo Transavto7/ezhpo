@@ -5,6 +5,7 @@ namespace App;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Ramsey\Uuid\Uuid;
 
 class Log extends Model
 {
@@ -17,8 +18,18 @@ class Log extends Model
         'data',
         'type',
         'model_id',
-        'model_type'
+        'model_type',
+        'uuid'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->uuid = $model->uuid ?? Uuid::uuid4();
+        });
+    }
 
     public function model(): MorphTo
     {
@@ -50,6 +61,13 @@ class Log extends Model
     {
         return $query->when($value, function ($subQuery) use ($value) {
             return $subQuery->where('logs.model_id', 'like', "%$value%");
+        });
+    }
+
+    public function scopeUuid($query, $value)
+    {
+        return $query->when($value, function ($subQuery) use ($value) {
+            return $subQuery->where('logs.uuid', 'like', "%$value%");
         });
     }
 

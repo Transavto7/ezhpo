@@ -23,6 +23,7 @@ export default {
     data() {
         return {
             fields: [
+                {key: 'uuid', label: 'UUID', class: 'text-left'},
                 {key: 'user', label: 'Пользователь', class: 'text-left'},
                 {key: 'created_at', label: 'Дата, время', class: 'text-left'},
                 {key: 'type', label: 'Действие', class: 'text-left'},
@@ -68,6 +69,15 @@ export default {
             responsive
             bordered
         >
+            <template #cell(uuid)="{ item }">
+                <span id="uuid">
+                    {{ item.uuid ? item.uuid.substring(0, 7) : null }}
+                </span>
+                <b-tooltip target="uuid" placement="bottom">
+                    {{ item.uuid }}
+                </b-tooltip>
+            </template>
+
             <template #cell(data)="{ item }">
                 <div v-for="(changeItem, index) of item.data" :key="index" class="p-1 mb-1" style="line-height: 19px">
                     <div>
@@ -90,5 +100,8 @@ export default {
 </template>
 
 <style scoped>
-
+.table-responsive {
+    max-height: 80vh !important;
+    overscroll-behavior: none !important;
+}
 </style>

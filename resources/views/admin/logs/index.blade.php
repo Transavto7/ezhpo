@@ -20,6 +20,10 @@
         window.PAGE_SETUP.fieldPromptsMap = @json($fieldPromptsMap);
 
         window.PAGE_SETUP.tableDataUrl = '/admin/logs/list';
+
+        window.PAGE_SETUP.MODEL_SEARCHER = {
+            tableDataUrl: '/elements/search'
+        }
     </script>
 @endpush
 

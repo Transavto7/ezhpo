@@ -222,7 +222,7 @@ class User extends Authenticatable
             ->isNotEmpty();
     }
 
-    public static function getUserCompanyId($field = 'id', $withUserCompanyId = false)
+    public static function getUserCompanyId(): int
     {
         /** @var User $authUser */
         $authUser = auth()->user();
@@ -236,17 +236,7 @@ class User extends Authenticatable
                 return -1;
             }
 
-            return $company->$field;
-        }
-
-        if ($withUserCompanyId && $authUser->company_id !== null) {
-            $company = Company::find($authUser->company_id);
-
-            if (! $company) {
-                return -1;
-            }
-
-            return $company->$field;
+            return $company->id;
         }
 
         return -1;

@@ -137,7 +137,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('elements')->group(function () {
             Route::get('/export/{type}', 'Elements\ExportElementController')->name('exportElement');
             Route::post('/import', 'Elements\ImportElementController')->name('importElement');
-
+            Route::post('/search', 'Elements\SearchElementsController')->name('searchElement');
             Route::get('{type}', 'IndexController@RenderElements')->name('renderElements');
             Route::get('{type}/{id}', 'IndexController@RemoveElement')->name('removeElement');
             Route::post('{type}', 'IndexController@AddElement')->name('addElement');

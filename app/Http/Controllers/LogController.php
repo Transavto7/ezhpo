@@ -79,6 +79,7 @@ class LogController extends Controller
             ->dateTo($request->input('filter.date_end'))
             ->modelTypes($request->input('filter.models'))
             ->modelId($request->input('filter.id'))
+            ->uuid($request->input('filter.uuid'))
             ->userIds($request->input('filter.users'))
             ->actionTypes($request->input('filter.actions'))
             ->leftJoin('users', 'logs.user_id', '=', 'users.id')

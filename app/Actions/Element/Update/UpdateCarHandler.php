@@ -7,6 +7,7 @@ use App\Events\Relations\Attached;
 use App\Events\Relations\Detached;
 use App\Models\Contract;
 use Exception;
+use Ramsey\Uuid\Uuid;
 
 class UpdateCarHandler extends UpdateElementHandler
 {
@@ -28,11 +29,13 @@ class UpdateCarHandler extends UpdateElementHandler
 
     protected function attachContracts()
     {
+        $syncEventUuid = Uuid::uuid4();
+
         $changes = $this->element
             ->contracts()
             ->sync($this->data['contract_ids'] ?? []);
-        event(new Attached($this->element, $changes['attached'], Contract::class));
-        event(new Detached($this->element, $changes['detached'], Contract::class));
+        event(new Attached($this->element, $changes['attached'], Contract::class), $syncEventUuid);
+        event(new Detached($this->element, $changes['detached'], Contract::class), $syncEventUuid);
 
         /** @var Contract $contract */
         $contract = Contract::query()
@@ -45,7 +48,7 @@ class UpdateCarHandler extends UpdateElementHandler
         }
 
         $changes = $contract->cars()->syncWithoutDetaching($this->element->id);
-        event(new Attached($contract, $changes['attached'], Car::class));
+        event(new Attached($contract, $changes['attached'], Car::class), $syncEventUuid);
 
         $contract->save();
     }

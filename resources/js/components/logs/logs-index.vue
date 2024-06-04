@@ -2,10 +2,11 @@
 import LogsFilter from "./logs-filter.vue";
 import LogsTable from "./logs-table.vue";
 import swal from "sweetalert2";
+import ModelSearcher from "../searcher/model-searcher";
 
 export default {
     name: "logs-index",
-    components: {LogsTable, LogsFilter},
+    components: {ModelSearcher, LogsTable, LogsFilter},
     data() {
         return {
             pageSetup: window.PAGE_SETUP,
@@ -13,6 +14,7 @@ export default {
                 users: [],
                 models: [],
                 id: null,
+                uuid: null,
                 actions: [],
                 date_start: null,
                 date_end: null,
@@ -31,6 +33,7 @@ export default {
                     page: this.page,
                     filter: {
                         id: this.filter.id ? this.filter.id : null,
+                        uuid: this.filter.uuid ? this.filter.uuid : null,
                         date_start: this.filter.date_start ? this.filter.date_start : null,
                         date_end: this.filter.date_end ? this.filter.date_end : null,
                         users: this.filter.users.map(item => item.id),
@@ -70,6 +73,7 @@ export default {
                 users: [],
                 models: [],
                 id: null,
+                uuid: null,
                 actions: [],
                 date_start: null,
                 date_end: null,
@@ -82,10 +86,12 @@ export default {
     },
     watch: {
         page() {
+            //TODO: а почему так?
             this.filter = {
                 users: [],
                 models: [],
                 id: null,
+                uuid: null,
                 actions: [],
                 date_start: null,
                 date_end: null,
@@ -124,6 +130,14 @@ export default {
                         :total="total"
                         style="margin-top: 25px"
                     />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <model-searcher/>
                 </div>
             </div>
         </div>
