@@ -7,6 +7,7 @@ use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
 use App\Http\Controllers\SmsController;
+use App\Stamp;
 use App\Traits\UserEdsTrait;
 use App\ValueObjects\Phone;
 use Illuminate\Http\JsonResponse;
@@ -379,7 +380,7 @@ class SdpoController extends Controller
     /*
      * return all medics
      */
-    public function getMedics(Request $request)
+    public function getMedics(): JsonResponse
     {
         $users = User::query()
             ->with([
@@ -387,7 +388,7 @@ class SdpoController extends Controller
                 'pv:id,name,pv_id',
                 'pv.town:id,name'
             ])
-            ->whereHas('roles', function ($q) use ($request) {
+            ->whereHas('roles', function ($q) {
                 $q->where('roles.id', 2);
             })
             ->select([
@@ -405,6 +406,19 @@ class SdpoController extends Controller
             ]);
 
         return response()->json($users);
+    }
+
+    public function getStamps(): JsonResponse
+    {
+        $stamps = Stamp::query()
+            ->select([
+                'id',
+                'company_name as stamp_head',
+                'licence as stamp_licence'
+            ])
+            ->get();
+
+        return response()->json($stamps);
     }
 
     /*
