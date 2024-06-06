@@ -12,6 +12,7 @@
                 type="{{ \App\Enums\ElementType::DRIVER }}"
                 import-url="{{ route('importElement') }}"
             >
+                <p>Изучите <a target="_blank" href="{{ Storage::disk('examples')->url('import_instruction.pdf') }}">инструкцию</a> по импорту данных.</p>
                 <p>Выберите файл соответствующий <a href="{{ Storage::disk('examples')->url('drivers_example.xlsx') }}">шаблону</a> и удовлетворяющий правилам:</p>
                 <ul>
                     <li>A: Инн компании - обязательное поле (7727563778)</li>

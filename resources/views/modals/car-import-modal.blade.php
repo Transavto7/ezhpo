@@ -12,6 +12,7 @@
                 type="{{ \App\Enums\ElementType::CAR }}"
                 import-url="{{ route('importElement') }}"
             >
+                <p>Изучите <a target="_blank" href="{{ Storage::disk('examples')->url('import_instruction.pdf') }}">инструкцию</a> по импорту данных.</p>
                 <p>Выберите файл соответствующий <a href="{{ Storage::disk('examples')->url('cars_example.xlsx') }}">шаблону</a> и удовлетворяющий правилам:</p>
                 <ul>
                     <li>A: Название компании (Пример)</li>
