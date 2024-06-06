@@ -83,6 +83,7 @@ class LogController extends Controller
             ->userIds($request->input('filter.users'))
             ->actionTypes($request->input('filter.actions'))
             ->leftJoin('users', 'logs.user_id', '=', 'users.id')
+            ->orderBy('created_at', 'desc')
             ->paginate(
                 $request->input('limit', 100),
                 ['*'],
