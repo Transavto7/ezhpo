@@ -45,7 +45,8 @@ export default {
                 this.total = data.total
                 this.items = data.data.map((item) => {
                     item.data = (item.data ?? []).map((field) => {
-                        field.name = this.pageSetup.fieldPromptsMap[item.model_type][field.name] ?? field.name
+
+                        field.name = this.pageSetup.fieldPromptsMap[item.model_type]?.[field.name] ?? field.name
 
                         return field
                     })
@@ -88,7 +89,6 @@ export default {
     },
     watch: {
         page() {
-            //TODO: а почему так?
             this.filter = {
                 users: [],
                 models: [],
