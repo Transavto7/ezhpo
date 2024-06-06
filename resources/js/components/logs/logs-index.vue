@@ -56,6 +56,8 @@ export default {
                     return item
                 })
             } catch (e) {
+                console.error(e.message);
+
                 swal.fire({
                     title: 'Ошибка',
                     text: 'Ошибка при загрузке данных',

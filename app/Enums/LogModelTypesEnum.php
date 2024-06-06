@@ -35,8 +35,12 @@ class LogModelTypesEnum
         ];
     }
 
-    public static function label(string $value): string
+    public static function label(string $value = null): string
     {
+        if (empty($value)) {
+            return '';
+        }
+
         return self::labels()[$value] ?? $value;
     }
 }

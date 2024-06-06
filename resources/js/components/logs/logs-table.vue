@@ -92,7 +92,7 @@ export default {
 
         <b-pagination
             :value="page"
-            :total-rows="items.length"
+            :total-rows="total"
             :per-page="limit"
             @input="handleChangePage"
         ></b-pagination>
