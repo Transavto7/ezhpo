@@ -416,7 +416,8 @@ class SdpoController extends Controller
                 'company_name as stamp_head',
                 'licence as stamp_licence'
             ])
-            ->get();
+            ->get()
+            ->groupBy('id');
 
         return response()->json($stamps);
     }
