@@ -8,6 +8,7 @@ use App\Driver;
 use App\Models\Contract;
 use App\Models\Service;
 use App\Product;
+use App\User;
 
 class LogModelTypesEnum
 {
@@ -20,6 +21,7 @@ class LogModelTypesEnum
             Contract::class => 'contracts',
             Service::class => 'product',
             Product::class => 'product',
+            User::class => 'users'
         ];
     }
 
@@ -31,7 +33,8 @@ class LogModelTypesEnum
             Car::class => 'ТС',
             Contract::class => 'Договора',
             Service::class => 'Услуги',
-            Product::class => 'Услуги'
+            Product::class => 'Услуги',
+            User::class => 'Пользователи'
         ];
     }
 

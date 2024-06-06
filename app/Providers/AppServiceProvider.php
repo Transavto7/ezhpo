@@ -10,6 +10,7 @@ use App\Observers\CompanyObserver;
 use App\Observers\ContractObserver;
 use App\Observers\DriverObserver;
 use App\Observers\CarObserver;
+use App\Observers\UserObserver;
 use App\Services\ElementsSearch\ElementSearchService;
 use App\Services\ElementsSearch\ElementsSearchServiceInterface;
 use App\Services\HashIdGenerator\HashIdGeneratorService;
@@ -166,5 +167,6 @@ class AppServiceProvider extends ServiceProvider
         Company::observe(CompanyObserver::class);
         Contract::observe(ContractObserver::class);
         Driver::observe(DriverObserver::class);
+        User::observe(UserObserver::class);
     }
 }
