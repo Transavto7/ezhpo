@@ -3,8 +3,12 @@
 namespace App\Actions\Element\Update;
 
 use App\Company;
+use App\Events\Relations\Attached;
+use App\Events\Relations\Detached;
+use App\Models\Contract;
 use Exception;
 use Illuminate\Support\Facades\Storage;
+use Ramsey\Uuid\Uuid;
 
 class UpdateElementHandler implements UpdateElementHandlerInterface
 {
@@ -199,5 +203,32 @@ class UpdateElementHandler implements UpdateElementHandlerInterface
                 $this->element->$fSync = $company->$fSync;
             }
         }
+    }
+
+    protected function attachContracts()
+    {
+        //TODO: добавить проверку, что такое отношение существует
+        $syncEventUuid = Uuid::uuid4();
+
+        $changes = $this->element
+            ->contracts()
+            ->sync($this->data['contract_ids'] ?? []);
+        event(new Attached($this->element, $changes['attached'], Contract::class), $syncEventUuid);
+        event(new Detached($this->element, $changes['detached'], Contract::class), $syncEventUuid);
+
+        /** @var Contract $contract */
+        $contract = Contract::query()
+            ->where('company_id', $this->data['company_id'])
+            ->where('main_for_company', 1)
+            ->first();
+
+        if (!$contract) {
+            return;
+        }
+
+        $changes = $contract->cars()->syncWithoutDetaching($this->element->id);
+        event(new Attached($contract, $changes['attached'], get_class($this->element)), $syncEventUuid);
+
+        $contract->save();
     }
 }
