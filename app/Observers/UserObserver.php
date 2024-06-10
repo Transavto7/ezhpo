@@ -35,6 +35,10 @@ class UserObserver
      */
     public function updating(User $user)
     {
+        $skipAttributeChanges = [
+            'last_connection_at'
+        ];
+
         $hideAttributeChanges = [
             'password'
         ];
@@ -42,6 +46,10 @@ class UserObserver
         $logData = [];
 
         foreach ($user->getDirty() as $attribute => $newValue) {
+            if (in_array($attribute, $skipAttributeChanges)) {
+                continue;
+            }
+
             $data = [
                 'name' => $attribute,
                 'oldValue' => $user->getOriginal($attribute),
