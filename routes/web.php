@@ -180,13 +180,6 @@ Route::middleware(['auth'])->group(function () {
      * Панель администратора
      */
     Route::prefix('admin')->group(function () {
-        Route::prefix('users')->group(function () {
-            Route::get('/', 'AdminController@ShowUsers')->name('adminUsers');
-            Route::post('/', 'AdminController@CreateUser')->name('adminCreateUser');
-            Route::get('{id}', 'AdminController@DeleteUser')->name('adminDeleteUser');
-            Route::post('{id}', 'AdminController@UpdateUser')->name('adminUpdateUser');
-        });
-
         Route::prefix('settings')->as('settings.')->group(function () {
             Route::get('/', 'SettingsController@index')->name('index');
             Route::post('/', 'SettingsController@update')->name('update');
