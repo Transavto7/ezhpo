@@ -190,7 +190,7 @@ class TerminalController extends Controller
             'permission_to_create' => $user->access('employee_create'),
             'permission_to_delete' => $user->access('employee_delete'),
             'permission_to_trash' => $user->access('employee_trash'),
-            'permission_to_read_logs' => user()->access('employee_logs_read')
+            'permission_to_logs_read' => user()->access('employee_logs_read')
         ];
 
         $fields = FieldPrompt::query()
