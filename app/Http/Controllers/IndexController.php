@@ -14,9 +14,6 @@ use App\Imports\CarImport;
 use App\Imports\CompanyImport;
 use App\Imports\DriverImport;
 use App\Point;
-use App\Services\HashIdGenerator\DefaultHashIdValidators;
-use App\Services\HashIdGenerator\HashedType;
-use App\Services\HashIdGenerator\HashIdGenerator;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -256,11 +253,6 @@ class IndexController extends Controller
         $model = app("App\\$model");
 
         if ($model) {
-//            if($model instanceof Company){
-//                Car::where('company_id', $model->id)->update(['contract_id' => null]);
-//                Driver::where('company_id', $model->id)->update(['contract_id' => null]);
-//            }
-
             if ($request->get('undo')) {
                 $model::withTrashed()->find($id)->restore();
 
