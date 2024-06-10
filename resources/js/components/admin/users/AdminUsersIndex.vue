@@ -52,10 +52,11 @@
                         </template>
 
                         <template #cell(pv)="row">
-                             {{ row.value.name }}
+                            {{ row.value.name }}
                         </template>
                         <template #cell(photo)="row">
-                            <img v-if="row.value" style="width: 100px; height: 100px" :src="'/storage/' + row.value" alt="">
+                            <img v-if="row.value" style="width: 100px; height: 100px" :src="'/storage/' + row.value"
+                                 alt="">
                             <img v-else style="width: 100px; height: 100px" :src="'/img/default_profile.jpg'" alt="">
                         </template>
                         <template #cell(company)="row">
@@ -73,25 +74,36 @@
                                 </h5>
                             </template>
                         </template>
-
-                        <template #cell(delete_btn)="row">
-                            <b-button
-                                v-if="!deleted"
-                                :disabled="!current_user_permissions.permission_to_delete"
-                                variant="danger"
-                                size="sm"
-                                @click="deleteUser(row.item.id)">
-                                <b-icon icon="trash-fill" aria-hidden="true"></b-icon>
-                            </b-button>
-                        </template>
-                        <template #cell(return_trash)="row">
-                            <b-button
-                                :disabled="!current_user_permissions.permission_to_trash"
-                                variant="warning"
-                                size="sm"
-                                @click="returnTrash(row.item.id)">
-                                <i class="fa fa-undo"></i>
-                            </b-button>
+                        <template #cell(buttons)="row">
+                            <div class="d-flex">
+                                <b-button
+                                    v-if="current_user_permissions.permission_to_logs_read"
+                                    size="sm"
+                                    variant="primary"
+                                    @click="logsRead(row.item.id)"
+                                    title="Журнал действий"
+                                >
+                                    <i class="fa fa-book"></i>
+                                </b-button>
+                                <b-button
+                                    v-if="!deleted"
+                                    :disabled="!current_user_permissions.permission_to_delete"
+                                    variant="danger"
+                                    size="sm"
+                                    class="ml-1"
+                                    @click="deleteUser(row.item.id)">
+                                    <i class="fa fa-trash"></i>
+                                </b-button>
+                                <b-button
+                                    v-if="deleted"
+                                    :disabled="!current_user_permissions.permission_to_trash"
+                                    variant="warning"
+                                    size="sm"
+                                    class="ml-1"
+                                    @click="returnTrash(row.item.id)">
+                                    <i class="fa fa-undo"></i>
+                                </b-button>
+                            </div>
                         </template>
                     </b-table>
                 </div>
@@ -190,7 +202,8 @@
                         <label>Срок действия ЭЦП:</label>
                     </b-col>
                     <b-col lg="5" class="d-flex align-items-baseline" style="gap: 5px">
-                        с <input v-model="infoModalUser.validity_eds_start" type="date" name="date" class="form-control">
+                        с <input v-model="infoModalUser.validity_eds_start" type="date" name="date"
+                                 class="form-control">
                         по
                         <input v-model="infoModalUser.validity_eds_end" type="date" name="date" class="form-control">
                     </b-col>
@@ -211,7 +224,7 @@
                         <label>Пункт выпуска:</label>
                     </b-col>
                     <b-col lg="5">
-                        <b-form-select v-model="infoModalUser.pv" :options="optionsPvs" />
+                        <b-form-select v-model="infoModalUser.pv" :options="optionsPvs"/>
                     </b-col>
                 </b-row>
                 <b-row class="my-1">
@@ -259,7 +272,7 @@
                                 У каждого пользователя есть набор прав и ролей
                             </div>
                             <div class="col-lg-5 mx-0 px-0 mb-3">
-                                <b-form-input v-model="searchPermissions" placeholder="Поиск прав" />
+                                <b-form-input v-model="searchPermissions" placeholder="Поиск прав"/>
                             </div>
                             <b-card>
                                 <b-form-group label="Доступы:" v-slot="{ ariaDescribedby }">
@@ -307,6 +320,16 @@
                 </b-row>
             </b-modal>
         </div>
+
+        <b-modal
+            v-model="logsModalShow"
+            :title="'Журнал действий'"
+            :static="true"
+            size="lg"
+            hide-footer>
+            <logs-modal ref="logsModal">
+            </logs-modal>
+        </b-modal>
     </div>
 </template>
 
@@ -315,6 +338,7 @@ import vSelect from "vue-select";
 import 'vue-select/dist/vue-select.css';
 import Swal2 from "sweetalert2";
 import UserPvsList from "./components/UserPvsList";
+import LogsModal from "../../logs/logs-modal";
 
 export default {
     name: "AdminUsersIndex",
@@ -328,7 +352,7 @@ export default {
         'options_company',
         'fields'
     ],
-    components: {UserPvsList, Swal2, vSelect },
+    components: {UserPvsList, Swal2, vSelect, LogsModal},
 
     data() {
         return {
@@ -366,10 +390,15 @@ export default {
             columns: [],
             items: [],
             loading: false,
+            logsModalShow: false,
         }
     },
 
     methods: {
+        logsRead(modelId) {
+            this.logsModalShow = true
+            this.$refs.logsModal.loadData(modelId)
+        },
         handlePvsSelect(data) {
             this.infoModalUser.pvs = data
         },
@@ -384,7 +413,7 @@ export default {
                     this.optionsCompany = response.data;
                 })
                 .catch(() => {
-                    Swal.fire({ title: "Неизвестная ошибка", icon:  "error" });
+                    Swal.fire({title: "Неизвестная ошибка", icon: "error"});
                 });
         },
         sortChanged(e) {
@@ -521,7 +550,7 @@ export default {
                     roles: this.infoModalUser_roles.map((item) => {
                         return item.id;
                     }),
-                    blocked:  this.infoModalUser.blocked,
+                    blocked: this.infoModalUser.blocked,
                     validity_eds_start: this.infoModalUser.validity_eds_start,
                     validity_eds_end: this.infoModalUser.validity_eds_end,
                     permissions: this.infoModalUser.permissions.filter((item) => {
@@ -538,8 +567,6 @@ export default {
                 if (this.infoModalUser.id) {
                     this.items = this.items.map((item) => {
                         if (item.id == data.user_info.id) {
-                            console.log(data.user_info)
-
                             return data.user_info
                         }
 
@@ -641,11 +668,11 @@ export default {
         });
         this.allPermissions = this.all_permissions;
 
-        this.fields.forEach(field =>{
+        this.fields.forEach(field => {
             this.columns.push({
                 'key': field.field,
                 'label': field.name,
-                'sortable': true, // field.field !== 'roles'
+                'sortable': true,
                 'thAttr': {
                     'data-toggle': 'tooltip',
                     'data-html': true,
@@ -655,25 +682,27 @@ export default {
                 }
             });
         });
-        this.columns.push({ key: 'delete_btn', label: '#', class: 'text-right' });
+
+        this.columns.push({key: 'buttons', label: '#', class: 'text-right'});
 
         if (this.deleted) {
-            this.columns.push({
-                key:   'deleted_user.name',
-                label: 'Имя удалившего',
-            }, {
-                key:   'deleted_at',
-                label: 'Время удаления',
-            }, {
-                key:   'return_trash',
-                label: '#',
-            })
+            const columns = [
+                {
+                    key: 'deleted_user.name',
+                    label: 'Имя удалившего',
+                }, {
+                    key: 'deleted_at',
+                    label: 'Время удаления',
+                }
+            ]
+
+            this.columns.push(...columns)
         }
     },
 
     watch: {
-        searchPermissions(val){
-            if(val === ''){
+        searchPermissions(val) {
+            if (val === '') {
                 this.allPermissions = this.all_permissions
                 return;
             }
@@ -687,10 +716,10 @@ export default {
                 this.resetModal()
             }
         },
-        infoModalUser_roles(val) {
+        infoModalUser_roles() {
             this.fetchRoleData(this.infoModalUser_roles)
         },
-        currentPage(){
+        currentPage() {
             this.loadData();
         }
     },

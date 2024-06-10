@@ -5,14 +5,15 @@ namespace App\Http\Controllers;
 use App\Company;
 use App\FieldPrompt;
 use App\GenerateHashIdTrait;
+use App\Town;
 use App\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -51,7 +52,7 @@ class UserController extends Controller
             $users->where('email', 'like', "%$email%");
         }
 
-        if ($pv_id = $request->get('pv_id')) {
+        if ($pv_id = $request->get('point_id')) {
             $users->where('pv_id', $pv_id);
         }
 
@@ -88,10 +89,77 @@ class UserController extends Controller
 
         $fields = FieldPrompt::where('type', 'users')->get();
 
-        return view('admin.users_v2.index')
+        $points = Town::query()
+            ->with(['pvs'])
+            ->orderBy('towns.name')
+            ->get();
+
+        $pointsToTable = $points->map(function ($model) {
+            $option['label'] = $model->name;
+
+            foreach ($model->pvs as $pv){
+                $option['options'][] = [
+                    'value' => $pv['id'],
+                    'text' => $pv['name']
+                ];
+            }
+
+            return $option;
+        });
+
+        $points = $points
+            ->reduce(function ($models, $model) {
+                foreach ($model->pvs as $point) {
+                    $models[] = [
+                        'id' => $point->id,
+                        'text' => sprintf(
+                            '[%s] %s - %s',
+                            $point->hash_id,
+                            $model->name,
+                            $point->name
+                        )
+                    ];
+                }
+
+                return $models;
+            }, []);
+
+        $roles = Role::query()->get();
+
+        $rolesToFilter = $roles
+            ->where('name', '!=', 'driver')
+            ->map(function ($model) {
+                return [
+                    'id' => $model->id,
+                    'text' => sprintf('[%s] %s', $model->id, $model->guard_name)
+                ];
+            })
+            ->toArray();
+
+        $allPermissions = Permission::orderBy('guard_name')->get();
+
+        $currentUserPermissions = [
+            'permission_to_edit' => user()->access('employee_update'),
+            'permission_to_view' => user()->access('employee_read'),
+            'permission_to_create' => user()->access('employee_create'),
+            'permission_to_delete' => user()->access('employee_delete'),
+            'permission_to_trash' => user()->access('employee_trash'),
+            'permission_to_logs_read' => user()->access('employee_logs_read')
+        ];
+
+        return view('admin.users.index')
             ->with([
                 'users' => $users->paginate(),
-                'fields' => $fields
+                'fields' => $fields,
+
+                'all_permissions' => $allPermissions,
+                'current_user_permissions' => $currentUserPermissions,
+
+                'roles' => $roles,
+                'roles_to_filter' => $rolesToFilter,
+
+                'points' => $points,
+                'points_to_table' => $pointsToTable
             ]);
     }
 
@@ -250,31 +318,6 @@ class UserController extends Controller
             'status' => true,
             'user_info' => $user,
         ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param int $id
-     *
-     * @return Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     *
-     * @return Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
     }
 
     /**

@@ -1,10 +1,11 @@
 <script>
 import LogsModalTable from "./logs-modal-table.vue";
+import ModelSearcher from "../searcher/model-searcher";
 import swal from "sweetalert2";
 
 export default {
     name: "logs-modal",
-    components: {LogsModalTable},
+    components: {ModelSearcher, LogsModalTable},
     data() {
         return {
             pageSetup: window.PAGE_SETUP.LOGS_MODAL,
@@ -16,6 +17,7 @@ export default {
         async loadData(modelId) {
             try {
                 this.items = []
+
                 if (this.maps === null) {
                     const {data} = await axios.post(this.pageSetup.mapDataUrl, {
                         model: this.pageSetup.model
@@ -50,25 +52,28 @@ export default {
         },
     },
     mounted() {
-        //TODO: нужно удалять перед уничтожением
         document.addEventListener("loadLogsModalData", (e) => {
+            this.$refs.modelSearcher.reset()
             this.loadData(e.detail.modelId);
         });
+    },
+    computed: {
+        searchAvailable: function () {
+            return this.items.length > 0
+        }
     }
 }
 </script>
 
 <template>
-    <div>
-        <div class="col-md-12">
-            <div class="card my-3">
-                <div class="card-body">
-                    <logs-modal-table
-                        :items="items"
-                    />
-                </div>
-            </div>
-        </div>
+    <div class="col-md-12 mt-2">
+        <logs-modal-table
+            :items="items"
+        />
+        <model-searcher
+            v-show="searchAvailable"
+            ref="modelSearcher"
+        />
     </div>
 </template>
 

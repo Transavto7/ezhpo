@@ -778,10 +778,15 @@
 
     @push('setup-scripts')
         <script>
-            window.PAGE_SETUP.LOGS_MODAL = {
-                tableDataUrl: '{{ route('logs.list-model') }}',
-                mapDataUrl: '{{ route('logs.list-model-map') }}',
-                model: '{{ $model }}',
+            window.PAGE_SETUP = {
+                LOGS_MODAL: {
+                    tableDataUrl: '{{ route('logs.list-model') }}',
+                    mapDataUrl: '{{ route('logs.list-model-map') }}',
+                    model: '{{ $model }}',
+                },
+                MODEL_SEARCHER: {
+                    tableDataUrl: '{{ route('searchElement') }}',
+                }
             };
         </script>
     @endpush

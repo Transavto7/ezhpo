@@ -91,24 +91,36 @@
                             {{ row.value === '1' ? 'Да' : 'Нет' }}
                         </template>
 
-                        <template #cell(delete_btn)="row">
-                            <b-button
-                                v-if="!deleted"
-                                :disabled="!current_user_permissions.permission_to_delete"
-                                variant="danger"
-                                size="sm"
-                                @click="deleteUser(row.item.id)">
-                                <b-icon icon="trash-fill" aria-hidden="true"></b-icon>
-                            </b-button>
-                        </template>
-                        <template #cell(return_trash)="row">
-                            <b-button
-                                :disabled="!current_user_permissions.permission_to_trash"
-                                variant="warning"
-                                size="sm"
-                                @click="returnTrash(row.item.id)">
-                                <i class="fa fa-undo"></i>
-                            </b-button>
+                        <template #cell(buttons)="row">
+                            <div class="d-flex">
+                                <b-button
+                                    v-if="current_user_permissions.permission_to_logs_read"
+                                    size="sm"
+                                    variant="primary"
+                                    @click="logsRead(row.item.id)"
+                                    title="Журнал действий"
+                                >
+                                    <i class="fa fa-book"></i>
+                                </b-button>
+                                <b-button
+                                    v-if="!deleted"
+                                    :disabled="!current_user_permissions.permission_to_delete"
+                                    variant="danger"
+                                    size="sm"
+                                    class="ml-1"
+                                    @click="deleteUser(row.item.id)">
+                                    <i class="fa fa-trash"></i>
+                                </b-button>
+                                <b-button
+                                    v-if="deleted"
+                                    :disabled="!current_user_permissions.permission_to_trash"
+                                    variant="warning"
+                                    size="sm"
+                                    class="ml-1"
+                                    @click="returnTrash(row.item.id)">
+                                    <i class="fa fa-undo"></i>
+                                </b-button>
+                            </div>
                         </template>
                     </b-table>
                 </div>
@@ -283,6 +295,16 @@
                 </div>
             </b-modal>
         </div>
+
+        <b-modal
+            v-model="logsModalShow"
+            :title="'Журнал действий'"
+            :static="true"
+            size="lg"
+            hide-footer>
+            <logs-modal ref="logsModal">
+            </logs-modal>
+        </b-modal>
     </div>
 </template>
 
@@ -291,11 +313,12 @@ import vSelect from "vue-select";
 import 'vue-select/dist/vue-select.css';
 import Swal2 from "sweetalert2";
 import DevicesInput from "./ui/DevicesInput.vue";
+import LogsModal from "../../logs/logs-modal";
 
 export default {
     name: "AdminTerminalsIndex",
     props: ['users', 'deleted', 'roles', 'points', 'all_permissions', 'current_user_permissions', 'options_company', 'fields', 'devicesOptions'],
-    components: {DevicesInput, Swal2, vSelect },
+    components: {DevicesInput, Swal2, vSelect, LogsModal },
 
     data() {
         return {
@@ -335,16 +358,21 @@ export default {
             columns: [],
             items: [],
             loading: false,
+            logsModalShow: false,
         }
     },
     methods: {
+        logsRead(modelId) {
+            this.logsModalShow = true
+            this.$refs.logsModal.loadData(modelId)
+        },
         sortChanged(e) {
             this.sortBy = e.sortBy;
             this.sortDesc = e.sortDesc;
             this.loadData();
         },
         loadConnectionStatus() {
-          if (!this.items) {
+          if (this.items.length === 0) {
               return;
           }
 
@@ -366,7 +394,6 @@ export default {
             });
 
             this.$forceUpdate();
-            console.log(this.items);
           });
         },
         tableRowClass(item, type) {
@@ -394,8 +421,6 @@ export default {
                             expired: response.data.expired.includes(item.hash_id),
                         }
                     }))
-
-                    console.log('need', [...this.items.map(item => ({...item.need_check}))])
                 })
         },
         loadData() {
@@ -680,7 +705,7 @@ export default {
             this.columns.push({
                 'key': field.field,
                 'label': field.name,
-                'sortable': true, // field.field !== 'roles'
+                'sortable': true,
                 'thAttr': {
                     'data-toggle': 'tooltip',
                     'data-html': true,
@@ -690,19 +715,22 @@ export default {
                 }
             });
         });
-        this.columns.push({ key: 'delete_btn', label: '#', class: 'text-right' });
+
+        this.columns.push({ key: 'buttons', label: '#', class: 'text-right' });
 
         if (this.deleted) {
-            this.columns.push({
-                key:   'deleted_user.name',
-                label: 'Имя удалившего',
-            }, {
-                key:   'deleted_at',
-                label: 'Время удаления',
-            }, {
-                key:   'return_trash',
-                label: '#',
-            })
+            const columns = [
+                {
+                    key:   'deleted_user.name',
+                    label: 'Имя удалившего',
+                },
+                {
+                    key:   'deleted_at',
+                    label: 'Время удаления',
+                }
+            ];
+
+            this.columns.push(...columns)
         }
 
         setInterval(this.loadConnectionStatus, 5000);
@@ -723,7 +751,7 @@ export default {
                 this.resetModal()
             }
         },
-        infoModalUser_roles(val) {
+        infoModalUser_roles() {
             this.fetchRoleData(this.infoModalUser_roles)
         },
         currentPage(){

@@ -56,5 +56,6 @@ export default {
 <style scoped>
 .table-responsive {
     max-height: 50vh !important;
+    overscroll-behavior: none !important;
 }
 </style>

@@ -137,3 +137,18 @@
         :devices-options='@json($devicesOptions)'
     ></admin-terminals-index>
 @endsection
+
+@push('setup-scripts')
+    <script>
+        window.PAGE_SETUP = {
+            LOGS_MODAL: {
+                tableDataUrl: '{{ route('logs.list-model') }}',
+                mapDataUrl: '{{ route('logs.list-model-map') }}',
+                model: '{{ 'users' }}',
+            },
+            MODEL_SEARCHER: {
+                tableDataUrl: '{{ route('searchElement') }}',
+            }
+        };
+    </script>
+@endpush

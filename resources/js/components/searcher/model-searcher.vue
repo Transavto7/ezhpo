@@ -9,7 +9,12 @@
                 <b-input-group-append>
                     <b-button variant="outline-success"
                               @click="loadData"
-                              :disabled="!searchAvailable">Найти</b-button>
+                              :disabled="!searchAvailable">Найти
+                    </b-button>
+                    <b-button variant="outline-danger"
+                              @click="reset"
+                              :disabled="!searchAvailable">Очистить
+                    </b-button>
                 </b-input-group-append>
             </b-input-group>
         </div>
@@ -61,6 +66,10 @@ export default {
             } finally {
                 this.loading = false
             }
+        },
+        reset() {
+            this.identifier = ''
+            this.items = []
         }
     },
     computed: {
