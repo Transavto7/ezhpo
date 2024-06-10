@@ -9,6 +9,7 @@ use App\Dto\ElementDto;
 use App\Enums\LogModelTypesEnum;
 use App\Models\Contract;
 use App\Product;
+use App\Stamp;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -73,6 +74,14 @@ class ElementSearchService implements ElementsSearchServiceInterface
             'fields' => [
                 'hash_id',
             ]
+        ],
+        Stamp::class => [
+            'select' => [
+                'id as hash_id',
+                'id',
+                'company_name as name'
+            ],
+            'fields' => []
         ]
     ];
 

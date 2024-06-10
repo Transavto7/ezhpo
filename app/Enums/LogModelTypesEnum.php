@@ -8,6 +8,7 @@ use App\Driver;
 use App\Models\Contract;
 use App\Models\Service;
 use App\Product;
+use App\Stamp;
 use App\User;
 
 class LogModelTypesEnum
@@ -21,7 +22,8 @@ class LogModelTypesEnum
             Contract::class => 'contracts',
             Service::class => 'product',
             Product::class => 'product',
-            User::class => 'users'
+            User::class => 'users',
+            Stamp::class => 'stamps'
         ];
     }
 
@@ -34,7 +36,8 @@ class LogModelTypesEnum
             Contract::class => 'Договора',
             Service::class => 'Услуги',
             Product::class => 'Услуги',
-            User::class => 'Пользователи'
+            User::class => 'Пользователи',
+            Stamp::class => 'Штампы'
         ];
     }
 
