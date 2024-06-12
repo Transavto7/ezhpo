@@ -31,7 +31,8 @@ export default {
                 this.$toast('Штамп удален', {type: 'error'});
                 this.$emit('success');
             }).catch(error => {
-                console.log(error);
+                console.error(error)
+                this.$toast('Ошибка!', {type: 'error'});
             });
         }
     }

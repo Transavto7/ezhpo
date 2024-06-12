@@ -57,19 +57,19 @@
                     </template>
                     <template #cell(delete_btn)="row">
                         <b-button size="sm"
-                            v-if="!deleted"
-                            :disabled="!current_user_permissions.permission_to_delete"
-                            variant="danger"
-                            @click="deleteRole(row.item.id)">
+                                  v-if="!deleted"
+                                  :disabled="!current_user_permissions.permission_to_delete"
+                                  variant="danger"
+                                  @click="deleteRole(row.item.id)">
                             <b-icon icon="trash-fill" aria-hidden="true"></b-icon>
                         </b-button>
                     </template>
 
                     <template #cell(return_trash)="row">
                         <b-button size="sm"
-                            :disabled="!current_user_permissions.permission_to_trash"
-                            variant="warning"
-                            @click="returnTrash(row.item.id)">
+                                  :disabled="!current_user_permissions.permission_to_trash"
+                                  variant="warning"
+                                  @click="returnTrash(row.item.id)">
                             <i class="fa fa-undo"></i>
                         </b-button>
                     </template>
@@ -119,7 +119,7 @@
                             У каждого пользователя есть набор прав и ролей
                         </div>
                         <div class="mb-1 col-lg-5">
-                            <b-form-input v-model="searchPermissions" placeholder="Поиск прав" />
+                            <b-form-input v-model="searchPermissions" placeholder="Поиск прав"/>
                         </div>
                         <b-card>
                             <b-form-group label="Доступы:" v-slot="{ ariaDescribedby }">
@@ -174,7 +174,7 @@ export default {
             infoModalRole: {
                 id: null,
                 name: null,
-                guard_name:  null,
+                guard_name: null,
                 permissions: [],
             },
             optionsRoles: [],
@@ -203,18 +203,17 @@ export default {
                             location.reload()
                             this.resetModal();
                         } else {
-                            Swal2.fire('Ошибка', data.message,'warning')
+                            Swal2.fire('Ошибка', data.message, 'warning')
                         }
-                    })
-                    .catch((err) => {
+                    }).catch(error => {
+                        console.error(error)
                         Swal2.fire('Ошибка!', '', 'warning');
-                    })
-                    .finally(() => {
+                    }).finally(() => {
                         this.loading = false;
                     });
             } else {
                 axios.post('/roles/' + this.infoModalRole.id, {
-                    params:  this.infoModalRole,
+                    params: this.infoModalRole,
                     _method: 'PUT',
                 }).then(({data}) => {
                     if (data.status) {
@@ -316,8 +315,6 @@ export default {
         },
 
         toggleModal() {
-            // Мы передаем идентификатор кнопки, на которую мы хотим вернуть фокус,
-            // когда модальное окно скрыто
             this.resetModal();
             this.$refs['groups_modal'].toggle('#toggle-btn')
         },
@@ -336,13 +333,13 @@ export default {
 
         if (this.deleted) {
             this.columns.push({
-                key:   'deleted_user.name',
+                key: 'deleted_user.name',
                 label: 'Имя удалившего',
             }, {
-                key:   'deleted_at',
+                key: 'deleted_at',
                 label: 'Время удаления',
             }, {
-                key:   'return_trash',
+                key: 'return_trash',
                 label: '#',
                 class: 'text-center',
             })
@@ -351,8 +348,8 @@ export default {
         this.total = this.roles.length;
     },
     watch: {
-        searchPermissions(val){
-            if(val === ''){
+        searchPermissions(val) {
+            if (val === '') {
                 this.allPermissions = this.all_permissions
                 return;
             }
@@ -371,14 +368,6 @@ export default {
 </script>
 
 <style scoped>
-/*.box {*/
-/*    display: flex;*/
-/*    flex-wrap: wrap;*/
-/*    flex-direction: column;*/
-/*    width: 500px;*/
-/*    height: 400px;*/
-/*    align-content: space-between;*/
-/*}*/
 .modal-dialog.modal-xl {
     max-width: 90%;
     margin: 1.75rem auto;

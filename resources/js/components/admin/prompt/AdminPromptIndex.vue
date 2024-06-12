@@ -9,7 +9,8 @@
                               @click="changeTrash(true)"
                               v-if="!filters.trash"
                     >
-                        <b-icon-trash></b-icon-trash> Корзина
+                        <b-icon-trash></b-icon-trash>
+                        Корзина
                     </b-button>
                     <b-button class="mb-3 ml-2"
                               size="sm"
@@ -61,8 +62,8 @@
                     </div>
                     <div class="d-flex align-items-center">
                         <b-button
-                                  variant="info"
-                                  @click="loadData"
+                            variant="info"
+                            @click="loadData"
                         >
                             Поиск
                         </b-button>
@@ -186,7 +187,7 @@ export default {
     },
     data() {
         return {
-            prompts: [ ],
+            prompts: [],
             perPage: 25,
             sortBy: 'id',
             sortDesc: false,
@@ -194,8 +195,7 @@ export default {
             total: 0,
             type: null,
             field: null,
-            filters: {
-            },
+            filters: {},
             currentPage: 1,
             column: [
                 {
@@ -288,8 +288,8 @@ export default {
             this.loadData();
         },
         changePage(page) {
-          this.currentPage = page;
-          this.loadData();
+            this.currentPage = page;
+            this.loadData();
         },
         loadData() {
             this.filters.field = this.field?.key;
@@ -304,7 +304,7 @@ export default {
             };
 
             addParams(data);
-            axios.post('/field/prompt/filter', data).then(({ data }) => {
+            axios.post('/field/prompt/filter', data).then(({data}) => {
                 this.currentPage = data.current_page;
                 this.total = data.total;
                 this.prompts = data.data;

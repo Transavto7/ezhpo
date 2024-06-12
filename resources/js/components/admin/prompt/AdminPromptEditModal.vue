@@ -14,7 +14,7 @@
             </div>
             <div class="form-group mb-3">
                 <label class="mb-1">Содержимое подсказки</label>
-                <vue-editor v-model="prompt.content" :editor-toolbar="customToolbar" />
+                <vue-editor v-model="prompt.content" :editor-toolbar="customToolbar"/>
             </div>
 
             <div class="mt-3 d-flex justify-content-end">
@@ -29,10 +29,10 @@
 </template>
 
 <script>
-import { VueEditor, Quill } from "vue2-editor";
+import {VueEditor, Quill} from "vue2-editor";
 
 export default {
-    components: { VueEditor },
+    components: {VueEditor},
     props: ['types', 'fields'],
     data() {
         return {
@@ -41,8 +41,8 @@ export default {
             prompt: {},
             customToolbar: [
                 ['bold', 'italic', 'underline', 'strike'],
-                [{ size: [ 'small', false, 'large']}],
-                ['link', { 'color': [] }],
+                [{size: ['small', false, 'large']}],
+                ['link', {'color': []}],
 
             ]
         }
@@ -77,12 +77,13 @@ export default {
             await axios.put('/field/prompt/' + this.prompt.id, {
                 name: this.prompt.name,
                 content: this.prompt.content,
-            }).then(({ data }) => {
+            }).then(({data}) => {
                 this.show = false;
                 this.$toast('Изменения сохранены');
                 this.$emit('success', this.prompt);
-            }).catch((error) => {
-
+            }).catch(error => {
+                console.error(error)
+                this.$toast('Ошибка!', {type: 'error'});
             });
             this.saving = false;
         }

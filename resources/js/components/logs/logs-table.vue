@@ -1,6 +1,11 @@
 <script>
+import LogsUuidCell from "./logs-uuid-cell";
+
 export default {
     name: "logs-table",
+    components: {
+        LogsUuidCell
+    },
     props: {
         items: {
             type: Array,
@@ -62,20 +67,13 @@ export default {
         <b-table
             :fields="fields"
             :items="items"
-            :perPage="limit"
-            :current-page="page"
             head-variant="light"
             striped
             responsive
             bordered
         >
             <template #cell(uuid)="{ item }">
-                <span id="uuid">
-                    {{ item.uuid ? item.uuid.substring(0, 7) : null }}
-                </span>
-                <b-tooltip target="uuid" placement="bottom">
-                    {{ item.uuid }}
-                </b-tooltip>
+                <logs-uuid-cell :uuid="item.uuid"></logs-uuid-cell>
             </template>
 
             <template #cell(data)="{ item }">

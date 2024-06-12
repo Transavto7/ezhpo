@@ -412,7 +412,8 @@ export default {
                 .then(response => {
                     this.optionsCompany = response.data;
                 })
-                .catch(() => {
+                .catch(error => {
+                    console.error(error)
                     Swal.fire({title: "Неизвестная ошибка", icon: "error"});
                 });
         },

@@ -586,16 +586,16 @@ export default {
                         location.reload()
 
                     }
-                })
-                .catch((error) => {
+                }).catch(error => {
                     let errorText = 'Произошла ошибка. Попробуйте, пожалуйста, позже'
                     if (error?.response?.data?.errors?.length) {
                         errorText = error?.response?.data?.errors.join('\n')
+                    } else {
+                        console.error(error)
                     }
 
                     Swal2.fire('Ошибка', errorText, 'error');
-                })
-                .finally(() => {
+                }).finally(() => {
                     this.loading = false;
                 });
         },

@@ -28,6 +28,7 @@ export default {
                         Notify.error(response.data.message);
                         return;
                     }
+                    console.error(response)
                     Notify.error('Ошибка сервера!');
                 })
                 .finally(() => {

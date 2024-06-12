@@ -132,7 +132,6 @@ export default {
     this.selectedTowns = this.selTowns || [];
     this.selectedPoints = this.selPoints || [];
     this.selectedCompanies = this.selCompanies || [];
-    console.log(this.companies, this.selectedCompanies);
 
       this.pointList = this.points.filter((point) => {
           return this.selectedTowns.includes('' + point.pv_id);

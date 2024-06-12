@@ -34,7 +34,8 @@ export default {
                     this.importResult = res.data;
                     Notify.success("Импорт завершен успешно!")
                 })
-                .catch(() => {
+                .catch(error => {
+                    console.error(error)
                     Notify.error("Ошибка сервера!")
                 })
                 .finally(() => {

@@ -203,7 +203,10 @@ export default {
                     this.total = data.result.total;
                     this.filters.currentPage = data.result.currentPage;
                 })
-                .catch(() => Swal2.fire({title: "Неизвестная ошибка", icon: "error"}))
+                .catch(error => {
+                    console.error(error)
+                    Swal2.fire({title: "Неизвестная ошибка", icon: "error"})
+                })
                 .finally(() => this.busy = false);
         },
     },

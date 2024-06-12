@@ -68,7 +68,7 @@ export default {
         },
 
         async handleApply() {
-            await this.reload()
+            await this.resetPageOrReload()
         },
 
         async handleReset() {
@@ -81,7 +81,15 @@ export default {
                 date_start: null,
                 date_end: null,
             }
-            await this.reload()
+            await this.resetPageOrReload()
+        },
+
+        async resetPageOrReload() {
+            if (this.page === 1) {
+                await this.reload()
+            } else {
+                this.page = 1
+            }
         }
     },
     async mounted() {
@@ -89,20 +97,11 @@ export default {
     },
     watch: {
         page() {
-            this.filter = {
-                users: [],
-                models: [],
-                id: null,
-                uuid: null,
-                actions: [],
-                date_start: null,
-                date_end: null,
-            }
             this.reload()
         },
 
         limit() {
-            this.reload()
+            this.resetPageOrReload()
         },
     }
 }

@@ -118,19 +118,20 @@ export default {
             axios.post(`/contract/` + id, {
                 _method: 'DELETE'
             })
-            .then(({data}) => {
-                if (data.status) {
-                    this.$emit('success');
-                } else {
-                    Swal2.fire('Ошибка!', '', 'warning')
-                }
-            })
-            .catch(() => {
-                Swal2.fire('Ошибка!', '', 'warning');
-            })
-            .finally(() => {
-                element.disabled = false
-            });
+                .then(({data}) => {
+                    if (data.status) {
+                        this.$emit('success');
+                    } else {
+                        Swal2.fire('Ошибка!', '', 'warning')
+                    }
+                })
+                .catch(error => {
+                    console.error(error)
+                    Swal2.fire('Ошибка!', '', 'warning');
+                })
+                .finally(() => {
+                    element.disabled = false
+                });
         },
         restoreItem(id, element) {
             element.disabled = true
@@ -138,19 +139,20 @@ export default {
             axios.post(`/contract/restore/` + id, {
                 _method: 'PUT'
             })
-            .then(({data}) => {
-                if (data.status) {
-                    this.$emit('success');
-                } else {
-                    Swal2.fire('Ошибка!', '', 'warning')
-                }
-            })
-            .catch(() => {
-                Swal2.fire('Ошибка!', '', 'warning');
-            })
-            .finally(() => {
-                element.disabled = false
-            });
+                .then(({data}) => {
+                    if (data.status) {
+                        this.$emit('success');
+                    } else {
+                        Swal2.fire('Ошибка!', '', 'warning')
+                    }
+                })
+                .catch(error => {
+                    console.error(error)
+                    Swal2.fire('Ошибка!', '', 'warning');
+                })
+                .finally(() => {
+                    element.disabled = false
+                });
         },
     }
 }
