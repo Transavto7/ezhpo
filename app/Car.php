@@ -4,15 +4,18 @@ namespace App;
 
 use App\Models\Contract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Car extends Model
 {
-    use \Illuminate\Database\Eloquent\SoftDeletes;
+    use SoftDeletes;
 
     public $fillable
         = [
             'hash_id',
-            //'old_id',
             'gos_number',
             'mark_model',
             'type_auto',
@@ -33,33 +36,21 @@ class Car extends Model
             'deleted_id',
         ];
 
-    public function inspections_tech()
+    public function inspections_tech(): HasMany
     {
-        return $this->hasMany(
-            Anketa::class,
-            'car_id',
-            'hash_id'
-        )
-                    ->where('type_anketa', 'tech');
+        return $this
+            ->hasMany(Anketa::class, 'car_id', 'hash_id')
+            ->where('type_anketa', 'tech');
     }
 
-
-    public function deleted_user()
+    public function deleted_user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'deleted_id', 'id')
-                    ->withDefault();
+        return $this
+            ->belongsTo(User::class, 'deleted_id', 'id')
+            ->withDefault();
     }
 
-//    public function contracts()
-//    {
-//        return $this->hasMany(
-//            Contract::class,
-//            'company_id',
-//            'id'
-//        );
-//    }
-
-    public function contracts()
+    public function contracts(): BelongsToMany
     {
         return $this->belongsToMany(
             Contract::class,
@@ -69,17 +60,12 @@ class Car extends Model
         );
     }
 
-//    public function contract()
-//    {
-//        return $this->belongsTo(Contract::class, 'contract_id', 'id')
-//                    ->withDefault();
-//    }
-    // sorry for name
-    public function company()
+    public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'company_id', 'id');
     }
 
+    //TODO: заменить трейтом
     public function delete()
     {
         $this->deleted_id = user()->id;
@@ -88,98 +74,34 @@ class Car extends Model
         return parent::delete();
     }
 
-    public function getAutoSyncFieldsFromHashId($hash_id)
+    public static function getAutoSyncFields($hash_id): array
     {
         $element = self::where('hash_id', $hash_id)->first();
 
-        if ($element) {
-            if ($element->autosync_fields) {
-                return explode(',', $element->autosync_fields);
-            }
+        if (!$element) {
+            return [];
+        }
+
+        if ($element->autosync_fields) {
+            return explode(',', $element->autosync_fields) ?? [];
         }
 
         return [];
     }
 
-    public static function getAutoSyncFields($hash_id)
+    public function getAutoSyncFieldsFromHashId($hash_id): array
     {
-        $element = self::where('hash_id', $hash_id)->first();
-
-        if ($element) {
-            if ($element->autosync_fields) {
-                return explode(',', $element->autosync_fields);
-            }
-        }
-
-        return [];
+        return self::getAutoSyncFields($hash_id);
     }
 
-    public static function calcServices($hash_id, $type_anketa = '', $type_view = '', $count = 0)
+    public static function getName($id = 0): string
     {
-        $element = self::where('hash_id', $hash_id)->first();
-        $data    = '';
+        $car = self::where('hash_id', $id)->first();
 
-        if ($element) {
-            if (isset($element->products_id)) {
-                $data     = [];
-                $services = explode(',', $element->products_id);
-
-                $services = Product::whereIn('id', $services)
-                                   ->where('type_anketa', $type_anketa)
-                                   ->where('type_view', 'LIKE', "%$type_view%")->get();
-
-                foreach ($services as $serviceKey => $service) {
-                    $discounts = Discount::where('products_id', $service->id)->get();
-
-                    if ($discounts->count()) {
-                        foreach ($discounts as $discount) {
-                            eval('$is_discount_valid = '.$count.$discount->trigger.$discount->porog.';');
-
-                            if ($is_discount_valid) {
-                                $disc   = ($service->price_unit * $discount->discount) / 100;
-                                $p_unit = $service->price_unit;
-
-                                $services[$serviceKey]->price_unit = $p_unit - $disc;
-                            }
-                        }
-                    }
-                }
-
-                if (count($services)) {
-                    $data['summ'] = $services->sum('price_unit').'₽';
-                } else {
-                    if ( !isset($element->products_id)) {
-                        $data['summ'] = "<span class='text-red'>Услуги не указаны</span>";
-                    } else {
-                        $data['summ'] = "<span class='text-red'>Услуги не найдены</span>";
-                    }
-                }
-
-                return "<div><b>$data[summ]</b></div>";
-            } else {
-                $data = 'Услуги не указаны';
-            }
+        if (!$car) {
+            return '';
         }
 
-        return $data;
-    }
-
-    public static function getAll()
-    {
-        return self::all();
-    }
-
-    // Получение пункта выпуска
-    public static function getName($id = 0)
-    {
-        $car = Car::where('hash_id', $id)->first();
-
-        if ($car) {
-            $car = $car->gos_number;
-        } else {
-            $car = '';
-        }
-
-        return $car;
+        return $car->gos_number;
     }
 }
