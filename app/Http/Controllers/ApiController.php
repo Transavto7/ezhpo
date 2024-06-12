@@ -263,11 +263,14 @@ class ApiController extends Controller
             'contract_id'
         ];
 
-        if (!user()->access('elements_access_field_pressures')) {
-            $blockedFields = [
-                'pressure_systolic',
-                'pressure_diastolic'
-            ];
+        if (($modelMap['model'] === Company::class) && !user()->access('company_update_pressure_fields')) {
+            $blockedFields[] = 'pressure_systolic';
+            $blockedFields[] = 'pressure_diastolic';
+        }
+
+        if (($modelMap['model'] === Driver::class) && !user()->access('drivers_update_pressure_fields')) {
+            $blockedFields[] = 'pressure_systolic';
+            $blockedFields[] = 'pressure_diastolic';
         }
 
         return ApiController::r([
