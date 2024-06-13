@@ -514,7 +514,6 @@ $(document).ready(function () {
             /**
              * Вставляем поля
              */
-            console.log(data);
             for(let i in data) {
                 let fvItem = fieldsValues[i]
 
@@ -680,7 +679,6 @@ $(document).ready(function () {
     // Проверка свойства по модели на бэкенда
     window.checkInputProp = async (prop = '0', model = '0', val = '0', label, parent, is_dop) => {
         let PARENT_ELEM;
-        console.log('---------------')
         if(parent){
             PARENT_ELEM = parent;
         }else{
@@ -689,15 +687,19 @@ $(document).ready(function () {
 
         //check-prop-one
         if(!is_dop) {
+            if (!val) {
+                return;
+            }
+
             let answer = await $.ajax({
                 url: `/api/check-prop-one/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
                 headers: {'Authorization': 'Bearer ' + API_TOKEN},
                 success:  (data) => {
                     let element = PARENT_ELEM.find('.app-checker-prop')
-                    if(data.status){
+                    if (data.status) {
                         element.removeClass('text-danger').addClass('text-success').text(data.name);
                         PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', false);
-                    }else{
+                    } else {
                         element.removeClass('text-success').addClass('text-danger').text(`Не найдено`);
                         parent.prevObject.attr('company', null);
                         PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', true);
@@ -1394,7 +1396,6 @@ $(document).ready(function () {
         axios.post('/contract/getAvailableForCompany', {
             company_id: value,
         }).then(({data}) => {
-            console.log(data)
             if (data.status) {
                 targetSelect.append($('<option>', {
                     value: '',

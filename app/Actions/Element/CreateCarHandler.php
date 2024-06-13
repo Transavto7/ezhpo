@@ -4,6 +4,7 @@ namespace App\Actions\Element;
 
 use App\Car;
 use App\Company;
+use App\Events\Relations\Attached;
 use App\Models\Contract;
 use Exception;
 
@@ -56,6 +57,7 @@ class CreateCarHandler extends AbstractCreateElementHandler implements CreateEle
 
         $created = $this->createElement($data);
 
+        /** @var Contract $contract */
         $contract = Contract::query()
             ->where('company_id', $companyId)
             ->where('main_for_company', 1)
@@ -63,6 +65,7 @@ class CreateCarHandler extends AbstractCreateElementHandler implements CreateEle
 
         if ($contract) {
             $contract->cars()->attach($created->id);
+            event(new Attached($contract, [$created->id], Car::class));
         }
     }
 }

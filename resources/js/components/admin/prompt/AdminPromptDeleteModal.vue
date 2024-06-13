@@ -25,12 +25,13 @@ export default {
             this.prompt = prompt;
         },
         deleteElement() {
-            axios.delete('/field/prompt/' + this.prompt.id).then(({ data }) => {
+            axios.delete('/field/prompt/' + this.prompt.id).then(({data}) => {
                 this.show = false;
                 this.$toast('Подсказка удалена', {type: 'error'});
                 this.$emit('success');
             }).catch(error => {
-                console.log(error);
+                console.error(error)
+                this.$toast('Ошибка!', {type: 'error'});
             });
         }
     }

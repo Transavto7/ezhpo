@@ -8,14 +8,16 @@ use App\Actions\Element\Update\UpdateElementHandlerFactory;
 use App\Car;
 use App\Company;
 use App\Driver;
+use App\Enums\LogActionTypesEnum;
 use App\FieldPrompt;
-use App\Imports\CarImport;
-use App\Imports\CompanyImport;
-use App\Imports\DriverImport;
 use App\Point;
+use App\User;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -85,11 +87,10 @@ class IndexController extends Controller
         );
     }
 
-    public function showVideo(): View
+    public function showVideo(Request $request): View
     {
-        //TODO: это гет параметр?
         return view('showVideo', [
-            'video' => $_GET['url'] ?? ''
+            'video' => $request->input('url', '')
         ]);
     }
 
@@ -109,10 +110,10 @@ class IndexController extends Controller
             }
 
             return view('templates.elements_field', [
-                'k'             => $fieldKey,
-                'v'             => $field,
-                'is_required'   => '',
-                'model'         => $model,
+                'k' => $fieldKey,
+                'v' => $field,
+                'is_required' => '',
+                'model' => $model,
                 'default_value' => $request->default_value ?? 'Не установлено',
             ]);
         } catch (Throwable $exception) {
@@ -147,26 +148,35 @@ class IndexController extends Controller
             abort(500, 'Не найдена модель');
         }
 
-        $updatedModelsCount = $syncFieldsHandler->handle([
-            'model'          => $modelName,
-            'fieldFind'      => $request->fieldFind,
-            'fieldFindId'    => $request->fieldFindId,
-            'fieldSync'      => $request->fieldSync,
-            'fieldSyncValue' => $request->fieldSyncValue ?? '',
-        ]);
+        try {
+            DB::beginTransaction();
 
-        if ($isApi) {
-            return $updatedModelsCount ?? 0;
-        }
+            $updatedModelsCount = $syncFieldsHandler->handle([
+                'model' => $modelName,
+                'fieldFind' => $request->fieldFind,
+                'fieldFindId' => $request->fieldFindId,
+                'fieldSync' => $request->fieldSync,
+                'fieldSyncValue' => $request->fieldSyncValue ?? '',
+            ]);
 
-        if ($updatedModelsCount) {
+            if (($updatedModelsCount ?? 0) === 0) {
+                throw new Exception("Нет моделей $modelName для синхронизации");
+            }
+
+            DB::commit();
+
             return view('pages.success', [
                 'text' => "Поля успешно синхронизированы. Кол-во элементов: $updatedModelsCount",
             ]);
-        } else {
-            //TODO: очень странное поведение, если нет записей для обновления - выводит такое
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            if ($isApi) {
+                return 0;
+            }
+
             return view('pages.warning', [
-                'text' => "Модель $modelName не найдена",
+                'text' => $exception->getMessage(),
             ]);
         }
     }
@@ -174,34 +184,6 @@ class IndexController extends Controller
     public function getElements()
     {
         return $this->elements;
-    }
-
-    /**
-     * POST-запросы
-     */
-    public function ImportElements(Request $request)
-    {
-        $model_type = $request->type;
-        $file       = $request->file('file');
-
-        $objs = [
-            'Company' => CompanyImport::class,
-            'Driver'  => DriverImport::class,
-            'Car'     => CarImport::class,
-            'Town'    => '',
-        ];
-
-        if ($request->hasFile('file')) {
-            //$file = $file->getRealPath();
-            //print_r($file);
-
-            $path1 = $request->file('file')->store('temp');
-            $path  = storage_path('app').'/'.$path1;
-
-            $data = \Maatwebsite\Excel\Facades\Excel::import(new $objs[$model_type], $path);
-        }
-
-        return redirect($_SERVER['HTTP_REFERER']);
     }
 
     public function AddElement(Request $request, CreateElementHandlerFactory $factory)
@@ -233,51 +215,113 @@ class IndexController extends Controller
         }
     }
 
-    public function RemoveElement (Request $request)
+    public function RemoveElement(Request $request): RedirectResponse
     {
-        $model = $request->type;
-        $id = $request->id;
-        $model = app("App\\$model");
+        try {
+            $model = $request->type;
+            $id = $request->id;
 
-        if ($model) {
-//            if($model instanceof Company){
-//                Car::where('company_id', $model->id)->update(['contract_id' => null]);
-//                Driver::where('company_id', $model->id)->update(['contract_id' => null]);
-//            }
+            $modelClass = app("App\\$model");
+            if (!$modelClass) {
+                throw new Exception("Модель $model не найдена");
+            }
+
+            $existModel = $modelClass::withTrashed()->find($id);
+            if (!$existModel) {
+                throw new Exception("Модель $model с ID $id не найдена");
+            }
+
+            DB::beginTransaction();
 
             if ($request->get('undo')) {
-                $model::withTrashed()->find($id)->restore();
+                $existModel->restore();
+            } else {
+                $existModel->delete();
+            }
 
-                return redirect($_SERVER['HTTP_REFERER']);
-            }
-            if ($model::find($id)->delete()) {
-                return redirect($_SERVER['HTTP_REFERER']);
-            }
+            DB::commit();
+
+            return back();
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            return back()->withErrors([
+                'errors' => $exception->getMessage()
+            ]);
         }
     }
 
-    // Для компаний синхронизация
-    // Ставит услуги машинам и водителям такие же, как и у компании
-    public function syncElement(Request $request)
+    public function syncElement(Request $request): RedirectResponse
     {
-        if ($request->type !== 'Company') {
-            return redirect($_SERVER['HTTP_REFERER']);
+        try {
+            $userId = Auth::id();
+
+            if ($request->type !== 'Company') {
+                return back();
+            }
+
+            $id = $request->id;
+            $company = Company::find($id);
+
+            if (!$company) {
+                throw new Exception('Компания с таким ID не найдена');
+            }
+
+            $productIds = $company->products_id;
+            if (!$productIds) {
+                return back();
+            }
+
+            DB::beginTransaction();
+
+            foreach ([Car::class, Driver::class] as $class) {
+                app($class)::query()
+                    ->select([
+                        'id',
+                        'products_id'
+                    ])
+                    ->where('company_id', $id)
+                    ->get()
+                    ->each(function ($model) use ($productIds, $userId) {
+                        $oldValue = $model->products_id;
+
+                        if ($oldValue == $productIds) return;
+
+                        /** @var \App\Log $log */
+                        $log = Log::create([
+                            'user_id' => $userId,
+                            'type' => LogActionTypesEnum::UPDATING
+                        ]);
+
+                        $log->setAttribute('data', [
+                            [
+                                'name' => 'products_id',
+                                'oldValue' => $oldValue,
+                                'newValue' => $productIds
+                            ]
+                        ]);
+
+                        $log->model()->associate($model);
+
+                        $log->save();
+                    });
+
+                app($class)::where('company_id', $id)->update(['products_id' => $company->products_id]);
+            }
+
+            DB::commit();
+
+            return back();
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            return back()->withErrors([
+                'errors' => $exception->getMessage()
+            ]);
         }
-        $id      = $request->id;
-        $company = Company::find($id);
-
-        if(!$company->products_id){
-            return redirect($_SERVER['HTTP_REFERER']);
-        }
-
-        Car::where('company_id', $id)->update(['products_id' => $company->products_id]);
-        Driver::where('company_id', $id)->update(['products_id' => $company->products_id]);
-
-
-        return redirect($_SERVER['HTTP_REFERER']);
     }
 
-    public function DeleteFileElement (Request $request)
+    public function DeleteFileElement(Request $request): RedirectResponse
     {
         $id = $request->id;
         $field = $request->field;
@@ -285,7 +329,7 @@ class IndexController extends Controller
 
         $model = app("App\\$model_text");
 
-        if($model) {
+        if ($model) {
             $model = $model->find($id);
 
             Storage::disk('public')->delete($model->$field);
@@ -294,7 +338,7 @@ class IndexController extends Controller
             $model->save();
         }
 
-        return redirect( $_SERVER['HTTP_REFERER'] );
+        return back();
     }
 
     public function UpdateElement(Request $request, UpdateElementHandlerFactory $factory)
@@ -329,23 +373,52 @@ class IndexController extends Controller
 
     public function showEditModal($model, $id)
     {
-        $page = $this->elements[$model];
+        $modelClass = app("App\\$model");
+        $query = $modelClass::query();
 
-        $page['model'] = $model;
-        $page['id']    = $id;
-
-
-        if($model == 'Company' ||
-           $model == 'Driver' ||
-           $model == 'Car'){
-            $el = app("App\\$model")
-                ->with(['contracts.services'])
-                ->find($id);
-        }else{
-            $el = app("App\\$model")->find($id);
+        $attachServices = in_array($modelClass, [
+            Company::class,
+            Driver::class,
+            Car::class
+        ]);
+        if ($attachServices) {
+            $query = $query->with(['contracts.services']);
         }
 
-        $page['el'] = $el;
+        $page = $this->elements[$model];
+        $page['model'] = $model;
+        $page['id'] = $id;
+        $page['el'] = $query->find($id);
+
+        $disabledFields = [];
+        if (($model === 'Company') && !user()->access('company_update_pressure_fields')) {
+            $disabledFields[] = 'pressure_systolic';
+            $disabledFields[] = 'pressure_diastolic';
+        }
+        if (($model === 'Driver') && !user()->access('drivers_update_pressure_fields')) {
+            $disabledFields[] = 'pressure_systolic';
+            $disabledFields[] = 'pressure_diastolic';
+        }
+        $page['disabledFields'] = $disabledFields;
+
+        $fieldsToSkip = [
+            'essence',
+            'hash_id',
+            'id'
+        ];
+        if (user()->hasRole('client')) {
+            $fieldsToSkip[] = 'products_id';
+        }
+        if (!user()->access('companies_access_field_where_call_name')) {
+            $fieldsToSkip[] = 'where_call_name';
+        }
+        if (!user()->access('companies_access_field_where_call')) {
+            $fieldsToSkip[] = 'where_call';
+        }
+        if ($model === 'Instr') {
+            $fieldsToSkip[] = 'signature';
+        }
+        $page['fieldsToSkip'] = $fieldsToSkip;
 
         echo view('showEditElementModal', $page);
     }
@@ -357,7 +430,7 @@ class IndexController extends Controller
     {
         $user = Auth::user();
 
-        if ( !$user) {
+        if (!$user) {
             return view('auth.login');
         }
 
@@ -367,178 +440,162 @@ class IndexController extends Controller
     /**
      * Рендер просмотра вкладок CRM
      */
-    public function RenderElements (Request $request)
+    public function RenderElements(Request $request)
     {
-        $user = Auth::user();
         $type = $request->type;
+        if (!isset($this->elements[$type])) {
+            return redirect(route('home'));
+        }
 
-        $queryString = '';
         $oKey = 'orderKey';
         $oBy = 'orderBy';
 
-        // ОПЕРАТОР ПАК & КОМПАНИИ
 
-        foreach($_GET as $getK => $getV) {
-            if($getK !== $oKey && $getK !== $oBy) {
-                if(is_array($getV)) {
-                    foreach($getV as $getVkey => $getVvalue) {
-                        $queryString .= '&' . $getK . "[$getVkey]" . '=' . $getVvalue;
-                    }
-                } else {
-                    $queryString .= '&' . $getK . '=' . $getV;
+        $data = $this->elements[$type];
+
+        $model = $data['model'];
+        $modelClass = app("App\\$model");
+
+        $query = $modelClass::query();
+
+        $attachServices = in_array($modelClass, [
+            Company::class,
+            Driver::class,
+            Car::class
+        ]);
+        if ($attachServices) {
+            $query = $query->with(['contracts.services']);
+        }
+
+        if ($request->get('deleted')) {
+            $query = $query->onlyTrashed();
+        }
+
+        $filter = $request->get('filter', 0);
+        if ($filter) {
+            $filters = $request->except([
+                'filter',
+                'take',
+                'orderBy',
+                'orderKey',
+                'page',
+                'deleted'
+            ]);
+
+            foreach ($filters as $filterKey => $filterValue) {
+                if (empty($filterValue)) {
+                    continue;
                 }
 
+                if (!is_array($filterValue)) {
+                    if ($filterKey == 'date_of_employment') {
+                        $query = $query->whereBetween($filterKey, [
+                            Carbon::parse($filterValue)->startOfDay(),
+                            Carbon::parse($filterValue)->endOfDay()
+                        ]);
+
+                        continue;
+                    }
+
+                    $query = $query->where($filterKey, 'LIKE', '%' . trim($filterValue) . '%');
+
+                    continue;
+                }
+
+                if (count($filterValue) === 0) {
+                    continue;
+                }
+
+                $query = $query->where(function ($subQuery) use ($filterValue, $filterKey) {
+                    foreach ($filterValue as $filterValueItem) {
+                        if ($filterKey === 'town_id' || $filterKey === 'products_id') {
+                            $subQuery = $subQuery->orWhere($filterKey, $filterValueItem)
+                                ->orWhere($filterKey, 'like', "%,$filterValueItem,%")
+                                ->orWhere($filterKey, 'like', "%,$filterValueItem")
+                                ->orWhere($filterKey, 'like', "$filterValueItem,%");
+                        } else if (strpos($filterKey, '_id')) {
+                            $subQuery = $subQuery->orWhere($filterKey, $filterValueItem);
+                        } else if (strlen($filterValueItem) === 0) {
+                            //TODO: странный фильтр только на пустую строку
+                            $subQuery = $subQuery->orWhere($filterKey, $filterValueItem);
+                        } else {
+                            $subQuery = $subQuery->orWhere($filterKey, 'LIKE', '%' . trim($filterValueItem) . '%');
+                        }
+                    }
+
+                    return $subQuery;
+                });
             }
         }
 
-        /**
-         * Сортировка
-         */
+        /** @var User $user */
+        $user = Auth::user();
+        if ($user->hasRole('client')) {
+            $companyIdField = 'id';
+
+            //TODO: может странно работать на компании
+            if ($model == 'Driver' || $model == 'Car' || $model == 'Company') {
+                $companyIdField = 'company_id';
+            }
+
+            $query = $query->where($companyIdField, $user->company_id);
+        }
+
         $orderKey = $request->get($oKey, 'created_at');
         $orderBy = $request->get($oBy, 'DESC');
-        $filter = $request->get('filter', 0);
+        $query = $query->orderBy($orderKey, $orderBy);
+
+        $loadWithoutFiltersElementTypes = [
+            'Settings',
+            'Discount',
+            'DDates',
+            'DDate',
+            'Product',
+            'Instr',
+            'Town',
+            'Point',
+            'Req',
+        ];
+
+        $loadWithoutFiltersElementTypesForClients = [
+            'Driver',
+            'Car'
+        ];
 
         $take = $request->get('take', 500);
 
-        if(isset($this->elements[$type])) {
-            $element = $this->elements[$type];
-
-            $model = $element['model'];
-            $MODEL_ELEMENTS = app("App\\$model");
-
-            $element['elements_count_all'] = $MODEL_ELEMENTS->count();
-
-            if ($model == 'Company') {
-                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contracts.services']);
-            } elseif ($model == 'Car' || $model == 'Driver') {
-                $MODEL_ELEMENTS = $MODEL_ELEMENTS->with(['contracts.services']);
-            }
-
-            $element['elements'] = $MODEL_ELEMENTS;
-
-            $element['type'] = $type;
-            $element['orderBy'] = $orderBy;
-            $element['orderKey'] = $orderKey;
-            $element['take'] = $take;
-
-            if($request->get('deleted')){
-                $element['elements'] = $element['elements']->onlyTrashed();
-            }
-            if($filter) {
-                $allFilters = $request->all();
-                unset($allFilters['filter']);
-                unset($allFilters['take']);
-                unset($allFilters['orderBy']);
-                unset($allFilters['orderKey']);
-                unset($allFilters['page']);
-                unset($allFilters['deleted']);
-
-                foreach($allFilters as $aFk => $aFv) {
-                    if(!empty($aFv)) {
-                        if(is_array($aFv)) {
-                            if(count($aFv) > 0) {
-                                $element['elements'] = $element['elements']->where(function ($q) use ($aFv, $aFk) {
-                                    $isId = strpos($aFk, '_id');
-
-                                    foreach($aFv as $aFvItemKey => $aFvItemValue) {
-                                        if ($isId && ($aFk === 'town_id' || $aFk === 'products_id')) {
-                                            $q = $q->orWhere($aFk, $aFvItemValue)
-                                                   ->orWhere($aFk, 'like', "%,$aFvItemValue,%")
-                                                   ->orWhere($aFk, 'like', "%,$aFvItemValue")
-                                                   ->orWhere($aFk, 'like', "$aFvItemValue,%");
-                                        } else {
-                                            if ($isId) {
-                                                $q = $q->orWhere($aFk, $aFvItemValue);
-                                            } else {
-                                                if (strlen($aFvItemValue) === 0) {
-                                                    $q = $q->orWhere($aFk, $aFvItemValue);
-                                                } else {
-                                                    $q = $q->orWhere($aFk, 'LIKE', '%'.trim($aFvItemValue).'%');
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    return $q;
-                                });
-                            }
-                        } else {
-                            if ($aFk == 'date_of_employment') {
-                                $element['elements'] = $element['elements']->whereBetween($aFk, [
-                                    Carbon::parse($aFv)->startOfDay(),
-                                    Carbon::parse($aFv)->endOfDay()
-                                ]);
-                            } else {
-                                $element['elements'] = $element['elements']->where($aFk, 'LIKE', '%' . trim($aFv) . '%');
-                            }
-                        }
-                    }
-                }
-            }
-
-            if(auth()->user()->hasRole('client')) {
-                if($model == 'Driver' || $model == 'Car' || $model == 'Company') {
-                    $element['elements'] = $element['elements']->where('company_id', auth()->user()->company_id);
-                } else {
-                    $element['elements'] = $element['elements']->where('id', auth()->user()->company_id);
-                }
-            }
-
-
-            $element['max'] = isset($element['max']) ? $element['max'] : null;
-            $element['elements_count_all'] = $MODEL_ELEMENTS->count();
-            $element['elements'] = $element['elements']->orderBy($orderKey, $orderBy);
-
-            // Автоматическая загрузка справочников
-            $excludeElementTypes = [
-                'Settings',
-                'Discount',
-                'DDates',
-                'DDate',
-                'Product',
-                'Instr',
-                'Town',
-                'Point',
-                'Req',
-            ];
-
-
-            if ($filter || in_array($type, $excludeElementTypes)
-                || ($user->hasRole('client')
-                    && ($type === 'Driver'
-                        || $type === 'Car'))) {
-                if ($element['max']) {
-                    $element['elements'] = $element['elements']->take($element['max'])->get();
-                } else {
-                    $element['elements'] = $element['elements']->paginate($take);
-                }
+        $elements = [];
+        $loadElements = $filter
+            || in_array($type, $loadWithoutFiltersElementTypes)
+            || $user->hasRole('client') && in_array($type, $loadWithoutFiltersElementTypesForClients);
+        if ($loadElements) {
+            if (isset($data['max'])) {
+                $elements = $query->take($data['max'])->get();
             } else {
-                $element['elements'] = [];
+                $elements = $query->paginate($take);
             }
-
-            // Проверка прав доступа
-            $roles = ['manager', 'admin'];
-            if (isset($element['otherRoles'])) {
-                foreach ($roles as $roleOther) {
-                    array_push($element['otherRoles'], $roleOther);
-                }
-            } else {
-                $element['otherRoles'] = $roles;
-            }
-
-            $element['queryString'] = $queryString;
-            $fieldsQuery = FieldPrompt::where('type', strtolower($model));
-            $element['fieldPrompts'] = $fieldsQuery->get();
-            return view('elements', $element);
-        } else {
-            return redirect( route('home') );
         }
+
+        $data['elements'] = $elements;
+        $data['type'] = $type;
+        $data['orderBy'] = $orderBy;
+        $data['orderKey'] = $orderKey;
+        $data['take'] = $take;
+        $data['max'] = $data['max'] ?? null;
+        $data['elements_count_all'] = $query->count();
+        $data['otherRoles'] = $data['otherRoles'] ?? [];
+        $data['otherRoles'][] = 'manager';
+        $data['otherRoles'][] = 'admin';
+        $data['queryString'] = Arr::query($request->except([$oKey, $oBy]));;
+        $data['fieldPrompts'] = FieldPrompt::where('type', strtolower($model))->get();
+
+        return view('elements', $data);
     }
 
     /**
      * Рендер последовательного добавления Клиента
      */
-    public function RenderAddClient (Request $request)
+    public function RenderAddClient()
     {
         return view('pages.add_client', [
             'title' => 'Добавление клиента'
@@ -553,82 +610,84 @@ class IndexController extends Controller
     /**
      * Рендер анкет
      */
-    public function RenderForms (Request $request)
+    public function RenderForms(Request $request)
     {
         $user = Auth::user();
 
-        if(!($type = $request->get('type'))){
-            if(user()->hasRole('tech')){
+        $type = $request->get('type');
+        if (!$type) {
+            if ($user->hasRole('tech')) {
                 $type = 'tech';
             }
-            if(user()->hasRole('medic')){
+            if ($user->hasRole('medic')) {
                 $type = 'medic';
             }
-            if(user()->hasRole('manager') || user()->hasRole('engineer_bdd')){
+            if ($user->hasRole('manager') || $user->hasRole('engineer_bdd')) {
                 return redirect()->route('renderElements', 'Company');
             }
-            if(user()->hasRole('operator_sdpo')){
+            if ($user->hasRole('operator_sdpo')) {
                 return redirect()->route('home', 'pak_queue');
             }
 
-            if(user()->hasRole('client')){
+            if ($user->hasRole('client')) {
                 return redirect()->route('home', ['type_ankets' => 'medic']);
             }
-            if(!$type){
+            if (!$type) {
                 return redirect()->route('index');
             }
         }
 
-        $company_fields = $this->elements['Driver']['fields']['company_id'];
-        $company_fields['getFieldKey'] = 'name';
-
-        $anketa_key = $type;
+        $companyFields = $this->elements['Driver']['fields']['company_id'];
+        $companyFields['getFieldKey'] = 'name';
 
         // Отображаем данные
-        $anketa = $this->ankets[$anketa_key];
-        $points = Point::getAll();
+        $data = $this->ankets[$type];
 
         // Конвертация текущего времени Юзера
         date_default_timezone_set('UTC');
-
         $time = time();
-
-        $timezone = $user->timezone ? $user->timezone : 3;
-
+        $timezone = $user->timezone ?: 3;
         $time += $timezone * 3600;
         $time = date('Y-m-d\TH:i', $time);
 
         // Дефолтные значения
-        $anketa['default_current_date'] = $time;
-        $anketa['points'] = $points;
-        $anketa['type_anketa'] = $anketa_key;
-        $anketa['default_pv_id'] = $user->pv_id;
-        $anketa['company_fields'] = $company_fields;
-
-        $anketa['Driver'] = Driver::class;
-        $anketa['Car'] = Car::class;
+        $data['default_current_date'] = $time;
+        $data['points'] = Point::getAll();
+        $data['type_anketa'] = $type;
+        $data['default_pv_id'] = $user->pv_id;
+        $data['company_fields'] = $companyFields;
+        $data['Driver'] = Driver::class;
+        $data['Car'] = Car::class;
 
         // Проверяем выставленный ПВ
-        if(session()->exists('anketa_pv_id')) {
-            $session_pv_id = session('anketa_pv_id');
-
-            if(date('d.m') > $session_pv_id['expired']) {
+        if (session()->exists('anketa_pv_id')) {
+            if (date('d.m') > session('anketa_pv_id')['expired']) {
                 session()->remove('anketa_pv_id');
             }
         }
 
-        return view('profile.anketa', $anketa);
+        return view('profile.anketa', $data);
     }
 
-    public function agreement(Request $request) {
+    public function agreement()
+    {
         return view('agreement.index');
     }
 
-    public function acceptAgreement(Request $request) {
-        $request->user()->update([
-            'accepted_agreement' => true
-        ]);
+    public function acceptAgreement(Request $request): RedirectResponse
+    {
+        try {
+            DB::beginTransaction();
 
-        return back();
+            $request->user()->update([
+                'accepted_agreement' => true
+            ]);
+
+            DB::commit();
+        } catch (Throwable $exception) {
+            DB::rollBack();
+        } finally {
+            return back();
+        }
     }
 }

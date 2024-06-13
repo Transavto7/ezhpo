@@ -296,8 +296,8 @@ export default {
                     })
                     loading(false);
                 })
-                .catch((err) => {
-                    //Ошибка
+                .catch(error => {
+                    console.error(error)
                     Swal2.fire('Ошибка!', '', 'warning');
                     loading(false);
                 });
@@ -323,8 +323,8 @@ export default {
                     })
                     loading(false);
                 })
-                .catch((err) => {
-                    //Ошибка
+                .catch(error => {
+                    console.error(error)
                     Swal2.fire('Ошибка!', '', 'warning');
                     loading(false);
                 });
@@ -350,8 +350,8 @@ export default {
                     })
                     loading(false);
                 })
-                .catch((err) => {
-                    //Ошибка
+                .catch(error => {
+                    console.error(error)
                     Swal2.fire('Ошибка!', '', 'warning');
                     loading(false);
                 });

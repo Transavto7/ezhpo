@@ -119,8 +119,8 @@ export default {
                 .then((response) => {
                     this.rows = this.rows.filter((row) => row.id !== id)
                 })
-                .catch((error) => {
-                    console.log(error)
+                .catch(error => {
+                    console.error(error)
                     Swal.fire(
                         'Ошибка принятия осмотра!',
                         error.response.data.message,

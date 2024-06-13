@@ -4,15 +4,14 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -91,38 +90,38 @@ class User extends Authenticatable
 
     public static $userRolesValues
         = [
-            'client'       => 12,
-            'tech'         => 1,
-            'medic'        => 2,
-            'driver'       => 3,
-            'terminal'     => 778,
+            'client' => 12,
+            'tech' => 1,
+            'medic' => 2,
+            'driver' => 3,
+            'terminal' => 778,
             'engineer_bdd' => 12,
-            'manager'      => 11,
-            'admin'        => 777,
+            'manager' => 11,
+            'admin' => 777,
             'operator_pak' => 4,
         ];
 
     public static $userRolesKeys
         = [
-            '0'   => 'medic',
-            '1'   => 'tech',
-            '2'   => 'medic',
-            '4'   => 'pak_queue',
-            '12'  => 'medic',
-            '11'  => 'medic',
+            '0' => 'medic',
+            '1' => 'tech',
+            '2' => 'medic',
+            '4' => 'pak_queue',
+            '12' => 'medic',
+            '11' => 'medic',
             '777' => 'medic',
             '778' => 'medic',
         ];
 
     public static $userRolesText
         = [
-            1   => 'Контролёр ТС',
-            2   => 'Медицинский сотрудник',
-            3   => 'Водитель',
-            4   => 'Оператор СДПО',
-            11  => 'Менеджер',
-            12  => 'Клиент',
-            13  => 'Инженер БДД',
+            1 => 'Контролёр ТС',
+            2 => 'Медицинский сотрудник',
+            3 => 'Водитель',
+            4 => 'Оператор СДПО',
+            11 => 'Менеджер',
+            12 => 'Клиент',
+            13 => 'Инженер БДД',
             777 => 'Администратор',
             778 => 'Терминал',
         ];
@@ -152,7 +151,7 @@ class User extends Authenticatable
         return $user->login !== self::DEFAULT_USER_LOGIN;
     }
 
-    public function deleted_user()
+    public function deleted_user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'deleted_id', 'id')
             ->withDefault();
@@ -166,7 +165,7 @@ class User extends Authenticatable
         return parent::delete();
     }
 
-    public function roles($deleted = false) : BelongsToMany
+    public function roles($deleted = false): BelongsToMany
     {
         return $this->belongsToMany(Role::class,
             'model_has_roles',
@@ -178,30 +177,30 @@ class User extends Authenticatable
             ->wherePivot('deleted', $deleted ? 1 : 0);
     }
 
-    public function anketas()
+    public function anketas(): HasMany
     {
         return $this->hasMany(Anketa::class, 'user_id', 'id')
             ->withDefault();
     }
 
-    public function company()
+    public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'company_id', 'id')
             ->withDefault();
     }
 
-    public function companies()
+    public function companies(): HasMany
     {
         return $this->hasMany(Company::class);
     }
 
-    public function pv()
+    public function pv(): BelongsTo
     {
         return $this->belongsTo(Point::class, 'pv_id')
             ->withDefault();
     }
 
-    public function points()
+    public function points(): BelongsToMany
     {
         return $this->belongsToMany(Point::class, 'points_to_users', 'user_id', 'point_id');
     }
@@ -216,62 +215,34 @@ class User extends Authenticatable
         return $this->hasOne(TerminalCheck::class, 'user_id');
     }
 
-    public function access(...$permissionName)
+    public function access(...$permissionName): bool
     {
         return $this->getAllPermissions()
             ->whereIn('name', $permissionName)
             ->isNotEmpty();
     }
 
-    public static function fetchPermissions()
+    public static function getUserCompanyId(): int
     {
-        $permissions = collect(config('access'));
-        DB::statement("SET foreign_key_checks=0");
-
-        $counter['added'] = 0;
-        foreach ($permissions as $permission) {
-            if($updatePermission = Permission::where('name', $permission['name'])->first()){
-                $updatePermission->guard_name = $permission['description'];
-
-                $updatePermission->save();
-            }else{
-                $counter['added']++;
-                Permission::create([
-                    'name'       => $permission['name'],
-                    'guard_name' => $permission['description'],
-                ]);
-            }
-        }
-        $deleted = Permission::whereNotIn('name', $permissions->pluck('name'));
-        $counter['deleted'] = $deleted->count();
-        $deleted->delete();
-
-        $counter['total'] = Permission::count();
-
-        DB::statement("SET foreign_key_checks=1");
-
-        return $counter;
-    }
-
-    public static function getUserCompanyId($field = 'id')
-    {
-        $point = auth()->user()->pv_id;
+        /** @var User $authUser */
+        $authUser = auth()->user();
+        $point = $authUser->pv_id;
         $point = Point::find($point);
 
         if ($point) {
             $company = $point->company_id ? Company::find($point->company_id) : 0;
 
-            if ($company) {
-                return $company->$field;
-            } else {
+            if (! $company) {
                 return -1;
             }
+
+            return $company->id;
         }
 
         return -1;
     }
 
-    public function stamp()
+    public function stamp(): BelongsTo
     {
         return $this->belongsTo(Stamp::class, 'stamp_id', 'id');
     }

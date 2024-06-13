@@ -115,9 +115,9 @@ class TerminalController extends Controller
             }
 
             return response([
-                'total_rows'   => $paginate->total(),
+                'total_rows' => $paginate->total(),
                 'current_page' => $paginate->currentPage(),
-                'items'        => $paginate->getCollection(),
+                'items' => $paginate->getCollection(),
             ]);
         }
 
@@ -155,7 +155,7 @@ class TerminalController extends Controller
         $pointsToTable = $points->map(function ($model) {
             $option['label'] = $model->name;
 
-            foreach ($model->pvs as $pv){
+            foreach ($model->pvs as $pv) {
                 $option['options'][] = [
                     'value' => $pv['id'],
                     'text' => $pv['name']
@@ -190,6 +190,7 @@ class TerminalController extends Controller
             'permission_to_create' => $user->access('employee_create'),
             'permission_to_delete' => $user->access('employee_delete'),
             'permission_to_trash' => $user->access('employee_trash'),
+            'permission_to_logs_read' => user()->access('employee_logs_read')
         ];
 
         $fields = FieldPrompt::query()
@@ -198,7 +199,7 @@ class TerminalController extends Controller
             ->orderBy('id')
             ->get();
 
-        return view('admin.users_v2.terminal')
+        return view('admin.users.terminal')
             ->with([
 
                 'fields' => $fields,
@@ -215,7 +216,8 @@ class TerminalController extends Controller
             ]);
     }
 
-    public function getConnectionStatus(Request $request) {
+    public function getConnectionStatus(Request $request)
+    {
         if (!$request->terminals_id) {
             return;
         }
@@ -245,8 +247,7 @@ class TerminalController extends Controller
             if ($request->input('user_id')) {
                 $userId = $request->input('user_id');
                 $terminalUpdateHandler->handle($request);
-            }
-            else {
+            } else {
                 $userId = $terminalStoreHandler->handle($request);
             }
 
@@ -258,8 +259,7 @@ class TerminalController extends Controller
                         Carbon::parse($request->input('date_check'))
                     )
                 );
-            }
-            else {
+            } else {
                 $terminalCheckStoreHandler->handle(new TerminalCheckStoreAction(
                     $userId,
                     $request->input('serial_number'),
@@ -269,7 +269,7 @@ class TerminalController extends Controller
 
             // todo(hv): вынести в action
             TerminalDevice::where('user_id', '=', $userId)->forceDelete();
-            foreach ($request->input('devices') as  $device) {
+            foreach ($request->input('devices') as $device) {
                 $terminalDeviceStoreHandler->handle(new TerminalDeviceStoreAction(
                     $userId,
                     $device['id'],
@@ -283,7 +283,7 @@ class TerminalController extends Controller
             DB::commit();
 
             return response([
-                'status'    => true,
+                'status' => true,
                 'user_info' => User::query()
                     ->with(['company'])
                     ->find($user->id),

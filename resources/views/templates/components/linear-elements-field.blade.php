@@ -1,6 +1,8 @@
 @php
     $uniqueInputId = sha1(time() + rand(999, 99999));
-    if ($k === 'date_of_employment') {
+    $disabled = $disabled ?? true;
+    if (($k ?? null) === 'date_of_employment') {
+        $default_value = $default_value ?? null;
         if ($default_value == 'current_date') {
             $default_value = \Carbon\Carbon::now()->format('Y-m-d');
         } else if ($default_value != null) {
@@ -16,7 +18,7 @@
     @if($v['type'] == 'file' && isset($v['resize']))
         id="croppie-input{{ $uniqueInputId }}"
     @endif
-
+    @if($disabled) disabled @endif
     value="{{ $default_value }}"
     type="{{ $v['type'] }}" {{ $is_required }}
     name="{{ $k }}"

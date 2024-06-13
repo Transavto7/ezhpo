@@ -134,6 +134,8 @@ Route::middleware('auth:api')->prefix('sdpo')->name('sdpo')->group(function () {
     });
 
     Route::get('/pv', 'Api\SdpoController@getPoint');
+    Route::get('/stamp', 'Api\SdpoController@getStamp');
+    Route::get('/stamps', 'Api\SdpoController@getStamps');
     Route::get('/terminal/verification', 'Api\SdpoController@getTerminalVerification');
     Route::get('/medics', 'Api\SdpoController@getMedics');
 
