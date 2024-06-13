@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class HomeController extends Controller
@@ -315,6 +316,8 @@ class HomeController extends Controller
          * <Измеряем количество Авто и Водителей (уникальные ID)>
          */
 
+        $export = $filterActivated && $request->get('export');
+
         /**
          * Обогащение данных
          */
@@ -333,6 +336,15 @@ class HomeController extends Controller
                 ->select([
                     'anketas.*',
                     'points.name as pv_id'
+                ]);
+        } else if (($validTypeForm == 'medic') && $export) {
+            $forms = $forms
+                ->with('operator')
+                ->leftJoin('medic_form_normalized_pressures', 'anketas.id', '=', 'medic_form_normalized_pressures.form_id')
+                ->select([
+                    'anketas.*',
+                    'anketas.pv_id as pv_id',
+                    DB::raw("COALESCE(medic_form_normalized_pressures.pressure, anketas.tonometer, NULL) as tonometer")
                 ]);
         } else if ($validTypeForm == 'medic') {
             $forms = $forms
@@ -383,7 +395,7 @@ class HomeController extends Controller
         /**
          * Экспорт журнала
          */
-        if ($filterActivated && $request->get('export')) {
+        if ($export) {
             $forms = $forms->orderBy('date');
 
             if ($validTypeForm == 'tech' && $request->get('exportPrikaz')) {
