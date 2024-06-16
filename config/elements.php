@@ -385,6 +385,15 @@ return [
                 'type' => 'number',
                 'noRequired' => 1,
             ],
+            'only_offline_medic_inspections' => [
+                'label' => 'Блокировка прохождения МО',
+                'type' => 'select',
+                'values' => [
+                    0 => 'Нет',
+                    1 => 'Да',
+                ],
+                'noRequired' => 1,
+            ],
         ],
     ],
 
