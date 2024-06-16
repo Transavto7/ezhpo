@@ -293,10 +293,11 @@ abstract class AbstractCreateFormHandler
         return true;
     }
 
+    //TODO: вынести в трейт или хэлпер
     protected function isDuplicate($first, $second): bool
     {
-        $diffInMinutes = round(($first - Carbon::parse($second)->timestamp)/60, 1);
+        $diffInMinutes = abs($first - Carbon::parse($second)->timestamp);
 
-        return $diffInMinutes < 1 && $diffInMinutes >= 0;
+        return ($diffInMinutes < Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS) && ($diffInMinutes >= 0);
     }
 }

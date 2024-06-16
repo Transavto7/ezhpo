@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Anketa extends Model
 {
+    public const MIN_DIFF_BETWEEN_FORMS_IN_SECONDS = 60;
+
     // archive
     public function contract_snapshot()
     {
