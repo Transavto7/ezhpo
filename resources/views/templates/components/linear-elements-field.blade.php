@@ -1,6 +1,6 @@
 @php
     $uniqueInputId = sha1(time() + rand(999, 99999));
-    $disabled = $disabled ?? true;
+    $disabled = $disabled ?? false;
     if (($k ?? null) === 'date_of_employment') {
         $default_value = $default_value ?? null;
         if ($default_value == 'current_date') {
