@@ -27,6 +27,10 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         $drivers = [$this->data['driver_id'] ?? 0];
 
         $this->existForms = Anketa::query()
+            ->select([
+                'id',
+                'date'
+            ])
             ->where('driver_id', $drivers)
             ->where('type_anketa', 'medic')
             ->where('in_cart', 0)

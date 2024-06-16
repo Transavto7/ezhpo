@@ -101,10 +101,9 @@ class AnketsController extends Controller
             $data['default_current_date'] = date('Y-m-d\TH:i', strtotime($form->date));
         }
 
-        $data['default_point'] = $form->point_id ?? $form->pv_id;
         $data['points'] = Point::getAll();
         $data['anketa_view'] = 'profile.ankets.' . $form->type_anketa;
-        $data['default_pv_id'] = $form->point_id ?? $form->pv_id;
+        $data['pv_id'] = $form->point_id ?? $form->pv_id;
         $data['anketa_route'] = 'forms.update';
         $data['company_fields'] = $companyFields;
 

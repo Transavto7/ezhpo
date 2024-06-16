@@ -40,6 +40,10 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         }
 
         $this->existForms = Anketa::query()
+            ->select([
+                'id',
+                'date'
+            ])
             ->whereIn('car_id', $cars)
             ->where('type_anketa', 'tech')
             ->where('in_cart', 0)
