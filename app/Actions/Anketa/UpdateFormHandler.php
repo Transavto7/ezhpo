@@ -8,9 +8,12 @@ use App\Company;
 use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Http\Controllers\SmsController;
+use App\MedicFormNormalizedPressure;
 use App\Point;
 use App\Settings;
 use App\User;
+use App\ValueObjects\PressureLimits;
+use App\ValueObjects\Tonometer;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
@@ -20,6 +23,7 @@ class UpdateFormHandler
     public function handle(Anketa $form, array $data, Authenticatable $user)
     {
         $isPakQueueForm = $form['type_anketa'] === FormTypeEnum::PAK_QUEUE;
+        $isMedicForm = $form['type_anketa'] === FormTypeEnum::MEDIC;
 
         $point = Point::where('id', $data['pv_id'])->first();
         $data['pv_id'] = $point->name;
@@ -86,6 +90,26 @@ class UpdateFormHandler
         if ($isPakQueueForm) {
             $this->updatePakQueueForm($form, $user);
             $this->notifyCancel($form);
+        }
+
+        if ($isMedicForm) {
+            $this->normalizeMedicPressure($form);
+        }
+    }
+
+    protected function normalizeMedicPressure(Anketa $form)
+    {
+        $driver = Driver::where('hash_id', $form->driver_id)->first();
+        $pressure = Tonometer::fromString($form->tonometer);
+        $pressureLimits = PressureLimits::create($driver);
+
+        if ($pressure->needNormalize($pressureLimits)) {
+            MedicFormNormalizedPressure::store(
+                $form->id,
+                $pressure->getNormalized()
+            );
+        } else {
+            MedicFormNormalizedPressure::reset($form->id);
         }
     }
 
