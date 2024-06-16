@@ -1,20 +1,20 @@
 @php
-    $isSelected = function($child): bool {
-        if (isset($default_point)) {
-            if ($default_point === $child['id'] || $default_point === $child['name']) {
-                return true;
-            }
-        } else {
-            if (session()->has('anketa_pv_id') && $child['id'] == session('anketa_pv_id')['value']) {
-                return true;
-            }
+    $default_pv_id = $default_pv_id ?? null;
+    $pv_id = $pv_id ?? null;
+    $isSelected = function($child) use ($pv_id, $default_pv_id): bool {
+        switch (true) {
+            /** Установлено в осмотре */
+            case !is_null($pv_id):
+                return $pv_id === $child['id'] || $pv_id === $child['name'];
+            /** Установлено в сессии */
+            case session()->has('anketa_pv_id'):
+                return $child['id'] === session('anketa_pv_id')['value'];
+            /** Установлено у пользователя */
+            case !is_null($default_pv_id):
+                return $default_pv_id === $child['id'] || $default_pv_id === $child['name'];
+            default:
+                return false;
         }
-
-        if (isset($default_pv_id) && ($default_pv_id === $child['name'] || $default_pv_id === $child['id'])) {
-            return true;
-        }
-
-        return false;
     };
 @endphp
 
