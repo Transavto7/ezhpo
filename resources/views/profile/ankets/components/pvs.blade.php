@@ -5,13 +5,13 @@
         switch (true) {
             /** Установлено в осмотре */
             case !is_null($pv_id):
-                return $pv_id === $child['id'] || $pv_id === $child['name'];
+                return $pv_id == $child['id'] || $pv_id === $child['name'];
             /** Установлено в сессии */
             case session()->has('anketa_pv_id'):
-                return $child['id'] === session('anketa_pv_id')['value'];
+                return $child['id'] == session('anketa_pv_id')['value'];
             /** Установлено у пользователя */
             case !is_null($default_pv_id):
-                return $default_pv_id === $child['id'] || $default_pv_id === $child['name'];
+                return $default_pv_id == $child['id'] || $default_pv_id === $child['name'];
             default:
                 return false;
         }
