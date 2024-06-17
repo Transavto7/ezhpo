@@ -458,7 +458,8 @@ class SdpoController extends Controller
                 'company_id',
                 'end_of_ban',
                 'photo',
-                'phone'
+                'phone',
+                'only_offline_medic_inspections'
             ])
             ->first();
 
