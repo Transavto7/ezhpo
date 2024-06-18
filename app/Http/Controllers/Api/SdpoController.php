@@ -124,10 +124,19 @@ class SdpoController extends Controller
                 throw new Exception($message, 400);
             }
 
+            if ($driver->dismissed === 'Да') {
+                throw new Exception('Водитель с указанным ID уволен!', 303);
+            }
+
             $company = $driver->company;
             if ($company->dismissed === 'Да') {
                 $message = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
                 throw new Exception($message, 401);
+            }
+
+            if ($driver->only_offline_medic_inspections) {
+                $message = 'Водителю ограничен дистанционный выпуск, обратитесь к медицинскому сотруднику на Пункте Выпуска!';
+                throw new Exception($message, 400);
             }
 
             //TODO: добавить валидацию
@@ -246,7 +255,6 @@ class SdpoController extends Controller
                 $medic['med_view'] = 'Отстранение';
             }
 
-            $needStoreNormalizedPressure = false;
             $pressure = Tonometer::fromString($tonometer);
             $pressureLimits = PressureLimits::create($driver);
             if (!$pressure->isAdmitted($pressureLimits)) {
@@ -450,7 +458,8 @@ class SdpoController extends Controller
                 'company_id',
                 'end_of_ban',
                 'photo',
-                'phone'
+                'phone',
+                'only_offline_medic_inspections'
             ])
             ->first();
 
@@ -477,6 +486,10 @@ class SdpoController extends Controller
 
         if ($driver->company->dismissed === 'Да') {
             return response()->json(['message' => 'Компания указанного водителя заблокирована!'], 303);
+        }
+
+        if ($driver->only_offline_medic_inspections) {
+            return response()->json(['message' => 'Водителю ограничен дистанционный выпуск, обратитесь к медицинскому сотруднику на Пункте Выпуска!'], 400);
         }
 
         return response()->json($driver);
@@ -506,6 +519,10 @@ class SdpoController extends Controller
 
         if ($driver->company->dismissed === 'Да') {
             return response()->json(['message' => 'Компания указанного водителя заблокирована!'], 303);
+        }
+
+        if ($driver->only_offline_medic_inspections) {
+            return response()->json(['message' => 'Водителю ограничен дистанционный выпуск, обратитесь к медицинскому сотруднику на Пункте Выпуска!'], 400);
         }
 
         $phone = new Phone($request->input('phone'));
