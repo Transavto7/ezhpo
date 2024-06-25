@@ -442,6 +442,7 @@ class IndexController extends Controller
      */
     public function RenderElements(Request $request)
     {
+        $isAdminOrClient = (Auth::user()->hasRole('admin') || Auth::user()->hasRole('client'));
         $type = $request->type;
         if (!isset($this->elements[$type])) {
             return redirect(route('home'));
@@ -588,6 +589,8 @@ class IndexController extends Controller
         $data['otherRoles'][] = 'admin';
         $data['queryString'] = Arr::query($request->except([$oKey, $oBy]));;
         $data['fieldPrompts'] = FieldPrompt::where('type', strtolower($model))->get();
+        $data['isAdminOrClient'] = false;
+//        $data['isAdminOrClient'] = $isAdminOrClient;
 
         return view('elements', $data);
     }

@@ -23,6 +23,7 @@
     @include('modals.model-log-modal')
     @include('modals.driver-import-modal')
     @include('modals.car-import-modal')
+    @include('modals.export-modal', ['model' => $model])
     @if($errors->any())
         <div class="alert alert-danger" role="alert">
             <i class="mdi mdi-block-helper mr-2"></i> Ошибка валидации.
@@ -404,9 +405,18 @@
                     </div>
                 @endif
 
-                @if($permissionToExport && ! request()->get('deleted'))
+                @if($permissionToExport && ! request()->get('deleted') && $isAdminOrClient)
                     <div class="m-2">
-                        <export-element-button export-url="{{ route('exportElement', $model) }}" />
+                        <export-element-button export-url="{{ route('exportElement', $model) }}"/>
+                    </div>
+                @endif
+
+                @if($permissionToExport && ! request()->get('deleted') && ! $isAdminOrClient)
+                    <div class="m-2">
+                        <button type="button" data-toggle="modal" data-target="#export-modal"
+                                class="btn btn-sm btn-success">
+                            Экспортировать <i class="fa fa-file-excel-o"></i>
+                        </button>
                     </div>
                 @endif
 

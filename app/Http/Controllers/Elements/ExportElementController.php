@@ -8,15 +8,19 @@ use App\Actions\Element\Export\ExportElementHandlerFactory;
 use App\Enums\ElementType;
 use App\Http\Controllers\Controller;
 use App\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 
 final class ExportElementController extends Controller
 {
-    public function __invoke(string $type)
+    public function __invoke(string $type, Request $request)
     {
-        $userCompanyId = User::getUserCompanyId('id', true);
+        $authUser = Auth::user();
+        $userCompanyId = $authUser->hasRole('client')
+            ? User::getUserCompanyId('id', true)
+            : $request->input('company_id', -1);
 
         $handler = ExportElementHandlerFactory::make(
             ElementType::fromString(mb_strtolower($type)),
