@@ -399,6 +399,19 @@ class IndexController extends Controller
             $disabledFields[] = 'pressure_systolic';
             $disabledFields[] = 'pressure_diastolic';
         }
+        if (($model === 'Car') && user()->hasRole('client')) {
+            $disabledFields[] = 'note';
+            $disabledFields[] = 'procedure_pv';
+        }
+
+        if (($model === 'Driver') && user()->hasRole('client')) {
+            $disabledFields[] = 'note';
+            $disabledFields[] = 'procedure_pv';
+            $disabledFields[] = 'group_risk';
+            $disabledFields[] = 'only_offline_medic_inspections';
+            $disabledFields[] = 'pressure_systolic';
+            $disabledFields[] = 'pressure_diastolic';
+        }
         $page['disabledFields'] = $disabledFields;
 
         $fieldsToSkip = [

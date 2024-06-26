@@ -5,8 +5,7 @@
     $key = $v['getFieldKey'] ?? 'id';
     $value = $v['getField'] ?? 'name';
     $concatField = $v['concatField'] ?? false;
-
-    $disabled = false;
+    $disabled = $disabled ?? false;
     if (($el->type_product ?? '') == 'Абонентская плата без реестров' && in_array($k, ['type_view', 'type_anketa'])) {
         $disabled = true;
     }
