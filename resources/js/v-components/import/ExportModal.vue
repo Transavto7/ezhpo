@@ -14,13 +14,21 @@ export default {
     data() {
         return {
             pending: false,
+            showError: false,
         };
     },
     methods: {
         handleExportClick() {
-            const companyId = '';
+            const companyId = $('#export_company_select').val();
+            if (companyId == null) {
+                this.showError = true;
+                setTimeout(() => {
+                    this.showError = false
+                }, 5000)
+                return;
+            }
             this.pending = true;
-            axios.post(this.exportUrl)
+            axios.post(this.exportUrl, {company_id: companyId})
                 .then(({data}) => {
                     window.location.href = data.url;
                 })
@@ -46,6 +54,9 @@ export default {
 <template>
     <form @submit.prevent="handleExportClick">
         <div class="modal-body">
+            <div class="alert alert-danger" v-if="showError">
+                <strong>Ошибка валидации!</strong> Компания для экспорта обязательна для заполнения.
+            </div>
             <slot></slot>
         </div>
         <div class="modal-footer">
@@ -67,5 +78,7 @@ export default {
 </template>
 
 <style scoped>
-
+.alert-danger {
+    font-size: 12px;
+}
 </style>

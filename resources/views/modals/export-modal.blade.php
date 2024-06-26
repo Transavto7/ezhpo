@@ -10,10 +10,8 @@
             </div>
             <export-modal export-url="{{ route('exportElement', $model) }}">
                 <div class="form-group">
+                    <label for="export_company_select">Выберите компанию для экспорта</label>
                     <select id="export_company_select" class="form-control">
-                        @foreach(\App\Company::all() as $company)
-                            <option value="{{ $company->id }}">{{ $company->name }}</option>
-                        @endforeach
                     </select>
                 </div>
             </export-modal>

@@ -391,11 +391,11 @@ class IndexController extends Controller
         $page['el'] = $query->find($id);
 
         $disabledFields = [];
-        if (($model === 'Company') && !user()->access('company_update_pressure_fields')) {
+        if (($model === 'Company') && (user()->hasRole('client') || !user()->access('company_update_pressure_fields'))) {
             $disabledFields[] = 'pressure_systolic';
             $disabledFields[] = 'pressure_diastolic';
         }
-        if (($model === 'Driver') && !user()->access('drivers_update_pressure_fields')) {
+        if (($model === 'Driver') && (user()->hasRole('client') || !user()->access('drivers_update_pressure_fields'))) {
             $disabledFields[] = 'pressure_systolic';
             $disabledFields[] = 'pressure_diastolic';
         }
@@ -602,8 +602,7 @@ class IndexController extends Controller
         $data['otherRoles'][] = 'admin';
         $data['queryString'] = Arr::query($request->except([$oKey, $oBy]));;
         $data['fieldPrompts'] = FieldPrompt::where('type', strtolower($model))->get();
-        $data['isAdminOrClient'] = false;
-//        $data['isAdminOrClient'] = $isAdminOrClient;
+        $data['isAdminOrClient'] = $isAdminOrClient;
 
         return view('elements', $data);
     }

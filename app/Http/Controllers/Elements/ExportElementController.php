@@ -20,7 +20,7 @@ final class ExportElementController extends Controller
         $authUser = Auth::user();
         $userCompanyId = $authUser->hasRole('client')
             ? User::getUserCompanyId('id', true)
-            : $request->input('company_id', -1);
+            : (int)$request->input('company_id', -1);
 
         $handler = ExportElementHandlerFactory::make(
             ElementType::fromString(mb_strtolower($type)),

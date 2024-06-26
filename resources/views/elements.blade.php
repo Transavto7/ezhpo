@@ -835,6 +835,37 @@
                     }
                 ))
             })
+
+            $('#export_company_select').select2({
+                dropdownParent: $('#export-modal'),
+                placeholder: 'Нажмите для выбора из списка',
+                allowClear: true,
+                multiple: false,
+                width: '100%',
+                ajax: {
+                    dataType: 'json',
+                    url: '{{ route('companies.select') }}',
+                    delay: 250,
+                    data: (params) => {
+                        return {
+                            search: params.term || ''
+                        }
+                    },
+                    processResults: (result) => {
+                        return {
+                            results: result.map((item) => {
+                                return {
+                                    id: item.id,
+                                    text: `[${item.hash_id}] ${item.name}`
+                                }
+                            })
+                        }
+                    },
+                    cache: true
+
+                }
+            });
+
         </script>
     @endsection
 @endsection

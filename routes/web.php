@@ -146,6 +146,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('delete-file/{model}/{id}/{field}', 'IndexController@DeleteFileElement')->name('deleteFileElement');
         });
 
+        Route::get('/companies/select', 'ApiController@companiesList')->name('companies.select');
+
         Route::get('elements-syncdata/{fieldFindId}/{fieldFind}/{model}/{fieldSync}/{fieldSyncValue?}', 'IndexController@SyncDataElement')->name('syncDataElement');
 
         Route::prefix('anketa')->group(function () {
