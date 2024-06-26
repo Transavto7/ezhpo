@@ -84,9 +84,23 @@
                                     @continue
                                 @endif
 
-                                @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
+                                @php
 
-                                @php $default_value = isset($v['defaultValue']) ? $v['defaultValue'] : '' @endphp
+                                    $is_required = isset($v['noRequired']) ? '' : 'required';
+                                    $default_value = $v['defaultValue'] ?? '';
+                                    $disabled = false;
+
+                                    if (true || user()->hasRole('client')) {
+                                        if ($model === 'Driver' && in_array($k, ['group_risk', 'note', 'procedure_pv', 'pressure_systolic', 'pressure_diastolic', 'only_offline_medic_inspections'])) {
+                                            $disabled = true;
+                                        }
+
+                                        if ($model === 'Car' && in_array($k, ['note', 'procedure_pv'])) {
+                                            $disabled = true;
+                                        }
+                                    }
+
+                                @endphp
 
                                 @if($k !== 'id' && !isset($v['hidden']))
                                     @if($model === 'Instr' && $k === 'sort')
@@ -119,6 +133,8 @@
                                     @endif
                                 @endif
                             @endforeach
+
+                            @php $disabled = false; @endphp
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-sm btn-success">Добавить</button>
