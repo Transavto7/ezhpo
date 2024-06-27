@@ -23,6 +23,7 @@
     @include('modals.model-log-modal')
     @include('modals.driver-import-modal')
     @include('modals.car-import-modal')
+    @include('modals.export-modal', ['model' => $model])
     @if($errors->any())
         <div class="alert alert-danger" role="alert">
             <i class="mdi mdi-block-helper mr-2"></i> Ошибка валидации.
@@ -84,9 +85,23 @@
                                     @continue
                                 @endif
 
-                                @php $is_required = isset($v['noRequired']) ? '' : 'required' @endphp
+                                @php
 
-                                @php $default_value = isset($v['defaultValue']) ? $v['defaultValue'] : '' @endphp
+                                    $is_required = isset($v['noRequired']) ? '' : 'required';
+                                    $default_value = $v['defaultValue'] ?? '';
+                                    $disabled = false;
+
+                                    if (true || user()->hasRole('client')) {
+                                        if ($model === 'Driver' && in_array($k, ['group_risk', 'note', 'procedure_pv', 'pressure_systolic', 'pressure_diastolic', 'only_offline_medic_inspections'])) {
+                                            $disabled = true;
+                                        }
+
+                                        if ($model === 'Car' && in_array($k, ['note', 'procedure_pv'])) {
+                                            $disabled = true;
+                                        }
+                                    }
+
+                                @endphp
 
                                 @if($k !== 'id' && !isset($v['hidden']))
                                     @if($model === 'Instr' && $k === 'sort')
@@ -119,6 +134,8 @@
                                     @endif
                                 @endif
                             @endforeach
+
+                            @php $disabled = false; @endphp
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-sm btn-success">Добавить</button>
@@ -404,9 +421,18 @@
                     </div>
                 @endif
 
-                @if($permissionToExport && ! request()->get('deleted'))
+                @if($permissionToExport && ! request()->get('deleted') && $isAdminOrClient)
                     <div class="m-2">
-                        <export-element-button export-url="{{ route('exportElement', $model) }}" />
+                        <export-element-button export-url="{{ route('exportElement', $model) }}"/>
+                    </div>
+                @endif
+
+                @if($permissionToExport && ! request()->get('deleted') && ! $isAdminOrClient)
+                    <div class="m-2">
+                        <button type="button" data-toggle="modal" data-target="#export-modal"
+                                class="btn btn-sm btn-success">
+                            Экспортировать <i class="fa fa-file-excel-o"></i>
+                        </button>
                     </div>
                 @endif
 
@@ -809,6 +835,37 @@
                     }
                 ))
             })
+
+            $('#export_company_select').select2({
+                dropdownParent: $('#export-modal'),
+                placeholder: 'Нажмите для выбора из списка',
+                allowClear: true,
+                multiple: false,
+                width: '100%',
+                ajax: {
+                    dataType: 'json',
+                    url: '{{ route('companies.select') }}',
+                    delay: 250,
+                    data: (params) => {
+                        return {
+                            search: params.term || ''
+                        }
+                    },
+                    processResults: (result) => {
+                        return {
+                            results: result.map((item) => {
+                                return {
+                                    id: item.id,
+                                    text: `[${item.hash_id}] ${item.name}`
+                                }
+                            })
+                        }
+                    },
+                    cache: true
+
+                }
+            });
+
         </script>
     @endsection
 @endsection

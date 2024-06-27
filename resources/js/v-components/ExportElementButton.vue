@@ -19,7 +19,7 @@ export default {
     methods: {
         handleExportClick() {
             this.pending = true;
-            axios.get(this.exportUrl)
+            axios.post(this.exportUrl)
                 .then(({data}) => {
                     window.location.href = data.url;
                 })

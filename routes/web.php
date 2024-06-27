@@ -135,7 +135,7 @@ Route::middleware(['auth'])->group(function () {
          * Элементы CRM
          */
         Route::prefix('elements')->group(function () {
-            Route::get('/export/{type}', 'Elements\ExportElementController')->name('exportElement');
+            Route::post('/export/{type}', 'Elements\ExportElementController')->name('exportElement');
             Route::post('/import', 'Elements\ImportElementController')->name('importElement');
             Route::post('/search', 'Elements\SearchElementsController')->name('searchElement');
             Route::get('{type}', 'IndexController@RenderElements')->name('renderElements');
@@ -145,6 +145,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('{type}/sync/{id}', 'IndexController@syncElement')->name('syncElement');
             Route::get('delete-file/{model}/{id}/{field}', 'IndexController@DeleteFileElement')->name('deleteFileElement');
         });
+
+        Route::get('/companies/select', 'ApiController@companiesList')->name('companies.select');
 
         Route::get('elements-syncdata/{fieldFindId}/{fieldFind}/{model}/{fieldSync}/{fieldSyncValue?}', 'IndexController@SyncDataElement')->name('syncDataElement');
 

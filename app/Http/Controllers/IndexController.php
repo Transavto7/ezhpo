@@ -391,11 +391,24 @@ class IndexController extends Controller
         $page['el'] = $query->find($id);
 
         $disabledFields = [];
-        if (($model === 'Company') && !user()->access('company_update_pressure_fields')) {
+        if (($model === 'Company') && (user()->hasRole('client') || !user()->access('company_update_pressure_fields'))) {
             $disabledFields[] = 'pressure_systolic';
             $disabledFields[] = 'pressure_diastolic';
         }
-        if (($model === 'Driver') && !user()->access('drivers_update_pressure_fields')) {
+        if (($model === 'Driver') && (user()->hasRole('client') || !user()->access('drivers_update_pressure_fields'))) {
+            $disabledFields[] = 'pressure_systolic';
+            $disabledFields[] = 'pressure_diastolic';
+        }
+        if (($model === 'Car') && user()->hasRole('client')) {
+            $disabledFields[] = 'note';
+            $disabledFields[] = 'procedure_pv';
+        }
+
+        if (($model === 'Driver') && user()->hasRole('client')) {
+            $disabledFields[] = 'note';
+            $disabledFields[] = 'procedure_pv';
+            $disabledFields[] = 'group_risk';
+            $disabledFields[] = 'only_offline_medic_inspections';
             $disabledFields[] = 'pressure_systolic';
             $disabledFields[] = 'pressure_diastolic';
         }
@@ -442,6 +455,7 @@ class IndexController extends Controller
      */
     public function RenderElements(Request $request)
     {
+        $isAdminOrClient = (Auth::user()->hasRole('admin') || Auth::user()->hasRole('client'));
         $type = $request->type;
         if (!isset($this->elements[$type])) {
             return redirect(route('home'));
@@ -588,6 +602,7 @@ class IndexController extends Controller
         $data['otherRoles'][] = 'admin';
         $data['queryString'] = Arr::query($request->except([$oKey, $oBy]));;
         $data['fieldPrompts'] = FieldPrompt::where('type', strtolower($model))->get();
+        $data['isAdminOrClient'] = $isAdminOrClient;
 
         return view('elements', $data);
     }
