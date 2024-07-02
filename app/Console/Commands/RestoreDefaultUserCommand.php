@@ -104,6 +104,7 @@ class RestoreDefaultUserCommand extends Command
                     'deleted_at' => null,
                     'deleted_id' => null
                 ]);
+                $existUser->restore();
             }
 
             $existUser->roles()->syncWithoutDetaching([$adminRole->id]);
