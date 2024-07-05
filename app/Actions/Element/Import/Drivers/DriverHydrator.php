@@ -64,7 +64,7 @@ final class DriverHydrator extends ElementHydrator
             $row['fullName'],
             Carbon::parse($row['birthday']),
             $row['companyName'],
-            Gender::parse($row['gender']),
+            $row['gender'] !== null ? Gender::parse($row['gender']) : null,
             $row['phone'],
             $row['snils'],
             $row['license'],
