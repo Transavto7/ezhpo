@@ -15,6 +15,7 @@
 @endphp
 
 <select
+    {{ $is_required }}
     @if($disabled)
         disabled
     @endif
