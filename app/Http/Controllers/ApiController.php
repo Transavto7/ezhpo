@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Anketa;
 use App\Car;
 use App\Company;
 use App\Driver;
+use App\Enums\FormTypeEnum;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -311,7 +313,6 @@ class ApiController extends Controller
 
     /**
      * Сохранение перечня фильтруемых полей у пользователя
-     * TODO: сохранять по-модельно, а не все вместе
      */
     public function saveFieldsVisible(Request $request)
     {
@@ -323,5 +324,32 @@ class ApiController extends Controller
         }
 
         $user->save();
+    }
+
+    public function getPreviousOdometer(Request $request): JsonResponse
+    {
+        //TODO: добавить валидацию
+        $carHashId = $request->input('car_id');
+        $date = $request->input('date');
+
+        $nearestTechForm = Anketa::query()
+            ->where('type_anketa', FormTypeEnum::TECH)
+            ->where('car_id', $carHashId)
+            ->whereDate('date', '<=', Carbon::parse($date))
+            ->whereNotNull('odometer')
+            ->orderBy('date', 'DESC')
+            ->first();
+
+        if (!$nearestTechForm) {
+            return response()->json(['message' => 'Предыдущих осмотров с таким ID автомобиля - не найдено']);
+        }
+
+        $message = sprintf(
+            '%s (%s)',
+            $nearestTechForm->getAttribute('odometer'),
+            $nearestTechForm->getAttribute('date')
+        );
+
+        return response()->json(['message' => $message]);
     }
 }

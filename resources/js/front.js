@@ -676,6 +676,49 @@ $(document).ready(function () {
         }
     };
 
+    window.loadPreviousOdometer = async () => {
+        //TODO: добавить проверку существования инпутов
+        const previousOdometerContainer = $(event.target).parent().parent()
+        const formContainer = previousOdometerContainer.parent().parent()
+        const previousOdometerInput = previousOdometerContainer.find('input')[0]
+        const formPrefix = previousOdometerInput.name.match(/\[([0-9]+)\]/)[0]
+        const carIdInput = formContainer.find(`input[name="anketa${formPrefix}[car_id]"]`)[0]
+        const dateInput = formContainer.find(`input[name="anketa${formPrefix}[date]"]`)[0]
+        const carIdValue = carIdInput.value
+        const dateValue = dateInput.value
+
+        if (carIdValue.trim().length === 0) {
+            previousOdometerInput.value = 'Не указан ID автомобиля'
+
+            return;
+        }
+
+        if (dateValue.trim().length === 0) {
+            previousOdometerInput.value = 'Не указана дата осмотра'
+
+            return;
+        }
+
+        previousOdometerInput.value = 'Получение данных...'
+
+        $.ajax({
+            type: "POST",
+            url: `/api/get-previous-odometer`,
+            headers: {'Authorization': 'Bearer ' + API_TOKEN},
+            data: {
+                car_id: carIdValue,
+                date: dateValue
+            },
+            success: (response) => {
+                previousOdometerInput.value = response.message
+            },
+            error: (jqXHR, textStatus) => {
+                previousOdometerInput.value = 'Ошибка получения данных!'
+                console.log(textStatus)
+            }
+        });
+    }
+
     // Проверка свойства по модели на бэкенда
     window.checkInputProp = async (prop = '0', model = '0', val = '0', label, parent, is_dop) => {
         let PARENT_ELEM;
