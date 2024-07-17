@@ -7,6 +7,7 @@ use App\Car;
 use App\Company;
 use App\Driver;
 use App\Enums\FormTypeEnum;
+use App\Http\Requests\GetPreviousOdometerRequest;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -326,16 +327,17 @@ class ApiController extends Controller
         $user->save();
     }
 
-    public function getPreviousOdometer(Request $request): JsonResponse
+    public function getPreviousOdometer(GetPreviousOdometerRequest $request): JsonResponse
     {
-        //TODO: добавить валидацию
-        $carHashId = $request->input('car_id');
-        $date = $request->input('date');
-
         $nearestTechForm = Anketa::query()
+            ->select([
+                'id',
+                'date',
+                'odometer',
+            ])
             ->where('type_anketa', FormTypeEnum::TECH)
-            ->where('car_id', $carHashId)
-            ->whereDate('date', '<=', Carbon::parse($date))
+            ->where('car_id', $request->input('car_id'))
+            ->whereDate('date', '<=', Carbon::parse($request->input('date')))
             ->whereNotNull('odometer')
             ->orderBy('date', 'DESC')
             ->first();
@@ -345,9 +347,10 @@ class ApiController extends Controller
         }
 
         $message = sprintf(
-            '%s (%s)',
+            '%s км %s (ТО ID - %s)',
             $nearestTechForm->getAttribute('odometer'),
-            $nearestTechForm->getAttribute('date')
+            $nearestTechForm->getAttribute('date'),
+            $nearestTechForm->getAttribute('id')
         );
 
         return response()->json(['message' => $message]);

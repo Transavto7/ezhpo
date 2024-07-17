@@ -677,46 +677,65 @@ $(document).ready(function () {
     };
 
     window.loadPreviousOdometer = async () => {
-        //TODO: добавить проверку существования инпутов
         const previousOdometerContainer = $(event.target).parent().parent()
         const formContainer = previousOdometerContainer.parent().parent()
         const previousOdometerInput = previousOdometerContainer.find('input')[0]
-        const formPrefix = previousOdometerInput.name.match(/\[([0-9]+)\]/)[0]
-        const carIdInput = formContainer.find(`input[name="anketa${formPrefix}[car_id]"]`)[0]
-        const dateInput = formContainer.find(`input[name="anketa${formPrefix}[date]"]`)[0]
-        const carIdValue = carIdInput.value
-        const dateValue = dateInput.value
 
-        if (carIdValue.trim().length === 0) {
-            previousOdometerInput.value = 'Не указан ID автомобиля'
-
+        if (previousOdometerInput === undefined) {
+            console.error('Не найдено поле для предыдущего показания одометра')
             return;
         }
 
-        if (dateValue.trim().length === 0) {
-            previousOdometerInput.value = 'Не указана дата осмотра'
+        try {
+            const formPrefix = previousOdometerInput.name.match(/\[([0-9]+)\]/)[0]
 
-            return;
-        }
-
-        previousOdometerInput.value = 'Получение данных...'
-
-        $.ajax({
-            type: "POST",
-            url: `/api/get-previous-odometer`,
-            headers: {'Authorization': 'Bearer ' + API_TOKEN},
-            data: {
-                car_id: carIdValue,
-                date: dateValue
-            },
-            success: (response) => {
-                previousOdometerInput.value = response.message
-            },
-            error: (jqXHR, textStatus) => {
-                previousOdometerInput.value = 'Ошибка получения данных!'
-                console.log(textStatus)
+            const carIdInput = formContainer.find(`input[name="anketa${formPrefix}[car_id]"]`)[0]
+            if (carIdInput === undefined) {
+                previousOdometerInput.value = 'Не найдено поле ID автомобиля'
+                return
             }
-        });
+            const carIdValue = carIdInput.value
+            if (carIdValue.trim().length === 0) {
+                previousOdometerInput.value = 'Не указано ID автомобиля'
+                return;
+            }
+
+            const dateInput = formContainer.find(`input[name="anketa${formPrefix}[date]"]`)[0]
+            if (dateInput === undefined) {
+                previousOdometerInput.value = 'Не найдено поле Дата и время осмотра'
+                return
+            }
+            const dateValue = dateInput.value
+            if (dateValue.trim().length === 0) {
+                previousOdometerInput.value = 'Не указана Дата и время осмотра'
+                return;
+            }
+
+            previousOdometerInput.value = 'Получение данных...'
+
+            $.ajax({
+                type: "POST",
+                url: `/api/get-previous-odometer`,
+                headers: {'Authorization': 'Bearer ' + API_TOKEN},
+                data: {
+                    car_id: carIdValue,
+                    date: dateValue
+                },
+                success: (response) => {
+                    previousOdometerInput.value = response.message
+                },
+                error: (jqXHR) => {
+                    if (jqXHR.status === 422) {
+                        previousOdometerInput.value = Object.values(jqXHR.responseJSON.errors)[0][0]
+                    } else {
+                        previousOdometerInput.value = 'Ошибка получения данных!'
+                    }
+                }
+            });
+        } catch (e) {
+            previousOdometerInput.value = 'Ошибка!'
+            console.error(e.message)
+        }
     }
 
     // Проверка свойства по модели на бэкенда
