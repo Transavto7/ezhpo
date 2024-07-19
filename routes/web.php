@@ -41,7 +41,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', 'ContractController@view');
         Route::put('restore/{id}', 'ContractController@restore');
         Route::get('index', 'ContractController@index');
-        Route::get('getOne', 'ContractController@getOne');
         Route::post('update', 'ContractController@update');
         Route::get('create', 'ContractController@create');
         Route::delete('{id}', 'ContractController@destroy');
@@ -136,6 +135,9 @@ Route::middleware(['auth'])->group(function () {
          * Элементы CRM
          */
         Route::prefix('elements')->group(function () {
+            Route::post('/export/{type}', 'Elements\ExportElementController')->name('exportElement');
+            Route::post('/import', 'Elements\ImportElementController')->name('importElement');
+            Route::post('/search', 'Elements\SearchElementsController')->name('searchElement');
             Route::get('{type}', 'IndexController@RenderElements')->name('renderElements');
             Route::get('{type}/{id}', 'IndexController@RemoveElement')->name('removeElement');
             Route::post('{type}', 'IndexController@AddElement')->name('addElement');
@@ -144,7 +146,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('delete-file/{model}/{id}/{field}', 'IndexController@DeleteFileElement')->name('deleteFileElement');
         });
 
-        Route::post('elements-import/{type}', 'IndexController@ImportElements')->name('importElements');
+        Route::get('/companies/select', 'ApiController@companiesList')->name('companies.select');
+
         Route::get('elements-syncdata/{fieldFindId}/{fieldFind}/{model}/{fieldSync}/{fieldSyncValue?}', 'IndexController@SyncDataElement')->name('syncDataElement');
 
         Route::prefix('anketa')->group(function () {
@@ -178,16 +181,16 @@ Route::middleware(['auth'])->group(function () {
      * Панель администратора
      */
     Route::prefix('admin')->group(function () {
-        Route::prefix('users')->group(function () {
-            Route::get('/', 'AdminController@ShowUsers')->name('adminUsers');
-            Route::post('/', 'AdminController@CreateUser')->name('adminCreateUser');
-            Route::get('{id}', 'AdminController@DeleteUser')->name('adminDeleteUser');
-            Route::post('{id}', 'AdminController@UpdateUser')->name('adminUpdateUser');
-        });
-
         Route::prefix('settings')->as('settings.')->group(function () {
             Route::get('/', 'SettingsController@index')->name('index');
             Route::post('/', 'SettingsController@update')->name('update');
+        });
+
+        Route::prefix('logs')->as('logs.')->group(function () {
+            Route::get('/', 'LogController@index')->name('index');
+            Route::post('list', 'LogController@list')->name('list');
+            Route::post('list-model', 'LogController@listByModel')->name('list-model');
+            Route::post('list-model-map', 'LogController@listByModelMaps')->name('list-model-map');
         });
     });
 });

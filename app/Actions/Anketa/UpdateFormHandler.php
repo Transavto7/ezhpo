@@ -8,18 +8,24 @@ use App\Company;
 use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Http\Controllers\SmsController;
+use App\MedicFormNormalizedPressure;
 use App\Point;
 use App\Settings;
 use App\User;
+use App\ValueObjects\PressureLimits;
+use App\ValueObjects\Tonometer;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 class UpdateFormHandler
 {
     public function handle(Anketa $form, array $data, Authenticatable $user)
     {
         $isPakQueueForm = $form['type_anketa'] === FormTypeEnum::PAK_QUEUE;
+        $isMedicForm = $form['type_anketa'] === FormTypeEnum::MEDIC;
 
         $point = Point::where('id', $data['pv_id'])->first();
         $data['pv_id'] = $point->name;
@@ -87,6 +93,26 @@ class UpdateFormHandler
             $this->updatePakQueueForm($form, $user);
             $this->notifyCancel($form);
         }
+
+        if ($isMedicForm) {
+            $this->normalizeMedicPressure($form);
+        }
+    }
+
+    protected function normalizeMedicPressure(Anketa $form)
+    {
+        $driver = Driver::where('hash_id', $form->driver_id)->first();
+        $pressure = Tonometer::fromString($form->tonometer);
+        $pressureLimits = PressureLimits::create($driver);
+
+        if ($pressure->needNormalize($pressureLimits)) {
+            MedicFormNormalizedPressure::store(
+                $form->id,
+                $pressure->getNormalized()
+            );
+        } else {
+            MedicFormNormalizedPressure::reset($form->id);
+        }
     }
 
     protected function updatePakQueueForm(Anketa $form, Authenticatable $user)
@@ -127,46 +153,72 @@ class UpdateFormHandler
      */
     protected function findDuplicates(Anketa $form, array $data)
     {
-        if ($form->is_dop && $form->result_dop == null) {
+        if ($form->is_dop && ($form->result_dop == null)) {
             return;
         }
 
         $mainFormTimestamp = Carbon::parse($data['anketa'][0]['date'])->timestamp;
 
         foreach($this->getExistForms($form, $data) as $existForm) {
-            if (!$existForm->date || $existForm->id === $form->id || ($existForm->is_dop && $existForm->result_dop == null)) {
+            if ($existForm->id === $form->id) {
                 continue;
             }
 
-            $hourDiffCheck = round(($mainFormTimestamp - Carbon::parse($existForm->date)->timestamp)/60, 1);
-
-            if ($hourDiffCheck < 1 && $hourDiffCheck >= 0) {
+            if ($this->isDuplicate($mainFormTimestamp, $existForm->date)) {
                 throw new Exception("Найден дубликат осмотра (ID: $existForm->id, Дата: $existForm->date)");
             }
         }
     }
 
-    protected function getExistForms(Anketa $form, array $data)
+    protected function getExistForms(Anketa $form, array $data): Collection
     {
-        if ($form->type_anketa === 'medic') {
-            return Anketa::where('driver_id', $data['driver_id'])
-                ->where('type_anketa', 'medic')
+        $formNewDate = $data['anketa'][0]['date'];
+        $datesDiapason = [
+            Carbon::parse($formNewDate)->subSeconds(Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS),
+            Carbon::parse($formNewDate)->addSeconds(Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS)
+        ];
+
+        $query = Anketa::query()
+            ->select([
+                'id',
+                'date'
+            ])
+            ->where('type_anketa', $form->type_anketa)
+            ->where('id', '<>', $form->id)
+            ->where(function (Builder $query) {
+                $query
+                    ->where('is_dop', '<>', 1)
+                    ->orWhereNotNull('result_dop');
+            })
+            ->whereBetween('date', $datesDiapason)
+            ->whereNotNull('date')
+            ->where('in_cart', 0)
+            ->orderBy('date', 'desc');
+
+        if ($form->type_anketa === FormTypeEnum::MEDIC) {
+            return $query
+                //TODO: разобраться позднее, почему есть разница в том, где лежат данные
+                ->where('driver_id', $data['driver_id'])
                 ->where('type_view', $data['anketa'][0]['type_view'])
-                ->where('in_cart', 0)
-                ->orderBy('date', 'desc')
                 ->get();
         }
 
-        if ($form->type_anketa === 'tech') {
-            return Anketa::where('car_id', $data['anketa'][0]['car_id'])
-                ->where('type_anketa', 'tech')
+        if ($form->type_anketa === FormTypeEnum::TECH) {
+            return $query
+                ->where('car_id', $data['anketa'][0]['car_id'])
                 ->where('type_view', $data['anketa'][0]['type_view'] ?? '')
-                ->where('in_cart', 0)
-                ->orderBy('date', 'desc')
                 ->get();
         }
 
         return collect([]);
+    }
+
+    //TODO: вынести в трейт или хэлпер
+    protected function isDuplicate($first, $second): bool
+    {
+        $diffInMinutes = abs($first - Carbon::parse($second)->timestamp);
+
+        return ($diffInMinutes < Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS) && ($diffInMinutes >= 0);
     }
 
     protected function updateConnectedForm(Anketa $form)

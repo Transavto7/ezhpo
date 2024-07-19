@@ -7,6 +7,7 @@ use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Http\Controllers\SmsController;
+use App\MedicFormNormalizedPressure;
 use App\Settings;
 use App\User;
 use App\ValueObjects\Pulse;
@@ -187,6 +188,13 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
          */
         $formModel = Anketa::create($form);
         $this->createdForms->push($formModel);
+
+        if ($this->needStoreNormalizedPressure) {
+            MedicFormNormalizedPressure::store(
+                $formModel->id,
+                Tonometer::fromString($formModel->tonometer)->getNormalized()
+            );
+        }
 
         /**
          * ОТПРАВКА SMS

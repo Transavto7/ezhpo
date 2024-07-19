@@ -2,11 +2,22 @@
 
 namespace App\Providers;
 
+use App\Car;
+use App\Company;
+use App\Driver;
+use App\Models\Contract;
+use App\Observers\CompanyObserver;
+use App\Observers\ContractObserver;
+use App\Observers\DriverObserver;
+use App\Observers\CarObserver;
+use App\Observers\UserObserver;
+use App\Services\ElementsSearch\ElementSearchService;
+use App\Services\ElementsSearch\ElementsSearchServiceInterface;
+use App\Services\HashIdGenerator\HashIdGeneratorService;
 use App\Settings;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
@@ -19,7 +30,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind('hash-id-generator', function () {
+            return new HashIdGeneratorService();
+        });
+
+        $this->app->bind(ElementsSearchServiceInterface::class, ElementSearchService::class);
     }
 
     /**
@@ -31,79 +46,127 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
 
+        $this->registerBladeDirectives();
+        $this->registerModelObservers();
+    }
+
+    private function registerBladeDirectives()
+    {
+        $this->registerAdminBlade();
+        $this->registerManagerBlade();
+        $this->registerAccessSettingBlade();
+        $this->registerExcludeRoleBlade();
+        $this->registerRoleBlade();
+    }
+
+    private function registerAdminBlade()
+    {
         Blade::if('admin', function () {
+            /** @var User $user */
             $user = Auth::user();
 
-            if($user->role >= 777) {
+            if ($user->role >= 777) {
                 return 1;
             }
 
             return 0;
         });
+    }
 
+    private function registerManagerBlade()
+    {
         Blade::if('manager', function () {
+            /** @var User $user */
             $user = Auth::user();
 
-            if($user->role == 12 || $user->role == 11 || $user->role_manager || $user->role >= 777) {
+            if ($user->role_manager) {
+                return 1;
+            }
+
+            $userRole = $user->role;
+            if ($userRole == 12 || $userRole == 11 || $userRole >= 777) {
                 return 1;
             }
 
             return 0;
         });
+    }
 
+    private function registerAccessSettingBlade()
+    {
         Blade::if('accessSetting', function ($setting) {
+            /** @var Settings $setting */
             $setting = Settings::where('key', $setting)->first();
+
             if (!$setting) {
                 return false;
             }
+
             if ($setting->value == '1') {
                 return true;
             }
 
             return false;
         });
+    }
 
+    private function registerExcludeRoleBlade()
+    {
         Blade::if('excludeRole', function ($dataRoles) {
-            $roles = User::$userRolesValues;
+            /** @var User $user */
             $user = Auth::user();
-            $user_role = $user->role;
 
-            $excluded = true;
-
-            foreach($dataRoles as $role) {
-                if(isset($roles[$role])) {
-                    if($user_role == $roles[$role] && $user_role !== 777) {
-                        $excluded = false;
-                    }
-                }
+            if ($user->role_manager) {
+                return true;
             }
 
-            if($user->role_manager) {
-                $excluded = true;
-            }
-
-            return $excluded;
-        });
-
-        Blade::if('role', function ($dataRoles) {
             $roles = User::$userRolesValues;
-            $user_role = Auth::user()->role;
-            $is_role_manager = Auth::user()->role_manager;
+            foreach ($dataRoles as $role) {
+                if (!isset($roles[$role])) {
+                    continue;
+                }
 
-
-
-
-            $validRoles = [];
-
-            foreach($dataRoles as $role) {
-                if(isset($roles[$role])) {
-                    if(($user_role == $roles[$role] || ($is_role_manager && $role === 'manager')) || $user_role === 777) {
-                        $validRoles[] = 1;
-                    }
+                $userRole = $user->role;
+                if ($userRole == $roles[$role] && $userRole !== 777) {
+                    return false;
                 }
             }
 
-            return count($validRoles);
+            return true;
         });
+    }
+
+    private function registerRoleBlade()
+    {
+        Blade::if('role', function ($dataRoles) {
+            /** @var User $user */
+            $user = Auth::user();
+            $userRole = $user->role;
+            $isRoleManager = $user->role_manager;
+
+            $validRoles = 0;
+
+            $roles = User::$userRolesValues;
+            foreach($dataRoles as $role) {
+                if (!isset($roles[$role])) {
+                    continue;
+                }
+
+                if (($userRole == $roles[$role] || ($isRoleManager && $role === 'manager')) || $userRole === 777) {
+                    $validRoles++;
+                }
+            }
+
+            return $validRoles;
+        });
+    }
+
+    private function registerModelObservers()
+    {
+        Car::observe(CarObserver::class);
+        Company::observe(CompanyObserver::class);
+        Contract::observe(ContractObserver::class);
+        Driver::observe(DriverObserver::class);
+        User::observe(UserObserver::class);
     }
 }

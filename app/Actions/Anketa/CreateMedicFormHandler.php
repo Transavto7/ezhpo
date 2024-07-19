@@ -7,8 +7,8 @@ use App\Company;
 use App\Driver;
 use App\Dto\NotifyParams;
 use App\Enums\BlockActionReasonsEnum;
-use App\Enums\FormTypeEnum;
 use App\Http\Controllers\SmsController;
+use App\MedicFormNormalizedPressure;
 use App\Settings;
 use App\ValueObjects\PressureLimits;
 use App\ValueObjects\Pulse;
@@ -20,13 +20,17 @@ use Illuminate\Support\Carbon;
 
 class CreateMedicFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
 {
-    const FORM_TYPE = FormTypeEnum::MEDIC;
+    protected $needStoreNormalizedPressure = false;
 
     protected function fetchExistForms()
     {
         $drivers = [$this->data['driver_id'] ?? 0];
 
         $this->existForms = Anketa::query()
+            ->select([
+                'id',
+                'date'
+            ])
             ->where('driver_id', $drivers)
             ->where('type_anketa', 'medic')
             ->where('in_cart', 0)
@@ -225,6 +229,14 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         }
 
         $formModel->save();
+
+        if ($this->needStoreNormalizedPressure) {
+            MedicFormNormalizedPressure::store(
+                $formModel->id,
+                Tonometer::fromString($formModel->tonometer)->getNormalized()
+            );
+        }
+
         $this->createdForms->push($formModel);
     }
 
@@ -262,7 +274,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
 
     protected function admit(array $form, Driver $driver = null): bool
     {
-        if ($form['is_dop'] ?? 0 === 1) {
+        if (($form['is_dop'] ?? 0) === 1) {
             return true;
         }
 
@@ -279,15 +291,18 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         }
 
         $test_narko = $form['test_narko'];
-        if ($test_narko !== 'Отрицательно' && $test_narko !== 'Не проводился') {
+        if (($test_narko !== 'Отрицательно') && ($test_narko !== 'Не проводился')) {
             $admitted = false;
         }
 
-        if (!Tonometer::fromString($form['tonometer'])->isAdmitted(PressureLimits::create($driver))) {
+        $pressure = Tonometer::fromString($form['tonometer']);
+        $pressureLimits = PressureLimits::create($driver);
+        if (!$pressure->isAdmitted($pressureLimits)) {
             $admitted = false;
             $driver->end_of_ban = Carbon::parse($this->time)->addMinutes($driver->getTimeOfPressureBan());
             $driver->save();
         }
+        $this->needStoreNormalizedPressure = $pressure->needNormalize($pressureLimits);
 
         $pulse = new Pulse(intval($form['pulse']));
         $pulseLimits = PulseLimits::create($driver);

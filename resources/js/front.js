@@ -514,7 +514,6 @@ $(document).ready(function () {
             /**
              * Вставляем поля
              */
-            console.log(data);
             for(let i in data) {
                 let fvItem = fieldsValues[i]
 
@@ -680,7 +679,6 @@ $(document).ready(function () {
     // Проверка свойства по модели на бэкенда
     window.checkInputProp = async (prop = '0', model = '0', val = '0', label, parent, is_dop) => {
         let PARENT_ELEM;
-        console.log('---------------')
         if(parent){
             PARENT_ELEM = parent;
         }else{
@@ -689,15 +687,19 @@ $(document).ready(function () {
 
         //check-prop-one
         if(!is_dop) {
+            if (!val) {
+                return;
+            }
+
             let answer = await $.ajax({
                 url: `/api/check-prop-one/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
                 headers: {'Authorization': 'Bearer ' + API_TOKEN},
                 success:  (data) => {
                     let element = PARENT_ELEM.find('.app-checker-prop')
-                    if(data.status){
+                    if (data.status) {
                         element.removeClass('text-danger').addClass('text-success').text(data.name);
                         PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', false);
-                    }else{
+                    } else {
                         element.removeClass('text-success').addClass('text-danger').text(`Не найдено`);
                         parent.prevObject.attr('company', null);
                         PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', true);
@@ -1280,18 +1282,28 @@ $(document).ready(function () {
         triggerField()
     })
 
-    $('*[data-field="Company_name"]').suggestions({
-        token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
-        type: "PARTY",
-        /* Вызывается, когда пользователь выбирает одну из подсказок */
-        onSelect: function(suggestion) {
-            if(suggestion.data) {
+    function initCompanyNameSuggestion(companyNameInput, innInput) {
+        if (!companyNameInput) return;
+
+        if (!innInput) return;
+
+        companyNameInput.suggestions({
+            token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
+            type: "PARTY",
+            /* Вызывается, когда пользователь выбирает одну из подсказок */
+            onSelect: function(suggestion) {
+                if (!suggestion.data) {
+                    return
+                }
+
                 const { inn } = suggestion.data
 
-                $('#elements-modal-add input[name="inn"]').val(inn)
+                innInput.val(inn)
             }
-        }
-    });
+        });
+    }
+
+    initCompanyNameSuggestion($('*[data-field="Company_name"]'), $('#elements-modal-add input[name="inn"]'))
 
     $('.header #toggle-btn').each(function () {
         let localStatusSidebar = () => {
@@ -1325,6 +1337,7 @@ $(document).ready(function () {
         axios.get(route).then(({ data }) => {
             modalContent.text('').append(data);
             LIBS.initAll()
+            initCompanyNameSuggestion($('#modalEditor *[data-field="Company_name"]'), $('#modalEditor input[name="inn"]'))
         })
 
     })
@@ -1383,7 +1396,6 @@ $(document).ready(function () {
         axios.post('/contract/getAvailableForCompany', {
             company_id: value,
         }).then(({data}) => {
-            console.log(data)
             if (data.status) {
                 targetSelect.append($('<option>', {
                     value: '',

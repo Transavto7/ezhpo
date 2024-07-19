@@ -2,15 +2,16 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Request;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -20,6 +21,8 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     use Notifiable, HasRoles, SoftDeletes;
+
+    const DEFAULT_USER_LOGIN = 'it@nozdratenko.ru';
 
     public $fillable
         = [
@@ -59,11 +62,101 @@ class User extends Authenticatable
             'last_connection_at' => 'datetime',
         ];
 
-    public function deleted_user()
+    public static $newUserRolesText
+        = [
+            1 => 'Контролёр ТС',
+            2 => 'Медицинский сотрудник',
+            3 => 'Водитель',
+            4 => 'Оператор СДПО',
+            5 => 'Менеджер',
+            6 => 'Клиент',
+            7 => 'Инженер БДД',
+            8 => 'Администратор',
+            9 => 'Терминал',
+        ];
+
+    public static $newUserRolesTextEN
+        = [
+            1 => 'tech',
+            2 => 'medic',
+            3 => 'driver',
+            4 => 'operator_sdpo',
+            5 => 'manager',
+            6 => 'client',
+            7 => 'engineer_bdd',
+            8 => 'admin',
+            9 => 'terminal',
+        ];
+
+    public static $userRolesValues
+        = [
+            'client' => 12,
+            'tech' => 1,
+            'medic' => 2,
+            'driver' => 3,
+            'terminal' => 778,
+            'engineer_bdd' => 12,
+            'manager' => 11,
+            'admin' => 777,
+            'operator_pak' => 4,
+        ];
+
+    public static $userRolesKeys
+        = [
+            '0' => 'medic',
+            '1' => 'tech',
+            '2' => 'medic',
+            '4' => 'pak_queue',
+            '12' => 'medic',
+            '11' => 'medic',
+            '777' => 'medic',
+            '778' => 'medic',
+        ];
+
+    public static $userRolesText
+        = [
+            1 => 'Контролёр ТС',
+            2 => 'Медицинский сотрудник',
+            3 => 'Водитель',
+            4 => 'Оператор СДПО',
+            11 => 'Менеджер',
+            12 => 'Клиент',
+            13 => 'Инженер БДД',
+            777 => 'Администратор',
+            778 => 'Терминал',
+        ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        if (static::hideDefaultUser()) {
+            static::addGlobalScope('hideDefaultUser', function (Builder $builder) {
+                $builder->where('login', '!=', self::DEFAULT_USER_LOGIN);
+            });
+        }
+    }
+
+    //TODO: перенести в корректный слой позже
+    protected static function hideDefaultUser(): bool
+    {
+        $user = Request::user('web');
+
+        if (!$user) {
+            $user = Request::user('api');
+        }
+
+        if (!$user) return false;
+
+        return $user->login !== self::DEFAULT_USER_LOGIN;
+    }
+
+    public function deleted_user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'deleted_id', 'id')
-                    ->withDefault();
+            ->withDefault();
     }
+
     public function delete()
     {
         $this->deleted_id = user()->id;
@@ -72,42 +165,42 @@ class User extends Authenticatable
         return parent::delete();
     }
 
-    public function roles($deleted = false) : BelongsToMany
+    public function roles($deleted = false): BelongsToMany
     {
-        return $this->belongsToMany(\App\Role::class,
+        return $this->belongsToMany(Role::class,
             'model_has_roles',
             'model_id',
             'role_id',
             'id',
             'id'
         )->withPivot('deleted')
-        ->wherePivot('deleted', $deleted ? 1 : 0);
+            ->wherePivot('deleted', $deleted ? 1 : 0);
     }
 
-    public function anketas()
+    public function anketas(): HasMany
     {
         return $this->hasMany(Anketa::class, 'user_id', 'id')
             ->withDefault();
     }
 
-    public function company()
+    public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'company_id', 'id')
             ->withDefault();
     }
 
-    public function companies()
+    public function companies(): HasMany
     {
         return $this->hasMany(Company::class);
     }
 
-    public function pv()
+    public function pv(): BelongsTo
     {
         return $this->belongsTo(Point::class, 'pv_id')
             ->withDefault();
     }
 
-    public function points()
+    public function points(): BelongsToMany
     {
         return $this->belongsToMany(Point::class, 'points_to_users', 'user_id', 'point_id');
     }
@@ -122,127 +215,43 @@ class User extends Authenticatable
         return $this->hasOne(TerminalCheck::class, 'user_id');
     }
 
-    public static $newUserRolesText
-        = [
-            1 => 'Контролёр ТС',
-            2 => 'Медицинский сотрудник',
-            3 => 'Водитель',
-            4 => 'Оператор СДПО',
-            5 => 'Менеджер',
-            6 => 'Клиент',
-            7 => 'Инженер БДД',
-            8 => 'Администратор',
-            9 => 'Терминал',
-        ];
-    public static $newUserRolesTextEN
-        = [
-            1 => 'tech',
-            2 => 'medic',
-            3 => 'driver',
-            4 => 'operator_sdpo',
-            5 => 'manager',
-            6 => 'client',
-            7 => 'engineer_bdd',
-            8 => 'admin',
-            9 => 'terminal',
-        ];
-
-    // check access
-    public function access(...$permissionName)
+    public function access(...$permissionName): bool
     {
-
         return $this->getAllPermissions()
-                    ->whereIn('name', $permissionName)
-                    ->isNotEmpty();
+            ->whereIn('name', $permissionName)
+            ->isNotEmpty();
     }
 
-    public static function fetchPermissions()
+    public static function getUserCompanyId($field = 'id', $withUserCompanyId = false): int
     {
-        $permissions = collect(config('access'));
-        DB::statement("SET foreign_key_checks=0");
-
-        $counter['added'] = 0;
-        foreach ($permissions as $permission) {
-            if($updatePermission = Permission::where('name', $permission['name'])->first()){
-                $updatePermission->guard_name = $permission['description'];
-
-                $updatePermission->save();
-            }else{
-                $counter['added']++;
-                Permission::create([
-                    'name'       => $permission['name'],
-                    'guard_name' => $permission['description'],
-                ]);
-            }
-        }
-        $deleted = Permission::whereNotIn('name', $permissions->pluck('name'));
-        $counter['deleted'] = $deleted->count();
-        $deleted->delete();
-
-        $counter['total'] = Permission::count();
-
-        DB::statement("SET foreign_key_checks=1");
-
-        return $counter;
-    }
-
-    public static $userRolesValues
-        = [
-            'client'       => 12,
-            'tech'         => 1,
-            'medic'        => 2,
-            'driver'       => 3,
-            'terminal'     => 778,
-            'engineer_bdd' => 12,
-            'manager'      => 11,
-            'admin'        => 777,
-            'operator_pak' => 4,
-        ];
-
-    public static $userRolesKeys
-        = [
-            '0'   => 'medic',
-            '1'   => 'tech',
-            '2'   => 'medic',
-            '4'   => 'pak_queue',
-            '12'  => 'medic',
-            '11'  => 'medic',
-            '777' => 'medic',
-            '778' => 'medic',
-        ];
-
-    public static $userRolesText
-        = [
-            1   => 'Контролёр ТС',
-            2   => 'Медицинский сотрудник',
-            3   => 'Водитель',
-            4   => 'Оператор СДПО',
-            11  => 'Менеджер',
-            12  => 'Клиент',
-            13  => 'Инженер БДД',
-            777 => 'Администратор',
-            778 => 'Терминал',
-        ];
-
-    public static function getUserCompanyId($field = 'id')
-    {
-        $point = auth()->user()->pv_id;
+        /** @var User $authUser */
+        $authUser = auth()->user();
+        $point = $authUser->pv_id;
         $point = Point::find($point);
 
         if ($point) {
             $company = $point->company_id ? Company::find($point->company_id) : 0;
 
             if ($company) {
-                return $company->$field;
-            } else {
+               return $company->$field;
+            }
+
+        }
+	
+	    if ($withUserCompanyId && $authUser->company_id !== null) {
+            $company = Company::find($authUser->company_id);
+
+            if (! $company) {
                 return -1;
             }
+
+            return $company->$field;
         }
 
         return -1;
     }
 
-    public function stamp()
+    public function stamp(): BelongsTo
     {
         return $this->belongsTo(Stamp::class, 'stamp_id', 'id');
     }
@@ -250,14 +259,13 @@ class User extends Authenticatable
     /**
      * Получение имени юзера
      *
-     * @param $id
-     *
+     * @param int $id
+     * @param bool $authId
      * @return string
      */
-
     public function getName($id = -1, $authId = true)
     {
-        $id = $id ? $id : ($authId ? auth()->user()->id : -1);
+        $id = $id ?: ($authId ? auth()->user()->id : -1);
 
         $userName = User::find($id);
 

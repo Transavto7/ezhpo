@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class HomeController extends Controller
@@ -38,21 +39,21 @@ class HomeController extends Controller
 
         if (isset($anketaModel['connectItemProp'])) {
             $connectItemProp = $anketaModel['connectItemProp'];
-            $connectModel    = $fieldsKeys[$anketaModel['connectTo']];
+            $connectModel = $fieldsKeys[$anketaModel['connectTo']];
 
             $valueWhere = app($connectModel['model'])
-                              ->where($connectItemProp['check'], $anketa[$connectModel['connectTo']])
-                              ->first()[$connectItemProp['get']];
+                ->where($connectItemProp['check'], $anketa[$connectModel['connectTo']])
+                ->first()[$connectItemProp['get']];
         }
 
         return app($anketaModel['model'])
-                   ->where($anketaModel['key'], $valueWhere)
-                   ->first()[$anketaModel['resultKey']];
+            ->where($anketaModel['key'], $valueWhere)
+            ->first()[$anketaModel['resultKey']];
     }
 
     public function SaveCheckedFieldsFilter(Request $request)
     {
-        $fields      = $request->all();
+        $fields = $request->all();
         $type_ankets = $request->type_ankets;
 
         unset($fields['_token']);
@@ -152,11 +153,11 @@ class HomeController extends Controller
                 if ($filterValue === null) continue;
 
                 if ($filterKey == 'hour_from') {
-                    $forms->whereTime('date', '>=', $filterValue.':00');
+                    $forms->whereTime('date', '>=', $filterValue . ':00');
                     continue;
                 }
                 if ($filterKey == 'hour_to') {
-                    $forms->whereTime('date', '<=', $filterValue.':00');
+                    $forms->whereTime('date', '<=', $filterValue . ':00');
                     continue;
                 }
                 if ($filterKey == 'created_at') {
@@ -183,8 +184,8 @@ class HomeController extends Controller
                 if (in_array($filterKey, $formModel->fillable)) {
                     if (in_array($filterKey, ['date', 'created_at'])) continue;
 
-                    if ($filterKey == 'is_dop' && !$filterValue){
-                        $forms = $forms->where(function ($query){
+                    if ($filterKey == 'is_dop' && !$filterValue) {
+                        $forms = $forms->where(function ($query) {
                             $query->whereNull('is_dop')->orWhere('is_dop', 0);
                         });
                         continue;
@@ -241,7 +242,7 @@ class HomeController extends Controller
                             continue;
                         }
 
-                        $forms = $forms->where('anketas.' . $filterKey, 'LIKE', '%'.$explodeData.'%');
+                        $forms = $forms->where('anketas.' . $filterKey, 'LIKE', '%' . $explodeData . '%');
                         continue;
                     }
 
@@ -260,7 +261,7 @@ class HomeController extends Controller
 
                 if ($filterKey === 'date_prto') {
                     $dateFrom = Carbon::parse($filterValue)->startOfDay();
-                    $dateTo   = Carbon::parse($filterValue)->endOfDay();
+                    $dateTo = Carbon::parse($filterValue)->endOfDay();
                     $forms = $forms->whereBetween('cars.date_prto', [$dateFrom, $dateTo]);
                     continue;
                 }
@@ -269,7 +270,7 @@ class HomeController extends Controller
                     continue;
                 }
 
-                $forms = $forms->where('anketas.' . $filterKey, 'LIKE', '%'.$filterValue.'%');
+                $forms = $forms->where('anketas.' . $filterKey, 'LIKE', '%' . $filterValue . '%');
             }
 
             if (($filterParams['date'] ?? null) || ($filterParams['TO_date'] ?? null)) {
@@ -307,13 +308,15 @@ class HomeController extends Controller
 
             return response()->json([
                 'anketasCountDrivers' => $formsDistinctQuery->count('driver_id'),
-                'anketasCountCars'    => $formsDistinctQuery->count('car_id'),
+                'anketasCountCars' => $formsDistinctQuery->count('car_id'),
                 'anketasCountCompany' => $formsDistinctQuery->count('company_id'),
             ]);
         }
         /**
          * <Измеряем количество Авто и Водителей (уникальные ID)>
          */
+
+        $export = $filterActivated && $request->get('export');
 
         /**
          * Обогащение данных
@@ -333,6 +336,15 @@ class HomeController extends Controller
                 ->select([
                     'anketas.*',
                     'points.name as pv_id'
+                ]);
+        } else if (($validTypeForm == 'medic') && $export) {
+            $forms = $forms
+                ->with('operator')
+                ->leftJoin('medic_form_normalized_pressures', 'anketas.id', '=', 'medic_form_normalized_pressures.form_id')
+                ->select([
+                    'anketas.*',
+                    'anketas.pv_id as pv_id',
+                    DB::raw("COALESCE(medic_form_normalized_pressures.pressure, anketas.tonometer, NULL) as tonometer")
                 ]);
         } else if ($validTypeForm == 'medic') {
             $forms = $forms
@@ -383,7 +395,7 @@ class HomeController extends Controller
         /**
          * Экспорт журнала
          */
-        if ($filterActivated && $request->get('export')) {
+        if ($export) {
             $forms = $forms->orderBy('date');
 
             if ($validTypeForm == 'tech' && $request->get('exportPrikaz')) {
@@ -496,58 +508,51 @@ class HomeController extends Controller
 
         $view = $request->get('getFormFilter') ? 'home_filters' : 'home';
         return view($view, [
-            'title'                 => Anketa::$anketsKeys[$validTypeForm],
-            'name'                  => $user->name,
-            'ankets'                => $forms,
-            'filter_activated'      => $filterActivated,
-            'type_ankets'           => $validTypeForm,
-            'anketsFields'          => $formsFields,
-            'anketsFieldsTable'     => Anketa::$fieldsKeysTable[$validTypeForm] ?? $formsFields,
-            'fieldsKeys'            => $fieldsKeys,
-            'fieldPrompts'          => $fieldPrompts,
-            'fieldsGroupFirst'      => Anketa::$fieldsGroupFirst[$validTypeForm] ?? [],
+            'title' => Anketa::$anketsKeys[$validTypeForm],
+            'name' => $user->name,
+            'ankets' => $forms,
+            'filter_activated' => $filterActivated,
+            'type_ankets' => $validTypeForm,
+            'anketsFields' => $formsFields,
+            'anketsFieldsTable' => Anketa::$fieldsKeysTable[$validTypeForm] ?? $formsFields,
+            'fieldsKeys' => $fieldsKeys,
+            'fieldPrompts' => $fieldPrompts,
+            'fieldsGroupFirst' => Anketa::$fieldsGroupFirst[$validTypeForm] ?? [],
             'blockedToExportFields' => Anketa::$blockedToExportFields[$validTypeForm] ?? [],
-            'anketasCountResult'    => $formsCountResult,
-            'typePrikaz'            => $request->get('typePrikaz'),
-            'currentRole'           => $currentRole,
-            'take'                  => $take,
-            'orderBy'               => $orderBy,
-            'orderKey'              => $orderKey,
-            'queryString'           => Arr::query($request->except(['orderKey', 'orderBy']))
+            'anketasCountResult' => $formsCountResult,
+            'typePrikaz' => $request->get('typePrikaz'),
+            'currentRole' => $currentRole,
+            'take' => $take,
+            'orderBy' => $orderBy,
+            'orderKey' => $orderKey,
+            'queryString' => Arr::query($request->except(['orderKey', 'orderBy']))
         ]);
     }
 
     public function getFilters(Request $request)
     {
+        $fromType = $request->type_ankets;
 
-        $typePrikaz = $request->get('typePrikaz');
-        $typeAnkets = $request->type_ankets;
-
-        $validTypeAnkets = User::$userRolesKeys[auth()->user()->role];
-        if (isset(Anketa::$anketsKeys[$typeAnkets])) {
-            $validTypeAnkets = $typeAnkets;
+        $validFormType = User::$userRolesKeys[auth()->user()->role] ?? 'medic';
+        if (isset(Anketa::$anketsKeys[$fromType])) {
+            $validFormType = $fromType;
         }
 
-        /**
-         * Выбор полей
-         */
-        $fieldsKeysTypeAnkets = $validTypeAnkets;
-
-        $fieldsKeys       = Anketa::$fieldsKeys[$fieldsKeysTypeAnkets];
-        $fieldsGroupFirst = Anketa::$fieldsGroupFirst[$fieldsKeysTypeAnkets] ?? [];
-        $anketsFields     = array_keys($fieldsKeys);
+        $fields = Anketa::$fieldsKeys[$validFormType];
+        $fieldsGroupFirst = Anketa::$fieldsGroupFirst[$validFormType] ?? [];
+        $fieldsKeys = array_keys($fields);
 
         if (auth()->user()->hasRole('client')) {
-            unset($fieldsKeys['created_at']);
-            unset($fieldsKeys['is_pak']);
+            unset($fields['created_at']);
+            unset($fields['is_pak']);
         }
 
-        $exclude = config('fields.client_exclude.' . $validTypeAnkets) ?? [];
+        $exclude = config('fields.client_exclude.' . $validFormType) ?? [];
 
         return view('home_filters', [
-            'anketsFields'     => $anketsFields,
-            'type_ankets'      => $validTypeAnkets,
-            'fieldsKeys'       => $fieldsKeys,
+            'anketsFields' => $fieldsKeys,
+            'type_ankets' => $validFormType,
+            'fieldsKeys' => $fields,
             'fieldsGroupFirst' => $fieldsGroupFirst,
             'exclude' => $exclude
         ]);

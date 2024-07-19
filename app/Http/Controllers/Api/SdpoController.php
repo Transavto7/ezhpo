@@ -7,18 +7,24 @@ use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
 use App\Http\Controllers\SmsController;
+use App\MedicFormNormalizedPressure;
+use App\Stamp;
 use App\Traits\UserEdsTrait;
 use App\ValueObjects\Phone;
+use App\ValueObjects\PressureLimits;
+use App\ValueObjects\Tonometer;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use App\Notify;
 use App\Settings;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class SdpoController extends Controller
@@ -66,7 +72,7 @@ class SdpoController extends Controller
         $forms = array_map(function ($form) {
             $validity = UserEdsTrait::getValidityString(
                 $form['user_validity_eds_start'] ?? null,
-                    $form['user_validity_eds_end'] ?? null
+                $form['user_validity_eds_end'] ?? null
             );
             if ($validity) {
                 $form['validity'] = $validity;
@@ -83,232 +89,247 @@ class SdpoController extends Controller
      */
     public function createAnketa(Request $request): JsonResponse
     {
-        /** @var User $user */
-        $user = $request->user('api');
-        $apiClient = $user;
-        if ($user->blocked) {
-            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
-        }
-
-        if ($request->user_id) {
-            $user = User::find($request->user_id);
-            if (!$user) {
-                return response()->json(['message' => 'Пользователь с таким ID не найден!'], 400);
-            }
-        }
-
-        /** @var Driver $driver */
-        $driver = Driver::where('hash_id', $request->driver_id)->first();
-        if (!$driver) {
-            return response()->json(['message' => 'Указанный водитель не найден!'], 400);
-        }
-
-        date_default_timezone_set('UTC');
-        $time = time();
-        $timezone = $apiClient->timezone ?? 3;
-        $time += $timezone * 3600;
-        $time = date('Y-m-d H:i:s', $time);
-
-        if ($driver->end_of_ban && (Carbon::parse($time) < Carbon::parse($driver->end_of_ban))) {
-            return response()->json(
-                ['message' => 'Указанный водитель отстранен до ' . Carbon::parse($driver->end_of_ban) . "!"],
-                400
-            );
-        }
-
-        $company = $driver->company;
-        if ($company->dismissed === 'Да') {
-            return response()->json([
-                'message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK)
-            ], 401);
-        }
-
-        if ($request->tonometer) {
-            $tonometer = $request->tonometer;
-        } else {
-            $systolic = rand(100, 139);
-            $diastolic = rand(60, 89);
-
-            if ($systolic >= intval($driver->getPressureSystolic())) {
-                $systolic = intval($driver->getPressureSystolic()) - rand(1, 10);
-            }
-
-            if ($diastolic >= intval($driver->getPressureDiastolic())) {
-                $diastolic = intval($driver->getPressureDiastolic()) - rand(1, 10);
-            }
-
-            $tonometer = $systolic . '/' . $diastolic;
-        }
-
-        $medic = [];
-        $medic['type_anketa'] = $request->type_anketa ?? 'medic';
-        $medic['user_id'] = $user->id;
-        $medic['user_name'] = $user->name;
-        $medic['user_validity_eds_start'] = $user->validity_eds_start;
-        $medic['user_validity_eds_end'] = $user->validity_eds_end;
-        $medic['user_eds'] = $user->eds;
-        $medic['pulse'] = $request->pulse ?? mt_rand(60, 80);
-        $medic['pv_id'] = $apiClient->pv->name;
-        $medic['point_id'] = $apiClient->pv->id;
-        $medic['tonometer'] = $tonometer;
-        $medic['driver_id'] = $driver->hash_id;
-        $medic['driver_fio'] = $driver->fio;
-        $medic['driver_gender'] = $driver->gender ?? '';
-        $medic['company_id'] = $company->hash_id;
-        $medic['company_name'] = $company->name;
-        $medic['med_view'] = $request->med_view ?? 'В норме';
-        $medic['t_people'] = $request->t_people ?? 36.6;
-        $medic['type_view'] = $request->type_view ?? 'Предрейсовый/Предсменный';
-        $medic['flag_pak'] = $request->type_anketa === 'pak_queue' ? 'СДПО Р' : 'СДПО А';
-        $medic['terminal_id'] = $apiClient->id;
-        $medic['realy'] = "да";
-
-        if ($driver->year_birthday !== '' && $driver->year_birthday !== '0000-00-00') {
-            $medic['driver_year_birthday'] = $driver->year_birthday;
-        }
-
-        if ($request->photo) {
-            $medic['photos'] = $request->photo;
-        }
-
-        if ($request->video) {
-            $medic['videos'] = $request->video;
-        }
-
-        $medic['created_at'] = $request->created_at ?? $time;
-        $medic['date'] = $request->date ?? $medic['created_at'];
-
-        $test_narko = $request->test_narko ?? 'Отрицательно';
-        $proba_alko = $request->proba_alko ?? 'Отрицательно';
-        $driver->date_prmo = $medic['created_at'];
-
-        $admitted = 'Допущен';
-        $notAdmittedReasons = [];
-
-        if ($request->filled('alcometer_result')) {
-            $medic['alcometer_result'] = $request->input('alcometer_result');
-        }
-
-        if ($request->filled('alcometer_mode')) {
-            $medic['alcometer_mode'] = $request->input('alcometer_mode');
-        }
-
-        if (doubleval($request->alcometer_result) > 0) {
-            $notAdmittedReasons[] = ['Алкоголь в крови'];
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-            $medic['proba_alko'] = 'Положительно';
-            $proba_alko = $request->proba_alko ?? 'Положительно';
-        }
-
-        $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
-
-        if ($request->sleep_status === 'Нет') {
-            $notAdmittedReasons[] = ['sleep_status - нет'];
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-        }
-
-        if ( $request->people_status === 'Нет') {
-            $notAdmittedReasons[] = ['people_status - нет'];
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-        }
-
-        if ($proba_alko === 'Положительно') {
-            $notAdmittedReasons[] = ['Положительный тест на алкоголь'];
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-            $driver->end_of_ban = Carbon::parse($time)->addMinutes($driver->getTimeOfAlcoholBan());
-        }
-
-        if ($test_narko === 'Положительно') {
-            $notAdmittedReasons[] = ['Положительный тест на наркотики'];
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-        }
-
-        if ($medic['med_view'] !== 'В норме') {
-            $notAdmittedReasons[] = ['med_view не в норме'];
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-        }
-
-        if (doubleval($medic['t_people']) >= 37) {
-            $notAdmittedReasons[] = ['Высокая температура'];
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-        }
-
-        if (intval($medic['pulse']) <= $driver->getPulseLower() || intval($medic['pulse']) >= $driver->getPulseUpper())
-        {
-            $notAdmittedReasons[] = ['Слишком высокий или низкий пульс'];
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-        }
-
-        $ton = explode('/', $tonometer);
-        if (intval($ton[1]) >= $driver->getPressureDiastolic() || intval($ton[0]) >= $driver->getPressureSystolic()) {
-            $notAdmittedReasons[] = ['Высокое давление'];
-            $admitted = 'Не допущен';
-            $medic['med_view'] = 'Отстранение';
-            $driver->end_of_ban = Carbon::parse($time)->addMinutes($driver->getTimeOfPressureBan());
-        }
-
-        $driver->save();
-
-        $medic['admitted'] = $admitted;
         try {
-            $anketa = Anketa::create($medic);
-        } catch (Throwable $e) {
-            abort(500);
+            DB::beginTransaction();
+
+            /** @var User $user */
+            $user = $request->user('api');
+            $apiClient = $user;
+            if ($user->blocked) {
+                throw new Exception('Этот терминал заблокирован!', 400);
+            }
+
+            if ($request->user_id) {
+                $user = User::find($request->user_id);
+            }
+
+            if (!$user) {
+                throw new Exception('Пользователь с таким ID не найден!', 400);
+            }
+
+            /** @var Driver $driver */
+            $driver = Driver::where('hash_id', $request->driver_id)->first();
+            if (!$driver) {
+                throw new Exception('Указанный водитель не найден!', 400);
+            }
+
+            date_default_timezone_set('UTC');
+            $time = time();
+            $timezone = $apiClient->timezone ?: 3;
+            $time += $timezone * 3600;
+            $time = date('Y-m-d H:i:s', $time);
+
+            if ($driver->end_of_ban && (Carbon::parse($time) < Carbon::parse($driver->end_of_ban))) {
+                $message = sprintf("Указанный водитель отстранен до %s!", Carbon::parse($driver->end_of_ban));
+                throw new Exception($message, 400);
+            }
+
+            if ($driver->dismissed === 'Да') {
+                throw new Exception('Водитель с указанным ID уволен!', 303);
+            }
+
+            $company = $driver->company;
+            if ($company->dismissed === 'Да') {
+                $message = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+                throw new Exception($message, 401);
+            }
+
+            if ($driver->only_offline_medic_inspections) {
+                $message = 'Водителю ограничен дистанционный выпуск, обратитесь к медицинскому сотруднику на Пункте Выпуска!';
+                throw new Exception($message, 400);
+            }
+
+            //TODO: добавить валидацию
+            $tonometer = $request->tonometer;
+            if (!$tonometer) {
+                $tonometer = strval(Tonometer::random($driver));
+            }
+
+            $medic = [];
+            $medic['type_anketa'] = $request->type_anketa ?? 'medic';
+            $medic['user_id'] = $user->id;
+            $medic['user_name'] = $user->name;
+            $medic['user_validity_eds_start'] = $user->validity_eds_start;
+            $medic['user_validity_eds_end'] = $user->validity_eds_end;
+            $medic['user_eds'] = $user->eds;
+            $medic['pulse'] = $request->pulse ?? mt_rand(60, 80);
+            $medic['pv_id'] = $apiClient->pv->name;
+            $medic['point_id'] = $apiClient->pv->id;
+            $medic['tonometer'] = $tonometer;
+            $medic['driver_id'] = $driver->hash_id;
+            $medic['driver_fio'] = $driver->fio;
+            $medic['driver_gender'] = $driver->gender ?? '';
+            $medic['company_id'] = $company->hash_id;
+            $medic['company_name'] = $company->name;
+            $medic['med_view'] = $request->med_view ?? 'В норме';
+            $medic['t_people'] = $request->t_people ?? 36.6;
+            $medic['type_view'] = $request->type_view ?? 'Предрейсовый/Предсменный';
+            $medic['flag_pak'] = $request->type_anketa === 'pak_queue' ? 'СДПО Р' : 'СДПО А';
+            $medic['terminal_id'] = $apiClient->id;
+            $medic['realy'] = "да";
+
+            if ($driver->year_birthday !== '' && $driver->year_birthday !== '0000-00-00') {
+                $medic['driver_year_birthday'] = $driver->year_birthday;
+            }
+
+            if ($request->photo) {
+                $medic['photos'] = $request->photo;
+            }
+
+            if ($request->video) {
+                $medic['videos'] = $request->video;
+            }
+
+            $medic['created_at'] = $request->created_at ?? $time;
+            $medic['date'] = $request->date ?? $medic['created_at'];
+
+            $test_narko = $request->test_narko ?? 'Отрицательно';
+            $proba_alko = $request->proba_alko ?? 'Отрицательно';
+            $driver->date_prmo = $medic['created_at'];
+
+            $admitted = 'Допущен';
+            $notAdmittedReasons = [];
+
+            if ($request->filled('alcometer_result')) {
+                $medic['alcometer_result'] = doubleval($request->input('alcometer_result'));
+            }
+
+            if (($medic['alcometer_result'] ?? 0) == 1) {
+                $medic['alcometer_result'] = 0.1;
+            }
+
+            if ($request->filled('alcometer_mode')) {
+                $medic['alcometer_mode'] = $request->input('alcometer_mode');
+            }
+
+            if (($medic['alcometer_result'] ?? 0) > 0) {
+                $notAdmittedReasons[] = ['Алкоголь в крови'];
+                $admitted = 'Не допущен';
+                $medic['med_view'] = 'Отстранение';
+                $medic['proba_alko'] = 'Положительно';
+                $proba_alko = $request->proba_alko ?? 'Положительно';
+            }
+
+            $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
+
+            if ($request->sleep_status === 'Нет') {
+                $notAdmittedReasons[] = ['sleep_status - нет'];
+                $admitted = 'Не допущен';
+                $medic['med_view'] = 'Отстранение';
+            }
+
+            if ($request->people_status === 'Нет') {
+                $notAdmittedReasons[] = ['people_status - нет'];
+                $admitted = 'Не допущен';
+                $medic['med_view'] = 'Отстранение';
+            }
+
+            if ($proba_alko === 'Положительно') {
+                $notAdmittedReasons[] = ['Положительный тест на алкоголь'];
+                $admitted = 'Не допущен';
+                $medic['med_view'] = 'Отстранение';
+                $driver->end_of_ban = Carbon::parse($time)->addMinutes($driver->getTimeOfAlcoholBan());
+            }
+
+            if ($test_narko === 'Положительно') {
+                $notAdmittedReasons[] = ['Положительный тест на наркотики'];
+                $admitted = 'Не допущен';
+                $medic['med_view'] = 'Отстранение';
+            }
+
+            if ($medic['med_view'] !== 'В норме') {
+                $notAdmittedReasons[] = ['med_view не в норме'];
+                $admitted = 'Не допущен';
+                $medic['med_view'] = 'Отстранение';
+            }
+
+            if (doubleval($medic['t_people']) >= 37) {
+                $notAdmittedReasons[] = ['Высокая температура'];
+                $admitted = 'Не допущен';
+                $medic['med_view'] = 'Отстранение';
+            }
+
+            if (intval($medic['pulse']) <= $driver->getPulseLower() || intval($medic['pulse']) >= $driver->getPulseUpper()) {
+                $notAdmittedReasons[] = ['Слишком высокий или низкий пульс'];
+                $admitted = 'Не допущен';
+                $medic['med_view'] = 'Отстранение';
+            }
+
+            $pressure = Tonometer::fromString($tonometer);
+            $pressureLimits = PressureLimits::create($driver);
+            if (!$pressure->isAdmitted($pressureLimits)) {
+                $notAdmittedReasons[] = ['Высокое давление'];
+                $admitted = 'Не допущен';
+                $medic['med_view'] = 'Отстранение';
+                $driver->end_of_ban = Carbon::parse($time)->addMinutes($driver->getTimeOfPressureBan());
+            }
+
+            $driver->save();
+
+            $medic['admitted'] = $admitted;
+            $form = Anketa::create($medic);
+
+            if ($pressure->needNormalize($pressureLimits)) {
+                MedicFormNormalizedPressure::store(
+                    $form->id,
+                    $pressure->getNormalized()
+                );
+            }
+
+            /**
+             * ОТПРАВКА SMS
+             */
+            $needNotify = $form['admitted'] === 'Не допущен' && $form['flag_pak'] !== 'СДПО Р';
+            if ($needNotify) {
+                $phoneToCall = Settings::setting('sms_text_phone');
+                $message = Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall";
+
+                $sms = new SmsController();
+                $sms->sms($company->where_call, $message);
+            }
+
+            $form['timeout'] = Settings::setting('timeout') ?? 20;
+
+            $stamp = $apiClient->stamp;
+            if ($stamp) {
+                $form['stamp_head'] = $stamp->company_name;
+                $form['stamp_licence'] = $stamp->licence;
+            }
+
+            $validity = UserEdsTrait::getValidityString($user->validity_eds_start, $user->validity_eds_end);
+            if ($validity) {
+                $form['validity'] = $validity;
+            }
+
+            $form['sleep_status'] = $request->sleep_status;
+            $form['people_status'] = $request->people_status;
+
+            /** @var Anketa $form */
+            if ($form['admitted'] === 'Не допущен') {
+                $form['reasons'] = $notAdmittedReasons;
+            }
+
+            //TODO: вынести в мидлвар или ивент позже
+            if ($request->has('logs')) {
+                Log::channel('sdpo')->info(json_encode(
+                    [
+                        'id' => $form->id,
+                        'request' => $request->all(),
+                        'ip' => $request->getClientIp() ?? null
+                    ]
+                ));
+            }
+
+            DB::commit();
+
+            return response()->json($form);
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => $exception->getMessage()
+            ], $exception->getCode() ?? Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        /**
-         * ОТПРАВКА SMS
-         */
-        $needNotify = $anketa['admitted'] === 'Не допущен' && $anketa['flag_pak'] !== 'СДПО Р';
-        if ($needNotify) {
-            $phoneToCall = Settings::setting('sms_text_phone');
-            $message = Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall";
-
-            $sms = new SmsController();
-            $sms->sms($company->where_call, $message);
-        }
-
-        $anketa['timeout'] = Settings::setting('timeout') ?? 20;
-
-        $stamp = $apiClient->stamp;
-        if ($stamp) {
-            $anketa['stamp_head'] = $stamp->company_name;
-            $anketa['stamp_licence'] = $stamp->licence;
-        }
-
-        $validity = UserEdsTrait::getValidityString($user->validity_eds_start, $user->validity_eds_end);
-        if ($validity) {
-            $anketa['validity'] = $validity;
-        }
-
-        $anketa['sleep_status'] = $request->sleep_status;
-        $anketa['people_status'] = $request->people_status;
-
-        /** @var Anketa $anketa */
-        if ($anketa['admitted'] === 'Не допущен') {
-            $anketa['reasons'] = $notAdmittedReasons;
-        }
-
-        //TODO: вынести в мидлвар или ивент позже
-        if ($request->has('logs')) {
-            Log::channel('sdpo')->info(json_encode(
-                [
-                    'id' => $anketa->id,
-                    'request' => $request->all(),
-                    'ip' => $request->getClientIp() ?? null
-                ]
-            ));
-        }
-
-        return response()->json($anketa);
     }
 
     /*
@@ -333,6 +354,28 @@ class SdpoController extends Controller
         return response()->json($user->pv->name);
     }
 
+    public function getStamp(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user('api');
+
+        $stamp = $user->stamp;
+
+        $data = [
+            'stamp_head' => null,
+            'stamp_licence' => null
+        ];
+
+        if ($user->stamp) {
+            $data = [
+                'stamp_head' => $stamp->company_name,
+                'stamp_licence' => $stamp->licence
+            ];
+        }
+
+        return response()->json($data);
+    }
+
     public function getTerminalVerification(Request $request)
     {
         $user = $request->user('api');
@@ -353,17 +396,46 @@ class SdpoController extends Controller
     /*
      * return all medics
      */
-    public function getMedics(Request $request)
+    public function getMedics(): JsonResponse
     {
-        $users = User::with(['roles', 'pv:id,name,pv_id', 'pv.town:id,name'])
-            ->whereHas('roles', function ($q) use ($request) {
+        $users = User::query()
+            ->with([
+                'roles',
+                'pv:id,name,pv_id',
+                'pv.town:id,name'
+            ])
+            ->whereHas('roles', function ($q) {
                 $q->where('roles.id', 2);
             })
-            ->select(['id', 'name', 'eds', 'pv_id'])
+            ->select([
+                'id',
+                'name',
+                'eds',
+                'pv_id',
+                'validity_eds_start',
+                'validity_eds_end'
+            ])
             ->get()
-            ->groupBy(['pv.town.name', 'pv.name']);
+            ->groupBy([
+                'pv.town.name',
+                'pv.name'
+            ]);
 
         return response()->json($users);
+    }
+
+    public function getStamps(): JsonResponse
+    {
+        $stamps = Stamp::query()
+            ->select([
+                'id',
+                'company_name as stamp_head',
+                'licence as stamp_licence'
+            ])
+            ->get()
+            ->groupBy('id');
+
+        return response()->json($stamps);
     }
 
     /*
@@ -386,7 +458,8 @@ class SdpoController extends Controller
                 'company_id',
                 'end_of_ban',
                 'photo',
-                'phone'
+                'phone',
+                'only_offline_medic_inspections'
             ])
             ->first();
 
@@ -413,6 +486,10 @@ class SdpoController extends Controller
 
         if ($driver->company->dismissed === 'Да') {
             return response()->json(['message' => 'Компания указанного водителя заблокирована!'], 303);
+        }
+
+        if ($driver->only_offline_medic_inspections) {
+            return response()->json(['message' => 'Водителю ограничен дистанционный выпуск, обратитесь к медицинскому сотруднику на Пункте Выпуска!'], 400);
         }
 
         return response()->json($driver);
@@ -442,6 +519,10 @@ class SdpoController extends Controller
 
         if ($driver->company->dismissed === 'Да') {
             return response()->json(['message' => 'Компания указанного водителя заблокирована!'], 303);
+        }
+
+        if ($driver->only_offline_medic_inspections) {
+            return response()->json(['message' => 'Водителю ограничен дистанционный выпуск, обратитесь к медицинскому сотруднику на Пункте Выпуска!'], 400);
         }
 
         $phone = new Phone($request->input('phone'));

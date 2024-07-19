@@ -55,6 +55,25 @@ return [
             'visibility' => 'public',
         ],
 
+        'export' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/export'),
+            'url' => env('APP_URL').'/storage/export',
+            'visibility' => 'public',
+        ],
+
+        'examples' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/examples'),
+            'url' => env('APP_URL').'/storage/examples',
+            'visibility' => 'public',
+        ],
+
+        'import' => [
+            'driver' => 'local',
+            'root' => storage_path('app/imports'),
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

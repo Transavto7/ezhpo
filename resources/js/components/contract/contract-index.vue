@@ -1,6 +1,5 @@
 <template>
-    <div class="">
-        <!-- filters -->
+    <div>
         <contract-filters
             v-on:change_filters="changeFilters"
             ref="contractFilters"
@@ -11,29 +10,27 @@
         >
         </contract-filters>
 
-
         <div class="card">
-
-            <div class="card-body pt-0">
-                <!-- table -->
+            <div class="card-body" v-if="permissions.read">
                 <contract-table
-                    v-show="permissions.read"
                     :table="table"
                     :busy="busy"
                     :trash="filters.trash"
                     :permissions="permissions"
-                    v-on:change_sort="changeSort"
                     ref="contractTable"
+                    v-on:logs_read="logsRead"
+                    v-on:change_sort="changeSort"
                     v-on:update_data="showCreateModal"
                     v-on:clone_data="showCloneModal"
                     v-on:success="loadData"
                 >
                 </contract-table>
+            </div>
+        </div>
 
-                <!-- paginator/ -->
-                <b-row
-                    class="w-100 d-flex justify-content-start" v-if="total > 1 && permissions.read">
-                    <!--            <b-col class="my-1 d-flex justify-content-center">-->
+        <div class="card">
+            <div class="card-body">
+                <b-row class="w-100 d-flex justify-content-start" v-if="total > 1">
                     <b-col class="my-1 d-flex justify-content-start">
                         <b-form-group
                             label-size="sm"
@@ -51,11 +48,8 @@
                         </b-form-group>
                     </b-col>
                 </b-row>
-                <!-- perPage -->
-                <b-row
-                    v-if="permissions.read"
-                >
 
+                <b-row>
                     <b-col md="2" class="my-1">
                         <select @change="loadData" v-model="perPage">
                             <option value="20">20</option>
@@ -66,16 +60,26 @@
                         </select>
                     </b-col>
                 </b-row>
+
                 <p class="text-success">Найдено записей: <b>{{ total }}</b></p>
             </div>
         </div>
 
-        <!-- create/update contracts -->
         <contract-create
             ref="contractCreate"
             v-on:success="loadData"
         >
         </contract-create>
+
+        <b-modal
+            v-model="logsModalShow"
+            :title="'Журнал действий'"
+            :static="true"
+            size="lg"
+            hide-footer>
+            <logs-modal ref="logsModal">
+            </logs-modal>
+        </b-modal>
     </div>
 </template>
 
@@ -83,6 +87,8 @@
 import Swal2 from "sweetalert2";
 import ContractCreate from "./contract-create";
 import ContractFilters from "./contract-filters";
+import ContractTable from "./contract-table";
+import LogsModal from "../logs/logs-modal";
 import {getParams, addParams} from "../const/params";
 
 export default {
@@ -91,19 +97,20 @@ export default {
         Swal2,
         ContractCreate,
         ContractFilters,
+        ContractTable,
+        LogsModal
     },
     props: ['permissions', 'fields'],
     data() {
         return {
+            logsModalShow: false,
             busy: false,
             user: null,
-
             table: {
                 items: [],
-                fields: [ ],
+                fields: [],
             },
-
-            filters:     {
+            filters: {
                 sortBy: 'id',
                 sortDesc: true,
                 currentPage: 1,
@@ -114,8 +121,7 @@ export default {
         }
     },
     mounted() {
-        console.log(this.table.fields);
-        this.fields.forEach(field =>{
+        this.fields.forEach(field => {
             this.table.fields.push({
                 'key': field.field,
                 'label': field.name,
@@ -129,7 +135,7 @@ export default {
                 }
             });
         });
-        this.table.fields.push({ key: "buttons", label: "#", class: "text-center" });
+        this.table.fields.push({key: "buttons", label: "#", class: "text-center"});
 
         let getData = getParams()
         for (let param in getData) {
@@ -141,21 +147,27 @@ export default {
         }
         this.$refs.contractFilters.setFilters(this.filters)
 
-
         this.loadData()
     },
     methods: {
+        logsRead(modelId) {
+            this.logsModalShow = true
+            this.$refs.logsModal.loadData(modelId)
+        },
         toggleTrash() {
             this.filters.trash = this.filters.trash ? 0 : 1;
+
             this.loadData();
         },
         selectPage(page = 1) {
             this.filters.currentPage = page;
+
             this.loadData();
         },
         changeSort(e) {
             this.filters.sortBy = e.sortBy;
             this.filters.sortDesc = e.sortDesc;
+
             this.loadData();
         },
         changeFilters(filters) {
@@ -165,15 +177,12 @@ export default {
 
             this.loadData();
         },
-
         showCreateModal(data = null) {
             this.$refs.contractCreate.open(data)
         },
-
         showCloneModal(data = null) {
             this.$refs.contractCreate.open(data, true)
         },
-
         loadData() {
             this.busy = true
             addParams(this.filters);
@@ -185,19 +194,20 @@ export default {
 
             axios.get("/contract/index", data)
                 .then(({data}) => {
-
-                    if (data.status) {
-                        this.table.items = data.result.contracts
-                        this.total = data.result.total;
-                        this.filters.currentPage = data.result.currentPage;
-                    } else {
+                    if (!data.status) {
                         Swal2.fire({title: "Неизвестная ошибка сервера", icon: "error"});
+                        return;
                     }
-                })
 
+                    this.table.items = data.result.contracts
+                    this.total = data.result.total;
+                    this.filters.currentPage = data.result.currentPage;
+                })
                 .catch(error => {
-                    Swal2.fire({title: "Неизвестная ошибка", icon: "error"});
-                }).finally(() => this.busy = false);
+                    console.error(error)
+                    Swal2.fire({title: "Неизвестная ошибка", icon: "error"})
+                })
+                .finally(() => this.busy = false);
         },
     },
 }

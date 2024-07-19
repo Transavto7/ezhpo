@@ -86,8 +86,9 @@ export default {
                 this.show = false;
                 this.$toast('Штамп успешно добавлен');
                 this.$emit('success', this.stamp);
-            }).catch((error) => {
-                this.$toast('Ошибка добавления', {type: 'error'});
+            }).catch(error => {
+                console.error(error)
+                this.$toast('Ошибка!', {type: 'error'});
             });
             this.saving = false;
         }

@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
-use App\Driver;
+use App\Events\Relations\Attached;
+use App\Events\Relations\Detached;
+use App\Listeners\LogAttachedEvent;
+use App\Listeners\LogDetachedEvent;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -18,6 +21,12 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        Attached::class => [
+            LogAttachedEvent::class
+        ],
+        Detached::class => [
+            LogDetachedEvent::class
+        ]
     ];
 
     /**

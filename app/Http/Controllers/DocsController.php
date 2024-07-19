@@ -3,9 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Anketa;
-use App\Company;
-use App\Driver;
-use App\Point;
 use App\Services\DocDataService;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Http\Request;
@@ -84,7 +81,7 @@ class DocsController extends Controller
         $data['time'] = date('Hч iмин', strtotime($data['date']));
         $data['date_str'] = 'от ' . date('d.m.Y', strtotime($data['date'])) . ' года';
         $data['post'] = 'Водитель';
-        $data['alko'] = $data['alcometer_result'];
+        $data['alko'] = $data['alcometer_result'] . ' мг\л';
 
         //TODO: фикс для протокола, при необходимости - можно привести к 1 шаблону
         $view = 'docs.exports.' . $type;
