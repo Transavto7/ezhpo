@@ -7,8 +7,8 @@ cd "../"
 
 # Проверить, что текущая ветка - мастер
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-if [[ "$BRANCH" != "master" ]]; then
-  echo 'Current branch is not master!';
+if [[ "$BRANCH" != "dev" ]]; then
+  echo 'Current branch is not dev!';
   exit 1;
 fi
 

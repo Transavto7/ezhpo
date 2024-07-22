@@ -1,0 +1,23 @@
+name: Deploy dev branch
+
+on:
+  push:
+    branches: [ dev ]
+
+jobs:
+  update-servers:
+    name: "crm.ta-7.ru update"
+    runs-on: ubuntu-latest
+    steps:
+    - name: Update domain
+      uses: appleboy/ssh-action@master
+      env:
+        GITHUB_SHA: ${{ github.sha }}
+      with:
+        host: 91.106.207.85
+        username: admint4n
+        key: ${{ secrets.CRM_SSHKEY }}
+        port: 22
+        envs: GITHUB_SHA
+        script: |
+            ~/crm.ta-7.ru/public_html/.scripts/deploy-dev.sh

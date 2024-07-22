@@ -1,4 +1,4 @@
-name: Deploy master branc
+name: Deploy master branch
 
 on:
   push:
@@ -37,16 +37,16 @@ jobs:
           - tomilko
           - tverkooptrans
     steps:
-    - name: Update domain
+    - name: Update domains
       uses: appleboy/ssh-action@master
       env:
         GITHUB_SHA: ${{ github.sha }}
         PROJECT_PATH: /home/admin/web/${{ matrix.server }}.ta-7.ru/public_html
       with:
         host: 213.139.210.53
-        username: deploy
+        username: root
         key: ${{ secrets.SSHKEY }}
         port: 22
         envs: PROJECT_PATH,GITHUB_SHA
         script: |
-            sudo PROJECT_PATH/.scripts/deploy-master.sh
+            PROJECT_PATH/.scripts/deploy-master.sh
