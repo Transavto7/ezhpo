@@ -1,0 +1,54 @@
+name: Deploy master branc
+
+on:
+  pull_request:
+    branches: [ master ]
+  push:
+    branches: [ master ]
+
+jobs:
+  update-servers:
+    name: "${{ matrix.server }}.ta-7.ru update"
+    runs-on: ubuntu-latest
+  strategy:
+    matrix:
+      server: 
+        - alkomed 
+        - aplus
+        - a-rosa 
+        - atp 
+        - avtodoctor69 
+        - avtomedik 
+        - avto-med 
+        - cert
+        - chinara 
+        - demo
+        - dopusk 
+        - leskraft 
+        - medi-d
+        - meduslugi 
+        - medzenklinik 
+        - mkyyzch
+        - mt
+        - oreltaxi 
+        - pomosh
+        - p-osmotr 
+        - profmed 
+        - puti-nn 
+        - smirnova 
+        - tomilko 
+        - tverkooptrans
+  steps:
+    - name: Update domain
+      uses: appleboy/ssh-action@master
+      env:
+        GITHUB_SHA: ${{ github.sha }}
+        PROJECT_PATH: /home/admin/web/${{ matrix.server }}.ta-7.ru/public_html
+      with:
+        host: 213.139.210.53
+        username: deploy
+        key: ${{ secrets.SSHKEY }}
+        port: 22
+	envs: PROJECT_PATH, GITHUB_SHA
+        script: |
+          sudo PROJECT_PATH/.scripts/deploy-master.sh
