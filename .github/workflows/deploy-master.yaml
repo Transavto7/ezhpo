@@ -10,35 +10,35 @@ jobs:
   update-servers:
     name: "${{ matrix.server }}.ta-7.ru update"
     runs-on: ubuntu-latest
-  strategy:
-    matrix:
-      server: 
-        - alkomed 
-        - aplus
-        - a-rosa 
-        - atp 
-        - avtodoctor69 
-        - avtomedik 
-        - avto-med 
-        - cert
-        - chinara 
-        - demo
-        - dopusk 
-        - leskraft 
-        - medi-d
-        - meduslugi 
-        - medzenklinik 
-        - mkyyzch
-        - mt
-        - oreltaxi 
-        - pomosh
-        - p-osmotr 
-        - profmed 
-        - puti-nn 
-        - smirnova 
-        - tomilko 
-        - tverkooptrans
-  steps:
+    strategy:
+      matrix:
+        server:
+          - alkomed
+          - aplus
+          - a-rosa
+          - atp
+          - avtodoctor69
+          - avtomedik
+          - avto-med
+          - cert
+          - chinara
+          - demo
+          - dopusk
+          - leskraft
+          - medi-d
+          - meduslugi
+          - medzenklinik
+          - mkyyzch
+          - mt
+          - oreltaxi
+          - pomosh
+          - p-osmotr
+          - profmed
+          - puti-nn
+          - smirnova
+          - tomilko
+          - tverkooptrans
+    steps:
     - name: Update domain
       uses: appleboy/ssh-action@master
       env:
@@ -49,5 +49,6 @@ jobs:
         username: deploy
         key: ${{ secrets.SSHKEY }}
         port: 22
-	envs: PROJECT_PATH,GITHUB_SHA
-        script: "sudo PROJECT_PATH/.scripts/deploy-master.sh"
+        envs: PROJECT_PATH,GITHUB_SHA
+        script: |
+            sudo PROJECT_PATH/.scripts/deploy-master.sh
