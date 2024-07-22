@@ -1,4 +1,4 @@
-<input type="hidden" name="type_anketa" value="{{ $type_anketa }}" />
+<input type="hidden" name="type_anketa" value="{{ $type_anketa }}"/>
 
 @include('profile.ankets.components.pvs')
 
@@ -8,7 +8,9 @@
     <div class="form-group row">
         <label class="form-control-label col-md-3">ID компании:</label>
         <article class="col-md-9">
-            <input value="{{ $company_id ?? '' }}" required type="number" oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Company', event.target.value, 'name', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})" min="5" name="company_id" class="MASK_ID_ELEM form-control">
+            <input value="{{ $company_id ?? '' }}" required type="number"
+                   oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Company', event.target.value, 'name', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
+                   min="5" name="company_id" class="MASK_ID_ELEM form-control">
             <p class="app-checker-prop"></p>
         </article>
     </div>
@@ -16,7 +18,9 @@
     <div class="form-group row">
         <label class="form-control-label col-md-3">ID водителя:</label>
         <article class="col-md-9">
-            <input value="{{ $driver_id ?? '' }}" type="number" oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})" min="6" name="driver_id" class="MASK_ID_ELEM form-control">
+            <input value="{{ $driver_id ?? '' }}" type="number"
+                   oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
+                   min="6" name="driver_id" class="MASK_ID_ELEM form-control">
             <p class="app-checker-prop"></p>
         </article>
     </div>
@@ -26,7 +30,9 @@
         <div class="form-group row">
             <label class="col-md-3 form-control-label">ID автомобиля:</label>
             <article class="col-md-9">
-                <input value="{{ $car_id ?? '' }}" type="number" oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})" min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control car-input">
+                <input value="{{ $car_id ?? '' }}" type="number"
+                       oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
+                       min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control car-input">
                 <p class="app-checker-prop"></p>
             </article>
         </div>
@@ -65,17 +71,11 @@
             </article>
         </div>
 
-{{--        <div class="form-group row">--}}
-{{--            <label class="col-md-3 form-control-label">Количество выданных ПЛ:</label>--}}
-{{--            <article class="col-md-9">--}}
-{{--                <input type="number" required max="30" value="{{ isset($count_pl) ? $count_pl : '' }}" name="anketa[0][count_pl]" class="form-control">--}}
-{{--            </article>--}}
-{{--        </div>--}}
-
         <div class="form-group row">
             <label class="col-md-3 form-control-label">Номер путевого листа:</label>
             <article class="col-md-9">
-                <input type="text" value="{{ $number_list_road ?? '' }}" name="anketa[0][number_list_road]" class="form-control">
+                <input type="text" value="{{ $number_list_road ?? '' }}" name="anketa[0][number_list_road]"
+                       class="form-control">
             </article>
         </div>
 
@@ -83,12 +83,26 @@
             <label class="form-control-label col-md-3">Тип осмотра:</label>
             <article class="col-md-9">
                 <select name="anketa[0][type_view]" class="form-control">
-                    <option value="Предрейсовый/Предсменный" @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>Предрейсовый/Предсменный</option>
-                    <option value="Послерейсовый/Послесменный" @if(strcasecmp($type_view ?? '', 'Послерейсовый/Послесменный') == 0) selected @endif>Послерейсовый/Послесменный</option>
-{{--                    <option value="Предрейсовый/Предсменный" @if(($type_view ?? '') == "Предрейсовый/Предсменный") selected @endif>Предрейсовый/Предсменный</option>--}}
-{{--                    <option value="Послерейсовый/Послесменный" @if(($type_view ?? '') == "Послерейсовый/Послесменный") selected @endif>Послерейсовый/Послесменный</option>--}}
+                    <option value="Предрейсовый/Предсменный"
+                            @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>
+                        Предрейсовый/Предсменный
+                    </option>
+                    <option value="Послерейсовый/Послесменный"
+                            @if(strcasecmp($type_view ?? '', 'Послерейсовый/Послесменный') == 0) selected @endif>
+                        Послерейсовый/Послесменный
+                    </option>
                 </select>
             </article>
+        </div>
+
+        <div class="form-group row">
+            <label class="form-control-label col-md-3">Предыдущие показания одометра:</label>
+            <div class="input-group mb-3 col-md-9">
+                <input type="text" readonly disabled name="anketa[0][previous_odometer]" class="form-control h-auto">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-success" type="button" onclick="loadPreviousOdometer()">Получить</button>
+                </div>
+            </div>
         </div>
 
         <div class="form-group row">
@@ -104,7 +118,9 @@
     <div class="form-group">
         <label class="form-control-label">ID водителя:</label>
         <article>
-            <input required value="{{ $driver_id ?? '' }}" type="number" oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})" min="6" name="driver_id" class="MASK_ID_ELEM form-control">
+            <input required value="{{ $driver_id ?? '' }}" type="number"
+                   oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
+                   min="6" name="driver_id" class="MASK_ID_ELEM form-control">
             <p class="app-checker-prop"></p>
         </article>
     </div>
@@ -114,14 +130,17 @@
             <label class="form-control-label">Дата и время осмотра:</label>
             <article>
                 <input min="1900-02-20T20:20"
-                       max="2999-02-20T20:20" type="datetime-local" value="{{ $default_current_date ?? '' }}" name="anketa[0][date]" class="form-control">
+                       max="2999-02-20T20:20" type="datetime-local" value="{{ $default_current_date ?? '' }}"
+                       name="anketa[0][date]" class="form-control">
             </article>
         </div>
 
         <div class="form-group">
             <label class="form-control-label">ID автомобиля:</label>
             <article>
-                <input required value="{{ $car_id ?? '' }}" type="number" required oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})" min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control car-input">
+                <input required value="{{ $car_id ?? '' }}" type="number"
+                       oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
+                       min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control car-input">
                 <p class="app-checker-prop"></p>
             </article>
         </div>
@@ -130,12 +149,26 @@
             <label class="form-control-label">Тип осмотра:</label>
             <article>
                 <select name="anketa[0][type_view]" required class="form-control">
-                    <option value="Предрейсовый/Предсменный" @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>Предрейсовый/Предсменный</option>
-                    <option value="Послерейсовый/Послесменный" @if(strcasecmp($type_view ?? '', 'Послерейсовый/Послесменный') == 0) selected @endif>Послерейсовый/Послесменный</option>
-{{--                    <option value="Предрейсовый/Предсменный" @if(($type_view ?? ')' == "Предрейсовый/Предсменный") selected @endif>Предрейсовый/Предсменный</option>--}}
-{{--                    <option value="Послерейсовый/Послесменный" @if(($type_view ?? '') == "Послерейсовый/Послесменный") selected @endif>Послерейсовый/Послесменный</option>--}}
+                    <option value="Предрейсовый/Предсменный"
+                            @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>
+                        Предрейсовый/Предсменный
+                    </option>
+                    <option value="Послерейсовый/Послесменный"
+                            @if(strcasecmp($type_view ?? '', 'Послерейсовый/Послесменный') == 0) selected @endif>
+                        Послерейсовый/Послесменный
+                    </option>
                 </select>
             </article>
+        </div>
+
+        <div class="form-group">
+            <label class="form-control-label">Предыдущие показания одометра:</label>
+            <div class="input-group mb-3">
+                <input type="text" readonly disabled name="anketa[0][previous_odometer]" class="form-control h-auto">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-success" type="button" onclick="loadPreviousOdometer()">Получить</button>
+                </div>
+            </div>
         </div>
 
         <div class="form-group">
@@ -145,7 +178,8 @@
 
         <div class="form-group">
             <label class="form-control-label">Номер путевого листа:</label>
-            <input type="text" value="{{ $number_list_road ?? '' }}" name="anketa[0][number_list_road]" class="form-control">
+            <input type="text" value="{{ $number_list_road ?? '' }}" name="anketa[0][number_list_road]"
+                   class="form-control">
         </div>
 
         <div class="anketa-delete"></div>
