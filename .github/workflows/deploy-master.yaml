@@ -49,6 +49,5 @@ jobs:
         username: deploy
         key: ${{ secrets.SSHKEY }}
         port: 22
-	envs: PROJECT_PATH, GITHUB_SHA
-        script: |
-          sudo PROJECT_PATH/.scripts/deploy-master.sh
+	envs: PROJECT_PATH,GITHUB_SHA
+        script: "sudo PROJECT_PATH/.scripts/deploy-master.sh"
