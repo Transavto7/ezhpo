@@ -51,4 +51,4 @@ jobs:
         port: 22
 	envs: PROJECT_PATH, GITHUB_SHA
         script: |
-          $PROJECT_PATH/.scripts/deploy-master.sh
+          sudo PROJECT_PATH/.scripts/deploy-master.sh

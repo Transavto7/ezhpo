@@ -1,11 +1,9 @@
 #!/bin/bash
-sudo su
-
 set -e
 
 echo "Deployment started ..."
 
-cd "PROJECT_PATH"
+cd "$PROJECT_PATH"
 
 # Проверить, что текущая ветка - мастер
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
@@ -28,7 +26,17 @@ composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 php artisan cache:clear
 php artisan view:clear
 
-#TODO: забэкапить БД
+# Дамп БД
+DATE=$(date '+%Y-%m-%d')
+
+export $(cat ../.env | sed 's/#.*//g' | xargs)
+
+export MYSQL_PWD=$DB_PASSWORD
+
+mysqldump -u $DB_USERNAME $DB_DATABASE \
+    --no-tablespaces \
+    --verbose \
+    --result-file ../../$DATE-$GITHUB_SHA-dump.sql
 
 # Запустить миграцию базы данных
 php artisan migrate --force
