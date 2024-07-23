@@ -3,7 +3,7 @@ set -e
 
 echo "Deployment started ..."
 
-cd "../"
+cd $PROJECT_PATH
 
 # Проверить, что текущая ветка - мастер
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
@@ -20,28 +20,33 @@ fi
 git pull origin master
 
 # Установить зависимости Composer
-composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+composer install --optimize-autoloader
 
 # Очистить старый кэш
 php artisan cache:clear
 php artisan view:clear
 
-# Дамп БД
-DATE=$(date '+%Y-%m-%d')
+# Проверить, что нужно выполнить миграции и сделать дамп
+NEED_MIGRATE="$(php artisan migrate --pretend)"
+if [[ "$NEED_MIGRATE" = "Nothing to migrate." ]];
+then
+  # Дамп БД
+  DATE=$(date '+%Y-%m-%d')
 
-DUMP_NAME="../${DATE_DUMP}-${GITHUB_SHA}-dump.sql"
+  DUMP_NAME="../${DATE_DUMP}-${GITHUB_SHA}-dump.sql"
 
-export $(cat .env | sed 's/#.*//g' | xargs)
+  export $(cat .env | sed 's/#.*//g' | xargs)
 
-export MYSQL_PWD=$DB_PASSWORD
+  export MYSQL_PWD=$DB_PASSWORD
 
-mysqldump -u $DB_USERNAME $DB_DATABASE \
-    --no-tablespaces \
-    --verbose \
-    --result-file $DUMP_NAME
+  mysqldump -u $DB_USERNAME $DB_DATABASE \
+      --no-tablespaces \
+      --verbose \
+      --result-file $DUMP_NAME
 
-# Запустить миграцию базы данных
-php artisan migrate --force
+  # Запустить миграцию базы данных
+  php artisan migrate --force
+fi
 
 # Закэшировать конфиг
 php artisan config:cache
