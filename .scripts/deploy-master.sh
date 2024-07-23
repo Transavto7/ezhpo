@@ -27,8 +27,8 @@ php artisan cache:clear
 php artisan view:clear
 
 # Проверить, что нужно выполнить миграции и сделать дамп
-NEED_MIGRATE="$(php artisan migrate --pretend)"
-if [[ "$NEED_MIGRATE" = "Nothing to migrate." ]];
+NEED_MIGRATE="$(php artisan migrate --pretend --force)"
+if [[ "$NEED_MIGRATE" != "Nothing to migrate." ]];
 then
   # Дамп БД
   DATE=$(date '+%Y-%m-%d')
