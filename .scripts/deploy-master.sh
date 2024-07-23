@@ -29,14 +29,16 @@ php artisan view:clear
 # Дамп БД
 DATE=$(date '+%Y-%m-%d')
 
-export $(cat ../.env | sed 's/#.*//g' | xargs)
+DUMP_NAME="../${DATE_DUMP}-${GITHUB_SHA}-dump.sql"
+
+export $(cat .env | sed 's/#.*//g' | xargs)
 
 export MYSQL_PWD=$DB_PASSWORD
 
 mysqldump -u $DB_USERNAME $DB_DATABASE \
     --no-tablespaces \
     --verbose \
-    --result-file ../../$DATE-$GITHUB_SHA-dump.sql
+    --result-file $DUMP_NAME
 
 # Запустить миграцию базы данных
 php artisan migrate --force
