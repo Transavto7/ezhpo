@@ -17,7 +17,7 @@ fi
 (php artisan down) || true
 
 # Загрузить последнюю версию приложения
-git pull origin master
+git pull origin dev
 
 # Установить зависимости Composer
 composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
@@ -29,6 +29,8 @@ php artisan view:clear
 # Дамп БД
 DATE=$(date '+%Y-%m-%d')
 
+DUMP_NAME=$DATE-$GITHUB_SHA-dump.sql
+
 export $(cat ../.env | sed 's/#.*//g' | xargs)
 
 export MYSQL_PWD=$DB_PASSWORD
@@ -36,7 +38,7 @@ export MYSQL_PWD=$DB_PASSWORD
 mysqldump -u $DB_USERNAME $DB_DATABASE \
     --no-tablespaces \
     --verbose \
-    --result-file ../../$DATE-$GITHUB_SHA-dump.sql
+    --result-file ../../$DUMP_NAME
 
 # Запустить миграцию базы данных
 php artisan migrate --force

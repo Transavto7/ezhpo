@@ -9,6 +9,7 @@ jobs:
     name: "${{ matrix.server }}.ta-7.ru update"
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 1
       matrix:
         server:
           - alkomed
@@ -45,8 +46,8 @@ jobs:
       with:
         host: 213.139.210.53
         username: root
-        key: ${{ secrets.SSHKEY }}
+        key: ${{ secrets.CLIENTS_SSHKEY }}
         port: 22
         envs: PROJECT_PATH,GITHUB_SHA
         script: |
-            PROJECT_PATH/.scripts/deploy-master.sh
+            ${PROJECT_PATH}/.scripts/deploy-master.sh
