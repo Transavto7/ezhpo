@@ -24,7 +24,6 @@ jobs:
           - cert
           - chinara
           - dopusk
-          - leskraft
           - medi-t
           - meduslugi
           - medzenklinik
