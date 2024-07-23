@@ -3,7 +3,7 @@ set -e
 
 echo "Deployment started ..."
 
-cd "~/crm.ta-7.ru/public_html"
+cd ~/crm.ta-7.ru/public_html
 
 # Проверить, что текущая ветка - дев
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
