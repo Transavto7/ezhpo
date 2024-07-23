@@ -29,8 +29,9 @@ $PHP_VERSION artisan cache:clear
 $PHP_VERSION artisan view:clear
 
 # Проверить, что нужно выполнить миграции и сделать дамп
-NEED_MIGRATE="$($PHP_VERSION artisan migrate --pretend --force)"
-if [[ "$NEED_MIGRATE" != "Nothing to migrate." ]];
+$PHP_VERSION artisan migrate:check
+NEED_MIGRATE="$(echo $?)"
+if [[ "$NEED_MIGRATE" != "0" ]];
 then
   # Дамп БД
   DATE=$(date '+%Y-%m-%d')
