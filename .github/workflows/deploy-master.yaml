@@ -12,6 +12,8 @@ jobs:
       max-parallel: 1
       matrix:
         server:
+          - 09vk
+          - alekseeva
           - alkomed
           - aplus
           - a-rosa
@@ -19,12 +21,13 @@ jobs:
           - avtodoctor69
           - avtomedik
           - avto-med
+          - avtomed
           - cert
           - chinara
           - demo
           - dopusk
           - leskraft
-          - medi-d
+          - medi-t
           - meduslugi
           - medzenklinik
           - mkyyzch
@@ -35,6 +38,7 @@ jobs:
           - profmed
           - puti-nn
           - smirnova
+          - soyuzmed
           - tomilko
           - tverkooptrans
     steps:
