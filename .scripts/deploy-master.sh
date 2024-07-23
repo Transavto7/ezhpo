@@ -3,7 +3,7 @@ set -e
 
 echo "Deployment started ..."
 
-cd "../"
+cd $PROJECT_PATH
 
 # Проверить, что текущая ветка - мастер
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
@@ -20,7 +20,7 @@ fi
 git pull origin master
 
 # Установить зависимости Composer
-composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+composer install --optimize-autoloader
 
 # Очистить старый кэш
 php artisan cache:clear

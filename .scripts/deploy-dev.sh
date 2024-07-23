@@ -22,7 +22,7 @@ PHP_VERSION=php7.3
 git pull origin dev
 
 # Установить зависимости Composer
-composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+$PHP_VERSION composer.phar install --optimize-autoloader
 
 # Очистить старый кэш
 $PHP_VERSION artisan cache:clear
