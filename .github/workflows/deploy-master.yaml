@@ -23,7 +23,6 @@ jobs:
           - avto-med
           - cert
           - chinara
-          - demo
           - dopusk
           - leskraft
           - medi-t
