@@ -28,22 +28,27 @@ $PHP_VERSION composer.phar install --optimize-autoloader
 $PHP_VERSION artisan cache:clear
 $PHP_VERSION artisan view:clear
 
-# Дамп БД
-DATE_DUMP=$(date '+%Y-%m-%d')
+# Проверить, что нужно выполнить миграции и сделать дамп
+NEED_MIGRATE="$($PHP_VERSION artisan migrate --pretend)"
+if [[ "$NEED_MIGRATE" = "Nothing to migrate." ]];
+then
+  # Дамп БД
+  DATE=$(date '+%Y-%m-%d')
 
-DUMP_NAME="../${DATE_DUMP}-${GITHUB_SHA}-dump.sql"
+  DUMP_NAME="../${DATE_DUMP}-${GITHUB_SHA}-dump.sql"
 
-export $(cat .env | sed 's/#.*//g' | xargs)
+  export $(cat .env | sed 's/#.*//g' | xargs)
 
-export MYSQL_PWD=$DB_PASSWORD
+  export MYSQL_PWD=$DB_PASSWORD
 
-mysqldump -u $DB_USERNAME $DB_DATABASE \
-    --no-tablespaces \
-    --verbose \
-    --result-file $DUMP_NAME
+  mysqldump -u $DB_USERNAME $DB_DATABASE \
+      --no-tablespaces \
+      --verbose \
+      --result-file $DUMP_NAME
 
-# Запустить миграцию базы данных
-$PHP_VERSION artisan migrate --force
+  # Запустить миграцию базы данных
+  $PHP_VERSION artisan migrate --force
+fi
 
 # Закэшировать конфиг
 $PHP_VERSION artisan config:cache
