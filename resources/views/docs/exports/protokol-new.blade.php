@@ -39,12 +39,12 @@
                 <h3>№ {{ $id }} от {{ date('d.m.Y', strtotime($date)) }} года</h3>
             </div>
             <br>
-            1. Фамилия, имя, отчество, год рождения, место работы, должность:<br>
+            1. Фамилия, имя, отчество, год рождения, должность:<br>
             <b>{{ $driver_fio ? $driver_fio . ',' : '' }} {{ $driver_year_birthday }} г.р., {{ $driver_pv }}, {{ app('app\Company')->getName($company_id, 'hash_id') }}</b>
             <br>
 
-            кем и когда (точное время) произведен контроль трезвости<br>
-            <b>{{ $user_post ? $user_post . ',' : '' }} {{ $user_name }}, {{ $date }}</b>
+            кем, когда (точное время) и где произведен контроль трезвости<br>
+            <b>{{ $user_post ? $user_post . ',' : '' }} {{ $user_name }}, {{ $date }}, {{ $town }}, {{ $point }}</b>
             <br><br>
 
             2. Особенности поведения обследуемого:<br>
