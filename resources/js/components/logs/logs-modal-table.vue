@@ -1,10 +1,10 @@
 <script>
-import LogsUuidCell from "./logs-uuid-cell";
+import UuidCell from "./../common/uuid-cell";
 
 export default {
     name: "logs-modal-table",
     components: {
-        LogsUuidCell
+        UuidCell
     },
     props: {
         items: {
@@ -37,7 +37,7 @@ export default {
             bordered
         >
             <template #cell(uuid)="{ item }">
-                <logs-uuid-cell :uuid="item.uuid"></logs-uuid-cell>
+                <uuid-cell :uuid="item.uuid"></uuid-cell>
             </template>
             <template #cell(data)="{ item }">
                 <div v-for="(changeItem, index) of item.data" :key="index" class="p-1 mb-1" style="line-height: 19px">

@@ -299,6 +299,10 @@
                     @if(user()->access('logs_read'))
                         <li><a href="{{ route('logs.index') }}">Журнал действий</a></li>
                     @endif
+
+                    @if(user()->access('sdpo_crash_logs_read'))
+                        <li><a href="{{ route('sdpo_crash_logs.index') }}">Отказы СДПО</a></li>
+                    @endif
                 </ul>
             </li>
         @endif
