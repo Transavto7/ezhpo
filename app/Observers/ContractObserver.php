@@ -38,6 +38,10 @@ class ContractObserver
         $logData = [];
 
         foreach ($contract->getDirty() as $attribute => $newValue) {
+            if (empty($newValue) && empty($contract->getOriginal($attribute))) {
+                continue;
+            }
+
             $logData[] = [
                 'name' => $attribute,
                 'oldValue' => $contract->getOriginal($attribute),
