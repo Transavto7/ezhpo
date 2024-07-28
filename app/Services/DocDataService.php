@@ -24,7 +24,8 @@ class DocDataService
             'town' => '',
             'drugs' => false,
             'alko' => false,
-            'status' => 'Нет'
+            'status' => 'Нет',
+            'point' => ''
         ];
 
         foreach ($form->fillable as $field) {
@@ -74,6 +75,7 @@ class DocDataService
 
             if ($point) {
                 $data['town'] = $point->town->name;
+                $data['point'] = $point->name;
             }
         }
 
