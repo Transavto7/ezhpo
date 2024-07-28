@@ -141,6 +141,5 @@ Route::middleware('auth:api')->prefix('sdpo')->name('sdpo')->group(function () {
     Route::get('/medics', 'Api\SdpoController@getMedics');
 
     Route::get('/check', 'Api\SdpoController@checkConnaction');
-    Route::post('/work/report', [SdpoController::class, 'workReport']);
+    Route::post('/crash', 'Api\SdpoController@storeCrash');
 });
-

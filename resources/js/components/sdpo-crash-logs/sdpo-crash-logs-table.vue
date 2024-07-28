@@ -1,5 +1,5 @@
 <script>
-import UuidCell from "./../common/uuid-cell";
+import UuidCell from "../common/uuid-cell";
 
 export default {
     name: "logs-table",
@@ -24,17 +24,23 @@ export default {
             required: true,
         },
     },
-    emits: ['update:page', 'update:limit'],
+    emits: ['update:page', 'update:limit', 'showCrashData'],
     data() {
         return {
+            limits: [
+                25,
+                50,
+                100
+            ],
             fields: [
                 {key: 'uuid', label: 'UUID', class: 'text-left'},
-                {key: 'user', label: 'Пользователь', class: 'text-left'},
-                {key: 'created_at', label: 'Дата, время', class: 'text-left'},
-                {key: 'type', label: 'Действие', class: 'text-left'},
-                {key: 'model_type', label: 'Модель', class: 'text-left'},
-                {key: 'model_id', label: 'ID Модели', class: 'text-center'},
-                {key: 'data', label: 'Изменения', class: 'text-left'},
+                {key: 'terminal', label: 'Терминал', class: 'text-left'},
+                {key: 'point', label: 'ПВ', class: 'text-left'},
+                {key: 'created_at', label: 'Дата, время получения', class: 'text-left'},
+                {key: 'happened_at', label: 'Дата, время возникновения', class: 'text-left'},
+                {key: 'type', label: 'Тип отказа', class: 'text-left'},
+                {key: 'version', label: 'Версия', class: 'text-left'},
+                {key: 'data', label: 'Детали', class: 'text-left'},
             ],
         }
     },
@@ -45,6 +51,10 @@ export default {
 
         handleChangeLimit(e) {
             this.$emit('update:limit', +e.target.value)
+        },
+
+        handleShowDetailsClick(details) {
+            this.$emit('showCrashData', details)
         }
     }
 }
@@ -55,11 +65,7 @@ export default {
         <div class="d-flex align-items-center mb-4">
             <span>Показывать</span>
             <select :value="limit" class="ml-2 mr-2" @input="handleChangeLimit">
-                <option value="100">100</option>
-                <option value="500">500</option>
-                <option value="1000">1000</option>
-                <option value="1500">1500</option>
-                <option value="2000">2000</option>
+                <option v-for="(limit, index) in limits" :value="limit">{{limit}}</option>
             </select>
             <span>записей</span>
         </div>
@@ -77,14 +83,9 @@ export default {
             </template>
 
             <template #cell(data)="{ item }">
-                <div v-for="(changeItem, index) of item.data" :key="index" class="p-1 mb-1" style="line-height: 19px">
-                    <div>
-                        <b>{{ changeItem.name }}</b>
-                    </div>
-                    <span style="height: 18px">{{ changeItem.oldValue }}</span>
-                    <span class="text-primary">&xrarr;</span>
-                    <span> {{ changeItem.newValue }}</span>
-                </div>
+                <b-button v-if="item.data" variant="success" size="sm" @click="handleShowDetailsClick(item.data)">
+                    <i class="fa fa-info"></i>
+                </b-button>
             </template>
         </b-table>
 
