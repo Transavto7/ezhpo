@@ -192,6 +192,11 @@ Route::middleware(['auth'])->group(function () {
             Route::post('list-model', 'LogController@listByModel')->name('list-model');
             Route::post('list-model-map', 'LogController@listByModelMaps')->name('list-model-map');
         });
+
+        Route::prefix('sdpo-crash-logs')->as('sdpo_crash_logs.')->group(function () {
+            Route::get('/', 'SdpoCrashLogController@index')->name('index');
+            Route::post('list', 'SdpoCrashLogController@list')->name('list');
+        });
     });
 });
 

@@ -7,7 +7,9 @@ use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
 use App\Http\Controllers\SmsController;
+use App\Http\Requests\StoreSdpoCrashRequest;
 use App\MedicFormNormalizedPressure;
+use App\SdpoCrashLog;
 use App\Stamp;
 use App\Traits\UserEdsTrait;
 use App\ValueObjects\Phone;
@@ -609,5 +611,39 @@ class SdpoController extends Controller
         $driver->update([
             'photo' => $path
         ]);
+    }
+
+    public function storeCrash(StoreSdpoCrashRequest $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user('api');
+
+        if ($user->blocked) {
+            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            SdpoCrashLog::create(
+                $request->all() +
+                [
+                    'terminal_id' => $user->getAttribute('id'),
+                    'point_id' => $user->getAttribute('pv_id')
+                ]
+            );
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Ошибка успешно передана на сервер!'
+            ]);
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => "Ошибка не была передана на сервер! " . $exception->getMessage()
+            ]);
+        }
     }
 }
