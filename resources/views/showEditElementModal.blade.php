@@ -135,6 +135,12 @@
                                 @endforeach
                             </select>
                         </div>
+                    @else
+                        <select name="contract_ids[]" hidden>
+                            @foreach($contractForDriverOrCar->contracts as $contract)
+                                <option value="{{ $contract->id }}"></option>
+                            @endforeach
+                        </select>
                     @endif
                     <div>
                         <ul class="list-group">
