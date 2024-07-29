@@ -40,11 +40,11 @@
             </div>
             <br>
             1. Фамилия, имя, отчество, год рождения, должность:<br>
-            <b>{{ $driver_fio ? $driver_fio . ',' : '' }} {{ $driver_year_birthday }} г.р., {{ $driver_pv }}, {{ app('app\Company')->getName($company_id, 'hash_id') }}</b>
+            <b>{{ $driver_fio ? $driver_fio . ',' : '' }} {{ $driver_year_birthday }} г.р., {{ app('app\Company')->getName($company_id, 'hash_id') }}</b>
             <br>
 
             кем, когда (точное время) и где произведен контроль трезвости<br>
-            <b>{{ $user_post ? $user_post . ',' : '' }} {{ $user_name }}, {{ $date }}, {{ $town }}, {{ $point }}</b>
+            <b>{{ $user_post ? $user_post . ',' : '' }} {{ $user_name }}, {{ $date }}, {{ $point }}</b>
             <br><br>
 
             2. Особенности поведения обследуемого:<br>
