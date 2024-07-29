@@ -112,7 +112,7 @@
 
     <div class="row" data-anketa="{{ $anketa_view }}" id="ANKETA_FORM_VIEW">
         <!-- Анкета -->
-        <div class="col-lg-2" id="ANKETA_FORM_VIEW_FIRST">
+        <div class="col-lg-3" id="ANKETA_FORM_VIEW_FIRST">
             <div class="card">
                 <div class="card-body">
                     <p><b>Карточка автомобиля</b></p>
@@ -124,7 +124,7 @@
             </div>
         </div>
 
-        <div class="col-lg-6" id="ANKETA_FORM_ROOT">
+        <div class="col-lg-3" id="ANKETA_FORM_ROOT">
             <div class="card">
                 <div class="card-body">
 
@@ -146,7 +146,7 @@
 
 
                                     @isset($anketa)
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
                                             <div class="card p-2 text-xsmall">
                                                 @if($type_anketa === 'medic')
                                                     <b>"{{ $title }}" успешно создан!</b>
@@ -272,7 +272,7 @@
             </div>
         </div>
 
-        <div class="col-lg-2">
+        <div class="col-lg-3">
             <div class="card">
                 <div class="card-body">
                     <p><b>Карточка компании</b></p>
@@ -284,7 +284,7 @@
             </div>
         </div>
 
-        <div class="col-lg-2">
+        <div class="col-lg-3">
             <div class="card">
                 <div class="card-body">
                     <p><b>Карточка водителя</b></p>
