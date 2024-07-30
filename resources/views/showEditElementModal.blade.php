@@ -11,6 +11,21 @@
                 @if(isset($v['hidden']) || in_array($k, $fieldsToSkip))
                     @continue
                 @endif
+                @if(($k === 'name') && $model === 'Company')
+                    <div class="form-group" data-field="name">
+                        <label>
+                            {{ $v['label'] }}
+                        </label>
+                        <textarea name="name"
+                                  data-label="{{ $v['label'] }}"
+                                  placeholder="{{ $v['label'] }}"
+                                  data-field="Company_name"
+                                  class="form-control">
+                        {{ $el[$k] ?? '' }}
+                    </textarea>
+                    </div>
+                    @continue
+                @endif
                 @if(($k === 'note') && $model === 'Company')
                     <div class="form-group" data-field="comment">
                         <label>
