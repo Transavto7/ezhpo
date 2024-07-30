@@ -18,21 +18,26 @@
     <div class="form-group row">
         <label class="form-control-label col-md-3">ID водителя:</label>
         <article class="col-md-9">
-            <input value="{{ $driver_id ?? '' }}" type="number"
-                   oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
-                   min="6" name="driver_id" class="MASK_ID_ELEM form-control">
+            <div class="d-flex">
+                <input value="{{ $driver_id ?? '' }}" type="number"
+                       oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
+                       min="6" name="driver_id" class="MASK_ID_ELEM form-control">
+                <a class="btn btn-outline-secondary camera-btn"><i class="fa fa-camera"></i></a>
+            </div>
             <p class="app-checker-prop"></p>
         </article>
     </div>
 
     <div class="cloning" id="cloning-first">
-
         <div class="form-group row">
             <label class="col-md-3 form-control-label">ID автомобиля:</label>
             <article class="col-md-9">
-                <input value="{{ $car_id ?? '' }}" type="number"
-                       oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
-                       min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control car-input">
+                <div class="d-flex">
+                    <input value="{{ $car_id ?? '' }}" type="number"
+                           oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
+                           min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control car-input">
+                    <a class="btn btn-outline-secondary camera-btn"><i class="fa fa-camera"></i></a>
+                </div>
                 <p class="app-checker-prop"></p>
             </article>
         </div>
@@ -100,7 +105,8 @@
             <div class="input-group mb-3 col-md-9">
                 <input type="text" readonly disabled name="anketa[0][previous_odometer]" class="form-control h-auto">
                 <div class="input-group-append">
-                    <button class="btn btn-outline-success" type="button" onclick="loadPreviousOdometer()">Получить</button>
+                    <button class="btn btn-outline-success" type="button" onclick="loadPreviousOdometer()">Получить
+                    </button>
                 </div>
             </div>
         </div>
@@ -118,9 +124,12 @@
     <div class="form-group">
         <label class="form-control-label">ID водителя:</label>
         <article>
-            <input required value="{{ $driver_id ?? '' }}" type="number"
-                   oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
-                   min="6" name="driver_id" class="MASK_ID_ELEM form-control">
+            <div class="d-flex">
+                <input required value="{{ $driver_id ?? '' }}" type="number"
+                       oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
+                       min="6" name="driver_id" class="MASK_ID_ELEM form-control">
+                <a class="btn btn-outline-secondary camera-btn"><i class="fa fa-camera"></i></a>
+            </div>
             <p class="app-checker-prop"></p>
         </article>
     </div>
@@ -138,9 +147,12 @@
         <div class="form-group">
             <label class="form-control-label">ID автомобиля:</label>
             <article>
-                <input required value="{{ $car_id ?? '' }}" type="number"
-                       oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
-                       min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control car-input">
+                <div class="d-flex">
+                    <input required value="{{ $car_id ?? '' }}" type="number"
+                           oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
+                           min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control car-input">
+                    <a class="btn btn-outline-secondary camera-btn"><i class="fa fa-camera"></i></a>
+                </div>
                 <p class="app-checker-prop"></p>
             </article>
         </div>
@@ -166,7 +178,8 @@
             <div class="input-group mb-3">
                 <input type="text" readonly disabled name="anketa[0][previous_odometer]" class="form-control h-auto">
                 <div class="input-group-append">
-                    <button class="btn btn-outline-success" type="button" onclick="loadPreviousOdometer()">Получить</button>
+                    <button class="btn btn-outline-success" type="button" onclick="loadPreviousOdometer()">Получить
+                    </button>
                 </div>
             </div>
         </div>
@@ -197,4 +210,14 @@
         </select>
     </div>
 @endif
+
+@section('custom-styles')
+    <style>
+        .camera-btn {
+            line-height: 0.5 !important;
+            border-radius: 0 0.25rem 0.25rem 0;
+        }
+    </style>
+@endsection
+
 
