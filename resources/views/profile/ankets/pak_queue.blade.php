@@ -73,8 +73,12 @@
                         class="form-control"
                         required
                         onchange="updateAlcometerResult()">
-                    <option @if (($proba_alko ?? false) === 'Отрицательно') selected @endif value="Отрицательно">Отрицательно</option>
-                    <option @if ((($proba_alko ?? false) === 'Положительно') || !isset($proba_alko)) selected @endif value="Положительно">Положительно</option>
+                    <option @if (($proba_alko ?? false) === 'Отрицательно') selected @endif value="Отрицательно">
+                        Отрицательно
+                    </option>
+                    <option @if ((($proba_alko ?? false) === 'Положительно') || !isset($proba_alko)) selected
+                            @endif value="Положительно">Положительно
+                    </option>
                 </select>
             </article>
         </div>
@@ -95,31 +99,7 @@
         </div>
     </div>
 
-    @if(isset($photos) || isset($videos))
-        <div class="col-md-12">
-            <p>Фотографии и видео:</p>
-        </div>
-        @if(!empty($photos))
-            @foreach(explode(',', $photos) as $photo)
-                @php
-                    $isUri = strpos($photo, 'sdpo.ta-7');
-                    $photo_path = $isUri ? $photo : Storage::url($photo);
-                @endphp
-
-                <a href="{{ $photo_path }}" data-fancybox class="col-md-12">
-                    <img width="100%" src="{{ $photo_path }}" alt="photo" />
-                </a>
-            @endforeach
-        @endif
-
-        @if(!empty($videos))
-            @foreach(explode(',', $videos) as $video)
-                <div class="col-md-12">
-                    <video controls="controls" src="{{ $video }}" width="100%" height="100"></video>
-                </div>
-            @endforeach
-        @endif
-    @endif
+    @include('profile.ankets.components.media')
 
     @section('ankets_submit')
         <div class="col-md-12">
@@ -148,7 +128,7 @@
                            class="d-none"
                            type="radio"
                            value="Не допущен"
-                           name="admitted" />
+                           name="admitted"/>
                 </label>
             </div>
         </div>
