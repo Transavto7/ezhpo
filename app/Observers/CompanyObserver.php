@@ -38,6 +38,10 @@ class CompanyObserver
         $logData = [];
 
         foreach ($company->getDirty() as $attribute => $newValue) {
+            if (empty($newValue) && empty($company->getOriginal($attribute))) {
+                continue;
+            }
+
             $logData[] = [
                 'name' => $attribute,
                 'oldValue' => $company->getOriginal($attribute),

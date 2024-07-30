@@ -38,6 +38,10 @@ class DriverObserver
         $logData = [];
 
         foreach ($driver->getDirty() as $attribute => $newValue) {
+            if (empty($newValue) && empty($driver->getOriginal($attribute))) {
+                continue;
+            }
+
             $logData[] = [
                 'name' => $attribute,
                 'oldValue' => $driver->getOriginal($attribute),

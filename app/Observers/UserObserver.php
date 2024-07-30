@@ -47,6 +47,10 @@ class UserObserver
         $logData = [];
 
         foreach ($user->getDirty() as $attribute => $newValue) {
+            if (empty($newValue) && empty($user->getOriginal($attribute))) {
+                continue;
+            }
+
             if (in_array($attribute, $skipAttributeChanges)) {
                 continue;
             }
