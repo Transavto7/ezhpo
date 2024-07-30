@@ -5,7 +5,7 @@
 @section('class-page', 'page-anketa anketa-' . $type_anketa)
 
 @php
-    $is_dop = $is_dop ??request()->get('is_dop', '0') === '1';
+    $is_dop = $is_dop ?? request()->get('is_dop', '0') === '1';
 @endphp
 
 @section('custom-scripts')
@@ -237,7 +237,7 @@
                                         </a>
                                     @endif
                                     <button type="submit"
-                                            class="m-center btn btn-success">
+                                            class="m-center btn btn-sm btn-success">
                                         {{ __('ankets.submit') }}
                                     </button>
                                 @endif
