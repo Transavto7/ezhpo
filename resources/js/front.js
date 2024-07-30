@@ -156,7 +156,7 @@ $(document).ready(function () {
 
             path += 'filters';
             $.get(path).done(response => {
-                if(response) {
+                if (response) {
                     $('#filter-groupsContent').html(response)
                     LIBS.initChosen()
                 }
@@ -164,13 +164,13 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('input', '.select2-search__field', async function(event) {
+    $(document).on('input', '.select2-search__field', async function (event) {
         let search = event.target.value;
         let select = $(event.target).parents('.select2')?.parent()?.children('.filled-select2');
 
         if (select.length < 1) {
-           const id = $(event.target).attr('aria-controls');
-           select = $(`.select2-selection[aria-owns="${id}"]`).parents('.select2')?.parent()?.children('.filled-select2');
+            const id = $(event.target).attr('aria-controls');
+            select = $(`.select2-selection[aria-owns="${id}"]`).parents('.select2')?.parent()?.children('.filled-select2');
         }
 
         const model = select.attr('model');
@@ -201,7 +201,7 @@ $(document).ready(function () {
                 key,
                 trashed
             }
-        }).then(({ data }) => {
+        }).then(({data}) => {
             data.forEach((element => {
                 const value = element[key];
                 let text = element[field];
@@ -211,7 +211,7 @@ $(document).ready(function () {
                 }
 
                 const exist = select.children('option');
-                for(let i = 0; i < exist.length; i++) {
+                for (let i = 0; i < exist.length; i++) {
                     if (exist[i].value == value) {
                         return;
                     }
@@ -233,7 +233,7 @@ $(document).ready(function () {
     const LIBS = {
         docFields: window.DOC_FIELDS,
 
-        initChosen () {
+        initChosen() {
             $('.filled-select2').select2({
                 placeholder: 'Выберите значение',
                 language: {
@@ -254,15 +254,15 @@ $(document).ready(function () {
             });
         },
 
-        initDoc () {
+        initDoc() {
             $('.Doc textarea').each(function () {
                 let name = this.name
 
                 $(this).click(async function () {
-                    if(LIBS.docFields[name] && this.classList.contains('open-modal')) {
+                    if (LIBS.docFields[name] && this.classList.contains('open-modal')) {
                         let df = LIBS.docFields[name]
 
-                        const { value: dataField } = await swal.fire({
+                        const {value: dataField} = await swal.fire({
                             input: 'select',
                             inputOptions: df,
                             inputPlaceholder: 'Выберите опцию',
@@ -271,7 +271,7 @@ $(document).ready(function () {
                             cancelButtonText: "Отмена",
                         })
 
-                        if(dataField) {
+                        if (dataField) {
                             this.value = df[dataField]
                         }
                     }
@@ -284,9 +284,9 @@ $(document).ready(function () {
             $('#DOC_FORM').each(function () {
                 let protokol = $(this).data('protokol')
 
-                if(protokol) {
-                    for(let i in protokol) {
-                        if(i !== 'id') {
+                if (protokol) {
+                    for (let i in protokol) {
+                        if (i !== 'id') {
                             let inp = $(this).find(`*[name="${i}"]`)
 
                             inp.val(protokol[i])
@@ -303,7 +303,7 @@ $(document).ready(function () {
                     let field = this.field?.value || 'protokol';
 
                     $(this).find('input,textarea,select').each(function () {
-                        if(this.name) {
+                        if (this.name) {
                             data[this.name] = this.value
                         }
                     })
@@ -315,14 +315,13 @@ $(document).ready(function () {
             })
         },
 
-        initAll () {
+        initAll() {
             LIBS.initDoc()
             LIBS.initChosen()
         }
     }
 
-    function initCroppies ()
-    {
+    function initCroppies() {
         let Croppies = {}
 
         $('.croppie-demo').each(function () {
@@ -383,7 +382,7 @@ $(document).ready(function () {
             let id = $(this).data('croppieId')
             let input = $(`#croppie-input${id}`);
 
-            if(input && id) {
+            if (input && id) {
                 input[0].files = null;
                 input[0].value = '';
 
@@ -392,10 +391,11 @@ $(document).ready(function () {
             }
         })
     }
+
     initCroppies()
 
     // Подгрузка в полей в Журналах: CHOSEN
-    if(location.pathname.indexOf('home') > -1) {
+    if (location.pathname.indexOf('home') > -1) {
         let path = location.origin + location.pathname;
 
         if (!path.endsWith('/')) {
@@ -405,7 +405,7 @@ $(document).ready(function () {
         path += 'filters' + location.search;
 
         $.get(path).done(response => {
-            if(response) {
+            if (response) {
                 $('#filter-groupsContent').html(response)
                 LIBS.initChosen()
             }
@@ -419,7 +419,7 @@ $(document).ready(function () {
      * @param data
      */
     const showAnketsCardDBitemData = async (model, data, fieldsValues, fullData) => {
-        if(data) {
+        if (data) {
             let dbItemId = 'CARD_' + model.toUpperCase(), msg = `<form id="form_${model}">`,
                 inputClass = model + '_' + 'input'
 
@@ -428,46 +428,50 @@ $(document).ready(function () {
             /**
              * Вставляем поля
              */
-            for(let i in data) {
+            for (let i in data) {
                 let fvItem = fieldsValues[i]
 
-                if(fvItem
-                || i === 'contract'
-                || i === 'contracts'
+                if (fvItem
+                    || i === 'contract'
+                    || i === 'contracts'
                 ) {
-                   if(i != 'id' && i != 'hash_id') {
-                       let field = '',
-                           otherHtmlItems = '',
-                           fId = uidv4(),
-                           isBlocked = fullData.blockedFields.includes(i) ? 'disabled' : ''
+                    if (i != 'id' && i != 'hash_id') {
+                        let field = '',
+                            otherHtmlItems = '',
+                            fId = uidv4(),
+                            isBlocked = fullData.blockedFields.includes(i) ? 'disabled' : ''
 
-                       if(isBlocked === ''){
-                           otherHtmlItems = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
-                       }
+                        if (isBlocked === '') {
+                            otherHtmlItems = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
+                        }
 
-                       if(i === 'contract_id', i === 'contract' || i === 'contracts'){
-                           continue;
-                       }
+                        if (i === 'contract_id' || i === 'contract' || i === 'contracts') {
+                            continue;
+                        }
 
-                       if(fvItem['type'] === 'select') {
-                           await API_CONTROLLER.getFieldHTML({ field: i, model, default_value: encodeURIComponent(data[i]) }).then(response => {
-                               field = response.data
-                           })
-                       } else {
-                           if(i === 'note' || i === 'comment') {
-                               field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${(data[i] ? data[i] : '').trim()}</textarea>`
-                           } else if(i === 'photo') {
-                               otherHtmlItems = ''
+                        if (fvItem['type'] === 'select') {
+                            await API_CONTROLLER.getFieldHTML({
+                                field: i,
+                                model,
+                                default_value: encodeURIComponent(data[i])
+                            }).then(response => {
+                                field = response.data
+                            })
+                        } else {
+                            if (i === 'note' || i === 'comment' || i === 'name') {
+                                field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${(data[i] ? data[i] : '').trim()}</textarea>`
+                            } else if (i === 'photo') {
+                                otherHtmlItems = ''
 
-                               if(data[i]) {
-                                   field = `<img src="/storage/${data[i]}" width="60%" />`
-                               }
-                           } else {
-                               field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${data[i] ? data[i] : ''}' name="${i}" />`
-                           }
-                       }
+                                if (data[i]) {
+                                    field = `<img src="/storage/${data[i]}" width="60%" />`
+                                }
+                            } else {
+                                field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${data[i] ? data[i] : ''}' name="${i}" />`
+                            }
+                        }
 
-                        if(i !== 'products_id') {
+                        if (i !== 'products_id') {
                             msg += `
                                 <p style="${i === 'dismissed' ? data[i].toUpperCase() === 'ДА' ? 'color: red; font-weight: bold;' : '' : ''}" data-field-card="${model}_${i}" class="text-small m-0">${fvItem.label}:<br/>
                                     ${otherHtmlItems}
@@ -477,62 +481,62 @@ $(document).ready(function () {
                                 </p>`
                         }
 
-                       if((i === 'company_id' && model === 'Driver') || (i === 'town_id' && model === 'Company')) {
-                           if (data.contract) {
-                               // driver & auto
-                               msg += `
+                        if ((i === 'company_id' && model === 'Driver') || (i === 'town_id' && model === 'Company')) {
+                            if (data.contract) {
+                                // driver & auto
+                                msg += `
                                <p class="text-small m-0">Договор:</p>`;
-                               if(data.contract.length != 0){
-                                   msg +=  `
+                                if (data.contract.length != 0) {
+                                    msg += `
                             <ul class="list-group my-2">
                                 <li style="padding: 0;" class="text-small list-group-item list-group-item-action list-group-item-success">
                                 <b>${data.contract.name_with_dates}</b>
 
                             <ul class="list-group">`;
-                                   if(data.contract.services){
+                                    if (data.contract.services) {
 
-                                       data.contract.services.map((service) => {
-                                           msg +=  `<li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">${service.name}</li>`;
-                                       })
-                                   }
+                                        data.contract.services.map((service) => {
+                                            msg += `<li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">${service.name}</li>`;
+                                        })
+                                    }
 
-                                   msg +=  `
+                                    msg += `
                             </ul></li>
                             </ul>`;
-                               } else {
-                                   msg += `
+                                } else {
+                                    msg += `
                                <p class="text-small">-- Отсутствует --</p>`;
-                               }
-                           } else if (data.contracts) {
-                               // copmany
-                               msg += `
+                                }
+                            } else if (data.contracts) {
+                                // copmany
+                                msg += `
                                <p class="text-small m-0">Договор:</p>`;
-                               if(data.contracts.length != 0) {
+                                if (data.contracts.length != 0) {
 
-                                   msg += `<ul class="list-group my-2">`;
-                                   data.contracts.map((contract) => {
-                                       if(contract.services){
+                                    msg += `<ul class="list-group my-2">`;
+                                    data.contracts.map((contract) => {
+                                        if (contract.services) {
 
-                                           msg += `
+                                            msg += `
 
                                     <li style="padding: 0;" class=" text-small list-group-item list-group-item-action list-group-item-success"><ul class="list-group">
                                     <b>${contract.name_with_dates}</b>`;
-                                           contract.services.map((service) => {
-                                               msg += `
+                                            contract.services.map((service) => {
+                                                msg += `
                                     <li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">
                                     ${service.name}</li>`;
-                                           })
-                                           msg += `</ul></li>`;
-                                       }
+                                            })
+                                            msg += `</ul></li>`;
+                                        }
 
-                                   })
-                                   msg += `</ul>`;
-                               } else {
-                                   msg += `
+                                    })
+                                    msg += `</ul>`;
+                                } else {
+                                    msg += `
                                <p class="text-small">-- Отсутствует --</p>`;
-                               }
-                           }
-                       }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -546,11 +550,11 @@ $(document).ready(function () {
             $(`#form_${model}`).submit(function (e) {
                 e.preventDefault()
 
-                if(confirm('Сохранить?')) {
+                if (confirm('Сохранить?')) {
                     $(this).find(`.${inputClass} input, .${inputClass} select, .${inputClass} textarea`).each(function () {
                         let val = this.value, name = this.name
 
-                        if(name) {
+                        if (name) {
                             API_CONTROLLER.updateModelProperty({
                                 item_model: model,
                                 item_field: name,
@@ -570,8 +574,8 @@ $(document).ready(function () {
              * Контроль дат (DDATE)
              */
             let redDates = fullData.redDates
-            if(redDates && typeof redDates === "object" && !Array.isArray(redDates)) {
-                for(let i in redDates) {
+            if (redDates && typeof redDates === "object" && !Array.isArray(redDates)) {
+                for (let i in redDates) {
                     $(`*[data-field-card="${model}_${i}"]`).css({
                         'color': 'red',
                         'font-weight': 'bold'
@@ -655,14 +659,14 @@ $(document).ready(function () {
     // Проверка свойства по модели на бэкенда
     window.checkInputProp = async (prop = '0', model = '0', val = '0', label, parent, is_dop) => {
         let PARENT_ELEM;
-        if(parent){
+        if (parent) {
             PARENT_ELEM = parent;
-        }else{
+        } else {
             PARENT_ELEM = $(event.target).parent();
         }
 
         //check-prop-one
-        if(!is_dop) {
+        if (!is_dop) {
             if (!val) {
                 return;
             }
@@ -670,7 +674,7 @@ $(document).ready(function () {
             let answer = await $.ajax({
                 url: `/api/check-prop-one/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
                 headers: {'Authorization': 'Bearer ' + API_TOKEN},
-                success:  (data) => {
+                success: (data) => {
                     let element = PARENT_ELEM.find('.app-checker-prop')
                     if (data.status) {
                         element.removeClass('text-danger').addClass('text-success').text(data.name);
@@ -683,7 +687,7 @@ $(document).ready(function () {
                 }
             })
 
-            if(!answer.status){
+            if (!answer.status) {
                 return;
             }
         }
@@ -692,7 +696,7 @@ $(document).ready(function () {
         $.ajax({
             url: `/api/check-prop/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
             headers: {'Authorization': 'Bearer ' + API_TOKEN},
-            success:  (data) => {
+            success: (data) => {
                 const PROP_HAS_EXISTS = data.data.exists
                 const DATA = data.data.message;
 
@@ -718,7 +722,7 @@ $(document).ready(function () {
                 }
 
                 if ((model === 'Driver' || model === 'Car') && DATA.company_name) {
-                    const form =  parent.closest('#ANKETA_FORM');
+                    const form = parent.closest('#ANKETA_FORM');
                     const select = form.find('select[name="company_name"]');
 
                     if (select.length > 0) {
@@ -739,10 +743,10 @@ $(document).ready(function () {
 
                 showAnketsCardDBitemData(model, DATA, data.data.fieldsValues, data.data)
 
-                if(PARENT_ELEM.length) {
+                if (PARENT_ELEM.length) {
                     const APP_CHECKER_PARENT = PARENT_ELEM.find('.app-checker-prop')
 
-                    if(PROP_HAS_EXISTS){
+                    if (PROP_HAS_EXISTS) {
                         APP_CHECKER_PARENT.removeClass('text-danger').addClass('text-success').text(DATA[label])
                     } else {
                         // PARENT_ELEM.find('input, textarea, select').val('');
@@ -750,8 +754,8 @@ $(document).ready(function () {
                     }
                 }
 
-                if(DATA) {
-                    if(!!DATA.company_id) {
+                if (DATA) {
+                    if (!!DATA.company_id) {
                         $('#ANKETA_FORM').find('input[name="company_id"]').parent().find('.app-checker-prop').removeClass('text-danger').addClass('text-success').text(DATA.company_name);
                         PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', false);
                         checkInputProp('id', 'Company', DATA.company_id, 'name', $('#ANKETA_FORM').find('input[name="company_id"]').parent())
@@ -763,19 +767,19 @@ $(document).ready(function () {
                     const driverInput = parent.closest('#ANKETA_FORM').find('.car-input');
                     driverInput.each((id, input) => {
                         const attr = $(input).attr('company');
-                       if (attr && attr !== DATA.company_hash_id) {
-                           const mess = $(input).parent()?.find('.app-checker-prop');
-                           if (mess?.find('#company')?.length < 1) {
-                               mess.append(
-                                   `<br><span id="company" class="text-danger">Компания автомобиля не соответствует компании водителя</span>`
-                               );
-                           }
-                       } else if (attr && attr === DATA.company_hash_id) {
-                           const mess = $(input).parent()?.find('.app-checker-prop');
-                           if (mess?.find('#company')?.length > 0) {
-                               mess.find('#company').remove();
-                           }
-                       }
+                        if (attr && attr !== DATA.company_hash_id) {
+                            const mess = $(input).parent()?.find('.app-checker-prop');
+                            if (mess?.find('#company')?.length < 1) {
+                                mess.append(
+                                    `<br><span id="company" class="text-danger">Компания автомобиля не соответствует компании водителя</span>`
+                                );
+                            }
+                        } else if (attr && attr === DATA.company_hash_id) {
+                            const mess = $(input).parent()?.find('.app-checker-prop');
+                            if (mess?.find('#company')?.length > 0) {
+                                mess.find('#company').remove();
+                            }
+                        }
                     });
                 }
 
@@ -799,7 +803,6 @@ $(document).ready(function () {
     }
 
 
-
     window.addFieldToHistory = (value, field) => {
         API.post('/api/field-history', {
             value, field
@@ -807,13 +810,13 @@ $(document).ready(function () {
     }
 
     // ЭКСПОРТ таблицы в xlsx
-    window.exportTable = function(table, withNotExport = false) {
+    window.exportTable = function (table, withNotExport = false) {
         table = document.getElementById(table)
 
-        if(table) {
+        if (table) {
             table = table.cloneNode(true)
 
-            if(!withNotExport) {
+            if (!withNotExport) {
                 $(table).find('.not-export').remove()
             }
 
@@ -825,11 +828,11 @@ $(document).ready(function () {
 
             var uri = 'data:application/vnd.ms-excel;base64,',
                 template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>',
-                base64 = function(s) {
+                base64 = function (s) {
                     return window.btoa(unescape(encodeURIComponent(s)))
                 },
-                format = function(s, c) {
-                    return s.replace(/{(\w+)}/g, function(m, p) {
+                format = function (s, c) {
+                    return s.replace(/{(\w+)}/g, function (m, p) {
                         return c[p];
                     })
                 }
@@ -846,7 +849,7 @@ $(document).ready(function () {
 
             setTimeout(() => {
                 let findStrtypePrikaz = '&exportPrikaz=1&typePrikaz=Dop'
-                if(location.href.indexOf(findStrtypePrikaz) > -1) {
+                if (location.href.indexOf(findStrtypePrikaz) > -1) {
                     let newLocation = location.href.replace(findStrtypePrikaz, '')
                     newLocation = newLocation.replace(/(export\=1\&)|(\&export\=1)|(export\=1)/g, '')
 
@@ -888,7 +891,7 @@ $(document).ready(function () {
         let $this = $(this), el = $($this.data('toggle-show')), title = $this.find('.toggle-title'),
             hiddenClass = 'toggle-hidden', titleData = 'Показать'
 
-        if(el.length && title.length) {
+        if (el.length && title.length) {
 
             titleData = (el.hasClass(hiddenClass)) ? 'Скрыть' : titleData
 
@@ -902,9 +905,9 @@ $(document).ready(function () {
             $i = $t.find('> i'),
             $input = $t.find('> input')
 
-        if($t.hasClass('field--password')) {
+        if ($t.hasClass('field--password')) {
             $i.click(function () {
-                if($(this).hasClass('fa-eye')) {
+                if ($(this).hasClass('fa-eye')) {
                     $(this).removeClass('fa-eye').addClass('fa-eye-slash')
                     $input.attr('type', 'password')
                 } else {
@@ -923,9 +926,9 @@ $(document).ready(function () {
             'ACTION_DELETE': 'Точно хотите удалить?'
         }
 
-        this.classList.forEach(cls=> {
-            if(confirms[cls])
-                if(confirm(confirms[cls]))
+        this.classList.forEach(cls => {
+            if (confirms[cls])
+                if (confirm(confirms[cls]))
                     location.href = this.href;
         })
     })
@@ -937,7 +940,7 @@ $(document).ready(function () {
 
     $('#ANKETA_CLONE_TRIGGER').click(e => {
         const CLONE_ID = 'cloning'
-        if(count_anketa + 1 === 32) {
+        if (count_anketa + 1 === 32) {
             swal.fire({
                 title: 'Нельзя добавлять более 31 осмотров',
                 icon: 'warning'
@@ -950,7 +953,7 @@ $(document).ready(function () {
         let clone = clone_first.clone()
         let randId = 'ANKETA_DOUBLE_' + count_anketa
 
-        if(clone_to.find('.cloning-clone').length) {
+        if (clone_to.find('.cloning-clone').length) {
             clone = clone_to.find('.cloning-clone').last().clone()
         }
 
@@ -963,7 +966,7 @@ $(document).ready(function () {
         clone_to.append(clone)
 
         clone.find('input,select').each(function () {
-            this.name = this.name.replace('anketa['+(count_anketa-1)+']', 'anketa['+count_anketa+']')
+            this.name = this.name.replace('anketa[' + (count_anketa - 1) + ']', 'anketa[' + count_anketa + ']')
         })
 
         const datePickerElement = clone.find(".date-range");
@@ -973,12 +976,12 @@ $(document).ready(function () {
 
         count_anketa++
 
-        clone.find('.anketa-delete').html('<a href="" onclick="'+randId+'.remove(); return false;" class="text-danger">Удалить</a>')
+        clone.find('.anketa-delete').html('<a href="" onclick="' + randId + '.remove(); return false;" class="text-danger">Удалить</a>')
     })
 
     // Отправка данных с форма по CTRL + ENTER
     $('.anketa-fields input, .anketa-fields textarea').keydown(e => {
-        if(e.ctrlKey & e.keyCode == 13) {
+        if (e.ctrlKey & e.keyCode == 13) {
             $('.anketa-fields form').trigger('submit');
         }
     })
@@ -995,13 +998,13 @@ $(document).ready(function () {
 
         field = $(field)
 
-        if(field.length) {
+        if (field.length) {
             let new_value = field.val()
 
-            API.put(url.replace(location.origin, ''), { new_value }).then(response => {
+            API.put(url.replace(location.origin, ''), {new_value}).then(response => {
                 const data = response.data
 
-                if(data.success)
+                if (data.success)
                     alert('Данные успешно обновлены!')
             })
         }
@@ -1066,7 +1069,7 @@ $(document).ready(function () {
 
         t.attr('aria-expanded', menu.hasClass(clsCollapse))
 
-        if(menu.length) {
+        if (menu.length) {
             menu.toggleClass(clsCollapse)
         }
     })
@@ -1075,25 +1078,25 @@ $(document).ready(function () {
      * Elements FORMS (edit, add)
      * Check Requireds / Validate
      */
-    function checkElementsFormDataRequireds (form, event = null) {
+    function checkElementsFormDataRequireds(form, event = null) {
         let $form = $(form),
             requireds = $form.find('[required]'), errors = []
 
         requireds.each(function () {
             let val = $(this).val(), name = $(this).data('label')
 
-            if(typeof val === "object") {
-                if(val.length === 0) {
+            if (typeof val === "object") {
+                if (val.length === 0) {
                     errors.push(`Поле "${name}" не заполнено`)
                 }
             } else {
-                if(!val)
+                if (!val)
                     errors.push(`Поле "${name}" не заполнено`)
             }
         })
 
-        if(errors.length) {
-            if(event)
+        if (errors.length) {
+            if (event)
                 event.preventDefault()
 
             Toast.fire({
@@ -1105,7 +1108,7 @@ $(document).ready(function () {
         }
     }
 
-    function initElementsModalCheckFields () {
+    function initElementsModalCheckFields() {
         $('[id*="elements-modal"] form, [id="elements-modal-add"] form').submit(function (e) {
             checkElementsFormDataRequireds(this, e)
         })
@@ -1113,10 +1116,11 @@ $(document).ready(function () {
         $('[id*="elements-modal"] button[type="submit"], [id="elements-modal-add"] button[type="submit"]').click(function (e) {
             let $form = $(this).parents('form')
 
-            if($form.length)
+            if ($form.length)
                 checkElementsFormDataRequireds($form)
         })
     }
+
     initElementsModalCheckFields()
 
     /**
@@ -1148,7 +1152,7 @@ $(document).ready(function () {
     $('a[data-btn-collapse] + ul a').each(function () {
         let $href = this.href.replace(location.origin, '')
 
-        if(location.pathname.indexOf($href) > -1) {
+        if (location.pathname.indexOf($href) > -1) {
             let $parent = $(this).parent().parent()
 
             $parent.prev().trigger('click')
@@ -1162,22 +1166,24 @@ $(document).ready(function () {
         let $t = $(this),
             timerDateStart = new Date($t.data('date'))
 
-        function showDiff(date1, date2){
-            var diff = (date2 - date1)/1000
+        function showDiff(date1, date2) {
+            var diff = (date2 - date1) / 1000
             diff = Math.abs(Math.floor(diff))
 
-            var days = Math.floor(diff/(24*60*60))
-            var leftSec = diff - days * 24*60*60
-            var hrs = Math.floor(leftSec/(60*60))
-            var leftSec = leftSec - hrs * 60*60
+            var days = Math.floor(diff / (24 * 60 * 60))
+            var leftSec = diff - days * 24 * 60 * 60
+            var hrs = Math.floor(leftSec / (60 * 60))
+            var leftSec = leftSec - hrs * 60 * 60
 
-            var min = Math.floor(leftSec/(60))
+            var min = Math.floor(leftSec / (60))
             var leftSec = leftSec - min * 60
 
             $t.html("<b class='text-red'>" + (days < 10 ? '0' + days : days) + ":" + (hrs < 10 ? '0' + hrs : hrs) + ":" + (min < 10 ? '0' + min : min) + ":" + (leftSec < 10 ? '0' + leftSec : leftSec) + "</b>")
         }
 
-        setInterval(() => { showDiff(timerDateStart, new Date()) }, 1000)
+        setInterval(() => {
+            showDiff(timerDateStart, new Date())
+        }, 1000)
     })
 
     // ------------------------------------------------------- //
@@ -1187,7 +1193,9 @@ $(document).ready(function () {
     var materialInputs = $('input.input-material');
 
     // activate labels for prefilled values
-    materialInputs.filter(function() { return $(this).val() !== ""; }).siblings('.label-material').addClass('active');
+    materialInputs.filter(function () {
+        return $(this).val() !== "";
+    }).siblings('.label-material').addClass('active');
 
     // move label on focus
     materialInputs.on('focus', function () {
@@ -1234,16 +1242,16 @@ $(document).ready(function () {
     })
 
     // ADAPTIVE
-    if(screen.width <= 900) {
+    if (screen.width <= 900) {
         $('#toggle-btn').trigger('click')
     }
 
     $('input[type="checkbox"][data-connect-field]').each(function () {
         let connectField = $(this).data('connectField')
-            connectField = $(`*[name="${connectField}"]`)
+        connectField = $(`*[name="${connectField}"]`)
 
         let triggerField = () => {
-            if(this.checked) {
+            if (this.checked) {
                 connectField.removeAttr('disabled')
             } else {
                 connectField.attr('disabled', 'disabled')
@@ -1267,12 +1275,12 @@ $(document).ready(function () {
             token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
             type: "PARTY",
             /* Вызывается, когда пользователь выбирает одну из подсказок */
-            onSelect: function(suggestion) {
+            onSelect: function (suggestion) {
                 if (!suggestion.data) {
                     return
                 }
 
-                const { inn } = suggestion.data
+                const {inn} = suggestion.data
 
                 innInput.val(inn)
             }
@@ -1289,12 +1297,12 @@ $(document).ready(function () {
                 localStorage.setItem('sidebar', status)
             }
 
-        if(localStatusSidebar() === "0") {
+        if (localStatusSidebar() === "0") {
             $(this).trigger('click')
         }
 
         $(this).click(function () {
-            if($(this).hasClass('active')) {
+            if ($(this).hasClass('active')) {
                 localStatusSet(1)
             } else {
                 localStatusSet(0)
@@ -1310,7 +1318,7 @@ $(document).ready(function () {
         let route = $(event.relatedTarget).data('route')
         let modalContent = $("#modalEditor .modal-content")
 
-        axios.get(route).then(({ data }) => {
+        axios.get(route).then(({data}) => {
             modalContent.text('').append(data);
             LIBS.initAll()
             initCompanyNameSuggestion($('#modalEditor *[data-field="Company_name"]'), $('#modalEditor input[name="inn"]'))
@@ -1318,19 +1326,19 @@ $(document).ready(function () {
 
     })
     let field = $("*[name=type_product]").chosen()
-    field.change(function(e, { selected }){
+    field.change(function (e, {selected}) {
 
-        if(selected === 'Абонентская плата без реестров'){
-            field.closest('.modal-body').find('select[name=type_anketa]').prop( "disabled", true);
-            field.closest('.modal-body').find('select[name="type_view[]"]').prop( "disabled", true);
+        if (selected === 'Абонентская плата без реестров') {
+            field.closest('.modal-body').find('select[name=type_anketa]').prop("disabled", true);
+            field.closest('.modal-body').find('select[name="type_view[]"]').prop("disabled", true);
 
             // field.closest('.modal-body').find('select[name=essence]').prop('required', true) // тип осмотра
             field.closest('.modal-body').find('select[name=type_anketa]').prop('required', false) // тип осмотра
             field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', false) // Реестр
-        }else{
+        } else {
             // field.closest('.modal-body').find('select[name=essence]').prop( "disabled", true);
-            field.closest('.modal-body').find('select[name=type_anketa]').prop( "disabled", false);
-            field.closest('.modal-body').find('select[name="type_view[]"]').prop( "disabled", false);
+            field.closest('.modal-body').find('select[name=type_anketa]').prop("disabled", false);
+            field.closest('.modal-body').find('select[name="type_view[]"]').prop("disabled", false);
 
             // field.closest('.modal-body').find('select[name=essence]').prop('required', false) // тип осмотра
             field.closest('.modal-body').find('select[name=type_anketa]').prop('required', true) // тип осмотра
@@ -1338,22 +1346,22 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('change', '.filled-select2.filled-select.type_product', function(event) {
+    $(document).on('change', '.filled-select2.filled-select.type_product', function (event) {
         const field = $(event.target);
         let selected = field.val()
 
-        if(selected === 'Абонентская плата без реестров'){
+        if (selected === 'Абонентская плата без реестров') {
             // field.closest('.modal-body').find('select[name=essence]').prop( "disabled", false);
-            field.closest('.modal-body').find('select[name=type_anketa]').prop( "disabled", true);
-            field.closest('.modal-body').find('select[name="type_view[]"]').prop( "disabled", true);
+            field.closest('.modal-body').find('select[name=type_anketa]').prop("disabled", true);
+            field.closest('.modal-body').find('select[name="type_view[]"]').prop("disabled", true);
 
             // field.closest('.modal-body').find('select[name=essence]').prop('required', true) // тип осмотра
             field.closest('.modal-body').find('select[name=type_anketa]').prop('required', false) // тип осмотра
             field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', false) // Реестр
-        }else{
+        } else {
             // field.closest('.modal-body').find('select[name=essence]').prop( "disabled", true);
-            field.closest('.modal-body').find('select[name="type_view[]"]').prop( "disabled", false);
-            field.closest('.modal-body').find('select[name=type_anketa]').prop( "disabled", false);
+            field.closest('.modal-body').find('select[name="type_view[]"]').prop("disabled", false);
+            field.closest('.modal-body').find('select[name=type_anketa]').prop("disabled", false);
 
             // field.closest('.modal-body').find('select[name=essence]').prop('required', false) // тип осмотра
             field.closest('.modal-body').find('select[name=type_anketa]').prop('required', true) // тип осмотра
