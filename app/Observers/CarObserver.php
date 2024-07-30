@@ -38,6 +38,10 @@ class CarObserver
         $logData = [];
 
         foreach ($car->getDirty() as $attribute => $newValue) {
+            if (empty($newValue) && empty($car->getOriginal($attribute))) {
+                continue;
+            }
+
             $logData[] = [
                 'name' => $attribute,
                 'oldValue' => $car->getOriginal($attribute),
