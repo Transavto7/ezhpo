@@ -82,7 +82,7 @@
 
             9. Данные лабораторного исследования:<br>
             а) на алкоголь<br>
-            - выдыхаемый воздух (алкометр): <b>DRIVESAFE II</b>
+            - выдыхаемый воздух (алкометр): <b> {{ $alcometer }} S/N {{ $alcometer_serial_number }}</b>
             <br>
             - время проведения контроля трезвости: <b>{{ \Carbon\Carbon::parse($date)->format('H:i') }}</textarea></b>
             <br>
