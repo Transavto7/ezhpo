@@ -537,8 +537,8 @@
                                 {{ $field->name }}
                             </span>
 
-                                @if($field->field !== 'contracts' && $field->field !== 'contract' && $field->field !== 'contract_id')
-                                    <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field . $queryString }}">
+                                @if(!in_array($field->field, ['contracts', 'contract', 'contract_id']))
+                                    <a href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field }}&{{ $queryString }}">
                                         <i class="fa fa-sort"></i>
                                     </a>
                                 @endif
