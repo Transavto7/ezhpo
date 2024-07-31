@@ -25,6 +25,8 @@ class DocDataService
             'drugs' => false,
             'alko' => false,
             'status' => 'Нет',
+            'alcometer' => config('docs.fields.alcometer')[0],
+            'alcometer_serial_number' => '',
             'point' => ''
         ];
 
@@ -77,6 +79,10 @@ class DocDataService
                 $data['town'] = $point->town->name;
                 $data['point'] = $point->name;
             }
+        }
+
+        if ($data['complaint'] === 'Нет') {
+            $data['complaint'] = 'Отсутствуют';
         }
 
         $data = $this->getUserEds($data);

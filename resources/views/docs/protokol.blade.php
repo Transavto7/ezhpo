@@ -56,7 +56,8 @@
             <p>9. Данные лабораторного исследования:</p>
             <p>а) на алкоголь</p>
             <p>- выдыхаемый воздух (алкометр)</p>
-            <textarea name="alcometer" rows="1" class="doc-input doc-input--row open-modal">DRIVESAFE II</textarea>
+            <textarea name="alcometer" rows="1" class="doc-input doc-input--row open-modal">{{ config('docs.fields.alcometer')[0] }}</textarea> S/N
+            <textarea name="alcometer_serial_number" rows="1" class="doc-input doc-input--row"></textarea>
             <p>время проведения контроля трезвости: <textarea name="time" rows="1" class="doc-input doc-input--row open-modal">{{ \Carbon\Carbon::parse($date)->format('H:i') }}</textarea></p>
             <p>результат: <textarea name="result" rows="1" class="doc-input doc-input--row open-modal">{{ $alcometer_result }} мг/л</textarea></p>
 
