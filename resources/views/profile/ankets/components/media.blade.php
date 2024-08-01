@@ -3,7 +3,7 @@
         <p>Фотографии и видео:</p>
     </div>
 
-    @if(!empty($photo))
+    @if(!empty($photos))
         @foreach(explode(',', $photos) as $photo)
             @php
                 $isUri = strpos($photo, 'sdpo.ta-7');
