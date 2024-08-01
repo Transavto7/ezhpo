@@ -8,11 +8,16 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div style="width: 100%; height: 100%" id="reader"></div>
+                <div style="width: 100%; height: 400px" id="reader"></div>
+                <div class="error-div" style="display: none">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="qr-error alert alert-danger" ></div>
+                        <a class="btn btn-outline-success restart-btn">Повторить</a>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary close-modal" data-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary">Сохранить</button>
+                <button type="button" class="btn btn-secondary close-modal" data-dismiss="modal">Отмена</button>
             </div>
         </div>
     </div>

@@ -1,6 +1,6 @@
-<div class="form-group row">
-    <label class="col-md-3 form-control-label">Режим ввода ПЛ:</label>
-    <article class="col-md-9">
+<div class="form-group row col-md-12">
+    <label class="form-control-label">Режим ввода ПЛ:</label>
+    <article class="ml-3">
         <a class="text-small" href="{{ route('forms', ['type' => $type_anketa, 'is_dop' => !$is_dop]) }}">
 
             <input onchange="this.parentNode.click()" type="checkbox" @if($is_dop) checked @endif>

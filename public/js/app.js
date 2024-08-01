@@ -9400,41 +9400,70 @@ var html5QrcodeScanner = new html5_qrcode__WEBPACK_IMPORTED_MODULE_0__.Html5Qrco
 },
 /* verbose= */
 true);
-
-function onScanSuccess(decodedText, decodedResult) {
-  console.log("Scan result: ".concat(decodedText), decodedResult);
-  html5QrcodeScanner.clear().then(function (r) {
-    return console.log('close camera');
-  });
-  axios.get('/api/parse-qr-code', {
-    params: {
-      decodedText: decodedText
-    }
-  }).then(function (response) {
-    $('#cameraModal').modal('hide');
-    var data = response.data;
-    console.log(data);
-  })["catch"](function (error) {
-    alert(error.response.data.error);
-  });
-}
-
-function onScanFailure(error) {
-  console.warn("Code scan error = ".concat(error));
-}
-
 $(document).ready(function () {
-  $('.camera-btn').click(function (e) {
+  var ui = {
+    errorAlert: $('.qr-error'),
+    cameraBtn: $('.camera-btn'),
+    cameraModal: $('#cameraModal'),
+    closeBtn: $('.close-modal'),
+    errorDiv: $('.error-div'),
+    restartBtn: $('.restart-btn'),
+    camera: $('#reader')
+  };
+  var $currentInput = null;
+  var fieldType = null;
+
+  function onScanSuccess(decodedText, decodedResult) {
+    console.log("Scan result: ".concat(decodedText), decodedResult);
+    html5QrcodeScanner.clear().then(function (r) {
+      return console.log('close camera');
+    });
+    axios.get('/api/parse-qr-code', {
+      params: {
+        decodedText: decodedText,
+        fieldType: fieldType
+      }
+    }).then(function (response) {
+      $('#cameraModal').modal('hide');
+      var data = response.data;
+      $currentInput.val(data.id).trigger('input');
+    })["catch"](function (error) {
+      ui.camera.attr('style', 'display:none');
+      ui.errorAlert.html('Ошибка сканирования QR кода: ' + error.response.data.error);
+      ui.errorDiv.attr('style', '');
+    });
+  }
+
+  function onScanFailure(error) {
+    console.warn("Code scan error = ".concat(error));
+  }
+
+  $(document).on('click', '.camera-btn', function (e) {
     e.stopPropagation();
     e.preventDefault();
+    var $cameraBtn = $(this);
+    $currentInput = $cameraBtn.siblings('input');
+    fieldType = $cameraBtn.data('field-type');
+    console.log($currentInput, fieldType);
     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-    $('#cameraModal').modal('show');
+    ui.cameraModal.modal('show');
   });
-  $('.close-modal').click(function (e) {
+  ui.restartBtn.click(function () {
+    ui.errorDiv.attr('style', 'display:none');
+    ui.camera.attr('style', '');
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+  });
+  ui.closeBtn.click(function (e) {
     e.stopPropagation();
     e.preventDefault();
-    $('#cameraModal').modal('hide');
+    ui.cameraModal.modal('hide');
+  });
+  ui.cameraModal.on('hidden.bs.modal', function () {
+    ui.errorDiv.attr('style', 'display:none');
+    ui.camera.attr('style', '');
     html5QrcodeScanner.clear();
+    $currentInput = null;
+    fieldType = null;
   });
 });
 
