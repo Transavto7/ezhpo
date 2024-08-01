@@ -1,5 +1,7 @@
 <input type="hidden" name="type_anketa" value="{{ $type_anketa }}"/>
 
+@include('profile.ankets.components.camera')
+
 @include('profile.ankets.components.pvs')
 
 @include('profile.ankets.components.is_dop')
@@ -22,7 +24,7 @@
                 <input value="{{ $driver_id ?? '' }}" type="number"
                        oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
                        min="6" name="driver_id" class="MASK_ID_ELEM form-control">
-                <a class="btn btn-outline-secondary camera-btn"><i class="fa fa-camera"></i></a>
+                <button class="btn btn-outline-secondary camera-btn"><i class="fa fa-camera"></i></button>
             </div>
             <p class="app-checker-prop"></p>
         </article>
@@ -36,7 +38,7 @@
                     <input value="{{ $car_id ?? '' }}" type="number"
                            oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
                            min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control car-input">
-                    <a class="btn btn-outline-secondary camera-btn"><i class="fa fa-camera"></i></a>
+                    <button class="btn btn-outline-secondary camera-btn"><i class="fa fa-camera"></i></button>
                 </div>
                 <p class="app-checker-prop"></p>
             </article>
@@ -128,7 +130,7 @@
                 <input required value="{{ $driver_id ?? '' }}" type="number"
                        oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
                        min="6" name="driver_id" class="MASK_ID_ELEM form-control">
-                <a class="btn btn-outline-secondary camera-btn"><i class="fa fa-camera"></i></a>
+                <button class="btn btn-outline-secondary camera-btn"><i class="fa fa-camera"></i></button>
             </div>
             <p class="app-checker-prop"></p>
         </article>
@@ -151,7 +153,7 @@
                     <input required value="{{ $car_id ?? '' }}" type="number"
                            oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
                            min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control car-input">
-                    <a class="btn btn-outline-secondary camera-btn"><i class="fa fa-camera"></i></a>
+                    <button class="btn btn-outline-secondary camera-btn"><i class="fa fa-camera"></i></button>
                 </div>
                 <p class="app-checker-prop"></p>
             </article>
@@ -219,5 +221,3 @@
         }
     </style>
 @endsection
-
-
