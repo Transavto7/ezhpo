@@ -16,6 +16,9 @@ fi
 # если уже в режиме обслуживания
 (php artisan down) || true
 
+# Затереть любые ручные изменения
+git checkout --force ./
+
 # Загрузить последнюю версию приложения
 git pull origin master
 
@@ -52,6 +55,10 @@ fi
 # Закэшировать конфиг
 php artisan config:cache
 
+# Обновить права на файлы и директории
+chown -R $(id -u):$(id -g) ./
+find ./ -type d -exec chmod 755 '{}' \;
+find ./ -type f -exec chmod 644 '{}' \;
 chmod 777 -R storage
 
 # Выход из режима обслуживания
