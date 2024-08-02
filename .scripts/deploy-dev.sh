@@ -12,6 +12,8 @@ if [[ "$BRANCH" != "dev" ]]; then
   exit 1;
 fi
 
+GITHUB_CURRENT_SHA="$(git rev-parse HEAD)"
+
 PHP_VERSION=php7.3
 
 # Войти в режим обслуживания или вернуть true
@@ -25,7 +27,7 @@ git checkout --force ./
 git pull origin dev
 
 # Установить зависимости Composer
-$PHP_VERSION composer.phar install --optimize-autoloader
+$PHP_VERSION composer.phar install --no-interaction --optimize-autoloader
 
 # Очистить старый кэш
 $PHP_VERSION artisan cache:clear
@@ -37,9 +39,11 @@ NEED_MIGRATE="$(echo $?)"
 if [[ "$NEED_MIGRATE" != "0" ]];
 then
   # Дамп БД
-  DATE=$(date '+%Y-%m-%d')
+  DATE=$(date '+%Y%m%d_%H%M%S')
 
-  DUMP_NAME="../${DATE_DUMP}-${GITHUB_SHA}-dump.sql"
+  GITHUB_CURRENT_SHA="$(git rev-parse HEAD)"
+
+  DUMP_NAME="../backups/db/${DATE}_${GITHUB_CURRENT_SHA}.sql.gz"
 
   export $(cat .env | sed 's/#.*//g' | xargs)
 
@@ -48,10 +52,19 @@ then
   mysqldump -u $DB_USERNAME $DB_DATABASE \
       --no-tablespaces \
       --verbose \
-      --result-file $DUMP_NAME
+      --result-file | gzip -c > $DUMP_NAME
 
   # Запустить миграцию базы данных
   $PHP_VERSION artisan migrate --force
+fi
+
+PUBLIC="../artifacts/public-${GITHUB_SHA}.tar.gz"
+if [ -f "$PUBLIC" ]; then
+    OLD_PUBLIC="public-${GITHUB_CURRENT_SHA}.tar.gz"
+    tar -czf ${OLD_PUBLIC} public/css public/js public/mix-manifest.json
+    mv ${OLD_PUBLIC} "../backups/public/"
+
+    tar xvfz ${PUBLIC} public/
 fi
 
 # Закэшировать конфиг
@@ -59,8 +72,6 @@ $PHP_VERSION artisan config:cache
 
 # Обновить права на файлы и директории
 chown -R $(id -u):$(id -g) ./
-find ./ -type d -exec chmod 755 '{}' \;
-find ./ -type f -exec chmod 644 '{}' \;
 chmod 777 -R storage
 
 # Выход из режима обслуживания
