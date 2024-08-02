@@ -18,6 +18,9 @@ PHP_VERSION=php7.3
 # если уже в режиме обслуживания
 ($PHP_VERSION artisan down) || true
 
+# Затереть любые ручные изменения
+git checkout --force ./
+
 # Загрузить последнюю версию приложения
 git pull origin dev
 
@@ -54,6 +57,10 @@ fi
 # Закэшировать конфиг
 $PHP_VERSION artisan config:cache
 
+# Обновить права на файлы и директории
+chown -R $(id -u):$(id -g) ./
+find ./ -type d -exec chmod 755 '{}' \;
+find ./ -type f -exec chmod 644 '{}' \;
 chmod 777 -R storage
 
 # Выход из режима обслуживания
