@@ -60,10 +60,6 @@ fi
 
 PUBLIC="../artifacts/public-${GITHUB_SHA}.tar.gz"
 if [ -f "$PUBLIC" ]; then
-    OLD_PUBLIC="public-${GITHUB_CURRENT_SHA}.tar.gz"
-    tar -czf ${OLD_PUBLIC} public/css public/js public/mix-manifest.json
-    mv ${OLD_PUBLIC} "../backups/public/"
-
     tar xvfz ${PUBLIC} public/
 fi
 
