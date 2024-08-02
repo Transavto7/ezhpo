@@ -5,10 +5,41 @@ on:
     branches: [ dev ]
 
 jobs:
+  create-deployment-artifacts:
+    name: Create deployment artifacts
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Compile CSS and Javascript
+      run: |
+        npm install
+        npm run production
+    - name: Create deployment artifact
+      env:
+        GITHUB_SHA: ${{ github.sha }}
+      run: tar -czf public-"${GITHUB_SHA}".tar.gz public/css public/js public/mix-manifest.json
+    - name: Store artifact for distribution
+      uses: actions/upload-artifact@v3
+      with:
+        name: front-build
+        path: public-${{ github.sha }}.tar.gz
   update-servers:
     name: "crm.ta-7.ru update"
     runs-on: ubuntu-latest
+    needs: create-deployment-artifacts
     steps:
+    - uses: actions/download-artifact@v3
+      with:
+        name: front-build
+    - name: Upload artifacts
+      uses: appleboy/scp-action@master
+      with:
+        host: 91.106.207.85
+        username: admint4n
+        key: ${{ secrets.CRM_SSHKEY }}
+        port: 22
+        source: public-${{ github.sha }}.tar.gz
+        target: ~/crm.ta-7.ru/artifacts
     - name: Update domain
       uses: appleboy/ssh-action@master
       env:
