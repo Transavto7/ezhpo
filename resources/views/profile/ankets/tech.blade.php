@@ -21,7 +21,7 @@
         <label class="form-control-label col-md-3">ID водителя:</label>
         <article class="col-md-9">
             <div class="d-flex">
-                <input value="{{ $driver_id ?? '' }}" type="number"
+                <input value="{{ $driverId }}" type="number"
                        oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent().parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
                        min="6" name="driver_id" class="MASK_ID_ELEM form-control">
                 <a class="btn btn-outline-secondary camera-btn" data-field-type="driverId"><i class="fa fa-camera"></i></a>
@@ -35,7 +35,7 @@
             <label class="col-md-3 form-control-label">ID автомобиля:</label>
             <article class="col-md-9">
                 <div class="d-flex">
-                    <input value="{{ $car_id ?? '' }}" type="number"
+                    <input value="{{ $carId }}" type="number"
                            oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent().parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
                            min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control car-input">
                     <a class="btn btn-outline-secondary camera-btn" data-field-type="carId"><i class="fa fa-camera"></i></a>
@@ -127,7 +127,7 @@
         <label class="form-control-label">ID водителя:</label>
         <article>
             <div class="d-flex">
-                <input required value="{{ $driver_id ?? '' }}" type="number"
+                <input required value="{{ $driverId }}" type="number"
                        oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent().parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
                        min="6" name="driver_id" class="MASK_ID_ELEM form-control">
                 <a class="btn btn-outline-secondary camera-btn" data-field-type="driverId"><i class="fa fa-camera"></i></a>
@@ -150,7 +150,7 @@
             <label class="form-control-label">ID автомобиля:</label>
             <article>
                 <div class="d-flex">
-                    <input required value="{{ $car_id ?? '' }}" type="number"
+                    <input required value="{{ $carId }}" type="number"
                            oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent().parent(), {{ ($is_dop && !($id ?? false)) ? 'true' : 'false' }})"
                            min="6" name="anketa[0][car_id]" class="MASK_ID_ELEM form-control car-input">
                     <a class="btn btn-outline-secondary camera-btn" data-field-type="carId"><i class="fa fa-camera"></i></a>

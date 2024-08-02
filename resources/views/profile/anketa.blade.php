@@ -243,7 +243,7 @@
                                 <input type="hidden" name="REFERER" value="{{ url()->previous() }}">
                             @endif
 
-                            @include($anketa_view)
+                            @include($anketa_view, $params)
 
                             @if(!isset($anketa_route))
                                 <div id="cloning-append"></div>
