@@ -9393,13 +9393,13 @@ __webpack_require__.r(__webpack_exports__);
 
 var html5QrcodeScanner = new html5_qrcode__WEBPACK_IMPORTED_MODULE_0__.Html5QrcodeScanner("reader", {
   fps: 2,
+  rememberLastUsedCamera: true,
+  showTorchButtonIfSupported: true,
   qrbox: {
-    width: 250,
-    height: 250
+    width: 300,
+    height: 300
   }
-},
-/* verbose= */
-true);
+}, true);
 $(document).ready(function () {
   var ui = {
     errorAlert: $('.qr-error'),
@@ -10803,28 +10803,28 @@ $(document).ready(function () {
                   if (!!DATA.company_id) {
                     $('#ANKETA_FORM').find('input[name="company_id"]').parent().find('.app-checker-prop').removeClass('text-danger').addClass('text-success').text(DATA.company_name);
                     PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', false);
-                    checkInputProp('id', 'Company', DATA.company_id, 'name', $('#ANKETA_FORM').find('input[name="company_id"]').parent());
+                    checkInputProp('id', 'Company', DATA.company_id, 'name', $('#ANKETA_FORM').find('input[name="company_id"]').parent().parent());
                   }
                 }
 
                 if (model === 'Driver' && DATA.company_hash_id) {
-                  parent.prevObject.attr('company', DATA.company_hash_id);
+                  parent.find('input').attr('company', DATA.company_hash_id);
                   var driverInput = parent.closest('#ANKETA_FORM').find('.car-input');
                   driverInput.each(function (id, input) {
                     var attr = $(input).attr('company');
 
                     if (attr && attr !== DATA.company_hash_id) {
-                      var _$$parent, _mess$find;
+                      var _$$closest, _mess$find;
 
-                      var mess = (_$$parent = $(input).parent()) === null || _$$parent === void 0 ? void 0 : _$$parent.find('.app-checker-prop');
+                      var mess = (_$$closest = $(input).closest('article')) === null || _$$closest === void 0 ? void 0 : _$$closest.find('.app-checker-prop');
 
                       if ((mess === null || mess === void 0 ? void 0 : (_mess$find = mess.find('#company')) === null || _mess$find === void 0 ? void 0 : _mess$find.length) < 1) {
                         mess.append("<br><span id=\"company\" class=\"text-danger\">\u041A\u043E\u043C\u043F\u0430\u043D\u0438\u044F \u0430\u0432\u0442\u043E\u043C\u043E\u0431\u0438\u043B\u044F \u043D\u0435 \u0441\u043E\u043E\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0443\u0435\u0442 \u043A\u043E\u043C\u043F\u0430\u043D\u0438\u0438 \u0432\u043E\u0434\u0438\u0442\u0435\u043B\u044F</span>");
                       }
                     } else if (attr && attr === DATA.company_hash_id) {
-                      var _$$parent2, _mess$find2;
+                      var _$$closest2, _mess$find2;
 
-                      var _mess = (_$$parent2 = $(input).parent()) === null || _$$parent2 === void 0 ? void 0 : _$$parent2.find('.app-checker-prop');
+                      var _mess = (_$$closest2 = $(input).closest('article')) === null || _$$closest2 === void 0 ? void 0 : _$$closest2.find('.app-checker-prop');
 
                       if ((_mess === null || _mess === void 0 ? void 0 : (_mess$find2 = _mess.find('#company')) === null || _mess$find2 === void 0 ? void 0 : _mess$find2.length) > 0) {
                         _mess.find('#company').remove();
@@ -10836,7 +10836,7 @@ $(document).ready(function () {
                 if (model === 'Car' && DATA.company_hash_id) {
                   var _driverInput = parent.closest('#ANKETA_FORM').find('input[name="driver_id"]');
 
-                  parent.prevObject.attr('company', DATA.company_hash_id);
+                  parent.find('input').attr('company', DATA.company_hash_id);
 
                   if (_driverInput) {
                     var driverCompany = _driverInput.attr('company');

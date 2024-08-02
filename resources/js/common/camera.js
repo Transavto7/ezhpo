@@ -2,8 +2,8 @@ import {Html5QrcodeScanner} from "html5-qrcode";
 
 let html5QrcodeScanner = new Html5QrcodeScanner(
     "reader",
-    { fps: 2, qrbox: {width: 250, height: 250} },
-    /* verbose= */ true);
+    { fps: 2, rememberLastUsedCamera: true, showTorchButtonIfSupported: true, qrbox: {width: 300, height: 300} },
+    true);
 
 $(document).ready(function() {
     const ui = {

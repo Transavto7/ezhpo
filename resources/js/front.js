@@ -841,24 +841,24 @@ $(document).ready(function () {
                     if(!!DATA.company_id) {
                         $('#ANKETA_FORM').find('input[name="company_id"]').parent().find('.app-checker-prop').removeClass('text-danger').addClass('text-success').text(DATA.company_name);
                         PARENT_ELEM.closest('#ANKETA_FORM').find('.btn-success').prop('disabled', false);
-                        checkInputProp('id', 'Company', DATA.company_id, 'name', $('#ANKETA_FORM').find('input[name="company_id"]').parent())
+                        checkInputProp('id', 'Company', DATA.company_id, 'name', $('#ANKETA_FORM').find('input[name="company_id"]').parent().parent())
                     }
                 }
 
                 if (model === 'Driver' && DATA.company_hash_id) {
-                    parent.prevObject.attr('company', DATA.company_hash_id);
+                    parent.find('input').attr('company', DATA.company_hash_id);
                     const driverInput = parent.closest('#ANKETA_FORM').find('.car-input');
                     driverInput.each((id, input) => {
                         const attr = $(input).attr('company');
                        if (attr && attr !== DATA.company_hash_id) {
-                           const mess = $(input).parent()?.find('.app-checker-prop');
+                           const mess = $(input).closest('article')?.find('.app-checker-prop');
                            if (mess?.find('#company')?.length < 1) {
                                mess.append(
                                    `<br><span id="company" class="text-danger">Компания автомобиля не соответствует компании водителя</span>`
                                );
                            }
                        } else if (attr && attr === DATA.company_hash_id) {
-                           const mess = $(input).parent()?.find('.app-checker-prop');
+                           const mess = $(input).closest('article')?.find('.app-checker-prop');
                            if (mess?.find('#company')?.length > 0) {
                                mess.find('#company').remove();
                            }
@@ -868,7 +868,7 @@ $(document).ready(function () {
 
                 if (model === 'Car' && DATA.company_hash_id) {
                     const driverInput = parent.closest('#ANKETA_FORM').find('input[name="driver_id"]');
-                    parent.prevObject.attr('company', DATA.company_hash_id);
+                    parent.find('input').attr('company', DATA.company_hash_id);
 
                     if (driverInput) {
                         const driverCompany = driverInput.attr('company');

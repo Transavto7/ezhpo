@@ -219,5 +219,9 @@
             line-height: 0.5 !important;
             border-radius: 0 0.25rem 0.25rem 0;
         }
+        #html5-qrcode-button-camera-stop {
+            visibility: hidden;
+            display: none;
+        }
     </style>
 @endsection
