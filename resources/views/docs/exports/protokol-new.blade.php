@@ -39,12 +39,12 @@
                 <h3>№ {{ $id }} от {{ date('d.m.Y', strtotime($date)) }} года</h3>
             </div>
             <br>
-            1. Фамилия, имя, отчество, год рождения, место работы, должность:<br>
-            <b>{{ $driver_fio ? $driver_fio . ',' : '' }} {{ $driver_year_birthday }} г.р., {{ $driver_pv }}, {{ app('app\Company')->getName($company_id, 'hash_id') }}</b>
+            1. Фамилия, имя, отчество, год рождения, должность:<br>
+            <b>{{ $driver_fio ? $driver_fio . ',' : '' }} {{ $driver_year_birthday }} г.р., {{ app('app\Company')->getName($company_id, 'hash_id') }}</b>
             <br>
 
-            кем и когда (точное время) произведен контроль трезвости<br>
-            <b>{{ $user_post ? $user_post . ',' : '' }} {{ $user_name }}, {{ $date }}</b>
+            кем, когда (точное время) и где произведен контроль трезвости<br>
+            <b>{{ $user_post ? $user_post . ',' : '' }} {{ $user_name }}, {{ $date }}, {{ $point }}</b>
             <br><br>
 
             2. Особенности поведения обследуемого:<br>
@@ -82,7 +82,7 @@
 
             9. Данные лабораторного исследования:<br>
             а) на алкоголь<br>
-            - выдыхаемый воздух (алкометр): <b>DRIVESAFE II</b>
+            - выдыхаемый воздух (алкометр): <b> {{ $alcometer }} S/N {{ $alcometer_serial_number }}</b>
             <br>
             - время проведения контроля трезвости: <b>{{ \Carbon\Carbon::parse($date)->format('H:i') }}</textarea></b>
             <br>

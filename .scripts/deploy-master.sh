@@ -16,11 +16,14 @@ fi
 # если уже в режиме обслуживания
 (php artisan down) || true
 
+# Затереть любые ручные изменения
+git checkout --force ./
+
 # Загрузить последнюю версию приложения
 git pull origin master
 
 # Установить зависимости Composer
-composer install --optimize-autoloader
+composer install --no-interaction --optimize-autoloader
 
 # Очистить старый кэш
 php artisan cache:clear
@@ -32,9 +35,11 @@ NEED_MIGRATE="$(echo $?)"
 if [[ "$NEED_MIGRATE" != "0" ]];
 then
   # Дамп БД
-  DATE=$(date '+%Y-%m-%d')
+  DATE=$(date '+%Y%m%d_%H%M%S')
 
-  DUMP_NAME="../${DATE_DUMP}-${GITHUB_SHA}-dump.sql"
+  GITHUB_CURRENT_SHA="$(git rev-parse HEAD)"
+
+  DUMP_NAME="../backups/db/${DATE}_${GITHUB_CURRENT_SHA}.sql.gz"
 
   export $(cat .env | sed 's/#.*//g' | xargs)
 
@@ -42,16 +47,23 @@ then
 
   mysqldump -u $DB_USERNAME $DB_DATABASE \
       --no-tablespaces \
-      --verbose \
-      --result-file $DUMP_NAME
+      --verbose | gzip -c > $DUMP_NAME
 
   # Запустить миграцию базы данных
   php artisan migrate --force
 fi
 
+# Разархивирование билда фронта
+PUBLIC="/home/admin/web/artifacts/public-${GITHUB_SHA}.tar.gz"
+if [ -f "$PUBLIC" ]; then
+    tar xvfz ${PUBLIC} public/
+fi
+
 # Закэшировать конфиг
 php artisan config:cache
 
+# Обновить права на файлы и директории
+chown -R $(id -u):$(id -g) ./
 chmod 777 -R storage
 
 # Выход из режима обслуживания
