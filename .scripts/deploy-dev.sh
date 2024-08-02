@@ -51,13 +51,13 @@ then
 
   mysqldump -u $DB_USERNAME $DB_DATABASE \
       --no-tablespaces \
-      --verbose \
-      --result-file | gzip -c > $DUMP_NAME
+      --verbose | gzip -c > $DUMP_NAME
 
   # Запустить миграцию базы данных
   $PHP_VERSION artisan migrate --force
 fi
 
+# Разархивирование билда фронта
 PUBLIC="../artifacts/public-${GITHUB_SHA}.tar.gz"
 if [ -f "$PUBLIC" ]; then
     tar xvfz ${PUBLIC} public/
