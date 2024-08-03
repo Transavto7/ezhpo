@@ -3,7 +3,7 @@
 namespace App\Listeners\UserActions;
 
 use App\Events\UserActions\UserActionEventInterface;
-use App\UserActions;
+use App\Models\UserActions;
 
 class LogUserActionEvent
 {
