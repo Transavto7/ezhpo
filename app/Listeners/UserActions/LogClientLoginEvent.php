@@ -3,8 +3,8 @@
 namespace App\Listeners\UserActions;
 
 use App\Enums\UserActionTypesEnum;
+use App\Models\UserActions;
 use App\User;
-use App\UserActions;
 use Illuminate\Auth\Events\Login;
 
 class LogClientLoginEvent
