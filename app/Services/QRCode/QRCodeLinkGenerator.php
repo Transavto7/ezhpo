@@ -19,6 +19,11 @@ final class QRCodeLinkGenerator
     /**
      * @var string
      */
+    private $equal = '=';
+
+    /**
+     * @var string
+     */
     private $id;
 
     /**
@@ -38,8 +43,8 @@ final class QRCodeLinkGenerator
         $this->url = route('addAnket', ['type' => 'tech']);
     }
 
-    public function generateLink(): string
+    public function generate(): string
     {
-        return $this->url.$this->paramSeparator.$this->parameter->value().$this->id;
+        return $this->url.$this->paramSeparator.$this->parameter->value().$this->equal.$this->id;
     }
 }
