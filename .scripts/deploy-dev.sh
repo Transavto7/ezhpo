@@ -49,7 +49,7 @@ then
 
   export MYSQL_PWD=$DB_PASSWORD
 
-  mysqldump -u $DB_USERNAME $DB_DATABASE \
+  /usr/local/bin/mysqldump -u $DB_USERNAME $DB_DATABASE \
       --no-tablespaces \
       --verbose | gzip -c > $DUMP_NAME
 

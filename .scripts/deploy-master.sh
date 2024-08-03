@@ -43,9 +43,7 @@ then
 
   export $(cat .env | sed 's/#.*//g' | xargs)
 
-  export MYSQL_PWD=$DB_PASSWORD
-
-  mysqldump -u $DB_USERNAME $DB_DATABASE \
+  mysqldump -u $DB_USERNAME -p$DB_PASSWORD $DB_DATABASE \
       --no-tablespaces \
       --verbose | gzip -c > $DUMP_NAME
 
