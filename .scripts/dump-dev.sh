@@ -7,12 +7,12 @@ DUMP_PATH="../backups/db/hourly/${DUMP_NAME}"
 
 export $(cat .env | sed 's/#.*//g' | xargs)
 export MYSQL_PWD=$DB_PASSWORD
-mysqldump -u $DB_USERNAME $DB_DATABASE --no-tablespaces --verbose | gzip -c > $DUMP_PATH
+/usr/local/bin/mysqldump -u $DB_USERNAME $DB_DATABASE --no-tablespaces --verbose | gzip -c > $DUMP_PATH
 
 find "../backups/db/hourly" -type f -mmin +1440 -name '*.sql.gz' -execdir rm -- '{}' \;
 
 if [ ! -z "${RESERVE_DUMPS_SERVER}" ]; then
-    scp $DUMP_PATH "${RESERVE_DUMPS_SERVER}/hourly/${DB_DATABASE}_${DUMP_NAME}"
+    scp $DUMP_PATH "${RESERVE_DUMPS_SERVER}/hourly/"
 fi
 
 HOUR=$(date +%H)
@@ -22,6 +22,6 @@ if [ "$HOUR" = "00" ]; then
     find "../backups/db/daily" -type f -mtime +7 -name '*.sql.gz' -execdir rm -- '{}' \;
 
     if [ ! -z "${RESERVE_DUMPS_SERVER}" ]; then
-        scp $DUMP_PATH "${RESERVE_DUMPS_SERVER}/daily/${DB_DATABASE}_${DUMP_NAME}"
+        scp $DUMP_PATH "${RESERVE_DUMPS_SERVER}/daily/"
     fi
 fi
