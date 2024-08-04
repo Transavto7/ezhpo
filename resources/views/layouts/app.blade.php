@@ -12,9 +12,9 @@
     <title>@yield('title') | {{ config('app.name', 'Laravel') }}</title>
 
     {{-- Disabled Cache --}}
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -34,13 +34,14 @@
         window.PAGE_SETUP = {
             baseUrl: '{{ config('app.url') }}'
         }
+        window.DOC_FIELDS = @json(config('docs.fields'));
     </script>
 
-@auth
+    @auth
         <script type="text/javascript">
             window.API_TOKEN = '{{ Auth::user()->api_token }}';
             window.userRole = function () {
-              return {{ auth()->user()->role }}
+                return {{ auth()->user()->role }}
             };
         </script>
     @endauth
@@ -55,7 +56,7 @@
     @endguest
 
     <script type="text/javascript">
-        window.addEventListener("load", function(event) {
+        window.addEventListener("load", function (event) {
             const preloader = document.querySelector('#page-preloader');
             preloader.classList.add('hide');
 
@@ -73,89 +74,97 @@
     @yield('custom-styles')
 </head>
 <body>
-    <div id="page-preloader" class="preloader">
-        <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
-        <span class="text-white">Загрузка</span>
+<div id="page-preloader" class="preloader">
+    <div class="lds-ring">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
     </div>
+    <span class="text-white">Загрузка</span>
+</div>
 
-    <div id="app" class="page @yield('class-page')">
-        @include('layouts.header')
+<div id="app" class="page @yield('class-page')">
+    @include('layouts.header')
 
-        <main class="page-content d-flex align-items-stretch @if (user() && (user()->hasRole('driver') || user()->hasRole('client'))) blue @endif">
+    <main
+        class="page-content d-flex align-items-stretch @if (user() && (user()->hasRole('driver') || user()->hasRole('client'))) blue @endif">
 
-            @if (user() && !user()->hasRole('driver'))
-                    @include('layouts.sidebar')
-            @endif
+        @if (user() && !user()->hasRole('driver'))
+            @include('layouts.sidebar')
+        @endif
 
-            @guest
-                @yield('content')
-            @endguest
+        @guest
+            @yield('content')
+        @endguest
 
-            @auth
-                <div
-                    class="content-inner @if (user() && user()->hasRole('driver')) w-100 @endif"
-                >
-                    @hasSection ('sidebar')
-                        <!-- Хэдер-->
-                        <header class="page-header">
-                            <div class="container-fluid">
-                                <h2 class="no-margin-bottom">@yield('title')</h2>
-                            </div>
-                        </header>
-                    @endif
-
-                    <!-- Контент страницы -->
-                    <section class="no-padding-bottom">
-                        <div class="page-container container-fluid">
-                            @yield('content')
+        @auth
+            <div
+                class="content-inner @if (user() && user()->hasRole('driver')) w-100 @endif"
+            >
+                @hasSection ('sidebar')
+                    <!-- Хэдер-->
+                    <header class="page-header">
+                        <div class="container-fluid">
+                            <h2 class="no-margin-bottom">@yield('title')</h2>
                         </div>
-                    </section>
-                </div>
-            @endauth
-        </main>
-    </div>
+                    </header>
+                @endif
 
-    @if(user() && !user()->accepted_agreement)
-        <div class="modal_agreement">
-            <div class="modal_agreement__inner">
-                <div class="modal_agreement__header">
-                    Пользовательское соглашение
-                </div>
+                <!-- Контент страницы -->
+                <section class="pt-3">
+                    <div class="page-container container-fluid">
+                        @yield('content')
+                    </div>
+                </section>
+            </div>
+        @endauth
+    </main>
+</div>
 
-                <div class="modal_agreement__content">
-                    Перед началом использования вы должны <br>
-                    прочитать и принять наше<br>
-                    <a href="/agreement" target="_blank">пользовательское соглашение</a>
-                </div>
+@if(user() && !user()->accepted_agreement)
+    <div class="modal_agreement">
+        <div class="modal_agreement__inner">
+            <div class="modal_agreement__header">
+                Пользовательское соглашение
+            </div>
 
-                <div class="modal_agreement__buttons">
-                    <button class="btn btn-success" onclick="event.preventDefault();
-                        document.getElementById('agreement-form').submit();">Принимаю</button>
-                    <button class="btn btn-danger" onclick="event.preventDefault();
-                        document.getElementById('logout-form').submit();">Выйти</button>
-                </div>
+            <div class="modal_agreement__content">
+                Перед началом использования вы должны <br>
+                прочитать и принять наше<br>
+                <a href="/agreement" target="_blank">пользовательское соглашение</a>
+            </div>
+
+            <div class="modal_agreement__buttons">
+                <button class="btn btn-success" onclick="event.preventDefault();
+                        document.getElementById('agreement-form').submit();">Принимаю
+                </button>
+                <button class="btn btn-danger" onclick="event.preventDefault();
+                        document.getElementById('logout-form').submit();">Выйти
+                </button>
             </div>
         </div>
+    </div>
 
-        <form id="agreement-form" action="/agreement" method="POST" style="display: none;">
-            @csrf
-        </form>
-    @endif
+    <form id="agreement-form" action="/agreement" method="POST" style="display: none;">
+        @csrf
+    </form>
+@endif
 
-    @stack('setup-scripts')
+@stack('setup-scripts')
 
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.min.js" integrity="sha512-Bkf3qaV86NxX+7MyZnLPWNt0ZI7/OloMlRo8z8KPIEUXssbVwB1E0bWVeCvYHjnSPwh4uuqDryUnRdcUw6FoTg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/TableExport/5.2.0/js/tableexport.min.js" integrity="sha512-XmZS54be9JGMZjf+zk61JZaLZyjTRgs41JLSmx5QlIP5F+sSGIyzD2eJyxD4K6kGGr7AsVhaitzZ2WTfzpsQzg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.jsdelivr.net/npm/suggestions-jquery@21.12.0/dist/js/jquery.suggestions.min.js"></script>
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.min.js" integrity="sha512-Bkf3qaV86NxX+7MyZnLPWNt0ZI7/OloMlRo8z8KPIEUXssbVwB1E0bWVeCvYHjnSPwh4uuqDryUnRdcUw6FoTg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/TableExport/5.2.0/js/tableexport.min.js" integrity="sha512-XmZS54be9JGMZjf+zk61JZaLZyjTRgs41JLSmx5QlIP5F+sSGIyzD2eJyxD4K6kGGr7AsVhaitzZ2WTfzpsQzg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/suggestions-jquery@21.12.0/dist/js/jquery.suggestions.min.js"></script>
 
-    <script src="{{ mix('/js/manifest.js') }}"></script>
-    <script src="{{ mix('/js/vendor.js') }}"></script>
-    <script src="{{ mix('/js/app.js') }}"></script>
+<script src="{{ mix('/js/manifest.js') }}"></script>
+<script src="{{ mix('/js/vendor.js') }}"></script>
+<script src="{{ mix('/js/app.js') }}"></script>
 
-    @yield('custom-scripts')
+@yield('custom-scripts')
 </body>
 </html>

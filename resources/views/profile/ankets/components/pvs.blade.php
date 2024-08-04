@@ -18,18 +18,14 @@
     };
 @endphp
 
-<div class="form-group mb-4">
+<div class="form-group">
     <label class="form-control-label">Пункт выпуска:</label> &nbsp;
-    <select name="pv_id" class="col-sm-6 form-control" required>
+    <select name="pv_id" class="form-control" required>
         @foreach($points as $point)
             @if(count($point['pvs']) > 0)
                 <optgroup label="{{ $point['name'] }}">
                     @foreach($point['pvs'] ?? [] as $child)
-                        <option
-                            @if($isSelected($child))
-                                selected
-                            @endif
-                            value="{{ $child['id'] }}">
+                        <option @if($isSelected($child)) selected @endif value="{{ $child['id'] }}">
                             — {{ $child['name'] }}
                         </option>
                     @endforeach

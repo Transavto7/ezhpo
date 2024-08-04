@@ -602,7 +602,7 @@ class IndexController extends Controller
         $data['otherRoles'] = $data['otherRoles'] ?? [];
         $data['otherRoles'][] = 'manager';
         $data['otherRoles'][] = 'admin';
-        $data['queryString'] = Arr::query($request->except([$oKey, $oBy]));;
+        $data['queryString'] = Arr::query(array_filter($request->except([$oKey, $oBy])));
         $data['fieldPrompts'] = FieldPrompt::where('type', strtolower($model))->get();
         $data['isAdminOrClient'] = $isAdminOrClient;
 

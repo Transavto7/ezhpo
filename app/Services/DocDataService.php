@@ -24,7 +24,10 @@ class DocDataService
             'town' => '',
             'drugs' => false,
             'alko' => false,
-            'status' => 'Нет'
+            'status' => 'Нет',
+            'alcometer' => config('docs.fields.alcometer')[0],
+            'alcometer_serial_number' => '',
+            'point' => ''
         ];
 
         foreach ($form->fillable as $field) {
@@ -74,7 +77,12 @@ class DocDataService
 
             if ($point) {
                 $data['town'] = $point->town->name;
+                $data['point'] = $point->name;
             }
+        }
+
+        if ($data['complaint'] === 'Нет') {
+            $data['complaint'] = 'Отсутствуют';
         }
 
         $data = $this->getUserEds($data);
