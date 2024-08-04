@@ -106,6 +106,7 @@
 @endsection
 
 @section('content')
+    @include('profile.ankets.components.fast-scroll')
 
     <div class="row" data-anketa="{{ $anketa_view }}" id="ANKETA_FORM_VIEW">
         <!-- Анкета -->
