@@ -137,8 +137,7 @@
                             <select name="contract_ids[]"
                                     data-label="Договор"
                                     id="select_for_contract_driver_car"
-                                    class="js-chosen"
-                                    style="display: none;"
+                                    class="filled-select2 filled-select"
                                     multiple="multiple"
                             >
                                 @foreach($contractCollect as $contract)
