@@ -208,9 +208,19 @@ class HomeController extends Controller
                             continue;
                         }
 
+                        if ($filterKey === 'flag_pak') {
+                            $explodeData = array_map(function($item) {
+                                return $item === 'internal' ? null : $item;
+                            }, $explodeData);
+                        }
+
                         $forms = $forms->where(function ($query) use ($explodeData, $filterKey) {
                             foreach ($explodeData as $fvItemValue) {
-                                $query = $query->orWhere('anketas.' . $filterKey, $fvItemValue);
+                                if ($fvItemValue === null) {
+                                    $query = $query->orWhereNull('anketas.' . $filterKey);
+                                } else {
+                                    $query = $query->orWhere('anketas.' . $filterKey, $fvItemValue);
+                                }
                             }
 
                             return $query;
@@ -230,6 +240,11 @@ class HomeController extends Controller
 
                                 return $query;
                             });
+                            continue;
+                        }
+
+                        if ($filterKey === 'flag_pak' && $explodeData === 'internal') {
+                            $forms = $forms->whereNull('anketas.flag_pak');
                             continue;
                         }
 
