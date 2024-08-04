@@ -412,177 +412,185 @@ $(document).ready(function () {
         });
     }
 
+    const showContractsFormCardDBItem = (contracts) => {
+        let block = '';
+
+        if (contracts !== undefined) {
+            block += `<p class="text-small m-0">Договор:</p>`;
+        }
+
+        contracts = contracts ?? []
+
+        if (contracts.length !== 0) {
+            block += `<ul class="list-group my-2">`;
+
+            contracts.map((contract) => {
+                block += `<li style="padding: 0;" class=" text-small list-group-item list-group-item-action list-group-item-success">
+                                    <ul class="list-group">
+                                        <b>${contract.name_with_dates}</b>`;
+
+                (contract.services ?? []).map((service) => {
+                    block += `<li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">${service.name}</li>`;
+                })
+
+                block += `</ul></li>`;
+            })
+
+            block += `</ul>`;
+        } else {
+            block += `<p class="text-small">-- Отсутствует --</p>`;
+        }
+
+        return block;
+    }
+
+    const showInputFormCardDBItem = async (fieldName, fieldValue, fvItem, model, isBlocked) => {
+        let field = '', clearInputBtn = '', fId = uidv4(), inputClass = `${model}_input`;
+
+        if (fvItem['type'] === 'select') {
+            await API_CONTROLLER.getFieldHTML({
+                field: fieldName,
+                model,
+                default_value: encodeURIComponent(fieldValue)
+            }).then(response => {
+                field = response.data
+            })
+        } else if (['note', 'comment', 'name'].includes(fieldName)) {
+            field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${fieldName}">${(fieldValue ?? '').trim()}</textarea>`
+        } else if (fieldName === 'photo' && fieldValue) {
+            field = `<img alt="photo" src="/storage/${fieldValue}" width="100%"/>`
+        } else {
+            field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${fieldValue ?? ''}' name="${fieldName}" />`
+        }
+
+        if (isBlocked === '' && fieldName !== 'photo') {
+            clearInputBtn = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
+        }
+
+        return `
+            <p style="${fieldName === 'dismissed' ? fieldValue.toUpperCase() === 'ДА' ? 'color: red; font-weight: bold;' : '' : ''}"
+            data-field-card="${model}_${fieldName}"
+            class="text-small m-0">
+            ${fvItem.label}:
+                <br/>
+                ${clearInputBtn}
+                <div class="form-group ${inputClass}">
+                    ${field}
+                </div>
+            </p>`
+    }
 
     /**
      * Показываем данные в сущностях в карточках Анкеты
-     * @param model
-     * @param data
+     * @param model Название модели
+     * @param data Значения инпутов
+     * @param fieldsValues Описание свойств инпутов
+     * @param fullData Дополнительная информация для отрисовки форм
      */
     const showAnketsCardDBitemData = async (model, data, fieldsValues, fullData) => {
-        if (data) {
-            let dbItemId = 'CARD_' + model.toUpperCase(), msg = `<form id="form_${model}">`,
-                inputClass = model + '_' + 'input'
+        if (!data) {
+            return;
+        }
 
-            $(`#${dbItemId}`).html('<b class="text-info">Загружаем данные...</b>')
+        let dbItemId = `CARD_${model.toUpperCase()}`,
+            itemForm = `<form id="form_${model}">`,
+            inputClass = `${model}_input`;
 
-            /**
-             * Вставляем поля
-             */
-            for (let i in data) {
-                let fvItem = fieldsValues[i]
+        const dbItem = $(`#${dbItemId}`);
 
-                if (fvItem
-                    || i === 'contract'
-                    || i === 'contracts'
-                ) {
-                    if (i != 'id' && i != 'hash_id') {
-                        let field = '',
-                            otherHtmlItems = '',
-                            fId = uidv4(),
-                            isBlocked = fullData.blockedFields.includes(i) ? 'disabled' : ''
+        dbItem.html('<b class="text-info">Загружаем данные...</b>')
 
-                        if (isBlocked === '') {
-                            otherHtmlItems = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
-                        }
+        let formIsFull = true;
 
-                        if (i === 'contract_id' || i === 'contract' || i === 'contracts') {
-                            continue;
-                        }
+        /**
+         * Вставляем поля
+         */
+        for (let fieldName in data) {
+            let fvItem = fieldsValues[fieldName];
 
-                        if (fvItem['type'] === 'select') {
-                            await API_CONTROLLER.getFieldHTML({
-                                field: i,
-                                model,
-                                default_value: encodeURIComponent(data[i])
-                            }).then(response => {
-                                field = response.data
-                            })
-                        } else {
-                            if (i === 'note' || i === 'comment' || i === 'name') {
-                                field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${i}">${(data[i] ? data[i] : '').trim()}</textarea>`
-                            } else if (i === 'photo') {
-                                otherHtmlItems = ''
+            if (!fvItem) continue;
 
-                                if (data[i]) {
-                                    field = `<img src="/storage/${data[i]}" width="60%" />`
-                                }
-                            } else {
-                                field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${data[i] ? data[i] : ''}' name="${i}" />`
-                            }
-                        }
+            if (['id', 'hash_id', 'contract_id', 'contract', 'contracts', 'products_id'].includes(fieldName)) continue;
 
-                        if (i !== 'products_id') {
-                            msg += `
-                                <p style="${i === 'dismissed' ? data[i].toUpperCase() === 'ДА' ? 'color: red; font-weight: bold;' : '' : ''}" data-field-card="${model}_${i}" class="text-small m-0">${fvItem.label}:<br/>
-                                    ${otherHtmlItems}
-                                    <div class="form-group ${inputClass}">
-                                        ${field}
-                                    </div>
-                                </p>`
-                        }
+            const isBlocked = (fullData.blockedFields ?? []).includes(fieldName) ? 'disabled' : '';
 
-                        if ((i === 'company_id' && model === 'Driver') || (i === 'town_id' && model === 'Company')) {
-                            if (data.contract) {
-                                // driver & auto
-                                msg += `
-                               <p class="text-small m-0">Договор:</p>`;
-                                if (data.contract.length != 0) {
-                                    msg += `
-                            <ul class="list-group my-2">
-                                <li style="padding: 0;" class="text-small list-group-item list-group-item-action list-group-item-success">
-                                <b>${data.contract.name_with_dates}</b>
+            const fieldValue = data[fieldName];
 
-                            <ul class="list-group">`;
-                                    if (data.contract.services) {
+            try {
+                const input = await showInputFormCardDBItem(fieldName, fieldValue, fvItem, model, isBlocked);
 
-                                        data.contract.services.map((service) => {
-                                            msg += `<li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">${service.name}</li>`;
-                                        })
-                                    }
+                itemForm += input;
+            } catch (e) {
+                itemForm += `<p>Ошибка получения поля ${fieldName}!</p>`;
 
-                                    msg += `
-                            </ul></li>
-                            </ul>`;
-                                } else {
-                                    msg += `
-                               <p class="text-small">-- Отсутствует --</p>`;
-                                }
-                            } else if (data.contracts) {
-                                // copmany
-                                msg += `
-                               <p class="text-small m-0">Договор:</p>`;
-                                if (data.contracts.length != 0) {
+                formIsFull = false;
 
-                                    msg += `<ul class="list-group my-2">`;
-                                    data.contracts.map((contract) => {
-                                        if (contract.services) {
-
-                                            msg += `
-
-                                    <li style="padding: 0;" class=" text-small list-group-item list-group-item-action list-group-item-success"><ul class="list-group">
-                                    <b>${contract.name_with_dates}</b>`;
-                                            contract.services.map((service) => {
-                                                msg += `
-                                    <li style="padding: 0; font-size: 0.8em" class="list-group-item text-small list-group-item-action list-group-item-secondary">
-                                    ${service.name}</li>`;
-                                            })
-                                            msg += `</ul></li>`;
-                                        }
-
-                                    })
-                                    msg += `</ul>`;
-                                } else {
-                                    msg += `
-                               <p class="text-small">-- Отсутствует --</p>`;
-                                }
-                            }
-                        }
-                    }
-                }
+                console.error(e.message)
             }
 
-            msg += `<button type="submit" class="btn btn-sm btn-success">Сохранить</button></form>`
-
-            $(`#${dbItemId}`).html(msg)
-
-            LIBS.initChosen()
-
-            $(`#form_${model}`).submit(function (e) {
-                e.preventDefault()
-
-                if (confirm('Сохранить?')) {
-                    $(this).find(`.${inputClass} input, .${inputClass} select, .${inputClass} textarea`).each(function () {
-                        let val = this.value, name = this.name
-
-                        if (name) {
-                            API_CONTROLLER.updateModelProperty({
-                                item_model: model,
-                                item_field: name,
-                                item_id: data['id'],
-                                new_value: val
-                            })
-                        }
-                    })
-                }
-            })
-
-            $('.ANKETAS_TEXTAREA').each(function () {
-                this.style.height = this.scrollHeight + 'px';
-            })
-
             /**
-             * Контроль дат (DDATE)
+             * Добавление списка договоров с услугами для просмотра,
+             * условие определяет - после каких полей выводить инфо
              */
-            let redDates = fullData.redDates
-            if (redDates && typeof redDates === "object" && !Array.isArray(redDates)) {
-                for (let i in redDates) {
-                    $(`*[data-field-card="${model}_${i}"]`).css({
-                        'color': 'red',
-                        'font-weight': 'bold'
-                    })
+            if ((fieldName === 'company_id' && model === 'Driver') || (fieldName === 'town_id' && model === 'Company')) {
+                let contracts = undefined;
+
+                if (data.contract) {
+                    contracts = [data.contract]
+                } else if (data.contracts) {
+                    contracts = data.contracts
                 }
+
+                itemForm += showContractsFormCardDBItem(contracts)
+            }
+        }
+
+        if (formIsFull) {
+            itemForm += `<button type="submit" class="btn btn-sm btn-success">Сохранить</button></form>`
+        }
+
+        dbItem.html(itemForm)
+
+        LIBS.initChosen()
+
+        $(`#form_${model}`).submit(function (e) {
+            e.preventDefault()
+
+            if (!confirm('Сохранить?')) {
+                return;
             }
 
+            $(this).find(`.${inputClass} input, .${inputClass} select, .${inputClass} textarea`).each(function () {
+                let val = this.value, name = this.name;
+
+                if (!name) {
+                    return;
+                }
+
+                API_CONTROLLER.updateModelProperty({
+                    item_model: model,
+                    item_field: name,
+                    item_id: data['id'],
+                    new_value: val
+                })
+            })
+        })
+
+        $('.ANKETAS_TEXTAREA').each(function () {
+            this.style.height = this.scrollHeight + 'px';
+        })
+
+        /**
+         * Контроль дат (DDATE)
+         */
+        let redDates = fullData.redDates
+        if (redDates && typeof redDates === "object" && !Array.isArray(redDates)) {
+            for (let i in redDates) {
+                $(`*[data-field-card="${model}_${i}"]`).css({
+                    'color': 'red',
+                    'font-weight': 'bold'
+                })
+            }
         }
     }
 
@@ -858,31 +866,6 @@ $(document).ready(function () {
             }, 1500)
         }
     };
-
-    /*
-    СТАРЫЙ ЭКСПОРТ==
-    window.exportTable = (function() {
-        let uri = 'data:application/vnd.ms-excel;base64,'
-            , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>'
-            , base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
-            , format = function(s, c) {
-            return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; })
-        }
-            , downloadURI = function(uri, name) {
-            let link = document.createElement("a");
-            link.download = name;
-            link.href = uri;
-            link.click();
-        }
-
-        //  exportTable('resultTable','Смета', 'Ремрайон_смета.xls');
-        return function(table, name, fileName) {
-            if (!table.nodeType) table = document.getElementById(table)
-            let ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
-            let resuri = uri + base64(format(template, ctx))
-            downloadURI(resuri, fileName);
-        }
-    })();*/
 
     // Открытие/закртие элементов
     $('[data-toggle-show]').click(function (e) {
@@ -1160,8 +1143,6 @@ $(document).ready(function () {
     })
 
     // Таймер
-
-
     $('.App-Timer[data-date]').each(function () {
         let $t = $(this),
             timerDateStart = new Date($t.data('date'))
@@ -1190,7 +1171,7 @@ $(document).ready(function () {
     // Material Inputs
     // ------------------------------------------------------ //
 
-    var materialInputs = $('input.input-material');
+    const materialInputs = $('input.input-material');
 
     // activate labels for prefilled values
     materialInputs.filter(function () {
@@ -1216,8 +1197,9 @@ $(document).ready(function () {
     // ------------------------------------------------------- //
     // Footer
     // ------------------------------------------------------ //
-
-    var contentInner = $('.content-inner');
+    function adjustFooter() {
+        $('.content-inner').css('padding-bottom', $('.main-footer').outerHeight() + 'px');
+    }
 
     $(document).on('sidebarChanged', function () {
         adjustFooter();
@@ -1227,16 +1209,10 @@ $(document).ready(function () {
         adjustFooter();
     })
 
-    function adjustFooter() {
-        var footerBlockHeight = $('.main-footer').outerHeight();
-        contentInner.css('padding-bottom', footerBlockHeight + 'px');
-    }
-
     // ------------------------------------------------------- //
     // External links to new window
     // ------------------------------------------------------ //
     $('.external').on('click', function (e) {
-
         e.preventDefault();
         window.open($(this).attr("href"));
     })
@@ -1272,6 +1248,7 @@ $(document).ready(function () {
         if (!innInput) return;
 
         companyNameInput.suggestions({
+            //TODO: вынести в енв
             token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
             type: "PARTY",
             /* Вызывается, когда пользователь выбирает одну из подсказок */
@@ -1313,7 +1290,9 @@ $(document).ready(function () {
     LIBS.initAll()
     $('.MASK_ID_ELEM').trigger('input')
 
-
+    /**
+     * Отображение контента в модалке редактирования
+     */
     $('#modalEditor').on('shown.bs.modal', function (event) {
         let route = $(event.relatedTarget).data('route')
         let modalContent = $("#modalEditor .modal-content")
@@ -1325,98 +1304,79 @@ $(document).ready(function () {
         })
 
     })
-    let field = $("*[name=type_product]").chosen()
-    field.change(function (e, {selected}) {
 
-        if (selected === 'Абонентская плата без реестров') {
-            field.closest('.modal-body').find('select[name=type_anketa]').prop("disabled", true);
-            field.closest('.modal-body').find('select[name="type_view[]"]').prop("disabled", true);
+    /**
+     * Блокировка инпутов в модалке
+     */
+    const disableModalFields = (modal, inputsToDisableSelectors, disabled) => {
+        inputsToDisableSelectors.forEach((inputToDisableSelector) => {
+            const input = modal.find(inputToDisableSelector)
 
-            // field.closest('.modal-body').find('select[name=essence]').prop('required', true) // тип осмотра
-            field.closest('.modal-body').find('select[name=type_anketa]').prop('required', false) // тип осмотра
-            field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', false) // Реестр
-        } else {
-            // field.closest('.modal-body').find('select[name=essence]').prop( "disabled", true);
-            field.closest('.modal-body').find('select[name=type_anketa]').prop("disabled", false);
-            field.closest('.modal-body').find('select[name="type_view[]"]').prop("disabled", false);
+            input.prop("disabled", disabled);
+            input.prop("required", !disabled);
+        })
+    }
 
-            // field.closest('.modal-body').find('select[name=essence]').prop('required', false) // тип осмотра
-            field.closest('.modal-body').find('select[name=type_anketa]').prop('required', true) // тип осмотра
-            field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', true) // Реестр
-        }
+    /**
+     * Блокировка полей при выборе конкретного типа услуги
+     */
+    const disableServiceFieldsByProductType = (productTypeField, selectedValue) => {
+        const modal = productTypeField.closest('.modal-body');
+
+        const inputsToDisableSelectors = [
+            'select[name=type_anketa]',
+            'select[name="type_view[]"]'
+        ];
+
+        const disabled = selectedValue === 'Абонентская плата без реестров';
+
+        disableModalFields(modal, inputsToDisableSelectors, disabled)
+    }
+    $("select[name=type_product]").on('change', function (event) {
+        const field = $(event.target);
+        const selected = field.val();
+
+        disableServiceFieldsByProductType(field, selected);
     });
-
     $(document).on('change', '.filled-select2.filled-select.type_product', function (event) {
         const field = $(event.target);
-        let selected = field.val()
+        const selected = field.val();
 
-        if (selected === 'Абонентская плата без реестров') {
-            // field.closest('.modal-body').find('select[name=essence]').prop( "disabled", false);
-            field.closest('.modal-body').find('select[name=type_anketa]').prop("disabled", true);
-            field.closest('.modal-body').find('select[name="type_view[]"]').prop("disabled", true);
-
-            // field.closest('.modal-body').find('select[name=essence]').prop('required', true) // тип осмотра
-            field.closest('.modal-body').find('select[name=type_anketa]').prop('required', false) // тип осмотра
-            field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', false) // Реестр
-        } else {
-            // field.closest('.modal-body').find('select[name=essence]').prop( "disabled", true);
-            field.closest('.modal-body').find('select[name="type_view[]"]').prop("disabled", false);
-            field.closest('.modal-body').find('select[name=type_anketa]').prop("disabled", false);
-
-            // field.closest('.modal-body').find('select[name=essence]').prop('required', false) // тип осмотра
-            field.closest('.modal-body').find('select[name=type_anketa]').prop('required', true) // тип осмотра
-            field.closest('.modal-body').find('select[name="type_view[]"]').prop('required', true) // Реестр
-        }
+        disableServiceFieldsByProductType(field, selected)
     });
 
-
-    $(document).on('change ready', 'select[name="company_id"]', function (e) {
-        //select_for_contract_driver_car 'input[name="company_id"]'
-        let value = $(this).val();
-        let targetSelect = $('select[name="company_id"]').parent().parent().parent().find('#select_for_contract_driver_car');
-        // let targetSelect = $('#select_for_contract_driver_car');
+    /**
+     * Обновление списка доступных договоров для водителя при смене компании
+     */
+    $(document).on('change ready', 'select[name="company_id"]', function (event) {
+        const field = $(event.target);
+        const value = field.val();
+        let targetSelect = field.closest('.modal-body').find('#select_for_contract_driver_car');
         targetSelect.empty();
 
         axios.post('/contract/getAvailableForCompany', {
             company_id: value,
         }).then(({data}) => {
-            if (data.status) {
-                targetSelect.append($('<option>', {
-                    value: '',
-                    text: 'Не установлено'
-                }));
-                data.contracts.map((item) => {
-                    targetSelect.append($('<option>', {
-                        value: item.id,
-                        text: item.name
-                    }));
-                })
-            } else {
+            if (!data.status) {
                 Swal2.fire('Ошибка', data.message, 'warning');
+                return;
             }
 
+            const contracts = (data.contracts ?? []).map((item) => {
+                return {
+                    value: item.id,
+                    text: item.name
+                }
+            })
+
+            contracts.push({
+                value: '',
+                text: 'Не установлено'
+            })
+
+            contracts.forEach((item) => {
+                targetSelect.append($('<option>', item));
+            })
         });
-
-
-        // $.ajax({
-        //     type:     'post',
-        //     url:      '/app/purchase/check-active-discount',
-        //     dataType: 'json',
-        //     data:     {
-        //         current_category_id: select.value,
-        //     },
-        //     success:  function (response) {
-        //         if (response.status) {
-        //         } else {
-        //             alert('Ошибка');
-        //         }
-        //     },
-        //     error:    function () {
-        //         alert('Ошибка на сервере при запросе на checkActiveDiscount');
-        //     },
-        // });
     })
-
-
-    // let field = $('*[data-field="Product_type_product"]')
 });
