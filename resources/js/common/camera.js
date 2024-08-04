@@ -1,9 +1,7 @@
-import {Html5QrcodeScanner} from "html5-qrcode";
+import {Html5Qrcode} from "html5-qrcode";
 
-let html5QrcodeScanner = new Html5QrcodeScanner(
-    "reader",
-    { fps: 2, rememberLastUsedCamera: true, showTorchButtonIfSupported: true, qrbox: {width: 300, height: 300} },
-    true);
+const html5QrCode = new Html5Qrcode("reader", false);
+const config = { fps: 2, showTorchButtonIfSupported: true, qrbox: { width: 300, height: 300 } };
 
 $(document).ready(function() {
     const ui = {
@@ -21,7 +19,7 @@ $(document).ready(function() {
 
     function onScanSuccess(decodedText, decodedResult) {
         console.log(`Scan result: ${decodedText}`, decodedResult);
-        html5QrcodeScanner.clear().then(r => console.log('close camera'));
+        html5QrCode.stop().then(r => console.log('close camera'));
 
         axios
             .get('/api/parse-qr-code', {
@@ -57,7 +55,7 @@ $(document).ready(function() {
 
         console.log($currentInput, fieldType)
 
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        html5QrCode.start({facingMode: "environment"}, config, onScanSuccess, onScanFailure)
 
         ui.cameraModal.modal('show')
     })
@@ -66,7 +64,7 @@ $(document).ready(function() {
         ui.errorDiv.attr('style', 'display:none')
         ui.camera.attr('style', '')
 
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        html5QrCode.start({facingMode: "environment"}, config, onScanSuccess, onScanFailure)
     })
 
     ui.closeBtn.click(function (e) {
@@ -79,7 +77,7 @@ $(document).ready(function() {
     ui.cameraModal.on('hidden.bs.modal', function () {
         ui.errorDiv.attr('style', 'display:none')
         ui.camera.attr('style', '')
-        html5QrcodeScanner.clear()
+        html5QrCode.stop()
         $currentInput = null
         fieldType = null
     })
