@@ -360,6 +360,7 @@
             || user()->access('service_logs_read') && $model == 'Service'
         );
 
+        $permissionToGenerateMetricLKK = ($model === 'Company' && user()->access('generate_metric_lkk'));
         $permissionToViewContract = user()->access('contract_read');
         $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
 
@@ -400,6 +401,15 @@
                                 Назад <i class="fa fa-trash"></i>
                             </a>
                         @endif
+                    </div>
+                @endif
+
+                @if($permissionToGenerateMetricLKK)
+                    <div class="m-2">
+                        <button type="button" data-toggle="modal" data-target="#elements-modal-generate-metric"
+                                class="btn btn-sm btn-secondary">
+                             Метрика ЛКК <i class="fa fa-table"></i>
+                        </button>
                     </div>
                 @endif
 
