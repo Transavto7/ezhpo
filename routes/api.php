@@ -26,17 +26,13 @@ Route::get('/companies/find', 'ApiController@companiesList');
 Route::get('/find/{model}', 'ApiController@modelList');
 
 Route::prefix('reports')->group(function () {
-    Route::prefix('journal')->group(function () {
-        Route::get('/', 'ReportController@getJournalData')->name('api.reports.journal');
-        Route::get('/export', 'ReportController@exportJournalData')->name('api.reports.journal.export');
-    });
     Route::prefix('contract')->group(function () {
         Route::get('/journal', 'ReportControllerContract@getJournalData')->name('api.reports.journal');
         Route::get('/journal/export', 'ReportController@exportJournalData');
         Route::get('/journal_v2',[ReportContractRefactoringController::class, 'getReport']);
         Route::get('/export/journal_v2',[ReportContractRefactoringController::class, 'export']);
     });
-    Route::get('getContractsForCompany', 'ReportControllerContract@getContractsForCompany')->name('api.reports.journal');
+    Route::get('getContractsForCompany', 'ReportControllerContract@getContractsForCompany');
 });
 
 Route::get('/sync-fields/{model}/{id}', function ($model, $id) {

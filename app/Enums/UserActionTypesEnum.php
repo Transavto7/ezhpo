@@ -7,8 +7,10 @@ use Illuminate\Support\Collection;
 class UserActionTypesEnum
 {
     const CLIENT_LOGIN = 'client_login';
+
     const CLIENT_DOC_IMPORT = 'client_doc_import';
     const CLIENT_DOC_EXPORT = 'client_doc_export';
+
     const MEDICAL_CHECKUP_LOG_REQUEST = 'medical_checkup_log_request';
     const TECHNICAL_INSPECTION_LOG_REQUEST = 'technical_inspection_log_request';
     const BRIEFING_LOG_REQUEST = 'briefing_log_request';
@@ -16,6 +18,17 @@ class UserActionTypesEnum
     const REPORT_CARD_LOG_REQUEST = 'report_card_log_request';
     const ERROR_REGISTER_LOG_REQUEST = 'error_register_log_request';
     const WAITING_LIST_REQUEST = 'waiting_list_request';
+
+    const WORK_SCHEDULE_REQUEST = 'work_schedule_request';
+    const SERVICE_REPORT_REQUEST = 'service_report_request';
+    const MEDICAL_INSPECTIONS_NUMBER_REPORT_REQUEST = 'medical_inspections_number_report_request';
+    const TECHNICAL_INSPECTIONS_NUMBER_REPORT_REQUEST = 'technical_inspections_number_report_request';
+    const ALL_INSPECTIONS_NUMBER_REPORT_REQUEST = 'all_inspections_number_report_request';
+
+    const CAR_IMPORT = 'car_import';
+    const CAR_EXPORT = 'car_export';
+    const DRIVER_IMPORT = 'driver_import';
+    const DRIVER_EXPORT = 'driver_export';
 
     public static function labels(): array
     {
@@ -30,6 +43,17 @@ class UserActionTypesEnum
             self::REPORT_CARD_LOG_REQUEST => 'Запрос реестра снятия отчетов с карт',
             self::ERROR_REGISTER_LOG_REQUEST => 'Запрос реестра ошибок СДПО',
             self::WAITING_LIST_REQUEST => 'Запрос очереди на утверждение',
+
+            self::WORK_SCHEDULE_REQUEST => 'Запрос графика работы пунктов выпуска',
+            self::SERVICE_REPORT_REQUEST => 'Запрос отчета по услугам компании',
+            self::MEDICAL_INSPECTIONS_NUMBER_REPORT_REQUEST => 'Запрос отчета по количеству медосмотров',
+            self::TECHNICAL_INSPECTIONS_NUMBER_REPORT_REQUEST => 'Запрос отчета по количеству техосмотров',
+            self::ALL_INSPECTIONS_NUMBER_REPORT_REQUEST => 'Запрос отчета по количеству всех осмотров',
+
+            self::CAR_IMPORT => 'Импорт автомобилей',
+            self::CAR_EXPORT => 'Экспорт автомобилей',
+            self::DRIVER_IMPORT => 'Импорт водителей',
+            self::DRIVER_EXPORT => 'Экспорт водителей',
         ];
     }
 

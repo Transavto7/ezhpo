@@ -16,11 +16,18 @@ class ClientDocImport implements UserActionEventInterface
     protected $user;
 
     /**
-     * @param User $user
+     * @var string
      */
-    public function __construct(User $user)
+    protected $itemType;
+
+    /**
+     * @param User $user
+     * @param string $itemType
+     */
+    public function __construct(User $user, string $itemType)
     {
         $this->user = $user;
+        $this->itemType = $itemType;
     }
 
     /**
@@ -33,6 +40,15 @@ class ClientDocImport implements UserActionEventInterface
 
     public function getType(): string
     {
-        return UserActionTypesEnum::CLIENT_DOC_IMPORT;
+        switch ($this->itemType) {
+            case 'Car':
+            case 'car':
+                return UserActionTypesEnum::CAR_IMPORT;
+            case 'Driver':
+            case 'driver':
+                return UserActionTypesEnum::DRIVER_IMPORT;
+            default:
+                throw new \DomainException("Undefined item type $this->itemType");
+        }
     }
 }
