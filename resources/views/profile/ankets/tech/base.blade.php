@@ -1,11 +1,14 @@
 <div class="form-group">
     <label class="form-control-label">ID водителя:</label>
     <article>
-        <input required value="{{ $driver_id ?? '' }}" type="number"
-               oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ 'false' }})"
-               min="6"
-               name="driver_id"
-               class="MASK_ID_ELEM form-control">
+        <div class="d-flex">
+            <input required value="{{ $driver_id ?? '' }}" type="number"
+                   oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent().parent(), {{ 'false' }})"
+                   min="6"
+                   name="driver_id"
+                   class="MASK_ID_ELEM form-control">
+            <a class="btn btn-outline-secondary camera-btn" data-field-type="driverId"><i class="fa fa-camera"></i></a>
+        </div>
         <p class="app-checker-prop"></p>
     </article>
 </div>
@@ -26,11 +29,14 @@
     <div class="form-group">
         <label class="form-control-label">ID автомобиля:</label>
         <article>
-            <input required value="{{ $car_id ?? '' }}" type="number"
-                   oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent(), {{ 'false' }})"
-                   min="6"
-                   name="anketa[0][car_id]"
-                   class="MASK_ID_ELEM form-control car-input">
+            <div class="d-flex">
+                <input required value="{{ $car_id ?? '' }}" type="number"
+                       oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent().parent(), {{ 'false' }})"
+                       min="6"
+                       name="anketa[0][car_id]"
+                       class="MASK_ID_ELEM form-control car-input">
+                <a class="btn btn-outline-secondary camera-btn" data-field-type="carId"><i class="fa fa-camera"></i></a>
+            </div>
             <p class="app-checker-prop"></p>
         </article>
     </div>

@@ -675,10 +675,8 @@ class IndexController extends Controller
         $data['company_fields'] = $companyFields;
         $data['Driver'] = Driver::class;
         $data['Car'] = Car::class;
-        $data['params'] = [
-            'carId' => $request->input('carId'),
-            'driverId' => $request->input('driverId'),
-        ];
+        $data['car_id'] = $request->input(QRCodeLinkParameter::CAR_ID);
+        $data['driver_id'] = $request->input(QRCodeLinkParameter::DRIVER_ID);
 
         // Проверяем выставленный ПВ
         if (session()->exists('anketa_pv_id')) {
