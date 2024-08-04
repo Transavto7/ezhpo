@@ -1,5 +1,6 @@
 require('jquery-mask-plugin')
 require('select2')
+require('html5-qrcode')
 
 /**
  * Init masks

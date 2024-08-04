@@ -21,6 +21,7 @@ $techToken = '$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx';
 Route::prefix('api')->group(function () use ($techToken) {
     Route::get("pv-reset/$techToken", 'ApiController@ResetAllPV')->name('api.resetpv');
     Route::get('getField/{model}/{field}/{default_value?}', 'IndexController@GetFieldHTML');
+    Route::get('/parse-qr-code', 'Api\Forms\TechnicalInspection\ParseQRCodeController');
 });
 
 Route::prefix('snippet')->group(function () use ($techToken) {

@@ -9,8 +9,10 @@ use App\Car;
 use App\Company;
 use App\Driver;
 use App\Enums\LogActionTypesEnum;
+use App\Enums\QRCodeLinkParameter;
 use App\FieldPrompt;
 use App\Point;
+use App\Services\QRCode\QRCodeLinkGenerator;
 use App\User;
 use Carbon\Carbon;
 use Exception;
@@ -673,6 +675,8 @@ class IndexController extends Controller
         $data['company_fields'] = $companyFields;
         $data['Driver'] = Driver::class;
         $data['Car'] = Car::class;
+        $data['car_id'] = $request->input(QRCodeLinkParameter::CAR_ID);
+        $data['driver_id'] = $request->input(QRCodeLinkParameter::DRIVER_ID);
 
         // Проверяем выставленный ПВ
         if (session()->exists('anketa_pv_id')) {
