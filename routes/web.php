@@ -135,6 +135,7 @@ Route::middleware(['auth'])->group(function () {
          * Элементы CRM
          */
         Route::prefix('elements')->group(function () {
+            Route::post('generate', 'Elements\GenerateMetricController')->name('generateMetric');
             Route::post('/export/{type}', 'Elements\ExportElementController')->name('exportElement');
             Route::post('/import', 'Elements\ImportElementController')->name('importElement');
             Route::post('/search', 'Elements\SearchElementsController')->name('searchElement');

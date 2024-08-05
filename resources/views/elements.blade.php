@@ -406,11 +406,12 @@
 
                 @if($permissionToGenerateMetricLKK)
                     <div class="m-2">
-                        <button type="button" data-toggle="modal" data-target="#elements-modal-generate-metric"
+                        <button type="button" data-toggle="modal" data-target="#elementsModalGenerateMetric"
                                 class="btn btn-sm btn-secondary">
                              Метрика ЛКК <i class="fa fa-table"></i>
                         </button>
                     </div>
+                    @component('modals.metric-modal')@endcomponent
                 @endif
 
                 @if($permissionToCreate && $model == 'Driver')
@@ -500,7 +501,7 @@
                                 @endif
                             @endforeach
 
-                            <div class="col-md-2">
+                            <div class="m-2">
                                 <button type="submit" class="btn btn-sm btn-info">Поиск</button>
                                 <a href="?" class="btn btn-sm btn-danger">Сбросить</a>
                             </div>
@@ -876,6 +877,69 @@
                 }
             });
 
+            $('.start-date').change(function () {
+                const start = $(this).val()
+                const end = $('.end-date').val()
+
+                if (! end) {
+                    return
+                }
+
+                if (end < start) {
+                    $('.end-date').val(start)
+                }
+            })
+
+            $('.end-date').change(function () {
+                const start = $('.start-date').val()
+                const end = $(this).val()
+
+                if (! start) {
+                    return
+                }
+
+                if (end < start) {
+                    $('.start-date').val(end)
+                }
+            })
+
+            $('.generate-metric').click(function () {
+                const url = '{{ route('generateMetric') }}'
+                const start = $('.start-date').val()
+                const end = $('.end-date').val()
+
+                if (start && end) {
+                    $('.spinner-btn').attr('style', '')
+                    $('.generate-metric').attr('style', 'display: none')
+
+                    axios
+                        .post(url, {
+                            start,
+                            end
+                        }, {
+                            headers: {
+                                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            },
+                            responseType: 'blob'
+                        })
+                        .then(response => {
+                            const { data } = response
+                            const url = window.URL.createObjectURL(new Blob([data]));
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.setAttribute('download', 'filename.xlsx');
+                            document.body.appendChild(link);
+                            link.click();
+                        })
+                        .finally(() => {
+                            $('.spinner-btn').attr('style', 'display: none')
+                            $('.generate-metric').attr('style', '')
+                        })
+                }
+            })
         </script>
     @endsection
+
 @endsection
+
+

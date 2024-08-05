@@ -1,0 +1,14 @@
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>$invoice->name</td>
+        <td>$invoice->email</td>
+    </tr>
+    </tbody>
+</table>
