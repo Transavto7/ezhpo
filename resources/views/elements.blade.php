@@ -866,6 +866,13 @@
                 }
             });
 
+            $('[data-field-type="date-range-picker"]').each((index, element) => {
+                initDatePicker($(element), {
+                    mode: 'range',
+                    showMonths: 2,
+                })
+            })
+
         </script>
     @endsection
 @endsection

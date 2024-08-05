@@ -9,9 +9,11 @@ use App\Car;
 use App\Company;
 use App\Driver;
 use App\Enums\LogActionTypesEnum;
+use App\Exceptions\DateRangeParseFailedException;
 use App\FieldPrompt;
 use App\Point;
 use App\User;
+use App\ValueObjects\DateRange;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -452,6 +454,7 @@ class IndexController extends Controller
 
     /**
      * Рендер просмотра вкладок CRM
+     * @throws DateRangeParseFailedException
      */
     public function RenderElements(Request $request)
     {
@@ -466,6 +469,19 @@ class IndexController extends Controller
 
 
         $data = $this->elements[$type];
+
+        $dateFields = [];
+        if (in_array($type, ['Driver', 'Car', 'Company'])) {
+            $dateFields = array_keys(array_filter($data['fields'], function ($item) {
+                $type = 'unknown';
+
+                if (array_key_exists('type', $item)) {
+                    $type = $item['type'];
+                }
+
+                return $type === 'date';
+            }));
+        }
 
         $model = $data['model'];
         $modelClass = app("App\\$model");
@@ -502,6 +518,22 @@ class IndexController extends Controller
                 }
 
                 if (!is_array($filterValue)) {
+                    if (in_array($filterKey, $dateFields)) {
+                        $dateRange = DateRange::from($filterValue);
+                        $start = $dateRange->getDateStart();
+                        $end = $dateRange->getDateEnd();
+
+                        if ($start && $end) {
+                            $query->whereBetween($filterKey, [$start, $end]);
+                        } elseif ($start) {
+                            $query->where($filterKey, '>=', $start);
+                        } elseif ($end) {
+                            $query->where($filterKey, '<=', $end);
+                        }
+
+                        continue;
+                    }
+
                     if ($filterKey == 'date_of_employment') {
                         $query = $query->whereBetween($filterKey, [
                             Carbon::parse($filterValue)->startOfDay(),

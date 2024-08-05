@@ -2,12 +2,13 @@
     $uniqueInputId = sha1(time() + rand(999, 99999));
     $disabled = $disabled ?? false;
     if (($k ?? null) === 'date_of_employment') {
-        $default_value = $default_value ?? null;
-        if ($default_value == 'current_date') {
-            $default_value = \Carbon\Carbon::now()->format('Y-m-d');
-        } else if ($default_value != null) {
-            $default_value = \Carbon\Carbon::parse($default_value)->format('Y-m-d');
-        }
+        $default_value = null;
+//        $default_value = $default_value ?? null;
+//        if ($default_value == 'current_date') {
+//            $default_value = \Carbon\Carbon::now()->format('Y-m-d');
+//        } else if ($default_value != null) {
+//            $default_value = \Carbon\Carbon::parse($default_value)->format('Y-m-d');
+//        }
     }
 @endphp
 <input
@@ -26,6 +27,7 @@
     placeholder="{{ $v['label'] }}"
     data-field="{{ $model }}_{{ $k }}"
     @if ($v['type'] !== 'file') class="form-control {{ $v['classes'] ?? '' }}" @endif
+    @if ($v['type'] === 'date') data-field-type="date-range-picker" @endif
 />
 
 @if($v['type'] == 'file' && $default_value)
