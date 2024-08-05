@@ -8,6 +8,7 @@ require('./init-plugins')
 require('chosen-js')
 require('croppie')
 require('suggestions-jquery')
+require('./custom/dual-input')
 
 $.fn.select2.amd.require(['select2/selection/search'], function (Search) {
     Search.prototype.searchRemoveChoice = function (decorated, item) {
@@ -1415,3 +1416,4 @@ $(document).ready(function () {
 });
 
 window.initDatePicker = initDatePicker
+

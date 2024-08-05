@@ -874,6 +874,10 @@
                 })
             })
 
+            $('[data-dual-number]').each((index, element) => {
+                initDualInputNumber($(element))
+            })
+
         </script>
     @endsection
 @endsection
