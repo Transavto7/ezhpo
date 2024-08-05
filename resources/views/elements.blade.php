@@ -481,7 +481,8 @@
                                                     'v' => $fv,
                                                     'k' => $fk,
                                                     'is_required' => '',
-                                                    'default_value' => request()->get($fk)
+                                                    'default_value' => request()->get($fk),
+                                                    'isFilter' => true
                                                 ])
                                             @endif
 
