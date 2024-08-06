@@ -30,8 +30,8 @@ php artisan cache:clear
 php artisan view:clear
 
 # Проверить, что нужно выполнить миграции и сделать дамп
-php artisan migrate:check
-NEED_MIGRATE="$(echo $?)"
+php artisan migrate:check | true
+NEED_MIGRATE="${PIPESTATUS[0]}"
 if [[ "$NEED_MIGRATE" != "0" ]];
 then
   # Дамп БД
