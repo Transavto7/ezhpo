@@ -4,7 +4,6 @@ namespace App\Actions\Element\Metric;
 
 use App\Actions\Element\Metric\View\MetricView;
 use Maatwebsite\Excel\Facades\Excel;
-use PhpOffice\PhpSpreadsheet\Exception;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class GenerateMetricHandler
@@ -24,7 +23,7 @@ class GenerateMetricHandler
      */
     public function __construct(GenerateMetricAction $action)
     {
-        $this->repository = new MetricRepository();
+        $this->repository = new MetricRepository($action);
         $this->action = $action;
     }
 
@@ -33,6 +32,6 @@ class GenerateMetricHandler
      */
     public function generate(): BinaryFileResponse
     {
-        return Excel::download(new MetricView($this->repository->get()), 'metric.xlsx');
+        return Excel::download(new MetricView($this->action, $this->repository->get()), 'metric.xlsx');
     }
 }

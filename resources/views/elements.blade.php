@@ -916,18 +916,13 @@
                         .post(url, {
                             start,
                             end
-                        }, {
-                            headers: {
-                                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                            },
-                            responseType: 'blob'
-                        })
+                        }, { responseType: 'blob' })
                         .then(response => {
                             const { data } = response
                             const url = window.URL.createObjectURL(new Blob([data]));
                             const link = document.createElement('a');
                             link.href = url;
-                            link.setAttribute('download', 'filename.xlsx');
+                            link.setAttribute('download', `Метрика ЛКК ${start} - ${end}.xlsx`);
                             document.body.appendChild(link);
                             link.click();
                         })
