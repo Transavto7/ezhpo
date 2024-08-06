@@ -1,9 +1,14 @@
 import {Html5Qrcode} from "html5-qrcode";
 
-const html5QrCode = new Html5Qrcode("reader", false);
-const config = { fps: 2, showTorchButtonIfSupported: true, qrbox: { width: 300, height: 300 } };
-
 $(document).ready(function() {
+    const qrCodeReaderId = "qr-code-reader";
+    const readerExists = document.getElementById(qrCodeReaderId);
+
+    if (!readerExists) return;
+
+    const html5QrCode = new Html5Qrcode(qrCodeReaderId, false);
+    const config = { fps: 2, showTorchButtonIfSupported: true, qrbox: { width: 300, height: 300 } };
+
     const ui = {
         errorAlert: $('.qr-error'),
         cameraBtn: $('.camera-btn'),
