@@ -53,10 +53,10 @@ final class DriverRecordHandler extends ElementRecordHandler
         return true;
     }
 
-    private function fetchCompany(int $companyInn): ?Company
+    private function fetchCompany(string $companyInn): ?Company
     {
         /** @var Company|null $company */
-        $company = Company::query()->where('inn', $companyInn)->first();
+        $company = Company::query()->where('inn', '=', $companyInn)->first();
         return $company;
     }
 

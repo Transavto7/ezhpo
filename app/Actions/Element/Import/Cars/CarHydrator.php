@@ -56,7 +56,7 @@ final class CarHydrator extends ElementHydrator
     {
         return new ImportedCar(
             $row['companyName'],
-            (int)$row['companyInn'],
+            (string)$row['companyInn'],
             $row['number'],
             $row['markAndModel'],
             $row['category'],

@@ -10,7 +10,7 @@ final class ErrorCar implements ErrorObject
     /** @var string|null */
     private $companyName;
 
-    /** @var int|null */
+    /** @var string|null */
     private $companyInn;
 
     /** @var string|null */
@@ -39,7 +39,7 @@ final class ErrorCar implements ErrorObject
 
     /**
      * @param string|null $companyName
-     * @param int|null $companyInn
+     * @param string|null $companyInn
      * @param string|null $number
      * @param string|null $markAndModel
      * @param string|null $category
