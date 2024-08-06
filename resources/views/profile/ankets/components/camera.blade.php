@@ -8,7 +8,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div style="width: 100%; min-height: 350px" id="reader"></div>
+                <div style="width: 100%; min-height: 350px" id="qr-code-reader"></div>
                 <div class="error-div" style="display: none">
                     <div class="d-flex flex-column align-items-center">
                         <div class="qr-error alert alert-danger" ></div>
