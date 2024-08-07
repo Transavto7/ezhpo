@@ -10,12 +10,10 @@ use App\Company;
 use App\Driver;
 use App\Enums\LogActionTypesEnum;
 use App\Exceptions\DateRangeParseFailedException;
-use App\Exceptions\PressureRangeParseFailedException;
 use App\FieldPrompt;
 use App\Point;
 use App\User;
 use App\ValueObjects\DateRange;
-use App\ValueObjects\PressureRange;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -457,7 +455,6 @@ class IndexController extends Controller
     /**
      * Рендер просмотра вкладок CRM
      * @throws DateRangeParseFailedException
-     * @throws PressureRangeParseFailedException
      */
     public function RenderElements(Request $request)
     {
@@ -526,32 +523,33 @@ class IndexController extends Controller
                         $start = $dateRange->getDateStart();
                         $end = $dateRange->getDateEnd();
 
-                        // todo: если есть хотя бы одна граница, то исключать записи с null?
-                        if ($start && $end) {
-                            $query->whereBetween($filterKey, [$start, $end]);
-                        } elseif ($start) {
+                        if ($start || $end) {
+                            $query->whereNotNull($filterKey);
+                        }
+
+                        if ($start) {
                             $query->where($filterKey, '>=', $start);
-                        } elseif ($end) {
+                        }
+
+                        if ($end) {
                             $query->where($filterKey, '<=', $end);
                         }
 
                         continue;
                     }
 
-                    if (in_array($filterKey, ['pressure_systolic', 'pressure_diastolic'])) {
-                        $pressureRange = PressureRange::from($filterValue);
-                        $down = $pressureRange->getDown();
-                        $up = $pressureRange->getUp();
+                    $pressureConditions = [
+                        'pressure_systolic_min' => ['pressure_systolic', '>=', $filterValue],
+                        'pressure_systolic_max' => ['pressure_systolic', '<=', $filterValue],
+                        'pressure_diastolic_min' => ['pressure_diastolic', '>=', $filterValue],
+                        'pressure_diastolic_max' => ['pressure_diastolic', '<=', $filterValue],
+                    ];
 
-                        // todo: если есть хотя бы одна граница, то исключать записи с null?
-                        if ($down !== null && $up !== null) {
-                            $query->whereBetween($filterKey, [$down, $up]);
-                        } elseif ($down !== null) {
-                            $query->where($filterKey, '>=', $down);
-                        } elseif ($up !== null) {
-                            $query->where($filterKey, '<=', $up);
-                        }
+                    if (isset($pressureConditions[$filterKey])) {
+                        $conditions = $pressureConditions[$filterKey];
 
+                        $query->whereNotNull($conditions[0]);
+                        $query->where($conditions[0], $conditions[1], $conditions[2]);
                         continue;
                     }
 

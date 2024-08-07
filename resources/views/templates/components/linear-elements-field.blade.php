@@ -1,8 +1,7 @@
 @php
     $uniqueInputId = sha1(time() + rand(999, 99999));
     $disabled = $disabled ?? false;
-    if (($k ?? null) === 'date_of_employment' && !$isFilter) {
-        $default_value = null;
+    if (($k ?? null) === 'date_of_employment') {
         $default_value = $default_value ?? null;
         if ($default_value == 'current_date') {
             $default_value = \Carbon\Carbon::now()->format('Y-m-d');
@@ -27,12 +26,6 @@
     placeholder="{{ $v['label'] }}"
     data-field="{{ $model }}_{{ $k }}"
     @if ($v['type'] !== 'file') class="form-control {{ $v['classes'] ?? '' }}" @endif
-
-    @if($isFilter)
-        @if ($v['type'] === 'date') data-field-type="date-range-picker" @endif
-        @if ($k === 'pressure_systolic') data-dual-number="pressure_systolic" @endif
-        @if ($k === 'pressure_diastolic') data-dual-number="pressure_diastolic" @endif
-    @endif
 />
 
 @if($v['type'] == 'file' && $default_value)

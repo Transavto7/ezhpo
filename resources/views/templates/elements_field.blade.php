@@ -1,6 +1,4 @@
 @php
-    $isFilter = isset($isFilter) && $isFilter;
-
     $default_value = $default_value ?? '';
     /** @var \App\User $user */
     $user = \Illuminate\Support\Facades\Auth::guard("web")->user() ??

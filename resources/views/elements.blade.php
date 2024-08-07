@@ -476,13 +476,35 @@
                                                 ])
                                             @elseif($model === 'Instr' && $fk === 'sort')
                                                 <!-- Сортировка доступна только инженеру БДД и Админу -->
+                                            @elseif($fv['type'] === 'date')
+                                                @include('templates.components.date-range-field', [
+                                                   'v' => $fv,
+                                                   'k' => $fk,
+                                                   'is_required' => '',
+                                                   'default_value' => request()->get($fk),
+                                               ])
+                                            @elseif($fk === 'pressure_systolic')
+                                                @include('templates.components.pressure-field', [
+                                                   'v' => $fv,
+                                                   'k' => $fk,
+                                                   'is_required' => '',
+                                                   'default_value_min' => request()->get($fk . '_min'),
+                                                   'default_value_max' => request()->get($fk . '_max'),
+                                               ])
+                                            @elseif($fk === 'pressure_diastolic')
+                                                @include('templates.components.pressure-field', [
+                                                   'v' => $fv,
+                                                   'k' => $fk,
+                                                   'is_required' => '',
+                                                   'default_value_min' => request()->get($fk . '_min'),
+                                                   'default_value_max' => request()->get($fk . '_max'),
+                                               ])
                                             @else
                                                 @include('templates.elements_field', [
                                                     'v' => $fv,
                                                     'k' => $fk,
                                                     'is_required' => '',
                                                     'default_value' => request()->get($fk),
-                                                    'isFilter' => true
                                                 ])
                                             @endif
 
@@ -872,10 +894,6 @@
                     mode: 'range',
                     showMonths: 2,
                 })
-            })
-
-            $('[data-dual-number]').each((index, element) => {
-                initDualInputNumber($(element))
             })
 
         </script>
