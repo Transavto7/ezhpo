@@ -30,13 +30,17 @@ final class MetricRepository
                             count(*) as count
                         from
                             user_actions as ua
-                                join users u on u.id = ua.user_id
-                                left join companies c on u.company_id = c.id
+                        join
+                            users u on u.id = ua.user_id
+                        left
+                            join companies c on u.company_id = c.id
                         where
                             ua.created_at >= '{$this->action->getStartDate()->format('Y-m-d')}' and
                             ua.created_at <= '{$this->action->getEndDate()->format('Y-m-d')}'
-                        group by c.name, ua.type
-                        order by c.name
+                        group by
+                            c.name, ua.type
+                        order by
+                            c.name
                     )
 
                 select

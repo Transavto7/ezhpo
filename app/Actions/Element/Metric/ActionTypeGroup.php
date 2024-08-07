@@ -34,6 +34,8 @@ class ActionTypeGroup
         UserActionTypesEnum::CLIENT_DOC_EXPORT,
         UserActionTypesEnum::CAR_EXPORT,
         UserActionTypesEnum::DRIVER_EXPORT,
+        UserActionTypesEnum::DOCUMENT_REQUEST,
+        UserActionTypesEnum::DOCUMENT_REQUEST_PDF,
     ];
 
     public function fromType(array $actions): array
