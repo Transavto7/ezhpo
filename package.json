@@ -37,7 +37,7 @@
         "portal-vue": "^2.1.7",
         "suggestions-jquery": "^21.2.0",
         "sweetalert": "^2.1.2",
-        "sweetalert2": "^11.3.0",
+        "sweetalert2": "11.4.28",
         "uuid": "^8.3.2",
         "vue-chartjs": "^3.5.1",
         "vue-loader": "^15.9.8",
