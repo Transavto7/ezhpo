@@ -5,7 +5,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="form-group col-lg-3">
-                        <label class="mb-1" for="company">Компании</label>
+                        <label class="mb-1" for="company">Компания</label>
                         <multiselect
                             :disabled="client"
                             v-model="company"
@@ -125,7 +125,7 @@ export default {
         report() {
             this.reset();
             this.loading = true;
-            axios.get('/api/reports/journal', {
+            axios.get('/report/journal/create', {
                 params: {
                     company_id: this.company_id,
                     month: this.month
@@ -142,7 +142,7 @@ export default {
         },
         exportData() {
             this.loadingExport = true;
-            axios.get('/api/reports/journal/export', {
+            axios.get('/report/journal/export', {
                 params: {
                     company_id: this.company_id,
                     month: this.month

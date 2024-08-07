@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Elements;
 use App\Actions\Element\Export\ExportElementAction;
 use App\Actions\Element\Export\ExportElementHandlerFactory;
 use App\Enums\ElementType;
+use App\Events\UserActions\ClientDocExport;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Request;
@@ -18,6 +19,9 @@ final class ExportElementController extends Controller
     public function __invoke(string $type, Request $request)
     {
         $authUser = Auth::user();
+
+        event(new ClientDocExport($authUser, $type));
+
         $userCompanyId = $authUser->hasRole('client')
             ? User::getUserCompanyId('id', true)
             : (int)$request->input('company_id', -1);

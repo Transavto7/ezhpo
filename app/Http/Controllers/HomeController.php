@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Anketa;
+use App\Events\UserActions\ClientActionLogRequest;
 use App\Exports\AnketasExport;
 use App\FieldPrompt;
 use App\Point;
@@ -63,8 +64,9 @@ class HomeController extends Controller
         return redirect($_SERVER['HTTP_REFERER']);
     }
 
-    public function index(Request $request)
+    public function index(string $formType, Request $request)
     {
+        $this->sendEvent($formType);
         $user = Auth::user();
 
         /**
@@ -83,7 +85,6 @@ class HomeController extends Controller
          * Очистка корзины в очереди на утверждение от СДПО
          */
 
-        $formType = $request->type_ankets;
         $validTypeForm = User::$userRolesKeys[$user->role] ?? 'medic';
         if (isset(Anketa::$anketsKeys[$formType])) {
             $validTypeForm = $formType;
@@ -527,6 +528,11 @@ class HomeController extends Controller
             'orderKey' => $orderKey,
             'queryString' => Arr::query($request->except(['orderKey', 'orderBy']))
         ]);
+    }
+
+    private function sendEvent(string $formType)
+    {
+        event(new ClientActionLogRequest(Auth::user(), $formType));
     }
 
     public function getFilters(Request $request)
