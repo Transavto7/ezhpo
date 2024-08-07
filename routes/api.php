@@ -26,6 +26,10 @@ Route::get('/companies/find', 'ApiController@companiesList');
 Route::get('/find/{model}', 'ApiController@modelList');
 
 Route::prefix('reports')->group(function () {
+    Route::prefix('journal')->group(function () {
+        Route::get('/', 'ReportController@getJournalData')->name('api.reports.journal');
+        Route::get('/export', 'ReportController@exportJournalData')->name('api.reports.journal.export');
+    });
     Route::prefix('contract')->group(function () {
         Route::get('/journal', 'ReportControllerContract@getJournalData')->name('api.reports.journal');
         Route::get('/journal/export', 'ReportController@exportJournalData');
