@@ -476,12 +476,13 @@
                                                 ])
                                             @elseif($model === 'Instr' && $fk === 'sort')
                                                 <!-- Сортировка доступна только инженеру БДД и Админу -->
-                                            @elseif($fv['type'] === 'date')
+                                            @elseif($fv['type'] === 'date' && in_array($model, ['Driver', 'Car', 'Company']))
                                                 @include('templates.components.date-range-field', [
                                                    'v' => $fv,
                                                    'k' => $fk,
                                                    'is_required' => '',
-                                                   'default_value' => request()->get($fk),
+                                                   'default_value_start' => request()->get($fk . '_start'),
+                                                   'default_value_end' => request()->get($fk . '_end'),
                                                ])
                                             @elseif($fk === 'pressure_systolic')
                                                 @include('templates.components.pressure-field', [
@@ -889,10 +890,9 @@
                 }
             });
 
-            $('[data-field-type="date-range-picker"]').each((index, element) => {
+            $('[data-field-type="date-picker"]').each((index, element) => {
                 initDatePicker($(element), {
-                    mode: 'range',
-                    showMonths: 2,
+                    mode: 'single'
                 })
             })
 

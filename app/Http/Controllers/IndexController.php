@@ -9,11 +9,9 @@ use App\Car;
 use App\Company;
 use App\Driver;
 use App\Enums\LogActionTypesEnum;
-use App\Exceptions\DateRangeParseFailedException;
 use App\FieldPrompt;
 use App\Point;
 use App\User;
-use App\ValueObjects\DateRange;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -454,7 +452,6 @@ class IndexController extends Controller
 
     /**
      * Рендер просмотра вкладок CRM
-     * @throws DateRangeParseFailedException
      */
     public function RenderElements(Request $request)
     {
@@ -470,18 +467,26 @@ class IndexController extends Controller
 
         $data = $this->elements[$type];
 
-        $dateFields = [];
+        $dateConditions = [];
         if (in_array($type, ['Driver', 'Car', 'Company'])) {
             $dateFields = array_keys(array_filter($data['fields'], function ($item) {
-                $type = 'unknown';
-
-                if (array_key_exists('type', $item)) {
-                    $type = $item['type'];
-                }
-
-                return $type === 'date';
+                return isset($item['type']) && $item['type'] === 'date';
             }));
+
+            $dateConditions = array_reduce($dateFields, function (array $carry, string $fieldName) {
+                $carry[$fieldName . '_start'] = [$fieldName, '>='];
+                $carry[$fieldName . '_end'] = [$fieldName, '<='];
+
+                return $carry;
+            }, []);
         }
+
+        $pressureConditions = [
+            'pressure_systolic_min' => ['pressure_systolic', '>='],
+            'pressure_systolic_max' => ['pressure_systolic', '<='],
+            'pressure_diastolic_min' => ['pressure_diastolic', '>='],
+            'pressure_diastolic_max' => ['pressure_diastolic', '<='],
+        ];
 
         $model = $data['model'];
         $modelClass = app("App\\$model");
@@ -518,38 +523,28 @@ class IndexController extends Controller
                 }
 
                 if (!is_array($filterValue)) {
-                    if (in_array($filterKey, $dateFields)) {
-                        $dateRange = DateRange::from($filterValue);
-                        $start = $dateRange->getDateStart();
-                        $end = $dateRange->getDateEnd();
+                    if (isset($dateConditions[$filterKey])) {
+                        $conditions = $dateConditions[$filterKey];
 
-                        if ($start || $end) {
-                            $query->whereNotNull($filterKey);
+                        $value = Carbon::parse($filterValue);
+
+                        if ($conditions[1] === '>=') {
+                            $value = $value->startOfDay();
+                        } else if ($conditions[1] === '<=') {
+                            $value = $value->endOfDay();
                         }
 
-                        if ($start) {
-                            $query->where($filterKey, '>=', $start);
-                        }
-
-                        if ($end) {
-                            $query->where($filterKey, '<=', $end);
-                        }
+                        $query->whereNotNull($conditions[0]);
+                        $query->where($conditions[0], $conditions[1], $value);
 
                         continue;
                     }
-
-                    $pressureConditions = [
-                        'pressure_systolic_min' => ['pressure_systolic', '>=', $filterValue],
-                        'pressure_systolic_max' => ['pressure_systolic', '<=', $filterValue],
-                        'pressure_diastolic_min' => ['pressure_diastolic', '>=', $filterValue],
-                        'pressure_diastolic_max' => ['pressure_diastolic', '<=', $filterValue],
-                    ];
 
                     if (isset($pressureConditions[$filterKey])) {
                         $conditions = $pressureConditions[$filterKey];
 
                         $query->whereNotNull($conditions[0]);
-                        $query->where($conditions[0], $conditions[1], $conditions[2]);
+                        $query->where($conditions[0], $conditions[1], $filterValue);
                         continue;
                     }
 
