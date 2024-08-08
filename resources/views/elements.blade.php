@@ -457,7 +457,7 @@
                                 @php $fv['multiple'] = true; @endphp
 
                                 @if(!in_array($fk, ['photo']) && !isset($fv['hidden']))
-                                    <div class="col-md-2">
+                                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                                         <div class="form-group">
                                             <label>{{ $fv['label'] }}</label>
 
@@ -480,22 +480,16 @@
                                                 @include('templates.components.date-range-field', [
                                                    'v' => $fv,
                                                    'k' => $fk,
+                                                   'disabled' => false,
                                                    'is_required' => '',
                                                    'default_value_start' => request()->get($fk . '_start'),
                                                    'default_value_end' => request()->get($fk . '_end'),
                                                ])
-                                            @elseif($fk === 'pressure_systolic')
+                                            @elseif($fk === 'pressure_systolic' || $fk === 'pressure_diastolic')
                                                 @include('templates.components.pressure-field', [
                                                    'v' => $fv,
                                                    'k' => $fk,
-                                                   'is_required' => '',
-                                                   'default_value_min' => request()->get($fk . '_min'),
-                                                   'default_value_max' => request()->get($fk . '_max'),
-                                               ])
-                                            @elseif($fk === 'pressure_diastolic')
-                                                @include('templates.components.pressure-field', [
-                                                   'v' => $fv,
-                                                   'k' => $fk,
+                                                   'disabled' => false,
                                                    'is_required' => '',
                                                    'default_value_min' => request()->get($fk . '_min'),
                                                    'default_value_max' => request()->get($fk . '_max'),
@@ -504,6 +498,7 @@
                                                 @include('templates.elements_field', [
                                                     'v' => $fv,
                                                     'k' => $fk,
+                                                    'disabled' => false,
                                                     'is_required' => '',
                                                     'default_value' => request()->get($fk),
                                                 ])
@@ -513,8 +508,7 @@
                                     </div>
                                 @endif
                             @endforeach
-
-                            <div class="col-md-2">
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                                 <button type="submit" class="btn btn-sm btn-info">Поиск</button>
                                 <a href="?" class="btn btn-sm btn-danger">Сбросить</a>
                             </div>
