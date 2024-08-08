@@ -63,7 +63,7 @@
                 <button class="btn btn-outline-success"
                         type="button"
                         onclick="loadPreviousOdometer()">
-                    Получить
+                    <i class="fa fa-search"></i>
                 </button>
             </div>
         </div>
