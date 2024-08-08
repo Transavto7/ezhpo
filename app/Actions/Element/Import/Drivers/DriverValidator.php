@@ -26,7 +26,7 @@ final class DriverValidator extends ElementValidator
         ];
 
         $validator = IlluminateValidator::make($parsedDataItem, [
-            'companyInn' => ['required', 'integer'],
+            'companyInn' => ['required', 'regex:/^\d{1,12}$/'],
             'fullName' => ['required', 'string', 'max:255'],
             'birthday' => [
                 'required',
@@ -40,7 +40,10 @@ final class DriverValidator extends ElementValidator
             'snils' => ['nullable', 'string', 'max:255'],
             'license' => ['nullable', 'string', 'max:255'],
             'licenseIssuedAt' => ['nullable', 'string', 'max:255', new DateIsCorrectFormatOrNull()],
-        ], ['gender.regex' => 'Пол должен быть одним из вариантов: муж,жен,мужской,женский,м,ж'], $attributes);
+        ], [
+            'gender.regex' => 'Пол должен быть одним из вариантов: муж,жен,мужской,женский,м,ж',
+            'companyInn.regex' => 'ИНН компании должен быть до 12 цифр'
+        ], $attributes);
 
         if ($validator->fails()) {
             $this->errors = $validator->errors()->all();

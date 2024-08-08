@@ -28,7 +28,7 @@ final class CarValidator extends ElementValidator
 
         $validator = IlluminateValidator::make($parsedDataItem, [
             'companyName' => ['nullable', 'string', 'max:255'],
-            'companyInn' => ['required', 'integer'],
+            'companyInn' => ['required', 'regex:/^\d{1,12}$/'],
             'number' => ['required', 'string', 'max:255'],
             'markAndModel' => ['nullable', 'string', 'max:255'],
             'category' => ['nullable', 'string', 'max:255', Rule::in(config('elements.Car.fields.type_auto.values'))],
@@ -37,7 +37,7 @@ final class CarValidator extends ElementValidator
             'dateOsago' => ['nullable', 'string', 'max:255', new DateIsCorrectFormatOrNull()],
             'dateSkzi' => ['nullable', 'string', 'max:255', new DateIsCorrectFormatOrNull()],
 
-        ], [], $attributes);
+        ], ['companyInn.regex' => 'ИНН компании должен быть до 12 цифр'], $attributes);
 
         if ($validator->fails()) {
             $this->errors = $validator->errors()->all();
