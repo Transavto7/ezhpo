@@ -16,7 +16,6 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
@@ -54,7 +53,6 @@ class ReportController extends Controller
         $reports2 = null;
 
         if (isset($data['filter'])) {
-            $this->sendEvent($type_report);
             $period_def = CarbonPeriod::create($date_from, $date_to)->month();
             $months_def = collect($period_def)->map(function (Carbon $date) {
                 return $date->month;
@@ -866,6 +864,8 @@ class ReportController extends Controller
 
     public function ApiGetReport(Request $request)
     {
+        $this->sendEvent($request->type_report);
+
         $report = $this->GetReport($request);
 
         return response()->json($report);
@@ -873,6 +873,6 @@ class ReportController extends Controller
 
     private function sendEvent(string $reportType)
     {
-        event(new ClientReportRequest(Auth::user(), $reportType));
+        event(new ClientReportRequest(request()->user(), $reportType));
     }
 }

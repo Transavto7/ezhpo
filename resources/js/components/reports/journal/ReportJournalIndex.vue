@@ -125,7 +125,7 @@ export default {
         report() {
             this.reset();
             this.loading = true;
-            axios.get('/report/journal/create', {
+            axios.get('/api/reports/journal', {
                 params: {
                     company_id: this.company_id,
                     month: this.month
@@ -142,7 +142,7 @@ export default {
         },
         exportData() {
             this.loadingExport = true;
-            axios.get('/report/journal/export', {
+            axios.get('/api/reports/journal/export', {
                 params: {
                     company_id: this.company_id,
                     month: this.month

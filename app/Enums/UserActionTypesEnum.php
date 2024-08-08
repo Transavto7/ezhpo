@@ -30,10 +30,14 @@ class UserActionTypesEnum
     const DRIVER_IMPORT = 'driver_import';
     const DRIVER_EXPORT = 'driver_export';
 
+    const DOCUMENT_REQUEST = 'document_request';
+    const DOCUMENT_REQUEST_PDF = 'document_request_pdf';
+
     public static function labels(): array
     {
         return [
             self::CLIENT_LOGIN => 'Вход в ЛКК',
+
             self::CLIENT_DOC_IMPORT => 'Импорт документа в ЛКК',
             self::CLIENT_DOC_EXPORT => 'Экспорт документа в ЛКК',
             self::MEDICAL_CHECKUP_LOG_REQUEST => 'Запрос журнала МО',
@@ -54,6 +58,9 @@ class UserActionTypesEnum
             self::CAR_EXPORT => 'Экспорт автомобилей',
             self::DRIVER_IMPORT => 'Импорт водителей',
             self::DRIVER_EXPORT => 'Экспорт водителей',
+
+            self::DOCUMENT_REQUEST => 'Запрос документа',
+            self::DOCUMENT_REQUEST_PDF => 'Запрос документа PDF',
         ];
     }
 

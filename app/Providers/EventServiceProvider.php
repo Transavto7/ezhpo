@@ -7,6 +7,7 @@ use App\Events\Relations\Detached;
 use App\Events\UserActions\ClientActionLogRequest;
 use App\Events\UserActions\ClientDocExport;
 use App\Events\UserActions\ClientDocImport;
+use App\Events\UserActions\ClientDocumentRequest;
 use App\Events\UserActions\ClientReportRequest;
 use App\Listeners\LogAttachedEvent;
 use App\Listeners\LogDetachedEvent;
@@ -47,6 +48,9 @@ class EventServiceProvider extends ServiceProvider
             LogUserActionEvent::class
         ],
         ClientReportRequest::class => [
+            LogUserActionEvent::class
+        ],
+        ClientDocumentRequest::class => [
             LogUserActionEvent::class
         ],
     ];

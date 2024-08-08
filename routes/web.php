@@ -135,6 +135,7 @@ Route::middleware(['auth'])->group(function () {
          * Элементы CRM
          */
         Route::prefix('elements')->group(function () {
+            Route::post('generate', 'Elements\GenerateMetricController')->name('generateMetric');
             Route::post('/export/{type}', 'Elements\ExportElementController')->name('exportElement');
             Route::post('/import', 'Elements\ImportElementController')->name('importElement');
             Route::post('/search', 'Elements\SearchElementsController')->name('searchElement');
@@ -161,13 +162,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::prefix('report')->as('report.')->group(function () {
             Route::get('getContractsForCompany_v2', [ReportContractRefactoringController::class, 'getContractsForCompany']);
-
-            Route::prefix('journal')->group(function () {
-                Route::get('journal', 'ReportController@ShowJournal')->name('journal');
-                Route::get('/create', 'ReportController@getJournalData')->name('api.reports.journal.create');
-                Route::get('/export', 'ReportController@exportJournalData')->name('api.reports.journal.export');
-            });
-
+            Route::get('journal', 'ReportController@ShowJournal')->name('journal');
             Route::get('journal_new',[ReportContractRefactoringController::class, 'index'])->name('company_service');
             Route::get('{type_report}', 'ReportController@GetReport')->name('get');
 
