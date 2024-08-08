@@ -8,7 +8,7 @@ use Carbon\Carbon;
 
 final class ImportedDriver
 {
-    /** @var int */
+    /** @var string */
     private $companyInn;
 
     /** @var string */
@@ -36,7 +36,7 @@ final class ImportedDriver
     private $licenseIssuedAt;
 
     /**
-     * @param int $companyInn
+     * @param string $companyInn
      * @param string $fullName
      * @param Carbon $birthday
      * @param string|null $companyName
@@ -47,7 +47,7 @@ final class ImportedDriver
      * @param Carbon|null $licenseIssuedAt
      */
     public function __construct(
-        int     $companyInn,
+        string     $companyInn,
         string  $fullName,
         Carbon  $birthday,
         ?string $companyName,
@@ -70,7 +70,7 @@ final class ImportedDriver
     }
 
 
-    public function getCompanyInn(): int
+    public function getCompanyInn(): string
     {
         return $this->companyInn;
     }

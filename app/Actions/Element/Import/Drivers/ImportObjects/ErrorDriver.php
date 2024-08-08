@@ -7,7 +7,7 @@ use App\Actions\Element\Import\Core\ErrorObject;
 
 final class ErrorDriver implements ErrorObject
 {
-    /** @var int|null */
+    /** @var string|null */
     private $companyInn;
 
     /** @var string|null */
@@ -38,7 +38,7 @@ final class ErrorDriver implements ErrorObject
     private $description;
 
     /**
-     * @param int|null $companyInn
+     * @param string|null $companyInn
      * @param string|null $fullName
      * @param string|null $birthday
      * @param string|null $companyName

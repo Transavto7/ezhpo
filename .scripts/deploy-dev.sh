@@ -34,8 +34,8 @@ $PHP_VERSION artisan cache:clear
 $PHP_VERSION artisan view:clear
 
 # Проверить, что нужно выполнить миграции и сделать дамп
-$PHP_VERSION artisan migrate:check
-NEED_MIGRATE="$(echo $?)"
+$PHP_VERSION artisan migrate:check | true
+NEED_MIGRATE="${PIPESTATUS[0]}"
 if [[ "$NEED_MIGRATE" != "0" ]];
 then
   # Дамп БД

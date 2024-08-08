@@ -60,7 +60,7 @@ final class DriverHydrator extends ElementHydrator
     public function hydrate(array $row): ImportedDriver
     {
         return new ImportedDriver(
-            (int) $row['companyInn'],
+            (string)$row['companyInn'],
             $row['fullName'],
             Carbon::parse($row['birthday']),
             $row['companyName'],
