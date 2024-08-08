@@ -12,7 +12,9 @@ jobs:
     - uses: actions/checkout@v3
     - name: Compile CSS and Javascript
       run: |
-        npm install --force
+        npm -v
+        node -v
+        npm install --legacy-peer-deps
         npm run production
     - name: Create deployment artifact
       env:
