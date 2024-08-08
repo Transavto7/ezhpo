@@ -29,7 +29,7 @@ function toggleAnketaCloneButton(state) {
     return button.show();
 }
 
-function initDatePicker(selector) {
+function initDatePicker(selector, conf = {}) {
     selector.flatpickr({
         mode: "multiple",
         dateFormat: "Y-m-d",
@@ -85,6 +85,7 @@ function initDatePicker(selector) {
             yearAriaLabel: "Год",
             time_24hr: true,
         },
+        ...conf
     });
 }
 
@@ -1390,3 +1391,6 @@ $(document).ready(function () {
         });
     })
 });
+
+window.initDatePicker = initDatePicker
+

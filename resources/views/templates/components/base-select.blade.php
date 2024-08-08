@@ -1,7 +1,12 @@
 @php
-    $default_value = is_array($default_value)
+    if ($default_value === '') {
+        $default_value = [];
+    } else {
+        $default_value = is_array($default_value)
         ? $default_value
         : explode(',', $default_value);
+    }
+
     $key = $v['getFieldKey'] ?? 'id';
     $value = $v['getField'] ?? 'name';
     $concatField = $v['concatField'] ?? false;

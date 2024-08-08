@@ -453,7 +453,7 @@ class Anketa extends Model
                 'med_view'               => 'Мед показания',
                 'pv_id'                  => 'Пункт выпуска',
                 'town_id'                => 'Город',
-                'flag_pak'               => 'Флаг СДПО',
+                'flag_pak'               => 'Вид осмотра',
                 'is_dop'                 => 'Режим ввода ПЛ',
             ],
             'tech' => [

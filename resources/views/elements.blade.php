@@ -476,12 +476,36 @@
                                                 ])
                                             @elseif($model === 'Instr' && $fk === 'sort')
                                                 <!-- Сортировка доступна только инженеру БДД и Админу -->
+                                            @elseif($fv['type'] === 'date' && in_array($model, ['Driver', 'Car', 'Company']))
+                                                @include('templates.components.date-range-field', [
+                                                   'v' => $fv,
+                                                   'k' => $fk,
+                                                   'is_required' => '',
+                                                   'default_value_start' => request()->get($fk . '_start'),
+                                                   'default_value_end' => request()->get($fk . '_end'),
+                                               ])
+                                            @elseif($fk === 'pressure_systolic')
+                                                @include('templates.components.pressure-field', [
+                                                   'v' => $fv,
+                                                   'k' => $fk,
+                                                   'is_required' => '',
+                                                   'default_value_min' => request()->get($fk . '_min'),
+                                                   'default_value_max' => request()->get($fk . '_max'),
+                                               ])
+                                            @elseif($fk === 'pressure_diastolic')
+                                                @include('templates.components.pressure-field', [
+                                                   'v' => $fv,
+                                                   'k' => $fk,
+                                                   'is_required' => '',
+                                                   'default_value_min' => request()->get($fk . '_min'),
+                                                   'default_value_max' => request()->get($fk . '_max'),
+                                               ])
                                             @else
                                                 @include('templates.elements_field', [
                                                     'v' => $fv,
                                                     'k' => $fk,
                                                     'is_required' => '',
-                                                    'default_value' => request()->get($fk)
+                                                    'default_value' => request()->get($fk),
                                                 ])
                                             @endif
 
@@ -865,6 +889,12 @@
 
                 }
             });
+
+            $('[data-field-type="date-picker"]').each((index, element) => {
+                initDatePicker($(element), {
+                    mode: 'single'
+                })
+            })
 
         </script>
     @endsection
