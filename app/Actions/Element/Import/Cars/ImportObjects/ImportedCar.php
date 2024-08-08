@@ -10,7 +10,7 @@ final class ImportedCar
     /** @var string|null */
     private $companyName;
 
-    /** @var int */
+    /** @var string */
     private $companyInn;
 
     /** @var string */
@@ -36,7 +36,7 @@ final class ImportedCar
 
     /**
      * @param string|null $companyName
-     * @param int $companyInn
+     * @param string $companyInn
      * @param string $number
      * @param string|null $markAndModel
      * @param string|null $category
@@ -47,7 +47,7 @@ final class ImportedCar
      */
     public function __construct(
         ?string $companyName,
-        int     $companyInn,
+        string     $companyInn,
         string  $number,
         ?string $markAndModel,
         ?string $category,
@@ -73,7 +73,7 @@ final class ImportedCar
         return $this->companyName;
     }
 
-    public function getCompanyInn(): int
+    public function getCompanyInn(): string
     {
         return $this->companyInn;
     }

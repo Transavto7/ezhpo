@@ -54,4 +54,7 @@ return [
 
     'controllers_base_namespace' => env('SENTRY_CONTROLLERS_BASE_NAMESPACE', 'App\\Http\\Controllers'),
 
+    'ignore_transactions' => [
+        'GET /api/sdpo/check',
+    ],
 ];
