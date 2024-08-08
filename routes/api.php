@@ -26,10 +26,6 @@ Route::get('/companies/find', 'ApiController@companiesList');
 Route::get('/find/{model}', 'ApiController@modelList');
 
 Route::prefix('reports')->group(function () {
-    Route::prefix('journal')->group(function () {
-        Route::get('/', 'ReportController@getJournalData')->name('api.reports.journal');
-        Route::get('/export', 'ReportController@exportJournalData')->name('api.reports.journal.export');
-    });
     Route::prefix('contract')->group(function () {
         Route::get('/journal', 'ReportControllerContract@getJournalData')->name('api.reports.journal');
         Route::get('/journal/export', 'ReportController@exportJournalData');
@@ -94,7 +90,11 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($anketa);
     });
 
-    Route::get('report/{type_report}', 'ReportController@ApiGetReport')->name('api.getReport');
+    Route::prefix('reports')->group(function () {
+        Route::get('/journal', 'ReportController@getJournalData');
+        Route::get('/journal/export', 'ReportController@exportJournalData');
+        Route::get('/graph_pv', 'ReportController@getGraphPvData');
+    });
 
     // Отображаем ПВ
     Route::get('pvs/{id?}', function () {

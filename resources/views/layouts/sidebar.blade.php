@@ -159,7 +159,7 @@
 
                     @if(user()->access('report_schedule_dynamic_mo'))
                         <li>
-                            <a href="{{ route('report.dynamic.medic') }}">
+                            <a href="{{ route('report.dynamic', ['journal' => 'medic']) }}">
                                 <i class="fa fa-book"></i>Отчет по количеству осмотров
                             </a>
                         </li>

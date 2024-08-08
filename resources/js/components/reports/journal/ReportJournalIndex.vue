@@ -73,6 +73,7 @@ import ReportJournalTech from "./ReportJournalTech";
 import ReportJournalTechOther from "./ReportJournalTechOther";
 import ReportJournalMedicOther from "./ReportJournalMedicOther";
 import ReportJournalOther from "./ReportJournalOther";
+import axios from "axios";
 
 export default {
     name: "ReportJournalIndex",
@@ -93,6 +94,12 @@ export default {
             companies: [],
             month: null,
             company_id: 0,
+            axios: axios.create({
+                baseURL: location.origin,
+                headers: {
+                    Authorization: 'Bearer ' + API_TOKEN
+                }
+            })
         }
     },
     mounted() {
@@ -125,7 +132,7 @@ export default {
         report() {
             this.reset();
             this.loading = true;
-            axios.get('/api/reports/journal', {
+            this.axios.get('/api/reports/journal', {
                 params: {
                     company_id: this.company_id,
                     month: this.month
@@ -142,7 +149,7 @@ export default {
         },
         exportData() {
             this.loadingExport = true;
-            axios.get('/api/reports/journal/export', {
+            this.axios.get('/api/reports/journal/export', {
                 params: {
                     company_id: this.company_id,
                     month: this.month
@@ -160,7 +167,7 @@ export default {
             });
         },
         searchCompany(query = '') {
-            axios.get('/api/companies/find', {
+            this.axios.get('/api/companies/find', {
                 params: {
                     search: query
                 }

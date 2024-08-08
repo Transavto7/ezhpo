@@ -165,12 +165,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('journal', 'ReportController@ShowJournal')->name('journal');
             Route::get('journal_new',[ReportContractRefactoringController::class, 'index'])->name('company_service');
             Route::get('{type_report}', 'ReportController@GetReport')->name('get');
-
-            Route::prefix('dynamic')->as('dynamic.')->group(function () {
-                Route::get('medic', 'ReportController@getDynamicMedic')->name('medic');
-                Route::get('tech', 'ReportController@getDynamicTech')->name('tech');
-                Route::get('all', 'ReportController@getDynamicAll')->name('all');
-            });
+            Route::get('/dynamic/{journal}', 'ReportController@getDynamic')->name('dynamic');
         });
 
         Route::post('save-fields-home/{type_ankets}', 'HomeController@SaveCheckedFieldsFilter')->name('home.save-fields');
