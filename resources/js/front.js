@@ -605,8 +605,8 @@ $(document).ready(function () {
     };
 
     window.loadPreviousOdometer = async () => {
-        const previousOdometerContainer = $(event.target).parent().parent()
-        const formContainer = previousOdometerContainer.parent().parent()
+        const previousOdometerContainer = $(event.target).closest('.input-group')
+        const formContainer = previousOdometerContainer.closest('.cloning')
         const previousOdometerInput = previousOdometerContainer.find('input')[0]
 
         if (previousOdometerInput === undefined) {
