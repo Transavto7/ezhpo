@@ -14,7 +14,7 @@ jobs:
       run: |
         npm -v
         node -v
-        npm install --force
+        npm install --legacy-peer-deps
         npm run production
     - name: Create deployment artifact
       env:
