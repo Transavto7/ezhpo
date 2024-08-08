@@ -466,7 +466,6 @@ class IndexController extends Controller
         $oKey = 'orderKey';
         $oBy = 'orderBy';
 
-
         $data = $this->elements[$type];
 
         $dateConditions = [];

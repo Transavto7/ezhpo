@@ -8,57 +8,36 @@
     <div class="col-md-12 bg-light p-2 mb-3">
         <form action="" method="GET" class="elements-form-filter">
             <input type="hidden" name="filter" value="1">
+            <div class="row">
+                @if($type_report === 'journal')
+                    <div class="col-md-3 form-group">
+                        <label>Компания</label>
 
-            <div class="row col-md-12 d-flex align-items-center">
-                @switch($type_report)
-                    @case('journal')
-                        <div class="col-md-2">
-                            <label>Компания</label>
+                        @include('templates.elements_field', [
+                            'v' => $company_fields,
+                            'k' => 'company_id',
+                            'is_required' => 'required',
+                            'model' => 'Company',
+                            'default_value' => request()->get('company_id')
+                        ])
+                    </div>
 
-                            @include('templates.elements_field', [
-                                'v' => $company_fields,
-                                'k' => 'company_id',
-                                'is_required' => 'required',
-                                'model' => 'Company',
-                                'default_value' => request()->get('company_id')
-                            ])
-                        </div>
+                    <input type="hidden" name="is_finance" value="1">
+                @endif
 
-                        <input type="hidden" name="is_finance" value="1">
-                        {{--<div class="col-md-2">
-                            <label>Финансовая информация</label>
+                @if($type_report === 'graph_pv')
+                    <div class="col-md-3 form-group">
+                        <label>Пункт выпуска</label>
 
-                            @include('templates.elements_field', [
-                                'v' => [
-                                    'type' => 'select',
-                                    'label' => 'Финансовая информация',
-                                    'values' => [
-                                        0 => 'Нет',
-                                        1 => 'Да'
-                                    ]
-                                ],
-                                'k' => 'is_finance',
-                                'is_required' => 0,
-                                'model' => '',
-                                'default_value' => request()->get('is_finance', 0)
-                            ])
-                        </div>--}}
-                        @break
-
-                    @case('graph_pv')
-                        <div class="col-md-2">
-                            <label>Пункт выпуска</label>
-
-                            @include('templates.elements_field', [
-                                'v' => $pv_fields,
-                                'k' => 'pv_id',
-                                'is_required' => 'required',
-                                'model' => 'Point',
-                                'default_value' => request()->get('pv_id')
-                            ])
-                        </div>
-                        @break
-                @endswitch
+                        @include('templates.elements_field', [
+                            'v' => $pv_fields,
+                            'k' => 'pv_id',
+                            'is_required' => 'required',
+                            'model' => 'Point',
+                            'default_value' => request()->input('pv_id')
+                        ])
+                    </div>
+                @endif
 
                 @php
                     $pre_month = \Illuminate\Support\Carbon::now()->subMonths();
@@ -66,30 +45,31 @@
                     $date_to_field = $pre_month->endOfMonth()->format('Y-m-d');
                 @endphp
 
-                <div class="col-md-2">
+                <div class="col-md-3 form-group">
                     <label>
                         С:
-                        <input type="date" required value="{{ request()->get('date_from') ?: $date_from_field }}" class="form-control" name="date_from">
                     </label>
+                    <input type="date" required value="{{ request()->input('date_from', $date_from_field) }}" class="form-control" name="date_from">
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-3 form-group">
                     <label>
                         ПО:
-                        <input type="date" required value="{{ request()->get('date_to') ?: $date_to_field }}" class="form-control" name="date_to">
                     </label>
-                </div>
-                <div class="col-md-2">
-                    <label>
-                        Тип осмотра:
-                        <select name="type_anketa"  class="form-control" >
-                            <option value="medic" @if(request()->get('type_anketa') == 'medic') selected @endif>Медицинский</option>
-                            <option value="tech" @if(request()->get('type_anketa') == 'tech') selected @endif>Техничекий</option>
-                        </select>
-                    </label>
+                    <input type="date" required value="{{ request()->input('date_to', $date_to_field) }}" class="form-control" name="date_to">
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3 form-group">
+                    <label>
+                        Тип осмотра:
+                    </label>
+                    <select name="type_anketa"  class="form-control" >
+                        <option value="medic" @if(request()->input('type_anketa') == 'medic') selected @endif>Медицинский</option>
+                        <option value="tech" @if(request()->input('type_anketa') == 'tech') selected @endif>Техничекий</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
                     <button type="submit" class="btn btn-info">Сформировать отчет</button>
                     <a href="?" class="btn btn-danger">Сбросить</a>
                 </div>
@@ -98,7 +78,7 @@
     </div>
 
     <div class="card">
-        @if(isset($_GET['filter']))
+        @if(request()->input('filter'))
             @include('pages.reports.' . $type_report)
         @endif
     </div>

@@ -90,7 +90,11 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($anketa);
     });
 
-    Route::get('report/{type_report}', 'ReportController@ApiGetReport')->name('api.getReport');
+    Route::prefix('reports')->group(function () {
+        Route::get('/journal', 'ReportController@getJournalData');
+        Route::get('/journal/export', 'ReportController@exportJournalData');
+        Route::get('/graph_pv', 'ReportController@getGraphPvData');
+    });
 
     // Отображаем ПВ
     Route::get('pvs/{id?}', function () {

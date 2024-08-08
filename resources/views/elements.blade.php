@@ -360,6 +360,7 @@
             || user()->access('service_logs_read') && $model == 'Service'
         );
 
+        $permissionToGenerateMetricLKK = ($model === 'Company' && user()->access('generate_metric_lkk'));
         $permissionToViewContract = user()->access('contract_read');
         $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
 
@@ -401,6 +402,16 @@
                             </a>
                         @endif
                     </div>
+                @endif
+
+                @if($permissionToGenerateMetricLKK)
+                    <div class="m-2">
+                        <button type="button" data-toggle="modal" data-target="#elementsModalGenerateMetric"
+                                class="btn btn-sm btn-secondary">
+                             Метрика ЛКК <i class="fa fa-table"></i>
+                        </button>
+                    </div>
+                    @component('modals.metric-modal')@endcomponent
                 @endif
 
                 @if($permissionToCreate && $model == 'Driver')
@@ -514,7 +525,7 @@
                                 @endif
                             @endforeach
 
-                            <div class="col-md-2">
+                            <div class="m-2">
                                 <button type="submit" class="btn btn-sm btn-info">Поиск</button>
                                 <a href="?" class="btn btn-sm btn-danger">Сбросить</a>
                             </div>
@@ -896,6 +907,64 @@
                 })
             })
 
+            $('.start-date').change(function () {
+                const start = $(this).val()
+                const end = $('.end-date').val()
+
+                if (! end) {
+                    return
+                }
+
+                if (end < start) {
+                    $('.end-date').val(start)
+                }
+            })
+
+            $('.end-date').change(function () {
+                const start = $('.start-date').val()
+                const end = $(this).val()
+
+                if (! start) {
+                    return
+                }
+
+                if (end < start) {
+                    $('.start-date').val(end)
+                }
+            })
+
+            $('.generate-metric').click(function () {
+                const url = '{{ route('generateMetric') }}'
+                const start = $('.start-date').val()
+                const end = $('.end-date').val()
+
+                if (start && end) {
+                    $('.spinner-btn').attr('style', '')
+                    $('.generate-metric').attr('style', 'display: none')
+
+                    axios
+                        .post(url, {
+                            start,
+                            end
+                        }, { responseType: 'blob' })
+                        .then(response => {
+                            const { data } = response
+                            const url = window.URL.createObjectURL(new Blob([data]));
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.setAttribute('download', `Метрика ЛКК ${start} - ${end}.xlsx`);
+                            document.body.appendChild(link);
+                            link.click();
+                        })
+                        .finally(() => {
+                            $('.spinner-btn').attr('style', 'display: none')
+                            $('.generate-metric').attr('style', '')
+                        })
+                }
+            })
         </script>
     @endsection
+
 @endsection
+
+
