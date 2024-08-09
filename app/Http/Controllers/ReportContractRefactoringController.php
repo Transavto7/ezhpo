@@ -7,20 +7,14 @@ use App\Car;
 use App\Company;
 use App\Discount;
 use App\Driver;
-use App\Exports\ReportJournalExport;
+use App\Events\UserActions\ClientReportRequest;
 use App\Models\Contract;
-use App\Models\Service;
 use App\Product;
-use App\Req;
 use Carbon\Carbon;
-use Carbon\CarbonPeriod;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
 
-// без комментариев
 class ReportContractRefactoringController extends Controller
 {
     public $total_sum_for_contract = 0;
@@ -30,11 +24,9 @@ class ReportContractRefactoringController extends Controller
     public $company;
 
 
-    public $reports
-        = [
+    public $reports = [
             'journal' => 'Отчет по услугам компании[Договор]',
         ];
-
 
     public function index()
     {
@@ -45,16 +37,16 @@ class ReportContractRefactoringController extends Controller
     public function getContractsForCompany(Request $request)
     {
         $contracts = Company::with(['contracts'])
-                            ->where('hash_id', $request->id)
-                            ->get()
-                            ->pluck('contracts')
-                            ->flatten()
-                            ->map(function ($q) {
-                                return [
-                                    'name' => $q->name,
-                                    'id'   => $q->id,
-                                ];
-                            });
+            ->where('hash_id', $request->id)
+            ->get()
+            ->pluck('contracts')
+            ->flatten()
+            ->map(function ($q) {
+                return [
+                    'name' => $q->name,
+                    'id'   => $q->id,
+                ];
+            });
 
         return response($contracts);
     }
@@ -75,6 +67,7 @@ class ReportContractRefactoringController extends Controller
             return response(null, 404);
         }
 
+        event(new ClientReportRequest($request->user('api'), 'service_report_request'));
 
         $this->contracts_ids = $request->contracts_ids ?? [];
         $this->date_from = $date_from;
@@ -82,15 +75,16 @@ class ReportContractRefactoringController extends Controller
         $this->services  = Product::all();
         $this->discounts = Discount::all();
         $this->company = Company::with([
-            'contracts.services',
-            'contracts' => function ($q) {
-                $q->whereIn('contracts.id', $this->contracts_ids);
-            },
-        ])->select('id', 'hash_id', 'name', 'products_id')
-                          ->where('hash_id', $company)
-                          ->first();
+                'contracts.services',
+                'contracts' => function ($q) {
+                    $q->whereIn('contracts.id', $this->contracts_ids);
+                },
+            ])
+            ->select('id', 'hash_id', 'name', 'products_id')
+            ->where('hash_id', $company)
+            ->first();
 
-        if ( !Contract::groupBy('company_id')
+        if (! Contract::groupBy('company_id')
                       ->where('company_id', $this->company->id)
                       ->select('company_id', DB::raw('SUM(main_for_company) AS count'))
                       ->whereDate('date_of_end', '>=', Carbon::parse($request->month)->endOfMonth())
@@ -114,11 +108,11 @@ class ReportContractRefactoringController extends Controller
     public function getJournalMedic()
     {
         $medics = Anketa::whereIn('type_anketa', [
-            'medic',
-            'bdd',
-            'report_cart',
-            'pechat_pl',
-        ])->with([
+                'medic',
+                'bdd',
+                'report_cart',
+                'pechat_pl',
+            ])->with([
                 'driver.contracts.services',
                 'company.contracts.services',
             ])
@@ -134,12 +128,12 @@ class ReportContractRefactoringController extends Controller
                           $this->date_to,
                       ]);
                 })
-                  ->orWhere(function ($q) {
-                      $q->whereNull('date')->whereBetween('period_pl', [
-                          $this->date_from->format('Y-m'),
-                          $this->date_to->format('Y-m'),
-                      ]);
-                  });
+                ->orWhere(function ($q) {
+                    $q->whereNull('date')->whereBetween('period_pl', [
+                        $this->date_from->format('Y-m'),
+                        $this->date_to->format('Y-m'),
+                    ]);
+                });
             })
             ->get();
 
@@ -805,6 +799,7 @@ class ReportContractRefactoringController extends Controller
 
     public function ApiGetReport(Request $request)
     {
+        dd(123);
         $report = $this->GetReport($request);
 
         return response()->json($report);

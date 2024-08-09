@@ -21,44 +21,48 @@ final class MetricRepository
 
     public function get(): array
     {
-        $companyActions = DB::select("
-                with
-                    company_action as (
-                        select
-                            c.name as name,
-                            ua.type as type,
-                            count(*) as count
-                        from
-                            user_actions as ua
-                        join
-                            users u on u.id = ua.user_id
-                        left
-                            join companies c on u.company_id = c.id
-                        where
-                            ua.created_at >= '{$this->action->getStartDate()->format('Y-m-d')}' and
-                            ua.created_at <= '{$this->action->getEndDate()->format('Y-m-d')}'
-                        group by
-                            c.name, ua.type
-                        order by
-                            c.name
-                    )
+        $actions = DB::table('user_actions')
+            ->select([
+                'companies.name',
+                'user_actions.type',
+                DB::raw('count(*) as count'),
+            ])
+            ->join(
+                'users',
+                'user_actions.user_id',
+                '=',
+                'users.id'
+            )
+            ->leftJoin(
+                'companies',
+                'users.company_id',
+                '=',
+                'companies.id'
+            )
+            ->where('user_actions.created_at', '>=', $this->action->getStartDate()->format('Y-m-d'))
+            ->where('user_actions.created_at', '<=', $this->action->getEndDate()->format('Y-m-d'))
+            ->groupBy(['companies.name', 'user_actions.type'])
+            ->orderBy('companies.name')
+            ->get()
+            ->toArray();
 
-                select
-                    name,
-                    json_objectagg(type, count) as actions
-                from
-                    company_action
-                group by
-                    name
-            ");
+        $companyActions = array_reduce($actions, function ($carry, $item) {
+            $name = $item->name;
 
-        return array_map(function ($company) {
-            $actions = (array)json_decode($company->actions, true);
+            if ($name === null) {
+                $name = 'emptyName';
+            }
 
+            $carry[$name][$item->type] = $item->count;
+
+            return $carry;
+        }, []);
+
+        return array_map(function ($name, $actions) {
             return new Metric(
-                $company->name,
+                $name,
                 (new ActionTypeGroup())->fromType($actions)
             );
-        }, $companyActions);
+        }, array_keys($companyActions), $companyActions);
     }
 }

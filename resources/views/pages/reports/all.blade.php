@@ -8,7 +8,7 @@
     <div class="col-md-12 bg-light p-2 mb-3">
         <form action="" method="GET" class="elements-form-filter">
             <input type="hidden" name="filter" value="1">
-            <div class="row">
+            <div class="row p-2">
                 @if($type_report === 'journal')
                     <div class="col-md-3 form-group">
                         <label>Компания</label>
@@ -69,7 +69,7 @@
                     </select>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-12">
                     <button type="submit" class="btn btn-info">Сформировать отчет</button>
                     <a href="?" class="btn btn-danger">Сбросить</a>
                 </div>
