@@ -66,7 +66,6 @@ class HomeController extends Controller
 
     public function index(string $formType, Request $request)
     {
-        $this->sendEvent($formType);
         $user = Auth::user();
 
         /**
@@ -522,6 +521,8 @@ class HomeController extends Controller
             true
         );
 
+        event(new ClientActionLogRequest(Auth::user(), $formType));
+
         $view = $request->get('getFormFilter') ? 'home_filters' : 'home';
         return view($view, [
             'title' => Anketa::$anketsKeys[$validTypeForm],
@@ -543,11 +544,6 @@ class HomeController extends Controller
             'orderKey' => $orderKey,
             'queryString' => Arr::query($request->except(['orderKey', 'orderBy']))
         ]);
-    }
-
-    private function sendEvent(string $formType)
-    {
-        event(new ClientActionLogRequest(Auth::user(), $formType));
     }
 
     public function getFilters(Request $request)

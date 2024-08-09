@@ -21,6 +21,9 @@ final class MetricRepository
 
     public function get(): array
     {
+        $start = $this->action->getStartDate();
+        $end = $this->action->getEndDate()->clone()->addDay();
+
         $actions = DB::table('user_actions')
             ->select([
                 'companies.name',
@@ -39,8 +42,8 @@ final class MetricRepository
                 '=',
                 'companies.id'
             )
-            ->where('user_actions.created_at', '>=', $this->action->getStartDate()->format('Y-m-d'))
-            ->where('user_actions.created_at', '<=', $this->action->getEndDate()->format('Y-m-d'))
+            ->where('user_actions.created_at', '>=', $start)
+            ->where('user_actions.created_at', '<=', $end)
             ->groupBy(['companies.name', 'user_actions.type'])
             ->orderBy('companies.name')
             ->get()
