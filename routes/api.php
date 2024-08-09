@@ -29,8 +29,8 @@ Route::prefix('reports')->group(function () {
     Route::prefix('contract')->group(function () {
         Route::get('/journal', 'ReportControllerContract@getJournalData')->name('api.reports.journal');
         Route::get('/journal/export', 'ReportController@exportJournalData');
-        Route::get('/journal_v2',[ReportContractRefactoringController::class, 'getReport']);
-        Route::get('/export/journal_v2',[ReportContractRefactoringController::class, 'export']);
+        Route::get('/journal_v2', [ReportContractRefactoringController::class, 'getReport']);
+        Route::get('/export/journal_v2', [ReportContractRefactoringController::class, 'export']);
     });
     Route::get('getContractsForCompany', 'ReportControllerContract@getContractsForCompany');
 });

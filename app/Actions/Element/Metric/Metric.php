@@ -38,7 +38,9 @@ class Metric
 
     public function getName(): string
     {
-        return $this->name ?: 'Компания не указана';
+        return $this->name !== 'emptyName'
+            ? $this->name
+            : 'Компания не указана';
     }
 
     /**
