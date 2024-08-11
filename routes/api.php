@@ -120,6 +120,8 @@ Route::middleware('auth:api')->group(function () {
 });
 
 Route::middleware(['auth:api', 'update-last-connection'])->prefix('sdpo')->name('sdpo')->group(function () {
+    Route::post('/get-sticker', 'Api\Forms\TechnicalInspection\QRCodeStickerController');
+
     Route::prefix('anketa')->group(function () {
         Route::post('/', 'Api\SdpoController@createAnketa');
         Route::post('/{id}', 'Api\SdpoController@changeType');
