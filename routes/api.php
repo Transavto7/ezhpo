@@ -119,7 +119,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/fields/visible', 'ApiController@saveFieldsVisible');
 });
 
-Route::middleware('auth:api')->prefix('sdpo')->name('sdpo')->group(function () {
+Route::middleware(['auth:api', 'update-last-connection'])->prefix('sdpo')->name('sdpo')->group(function () {
     Route::prefix('anketa')->group(function () {
         Route::post('/', 'Api\SdpoController@createAnketa');
         Route::post('/{id}', 'Api\SdpoController@changeType');
@@ -140,7 +140,8 @@ Route::middleware('auth:api')->prefix('sdpo')->name('sdpo')->group(function () {
     Route::get('/terminal/verification', 'Api\SdpoController@getTerminalVerification');
     Route::get('/medics', 'Api\SdpoController@getMedics');
 
-    Route::get('/check', 'Api\SdpoController@checkConnaction');
     Route::post('/work/report', [SdpoController::class, 'workReport']);
 });
+
+Route::get('/sdpo/check', 'Api\SdpoController@checkConnection');
 
