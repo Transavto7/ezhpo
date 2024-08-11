@@ -334,15 +334,12 @@ class SdpoController extends Controller
         }
     }
 
-    /*
+    /**
+     * @deprecated
      * Check connection sdpo
      */
-    public function checkConnaction(Request $request)
+    public function checkConnection(): JsonResponse
     {
-        $user = $request->user('api');
-        $user->last_connection_at = Carbon::now();
-        $user->save();
-
         return response()->json(true);
     }
 
