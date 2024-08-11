@@ -34,18 +34,38 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
     protected function fetchExistForms()
     {
-        $cars = [$this->data['car_id'] ?? 0];
+        $cars = [];
         foreach ($this->data['anketa'] ?? [] as $form) {
             $cars[] = $form['car_id'] ?? 0;
         }
 
-        $this->existForms = Anketa::query()
+        $cars = array_filter(array_unique($cars), function ($car) {
+            return ($car !== null) && ($car !== 0);
+        });
+
+        if (count($cars) === 0) {
+            $this->existForms = collect([]);
+
+            return;
+        };
+
+        $query = Anketa::query()
             ->select([
                 'id',
                 'date'
-            ])
-            ->whereIn('car_id', $cars)
-            ->where('type_anketa', 'tech')
+            ]);
+
+        if (count($cars) === 1) {
+            $query = $query->where('car_id', $cars[0]);
+        } else {
+            $query = $query->where(function (Builder $subQuery) use ($cars) {
+                foreach ($cars as $car) {
+                    $subQuery->orWhere('car_id', $car);
+                }
+            });
+        }
+
+        $this->existForms = $query->where('type_anketa', 'tech')
             ->where('in_cart', 0)
             ->whereNotNull('date')
             ->where(function (Builder $query) {
