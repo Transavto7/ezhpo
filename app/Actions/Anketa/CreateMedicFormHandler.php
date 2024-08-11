@@ -24,14 +24,14 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
 
     protected function fetchExistForms()
     {
-        $drivers = [$this->data['driver_id'] ?? 0];
+        $driver = $this->data['driver_id'] ?? 0;
 
         $this->existForms = Anketa::query()
             ->select([
                 'id',
                 'date'
             ])
-            ->where('driver_id', $drivers)
+            ->where('driver_id', $driver)
             ->where('type_anketa', 'medic')
             ->where('in_cart', 0)
             ->whereNotNull('date')
