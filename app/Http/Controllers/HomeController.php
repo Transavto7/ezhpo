@@ -191,7 +191,7 @@ class HomeController extends Controller
                         continue;
                     }
 
-                    $explodeData = is_array($filterValue) ? $filterValue : explode(',', $filterValue);
+                    $explodeData = array_values(is_array($filterValue) ? $filterValue : explode(',', $filterValue));
                     $explodeData = (count($explodeData) == 1) ? $explodeData[0] : $explodeData;
 
                     if (is_array($explodeData)) {
