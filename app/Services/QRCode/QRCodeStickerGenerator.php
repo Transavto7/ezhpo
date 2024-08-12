@@ -6,11 +6,12 @@ use App\Enums\QRCodeLinkParameter;
 use Barryvdh\DomPDF\Facade as PDF;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
+use Illuminate\Contracts\Container\BindingResolutionException;
 
 class QRCodeStickerGenerator
 {
-    const DRIVER = 'DRIVER';
-    const CAR = 'CAR';
+    const DRIVER = 'D';
+    const CAR = 'C';
     /**
      * @var QRCodeLinkGenerator
      */
@@ -24,6 +25,9 @@ class QRCodeStickerGenerator
         $this->linkGenerator = $linkGenerator;
     }
 
+    /**
+     * @throws BindingResolutionException
+     */
     public function getPdfResponse()
     {
         $customPaper = array(0,0,300.00,225.00);
@@ -48,13 +52,15 @@ class QRCodeStickerGenerator
     {
         $options = new QROptions;
         $options->version = 4;
+        $options->quietzoneSize = 0;
+        $options->scale = 8;
 
         return (new QRCode($options))->render($this->linkGenerator->generate());
     }
 
     public function getUrl()
     {
-        $url = env('APP_URL');
+        $url = config('app.url');
         $http = 'http://';
         $https = 'https://';
 
