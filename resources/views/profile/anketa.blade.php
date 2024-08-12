@@ -141,7 +141,7 @@
                                     @isset($anketa)
                                         <div class="col-md-12">
                                             <div class="card p-2 text-xsmall">
-                                                @if($type_anketa === 'medic')
+                                                @if($type_anketa === \App\Enums\FormTypeEnum::MEDIC)
                                                     <b>"{{ $title }}" успешно создан!</b>
                                                     <br/> ID осмотра: {{ $cId }}
 
@@ -149,6 +149,8 @@
                                                         <br/>
                                                         <b>Водитель: {{ $anketa->driver->fio }}</b>
                                                     @endif
+
+                                                    Тип осмотра:<b>{{ $anketa->type_view }}</b>
 
                                                     @if($anketa->date)
                                                         <div>
@@ -172,6 +174,10 @@
                                                     @if($anketa->driver && $anketa->driver->fio)
                                                         <br/>
                                                         <b>Водитель: {{ $anketa->driver->fio }}</b>
+                                                    @endif
+
+                                                    @if($type_anketa === \App\Enums\FormTypeEnum::TECH)
+                                                        Тип осмотра:<b>{{ $anketa->type_view }}</b>
                                                     @endif
 
                                                     @if($anketa->car && $anketa->car->gos_number)
