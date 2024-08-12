@@ -52,7 +52,7 @@ class QRCodeStickerGenerator
         return (new QRCode($options))->render($this->linkGenerator->generate());
     }
 
-    private function getUrl()
+    public function getUrl()
     {
         $url = env('APP_URL');
         $http = 'http://';
@@ -69,13 +69,13 @@ class QRCodeStickerGenerator
         return $url;
     }
 
-    private function getView(string $id, string $type, $img)
+    public function getView()
     {
         return view('templates.qr-code',
             [
-                'qrCode' => $img->generate(),
-                'id' => $id,
-                'type' => $type === QRCodeLinkParameter::CAR_ID
+                'qrCode' => $this->getCRCode(),
+                'id' => $this->linkGenerator->getId(),
+                'type' => $this->linkGenerator->getParameter()->value() === QRCodeLinkParameter::CAR_ID
                     ? self::CAR
                     : self::DRIVER,
                 'domain' => $this->getUrl()
