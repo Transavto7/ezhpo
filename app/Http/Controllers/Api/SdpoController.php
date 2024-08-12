@@ -326,21 +326,23 @@ class SdpoController extends Controller
         } catch (Throwable $exception) {
             DB::rollBack();
 
+            $code = $exception->getCode();
+            if ($code < 400 || $code >= 600) {
+                $code = Response::HTTP_INTERNAL_SERVER_ERROR;
+            }
+
             return response()->json([
                 'message' => $exception->getMessage()
-            ], $exception->getCode() ?? Response::HTTP_INTERNAL_SERVER_ERROR);
+            ], $code);
         }
     }
 
-    /*
+    /**
+     * @deprecated
      * Check connection sdpo
      */
-    public function checkConnaction(Request $request)
+    public function checkConnection(): JsonResponse
     {
-        $user = $request->user('api');
-        $user->last_connection_at = Carbon::now();
-        $user->save();
-
         return response()->json(true);
     }
 
