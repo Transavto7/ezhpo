@@ -379,6 +379,7 @@ class Anketa extends Model
             'medic_export_pl' => [
                 'date' => 'Дата и время осмотра',
                 'driver_fio' => 'ФИО РАБОТНИКА',
+                'type_view' => 'ТИП ОСМОТРА',
                 'driver_gender' => 'ПОЛ',
                 'driver_year_birthday' => 'ДАТА РОЖДЕНИЯ',
                 'complaint' => 'ЖАЛОБЫ',
@@ -399,6 +400,7 @@ class Anketa extends Model
                 'car_mark_model'     => 'Наименование марки, модели ТС',
                 'car_gos_number'     => 'Гос. регистрационный номер ТС',
                 'driver_fio'         => 'ФИО водителя',
+                'type_view'          => 'Тип осмотра',
                 'odometer'           => 'Показания одометра  (полные километры пробега при проведении контроля)',
                 'point_reys_control' => 'Отметка о прохождении контроля',
                 'user_name'          => 'ФИО лица, проводившего контроль',
