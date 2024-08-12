@@ -33,7 +33,7 @@ class QRCodeStickerController
 
             return $generator->getPdfResponse();
         } catch (Exception $exception) {
-            return response()->json(['error' => $exception->getMessage()], $exception->getCode());
+            return response()->json(['error' => $exception->getMessage()], 400);
         }
     }
 }
