@@ -191,7 +191,7 @@ class HomeController extends Controller
                         continue;
                     }
 
-                    $explodeData = is_array($filterValue) ? $filterValue : explode(',', $filterValue);
+                    $explodeData = array_values(is_array($filterValue) ? $filterValue : explode(',', $filterValue));
                     $explodeData = (count($explodeData) == 1) ? $explodeData[0] : $explodeData;
 
                     if (is_array($explodeData)) {
@@ -321,10 +321,25 @@ class HomeController extends Controller
         if ($filterActivated && $request->input('getCounts')) {
             $formsDistinctQuery = $forms->distinct();
 
+            /**
+             * Обогащение данных
+             */
+            if ($validTypeForm == 'tech') {
+                $formsDistinctQuery = $formsDistinctQuery
+                    ->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id');
+            } else if ($validTypeForm == 'pak') {
+                $formsDistinctQuery = $formsDistinctQuery
+                    ->leftJoin('points', 'anketas.pv_id', '=', 'points.id');
+            }
+            /**
+             * Обогащение данных
+             */
+
+
             return response()->json([
-                'anketasCountDrivers' => $formsDistinctQuery->count('driver_id'),
-                'anketasCountCars' => $formsDistinctQuery->count('car_id'),
-                'anketasCountCompany' => $formsDistinctQuery->count('company_id'),
+                'anketasCountDrivers' => $formsDistinctQuery->count('anketas.driver_id'),
+                'anketasCountCars' => $formsDistinctQuery->count('anketas.car_id'),
+                'anketasCountCompany' => $formsDistinctQuery->count('anketas.company_id'),
             ]);
         }
         /**
