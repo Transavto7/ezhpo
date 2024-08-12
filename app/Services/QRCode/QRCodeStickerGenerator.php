@@ -30,7 +30,7 @@ class QRCodeStickerGenerator
      */
     public function getPdfResponse()
     {
-        $customPaper = array(0,0,300.00,225.00);
+        $customPaper = array(0,0,282.00,222.00);
 
         $pdf = Pdf::loadView('templates.qr-code', [
                 'qrCode' => $this->getCRCode(),
