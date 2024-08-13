@@ -136,6 +136,10 @@ Route::middleware(['auth:api', 'update-last-connection'])->prefix('sdpo')->name(
         Route::post('/{id}/phone', 'Api\SdpoController@setDriverPhone');
     });
 
+    Route::prefix('car')->group(function () {
+        Route::get('/{id}', 'Api\SdpoController@getCar');
+    });
+
     Route::get('/pv', 'Api\SdpoController@getPoint');
     Route::get('/stamp', 'Api\SdpoController@getStamp');
     Route::get('/stamps', 'Api\SdpoController@getStamps');
