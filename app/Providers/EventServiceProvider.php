@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Events\Relations\Attached;
 use App\Events\Relations\Detached;
 use App\Events\UserActions\ClientActionLogRequest;
+use App\Events\UserActions\ClientAddRecord;
 use App\Events\UserActions\ClientDocExport;
 use App\Events\UserActions\ClientDocImport;
 use App\Events\UserActions\ClientDocumentRequest;
@@ -51,6 +52,9 @@ class EventServiceProvider extends ServiceProvider
             LogUserActionEvent::class
         ],
         ClientDocumentRequest::class => [
+            LogUserActionEvent::class
+        ],
+        ClientAddRecord::class => [
             LogUserActionEvent::class
         ],
     ];

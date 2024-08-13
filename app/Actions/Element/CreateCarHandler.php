@@ -4,8 +4,11 @@ namespace App\Actions\Element;
 
 use App\Car;
 use App\Company;
+use App\Enums\UserActionTypesEnum;
 use App\Events\Relations\Attached;
+use App\Events\UserActions\ClientAddRecord;
 use App\Models\Contract;
+use Auth;
 use Exception;
 
 class CreateCarHandler extends AbstractCreateElementHandler implements CreateElementHandlerInterface
@@ -56,6 +59,8 @@ class CreateCarHandler extends AbstractCreateElementHandler implements CreateEle
         }
 
         $created = $this->createElement($data);
+
+        event(new ClientAddRecord(Auth::user(), UserActionTypesEnum::ADD_CAR_VIA_FORM));
 
         /** @var Contract $contract */
         $contract = Contract::query()
