@@ -16,15 +16,15 @@ $(document).ready(function() {
         closeBtn: $('.close-modal'),
         errorDiv: $('.error-div'),
         restartBtn: $('.restart-btn'),
-        camera: $('#reader'),
+        camera: $('#qr-code-reader'),
     }
 
     let $currentInput = null
     let fieldType = null
 
     function onScanSuccess(decodedText, decodedResult) {
-        console.log(`Scan result: ${decodedText}`, decodedResult);
-        html5QrCode.stop().then(r => console.log('close camera'));
+        console.log(`Scan result: ${decodedText}`, decodedResult)
+        html5QrCode.stop().then(r => console.log('close camera'))
 
         axios
             .get('/api/parse-qr-code', {
@@ -34,9 +34,9 @@ $(document).ready(function() {
                 }
             })
             .then(response => {
-                $('#cameraModal').modal('hide')
                 const { data } = response
                 $currentInput.val(data.id).trigger('input')
+                $('#cameraModal').modal('hide')
             })
             .catch(error => {
                 ui.camera.attr('style', 'display:none')
@@ -58,9 +58,9 @@ $(document).ready(function() {
         $currentInput = $cameraBtn.siblings('input')
         fieldType = $cameraBtn.data('field-type')
 
-        console.log($currentInput, fieldType)
-
-        html5QrCode.start({facingMode: "environment"}, config, onScanSuccess, onScanFailure)
+        if (html5QrCode.isScanning) {
+            html5QrCode.stop().then(r => console.log('close camera'))
+        }
 
         ui.cameraModal.modal('show')
     })
@@ -70,6 +70,7 @@ $(document).ready(function() {
         ui.camera.attr('style', '')
 
         html5QrCode.start({facingMode: "environment"}, config, onScanSuccess, onScanFailure)
+            .then(r => console.log('restart camera'))
     })
 
     ui.closeBtn.click(function (e) {
@@ -79,10 +80,20 @@ $(document).ready(function() {
         ui.cameraModal.modal('hide')
     })
 
-    ui.cameraModal.on('hidden.bs.modal', function () {
+    ui.cameraModal.on('shown.bs.modal', function () {
+        html5QrCode.start({facingMode: "environment"}, config, onScanSuccess, onScanFailure)
+            .catch(r => {
+                alert('Ошибка открытия камеры. Перезагрузите страницу и разрешите браузеру доступ к камере')
+                ui.cameraModal.modal('hide')
+            })
+    })
+
+    ui.cameraModal.on('hide.bs.modal', function () {
         ui.errorDiv.attr('style', 'display:none')
         ui.camera.attr('style', '')
-        html5QrCode.stop()
+        if (html5QrCode.isScanning) {
+            html5QrCode.stop().then(r => console.log('close camera'))
+        }
         $currentInput = null
         fieldType = null
     })
