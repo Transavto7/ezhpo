@@ -492,6 +492,43 @@ class SdpoController extends Controller
         return response()->json($driver);
     }
 
+    /*
+    * return car by id
+    */
+    public function getCar(Request $request, $id): JsonResponse
+    {
+        $apiClient = $request->user('api');
+
+        if ($apiClient->blocked) {
+            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
+        }
+
+        $car = Driver::where('hash_id', $id)
+            ->with('company')
+            ->select([
+                'hash_id',
+                'gos_number',
+                'dismissed',
+                'company_id',
+                'only_offline_medic_inspections'
+            ])
+            ->first();
+
+        if (!$car) {
+            return response()->json(['message' => 'Авто с указанным ID не найдено!'], 400);
+        }
+
+        if ($car->dismissed === 'Да') {
+            return response()->json(['message' => 'Авто с указанным ID уволено!'], 303);
+        }
+
+        if ($car->company->dismissed === 'Да') {
+            return response()->json(['message' => 'Компания указанного авто заблокирована!'], 303);
+        }
+
+        return response()->json($car);
+    }
+
     public function setDriverPhone(Request $request, $id): JsonResponse
     {
         $apiClient = $request->user('api');
