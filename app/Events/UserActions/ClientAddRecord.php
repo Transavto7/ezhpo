@@ -2,11 +2,10 @@
 
 namespace App\Events\UserActions;
 
-use App\Enums\UserActionTypesEnum;
 use App\User;
 use Illuminate\Queue\SerializesModels;
 
-class ClientDocImport implements UserActionEventInterface
+class ClientAddRecord implements UserActionEventInterface
 {
     use SerializesModels;
 
@@ -18,16 +17,16 @@ class ClientDocImport implements UserActionEventInterface
     /**
      * @var string
      */
-    protected $itemType;
+    protected $requestType;
 
     /**
      * @param User $user
-     * @param string $itemType
+     * @param string $requestType
      */
-    public function __construct(User $user, string $itemType)
+    public function __construct(User $user, string $requestType)
     {
         $this->user = $user;
-        $this->itemType = $itemType;
+        $this->requestType = $requestType;
     }
 
     /**
@@ -40,6 +39,6 @@ class ClientDocImport implements UserActionEventInterface
 
     public function getType(): string
     {
-        return $this->itemType;
+        return $this->requestType;
     }
 }

@@ -25,10 +25,17 @@ class ActionTypeGroup
         UserActionTypesEnum::TECHNICAL_INSPECTIONS_NUMBER_REPORT_REQUEST,
         UserActionTypesEnum::ALL_INSPECTIONS_NUMBER_REPORT_REQUEST,
     ];
-    protected $import = [
-        UserActionTypesEnum::CLIENT_DOC_IMPORT,
+    protected $carImport = [
         UserActionTypesEnum::CAR_IMPORT,
+    ];
+    protected $driverImport = [
         UserActionTypesEnum::DRIVER_IMPORT,
+    ];
+    protected $addCarViaForm = [
+        UserActionTypesEnum::ADD_CAR_VIA_FORM,
+    ];
+    protected $addDriverViaForm = [
+        UserActionTypesEnum::ADD_DRIVER_VIA_FORM,
     ];
     protected $docRequest = [
         UserActionTypesEnum::CLIENT_DOC_EXPORT,
@@ -44,7 +51,10 @@ class ActionTypeGroup
             'authorization' => 0,
             'logRequest' => 0,
             'reportRequest' => 0,
-            'import' => 0,
+            'carImport' => 0,
+            'driverImport' => 0,
+            'addCarViaForm' => 0,
+            'addDriverViaForm' => 0,
             'docRequest' => 0,
         ];
 

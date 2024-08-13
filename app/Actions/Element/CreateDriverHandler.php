@@ -5,12 +5,15 @@ namespace App\Actions\Element;
 use App\Anketa;
 use App\Company;
 use App\Driver;
+use App\Enums\UserActionTypesEnum;
 use App\Events\Relations\Attached;
+use App\Events\UserActions\ClientAddRecord;
 use App\Instr;
 use App\Models\Contract;
 use App\Services\BriefingService;
 use App\Services\UserService;
 use App\User;
+use Auth;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Hash;
@@ -69,6 +72,8 @@ class CreateDriverHandler extends AbstractCreateElementHandler implements Create
 
         /** @var Driver $created */
         $created = $this->createElement($data);
+
+        event(new ClientAddRecord(Auth::user(), UserActionTypesEnum::ADD_DRIVER_VIA_FORM));
 
         UserService::createUserFromDriver($created);
 
