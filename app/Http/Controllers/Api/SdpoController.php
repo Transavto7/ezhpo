@@ -518,7 +518,6 @@ class SdpoController extends Controller
                 'gos_number',
                 'dismissed',
                 'company_id',
-                'only_offline_medic_inspections'
             ])
             ->first();
 
