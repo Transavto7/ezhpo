@@ -43,6 +43,7 @@
         <th style="width: 150px;height: 65px;text-align: center;vertical-align: center;font-weight: bold;border: 5px solid black;word-wrap: break-word;font-family: 'Times New Roman';">2. Запрос журнала</th>
         <th style="width: 150px;height: 65px;text-align: center;vertical-align: center;font-weight: bold;border: 5px solid black;word-wrap: break-word;font-family: 'Times New Roman';">3. Запрос отчета</th>
         <th style="width: 150px;height: 65px;text-align: center;vertical-align: center;font-weight: bold;border: 5px solid black;word-wrap: break-word;font-family: 'Times New Roman';">4. Кол-во добавленных вод./авто через импорт</th>
+        <th style="width: 150px;height: 65px;text-align: center;vertical-align: center;font-weight: bold;border: 5px solid black;word-wrap: break-word;font-family: 'Times New Roman';">4. Кол-во добавленных вод./авто через форму</th>
         <th style="width: 150px;height: 65px;text-align: center;vertical-align: center;font-weight: bold;border: 5px solid black;word-wrap: break-word;font-family: 'Times New Roman';">5. Запрос документа</th>
     </tr>
     </thead>
@@ -50,11 +51,12 @@
     @foreach($data as $line)
         <tr>
             <td style="height: 40px;border: 5px solid black;word-wrap: break-word;font-family: 'Times New Roman';">{{ $line->getName() }}</td>
-            <td style="height: 40px;border: 5px solid black;vertical-align: center;font-family: 'Times New Roman';">{{ $line->getAuthorization() . '     ' }}</td>
-            <td style="height: 40px;border: 5px solid black;vertical-align: center;font-family: 'Times New Roman';">{{ $line->getLogRequest() . '     ' }}</td>
-            <td style="height: 40px;border: 5px solid black;vertical-align: center;font-family: 'Times New Roman';">{{ $line->getReportRequest() . '     ' }}</td>
-            <td style="height: 40px;border: 5px solid black;vertical-align: center;font-family: 'Times New Roman';">{{ $line->getImport() . '     ' }}</td>
-            <td style="height: 40px;border: 5px solid black;vertical-align: center;font-family: 'Times New Roman';">{{ $line->getDocRequest() . '     ' }}</td>
+            <td style="height: 40px;border: 5px solid black;vertical-align: center;font-family: 'Times New Roman';">{{ $line->getAuthorization() }}</td>
+            <td style="height: 40px;border: 5px solid black;vertical-align: center;font-family: 'Times New Roman';">{{ $line->getLogRequest() }}</td>
+            <td style="height: 40px;border: 5px solid black;vertical-align: center;font-family: 'Times New Roman';">{{ $line->getReportRequest() }}</td>
+            <td style="height: 40px;border: 5px solid black;vertical-align: center;font-family: 'Times New Roman';">{{ $line->getDriverImport().' / '.$line->getCarImport() }}</td>
+            <td style="height: 40px;border: 5px solid black;vertical-align: center;font-family: 'Times New Roman';">{{ $line->getAddDriverViaForm().' / '.$line->getAddCarViaForm() }}</td>
+            <td style="height: 40px;border: 5px solid black;vertical-align: center;font-family: 'Times New Roman';">{{ $line->getDocRequest() }}</td>
         </tr>
     @endforeach
     </tbody>

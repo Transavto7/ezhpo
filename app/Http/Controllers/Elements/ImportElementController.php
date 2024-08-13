@@ -20,8 +20,6 @@ final class ImportElementController extends Controller
 {
     public function __invoke(ImportElementRequest $request): JsonResponse
     {
-        event(new ClientDocImport(Auth::user(), $request->input('type')));
-
         DB::beginTransaction();
         try {
             $handler = ImportElementHandlerFactory::make(ElementType::fromString($request->input('type')));

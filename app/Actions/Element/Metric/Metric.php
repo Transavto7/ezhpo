@@ -17,7 +17,16 @@ class Metric
     protected $reportRequest;
 
     /** @var int */
-    protected $import;
+    protected $carImport;
+
+    /** @var int */
+    protected $driverImport;
+
+    /** @var int */
+    protected $addCarViaForm;
+
+    /** @var int */
+    protected $addDriverViaForm;
 
     /** @var int */
     protected $docRequest;
@@ -32,7 +41,10 @@ class Metric
         $this->authorization = $data['authorization'];
         $this->logRequest = $data['logRequest'];
         $this->reportRequest = $data['reportRequest'];
-        $this->import = $data['import'];
+        $this->carImport = $data['carImport'];
+        $this->driverImport = $data['driverImport'];
+        $this->addCarViaForm = $data['addCarViaForm'];
+        $this->addDriverViaForm = $data['addDriverViaForm'];
         $this->docRequest = $data['docRequest'];
     }
 
@@ -70,9 +82,33 @@ class Metric
     /**
      * @return int|mixed
      */
-    public function getImport()
+    public function getCarImport()
     {
-        return $this->import;
+        return $this->carImport;
+    }
+
+    /**
+     * @return int|mixed
+     */
+    public function getDriverImport()
+    {
+        return $this->driverImport;
+    }
+
+    /**
+     * @return int|mixed
+     */
+    public function getAddCarViaForm()
+    {
+        return $this->addCarViaForm;
+    }
+
+    /**
+     * @return int|mixed
+     */
+    public function getAddDriverViaForm()
+    {
+        return $this->addDriverViaForm;
     }
 
     /**

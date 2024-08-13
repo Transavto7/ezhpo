@@ -27,8 +27,10 @@ class UserActionTypesEnum
 
     const CAR_IMPORT = 'car_import';
     const CAR_EXPORT = 'car_export';
+    const ADD_CAR_VIA_FORM = 'add_car_via_form';
     const DRIVER_IMPORT = 'driver_import';
     const DRIVER_EXPORT = 'driver_export';
+    const ADD_DRIVER_VIA_FORM = 'add_driver_via_form';
 
     const DOCUMENT_REQUEST = 'document_request';
     const DOCUMENT_REQUEST_PDF = 'document_request_pdf';
@@ -56,8 +58,11 @@ class UserActionTypesEnum
 
             self::CAR_IMPORT => 'Импорт автомобилей',
             self::CAR_EXPORT => 'Экспорт автомобилей',
+            self::ADD_CAR_VIA_FORM => 'add_car_via_form',
             self::DRIVER_IMPORT => 'Импорт водителей',
             self::DRIVER_EXPORT => 'Экспорт водителей',
+            self::ADD_DRIVER_VIA_FORM => 'add_driver_via_form',
+
 
             self::DOCUMENT_REQUEST => 'Запрос документа',
             self::DOCUMENT_REQUEST_PDF => 'Запрос документа PDF',
