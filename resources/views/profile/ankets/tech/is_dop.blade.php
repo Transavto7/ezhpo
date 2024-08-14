@@ -14,7 +14,7 @@
 
 <div class="form-group">
     <label class="form-control-label">ID водителя:</label>
-    <article class="col-md-9">
+    <article>
         <div class="d-flex">
             <input value="{{ $driver_id ?? '' }}"
                    type="number"
@@ -31,7 +31,7 @@
 <div class="cloning" id="cloning-first">
     <div class="form-group">
         <label class="form-control-label">ID автомобиля:</label>
-        <article class="col-md-9">
+        <article>
             <div class="d-flex">
                 <input value="{{ $car_id ?? '' }}"
                        type="number"
