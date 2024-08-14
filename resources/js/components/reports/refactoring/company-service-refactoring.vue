@@ -6,7 +6,7 @@
                 <h5 class="card-header">Выбор информации</h5>
                 <div class="card-body">
                     <div class="row">
-                        <div class="form-group col-lg-8">
+                        <div class="form-group col-lg-7">
                             <label class="mb-1" for="company">Компании </label>
                             <multiselect
                                 :disabled="client"
@@ -25,7 +25,7 @@
                                 <span slot="noOptions">Список пуст</span>
                             </multiselect>
                         </div>
-                        <div class="form-group col-lg-2">
+                        <div class="form-group col-lg-3">
                             <label class="mb-1" for="company">Договор</label>
                             <multiselect
                                 v-model="contracts"
@@ -54,7 +54,7 @@
                     <div class="row">
                         <div class="form-group col-lg-12">
                             <button v-if="permissions.create" type="submit" @click="getReport" class="btn btn-info"
-                                    :disabled="loading">
+                                    :disabled="loading || ! enableCreateBtn">
                                 <span v-if="loading" class="spinner-border spinner-border-sm" role="status"
                                       aria-hidden="true"></span>
                                 Сформировать отчет
@@ -82,9 +82,8 @@
 
             <div v-for="(contract, index) in contracts">
                 <div v-if="contract.visible_result" class="my-3">
-                    <b-button class="mb-2" v-b-toggle="'collapse-' + index" variant="primary">{{
-                            contract.name
-                        }}
+                    <b-button class="mb-2" v-b-toggle="'collapse-' + index" variant="primary">
+                        {{ contract.name }}
                     </b-button>
                     <b-collapse :id="'collapse-' + index" class="mt-2">
                         <b-card>
@@ -129,7 +128,6 @@
 </template>
 
 <script>
-
 import Swal2 from "sweetalert2";
 import ReportJournalTechOther from './ReportJournalTechOther'
 import ReportJournalOther from './ReportJournalOther'
@@ -137,7 +135,6 @@ import ReportJournalMedicOther from './ReportJournalMedicOther'
 import ReportJournalMedic from './ReportJournalMedic'
 import ReportJournalTech from './ReportJournalTech'
 import Total from "./Total";
-
 
 export default {
     name: "company-service-refactoring",
@@ -160,29 +157,30 @@ export default {
             companies: [],
             month: null,
             company_id: 0,
-
             contracts: [],
             contracts_options: [],
-
             permissions: {
                 export: true,
                 create: true,
-
             },
-
             result: [],
-
             temporary: [],
+            axios: axios.create({
+                baseURL: location.origin,
+                headers: {
+                    Authorization: 'Bearer ' + API_TOKEN
+                }
+            }),
         }
     },
     methods: {
         async getReport() {
-            this.loading = true;
             let contractsCount = this.contracts.length
+            this.loading = !! contractsCount
             let processedContracts = 0;
 
             this.contracts.forEach((contract, contract_key) => {
-                axios.get('/api/reports/contract/journal_v2', {
+                this.axios.get('/api/reports/contract/journal_v2', {
                     params: {
                         company_id: this.company_id,
                         contracts_ids: [this.contracts[contract_key].id],
@@ -213,7 +211,7 @@ export default {
             })
         },
         searchCompany(query = '') {
-            axios.get('/api/companies/find', {
+            this.axios.get('/api/companies/find', {
                 params: {
                     search: query
                 }
@@ -230,7 +228,7 @@ export default {
             this.contracts = [];
             this.contracts_options = [];
 
-            axios.get('/report/getContractsForCompany_v2', {
+            this.axios.get('/report/getContractsForCompany_v2', {
                 params: {
                     id: this.company_id
                 }
@@ -281,7 +279,12 @@ export default {
 
             this.searchServices()
         }
-    }
+    },
+    computed: {
+        enableCreateBtn() {
+            return !! this.contracts.length
+        }
+    },
 }
 </script>
 

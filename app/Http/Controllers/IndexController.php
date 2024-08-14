@@ -9,8 +9,10 @@ use App\Car;
 use App\Company;
 use App\Driver;
 use App\Enums\LogActionTypesEnum;
+use App\Enums\QRCodeLinkParameter;
 use App\FieldPrompt;
 use App\Point;
+use App\Services\QRCode\QRCodeLinkGenerator;
 use App\User;
 use Carbon\Carbon;
 use Exception;
@@ -464,8 +466,28 @@ class IndexController extends Controller
         $oKey = 'orderKey';
         $oBy = 'orderBy';
 
-
         $data = $this->elements[$type];
+
+        $dateConditions = [];
+        if (in_array($type, ['Driver', 'Car', 'Company'])) {
+            $dateFields = array_keys(array_filter($data['fields'], function ($item) {
+                return isset($item['type']) && $item['type'] === 'date';
+            }));
+
+            $dateConditions = array_reduce($dateFields, function (array $carry, string $fieldName) {
+                $carry[$fieldName . '_start'] = [$fieldName, '>='];
+                $carry[$fieldName . '_end'] = [$fieldName, '<='];
+
+                return $carry;
+            }, []);
+        }
+
+        $pressureConditions = [
+            'pressure_systolic_min' => ['pressure_systolic', '>='],
+            'pressure_systolic_max' => ['pressure_systolic', '<='],
+            'pressure_diastolic_min' => ['pressure_diastolic', '>='],
+            'pressure_diastolic_max' => ['pressure_diastolic', '<='],
+        ];
 
         $model = $data['model'];
         $modelClass = app("App\\$model");
@@ -502,6 +524,31 @@ class IndexController extends Controller
                 }
 
                 if (!is_array($filterValue)) {
+                    if (isset($dateConditions[$filterKey])) {
+                        $conditions = $dateConditions[$filterKey];
+
+                        $value = Carbon::parse($filterValue);
+
+                        if ($conditions[1] === '>=') {
+                            $value = $value->startOfDay();
+                        } else if ($conditions[1] === '<=') {
+                            $value = $value->endOfDay();
+                        }
+
+                        $query->whereNotNull($conditions[0]);
+                        $query->where($conditions[0], $conditions[1], $value);
+
+                        continue;
+                    }
+
+                    if (isset($pressureConditions[$filterKey])) {
+                        $conditions = $pressureConditions[$filterKey];
+
+                        $query->whereNotNull($conditions[0]);
+                        $query->where($conditions[0], $conditions[1], $filterValue);
+                        continue;
+                    }
+
                     if ($filterKey == 'date_of_employment') {
                         $query = $query->whereBetween($filterKey, [
                             Carbon::parse($filterValue)->startOfDay(),
@@ -673,6 +720,8 @@ class IndexController extends Controller
         $data['company_fields'] = $companyFields;
         $data['Driver'] = Driver::class;
         $data['Car'] = Car::class;
+        $data['car_id'] = $request->input(QRCodeLinkParameter::CAR_ID);
+        $data['driver_id'] = $request->input(QRCodeLinkParameter::DRIVER_ID);
 
         // Проверяем выставленный ПВ
         if (session()->exists('anketa_pv_id')) {

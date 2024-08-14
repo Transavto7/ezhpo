@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Anketa;
+use App\Enums\UserActionTypesEnum;
+use App\Events\UserActions\ClientDocumentRequest;
 use App\Services\DocDataService;
+use Auth;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\File;
@@ -13,6 +16,8 @@ class DocsController extends Controller
 {
     public function Get (Request $request, DocDataService $service)
     {
+        $this->sendEvent(UserActionTypesEnum::DOCUMENT_REQUEST);
+
         $formId = $request->anketa_id;
         $type = $request->type;
 
@@ -62,6 +67,8 @@ class DocsController extends Controller
 
     public function getPdf(Request $request, $type, $formId, DocDataService $service)
     {
+        $this->sendEvent(UserActionTypesEnum::DOCUMENT_REQUEST_PDF);
+
         $form = Anketa::find($formId);
 
         if (!$form) {
@@ -118,5 +125,10 @@ class DocsController extends Controller
         ]);
 
         return back();
+    }
+
+    private function sendEvent(string $actionType)
+    {
+        event(new ClientDocumentRequest(Auth::user(), $actionType));
     }
 }

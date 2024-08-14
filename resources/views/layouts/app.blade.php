@@ -112,7 +112,7 @@
                 @endif
 
                 <!-- Контент страницы -->
-                <section class="no-padding-bottom">
+                <section class="pt-3">
                     <div class="page-container container-fluid">
                         @yield('content')
                     </div>

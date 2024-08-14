@@ -26,17 +26,13 @@ Route::get('/companies/find', 'ApiController@companiesList');
 Route::get('/find/{model}', 'ApiController@modelList');
 
 Route::prefix('reports')->group(function () {
-    Route::prefix('journal')->group(function () {
-        Route::get('/', 'ReportController@getJournalData')->name('api.reports.journal');
-        Route::get('/export', 'ReportController@exportJournalData')->name('api.reports.journal.export');
-    });
     Route::prefix('contract')->group(function () {
         Route::get('/journal', 'ReportControllerContract@getJournalData')->name('api.reports.journal');
         Route::get('/journal/export', 'ReportController@exportJournalData');
-        Route::get('/journal_v2',[ReportContractRefactoringController::class, 'getReport']);
-        Route::get('/export/journal_v2',[ReportContractRefactoringController::class, 'export']);
+        Route::get('/journal_v2', [ReportContractRefactoringController::class, 'getReport']);
+        Route::get('/export/journal_v2', [ReportContractRefactoringController::class, 'export']);
     });
-    Route::get('getContractsForCompany', 'ReportControllerContract@getContractsForCompany')->name('api.reports.journal');
+    Route::get('getContractsForCompany', 'ReportControllerContract@getContractsForCompany');
 });
 
 Route::get('/sync-fields/{model}/{id}', function ($model, $id) {
@@ -94,7 +90,11 @@ Route::middleware('auth:api')->group(function () {
         return response()->json($anketa);
     });
 
-    Route::get('report/{type_report}', 'ReportController@ApiGetReport')->name('api.getReport');
+    Route::prefix('reports')->group(function () {
+        Route::get('/journal', 'ReportController@getJournalData');
+        Route::get('/journal/export', 'ReportController@exportJournalData');
+        Route::get('/graph_pv', 'ReportController@getGraphPvData');
+    });
 
     // Отображаем ПВ
     Route::get('pvs/{id?}', function () {
@@ -120,6 +120,8 @@ Route::middleware('auth:api')->group(function () {
 });
 
 Route::middleware(['auth:api', 'update-last-connection'])->prefix('sdpo')->name('sdpo')->group(function () {
+    Route::post('/get-sticker', 'Api\Forms\TechnicalInspection\QRCodeStickerController');
+
     Route::prefix('anketa')->group(function () {
         Route::post('/', 'Api\SdpoController@createAnketa');
         Route::post('/{id}', 'Api\SdpoController@changeType');
@@ -134,13 +136,17 @@ Route::middleware(['auth:api', 'update-last-connection'])->prefix('sdpo')->name(
         Route::post('/{id}/phone', 'Api\SdpoController@setDriverPhone');
     });
 
+    Route::prefix('car')->group(function () {
+        Route::get('/{id}', 'Api\SdpoController@getCar');
+    });
+
     Route::get('/pv', 'Api\SdpoController@getPoint');
     Route::get('/stamp', 'Api\SdpoController@getStamp');
     Route::get('/stamps', 'Api\SdpoController@getStamps');
     Route::get('/terminal/verification', 'Api\SdpoController@getTerminalVerification');
     Route::get('/medics', 'Api\SdpoController@getMedics');
 
-    Route::post('/work/report', [SdpoController::class, 'workReport']);
+    Route::post('/crash', 'Api\SdpoController@storeCrash');
 });
 
 Route::get('/sdpo/check', 'Api\SdpoController@checkConnection');

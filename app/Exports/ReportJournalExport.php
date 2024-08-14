@@ -27,7 +27,6 @@ class ReportJournalExport implements FromView, WithEvents
         ]);
     }
 
-
     public function registerEvents(): array
     {
         return [

@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Anketa;
+use App\Car;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
 use App\Http\Controllers\SmsController;
+use App\Http\Requests\StoreSdpoCrashRequest;
 use App\MedicFormNormalizedPressure;
+use App\SdpoCrashLog;
 use App\Stamp;
 use App\Traits\UserEdsTrait;
 use App\ValueObjects\Phone;
@@ -497,6 +500,42 @@ class SdpoController extends Controller
         return response()->json($driver);
     }
 
+    /*
+    * return car by id
+    */
+    public function getCar(Request $request, $id): JsonResponse
+    {
+        $apiClient = $request->user('api');
+
+        if ($apiClient->blocked) {
+            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
+        }
+
+        $car = Car::where('hash_id', $id)
+            ->with('company')
+            ->select([
+                'hash_id',
+                'gos_number',
+                'dismissed',
+                'company_id',
+            ])
+            ->first();
+
+        if (!$car) {
+            return response()->json(['message' => 'Авто с указанным ID не найдено!'], 400);
+        }
+
+        if ($car->dismissed === 'Да') {
+            return response()->json(['message' => 'Авто с указанным ID уволено!'], 303);
+        }
+
+        if ($car->company->dismissed === 'Да') {
+            return response()->json(['message' => 'Компания указанного авто заблокирована!'], 303);
+        }
+
+        return response()->json($car);
+    }
+
     public function setDriverPhone(Request $request, $id): JsonResponse
     {
         $apiClient = $request->user('api');
@@ -611,5 +650,39 @@ class SdpoController extends Controller
         $driver->update([
             'photo' => $path
         ]);
+    }
+
+    public function storeCrash(StoreSdpoCrashRequest $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user('api');
+
+        if ($user->blocked) {
+            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            SdpoCrashLog::create(
+                $request->all() +
+                [
+                    'terminal_id' => $user->getAttribute('id'),
+                    'point_id' => $user->getAttribute('pv_id')
+                ]
+            );
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Ошибка успешно передана на сервер!'
+            ]);
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => "Ошибка не была передана на сервер! " . $exception->getMessage()
+            ]);
+        }
     }
 }

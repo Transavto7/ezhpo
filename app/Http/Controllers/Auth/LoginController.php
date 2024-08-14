@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\HomeController;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use App\Services\UserService;
@@ -45,7 +44,7 @@ class LoginController extends Controller
             $this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
 
-            return $this->sendLockoutResponse($request);
+            $this->sendLockoutResponse($request);
         }
 
         if ($this->attemptLogin($request)) {
@@ -82,7 +81,7 @@ class LoginController extends Controller
                 $this->username() => Lang::get('auth.blocked'),
             ]);
         }
-        
+
         return redirect()->back()
             ->withInput($request->only($this->username(), 'remember'))
             ->withErrors([

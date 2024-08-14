@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Anketa;
+use App\Events\UserActions\ClientActionLogRequest;
 use App\Exports\AnketasExport;
 use App\FieldPrompt;
 use App\Point;
@@ -63,7 +64,7 @@ class HomeController extends Controller
         return redirect($_SERVER['HTTP_REFERER']);
     }
 
-    public function index(Request $request)
+    public function index(string $formType, Request $request)
     {
         $user = Auth::user();
 
@@ -83,7 +84,6 @@ class HomeController extends Controller
          * Очистка корзины в очереди на утверждение от СДПО
          */
 
-        $formType = $request->type_ankets;
         $validTypeForm = User::$userRolesKeys[$user->role] ?? 'medic';
         if (isset(Anketa::$anketsKeys[$formType])) {
             $validTypeForm = $formType;
@@ -208,9 +208,19 @@ class HomeController extends Controller
                             continue;
                         }
 
+                        if ($filterKey === 'flag_pak') {
+                            $explodeData = array_map(function($item) {
+                                return $item === 'internal' ? null : $item;
+                            }, $explodeData);
+                        }
+
                         $forms = $forms->where(function ($query) use ($explodeData, $filterKey) {
                             foreach ($explodeData as $fvItemValue) {
-                                $query = $query->orWhere('anketas.' . $filterKey, $fvItemValue);
+                                if ($fvItemValue === null) {
+                                    $query = $query->orWhereNull('anketas.' . $filterKey);
+                                } else {
+                                    $query = $query->orWhere('anketas.' . $filterKey, $fvItemValue);
+                                }
                             }
 
                             return $query;
@@ -230,6 +240,11 @@ class HomeController extends Controller
 
                                 return $query;
                             });
+                            continue;
+                        }
+
+                        if ($filterKey === 'flag_pak' && $explodeData === 'internal') {
+                            $forms = $forms->whereNull('anketas.flag_pak');
                             continue;
                         }
 
@@ -520,6 +535,8 @@ class HomeController extends Controller
                 ->get(),
             true
         );
+
+        event(new ClientActionLogRequest(Auth::user(), $formType));
 
         $view = $request->get('getFormFilter') ? 'home_filters' : 'home';
         return view($view, [

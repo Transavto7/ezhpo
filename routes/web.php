@@ -21,6 +21,7 @@ $techToken = '$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx';
 Route::prefix('api')->group(function () use ($techToken) {
     Route::get("pv-reset/$techToken", 'ApiController@ResetAllPV')->name('api.resetpv');
     Route::get('getField/{model}/{field}/{default_value?}', 'IndexController@GetFieldHTML');
+    Route::get('/parse-qr-code', 'Api\Forms\TechnicalInspection\ParseQRCodeController');
 });
 
 Route::prefix('snippet')->group(function () use ($techToken) {
@@ -135,6 +136,7 @@ Route::middleware(['auth'])->group(function () {
          * Элементы CRM
          */
         Route::prefix('elements')->group(function () {
+            Route::post('generate', 'Elements\GenerateMetricController')->name('generateMetric');
             Route::post('/export/{type}', 'Elements\ExportElementController')->name('exportElement');
             Route::post('/import', 'Elements\ImportElementController')->name('importElement');
             Route::post('/search', 'Elements\SearchElementsController')->name('searchElement');
@@ -164,12 +166,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('journal', 'ReportController@ShowJournal')->name('journal');
             Route::get('journal_new',[ReportContractRefactoringController::class, 'index'])->name('company_service');
             Route::get('{type_report}', 'ReportController@GetReport')->name('get');
-
-            Route::prefix('dynamic')->as('dynamic.')->group(function () {
-                Route::get('medic', 'ReportController@getDynamicMedic')->name('medic');
-                Route::get('tech', 'ReportController@getDynamicTech')->name('tech');
-                Route::get('all', 'ReportController@getDynamicAll')->name('all');
-            });
+            Route::get('/dynamic/{journal}', 'ReportController@getDynamic')->name('dynamic');
         });
 
         Route::post('save-fields-home/{type_ankets}', 'HomeController@SaveCheckedFieldsFilter')->name('home.save-fields');
@@ -191,6 +188,11 @@ Route::middleware(['auth'])->group(function () {
             Route::post('list', 'LogController@list')->name('list');
             Route::post('list-model', 'LogController@listByModel')->name('list-model');
             Route::post('list-model-map', 'LogController@listByModelMaps')->name('list-model-map');
+        });
+
+        Route::prefix('sdpo-crash-logs')->as('sdpo_crash_logs.')->group(function () {
+            Route::get('/', 'SdpoCrashLogController@index')->name('index');
+            Route::post('list', 'SdpoCrashLogController@list')->name('list');
         });
     });
 });
