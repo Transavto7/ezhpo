@@ -64,7 +64,7 @@ class HomeController extends Controller
         return redirect($_SERVER['HTTP_REFERER']);
     }
 
-    public function index(string $formType, Request $request)
+    public function index(Request $request)
     {
         $user = Auth::user();
 
@@ -84,6 +84,7 @@ class HomeController extends Controller
          * Очистка корзины в очереди на утверждение от СДПО
          */
 
+        $formType = $request->type_ankets;
         $validTypeForm = User::$userRolesKeys[$user->role] ?? 'medic';
         if (isset(Anketa::$anketsKeys[$formType])) {
             $validTypeForm = $formType;
