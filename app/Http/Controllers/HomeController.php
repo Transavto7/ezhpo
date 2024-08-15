@@ -537,7 +537,7 @@ class HomeController extends Controller
             true
         );
 
-        event(new ClientActionLogRequest(Auth::user(), $formType));
+        event(new ClientActionLogRequest(Auth::user(), $validTypeForm));
 
         $view = $request->get('getFormFilter') ? 'home_filters' : 'home';
         return view($view, [
