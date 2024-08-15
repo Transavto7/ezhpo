@@ -25,21 +25,21 @@
     </article>
 </div>
 
-<div class="form-group">
-    <label class="form-control-label">Дата осмотра ПЛ:</label>
-    <article>
-        <input min="1900-02-20T20:20"
-               max="2999-02-20T20:20"
-               type="datetime-local"
-               @if (!isset($period_pl)) required @endif
-               oninput="changeFormRequire(this, 'pl-period')"
-               @isset ($date) value="{{ $default_current_date ?? '' }}" @endisset
-               name="anketa[0][date]"
-               class="form-control pl-date">
-    </article>
-</div>
-
 <div class="cloning" id="cloning-first">
+    <div class="form-group">
+        <label class="form-control-label">Дата осмотра ПЛ:</label>
+        <article>
+            <input min="1900-02-20T20:20"
+                   max="2999-02-20T20:20"
+                   type="datetime-local"
+                   @if (!isset($period_pl)) required @endif
+                   oninput="changeFormRequire(this, 'pl-period')"
+                   @isset ($date) value="{{ $default_current_date ?? '' }}" @endisset
+                   name="anketa[0][date]"
+                   class="form-control pl-date">
+        </article>
+    </div>
+
     @if(empty($id))
         <div class="form-group">
             <label class="form-control-label">Доп. даты:</label>

@@ -597,11 +597,7 @@ $(document).ready(function () {
     }
 
     window.changeFormRequire = (element, className) => {
-        if (element.value.length > 0) {
-            $(element).parents('.cloning')?.find('.' + className).prop('required', false);
-        } else {
-            $(element).parents('.cloning')?.find('.' + className).prop('required', true);
-        }
+        $(element).closest('.cloning').find(`.${className}`).prop('required', !(element.value.length > 0));
     };
 
     window.loadPreviousOdometer = async () => {
