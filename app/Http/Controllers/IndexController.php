@@ -592,14 +592,19 @@ class IndexController extends Controller
         /** @var User $user */
         $user = Auth::user();
         if ($user->hasRole('client')) {
-            $companyIdField = 'id';
+            $companyIdField = null;
 
-            //TODO: может странно работать на компании
-            if ($model == 'Driver' || $model == 'Car' || $model == 'Company') {
+            if ($model == 'Company') {
+                $companyIdField = 'id';
+            }
+
+            if ($model == 'Driver' || $model == 'Car') {
                 $companyIdField = 'company_id';
             }
 
-            $query = $query->where($companyIdField, $user->company_id);
+            if ($companyIdField) {
+                $query = $query->where($companyIdField, $user->company_id);
+            }
         }
 
         $orderKey = $request->get($oKey, 'created_at');

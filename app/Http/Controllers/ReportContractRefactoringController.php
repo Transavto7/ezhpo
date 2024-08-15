@@ -799,7 +799,6 @@ class ReportContractRefactoringController extends Controller
 
     public function ApiGetReport(Request $request)
     {
-        dd(123);
         $report = $this->GetReport($request);
 
         return response()->json($report);
