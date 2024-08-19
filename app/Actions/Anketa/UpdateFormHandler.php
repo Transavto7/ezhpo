@@ -7,7 +7,7 @@ use App\Car;
 use App\Company;
 use App\Driver;
 use App\Enums\FormTypeEnum;
-use App\Http\Controllers\SmsController;
+use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
 use App\Point;
 use App\Settings;
@@ -138,14 +138,7 @@ class UpdateFormHandler
             return;
         }
 
-        $company = Company::query()->where('hash_id', $form->company_id)->first();
-        $driver = Driver::query()->where('hash_id', $form->driver_id)->first();
-
-        $phoneToCall = Settings::setting('sms_text_phone');
-        $message = Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall";
-
-        $sms = new SmsController();
-        $sms->sms($company->where_call, $message);
+        event(new DriverDismissed($form));
     }
 
     /**

@@ -3,10 +3,8 @@
 namespace App\Actions\PakQueue\ChangePakQueue;
 
 use App\Anketa;
-use App\Company;
-use App\Driver;
 use App\Enums\FormTypeEnum;
-use App\Http\Controllers\SmsController;
+use App\Events\Forms\DriverDismissed;
 use App\Settings;
 use Exception;
 
@@ -46,7 +44,7 @@ class ChangePakQueueHandler
             return;
         }
 
-        $this->sendSms($form);
+        event(new DriverDismissed($form));
     }
 
     protected function updateForm(Anketa $form, ChangePakQueueAction $action)
@@ -69,17 +67,5 @@ class ChangePakQueueHandler
         $form->user_validity_eds_end = $user->validity_eds_end;
 
         $form->save();
-    }
-
-    protected function sendSms(Anketa $form)
-    {
-        $company = Company::query()->where('hash_id', $form->company_id)->first();
-        $driver = Driver::query()->where('hash_id', $form->driver_id)->first();
-
-        $phoneToCall = Settings::setting('sms_text_phone');
-        $message = Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall";
-
-        $sms = new SmsController();
-        $sms->sms($company->where_call, $message);
     }
 }
