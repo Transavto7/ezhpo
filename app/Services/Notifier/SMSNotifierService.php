@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Services\Notifier;
 
 use App\Settings;
 use App\ValueObjects\Phone;
@@ -8,9 +8,9 @@ use Exception;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class SmsController extends Controller
+class SMSNotifierService
 {
-    public function sms($to, $msg)
+    public function notify($to, string $message)
     {
         try {
             if (config('app.env') !== 'production') return '';
@@ -26,7 +26,7 @@ class SmsController extends Controller
 
             $to = $phone->getSanitized();
 
-            $body = file_get_contents("https://sms.ru/sms/send?api_id=$apiKey&to=$to&msg=".urlencode($msg)."&json=1");
+            $body = file_get_contents("https://sms.ru/sms/send?api_id=$apiKey&to=$to&msg=".urlencode($message)."&json=1");
 
             $json = json_decode($body);
 
@@ -58,7 +58,7 @@ class SmsController extends Controller
         } catch (Throwable $exception) {
             $logData = [
                 'to' => $to,
-                'message' => $msg,
+                'message' => $message,
                 'exception' => $exception->getMessage()
             ];
 

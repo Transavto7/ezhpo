@@ -7,23 +7,23 @@ use App\Car;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
-use App\Http\Controllers\SmsController;
+use App\Events\Forms\DriverDismissed;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSdpoCrashRequest;
 use App\MedicFormNormalizedPressure;
 use App\SdpoCrashLog;
+use App\Settings;
 use App\Stamp;
 use App\Traits\UserEdsTrait;
+use App\User;
 use App\ValueObjects\Phone;
 use App\ValueObjects\PressureLimits;
 use App\ValueObjects\Tonometer;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
-use App\Settings;
-use App\User;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -170,6 +170,7 @@ class SdpoController extends Controller
             $medic['flag_pak'] = $request->type_anketa === 'pak_queue' ? 'СДПО Р' : 'СДПО А';
             $medic['terminal_id'] = $apiClient->id;
             $medic['realy'] = "да";
+            $medic['proba_alko'] = $request->proba_alko ?? 'Отрицательно';
 
             if ($driver->year_birthday !== '' && $driver->year_birthday !== '0000-00-00') {
                 $medic['driver_year_birthday'] = $driver->year_birthday;
@@ -187,7 +188,6 @@ class SdpoController extends Controller
             $medic['date'] = $request->date ?? $medic['created_at'];
 
             $test_narko = $request->test_narko ?? 'Отрицательно';
-            $proba_alko = $request->proba_alko ?? 'Отрицательно';
             $driver->date_prmo = $medic['created_at'];
 
             $admitted = 'Допущен';
@@ -210,9 +210,9 @@ class SdpoController extends Controller
                 $admitted = 'Не допущен';
                 $medic['med_view'] = 'Отстранение';
                 $medic['proba_alko'] = 'Положительно';
-                $proba_alko = $request->proba_alko ?? 'Положительно';
             }
 
+            $proba_alko = $medic['proba_alko'];
             $driver->checkGroupRisk($tonometer, $test_narko, $proba_alko);
 
             if ($request->sleep_status === 'Нет') {
@@ -280,15 +280,11 @@ class SdpoController extends Controller
             }
 
             /**
-             * ОТПРАВКА SMS
+             * ОТПРАВКА УВЕДОМЛЕНИЙ
              */
             $needNotify = $form['admitted'] === 'Не допущен' && $form['flag_pak'] !== 'СДПО Р';
             if ($needNotify) {
-                $phoneToCall = Settings::setting('sms_text_phone');
-                $message = Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall";
-
-                $sms = new SmsController();
-                $sms->sms($company->where_call, $message);
+                event(new DriverDismissed($form));
             }
 
             $form['timeout'] = Settings::setting('timeout') ?? 20;

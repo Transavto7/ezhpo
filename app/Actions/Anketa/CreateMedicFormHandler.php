@@ -5,11 +5,9 @@ namespace App\Actions\Anketa;
 use App\Anketa;
 use App\Company;
 use App\Driver;
-use App\Dto\NotifyParams;
 use App\Enums\BlockActionReasonsEnum;
-use App\Http\Controllers\SmsController;
+use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
-use App\Settings;
 use App\ValueObjects\PressureLimits;
 use App\ValueObjects\Pulse;
 use App\ValueObjects\PulseLimits;
@@ -216,19 +214,14 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
 
         $formModel = new Anketa($form);
 
+        $formModel->save();
+
         /**
          * ОТПРАВКА SMS
          */
         if ($form['admitted'] === 'Не допущен') {
-            $this->notify(new NotifyParams(
-                $company,
-                $driver,
-                null,
-                $formModel
-            ));
+            event(new DriverDismissed($formModel));
         }
-
-        $formModel->save();
 
         if ($this->needStoreNormalizedPressure) {
             MedicFormNormalizedPressure::store(
@@ -238,38 +231,6 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         }
 
         $this->createdForms->push($formModel);
-    }
-
-    protected function notify(NotifyParams $notifyParams)
-    {
-        $company = $notifyParams->getCompany();
-        if (empty($company)) {
-            return;
-        }
-
-        $phoneToCall = Settings::setting('sms_text_phone');
-        $whereCall = $company->where_call;
-        $sms = new SmsController();
-
-        $driver = $notifyParams->getDriver();
-        if (isset($driver)) {
-            $message = Settings::setting('sms_text_driver') . " $driver->fio. $phoneToCall";
-            $sms->sms($whereCall, $message);
-
-            return;
-        }
-
-        $car = $notifyParams->getCar();
-        if (isset($car)) {
-            $message = Settings::setting('sms_text_car') . " $car->gos_number. $phoneToCall";
-            $sms->sms($whereCall, $message);
-
-            return;
-        }
-
-        $form = $notifyParams->getForm();
-        $message = Settings::setting('sms_text_default') . ' ' . $form . '.' . ' ' . $phoneToCall;
-        $sms->sms($whereCall, $message);
     }
 
     protected function admit(array $form, Driver $driver = null): bool

@@ -6,9 +6,8 @@ use App\Anketa;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
-use App\Http\Controllers\SmsController;
+use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
-use App\Settings;
 use App\User;
 use App\ValueObjects\Pulse;
 use App\ValueObjects\Temperature;
@@ -200,12 +199,8 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
          * ОТПРАВКА SMS
          */
         $needNotify = $form['admitted'] === 'Не допущен' && $form['flag_pak'] !== 'СДПО Р';
-        if($needNotify) {
-            $phoneToCall = Settings::setting('sms_text_phone');
-            $message = Settings::setting('sms_text_driver') . " $driver->fio. $phoneToCall";
-
-            $sms = new SmsController();
-            $sms->sms($company->where_call, $message);
+        if ($needNotify) {
+            event(new DriverDismissed($formModel));
         }
     }
 }
