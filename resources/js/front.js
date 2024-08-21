@@ -664,21 +664,23 @@ $(document).ready(function () {
 
     // Проверка свойства по модели на бэкенда
     window.checkInputProp = async (prop = '0', model = '0', val = '0', label, parent, is_dop) => {
-        let PARENT_ELEM;
-        if (parent) {
-            PARENT_ELEM = parent;
-        } else {
+        val = `${val}`.trim()
+        if ((prop === 'hash_id') && (val.length < 6)) {
+            return;
+        }
+
+        let PARENT_ELEM = parent;
+        if (!parent) {
             PARENT_ELEM = $(event.target).parent();
         }
 
-        //check-prop-one
         if (!is_dop) {
             if (!val) {
                 return;
             }
 
             let answer = await $.ajax({
-                url: `/api/check-prop-one/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
+                url: `/api/check-prop-one/${prop}/${model}/${val}`,
                 headers: {'Authorization': 'Bearer ' + API_TOKEN},
                 success: (data) => {
                     let element = PARENT_ELEM.find('.app-checker-prop')
@@ -755,7 +757,6 @@ $(document).ready(function () {
                     if (PROP_HAS_EXISTS) {
                         APP_CHECKER_PARENT.removeClass('text-danger').addClass('text-success').text(DATA[label])
                     } else {
-                        // PARENT_ELEM.find('input, textarea, select').val('');
                         APP_CHECKER_PARENT.removeClass('text-success').addClass('text-danger').text(`Не найдено`)
                     }
                 }
@@ -811,8 +812,6 @@ $(document).ready(function () {
                         }
                     }
                 }
-
-                return;
             }
         });
     }
@@ -1304,11 +1303,18 @@ $(document).ready(function () {
         let route = $(event.relatedTarget).data('route')
         let modalContent = $("#modalEditor .modal-content")
 
-        axios.get(route).then(({data}) => {
-            modalContent.text('').append(data);
-            LIBS.initAll()
-            initCompanyNameSuggestion($('#modalEditor *[data-field="Company_name"]'), $('#modalEditor input[name="inn"]'))
-        })
+        axios
+            .create({
+                headers: {
+                    Authorization: 'Bearer ' + API_TOKEN
+                }
+            })
+            .post(route)
+            .then(({data}) => {
+                modalContent.text('').append(data);
+                LIBS.initAll()
+                initCompanyNameSuggestion($('#modalEditor *[data-field="Company_name"]'), $('#modalEditor input[name="inn"]'))
+            })
 
     })
 
