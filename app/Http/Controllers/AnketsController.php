@@ -153,7 +153,7 @@ class AnketsController extends Controller
             'date' => ''
         ];
 
-        if($anketa->type_anketa === 'medic') {
+        if ($anketa->type_anketa === 'medic') {
             $anketaMedic = Anketa::where('driver_id', $anketa->driver_id)
                 ->where('type_anketa', 'medic')
                 ->where('type_view', $anketa->type_view)
@@ -161,20 +161,20 @@ class AnketsController extends Controller
                 ->orderBy('date', 'desc')
                 ->get();
 
-            foreach($anketaMedic as $aM) {
+            foreach ($anketaMedic as $aM) {
                 if (!$aM->date || $aM->id === $anketa->id || ($aM->is_dop && $aM->result_dop == null)) {
                     continue;
                 }
 
                 $hourdiff_check = round((Carbon::parse($anketa->date)->timestamp - Carbon::parse($aM->date)->timestamp)/60, 1);
 
-                if($hourdiff_check < 1 && $hourdiff_check >= 0) {
+                if ($hourdiff_check < 1 && $hourdiff_check >= 0) {
                     $anketaDublicate['id'] = $aM->id;
                     $anketaDublicate['date'] = $aM->date;
                     $hourdiff = $hourdiff_check;
                 }
             }
-        } else if($anketa->type_anketa === 'tech') {
+        } else if ($anketa->type_anketa === 'tech') {
             $anketasTech = Anketa::where('car_id', $anketa->car_id)
                 ->where('type_anketa', 'tech')
                 ->where('type_view', $anketa->type_view ?? '')
@@ -182,14 +182,14 @@ class AnketsController extends Controller
                 ->orderBy('date', 'desc')
                 ->get();
 
-            foreach($anketasTech as $aT) {
+            foreach ($anketasTech as $aT) {
                 if (!$aT->date || $aT->id === $anketa->id || ($aT->is_dop && $aT->result_dop == null)) {
                     continue;
                 }
 
                 $hourdiff_check = round((Carbon::parse($anketa->date)->timestamp - Carbon::parse($aT->date)->timestamp)/60, 1);
 
-                if($hourdiff_check < 1 && $hourdiff_check >= 0) {
+                if ($hourdiff_check < 1 && $hourdiff_check >= 0) {
                     $anketaDublicate['id'] = $aT->id;
                     $anketaDublicate['date'] = $aT->date;
                     $hourdiff = $hourdiff_check;
@@ -197,18 +197,16 @@ class AnketsController extends Controller
             }
         }
 
-        if($hourdiff < 1 && $hourdiff >= 0) {
+        if ($hourdiff < 1 && $hourdiff >= 0) {
             return back()->with('error', "Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])");
         }
 
         if ($anketa->type_anketa === 'tech') {
-            if (!$anketa || !$anketa->date || !$anketa->car_id) {
+            if (!$anketa->date || !$anketa->car_id) {
                 return back()->with('error', 'Указаны не полные данные осмотра');
             }
 
-            if($anketa->number_list_road === null && $anketa->type_anketa !== 'medic') {
-                // Генерируем номер ПЛ
-                $findCurrentPL = Anketa::where('created_at', '>=', Carbon::today())->where('in_cart', 0)->get();
+            if ($anketa->number_list_road === null) {
                 $anketa->number_list_road = $anketa->car_id . '-' . date('d.m.Y', strtotime($anketa['date']));
             }
         }
