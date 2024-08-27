@@ -12,7 +12,7 @@
 <script>
 
 export default {
-    name: "logs-uuid-cell",
+    name: "uuid-cell",
     props: [ 'uuid' ],
     data() {
         return {

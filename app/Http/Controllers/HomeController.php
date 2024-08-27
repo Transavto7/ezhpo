@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Anketa;
+use App\Events\UserActions\ClientActionLogRequest;
 use App\Exports\AnketasExport;
 use App\FieldPrompt;
 use App\Point;
@@ -208,9 +209,19 @@ class HomeController extends Controller
                             continue;
                         }
 
+                        if ($filterKey === 'flag_pak') {
+                            $explodeData = array_map(function($item) {
+                                return $item === 'internal' ? null : $item;
+                            }, $explodeData);
+                        }
+
                         $forms = $forms->where(function ($query) use ($explodeData, $filterKey) {
                             foreach ($explodeData as $fvItemValue) {
-                                $query = $query->orWhere('anketas.' . $filterKey, $fvItemValue);
+                                if ($fvItemValue === null) {
+                                    $query = $query->orWhereNull('anketas.' . $filterKey);
+                                } else {
+                                    $query = $query->orWhere('anketas.' . $filterKey, $fvItemValue);
+                                }
                             }
 
                             return $query;
@@ -230,6 +241,11 @@ class HomeController extends Controller
 
                                 return $query;
                             });
+                            continue;
+                        }
+
+                        if ($filterKey === 'flag_pak' && $explodeData === 'internal') {
+                            $forms = $forms->whereNull('anketas.flag_pak');
                             continue;
                         }
 
@@ -520,6 +536,8 @@ class HomeController extends Controller
                 ->get(),
             true
         );
+
+        event(new ClientActionLogRequest(Auth::user(), $validTypeForm));
 
         $view = $request->get('getFormFilter') ? 'home_filters' : 'home';
         return view($view, [

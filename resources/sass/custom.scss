@@ -79,6 +79,10 @@
     border-radius: 0px;
 }
 
+.tooltip {
+    pointer-events: none;
+}
+
 .card {
     overflow-x: auto
 }

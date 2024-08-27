@@ -8,6 +8,8 @@ use App\Actions\Element\Import\Drivers\ImportObjects\ErrorDriver;
 use App\Actions\Element\Import\Drivers\ImportObjects\ImportedDriver;
 use App\Company;
 use App\Driver;
+use App\Enums\UserActionTypesEnum;
+use App\Events\UserActions\ClientDocImport;
 use App\GenerateHashIdTrait;
 use App\Models\Contract;
 use App\Services\BriefingService;
@@ -15,9 +17,8 @@ use App\Services\HashIdGenerator\DefaultHashIdValidators;
 use App\Services\HashIdGenerator\HashedType;
 use App\Services\HashIdGenerator\HashIdGenerator;
 use App\Services\UserService;
-use App\User;
+use Auth;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Hash;
 
 final class DriverRecordHandler extends ElementRecordHandler
 {
@@ -76,6 +77,8 @@ final class DriverRecordHandler extends ElementRecordHandler
      */
     private function createDriver(ImportedDriver $importedDriver, Company $company)
     {
+        event(new ClientDocImport(Auth::user(), UserActionTypesEnum::DRIVER_IMPORT));
+
         $hashId = HashIdGenerator::generateWithType(DefaultHashIdValidators::driver(), HashedType::driver());
         $productsId = $company->getAttribute('products_id');
 

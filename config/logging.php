@@ -110,6 +110,11 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/sms-api.log')
         ],
+
+        'tg-api' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/tg-api.log')
+        ],
     ],
 
 ];

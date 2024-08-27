@@ -25,21 +25,19 @@ export class ApiController {
     }
 
 
-    getGraphReport ({ pv_id, date_from, date_to, date_from_time, date_to_time, type_anketa }) {
-        let pv_id_str = ''
+    getGraphReport ({ pv_id, date_from, date_to, type_anketa }) {
+        const params = {
+            pv_id,
+            date_to,
+            date_from,
+            type_anketa,
+        }
 
-        pv_id.forEach((item, i) => {
-            pv_id_str += `pv_id[${i}]=${item}&`;
-        })
-
-        let dopParams = (date_to_time && date_from_time) ? `&date_from_time=${date_from_time}&date_to_time=${date_to_time}` : '';
-
-        // Ты чё еблан нахуй?
-        return this.client.get(`/api/report/graph_pv?filter=1&${pv_id_str}date_from=${date_from}&date_to=${date_to}&api=1${dopParams}&type_anketa=${type_anketa}`).then(response => {
-            const data = response.data
-
-            return data
-        })
+        return this.client
+            .get(`/api/reports/graph_pv`, { params })
+            .then(response => {
+                return response.data
+            })
     }
 
     getFieldHTML ({ field, model, default_value }) {

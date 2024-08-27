@@ -360,6 +360,7 @@
             || user()->access('service_logs_read') && $model == 'Service'
         );
 
+        $permissionToGenerateMetricLKK = ($model === 'Company' && user()->access('generate_metric_lkk'));
         $permissionToViewContract = user()->access('contract_read');
         $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
 
@@ -401,6 +402,16 @@
                             </a>
                         @endif
                     </div>
+                @endif
+
+                @if($permissionToGenerateMetricLKK)
+                    <div class="m-2">
+                        <button type="button" data-toggle="modal" data-target="#elementsModalGenerateMetric"
+                                class="btn btn-sm btn-secondary">
+                             Метрика ЛКК <i class="fa fa-table"></i>
+                        </button>
+                    </div>
+                    @component('modals.metric-modal')@endcomponent
                 @endif
 
                 @if($permissionToCreate && $model == 'Driver')
@@ -457,7 +468,7 @@
                                 @php $fv['multiple'] = true; @endphp
 
                                 @if(!in_array($fk, ['photo']) && !isset($fv['hidden']))
-                                    <div class="col-md-2">
+                                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                                         <div class="form-group">
                                             <label>{{ $fv['label'] }}</label>
 
@@ -476,12 +487,31 @@
                                                 ])
                                             @elseif($model === 'Instr' && $fk === 'sort')
                                                 <!-- Сортировка доступна только инженеру БДД и Админу -->
+                                            @elseif($fv['type'] === 'date' && in_array($model, ['Driver', 'Car', 'Company']))
+                                                @include('templates.components.date-range-field', [
+                                                   'v' => $fv,
+                                                   'k' => $fk,
+                                                   'disabled' => false,
+                                                   'is_required' => '',
+                                                   'default_value_start' => request()->get($fk . '_start'),
+                                                   'default_value_end' => request()->get($fk . '_end'),
+                                               ])
+                                            @elseif($fk === 'pressure_systolic' || $fk === 'pressure_diastolic')
+                                                @include('templates.components.pressure-field', [
+                                                   'v' => $fv,
+                                                   'k' => $fk,
+                                                   'disabled' => false,
+                                                   'is_required' => '',
+                                                   'default_value_min' => request()->get($fk . '_min'),
+                                                   'default_value_max' => request()->get($fk . '_max'),
+                                               ])
                                             @else
                                                 @include('templates.elements_field', [
                                                     'v' => $fv,
                                                     'k' => $fk,
+                                                    'disabled' => false,
                                                     'is_required' => '',
-                                                    'default_value' => request()->get($fk)
+                                                    'default_value' => request()->get($fk),
                                                 ])
                                             @endif
 
@@ -489,8 +519,7 @@
                                     </div>
                                 @endif
                             @endforeach
-
-                            <div class="col-md-2">
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                                 <button type="submit" class="btn btn-sm btn-info">Поиск</button>
                                 <a href="?" class="btn btn-sm btn-danger">Сбросить</a>
                             </div>
@@ -866,6 +895,67 @@
                 }
             });
 
+            $('[data-field-type="date-picker"]').each((index, element) => {
+                initDatePicker($(element), {
+                    mode: 'single'
+                })
+            })
+
+            $('.start-date').change(function () {
+                const start = $(this).val()
+                const end = $('.end-date').val()
+
+                if (! end) {
+                    return
+                }
+
+                if (end < start) {
+                    $('.end-date').val(start)
+                }
+            })
+
+            $('.end-date').change(function () {
+                const start = $('.start-date').val()
+                const end = $(this).val()
+
+                if (! start) {
+                    return
+                }
+
+                if (end < start) {
+                    $('.start-date').val(end)
+                }
+            })
+
+            $('.generate-metric').click(function () {
+                const url = '{{ route('generateMetric') }}'
+                const start = $('.start-date').val()
+                const end = $('.end-date').val()
+
+                if (start && end) {
+                    $('.spinner-btn').attr('style', '')
+                    $('.generate-metric').attr('style', 'display: none')
+
+                    axios
+                        .post(url, {
+                            start,
+                            end
+                        }, { responseType: 'blob' })
+                        .then(response => {
+                            const { data } = response
+                            const url = window.URL.createObjectURL(new Blob([data]));
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.setAttribute('download', `Метрика ЛКК ${start} - ${end}.xlsx`);
+                            document.body.appendChild(link);
+                            link.click();
+                        })
+                        .finally(() => {
+                            $('.spinner-btn').attr('style', 'display: none')
+                            $('.generate-metric').attr('style', '')
+                        })
+                }
+            })
         </script>
     @endsection
 @endsection

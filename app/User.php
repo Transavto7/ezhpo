@@ -24,8 +24,7 @@ class User extends Authenticatable
 
     const DEFAULT_USER_LOGIN = 'it@nozdratenko.ru';
 
-    public $fillable
-        = [
+    public $fillable = [
             'hash_id',
             'req_id',
             'photo',
@@ -51,19 +50,16 @@ class User extends Authenticatable
             'accepted_agreement'
         ];
 
-    protected $hidden
-        = [
+    protected $hidden = [
             'password',
         ];
 
-    protected $casts
-        = [
+    protected $casts = [
             'email_verified_at' => 'datetime',
             'last_connection_at' => 'datetime',
         ];
 
-    public static $newUserRolesText
-        = [
+    public static $newUserRolesText = [
             1 => 'Контролёр ТС',
             2 => 'Медицинский сотрудник',
             3 => 'Водитель',
@@ -75,8 +71,7 @@ class User extends Authenticatable
             9 => 'Терминал',
         ];
 
-    public static $newUserRolesTextEN
-        = [
+    public static $newUserRolesTextEN = [
             1 => 'tech',
             2 => 'medic',
             3 => 'driver',
@@ -88,8 +83,7 @@ class User extends Authenticatable
             9 => 'terminal',
         ];
 
-    public static $userRolesValues
-        = [
+    public static $userRolesValues = [
             'client' => 12,
             'tech' => 1,
             'medic' => 2,
@@ -101,8 +95,7 @@ class User extends Authenticatable
             'operator_pak' => 4,
         ];
 
-    public static $userRolesKeys
-        = [
+    public static $userRolesKeys = [
             '0' => 'medic',
             '1' => 'tech',
             '2' => 'medic',
@@ -113,8 +106,7 @@ class User extends Authenticatable
             '778' => 'medic',
         ];
 
-    public static $userRolesText
-        = [
+    public static $userRolesText = [
             1 => 'Контролёр ТС',
             2 => 'Медицинский сотрудник',
             3 => 'Водитель',
@@ -237,7 +229,7 @@ class User extends Authenticatable
             }
 
         }
-	
+
 	    if ($withUserCompanyId && $authUser->company_id !== null) {
             $company = Company::find($authUser->company_id);
 

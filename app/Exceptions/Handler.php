@@ -40,24 +40,4 @@ class Handler extends ExceptionHandler
 
         parent::report($exception);
     }
-
-    /**
-     * Render an exception into an HTTP response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
-     * @return \Illuminate\Http\Response
-     */
-    public function render($request, Exception $exception)
-    {
-        if ($this->isHttpException($exception)) {
-            $status = $exception->getStatusCode();
-            /** @var HttpExceptionInterface $exception */
-            if (!($status >= 200 && $status < 300)) {
-                return response()->view('pages.error', [], $status);
-            }
-        }
-
-        return parent::render($request, $exception);
-    }
 }

@@ -5,10 +5,7 @@
 @section('class-page', 'page-anketa anketa-' . $type_anketa)
 
 @php
-    if (!isset($is_dop)) {
-        $is_dop = isset($_GET['is_dop']) ? ($_GET['is_dop'] === "1") : 0;
-    }
-
+    $is_dop = $is_dop ?? request()->get('is_dop', '0') === '1';
 @endphp
 
 @section('custom-scripts')
@@ -109,10 +106,11 @@
 @endsection
 
 @section('content')
+    @include('profile.ankets.components.fast-scroll')
 
     <div class="row" data-anketa="{{ $anketa_view }}" id="ANKETA_FORM_VIEW">
         <!-- Анкета -->
-        <div class="col-lg-2" id="ANKETA_FORM_VIEW_FIRST">
+        <div class="col-lg-3" id="ANKETA_FORM_VIEW_FIRST">
             <div class="card">
                 <div class="card-body">
                     <p><b>Карточка автомобиля</b></p>
@@ -124,40 +122,33 @@
             </div>
         </div>
 
-        <div class="col-lg-6" id="ANKETA_FORM_ROOT">
+        <div class="col-lg-3" id="ANKETA_FORM_ROOT">
             <div class="card">
                 <div class="card-body">
-
-                    <h3 class="text-center">{{ $title }}</h3>
-                    <hr>
+                    <p><b>{{ $title }}</b></p>
 
                     <!-- Анкета: {{ $title }} -->
                     <article class="anketa anketa-fields">
-                        @isset($_GET['errors'])
-                            @foreach($_GET['errors'] as $error)
-                                <div class="alert alert-danger" role="alert">{{ $error }}</div>
-                            @endforeach
-                        @endisset
+                        @foreach(request()->get('errors', []) as $error)
+                            <div class="alert alert-danger" role="alert">{{ $error }}</div>
+                        @endforeach
 
-                        @isset($_GET['createdId'])
+                        @if(request()->filled('createdId'))
                             <div class="row">
-                                @foreach($_GET['createdId'] as $cId)
-                                    @php $anketa = \App\Anketa::find($cId) @endphp
-
+                                @foreach(request()->get('createdId', []) as $cId)
+                                    @php $anketa = \App\Anketa::query()->with(['driver', 'car'])->find($cId) @endphp
 
                                     @isset($anketa)
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
                                             <div class="card p-2 text-xsmall">
                                                 @if($type_anketa === \App\Enums\FormTypeEnum::MEDIC)
                                                     <b>"{{ $title }}" успешно создан!</b>
                                                     <br/> ID осмотра: {{ $cId }}
 
-                                                    @isset($anketa->driver_id)
-                                                        @isset(\App\Driver::where('hash_id', $anketa->driver_id)->first()->fio)
-                                                            <br/>
-                                                            <b>Водитель: {{ \App\Driver::where('hash_id', $anketa->driver_id)->first()->fio }}</b>
-                                                        @endisset
-                                                    @endisset
+                                                    @if($anketa->driver && $anketa->driver->fio)
+                                                        <br/>
+                                                        <b>Водитель: {{ $anketa->driver->fio }}</b>
+                                                    @endif
 
                                                     Тип осмотра:<b>{{ $anketa->type_view }}</b>
 
@@ -167,82 +158,65 @@
                                                         </div>
                                                     @elseif($anketa->period_pl)
                                                         <div>
-                                                            <i>Период проведения осмотра:
-                                                                <br/><b>{{ $anketa->period_pl }}</b></i>
+                                                            <i>Период проведения осмотра:<br/><b>{{ $anketa->period_pl }}</b></i>
                                                         </div>
                                                     @endif
 
-                                                    @if($anketa->admitted === 'Не допущен')
-                                                        @if(user()->access('medic_closing_edit'))
-                                                            <a class="btn primary btn-sm btn-table"
-                                                               href="{{ route('docs.get', ['type' => 'closing', 'anketa_id' => $cId]) }}">
-                                                                Мед. заключение
-                                                            </a>
-                                                        @endif
+                                                    @if(($anketa->admitted === 'Не допущен') && user()->access('medic_closing_edit'))
+                                                        <a class="btn primary btn-sm btn-table"
+                                                           href="{{ route('docs.get', ['type' => 'closing', 'anketa_id' => $cId]) }}">
+                                                            Мед. заключение
+                                                        </a>
                                                     @endif
                                                 @else
                                                     <b>"{{ $title }}" (ID: {{ $cId }}) успешно создан!</b>
 
-                                                    @isset($anketa->driver_id)
-                                                        @isset(\App\Driver::where('hash_id', $anketa->driver_id)->first()->fio)
-                                                            <br/>
-                                                            <b>Водитель: {{ \App\Driver::where('hash_id', $anketa->driver_id)->first()->fio }}</b>
-                                                        @endisset
-                                                    @endisset
+                                                    @if($anketa->driver && $anketa->driver->fio)
+                                                        <br/>
+                                                        <b>Водитель: {{ $anketa->driver->fio }}</b>
+                                                    @endif
 
                                                     @if($type_anketa === \App\Enums\FormTypeEnum::TECH)
                                                         Тип осмотра:<b>{{ $anketa->type_view }}</b>
                                                     @endif
 
-                                                    @isset($anketa->car_id)
-                                                        @isset(\App\Driver::where('hash_id', $anketa->car_id)->first()->gos_number)
-                                                            <br/> <b>Госномер
-                                                                автомобиля: {{ \App\Driver::where('hash_id', $anketa->car_id)->first()->gos_number }}</b>
-                                                        @endisset
-                                                    @endisset
+                                                    @if($anketa->car && $anketa->car->gos_number)
+                                                        <br/>
+                                                        <b>Госномер автомобиля: {{ $anketa->car->gos_number }}</b>
+                                                    @endif
 
                                                     <div>
                                                         Дата проведения осмотра <b>{{ $anketa->date }}</b>
                                                     </div>
                                                 @endif
 
-                                                @isset($_GET['redDates'])
-                                                    @if(is_array($_GET['redDates']))
-                                                        @if(count($_GET['redDates']) > 0)
-                                                            @foreach($_GET['redDates'] as $redDateKey => $redDateVal)
-                                                                <p class="text-danger">
-                                                                    {{ __('ankets.'.$redDateKey) }}
-                                                                    : {{ $redDateVal['value'] }}
-                                                                </p>
-                                                            @endforeach
-                                                        @endif
-                                                    @endif
-                                                @endisset
+                                                @foreach(request()->get('redDates', []) as $redDateKey => $redDateVal)
+                                                    <p class="text-danger">
+                                                        {{ __('ankets.'.$redDateKey) }}
+                                                        : {{ $redDateVal['value'] }}
+                                                    </p>
+                                                @endforeach
 
                                             </div>
                                         </div>
                                     @endif
                                 @endforeach
                             </div>
-                        @endisset
+                        @endif
 
-                        @isset($_GET['msg'])
+                        @if(request()->filled('msg'))
                             <div class="alert alert-success">
-                                <b>{{ $_GET['msg'] }}</b>
+                                <b>{{ request()->get('msg') }}</b>
                             </div>
                         @endif
 
                         <form method="POST"
-                              @if(isset($anketa_route))
-                                  action="{{ route($anketa_route, $id) }}"
-                              @else
-                                  action="{{ route('addAnket') }}"
-                              @endif
+                              action="{{ isset($anketa_route) ? route($anketa_route, $id) : route('addAnket') }}"
                               class="form-horizontal"
                               onsubmit="document.querySelector('#page-preloader').classList.remove('hide')"
                               enctype="multipart/form-data"
-                              id="ANKETA_FORM"
-                        >
+                              id="ANKETA_FORM">
+
                             @csrf
 
                             @if(isset($anketa_route) && $id)
@@ -263,22 +237,25 @@
                                 @hasSection('ankets_submit')
                                     @yield('ankets_submit')
                                 @else
-                                    @if (isset($anketa_route))
+                                    @if(isset($anketa_route))
                                         <a href="{{ url()->previous()  }}"
-                                           class="m-center btn btn-info">{{ __('Вернуться в журнал') }}</a>
+                                           class="m-center btn btn-info">
+                                            {{ __('Вернуться в журнал') }}
+                                        </a>
                                     @endif
                                     <button type="submit"
-                                            class="m-center btn btn-success">{{ __('ankets.submit') }}</button>
+                                            class="m-center btn btn-sm btn-success">
+                                        {{ __('ankets.submit') }}
+                                    </button>
                                 @endif
                             </div>
                         </form>
                     </article>
-
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-2">
+        <div class="col-lg-3">
             <div class="card">
                 <div class="card-body">
                     <p><b>Карточка компании</b></p>
@@ -290,7 +267,7 @@
             </div>
         </div>
 
-        <div class="col-lg-2">
+        <div class="col-lg-3">
             <div class="card">
                 <div class="card-body">
                     <p><b>Карточка водителя</b></p>
