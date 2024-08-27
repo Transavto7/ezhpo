@@ -5,31 +5,14 @@ use App\Http\Middleware\CheckDriver;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('fix/types', 'IndexController@deprecated');
-
-Route::get('/', 'IndexController@RenderIndex')->name('index');
-Route::get('index', 'IndexController@RenderHome')->name('index');
-
 Route::get('show-video', 'IndexController@showVideo')->name('showVideo');
-Route::get('show-edit-element-modal/{model}/{id}', 'IndexController@ShowEditModal')->name('showEditElementModal');
-
-/**
- * API-маршруты
- */
-$techToken = '$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx';
-
-Route::prefix('api')->group(function () use ($techToken) {
-    Route::get("pv-reset/$techToken", 'ApiController@ResetAllPV')->name('api.resetpv');
-    Route::get('getField/{model}/{field}/{default_value?}', 'IndexController@GetFieldHTML');
-    Route::get('/parse-qr-code', 'Api\Forms\TechnicalInspection\ParseQRCodeController');
-});
-
-Route::prefix('snippet')->group(function () use ($techToken) {
-    Route::get("update-pak-fields/$techToken", 'IndexController@deprecated');
-    Route::get("driver-to-user-all/$techToken", 'IndexController@deprecated');
-});
 
 Route::middleware(['auth'])->group(function () {
+    Route::post('show-edit-element-modal/{model}/{id}', 'IndexController@showEditModal')->name('showEditElementModal');
+
+    Route::get('/', 'IndexController@RenderForms')->name('index');
+    Route::get('index', 'IndexController@RenderHome')->name('index');
+
     Route::prefix('v-search')->group(function () {
         Route::get('companies', '\App\Helpers\VSelect@companies');
         Route::get('cars', '\App\Helpers\VSelect@cars');

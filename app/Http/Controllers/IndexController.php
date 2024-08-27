@@ -12,7 +12,6 @@ use App\Enums\LogActionTypesEnum;
 use App\Enums\QRCodeLinkParameter;
 use App\FieldPrompt;
 use App\Point;
-use App\Services\QRCode\QRCodeLinkGenerator;
 use App\User;
 use Carbon\Carbon;
 use Exception;
@@ -439,20 +438,6 @@ class IndexController extends Controller
     }
 
     /**
-     * Рендеры страниц
-     */
-    public function RenderIndex(Request $request)
-    {
-        $user = Auth::user();
-
-        if (!$user) {
-            return view('auth.login');
-        }
-
-        return redirect()->route('forms');
-    }
-
-    /**
      * Рендер просмотра вкладок CRM
      */
     public function RenderElements(Request $request)
@@ -695,7 +680,6 @@ class IndexController extends Controller
             if ($user->hasRole('operator_sdpo')) {
                 return redirect()->route('home', 'pak_queue');
             }
-
             if ($user->hasRole('client')) {
                 return redirect()->route('home', ['type_ankets' => 'medic']);
             }

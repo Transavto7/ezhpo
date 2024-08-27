@@ -35,11 +35,10 @@ Route::prefix('reports')->group(function () {
     Route::get('getContractsForCompany', 'ReportControllerContract@getContractsForCompany');
 });
 
-Route::get('/sync-fields/{model}/{id}', function ($model, $id) {
-    return app("App\\$model")->getAutoSyncFieldsFromHashId($id);
-});
-
 Route::middleware('auth:api')->group(function () {
+    Route::get('getField/{model}/{field}/{default_value?}', 'IndexController@GetFieldHTML');
+    Route::get('parse-qr-code', 'Api\Forms\TechnicalInspection\ParseQRCodeController');
+
     Route::get('/users/{role}', function (Request $request) {
         $user = $request->user();
 
