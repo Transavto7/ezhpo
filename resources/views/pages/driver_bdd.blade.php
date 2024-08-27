@@ -41,19 +41,8 @@
                                     </p>
                                 @endif
 
-                                <iframe  width="100%" height="350"
-                                    srcdoc="<style>html, body, a, img {display: block; width: 100%; height: 100%; margin: 0; padding: 0;}
-                                    a:before, a:after {position: absolute; content: ''; left: 50%; top: 50%;} a:before {margin: -4.9% 0 0 -7%;
-                                    background: rgba(31,31,30,.8); padding-top: 9.8%; width: 14%; border-radius: 16% / 27%;} a:after {margin: -1.9vw 0 0 -1vw;
-                                    border: 2vw solid transparent; border-left: 3.8vw solid #fff;} a:hover:before {background: #c0171c;}</style>
-                                    <a href='http://www.youtube-nocookie.com/embed/{{ str_replace('https://www.youtube.com/watch?v=', '', $instr->youtube) }}?autoplay=1'>
-                                    <img src='//img.youtube.com/vi/{{ str_replace('https://www.youtube.com/watch?v=', '', $instr->youtube) }}/maxresdefault.jpg'
-                                    srcset='//img.youtube.com/vi/{{ str_replace('https://www.youtube.com/watch?v=', '', $instr->youtube) }}/mqdefault.jpg 320w, //img.youtube.com/vi/{{ str_replace('https://www.youtube.com/watch?v=', '', $instr->youtube) }}/hqdefault.jpg 480w,
-                                    //img.youtube.com/vi/{{ str_replace('https://www.youtube.com/watch?v=', '', $instr->youtube) }}/maxresdefault.jpg 1307w'></a>"
-                                    allowfullscreen>
-                                </iframe>
+                                @include('pages.driver-bdd.components.frame', ['url' => $instr->youtube])
 
-                                <a href="{{ $instr->youtube }}">Посмотреть видео на YouTube</a>
                                 <br><br>
                                 <p>{{ $instr->descr }}</p>
 
