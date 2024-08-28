@@ -33,7 +33,7 @@ final class QRCodeParser
         $this->link = $link;
         $this->parameter = $parameter;
 
-        $this->url = route('addAnket', ['type' => 'tech']);
+        $this->url = route('forms.index', ['type' => 'tech']);
     }
     public function getParameter(): string
     {

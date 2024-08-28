@@ -211,7 +211,7 @@
                         @endif
 
                         <form method="POST"
-                              action="{{ isset($anketa_route) ? route($anketa_route, $id) : route('addAnket') }}"
+                              action="{{ isset($anketa_route) ? route($anketa_route, $id) : route('forms.store') }}"
                               class="form-horizontal"
                               onsubmit="document.querySelector('#page-preloader').classList.remove('hide')"
                               enctype="multipart/form-data"

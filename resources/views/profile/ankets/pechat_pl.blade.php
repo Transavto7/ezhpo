@@ -7,9 +7,15 @@
         <div class="form-group">
             <label class="form-control-label">Название компании:</label>
             <article>
-                @php $company_fields['getFieldKey'] = 'hash_id'; @endphp
                 @include('templates.elements_field', [
-                    'v' => $company_fields,
+                    'v' => [
+                        'label' => 'Компания',
+                        'type' => 'select',
+                        'values' => 'Company',
+                        'getField' => 'name',
+                        'concatField' => 'hash_id',
+                        'getFieldKey' => 'hash_id'
+                    ],
                     'k' => 'company_id',
                     'is_required' => 'required',
                     'model' => 'Company',
