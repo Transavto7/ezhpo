@@ -113,7 +113,7 @@ export default {
             })
         },
         admit(id) {
-            const url = `/anketa/change-pak-queue/${id}/Допущен`
+            const url = `/forms/${id}/change-pak-queue/Допущен`
 
             axios.get(url)
                 .then((response) => {
@@ -178,7 +178,7 @@ export default {
                 <span v-else>{{ row[field.field] }}</span>
             </td>
             <td class="td-option not-export d-flex">
-                <a :href="`/anketa/${row.id}`"
+                <a :href="`/forms/${row.id}`"
                    class="btn btn-info btn-sm mr-1">
                     <i class="fa fa-search"></i>
                 </a>
@@ -187,11 +187,11 @@ export default {
                    @click.prevent="approveAdmitting(row)">
                     <i class="fa fa-check"></i>
                 </a>
-                <a :href="`/anketa/change-pak-queue/${row.id}/Не идентифицирован`"
+                <a :href="`/forms/${row.id}/change-pak-queue/Не идентифицирован`"
                    class="btn btn-sm btn-secondary mr-1">
                     <i class="fa fa-question"></i>
                 </a>
-                <a :href="`/anketa/change-pak-queue/${row.id}/Не допущен`"
+                <a :href="`/forms/${row.id}/change-pak-queue/Не допущен`"
                    class="btn btn-sm btn-danger">
                     <i class="fa fa-close"></i>
                 </a>

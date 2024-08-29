@@ -770,7 +770,7 @@
                                         @if($anketa->is_dop && !$anketa->result_dop)
                                             @if (checkChangeResult($anketa))
                                                 <a
-                                                    href="{{ route('changeResultDop', ['result_dop' => 'Утвержден', 'id' => $anketa->id]) }}"
+                                                    href="{{ route('forms.changeResultDop', ['result_dop' => 'Утвержден', 'id' => $anketa->id]) }}"
                                                     class="btn btn-sm btn-success mr-1">
                                                     <i class="fa fa-check"></i>
                                                 </a>
