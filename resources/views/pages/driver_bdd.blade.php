@@ -55,7 +55,7 @@
                                               data-success-title="Инструктаж пройден!"
                                               class="API_FORM_SEND"
                                               method="post"
-                                              action="{{ route('bdd.store') }}">
+                                              action="{{ route('driver.bdd.store') }}">
                                             @csrf
                                             <input type="hidden"
                                                    name="type_anketa"
@@ -84,7 +84,7 @@
                                     </div>
 
                                     <div class="col-md-1">
-                                        <a href="{{ route('page.driver') }}"
+                                        <a href="{{ route('driver.index') }}"
                                            onclick="return confirm('Точно хотите уйти?')"
                                            class="btn btn-danger">
                                             Нет

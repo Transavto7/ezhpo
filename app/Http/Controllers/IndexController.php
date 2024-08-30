@@ -9,7 +9,6 @@ use App\Car;
 use App\Company;
 use App\Driver;
 use App\Enums\LogActionTypesEnum;
-use App\Enums\QRCodeLinkParameter;
 use App\FieldPrompt;
 use App\Point;
 use App\User;
@@ -30,41 +29,6 @@ use Throwable;
 class IndexController extends Controller
 {
     public $elements = [];
-
-    private $ankets = [
-        'medic' => [
-            'title' => 'Медицинский осмотр',
-            'anketa_view' => 'profile.ankets.medic',
-        ],
-        'tech' => [
-            'title' => 'Технический осмотр',
-            'anketa_view' => 'profile.ankets.tech',
-        ],
-        'pechat_pl' => [
-            'title' => 'Журнал печати путевых листов',
-            'anketa_view' => 'profile.ankets.pechat_pl',
-        ],
-        'pak' => [
-            'title' => 'СДПО',
-            'anketa_view' => 'profile.ankets.pak',
-        ],
-        'pak_queue' => [
-            'title' => 'Очередь на утверждение',
-            'anketa_view' => 'profile.ankets.pak_queue',
-        ],
-        'vid_pl' => [
-            'title' => 'Реестр выданных путевых листов',
-            'anketa_view' => 'profile.ankets.vid_pl',
-        ],
-        'bdd' => [
-            'title' => 'Журнал инструктажей по БДД',
-            'anketa_view' => 'profile.ankets.bdd',
-        ],
-        'report_cart' => [
-            'title' => 'Журнал снятия отчетов с карт',
-            'anketa_view' => 'profile.ankets.report_cart',
-        ],
-    ];
 
     public function __construct()
     {
@@ -180,11 +144,6 @@ class IndexController extends Controller
                 'text' => $exception->getMessage(),
             ]);
         }
-    }
-
-    public function getElements()
-    {
-        return $this->elements;
     }
 
     public function AddElement(Request $request, CreateElementHandlerFactory $factory)
@@ -654,72 +613,16 @@ class IndexController extends Controller
         ]);
     }
 
-    public function RenderHome()
+    public function index()
     {
-        return view('index');
-    }
-
-    /**
-     * Рендер анкет
-     */
-    public function RenderForms(Request $request)
-    {
+        /** @var User $user */
         $user = Auth::user();
 
-        $type = $request->get('type');
-        if (!$type) {
-            if ($user->hasRole('tech')) {
-                $type = 'tech';
-            }
-            if ($user->hasRole('medic')) {
-                $type = 'medic';
-            }
-            if ($user->hasRole('manager') || $user->hasRole('engineer_bdd')) {
-                return redirect()->route('renderElements', 'Company');
-            }
-            if ($user->hasRole('operator_sdpo')) {
-                return redirect()->route('home', 'pak_queue');
-            }
-            if ($user->hasRole('client')) {
-                return redirect()->route('home', ['type_ankets' => 'medic']);
-            }
-            if (!$type) {
-                return redirect()->route('index');
-            }
+        if ($user && $user->hasRole('driver')) {
+            return redirect(route('driver.index'));
         }
 
-        $companyFields = $this->elements['Driver']['fields']['company_id'];
-        $companyFields['getFieldKey'] = 'name';
-
-        // Отображаем данные
-        $data = $this->ankets[$type];
-
-        // Конвертация текущего времени Юзера
-        date_default_timezone_set('UTC');
-        $time = time();
-        $timezone = $user->timezone ?: 3;
-        $time += $timezone * 3600;
-        $time = date('Y-m-d\TH:i', $time);
-
-        // Дефолтные значения
-        $data['default_current_date'] = $time;
-        $data['points'] = Point::getAll();
-        $data['type_anketa'] = $type;
-        $data['default_pv_id'] = $user->pv_id;
-        $data['company_fields'] = $companyFields;
-        $data['Driver'] = Driver::class;
-        $data['Car'] = Car::class;
-        $data['car_id'] = $request->input(QRCodeLinkParameter::CAR_ID);
-        $data['driver_id'] = $request->input(QRCodeLinkParameter::DRIVER_ID);
-
-        // Проверяем выставленный ПВ
-        if (session()->exists('anketa_pv_id')) {
-            if (date('d.m') > session('anketa_pv_id')['expired']) {
-                session()->remove('anketa_pv_id');
-            }
-        }
-
-        return view('profile.anketa', $data);
+        return view('index');
     }
 
     public function agreement()

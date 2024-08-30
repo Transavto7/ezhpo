@@ -18,7 +18,7 @@
 
                     <div class="row row-flex">
                         <div class="col-lg-6 my-2">
-                            <a class="text-decoration-none" href="{{ route('page.driver_bdd') }}">
+                            <a class="text-decoration-none" href="{{ route('driver.bdd.index') }}">
                                 <div class="menu_link_driver">
                                     Пройти инструктаж по безопасности дорожного движения
                                 </div>
