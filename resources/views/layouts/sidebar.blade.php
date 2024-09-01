@@ -27,35 +27,35 @@
 
         @if(user()->access('medic_create'))
             <li>
-                <a href="{{ route('forms', ['type' => 'medic']) }}" class="bg-red text-white"><i
+                <a href="{{ route('forms.index', ['type' => 'medic']) }}" class="bg-red text-white"><i
                         class="icon-padnote"></i>Провести мед. осмотр</a>
             </li>
         @endif
 
         @if(user()->access('tech_create'))
             <li>
-                <a href="{{ route('forms', ['type' => 'tech']) }}" class="bg-blue text-white"><i
+                <a href="{{ route('forms.index', ['type' => 'tech']) }}" class="bg-blue text-white"><i
                         class="icon-padnote"></i>Провести тех. осмотр</a>
             </li>
         @endif
 
         @if(user()->access('map_report_create'))
             <li>
-                <a href="{{ route('forms', ['type' => 'report_cart']) }}" class="bg-gray"><i
+                <a href="{{ route('forms.index', ['type' => 'report_cart']) }}" class="bg-gray"><i
                         class="icon-padnote"></i>Внести Отчёт с карты</a>
             </li>
         @endif
 
         @if(user()->access('print_register_pl_create'))
             <li>
-                <a href="{{ route('forms', ['type' => 'pechat_pl']) }}" class="bg-gray"><i
+                <a href="{{ route('forms.index', ['type' => 'pechat_pl']) }}" class="bg-gray"><i
                         class="icon-padnote"></i>Внести запись в Реестр печати ПЛ</a>
             </li>
         @endif
 
         @if(user()->access('journal_briefing_bdd_create'))
             <li>
-                <a href="{{ route('forms', ['type' => 'bdd']) }}" class="bg-gray"><i
+                <a href="{{ route('forms.index', ['type' => 'bdd']) }}" class="bg-gray"><i
                         class="icon-padnote"></i>Внести Инструктаж БДД</a>
             </li>
         @endif

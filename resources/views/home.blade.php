@@ -760,9 +760,9 @@
                                 <td class="td-option not-export d-flex">
                                     @if($type_ankets === 'pak_queue')
                                         <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-sm btn-info mr-1"><i class="fa fa-search mr-1"></i></a>
-                                        <a href="{{ route('changePakQueue', ['admitted' => 'Допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-success mr-1"><i class="fa fa-check"></i></a>
-                                        <a href="{{ route('changePakQueue', ['admitted' => 'Не идентифицирован', 'id' => $anketa->id]) }}" class="btn btn-sm btn-secondary mr-1"><i class="fa fa-question"></i></a>
-                                        <a href="{{ route('changePakQueue', ['admitted' => 'Не допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-danger mr-1"><i class="fa fa-close"></i></a>
+                                        <a href="{{ route('forms.changePakQueue', ['admitted' => 'Допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-success mr-1"><i class="fa fa-check"></i></a>
+                                        <a href="{{ route('forms.changePakQueue', ['admitted' => 'Не идентифицирован', 'id' => $anketa->id]) }}" class="btn btn-sm btn-secondary mr-1"><i class="fa fa-question"></i></a>
+                                        <a href="{{ route('forms.changePakQueue', ['admitted' => 'Не допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-danger mr-1"><i class="fa fa-close"></i></a>
                                     @endif
 
                                     @if($permissionToUpdate)
@@ -770,7 +770,7 @@
                                         @if($anketa->is_dop && !$anketa->result_dop)
                                             @if (checkChangeResult($anketa))
                                                 <a
-                                                    href="{{ route('changeResultDop', ['result_dop' => 'Утвержден', 'id' => $anketa->id]) }}"
+                                                    href="{{ route('forms.changeResultDop', ['result_dop' => 'Утвержден', 'id' => $anketa->id]) }}"
                                                     class="btn btn-sm btn-success mr-1">
                                                     <i class="fa fa-check"></i>
                                                 </a>

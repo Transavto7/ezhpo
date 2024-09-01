@@ -89,8 +89,6 @@ class LoginController extends Controller
             ]);
     }
 
-
-
     /**
      * @param  \Illuminate\Http\Request  $request
      * @return bool

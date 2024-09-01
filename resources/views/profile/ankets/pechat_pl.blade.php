@@ -7,13 +7,19 @@
         <div class="form-group">
             <label class="form-control-label">Название компании:</label>
             <article>
-                @php $company_fields['getFieldKey'] = 'hash_id'; @endphp
                 @include('templates.elements_field', [
-                    'v' => $company_fields,
+                    'v' => [
+                        'label' => 'Компания',
+                        'type' => 'select',
+                        'values' => 'Company',
+                        'getField' => 'name',
+                        'concatField' => 'hash_id',
+                        'getFieldKey' => 'hash_id'
+                    ],
                     'k' => 'company_id',
                     'is_required' => 'required',
                     'model' => 'Company',
-                    'default_value' => request()->get('company_id')
+                    'default_value' => request()->get('company_id') ?? $company_id ?? ''
                 ])
                 <div class="app-checker-prop"></div>
             </article>
@@ -49,7 +55,7 @@
             <div class="form-group">
                 <label class="form-control-label">Количество распечатанных ПЛ:</label>
                 <article>
-                    <input type="number" required name="anketa[0][count_pl]" class="form-control">
+                    <input type="number" required name="anketa[0][count_pl]" value="{{ $count_pl ?? '' }}" class="form-control">
                 </article>
             </div>
 
