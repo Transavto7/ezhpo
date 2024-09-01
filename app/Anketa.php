@@ -3,7 +3,6 @@
 namespace App;
 
 use App\Enums\FormTypeEnum;
-use App\Models\ContractAnketaSnapshot;
 use App\ValueObjects\NotAdmittedReasons;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,25 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Anketa extends Model
 {
     public const MIN_DIFF_BETWEEN_FORMS_IN_SECONDS = 60;
-
-    // archive
-    public function contract_snapshot()
-    {
-        return $this->belongsTo(ContractAnketaSnapshot::class, 'contract_snapshot_id', 'id')
-                    ->withDefault();
-    }
-
-    public function services_snapshot()
-    {
-        return $this->belongsToMany(
-            Product::class,
-            'anketa_services_discount_snapshot_contracts',
-            'anketa_id',
-            'service_id',
-            'id',
-            'id'
-        )->withPivot('service_cost');
-    }
 
     public function our_company()
     {
