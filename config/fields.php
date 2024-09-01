@@ -123,6 +123,7 @@ return [
             'signature' => 'ЭЛ подпись водителя',
             'created_at' => 'Дата/Время создания записи',
         ],
+
         'bdd' => [
             'company_name' => 'Компания',
             'company_id' => 'ID Компании',
@@ -180,7 +181,7 @@ return [
             'procedure_pv' => 'Порядок выпуска',
             'date_prto' => 'Дата ПРТО',
             'date_techview' => 'Дата техосмотра',
-            'time_skzi' => 'Срок действия СКЗИ',
+            'time_skzi' => 'Срок действия СКЗИ\настройки тахографа ЕСТР',
             'date_osago' => 'Дата ОСАГО',
             'town_id' => 'Город',
             'dismissed' => 'Уволен',
@@ -222,6 +223,7 @@ return [
             'type_view' => 'Тип осмотра',
             'essence' => 'Сущности',
         ],
+
         'discount' => [
             'hash_id' => 'ID',
             'products_id' => 'Услуга',
@@ -229,6 +231,7 @@ return [
             'porog' => 'Пороговое значение',
             'discount' => 'Скидка (%)',
         ],
+
         'instr' => [
             'hash_id' => 'ID',
             'photos' => 'Фото',
@@ -240,16 +243,19 @@ return [
             'is_default' => 'Базовый',
             'sort' => 'Сортировка',
         ],
+
         'point' => [
             'hash_id' => 'ID',
             'name' => 'Пункт выпуска',
             'pv_id' => 'Город',
             'company_id' => 'Компания',
         ],
+
         'town' => [
             'hash_id' => 'ID',
             'name' => 'Город',
         ],
+
         'users' => [
             'hash_id' => 'ID',
             'photo' => 'Фото',
@@ -261,6 +267,7 @@ return [
             'blocked' => 'Заблокирован',
             'roles' => 'Роль',
         ],
+
         'terminals' => [
             'status' => 'on/off',
             'hash_id' => 'ID',
@@ -275,16 +282,19 @@ return [
             'last_month_amount' => 'Количество осмотров за предыдущий месяц',
             'month_amount' => 'Количество осмотров за текущий месяц',
         ],
+
         'roles' => [
             'id' => 'ID',
             'guard_name' => 'Название',
         ],
+
         'ddates' => [
             'hash_id' => 'ID',
             'field' => 'Поле даты проверки',
             'days' => 'Кол-во дней',
             'action' => 'Действие',
         ],
+
         'pak_sdpo' => [
             'hash_id' => 'ID',
             'api_token' => 'Токен',
@@ -296,6 +306,7 @@ return [
             'blocked' => 'Заблокирован',
             'roles' => 'Роль',
         ],
+
         'req' => [
             'hash_id' => 'id',
             'name' => 'Название',
@@ -308,11 +319,13 @@ return [
             'director_fio' => 'ФИО Руководителя',
             'seal' => 'Печать',
         ],
+
         'field_prompts' => [
             'type' => 'Журнал',
             'name' => 'Поле',
             'content' => 'Подсказка',
         ],
+
         'pechat_pl' => [
             'id' => 'ID записи',
             'company_name' => 'Компания',
@@ -324,6 +337,7 @@ return [
             'user_eds' => 'ЭЦП сотрудника',
             'pv_id' => 'Пункт выпуска',
         ],
+
         'contracts' => [
             'id' => 'ID',
             'name' => 'Название',
