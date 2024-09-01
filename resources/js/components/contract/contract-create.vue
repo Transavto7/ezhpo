@@ -418,13 +418,13 @@ export default {
 
         async open(data = null, isClone = false) {
             if (!this.companies.length) {
-                axios.get(`/v-search/companies`)
+                axios.get(`/contract/select/companies`)
                     .then(({data}) => this.companies = data)
                     .catch(error => {
                         console.error(error)
                         Swal2.fire('Ошибка!', '', 'warning')
                     });
-                axios.get(`/v-search/our_companies`)
+                axios.get(`/contract/select/our_companies`)
                     .then(({data}) => this.our_companies = data)
                     .catch(error => {
                         console.error(error)
@@ -437,7 +437,7 @@ export default {
                         Swal2.fire('Ошибка!', '', 'warning')
                     });
 
-                await axios.get(`/v-search/services`)
+                await axios.get(`/contract/select/products`)
                     .then(({data}) => this.products = data)
                     .catch(error => {
                         console.error(error)
@@ -578,7 +578,7 @@ export default {
         searchCompanies(value = '') {
             this.companies = [];
             axios
-                .get(`/v-search/companies`, {
+                .get(`/contract/select/companies`, {
                     params: {
                         query: value,
                     },
@@ -597,7 +597,7 @@ export default {
 
             this.companies = [];
             axios
-                .get(`/v-search/our_companies`, {
+                .get(`/contract/select/our_companies`, {
                     params: {
                         query: value,
                     },
@@ -619,7 +619,7 @@ export default {
 
             this.products = [];
             axios
-                .get(`/v-search/services`, {
+                .get(`/contract/select/products`, {
                     params: {
                         query: value,
                     },

@@ -13,14 +13,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', 'IndexController@RenderForms')->name('index');
     Route::get('index', 'IndexController@RenderHome')->name('index');
 
-    Route::prefix('v-search')->group(function () {
-        Route::get('companies', '\App\Helpers\VSelect@companies');
-        Route::get('cars', '\App\Helpers\VSelect@cars');
-        Route::get('drivers', '\App\Helpers\VSelect@drivers');
-        Route::get('services', '\App\Helpers\VSelect@services');
-        Route::get('our_companies', '\App\Helpers\VSelect@our_companies');
-    });
-
     Route::prefix('contract')->group(function () {
         Route::get('/', 'ContractController@view');
         Route::put('restore/{id}', 'ContractController@restore');
@@ -32,6 +24,14 @@ Route::middleware(['auth'])->group(function () {
         Route::post('getCarsByCompany/{id}', 'ContractController@getCarsByCompany');
         Route::post('getDriversByCompany/{id}', 'ContractController@getDriversByCompany');
         Route::post('getAvailableForCompany', 'ContractController@getAvailableForCompany');
+
+        Route::prefix('select')->group(function () {
+            Route::get('companies', 'ContractSelectsController@companies');
+            Route::get('cars', 'ContractSelectsController@cars');
+            Route::get('drivers', 'ContractSelectsController@drivers');
+            Route::get('products', 'ContractSelectsController@products');
+            Route::get('our_companies', 'ContractSelectsController@ourCompanies');
+        });
     });
 
     Route::get('driver-dashboard', function () { return view('pages.driver'); })->name('page.driver');
@@ -145,8 +145,8 @@ Route::middleware(['auth'])->group(function () {
         });
 
         Route::prefix('report')->as('report.')->group(function () {
-            Route::get('getContractsForCompany_v2', [ReportContractRefactoringController::class, 'getContractsForCompany']);
-            Route::get('journal', 'ReportController@ShowJournal')->name('journal');
+            Route::get('getContractsForCompany', [ReportContractRefactoringController::class, 'getContractsForCompany']);
+            Route::get('journal', 'ReportController@index')->name('journal');
             Route::get('journal_new',[ReportContractRefactoringController::class, 'index'])->name('company_service');
             Route::get('{type_report}', 'ReportController@GetReport')->name('get');
             Route::get('/dynamic/{journal}', 'ReportController@getDynamic')->name('dynamic');
