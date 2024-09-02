@@ -33,7 +33,7 @@
         $default_value = $v['defaultValue'] ?? '';
         $disabled = false;
 
-        if (true || user()->hasRole('client')) {
+        if (user()->hasRole('client')) {
             if ($model === 'Driver' && in_array($k, ['group_risk', 'note', 'procedure_pv', 'pressure_systolic', 'pressure_diastolic', 'only_offline_medic_inspections'])) {
                 $disabled = true;
             }
