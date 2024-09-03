@@ -9,6 +9,7 @@ require('chosen-js')
 require('croppie')
 require('suggestions-jquery')
 require('./common/camera')
+require('./common/medicInspection')
 
 $.fn.select2.amd.require(['select2/selection/search'], function (Search) {
     Search.prototype.searchRemoveChoice = function (decorated, item) {

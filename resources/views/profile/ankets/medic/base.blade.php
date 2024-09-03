@@ -49,6 +49,7 @@
                 <option value="Предрейсовый/Предсменный" @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>Предрейсовый/Предсменный</option>
                 <option value="Послерейсовый/Послесменный" @if(strcasecmp($type_view ?? '', 'Послерейсовый/Послесменный') == 0) selected @endif>Послерейсовый/Послесменный</option>
             </select>
+            <p class="duplicate-indicator text-danger d-none">МО с указанным водителем/датой/типом уже существует</p>
         </article>
     </div>
 
