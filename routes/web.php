@@ -132,7 +132,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'AnketsController@index')->name('index');
             Route::post('/', 'AnketsController@AddForm')->name('store');
             Route::get('{id}/print', 'AnketsController@Print')->name('print');
-            Route::delete('{id}', 'AnketsController@Delete')->name('delete');
             Route::post('{id}', 'AnketsController@Update')->name('update');
             Route::get('{id}', 'AnketsController@Get')->name('get');
             Route::get('{id}/change-pak-queue/{admitted}', 'AnketsController@ChangePakQueue')->name('changePakQueue');

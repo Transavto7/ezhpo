@@ -10,13 +10,13 @@ use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
 use App\Point;
+use App\Services\DuplicatesCheckerService;
 use App\Settings;
 use App\User;
 use App\ValueObjects\PressureLimits;
 use App\ValueObjects\Tonometer;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
@@ -87,8 +87,6 @@ class UpdateFormHandler
 
         $form->save();
 
-        $this->updateConnectedForm($form);
-
         if ($isPakQueueForm) {
             $this->updatePakQueueForm($form, $user);
             $this->notifyCancel($form);
@@ -152,15 +150,12 @@ class UpdateFormHandler
 
         $mainFormTimestamp = Carbon::parse($data['anketa'][0]['date'])->timestamp;
 
-        foreach($this->getExistForms($form, $data) as $existForm) {
-            if ($existForm->id === $form->id) {
-                continue;
-            }
+        $formId = $form->id;
+        $existForms = $this->getExistForms($form, $data)->reject(function ($existForm) use ($formId) {
+            return $formId === $existForm->id;
+        });
 
-            if ($this->isDuplicate($mainFormTimestamp, $existForm->date)) {
-                throw new Exception("Найден дубликат осмотра (ID: $existForm->id, Дата: $existForm->date)");
-            }
-        }
+        DuplicatesCheckerService::checkExist($existForms, $mainFormTimestamp);
     }
 
     protected function getExistForms(Anketa $form, array $data): Collection
@@ -171,78 +166,14 @@ class UpdateFormHandler
             Carbon::parse($formNewDate)->addSeconds(Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS)
         ];
 
-        $query = Anketa::query()
-            ->select([
-                'id',
-                'date'
-            ])
-            ->where('type_anketa', $form->type_anketa)
-            ->where('id', '<>', $form->id)
-            ->where(function (Builder $query) {
-                $query
-                    ->where('is_dop', '<>', 1)
-                    ->orWhereNotNull('result_dop');
-            })
-            ->whereBetween('date', $datesDiapason)
-            ->whereNotNull('date')
-            ->where('in_cart', 0)
-            ->orderBy('date', 'desc');
-
         if ($form->type_anketa === FormTypeEnum::MEDIC) {
-            return $query
-                //TODO: разобраться позднее, почему есть разница в том, где лежат данные
-                ->where('driver_id', $data['driver_id'])
-                ->where('type_view', $data['anketa'][0]['type_view'])
-                ->get();
+            return DuplicatesCheckerService::getExistMedicForms($data['driver_id'], $datesDiapason);
         }
 
         if ($form->type_anketa === FormTypeEnum::TECH) {
-            return $query
-                ->where('car_id', $data['anketa'][0]['car_id'])
-                ->where('type_view', $data['anketa'][0]['type_view'] ?? '')
-                ->get();
+            return DuplicatesCheckerService::getExistTechForms([$data['anketa'][0]['car_id']], $datesDiapason);
         }
 
         return collect([]);
-    }
-
-    //TODO: вынести в трейт или хэлпер
-    protected function isDuplicate($first, $second): bool
-    {
-        $diffInMinutes = abs($first - Carbon::parse($second)->timestamp);
-
-        return ($diffInMinutes < Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS) && ($diffInMinutes >= 0);
-    }
-
-    protected function updateConnectedForm(Anketa $form)
-    {
-        if (!$form->connected_hash) {
-            return;
-        }
-
-        $formCopy = Anketa::where('connected_hash', $form->connected_hash)
-            ->where('type_anketa', '!=', $form->type_anketa)
-            ->first();
-
-        if (!$formCopy) {
-            return;
-        }
-
-        $protectedAttributes = [
-            'type_anketa',
-            'id',
-            'created_at',
-            'updated_at'
-        ];
-
-        foreach ($form->fillable as $key) {
-            if (in_array($key, $protectedAttributes)) {
-                continue;
-            }
-
-            $formCopy->$key = $form[$key];
-        }
-
-        $formCopy->save();
     }
 }

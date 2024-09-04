@@ -8,7 +8,7 @@ use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
-use Illuminate\Database\Eloquent\Builder;
+use App\Services\DuplicatesCheckerService;
 use Illuminate\Support\Carbon;
 
 class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -43,38 +43,7 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             return ($car !== null) && ($car !== 0);
         });
 
-        if (count($cars) === 0) {
-            $this->existForms = collect([]);
-
-            return;
-        };
-
-        $query = Anketa::query()
-            ->select([
-                'id',
-                'date'
-            ]);
-
-        if (count($cars) === 1) {
-            $query = $query->where('car_id', $cars[0]);
-        } else {
-            $query = $query->where(function (Builder $subQuery) use ($cars) {
-                foreach ($cars as $car) {
-                    $subQuery->orWhere('car_id', $car);
-                }
-            });
-        }
-
-        $this->existForms = $query->where('type_anketa', 'tech')
-            ->where('in_cart', 0)
-            ->whereNotNull('date')
-            ->where(function (Builder $query) {
-                $query
-                    ->where('is_dop', '<>', 1)
-                    ->orWhereNotNull('result_dop');
-            })
-            ->orderBy('date', 'desc')
-            ->get();
+        $this->existForms = DuplicatesCheckerService::getExistTechForms($cars);
     }
 
     protected function createForm(array $form)

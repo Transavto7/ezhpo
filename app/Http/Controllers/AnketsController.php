@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Anketa\ChangeResultDopHandler;
 use App\Actions\Anketa\CreateFormHandlerFactory;
 use App\Actions\Anketa\CreateSdpoFormHandler;
 use App\Actions\Anketa\TrashFormHandler;
@@ -10,7 +11,6 @@ use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueAction;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueHandler;
 use App\Anketa;
 use App\Car;
-use App\DDates;
 use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Enums\QRCodeLinkParameter;
@@ -22,7 +22,6 @@ use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -32,40 +31,6 @@ use Throwable;
 
 class AnketsController extends Controller
 {
-    public static function ddateCheck($dateAnketa, $dateModel, $id)
-    {
-        $dateCheckModel = app("App\\$dateModel")->find($id);
-        $dateCheck = DDates::where('item_model', $dateModel)->get();
-
-        $redDates = [];
-
-        if ($dateCheck && $dateCheckModel) {
-            foreach ($dateCheck as $dateCheckItem) {
-                $fieldDateCheck = $dateCheckItem->field;
-
-                if (isset($dateCheckModel[$fieldDateCheck])) {
-                    $fieldDateItemValue = $dateCheckModel[$fieldDateCheck];
-
-                    $dateAction = $dateCheckItem->action . ' ' . $dateCheckItem->days . ' days';
-
-                    $dateCheckWithAnketa = date('Y-m-d', strtotime($fieldDateItemValue . ' ' . $dateAction));
-                    $anketaDate = date('Y-m-d', strtotime($dateAnketa));
-
-                    if ($dateCheckWithAnketa <= $anketaDate) {
-                        $redDates[$fieldDateCheck] = [
-                            'value' => $fieldDateItemValue,
-                            'item_model' => $dateCheckItem->item_model,
-                            'item_id' => $dateCheckModel->id,
-                            'item_field' => $fieldDateCheck
-                        ];
-                    }
-                }
-            }
-        }
-
-        return $redDates;
-    }
-
     public function index(Request $request)
     {
         /** @var User $user */
@@ -184,54 +149,51 @@ class AnketsController extends Controller
         return view('profile.anketa', $data);
     }
 
-    public function Delete(Request $request)
-    {
-        $id = $request->id;
-
-        if (Anketa::find($id)->delete()) {
-            return redirect(url()->previous());
-        }
-
-        return abort(403);
-    }
-
     public function Trash(Request $request, TrashFormHandler $handler)
     {
         $id = $request->id;
         $action = $request->action;
-        $anketa = Anketa::find($id);
+        $form = Anketa::findOrFail($id);
 
-        if ($anketa) {
-            $saved = $handler->handle($anketa, $action);
+        try {
+            DB::beginTransaction();
 
-            if ($saved) {
-                return redirect(url()->previous());
-            }
+            $handler->handle($form, $action, Auth::user());
+
+            DB::commit();
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            session()->flash('not_deleted_ankets', [$id]);
         }
 
-        return abort(403);
+        return redirect(url()->previous());
     }
 
-    public function MassTrash(Request $request, TrashFormHandler $handler)
+    public function MassTrash(Request $request, TrashFormHandler $handler): JsonResponse
     {
         $ids = $request->input('ids') ?? [];
         $action = $request->input('action');
-        $notDeletedAnkets = [];
+        $notDeletedForms = [];
 
         foreach ($ids as $id) {
             try {
-                $anketa = Anketa::findOrFail($id);
+                DB::beginTransaction();
 
-                if ($anketa && !$anketa->deleted_at) {
-                    $handler->handle($anketa, $action);
-                }
+                $form = Anketa::findOrFail($id);
+
+                $handler->handle($form, $action, Auth::user());
+
+                DB::commit();
             } catch (Throwable $exception) {
-                $notDeletedAnkets[] = $id;
+                DB::rollBack();
+
+                $notDeletedForms[] = $id;
             }
         }
 
-        if (count($notDeletedAnkets)) {
-            session()->flash('not_deleted_ankets', $notDeletedAnkets);
+        if (count($notDeletedForms)) {
+            session()->flash('not_deleted_ankets', $notDeletedForms);
         }
 
         return response()->json();
@@ -269,77 +231,23 @@ class AnketsController extends Controller
         }
     }
 
-    public function ChangeResultDop($id, $result_dop)
+    public function ChangeResultDop($id, $result_dop, ChangeResultDopHandler $handler): RedirectResponse
     {
-        $anketa = Anketa::find($id);
-        $hourdiff = 1;
-        $anketaDublicate = [
-            'id' => 0,
-            'date' => ''
-        ];
+        $form = Anketa::findOrFail($id);
 
-        if ($anketa->type_anketa === 'medic') {
-            $anketaMedic = Anketa::where('driver_id', $anketa->driver_id)
-                ->where('type_anketa', 'medic')
-                ->where('type_view', $anketa->type_view)
-                ->where('in_cart', 0)
-                ->orderBy('date', 'desc')
-                ->get();
+        try {
+            DB::beginTransaction();
 
-            foreach ($anketaMedic as $aM) {
-                if (!$aM->date || $aM->id === $anketa->id || ($aM->is_dop && $aM->result_dop == null)) {
-                    continue;
-                }
+            $handler->handle($form, $result_dop);
 
-                $hourdiff_check = round((Carbon::parse($anketa->date)->timestamp - Carbon::parse($aM->date)->timestamp) / 60, 1);
+            DB::commit();
 
-                if ($hourdiff_check < 1 && $hourdiff_check >= 0) {
-                    $anketaDublicate['id'] = $aM->id;
-                    $anketaDublicate['date'] = $aM->date;
-                    $hourdiff = $hourdiff_check;
-                }
-            }
-        } else if ($anketa->type_anketa === 'tech') {
-            $anketasTech = Anketa::where('car_id', $anketa->car_id)
-                ->where('type_anketa', 'tech')
-                ->where('type_view', $anketa->type_view ?? '')
-                ->where('in_cart', 0)
-                ->orderBy('date', 'desc')
-                ->get();
+            return back();
+        } catch (Throwable $exception) {
+            DB::rollBack();
 
-            foreach ($anketasTech as $aT) {
-                if (!$aT->date || $aT->id === $anketa->id || ($aT->is_dop && $aT->result_dop == null)) {
-                    continue;
-                }
-
-                $hourdiff_check = round((Carbon::parse($anketa->date)->timestamp - Carbon::parse($aT->date)->timestamp) / 60, 1);
-
-                if ($hourdiff_check < 1 && $hourdiff_check >= 0) {
-                    $anketaDublicate['id'] = $aT->id;
-                    $anketaDublicate['date'] = $aT->date;
-                    $hourdiff = $hourdiff_check;
-                }
-            }
+            return back()->with('error', $exception->getMessage());
         }
-
-        if ($hourdiff < 1 && $hourdiff >= 0) {
-            return back()->with('error', "Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])");
-        }
-
-        if ($anketa->type_anketa === 'tech') {
-            if (!$anketa->date || !$anketa->car_id) {
-                return back()->with('error', 'Указаны не полные данные осмотра');
-            }
-
-            if ($anketa->number_list_road === null) {
-                $anketa->number_list_road = $anketa->car_id . '-' . date('d.m.Y', strtotime($anketa['date']));
-            }
-        }
-
-        $anketa->result_dop = $result_dop;
-        $anketa->save();
-
-        return back();
     }
 
     public function Update(Request $request, UpdateFormHandler $handler): RedirectResponse
@@ -464,35 +372,29 @@ class AnketsController extends Controller
         }
     }
 
-    public function print(Request $request, $id)
+    public function print($id)
     {
-        $anketa = Anketa::find($id);
+        $form = Anketa::findOrFail($id);
 
-        if (!$anketa) {
-            return abort(404);
-        }
-
-        $terminal = User::find($anketa->terminal_id);
         $stamp = null;
-
+        $terminal = User::find($form->terminal_id);
         if ($terminal) {
             $stamp = $terminal->stamp;
         }
 
-        $user = User::find($anketa->user_id);
-
         $pdf = Pdf::loadView('docs.print', [
-            'anketa' => $anketa,
+            'anketa' => $form,
             'stamp' => $stamp,
-            'user' => $user,
+            'user' => User::find($form->user_id),
             'validity' => UserEdsTrait::getValidityString(
-                $anketa->user_validity_eds_start,
-                $anketa->user_validity_eds_end
+                $form->user_validity_eds_start,
+                $form->user_validity_eds_end
             )
         ]);
 
         $response = response()->make($pdf->output(), 200);
         $response->header('Content-Type', 'application/pdf');
+
         return $response;
     }
 }

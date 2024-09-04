@@ -8,12 +8,12 @@ use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
+use App\Services\DuplicatesCheckerService;
 use App\ValueObjects\PressureLimits;
 use App\ValueObjects\Pulse;
 use App\ValueObjects\PulseLimits;
 use App\ValueObjects\Temperature;
 use App\ValueObjects\Tonometer;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
 class CreateMedicFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -24,22 +24,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
     {
         $driver = $this->data['driver_id'] ?? 0;
 
-        $this->existForms = Anketa::query()
-            ->select([
-                'id',
-                'date'
-            ])
-            ->where('driver_id', $driver)
-            ->where('type_anketa', 'medic')
-            ->where('in_cart', 0)
-            ->whereNotNull('date')
-            ->where(function (Builder $query) {
-                $query
-                    ->where('is_dop', '<>', 1)
-                    ->orWhereNotNull('result_dop');
-            })
-            ->orderBy('date', 'desc')
-            ->get();
+        $this->existForms = DuplicatesCheckerService::getExistMedicForms($driver);
     }
 
     protected function validateData()
