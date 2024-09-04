@@ -41,10 +41,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/', 'BddController@store')->name('store');
     });
 
-    Route::prefix('profile')->group(function () {
-        Route::get('delete-avatar', 'ProfileController@DeleteAvatar')->name('deleteAvatar');
-        Route::get('/', 'ProfileController@RenderIndex')->name('profile');
-        Route::post('/', 'ProfileController@UpdateData')->name('updateProfile');
+    Route::prefix('profile')->as('profile.')->group(function () {
+        Route::get('delete-avatar', 'ProfileController@deleteAvatar')->name('deleteAvatar');
+        Route::get('/', 'ProfileController@index')->name('index');
+        Route::post('/', 'ProfileController@updateAvatar')->name('updateAvatar');
     });
 
     Route::prefix('users')->group(function () {
