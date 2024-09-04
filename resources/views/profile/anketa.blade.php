@@ -238,13 +238,13 @@
                                     @yield('ankets_submit')
                                 @else
                                     @if(isset($anketa_route))
-                                        <a href="{{ url()->previous()  }}"
+                                        <a href="{{ url()->previous() }}"
                                            class="m-center btn btn-info">
                                             {{ __('Вернуться в журнал') }}
                                         </a>
                                     @endif
                                     <button type="submit"
-                                            class="m-center btn btn-sm btn-success">
+                                            class="m-center btn btn-sm btn-success submit-btn">
                                         {{ __('ankets.submit') }}
                                     </button>
                                 @endif
