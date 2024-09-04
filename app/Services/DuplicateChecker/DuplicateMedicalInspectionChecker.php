@@ -3,19 +3,19 @@
 namespace App\Services\DuplicateChecker;
 
 use App\Services\DuplicateChecker\Dto\Inspection;
-use App\Services\DuplicateChecker\Repositories\DuplicateRepository;
+use App\Services\DuplicateChecker\Repositories\MedicalInspectionDuplicatesRepository;
 
 class DuplicateMedicalInspectionChecker implements DuplicateCheckerInterface
 {
     /**
-     * @var DuplicateRepository
+     * @var MedicalInspectionDuplicatesRepository
      */
     private $repository;
 
     /**
-     * @param DuplicateRepository $repository
+     * @param MedicalInspectionDuplicatesRepository $repository
      */
-    public function __construct(DuplicateRepository $repository)
+    public function __construct(MedicalInspectionDuplicatesRepository $repository)
     {
         $this->repository = $repository;
     }

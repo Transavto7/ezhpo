@@ -21,7 +21,7 @@
                    required
                    value="{{ $default_current_date ?? '' }}"
                    name="anketa[0][date]"
-                   class="form-control">
+                   class="form-control inspection-date">
         </article>
     </div>
 
@@ -45,11 +45,11 @@
     <div class="form-group">
         <label class="form-control-label">Тип осмотра:</label>
         <article>
-            <select name="anketa[0][type_view]" required class="form-control">
+            <select name="anketa[0][type_view]" required class="form-control type-view">
                 <option value="Предрейсовый/Предсменный" @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>Предрейсовый/Предсменный</option>
                 <option value="Послерейсовый/Послесменный" @if(strcasecmp($type_view ?? '', 'Послерейсовый/Послесменный') == 0) selected @endif>Послерейсовый/Послесменный</option>
             </select>
-            <p class="duplicate-indicator text-danger d-none">МО с указанным водителем/датой/типом уже существует</p>
+            <p class="duplicate-indicator text-danger d-none" style="font-size: 0.7875rem">Осмотр с указанным водителем, датой и типом уже существует</p>
         </article>
     </div>
 
