@@ -1263,6 +1263,8 @@ $(document).ready(function () {
                     return
                 }
 
+                console.log('test', suggestion)
+
                 const {inn} = suggestion.data
 
                 innInput.val(inn)
