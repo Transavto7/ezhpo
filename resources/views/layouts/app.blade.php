@@ -19,7 +19,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;800&display=swap" rel="stylesheet">
 
     <!-- Styles -->
-    <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
     <link href="{{ mix('css/app.css') }}?v={{ time() }}" rel="stylesheet" type="text/css">
     <link rel="shortcut icon" href="/favicon.ico">
 
