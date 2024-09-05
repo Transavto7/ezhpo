@@ -8,6 +8,8 @@ use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
+use App\Services\FormHash\FormHashGenerator;
+use App\Services\FormHash\HashData;
 use App\ValueObjects\PressureLimits;
 use App\ValueObjects\Pulse;
 use App\ValueObjects\PulseLimits;
@@ -199,6 +201,16 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         $isFormUnique = $this->findDuplicates($form);
         if (!$isFormUnique) {
             return;
+        }
+
+        if ($form['driver_id'] && $form['date'] && $form['type_view']) {
+            $form['day_hash'] = FormHashGenerator::generate(
+                new HashData(
+                    $form['driver_id'],
+                    new \DateTimeImmutable($form['date']),
+                    $form['type_view']
+                )
+            );
         }
 
         /**
