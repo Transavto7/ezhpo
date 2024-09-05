@@ -21,7 +21,6 @@
     <!-- Styles -->
     <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" integrity="sha512-yVvxUQV0QESBt1SyZbNJMAwyKvFTLMyXSyBHDO4BG5t7k/Lw34tyqlSDlKIrIENIzCl+RVUNjmCPG+V/GMesRw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link href="https://cdn.jsdelivr.net/npm/suggestions-jquery@21.12.0/dist/css/suggestions.min.css" rel="stylesheet" />
     <link href="{{ mix('css/app.css') }}?v={{ time() }}" rel="stylesheet" type="text/css">
     <link rel="shortcut icon" href="/favicon.ico">
 
