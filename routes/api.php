@@ -140,8 +140,7 @@ Route::middleware(['auth:api', 'update-last-connection'])->prefix('sdpo')->name(
     });
 
     Route::prefix('/forms')->group(function () {
-        Route::get('/medic/duplicates', 'Api\Forms\MedicalInspection\CheckMedicalInspectionDuplicateController');
-//        Route::get('/tech/duplicates', 'Api\SdpoController@getCar');
+        Route::get('/duplicates', 'Api\Forms\CheckInspectionDuplicatesController');
     });
 
     Route::get('/pv', 'Api\SdpoController@getPoint');

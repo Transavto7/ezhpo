@@ -2,6 +2,7 @@ $(document).ready(function () {
     const ui = {
         driverId: $('input[name="driver_id"]'),
     }
+    window.duplicates = {}
 
     let timer
 
@@ -10,20 +11,32 @@ $(document).ready(function () {
 
         timer = setTimeout(() => {
             const $dates = $('.anketa.anketa-fields').find('.inspection-date')
-            let hasDuplicate = false
+
             for (let i = 0; i < $dates.length; i++) {
                 const $date = $($dates[i])
                 isDuplicate($date)
-                hasDuplicate = window.hasDuplicates
             }
-            window.hasDuplicates = hasDuplicate
         }, 500)
     })
 
-    $(document).on('change', '.inspection-date', function () {
-        const $date = $(this)
-        isDuplicate($date)
+    $(document).on('keyup', '.inspection-date', function () {
+        changeDate(this)
     })
+
+    $(document).on('change', '.inspection-date', function () {
+        changeDate(this)
+    })
+
+    let dateTimer
+
+    function changeDate(element) {
+        clearTimeout(dateTimer)
+
+        dateTimer = setTimeout(() => {
+            const $date = $(element)
+            isDuplicate($date)
+        }, 500)
+    }
 
     $(document).on('change', '.type-view', function () {
         const $type = $(this)
@@ -33,18 +46,19 @@ $(document).ready(function () {
 
     function isDuplicate($date) {
         const $type = $date.closest('.cloning').find('.type-view')
-
+        const formType = $('input[name="type_anketa"]').val()
         if (! isValid($date, $type)) {
             $type.next().addClass('d-none')
             return
         }
 
         axios
-            .get('/api/sdpo/forms/medic/duplicates', {
+            .get('/api/sdpo/forms/duplicates', {
                 params: {
                     driverId: ui.driverId.val(),
                     date: $date.val(),
                     type: $type.val(),
+                    formType: formType,
                 },
                 headers: {
                     Authorization: 'Bearer ' + API_TOKEN
@@ -55,10 +69,12 @@ $(document).ready(function () {
 
                 if (data.hasDuplicates) {
                     $type.next().removeClass('d-none')
-                    window.hasDuplicates = true
+                    window.duplicates[$date.attr('name')] = true
+                    console.log(window.duplicates)
                     return
                 }
-                window.hasDuplicates = false
+                delete window.duplicates[$date.attr('name')]
+                console.log(window.duplicates)
                 $type.next().addClass('d-none')
             })
     }
@@ -67,8 +83,13 @@ $(document).ready(function () {
         return !!(ui.driverId.val().length >= 6 && $date.val() && $type.val())
     }
 
+    $(document).on('click', '.anketa-delete', function () {
+        const name = $(this).closest('.cloning').find('.inspection-date').attr('name')
+        delete window.duplicates[name]
+    })
+
     $('#ANKETA_FORM').submit(function (e) {
-        if (! window.hasDuplicates) {
+        if (! Object.keys(window.duplicates).length) {
             return
         }
         e.preventDefault()
@@ -84,7 +105,7 @@ $(document).ready(function () {
             cancelButtonText: "Отмена",
         }).then(function (result) {
             if (result.isConfirmed) {
-                window.hasDuplicates = false
+                window.duplicates = {}
                 $('#ANKETA_FORM').trigger('submit')
             } else {
                 document.querySelector('#page-preloader').classList.add('hide')

@@ -20,4 +20,18 @@ class FormTypeEnum
 
     /** @deprecated  */
     const VID_PL = 'vid_pl';
+
+    public static function toArray(): array
+    {
+        return [
+            self::MEDIC,
+            self::TECH,
+            self::BDD,
+            self::REPORT_CARD,
+            self::PRINT_PL,
+            self::PAK,
+            self::PAK_QUEUE,
+            self::VID_PL,
+        ];
+    }
 }
