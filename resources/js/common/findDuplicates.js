@@ -70,11 +70,9 @@ $(document).ready(function () {
                 if (data.hasDuplicates) {
                     $type.next().removeClass('d-none')
                     window.duplicates[$date.attr('name')] = true
-                    console.log(window.duplicates)
                     return
                 }
                 delete window.duplicates[$date.attr('name')]
-                console.log(window.duplicates)
                 $type.next().addClass('d-none')
             })
     }
