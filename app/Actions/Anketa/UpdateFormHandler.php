@@ -10,6 +10,8 @@ use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
 use App\Point;
+use App\Services\FormHash\FormHashGenerator;
+use App\Services\FormHash\HashData;
 use App\Settings;
 use App\User;
 use App\ValueObjects\PressureLimits;
@@ -83,6 +85,16 @@ class UpdateFormHandler
         $form['realy'] = 'нет';
         if ($diffDateCheck <= 60 * 12 && $form['date'] ?? null) {
             $form['realy'] = 'да';
+        }
+
+        if ($form['driver_id'] && $form['date'] && $form['type_view'] && in_array($form['type_anketa'], [FormTypeEnum::MEDIC, FormTypeEnum::TECH])) {
+            $form['day_hash'] = FormHashGenerator::generate(
+                new HashData(
+                    $form['driver_id'],
+                    new \DateTimeImmutable($form['date']),
+                    $form['type_view']
+                )
+            );
         }
 
         $form->save();
