@@ -22,7 +22,7 @@
                    type="datetime-local"
                    value="{{ $default_current_date ?? '' }}"
                    name="anketa[0][date]"
-                   class="form-control">
+                   class="form-control inspection-date">
         </article>
     </div>
 
@@ -44,7 +44,7 @@
     <div class="form-group">
         <label class="form-control-label">Тип осмотра:</label>
         <article>
-            <select name="anketa[0][type_view]" required class="form-control">
+            <select name="anketa[0][type_view]" required class="form-control type-view">
                 <option value="Предрейсовый/Предсменный"
                         @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>
                     Предрейсовый/Предсменный
@@ -54,6 +54,7 @@
                     Послерейсовый/Послесменный
                 </option>
             </select>
+            <p class="duplicate-indicator text-danger d-none" style="font-size: 0.7875rem">Осмотр с указанным водителем, датой и типом уже существует</p>
         </article>
     </div>
 

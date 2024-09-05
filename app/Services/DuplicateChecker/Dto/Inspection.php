@@ -22,15 +22,22 @@ class Inspection
     protected $type;
 
     /**
+     * @var string
+     */
+    protected $formType;
+
+    /**
      * @param string $driverId
      * @param DateTimeImmutable $date
      * @param string $type
+     * @param string $formType
      */
-    public function __construct(string $driverId, DateTimeImmutable $date, string $type)
+    public function __construct(string $driverId, DateTimeImmutable $date, string $type, string $formType)
     {
         $this->driverId = $driverId;
         $this->date = $date;
         $this->type = $type;
+        $this->formType = $formType;
     }
 
     public function getDriverId(): string
@@ -46,5 +53,10 @@ class Inspection
     public function getType(): string
     {
         return $this->type;
+    }
+
+    public function getFormType(): string
+    {
+        return $this->formType;
     }
 }
