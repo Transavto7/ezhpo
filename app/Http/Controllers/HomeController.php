@@ -10,6 +10,7 @@ use App\Point;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -98,6 +99,22 @@ class HomeController extends Controller
                 'deleted_user'
             ]);
 
+        $duplicates = $request->get('duplicates', false);
+
+        if (filter_var($duplicates, FILTER_VALIDATE_BOOLEAN) && $request->input('date') && $request->input('TO_date')) {
+            $duplicates = DB::table('anketas')
+                ->select('day_hash')
+                ->where('type_anketa', '=', $validTypeForm)
+                ->whereNotNull('day_hash')
+                ->groupBy(['day_hash'])
+                ->havingRaw('COUNT(day_hash) > 1');
+
+            $forms->whereNotNull('anketas.day_hash')
+                ->joinSub($duplicates, 'duplicates', function (JoinClause $join) {
+                    $join->on('anketas.day_hash', '=', 'duplicates.day_hash');
+                });
+        }
+
         /**
          * Фильтрация анкет в ЛКК
          */
@@ -141,8 +158,10 @@ class HomeController extends Controller
             'orderKey',
             'typePrikaz',
             'page',
-            'getFormFilter'
+            'getFormFilter',
+            'duplicates',
         ]);
+
         if (count($filterParams) > 0 && $filterActivated) {
             $formModel = new Anketa();
 

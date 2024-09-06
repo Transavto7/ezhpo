@@ -407,8 +407,8 @@
                 <div>
                     @if($type_ankets !== 'pak_queue')
                         <div class="col-md-12">
-                            <div class="row bg-light p-2">
-                                <div class="col-md-4">
+                            <div class="row bg-light p-2 justify-content-between">
+                                <div>
                                     @if (!user()->hasRole('client'))
                                         <button type="button" data-toggle-show="#ankets-filters" class="btn btn-sm btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
                                     @endif
@@ -420,9 +420,14 @@
                                             <a href="?trash=1" class="btn btn-sm btn-warning">Корзина <i class="fa fa-trash"></i></a>
                                         @endisset
                                     @endif
+                                        @if(request()->filled('duplicates'))
+                                            <a href="{{ route('home', $type_ankets) }}" class="btn btn-sm btn-secondary">Назад</a>
+                                        @else
+                                            <a href="?duplicates=true" class="btn btn-sm btn-secondary">Показать дубликаты <i class="fa fa-clone"></i></a>
+                                        @endif
                                 </div>
                                 @if($type_ankets === 'tech')
-                                    <div class="col-md-8 text-right">
+                                    <div class="text-right">
                                         @if($permissionToExport)
                                             <a href="?export=1&{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
                                         @endif
@@ -434,7 +439,7 @@
                                         @endif
                                     </div>
                                 @else
-                                    <div class="col-md-8 text-right">
+                                    <div class="text-right">
                                         @if($permissionToExport)
                                             <a href="?export=1&{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
                                         @endif
