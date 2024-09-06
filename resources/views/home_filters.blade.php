@@ -4,6 +4,10 @@
     <input type="hidden" name="trash" value="{{ request()->get('trash', 0) }}">
 @endisset
 
+@if(request()->filled('duplicates'))
+    <input type="hidden" name="duplicates" value="{{ request()->get('duplicates') }}">
+@endif
+
 <input type="hidden" name="take" value="{{ request()->get('take', '') }}">
 
 <div class="tab-pane fade show active" id="filter-group-1" role="tabpanel" aria-labelledby="filter-group-1">
