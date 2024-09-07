@@ -9,7 +9,6 @@ use App\FieldPrompt;
 use App\Point;
 use App\User;
 use Carbon\Carbon;
-use DateTimeImmutable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
@@ -615,8 +614,8 @@ class HomeController extends Controller
             return redirect()->back()->with('error', 'Не выбран период проведения осмотров');
         }
 
-        $startDate = new DateTimeImmutable($start);
-        $endDate = new DateTimeImmutable($end);
+        $startDate = Carbon::parse($start);
+        $endDate = Carbon::parse($end)->addDay();
 
         if ($endDate->diff($startDate)->days > 30) {
             return redirect()->back()->with('error', 'Выбранный период проведения осмотров превышает 30 дней');
@@ -628,12 +627,16 @@ class HomeController extends Controller
             ->where('date', '>=', $startDate->format('Y-m-d'))
             ->where('date', '<=', $endDate->format('Y-m-d'))
             ->whereNotNull('day_hash')
+            ->whereNull('deleted_at')
             ->groupBy(['day_hash'])
             ->havingRaw('COUNT(day_hash) > 1');
 
         $builder->whereNotNull('anketas.day_hash')
             ->joinSub($duplicates, 'duplicates', function (JoinClause $join) {
                 $join->on('anketas.day_hash', '=', 'duplicates.day_hash');
-            });
+            })
+            ->orderByDesc('date')
+            ->orderBy('driver_id')
+            ->orderBy('type_view');
     }
 }
