@@ -9,7 +9,9 @@ use App\FieldPrompt;
 use App\Point;
 use App\User;
 use Carbon\Carbon;
+use DateTimeImmutable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -100,19 +102,13 @@ class HomeController extends Controller
             ]);
 
         $duplicates = $request->get('duplicates', false);
-
-        if (filter_var($duplicates, FILTER_VALIDATE_BOOLEAN) && $request->input('date') && $request->input('TO_date')) {
-            $duplicates = DB::table('anketas')
-                ->select('day_hash')
-                ->where('type_anketa', '=', $validTypeForm)
-                ->whereNotNull('day_hash')
-                ->groupBy(['day_hash'])
-                ->havingRaw('COUNT(day_hash) > 1');
-
-            $forms->whereNotNull('anketas.day_hash')
-                ->joinSub($duplicates, 'duplicates', function (JoinClause $join) {
-                    $join->on('anketas.day_hash', '=', 'duplicates.day_hash');
-                });
+        if (filter_var($duplicates, FILTER_VALIDATE_BOOLEAN) && $request->has('date') && $request->has('TO_date')) {
+            $this->setDuplicatesQuery(
+                $validTypeForm,
+                $forms,
+                $request->input('date'),
+                $request->input('TO_date')
+            );
         }
 
         /**
@@ -608,5 +604,36 @@ class HomeController extends Controller
             'fieldsGroupFirst' => $fieldsGroupFirst,
             'exclude' => $exclude
         ]);
+    }
+
+    /**
+     * @throws \DateMalformedStringException
+     */
+    private function setDuplicatesQuery(string $formType, Builder $builder, $start, $end)
+    {
+        if (! $start || ! $end) {
+            return redirect()->back()->with('error', 'Не выбран период проведения осмотров');
+        }
+
+        $startDate = new DateTimeImmutable($start);
+        $endDate = new DateTimeImmutable($end);
+
+        if ($endDate->diff($startDate)->days > 30) {
+            return redirect()->back()->with('error', 'Выбранный период проведения осмотров превышает 30 дней');
+        }
+
+        $duplicates = DB::table('anketas')
+            ->select('day_hash')
+            ->where('type_anketa', '=', $formType)
+            ->where('date', '>=', $startDate->format('Y-m-d'))
+            ->where('date', '<=', $endDate->format('Y-m-d'))
+            ->whereNotNull('day_hash')
+            ->groupBy(['day_hash'])
+            ->havingRaw('COUNT(day_hash) > 1');
+
+        $builder->whereNotNull('anketas.day_hash')
+            ->joinSub($duplicates, 'duplicates', function (JoinClause $join) {
+                $join->on('anketas.day_hash', '=', 'duplicates.day_hash');
+            });
     }
 }
