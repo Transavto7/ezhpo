@@ -605,9 +605,6 @@ class HomeController extends Controller
         ]);
     }
 
-    /**
-     * @throws \DateMalformedStringException
-     */
     private function setDuplicatesQuery(string $formType, Builder $builder, $start, $end)
     {
         if (! $start || ! $end) {
