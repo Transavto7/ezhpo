@@ -622,9 +622,9 @@ class HomeController extends Controller
             ->select('day_hash')
             ->where('type_anketa', '=', $formType)
             ->where('date', '>=', $startDate->format('Y-m-d'))
-            ->where('date', '<=', $endDate->format('Y-m-d'))
+            ->where('date', '<', $endDate->format('Y-m-d'))
             ->whereNotNull('day_hash')
-            ->whereNull('deleted_at')
+            ->where('in_cart', '<>', 1)
             ->groupBy(['day_hash'])
             ->havingRaw('COUNT(day_hash) > 1');
 
@@ -632,8 +632,8 @@ class HomeController extends Controller
             ->joinSub($duplicates, 'duplicates', function (JoinClause $join) {
                 $join->on('anketas.day_hash', '=', 'duplicates.day_hash');
             })
-            ->orderByDesc('date')
-            ->orderBy('driver_id')
+            ->orderByDesc(DB::raw('DATE(date)'))
+            ->orderBy('driver_fio')
             ->orderBy('type_view');
     }
 }
