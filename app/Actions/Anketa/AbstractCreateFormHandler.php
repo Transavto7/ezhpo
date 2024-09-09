@@ -2,7 +2,6 @@
 
 namespace App\Actions\Anketa;
 
-use App\Anketa;
 use App\Point;
 use App\Services\DuplicatesCheckerService;
 use App\Services\RedDatesCheckerService;
@@ -52,9 +51,6 @@ abstract class AbstractCreateFormHandler
         $pointId = $data['pv_id'] ?? 0;
         $this->data['point_id'] = $pointId;
         $point = Point::find($pointId);
-        if ($point) {
-            $this->data['pv_id'] = $point->name;
-        }
 
         date_default_timezone_set('UTC');
         $this->time = date('Y-m-d H:i:s', time() + ($user->timezone ?: 3) * 3600);
@@ -73,6 +69,7 @@ abstract class AbstractCreateFormHandler
         }
 
         $responseData = [
+            //TODO: а потом выполняются лишние запросы
             'createdId' => $this->createdForms->pluck('id')->toArray(),
             'errors' => array_unique($this->errors)
         ];
@@ -94,7 +91,6 @@ abstract class AbstractCreateFormHandler
 
         /** @var User $user */
         $this->data['user_id'] = $user->id;
-        $this->data['user_name'] = $user->name;
         $this->data['operator_id'] = $user->id;
         $this->data['user_eds'] = $user->eds;
         $this->data['user_validity_eds_start'] = $user->validity_eds_start;
@@ -146,18 +142,6 @@ abstract class AbstractCreateFormHandler
         foreach ($this->data['anketa'] ?? [] as &$form) {
             unset($form['dates']);
         }
-    }
-
-    protected function saveSdpoFormWithError(array $form, string $comment = '')
-    {
-        if (!isset($form['is_pak'])) {
-            return;
-        }
-
-        $form['type_anketa'] = 'pak';
-        $form['comments'] = $comment;
-
-        Anketa::create($form);
     }
 
     protected function validateData()

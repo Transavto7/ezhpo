@@ -2,19 +2,17 @@
 
 namespace App\Actions\Anketa;
 
-use App\Anketa;
 use App\Car;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
-use App\Enums\FormTypeEnum;
+use App\Models\Forms\Form;
+use App\Models\Forms\PrintPlForm;
 use App\Services\DuplicatesCheckerService;
 use Illuminate\Support\Carbon;
 
 class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
 {
-    const FORM_TYPE = FormTypeEnum::MEDIC;
-
     protected function validateData()
     {
         if ($this->data['is_dop'] ?? 0 === 1) {
@@ -24,6 +22,7 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         $carExist = Car::where('hash_id', $this->data['anketa'][0]['car_id'])->first();
         if (!$carExist) {
             $this->errors[] = 'Не найдена машина.';
+            return;
         }
 
         $driverExist = Driver::where('hash_id', $this->data['driver_id'])->first();
@@ -56,7 +55,6 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
         $defaultData = [
             'date' => date('Y-m-d H:i:s'),
-            'admitted' => 'Допущен',
             'realy' => 'нет',
             'created_at' => $this->time
         ];
@@ -72,7 +70,6 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
             if ($companyDop) {
                 $form['company_id'] = $companyDop->hash_id;
-                $form['company_name'] = $companyDop->name;
             }
         }
 
@@ -84,7 +81,6 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
             if ($driverDop) {
                 $form['driver_id'] = $driverDop->hash_id;
-                $form['driver_fio'] = $driverDop->fio;
 
                 $driver = $driverDop;
             }
@@ -99,64 +95,37 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             }
 
             if (!$driver->company_id) {
-                $message = 'У Водителя не найдена компания';
-
-                $this->errors[] = $message;
-
-                $this->saveSdpoFormWithError($form, $message);
-
+                $this->errors[] = 'У Водителя не найдена компания';
                 return;
             }
 
             $company = Company::find($driver->company_id);
 
             if (!$company) {
-                $message = 'У Водителя не верно указано ID компании';
-
-                $this->errors[] = $message;
-
-                $this->saveSdpoFormWithError($form, $message);
-
+                $this->errors[] = 'У Водителя не верно указано ID компании';
                 return;
             }
 
             if ($company->dismissed === 'Да') {
                 $this->errors[] = BlockActionReasonsEnum::COMPANY_BLOCK;
-
                 return;
             }
 
-            if ($driver->year_birthday && $driver->year_birthday !== '0000-00-00') {
-                $form['driver_year_birthday'] = $driver->year_birthday;
-            }
-
-            $form['driver_gender'] = $driver->gender ?? '';
-            $form['driver_fio'] = $driver->fio;
-            $form['driver_group_risk'] = $driver->group_risk;
-
             $form['company_id'] = $company->hash_id;
-            $form['company_name'] = $company->name;
         } else if ($car) {
             $carCompany = Company::find($car->company_id);
 
             if (!$carCompany) {
-                $message = 'У Автомобиля не найдена компания';
-
-                $this->errors[] = $message;
-
-                $this->saveSdpoFormWithError($form, $message);
-
+                $this->errors[] = 'У Автомобиля не найдена компания';
                 return;
             }
 
             if ($carCompany->dismissed === 'Да') {
                 $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
-
                 return;
             }
 
             $form['company_id'] = $carCompany->hash_id;
-            $form['company_name'] = $carCompany->name;
         }
 
         if ($car) {
@@ -165,8 +134,6 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             }
 
             $form['car_id'] = $car->hash_id;
-            $form['car_mark_model'] = $car->mark_model;
-            $form['car_gos_number'] = $car->gos_number;
 
             $this->checkRedDates(
                 date('Y-m-d', strtotime($form['date'])),
@@ -201,9 +168,13 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             $form['realy'] = 'да';
         }
 
-        $formModel = new Anketa($form);
-
+        $formModel = new Form($form);
         $formModel->save();
+
+        $formDetailsModel = new PrintPlForm($form);
+        $formDetailsModel->setAttribute('form_id', $formModel->id);
+        $formDetailsModel->save();
+
         $this->createdForms->push($formModel);
     }
 }

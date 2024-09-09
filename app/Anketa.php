@@ -11,50 +11,41 @@ class Anketa extends Model
 {
     public const MIN_DIFF_BETWEEN_FORMS_IN_SECONDS = 60;
 
-    public function our_company()
-    {
-        return $this->belongsTo(
-            Req::class,
-            'our_company_id',
-            'id'
-        )->withDefault();
-    }
-
     public function terminal(): BelongsTo
     {
         return $this->belongsTo(User::class, 'terminal_id', 'id');
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id')
                     ->withDefault();
     }
 
-    public function company()
+    public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'company_id', 'hash_id')
                     ->withDefault();
     }
 
-    public function operator()
+    public function operator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'operator_id');
     }
 
-    public function car()
+    public function car(): BelongsTo
     {
         return $this->belongsTo(Car::class, 'car_id', 'hash_id')
                     ->withDefault();
     }
 
-    public function driver()
+    public function driver(): BelongsTo
     {
         return $this->belongsTo(Driver::class, 'driver_id', 'hash_id')
                     ->withDefault();
     }
 
-    public function deleted_user()
+    public function deleted_user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'deleted_id', 'id')
                     ->withDefault();
@@ -101,7 +92,7 @@ class Anketa extends Model
             'pv_id',
             'point_id',
             'date',
-            'number_list_road', //'date_number_list_road',
+            'number_list_road',
             'type_view',
             'tonometer',
             'signature',
@@ -124,8 +115,6 @@ class Anketa extends Model
             'date_pechat_pl',
             'count_pl',
             'period_pl',
-            'added_to_dop',
-            'added_to_mo',
 
             // Журнал БДД
             'type_briefing',
@@ -135,8 +124,6 @@ class Anketa extends Model
             'pulse',
             'alcometer_mode',
             'alcometer_result',
-            'type_trip',
-            'questions',
             'photos',
             'videos',
             'terminal_id',
@@ -144,12 +131,8 @@ class Anketa extends Model
             //системные поля
             'in_cart',
             'protokol_path',
-            'is_medic',
             'closing_path',
-            'comments',
-            'connected_hash',
-            'contract_id',
-            'contract_snapshot_id',
+            'comments'
         ];
 
     public static $anketsKeys
@@ -415,23 +398,17 @@ class Anketa extends Model
                 'driver_group_risk'      => 'Группа риска',
                 'type_view'              => 'Тип осмотра',
                 'proba_alko'             => 'Признаки опьянения',
-                'alcometer_result'       => 'Уровень алкоголя в выдыхаемом воздухе',
                 'test_narko'             => 'Тест на наркотики',
                 'driver_gender'          => 'Пол',
                 'driver_year_birthday'   => 'Дата рождения',
                 'complaint'              => 'Жалобы',
                 'condition_visible_sliz' => 'Состояние видимых слизистых',
                 'condition_koj_pokr'     => 'Состояние кожных покровов',
-                't_people'               => 'Температура тела',
-                'tonometer'              => "Артериальное давление",
-                'pulse'                  => 'Пульс',
                 'admitted'               => 'Заключение о результатах осмотра',
                 'user_id'                => 'ФИО ответственного',
                 'user_eds'               => 'ЭЦП медицинского работника',
                 // Поля не в выгрузку
                 'created_at'             => 'Дата создания',
-                'photos'                 => 'Фото',
-                'videos'                 => 'Видео',
                 'med_view'               => 'Мед показания',
                 'pv_id'                  => 'Пункт выпуска',
                 'town_id'                => 'Город',
@@ -452,7 +429,6 @@ class Anketa extends Model
                 'date_prto'      => 'Дата ПРТО',
                 // Доп поля
                 'number_list_road'   => 'Номер ПЛ',
-                'odometer'           => 'Показания одометра',
                 'point_reys_control' => 'Отметка о прохождении контроля',
                 'user_id'            => 'ФИО ответственного',
                 'user_eds'           => 'Подпись лица, проводившего контроль',
@@ -490,7 +466,6 @@ class Anketa extends Model
                 'user_eds'     => 'Подпись лица, проводившего снятие',
                 'pv_id'        => 'Пункт выпуска',
                 'town_id'      => 'Город',
-                'signature'    => 'ЭЛ подпись водителя',
                 'created_at'   => 'Дата/Время создания записи',
             ],
             'pak' => [
@@ -538,25 +513,14 @@ class Anketa extends Model
             ],
         ];
 
-    public function point()
+    public function point(): BelongsTo
     {
         return $this->belongsTo(Point::class, 'point_id', 'id');
     }
 
-    public static function getAll()
+    public static function pakQueueCount(User $user): int
     {
-        return self::all();
-    }
-
-    public static function pakQueueCount(User $user = null): int
-    {
-        $query = self::query();
-
-        if ($user) {
-            $query->pakQueueByUser($user);
-        }
-
-        return $query->count();
+        return self::query()->pakQueueByUser($user)->count();
     }
 
     public function scopePakQueueByUser($query, User $user)

@@ -20,7 +20,7 @@ return [
             'name' => [
                 'label' => 'Город',
                 'type' => 'text',
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
         ],
     ],
@@ -43,7 +43,7 @@ return [
             'name' => [
                 'label' => 'Пункт выпуска',
                 'type' => 'text',
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'pv_id' => [
                 'label' => 'Город',
@@ -372,7 +372,7 @@ return [
                 ],
                 'defaultValue' => 'products_id',
                 'multiple' => 1,
-                'hidden' => 1,
+                'hideFilter' => 1,
             ],
             'pressure_systolic' => [
                 'label' => 'Порог верхнего давления',
@@ -523,7 +523,7 @@ return [
                 ],
                 'defaultValue' => 'products_id',
                 'multiple' => 1,
-                'hidden' => 1,
+                'hideFilter' => 1,
             ],
         ],
     ],
@@ -547,7 +547,7 @@ return [
             'name' => [
                 'label' => 'Название компании',
                 'type' => 'text',
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'note' => [
                 'label' => 'Договоренности с клиентом',
@@ -697,7 +697,7 @@ return [
             'name' => [
                 'label' => 'Название',
                 'type' => 'text',
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'type_product' => [
                 'label' => 'Тип',
@@ -797,7 +797,7 @@ return [
                 'label' => 'Фото',
                 'type' => 'file',
                 'noRequired' => 1,
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'hash_id' => [
                 'label' => 'Инструктаж',
@@ -810,7 +810,7 @@ return [
             'name' => [
                 'label' => 'Название',
                 'type' => 'text',
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'descr' => [
                 'label' => 'Описание',
@@ -845,7 +845,7 @@ return [
                 'label' => 'Сортировка',
                 'type' => 'number',
                 'noRequired' => 1,
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'signature' => [
                 'label' => 'ЭЛ подпись водителя',
