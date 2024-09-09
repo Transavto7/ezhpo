@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ReportContractRefactoringController;
 use App\Http\Middleware\CheckDriver;
+use App\Http\Middleware\StripEmptyParamsFromQueryString;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -93,7 +94,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('filters', 'HomeController@getFilters');
             Route::get('{type_ankets?}/filters', 'HomeController@getFilters')->name('home.filters');
             Route::get('pak_queue', 'PakController@index');
-            Route::get('{type_ankets?}', 'HomeController@index')->name('home');
+            Route::middleware(StripEmptyParamsFromQueryString::class)->get('{type_ankets?}', 'HomeController@index')->name('home');
         });
 
         Route::prefix('pak')->as('pak.')->group(function () {
