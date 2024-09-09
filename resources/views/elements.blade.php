@@ -45,7 +45,7 @@
             <div role="document" class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Добавление {{ $popupTitle }}</h4>
+                        <h4 class="modal-title">Добавление 2 {{ $popupTitle }}</h4>
                         <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span
                                 aria-hidden="true">×</span></button>
                     </div>
@@ -147,7 +147,7 @@
             </div>
         </div>
     @else
-        <div id="elements-modal-add" tabindex="-1" role="dialog" aria-labelledby="elements-modal-label"
+        <div id="elements-modal-add" role="dialog" aria-labelledby="elements-modal-label"
              class="modal fade text-left" style="display: none;" aria-modal="true">
             <div role="document" class="modal-dialog">
                 <div class="modal-content">
