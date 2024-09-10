@@ -69,7 +69,7 @@
                     </div>
                     @continue
                 @endif
-                @if($k == 'unit' && ($model === 'Service' || $model === 'Product'))
+                @if($k == 'unit' && $model === 'Product')
                     <div data-field="essence" class="form-group">
                         <label><b class="text-danger text-bold">* </b>Сущности</label>
                         <select

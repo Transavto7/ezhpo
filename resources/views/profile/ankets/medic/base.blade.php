@@ -25,23 +25,6 @@
         </article>
     </div>
 
-    @accessSetting('id_auto')
-    <div class="form-group">
-        <label class="form-control-label">ID автомобиля:</label>
-        <article>
-            <input value="{{ $car_id ?? '' }}"
-                   type="number"
-                   required
-                   oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent(), {{ 'false' }})"
-                   min="6"
-                   name="anketa[0][car_id]"
-                   class="MASK_ID_ELEM form-control"
-                   @accessSetting('id_auto_required') required @endaccessSetting/>
-            <p class="app-checker-prop"></p>
-        </article>
-    </div>
-    @endaccessSetting
-
     <div class="form-group">
         <label class="form-control-label">Тип осмотра:</label>
         <article>

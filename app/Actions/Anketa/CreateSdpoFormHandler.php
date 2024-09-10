@@ -203,4 +203,16 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
             event(new DriverDismissed($formModel));
         }
     }
+
+    protected function saveSdpoFormWithError(array $form, string $comment = '')
+    {
+        if (!isset($form['is_pak'])) {
+            return;
+        }
+
+        $form['type_anketa'] = 'pak';
+        $form['comments'] = $comment;
+
+        Anketa::create($form);
+    }
 }

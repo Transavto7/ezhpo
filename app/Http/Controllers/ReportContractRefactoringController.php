@@ -17,12 +17,10 @@ use Illuminate\Support\Facades\DB;
 
 class ReportContractRefactoringController extends Controller
 {
-    public $total_sum_for_contract = 0;
     public $contracts_ids;
     public $date_from;
     public $date_to;
     public $company;
-
 
     public $reports = [
             'journal' => 'Отчет по услугам компании[Договор]',
@@ -282,7 +280,6 @@ class ReportContractRefactoringController extends Controller
             'total' => $total,
         ];
     }
-
 
     public function getJournalTechs()
     {
@@ -750,8 +747,6 @@ class ReportContractRefactoringController extends Controller
             ->pluck('services')
             ->flatten();
 
-        $services = $this->services->where('type_product', 'Абонентская плата без реестров');
-
         $drivers = Driver::with(['contracts.services'])
                          ->where('company_id', $this->company->id)
                          ->get();
@@ -795,13 +790,6 @@ class ReportContractRefactoringController extends Controller
         }
 
         return $result;
-    }
-
-    public function ApiGetReport(Request $request)
-    {
-        $report = $this->GetReport($request);
-
-        return response()->json($report);
     }
 
     public function useDiscount($service, $count) {

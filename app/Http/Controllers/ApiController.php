@@ -8,6 +8,7 @@ use App\Company;
 use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Http\Requests\GetPreviousOdometerRequest;
+use App\Services\RedDatesCheckerService;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -237,15 +238,15 @@ class ApiController extends Controller
             ]);
         }
 
-        $existModel = $existModel->toArray();
-
         /**
          * Контроль дат
          */
         $redDates = [];
         if ($dateForm = $request->get('dateAnketa', '')) {
-            $redDates = AnketsController::ddateCheck($dateForm, $model, $existModel['id']);
+            $redDates = RedDatesCheckerService::check($dateForm, $existModel);
         }
+
+        $existModel = $existModel->toArray();
 
         if ($company = Company::select('name', 'hash_id')->find($existModel['company_id'] ?? 0)) {
             $existModel['company_name'] = $company->name;

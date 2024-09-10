@@ -4,30 +4,55 @@ namespace App\Actions\Anketa;
 
 use App\Anketa;
 use App\Driver;
+use App\Enums\FormTypeEnum;
+use App\User;
 use Carbon\Carbon;
 
 final class TrashFormHandler
 {
-    public function handle(Anketa $anketa, $action): bool
+    public function handle(Anketa $form, $action, User $user)
     {
-        $anketa->in_cart = $action;
-        if ($anketa->type_anketa === 'medic' && $anketa->driver_id) {
-            $driver = Driver::where('hash_id', $anketa->driver_id)->first();
+        $form->in_cart = $action;
 
-            if ($driver && $driver->end_of_ban) {
-                $last = Anketa::orderBy('created_at', 'desc')
-                    ->where('driver_id', $anketa->driver_id)
-                    ->select('driver_id', 'created_at', 'id')->first();
-
-                if ($last->id === $anketa->id) {
-                    $driver->end_of_ban = null;
-                    $driver->save();
-                }
-            }
+        if ($form->type_anketa === 'medic' && $form->driver_id) {
+            $this->disableBanIfNeed($form);
         }
-        $anketa->deleted_id = user()->id;
-        $anketa->deleted_at = Carbon::now();
 
-        return $anketa->save();
+        $form->deleted_id = $user->id;
+
+        if ($action) {
+            $form->deleted_at = Carbon::now();
+        } else {
+            $form->deleted_at = null;
+        }
+
+        $form->save();
+    }
+
+    protected function disableBanIfNeed(Anketa $form)
+    {
+        $driver = Driver::where('hash_id', $form->driver_id)->first();
+
+        if (!$driver) {
+            return;
+        }
+
+        if (!$driver->end_of_ban) {
+            return;
+        }
+
+        $last = Anketa::query()
+            ->select([
+                'id'
+            ])
+            ->where('type_anketa', FormTypeEnum::MEDIC)
+            ->where('driver_id', $form->driver_id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($last->id === $form->id) {
+            $driver->end_of_ban = null;
+            $driver->save();
+        }
     }
 }

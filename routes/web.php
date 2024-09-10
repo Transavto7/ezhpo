@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ReportContractRefactoringController;
 use App\Http\Middleware\CheckDriver;
+use App\Http\Middleware\StripEmptyParamsFromQueryString;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -11,14 +12,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('show-edit-element-modal/{model}/{id}', 'IndexController@showEditModal')->name('showEditElementModal');
 
     Route::get('/', 'IndexController@index')->name('index');
-
-    Route::prefix('v-search')->group(function () {
-        Route::get('companies', '\App\Helpers\VSelect@companies');
-        Route::get('cars', '\App\Helpers\VSelect@cars');
-        Route::get('drivers', '\App\Helpers\VSelect@drivers');
-        Route::get('services', '\App\Helpers\VSelect@services');
-        Route::get('our_companies', '\App\Helpers\VSelect@our_companies');
-    });
 
     Route::prefix('contract')->group(function () {
         Route::get('/', 'ContractController@view');
@@ -31,6 +24,14 @@ Route::middleware(['auth'])->group(function () {
         Route::post('getCarsByCompany/{id}', 'ContractController@getCarsByCompany');
         Route::post('getDriversByCompany/{id}', 'ContractController@getDriversByCompany');
         Route::post('getAvailableForCompany', 'ContractController@getAvailableForCompany');
+
+        Route::prefix('select')->group(function () {
+            Route::get('companies', 'ContractSelectsController@companies');
+            Route::get('cars', 'ContractSelectsController@cars');
+            Route::get('drivers', 'ContractSelectsController@drivers');
+            Route::get('products', 'ContractSelectsController@products');
+            Route::get('our_companies', 'ContractSelectsController@ourCompanies');
+        });
     });
 
     Route::get('add-client', 'IndexController@RenderAddClient')->name('pages.add_client');
@@ -41,10 +42,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/', 'BddController@store')->name('store');
     });
 
-    Route::prefix('profile')->group(function () {
-        Route::get('delete-avatar', 'ProfileController@DeleteAvatar')->name('deleteAvatar');
-        Route::get('/', 'ProfileController@RenderIndex')->name('profile');
-        Route::post('/', 'ProfileController@UpdateData')->name('updateProfile');
+    Route::prefix('profile')->as('profile.')->group(function () {
+        Route::get('delete-avatar', 'ProfileController@deleteAvatar')->name('deleteAvatar');
+        Route::get('/', 'ProfileController@index')->name('index');
+        Route::post('/', 'ProfileController@updateAvatar')->name('updateAvatar');
     });
 
     Route::prefix('users')->group(function () {
@@ -93,7 +94,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('filters', 'HomeController@getFilters');
             Route::get('{type_ankets?}/filters', 'HomeController@getFilters')->name('home.filters');
             Route::get('pak_queue', 'PakController@index');
-            Route::get('{type_ankets?}', 'HomeController@index')->name('home');
+            Route::middleware(StripEmptyParamsFromQueryString::class)->get('{type_ankets?}', 'HomeController@index')->name('home');
         });
 
         Route::prefix('pak')->as('pak.')->group(function () {
@@ -132,7 +133,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'AnketsController@index')->name('index');
             Route::post('/', 'AnketsController@AddForm')->name('store');
             Route::get('{id}/print', 'AnketsController@Print')->name('print');
-            Route::delete('{id}', 'AnketsController@Delete')->name('delete');
             Route::post('{id}', 'AnketsController@Update')->name('update');
             Route::get('{id}', 'AnketsController@Get')->name('get');
             Route::get('{id}/change-pak-queue/{admitted}', 'AnketsController@ChangePakQueue')->name('changePakQueue');
@@ -140,8 +140,8 @@ Route::middleware(['auth'])->group(function () {
         });
 
         Route::prefix('report')->as('report.')->group(function () {
-            Route::get('getContractsForCompany_v2', [ReportContractRefactoringController::class, 'getContractsForCompany']);
-            Route::get('journal', 'ReportController@ShowJournal')->name('journal');
+            Route::get('getContractsForCompany', [ReportContractRefactoringController::class, 'getContractsForCompany']);
+            Route::get('journal', 'ReportController@index')->name('journal');
             Route::get('journal_new',[ReportContractRefactoringController::class, 'index'])->name('company_service');
             Route::get('{type_report}', 'ReportController@GetReport')->name('get');
             Route::get('/dynamic/{journal}', 'ReportController@getDynamic')->name('dynamic');

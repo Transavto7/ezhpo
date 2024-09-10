@@ -1,7 +1,6 @@
 <?php
 
 use App\Anketa;
-use App\Http\Controllers\Api\SdpoController;
 use App\Http\Controllers\ReportContractRefactoringController;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -27,12 +26,9 @@ Route::get('/find/{model}', 'ApiController@modelList');
 
 Route::prefix('reports')->group(function () {
     Route::prefix('contract')->group(function () {
-        Route::get('/journal', 'ReportControllerContract@getJournalData')->name('api.reports.journal');
-        Route::get('/journal/export', 'ReportController@exportJournalData');
         Route::get('/journal_v2', [ReportContractRefactoringController::class, 'getReport']);
         Route::get('/export/journal_v2', [ReportContractRefactoringController::class, 'export']);
     });
-    Route::get('getContractsForCompany', 'ReportControllerContract@getContractsForCompany');
 });
 
 Route::middleware('auth:api')->group(function () {

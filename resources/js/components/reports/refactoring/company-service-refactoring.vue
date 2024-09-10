@@ -228,7 +228,7 @@ export default {
             this.contracts = [];
             this.contracts_options = [];
 
-            this.axios.get('/report/getContractsForCompany_v2', {
+            this.axios.get('/report/getContractsForCompany', {
                 params: {
                     id: this.company_id
                 }
@@ -238,17 +238,6 @@ export default {
             }).finally(() => {
                 this.loading = false
             });
-        },
-        getTotalContractSum(contract) {
-            let res = 0;
-            for (let contract_key in contract) {
-                if (contract_key === 'other' || contract_key === 'message') {
-                    continue;
-                }
-                res += contract[contract_key].services.price
-
-            }
-            return res;
         },
     },
     mounted() {
@@ -271,7 +260,7 @@ export default {
         }
     },
     watch: {
-        company(val) {
+        company() {
             if (this.company_id == 0) {
                 this.loading = true
                 return;

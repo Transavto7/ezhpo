@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Storage;
 
 class SettingsController extends Controller
 {
-
     public function index()
     {
         return view('admin.settings', [
@@ -19,8 +18,6 @@ class SettingsController extends Controller
             'sms_text_driver' => Settings::setting('sms_text_driver') ?? null,
             'sms_text_car' => Settings::setting('sms_text_driver') ?? null,
             'sms_text_default' => Settings::setting('sms_text_default') ?? null,
-            'id_auto' => Settings::setting('id_auto') ?? null,
-            'id_auto_required' => Settings::setting('id_auto_required') ?? null,
             'phone' => Settings::setting('phone') ?? null,
             'telegram' => Settings::setting('telegram') ?? null,
             'pressure_systolic' => Settings::setting('pressure_systolic') ?? null,
@@ -58,12 +55,6 @@ class SettingsController extends Controller
         Settings::set('time_of_pressure_ban', $request->time_of_pressure_ban);
         Settings::set('time_of_alcohol_ban', $request->time_of_alcohol_ban);
         Settings::set('timeout', $request->timeout);
-
-        $id_auto = (bool) $request->id_auto;
-        Settings::set('id_auto', $id_auto ? '1' : '0');
-
-        $id_auto_required = (bool) $request->id_auto_required;
-        Settings::set('id_auto_required', $id_auto_required ? '1' : '0');
 
         return back();
     }

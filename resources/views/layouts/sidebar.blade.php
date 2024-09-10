@@ -1,9 +1,4 @@
-@php
-    $user_role_text = \App\Http\Controllers\ProfileController::getUserRole();
-    $user_role = \App\Http\Controllers\ProfileController::getUserRole(false);
-@endphp
-
-    <!-- Side Navbar -->
+<!-- Side Navbar -->
 <nav class="side-navbar">
     <!-- Sidebar Header-->
     <div class="sidebar-header d-flex align-items-center">

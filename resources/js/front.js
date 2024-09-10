@@ -447,7 +447,11 @@ $(document).ready(function () {
     }
 
     const showInputFormCardDBItem = async (fieldName, fieldValue, fvItem, model, isBlocked) => {
-        let field = '', clearInputBtn = '', fId = uidv4(), inputClass = `${model}_input`;
+        let field = '',
+            clearInputBtn = '',
+            fId = uidv4(),
+            inputClass = `${model}_input`,
+            required = Number(fvItem['noRequired'] ?? 0) !== 1 ? 'required' : '';
 
         if (fvItem['type'] === 'select') {
             await API_CONTROLLER.getFieldHTML({
@@ -458,19 +462,28 @@ $(document).ready(function () {
                 field = response.data
             })
         } else if (['note', 'comment', 'name'].includes(fieldName)) {
-            field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${fieldName}">${(fieldValue ?? '').trim()}</textarea>`
+            field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${fieldName}" ${required}>${(fieldValue ?? '').trim()}</textarea>`
         } else if (fieldName === 'photo' && fieldValue) {
             field = `<img alt="photo" src="/storage/${fieldValue}" width="100%"/>`
         } else {
-            field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${fieldValue ?? ''}' name="${fieldName}" />`
+            field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${fieldValue ?? ''}' name="${fieldName}" ${required}/>`
         }
 
         if (isBlocked === '' && fieldName !== 'photo') {
             clearInputBtn = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
         }
 
+        let labelStyle = ''
+        const importantValueLabelStyle = "color: red; font-weight: bold;";
+        if (fieldName === 'dismissed' && fieldValue.toUpperCase() === 'ДА') {
+            labelStyle = importantValueLabelStyle
+        }
+        if (fieldName === 'group_risk' && (fieldValue ?? '').trim() !== '') {
+            labelStyle = importantValueLabelStyle
+        }
+
         return `
-            <p style="${fieldName === 'dismissed' ? fieldValue.toUpperCase() === 'ДА' ? 'color: red; font-weight: bold;' : '' : ''}"
+            <p style="${labelStyle}"
             data-field-card="${model}_${fieldName}"
             class="text-small m-0">
             ${fvItem.label}:
