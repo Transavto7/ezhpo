@@ -22,6 +22,8 @@
     <link href="{{ mix('css/app.css') }}?v={{ time() }}" rel="stylesheet" type="text/css">
     <link rel="shortcut icon" href="/favicon.ico">
 
+    @include('layouts.analytics.yandex-metric')
+
     <script>
         window.PAGE_SETUP = {
             baseUrl: '{{ config('app.url') }}'
