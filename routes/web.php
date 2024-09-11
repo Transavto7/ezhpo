@@ -131,6 +131,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('forms')->as('forms.')->group(function () {
             Route::get('/', 'AnketsController@index')->name('index');
             Route::post('/', 'AnketsController@AddForm')->name('store');
+            Route::post('/change-multiple-result-dop', 'AnketsController@ChangeMultipleResultDop')->name('changeMultipleResultDop');
             Route::get('{id}/print', 'AnketsController@Print')->name('print');
             Route::delete('{id}', 'AnketsController@Delete')->name('delete');
             Route::post('{id}', 'AnketsController@Update')->name('update');

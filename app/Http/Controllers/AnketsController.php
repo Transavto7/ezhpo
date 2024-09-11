@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Anketa\ChangeResultDopHandler;
 use App\Actions\Anketa\CreateFormHandlerFactory;
 use App\Actions\Anketa\CreateSdpoFormHandler;
 use App\Actions\Anketa\TrashFormHandler;
@@ -269,77 +270,60 @@ class AnketsController extends Controller
         }
     }
 
-    public function ChangeResultDop($id, $result_dop)
+    public function ChangeResultDop($id, $result_dop, ChangeResultDopHandler $handler): RedirectResponse
     {
-        $anketa = Anketa::find($id);
-        $hourdiff = 1;
-        $anketaDublicate = [
-            'id' => 0,
-            'date' => ''
-        ];
+        $form = Anketa::findOrFail($id);
 
-        if ($anketa->type_anketa === 'medic') {
-            $anketaMedic = Anketa::where('driver_id', $anketa->driver_id)
-                ->where('type_anketa', 'medic')
-                ->where('type_view', $anketa->type_view)
-                ->where('in_cart', 0)
-                ->orderBy('date', 'desc')
-                ->get();
+        try {
+            DB::beginTransaction();
 
-            foreach ($anketaMedic as $aM) {
-                if (!$aM->date || $aM->id === $anketa->id || ($aM->is_dop && $aM->result_dop == null)) {
-                    continue;
-                }
+            $handler->handle($form, $result_dop);
 
-                $hourdiff_check = round((Carbon::parse($anketa->date)->timestamp - Carbon::parse($aM->date)->timestamp) / 60, 1);
+            DB::commit();
 
-                if ($hourdiff_check < 1 && $hourdiff_check >= 0) {
-                    $anketaDublicate['id'] = $aM->id;
-                    $anketaDublicate['date'] = $aM->date;
-                    $hourdiff = $hourdiff_check;
-                }
+            return back();
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            return back()->with('error', $exception->getMessage());
+        }
+    }
+
+    public function ChangeMultipleResultDop(Request $request, ChangeResultDopHandler $handler): RedirectResponse
+    {
+        $ids = $request->input('ids', []);
+        $result = $request->input('result', 'Утвержден');
+
+        $response = '';
+
+        foreach ($ids as $id) {
+            $form = Anketa::query()
+                ->where('id', $id)
+                ->where('is_dop', '=', 1)
+                ->whereNull('result_dop')
+                ->first();
+
+            if ($form === null) {
+                $response .= "Осмотр с id $id уже утвержден. ";
+                continue;
             }
-        } else if ($anketa->type_anketa === 'tech') {
-            $anketasTech = Anketa::where('car_id', $anketa->car_id)
-                ->where('type_anketa', 'tech')
-                ->where('type_view', $anketa->type_view ?? '')
-                ->where('in_cart', 0)
-                ->orderBy('date', 'desc')
-                ->get();
 
-            foreach ($anketasTech as $aT) {
-                if (!$aT->date || $aT->id === $anketa->id || ($aT->is_dop && $aT->result_dop == null)) {
-                    continue;
-                }
+            try {
+                DB::beginTransaction();
 
-                $hourdiff_check = round((Carbon::parse($anketa->date)->timestamp - Carbon::parse($aT->date)->timestamp) / 60, 1);
+                $handler->handle($form, $result);
 
-                if ($hourdiff_check < 1 && $hourdiff_check >= 0) {
-                    $anketaDublicate['id'] = $aT->id;
-                    $anketaDublicate['date'] = $aT->date;
-                    $hourdiff = $hourdiff_check;
-                }
+                DB::commit();
+            } catch (Throwable $exception) {
+                DB::rollBack();
+
+                $response .= $exception->getMessage();
             }
         }
 
-        if ($hourdiff < 1 && $hourdiff >= 0) {
-            return back()->with('error', "Найден дубликат осмотра (ID: $anketaDublicate[id], Дата: $anketaDublicate[date])");
-        }
-
-        if ($anketa->type_anketa === 'tech') {
-            if (!$anketa->date || !$anketa->car_id) {
-                return back()->with('error', 'Указаны не полные данные осмотра');
-            }
-
-            if ($anketa->number_list_road === null) {
-                $anketa->number_list_road = $anketa->car_id . '-' . date('d.m.Y', strtotime($anketa['date']));
-            }
-        }
-
-        $anketa->result_dop = $result_dop;
-        $anketa->save();
-
-        return back();
+        return mb_strlen($response)
+            ? back()->with('error', $response)
+            : back();
     }
 
     public function Update(Request $request, UpdateFormHandler $handler): RedirectResponse

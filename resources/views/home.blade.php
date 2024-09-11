@@ -156,7 +156,8 @@
     <script type="text/javascript">
         const SELECTED_ANKETS_ITEM = 'selectedAnkets'
         const anketsApi = {
-            massTrash: '{{ route('forms.mass-trash') }}'
+            massTrash: '{{ route('forms.mass-trash') }}',
+            massApprove: '{{ route('forms.changeMultipleResultDop') }}',
         }
         const data = {
             items: [],
@@ -210,14 +211,17 @@
         function updateAnketsControl() {
             const control = $('#selected-ankets-control')
             const controlBtnDelete = $('#selected-ankets-control-btn-delete')
+            const approveBtn = $('#approve-selected')
 
             const anketsStorage = getAnketsStorage()
 
             if (anketsStorage.total) {
                 const records = pronunciationWithNumber(anketsStorage.total, 'анкету', 'анкеты', 'анкет')
                 const label = "Удалить " + anketsStorage.total + " " + records
+                const approveLabel = "<i class=\"fa fa-check\"></i> Утвердить " + anketsStorage.total + " " + records
 
                 controlBtnDelete.html(label)
+                approveBtn.html(approveLabel)
                 control.addClass('d-flex')
                 control.removeClass('d-none')
             } else {
@@ -293,6 +297,27 @@
                         window.location.reload()
                     })
                     .catch(() => {})
+            })
+
+            $('#approve-selected').click(function (e) {
+                const anketsStorage = getAnketsStorage()
+
+                axios
+                    .create({
+                        headers: {
+                            Authorization: 'Bearer ' + API_TOKEN
+                        }
+                    })
+                    .post(anketsApi.massApprove, {
+                        ids: anketsStorage.items,
+                    })
+                    .then((response) => {
+                        clearAnketsStorage()
+                        window.location.reload()
+                    })
+                    .catch(error => {
+                        console.log(error.response.data)
+                    })
             })
 
             $('.hv-btn-trash').click(function (e) {
@@ -522,6 +547,7 @@
                     @if(count($ankets) > 0 && $permissionToView && $permissionToDelete)
                         <div id="selected-ankets-control" class="d-none align-items-center mt-4 mb-2">
                             <button id="selected-ankets-control-btn-delete" class="btn btn-danger btn-sm"></button>
+                            <button id="approve-selected" class="btn btn-success btn-sm ml-2"></button>
                             <button id="selected-ankets-control-btn-unset" class="btn btn-success btn-sm ml-2">Снять выделение</button>
                         </div>
                     @endif
