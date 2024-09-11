@@ -102,12 +102,29 @@ class HomeController extends Controller
 
         $duplicates = $request->get('duplicates', false);
         if (filter_var($duplicates, FILTER_VALIDATE_BOOLEAN) && $request->has('date') && $request->has('TO_date')) {
-            $this->setDuplicatesQuery(
-                $validTypeForm,
-                $forms,
-                $request->input('date'),
-                $request->input('TO_date')
-            );
+            if (! $request->has('date') || ! $request->has('TO_date')) {
+                $request->session()->flash('error', 'Не выбран период проведения осмотров');
+                $request->request->remove('filter');
+            }
+
+            $startDate = Carbon::parse($request->input('date'));
+            $endDate = Carbon::parse($request->input('TO_date'))->addDay();
+
+            if ($endDate->diff($startDate)->days > 31) {
+                $request->session()->flash('error', 'Выбранный период проведения осмотров превышает 31 день');
+                $request->request->remove('filter');
+            }
+
+            if (! $request->session()->has('error')) {
+                $this->setDuplicatesQuery(
+                    $validTypeForm,
+                    $forms,
+                    $startDate,
+                    $endDate
+                );
+            }
+        } else {
+            $request->session()->forget('error');
         }
 
         /**
@@ -607,22 +624,11 @@ class HomeController extends Controller
 
     private function setDuplicatesQuery(string $formType, Builder $builder, $start, $end)
     {
-        if (! $start || ! $end) {
-            return redirect()->back()->with('error', 'Не выбран период проведения осмотров');
-        }
-
-        $startDate = Carbon::parse($start);
-        $endDate = Carbon::parse($end)->addDay();
-
-        if ($endDate->diff($startDate)->days > 31) {
-            return redirect()->back()->with('error', 'Выбранный период проведения осмотров превышает 31 день');
-        }
-
         $duplicates = DB::table('anketas')
             ->select('day_hash')
             ->where('type_anketa', '=', $formType)
-            ->where('date', '>=', $startDate->format('Y-m-d'))
-            ->where('date', '<', $endDate->format('Y-m-d'))
+            ->where('date', '>=', $start->format('Y-m-d'))
+            ->where('date', '<', $end->format('Y-m-d'))
             ->whereNotNull('day_hash')
             ->where('in_cart', '<>', 1)
             ->groupBy(['day_hash'])
