@@ -614,8 +614,8 @@ class HomeController extends Controller
         $startDate = Carbon::parse($start);
         $endDate = Carbon::parse($end)->addDay();
 
-        if ($endDate->diff($startDate)->days > 30) {
-            return redirect()->back()->with('error', 'Выбранный период проведения осмотров превышает 30 дней');
+        if ($endDate->diff($startDate)->days > 31) {
+            return redirect()->back()->with('error', 'Выбранный период проведения осмотров превышает 31 день');
         }
 
         $duplicates = DB::table('anketas')
