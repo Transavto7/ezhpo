@@ -289,12 +289,12 @@ class AnketsController extends Controller
         }
     }
 
-    public function ChangeMultipleResultDop(Request $request, ChangeResultDopHandler $handler): RedirectResponse
+    public function ChangeMultipleResultDop(Request $request, ChangeResultDopHandler $handler): JsonResponse
     {
         $ids = $request->input('ids', []);
         $result = $request->input('result', 'Утвержден');
 
-        $response = '';
+        $errors = [];
 
         foreach ($ids as $id) {
             $form = Anketa::query()
@@ -304,7 +304,7 @@ class AnketsController extends Controller
                 ->first();
 
             if ($form === null) {
-                $response .= "Осмотр с id $id уже утвержден. ";
+                $errors[] = "Осмотр с id $id уже утвержден";
                 continue;
             }
 
@@ -317,13 +317,15 @@ class AnketsController extends Controller
             } catch (Throwable $exception) {
                 DB::rollBack();
 
-                $response .= $exception->getMessage();
+                $errors[] = $exception->getMessage();
             }
         }
 
-        return mb_strlen($response)
-            ? back()->with('error', $response)
-            : back();
+        if (count($errors)) {
+            session()->flash('mass_approve_errors', $errors);
+        }
+
+        return response()->json();
     }
 
     public function Update(Request $request, UpdateFormHandler $handler): RedirectResponse

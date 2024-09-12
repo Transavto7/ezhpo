@@ -423,6 +423,7 @@
     );
 
     $notDeletedItems = session('not_deleted_ankets');
+    $approveErrors = session('mass_approve_errors');
 @endphp
 
 @section('content')
@@ -558,6 +559,24 @@
                                 <div>Не удалось удалить анкеты с ID:</div>
                                 <div class="d-flex align-items-center flex-wrap" style="gap: 5px;">
                                     @foreach($notDeletedItems as $item)
+                                        <code>{{ $item }}</code>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div>
+                                <div id="hv-alert-error-close">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($approveErrors)
+                        <div id="hv-alert-error" class="alert alert-danger hv-mass-deletion-alert-error d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center" style="gap: 10px;">
+                                <div>Во время утверждения возникли ошибки: </div>
+                                <div class="d-flex align-items-center flex-wrap" style="gap: 5px;">
+                                    @foreach($approveErrors as $item)
                                         <code>{{ $item }}</code>
                                     @endforeach
                                 </div>
@@ -783,7 +802,7 @@
                                     </td>
                                 @endif
 
-                                <td class="td-option not-export d-flex">
+                                <td class="td-option not-export d-flex justify-content-end">
                                     @if($type_ankets === 'pak_queue')
                                         <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-sm btn-info mr-1"><i class="fa fa-search mr-1"></i></a>
                                         <a href="{{ route('forms.changePakQueue', ['admitted' => 'Допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-success mr-1"><i class="fa fa-check"></i></a>
@@ -791,24 +810,21 @@
                                         <a href="{{ route('forms.changePakQueue', ['admitted' => 'Не допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-danger mr-1"><i class="fa fa-close"></i></a>
                                     @endif
 
+                                    @if($anketa->is_dop && ! checkChangeResult($anketa))
+                                        <button class="btn btn-sm btn-outline-success mr-1" title="{{ $anketa->result_dop }}"
+                                                style="cursor: default" disabled>
+                                            <i class="fa fa-check"></i>
+                                        </button>
+                                    @endif
+
                                     @if($permissionToUpdate)
-                                        <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm mr-1"><i class="fa fa-edit"></i></a>
-                                        @if($anketa->is_dop && !$anketa->result_dop)
-                                            @if (checkChangeResult($anketa))
-                                                <a
-                                                    href="{{ route('forms.changeResultDop', ['result_dop' => 'Утвержден', 'id' => $anketa->id]) }}"
-                                                    class="btn btn-sm btn-success mr-1">
-                                                    <i class="fa fa-check"></i>
-                                                </a>
-                                            @else
-                                                <button
-                                                    disabled
-                                                    class="btn btn-sm btn-success mr-1">
-                                                    <i class="fa fa-check"></i>
-                                                </button>
-                                            @endif
+                                        @if($anketa->is_dop && !$anketa->result_dop && checkChangeResult($anketa))
+                                            <a href="{{ route('forms.changeResultDop', ['result_dop' => 'Утвержден', 'id' => $anketa->id]) }}"
+                                               class="btn btn-sm btn-success mr-1">
+                                                <i class="fa fa-check"></i>
+                                            </a>
                                         @endif
-                                        {{ $anketa->result_dop }}
+                                        <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm mr-1"><i class="fa fa-edit"></i></a>
                                     @endif
 
                                     @if($type_ankets === 'medic' && mb_strtolower($anketa->admitted ?? '') === 'допущен')
