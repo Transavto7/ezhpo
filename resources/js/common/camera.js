@@ -27,6 +27,11 @@ $(document).ready(function() {
         html5QrCode.stop().then(r => console.log('close camera'))
 
         axios
+            .create({
+                headers: {
+                    Authorization: 'Bearer ' + API_TOKEN
+                }
+            })
             .get('/api/parse-qr-code', {
                 params: {
                     decodedText,

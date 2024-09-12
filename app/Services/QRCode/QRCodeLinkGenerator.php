@@ -40,7 +40,7 @@ final class QRCodeLinkGenerator
         $this->id = $id;
         $this->parameter = $parameter;
 
-        $this->url = route('addAnket', ['type' => 'tech']);
+        $this->url = route('forms.index', ['type' => 'tech']);
     }
 
     public function generate(): string

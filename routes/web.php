@@ -5,31 +5,13 @@ use App\Http\Middleware\CheckDriver;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('fix/types', 'IndexController@deprecated');
-
-Route::get('/', 'IndexController@RenderIndex')->name('index');
-Route::get('index', 'IndexController@RenderHome')->name('index');
-
 Route::get('show-video', 'IndexController@showVideo')->name('showVideo');
-Route::get('show-edit-element-modal/{model}/{id}', 'IndexController@ShowEditModal')->name('showEditElementModal');
-
-/**
- * API-маршруты
- */
-$techToken = '$2y$10$I.RBe8HbmRj2xwpRFWl15OHmWRIMz98RXy1axcK8Jrnx';
-
-Route::prefix('api')->group(function () use ($techToken) {
-    Route::get("pv-reset/$techToken", 'ApiController@ResetAllPV')->name('api.resetpv');
-    Route::get('getField/{model}/{field}/{default_value?}', 'IndexController@GetFieldHTML');
-    Route::get('/parse-qr-code', 'Api\Forms\TechnicalInspection\ParseQRCodeController');
-});
-
-Route::prefix('snippet')->group(function () use ($techToken) {
-    Route::get("update-pak-fields/$techToken", 'IndexController@deprecated');
-    Route::get("driver-to-user-all/$techToken", 'IndexController@deprecated');
-});
 
 Route::middleware(['auth'])->group(function () {
+    Route::post('show-edit-element-modal/{model}/{id}', 'IndexController@showEditModal')->name('showEditElementModal');
+
+    Route::get('/', 'IndexController@index')->name('index');
+
     Route::prefix('v-search')->group(function () {
         Route::get('companies', '\App\Helpers\VSelect@companies');
         Route::get('cars', '\App\Helpers\VSelect@cars');
@@ -51,17 +33,15 @@ Route::middleware(['auth'])->group(function () {
         Route::post('getAvailableForCompany', 'ContractController@getAvailableForCompany');
     });
 
-    Route::get('driver-dashboard', function () { return view('pages.driver'); })->name('page.driver');
-
     Route::get('add-client', 'IndexController@RenderAddClient')->name('pages.add_client');
 
-    Route::prefix('driver-bdd')->group(function () {
-        Route::get('/', 'BddController@get')->name('page.driver_bdd');
-        Route::post('/', 'BddController@store')->name('bdd.store');
+    Route::get('driver-dashboard', 'DriverController@index')->name('driver.index');
+    Route::prefix('driver-bdd')->as('driver.bdd.')->group(function () {
+        Route::get('/', 'BddController@get')->name('index');
+        Route::post('/', 'BddController@store')->name('store');
     });
 
     Route::prefix('profile')->group(function () {
-        Route::post('anketa', 'AnketsController@AddForm')->name('addAnket');
         Route::get('delete-avatar', 'ProfileController@DeleteAvatar')->name('deleteAvatar');
         Route::get('/', 'ProfileController@RenderIndex')->name('profile');
         Route::post('/', 'ProfileController@UpdateData')->name('updateProfile');
@@ -121,10 +101,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('list', 'PakController@list')->name('list');
         });
 
-        Route::prefix('profile')->group(function () {
-            Route::get('anketa', 'IndexController@RenderForms')->name('forms');
-        });
-
         Route::prefix('docs')->as('docs.')->group(function () {
             Route::get('{type}/{anketa_id}/pdf', 'DocsController@getPdf')->name('get.pdf');
             Route::post('{type}/{anketa_id}/set', 'DocsController@setPdf')->name('add.pdf');
@@ -152,13 +128,15 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('elements-syncdata/{fieldFindId}/{fieldFind}/{model}/{fieldSync}/{fieldSyncValue?}', 'IndexController@SyncDataElement')->name('syncDataElement');
 
-        Route::prefix('anketa')->group(function () {
-            Route::get('print/{id}', 'AnketsController@Print')->name('forms.print');
-            Route::delete('{id}', 'AnketsController@Delete')->name('forms.delete');
-            Route::post('{id}', 'AnketsController@Update')->name('forms.update');
-            Route::get('{id}', 'AnketsController@Get')->name('forms.get');
-            Route::get('change-pak-queue/{id}/{admitted}', 'AnketsController@ChangePakQueue')->name('changePakQueue');
-            Route::get('change-resultdop-queue/{id}/{result_dop}', 'AnketsController@ChangeResultDop')->name('changeResultDop');
+        Route::prefix('forms')->as('forms.')->group(function () {
+            Route::get('/', 'AnketsController@index')->name('index');
+            Route::post('/', 'AnketsController@AddForm')->name('store');
+            Route::get('{id}/print', 'AnketsController@Print')->name('print');
+            Route::delete('{id}', 'AnketsController@Delete')->name('delete');
+            Route::post('{id}', 'AnketsController@Update')->name('update');
+            Route::get('{id}', 'AnketsController@Get')->name('get');
+            Route::get('{id}/change-pak-queue/{admitted}', 'AnketsController@ChangePakQueue')->name('changePakQueue');
+            Route::get('{id}/change-resultdop-queue/{result_dop}', 'AnketsController@ChangeResultDop')->name('changeResultDop');
         });
 
         Route::prefix('report')->as('report.')->group(function () {

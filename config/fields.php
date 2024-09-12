@@ -235,7 +235,7 @@ return [
             'name' => 'Название',
             'descr' => 'Описание',
             'type_briefing' => 'Вид инструктажа',
-            'youtube' => 'Ссылка на YouTube',
+            'youtube' => 'Ссылка на YouTube\RUTUBE',
             'active' => 'Активен',
             'is_default' => 'Базовый',
             'sort' => 'Сортировка',

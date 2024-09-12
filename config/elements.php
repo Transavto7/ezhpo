@@ -893,7 +893,7 @@ return [
                 'defaultValue' => 'Вводный',
             ],
             'youtube' => [
-                'label' => 'Ссылка на YouTube',
+                'label' => 'Ссылка на YouTube\RUTUBE',
                 'type' => 'text'
             ],
             'active' => [
