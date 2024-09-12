@@ -9,6 +9,7 @@ use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
+use App\Models\Forms\Form;
 use App\Point;
 use App\Services\DuplicatesCheckerService;
 use App\Settings;
@@ -22,13 +23,12 @@ use Illuminate\Support\Collection;
 
 class UpdateFormHandler
 {
-    public function handle(Anketa $form, array $data, Authenticatable $user)
+    public function handle(Form $form, array $data, Authenticatable $user)
     {
         $isPakQueueForm = $form['type_anketa'] === FormTypeEnum::PAK_QUEUE;
         $isMedicForm = $form['type_anketa'] === FormTypeEnum::MEDIC;
 
         $point = Point::where('id', $data['pv_id'])->first();
-        $data['pv_id'] = $point->name;
         $data['point_id'] = $point->id;
 
         if (isset($data['anketa'])) {
@@ -39,40 +39,22 @@ class UpdateFormHandler
             }
         }
 
-        unset($data['REFERER']);
-        unset($data['anketa']);
-        unset($data['_token']);
-
-        foreach($data as $key => $value) {
-            $form[$key] = $value;
-        }
-
-        $companyId = null;
-        $form['company_id'] = '';
-        $form['company_name'] = '';
-
-        $driverId = $data['driver_id'] ?? null;
+        $driverId = $data['driver_id'] ?? 0;
         $driver = Driver::where('hash_id', $driverId)->first();
         if ($driver) {
-            $form['driver_fio'] = $driver->fio;
-            $form['driver_group_risk'] = $driver->group_risk;
-            $form['driver_gender'] = $driver->gender;
-            $form['driver_year_birthday'] = $driver->year_birthday;
+            $data['driver_group_risk'] = $driver->group_risk;
             $companyId = $driver->company_id;
         }
 
-        $carId = $data['car_id'] ?? null;
+        $carId = $data['car_id'] ?? 0;
         $car = Car::where('hash_id', $carId)->first();
         if ($car) {
-            $form['car_mark_model'] = $car->mark_model;
-            $form['car_gos_number'] = $car->gos_number;
             $companyId = $car->company_id;
         }
 
-        $company = Company::where('id', $companyId)->first();
+        $company = Company::where('id', $companyId ?? 0)->first();
         if ($company) {
-            $form['company_id'] = $company->hash_id;
-            $form['company_name'] = $company->name;
+            $data['company_id'] = $company->hash_id;
         }
 
         $timezone      = $user->timezone ?? 3;
@@ -80,11 +62,15 @@ class UpdateFormHandler
             ->addHours($timezone)
             ->diffInMinutes($data['date'] ?? null);
 
-        $form['realy'] = 'нет';
+        $data['realy'] = 'нет';
         if ($diffDateCheck <= 60 * 12 && $form['date'] ?? null) {
-            $form['realy'] = 'да';
+            $data['realy'] = 'да';
         }
 
+        $form->fill($data);
+        $form->save();
+
+        $form->details->fill($data);
         $form->save();
 
         if ($isPakQueueForm) {
@@ -97,10 +83,10 @@ class UpdateFormHandler
         }
     }
 
-    protected function normalizeMedicPressure(Anketa $form)
+    protected function normalizeMedicPressure(Form $form)
     {
         $driver = Driver::where('hash_id', $form->driver_id)->first();
-        $pressure = Tonometer::fromString($form->tonometer);
+        $pressure = Tonometer::fromString($form->details->tonometer);
         $pressureLimits = PressureLimits::create($driver);
 
         if ($pressure->needNormalize($pressureLimits)) {
@@ -113,16 +99,15 @@ class UpdateFormHandler
         }
     }
 
-    protected function updatePakQueueForm(Anketa $form, Authenticatable $user)
+    protected function updatePakQueueForm(Form $form, Authenticatable $user)
     {
-        if ($form->admitted === 'Не идентифицирован') {
+        if ($form->details->admitted === 'Не идентифицирован') {
             $form->comments = Settings::setting('not_identify_text') ?? 'Водитель не идентифицирован';
         }
 
         /** @var User $user */
         $form->user_id = $user->id;
-        $form->user_name = $user->name;
-        $form->operator_id = $user->id;
+        $form->details->operator_id = $user->id;
         $form->user_eds = $user->eds;
         $form->user_validity_eds_start = $user->validity_eds_start;
         $form->user_validity_eds_end = $user->validity_eds_end;
@@ -130,9 +115,9 @@ class UpdateFormHandler
         $form->save();
     }
 
-    protected function notifyCancel(Anketa $form)
+    protected function notifyCancel(Form $form)
     {
-        if ($form->admitted !== 'Не допущен') {
+        if ($form->details->admitted !== 'Не допущен') {
             return;
         }
 
@@ -142,9 +127,11 @@ class UpdateFormHandler
     /**
      * @throws Exception
      */
-    protected function findDuplicates(Anketa $form, array $data)
+    protected function findDuplicates(Form $form, array $data)
     {
-        if ($form->is_dop && ($form->result_dop == null)) {
+        $details = $form->details;
+
+        if ($details->is_dop && ($details->result_dop == null)) {
             return;
         }
 
@@ -158,7 +145,7 @@ class UpdateFormHandler
         DuplicatesCheckerService::checkExist($existForms, $mainFormTimestamp);
     }
 
-    protected function getExistForms(Anketa $form, array $data): Collection
+    protected function getExistForms(Form $form, array $data): Collection
     {
         $formNewDate = $data['anketa'][0]['date'];
         $datesDiapason = [

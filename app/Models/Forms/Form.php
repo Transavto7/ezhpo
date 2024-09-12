@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Ramsey\Uuid\Uuid;
 
 class Form extends Model
 {
@@ -51,15 +52,26 @@ class Form extends Model
             'user_validity_eds_start',
             'user_validity_eds_end',
             'driver_id',
-            'point_id'
+            'point_id',
+            'company_id',
+            'really'
         ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->uuid = $model->uuid ?? Uuid::uuid4();
+        });
+    }
+
     /**
-     * @return BelongsTo|null
+     * @return HasOne|null
      */
     public function details(): ?HasOne
     {
-        $formType = $this->getAttribute('type');
+        $formType = $this->getAttribute('type_anketa');
         if ($formType === null) {
             return null;
         }
@@ -69,7 +81,7 @@ class Form extends Model
             return null;
         }
 
-        return $this->hasOne($related, 'uuid', 'forms_uuid');
+        return $this->hasOne($related, 'forms_uuid', 'uuid');
     }
 
     public function point(): BelongsTo
@@ -104,7 +116,7 @@ class Form extends Model
 
     public function scopePakQueueByUser($query, User $user)
     {
-        $query->where('type', FormTypeEnum::PAK_QUEUE);
+        $query->where('type_anketa', FormTypeEnum::PAK_QUEUE);
 
         if ($user->access('approval_queue_view_all')) {
 

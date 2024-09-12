@@ -2,9 +2,6 @@
 
 namespace App\Console;
 
-use App\Anketa;
-use App\Company;
-use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 

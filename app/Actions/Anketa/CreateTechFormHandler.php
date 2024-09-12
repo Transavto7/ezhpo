@@ -7,7 +7,7 @@ use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Models\Forms\Form;
-use App\Models\Forms\PrintPlForm;
+use App\Models\Forms\TechForm;
 use App\Services\DuplicatesCheckerService;
 use Illuminate\Support\Carbon;
 
@@ -171,8 +171,8 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         $formModel = new Form($form);
         $formModel->save();
 
-        $formDetailsModel = new PrintPlForm($form);
-        $formDetailsModel->setAttribute('form_id', $formModel->id);
+        $formDetailsModel = new TechForm($form);
+        $formDetailsModel->setAttribute('forms_uuid', $formModel->uuid);
         $formDetailsModel->save();
 
         $this->createdForms->push($formModel);

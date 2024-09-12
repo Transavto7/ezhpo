@@ -7,6 +7,7 @@ use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
+use App\Models\Forms\ReportCartForm;
 use Illuminate\Support\Carbon;
 
 class CreateReportCardFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -120,6 +121,11 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
         $formModel = new Anketa($form);
 
         $formModel->save();
+
+        $formDetailsModel = new ReportCartForm($form);
+        $formDetailsModel->setAttribute('forms_uuid', $formModel->uuid);
+        $formDetailsModel->save();
+
         $this->createdForms->push($formModel);
     }
 }

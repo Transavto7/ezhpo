@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Anketa;
+use App\Enums\FormTypeEnum;
 use App\Models\Forms\MedicForm;
 use App\Models\Forms\TechForm;
 use Exception;
@@ -63,7 +64,7 @@ class DuplicatesCheckerService
         };
 
         $query = TechForm::query()
-            ->join('forms', 'forms.id', 'tech_forms.form_id')
+            ->join('forms', 'forms.uuid', '=', 'tech_forms.forms_uuid')
             ->select([
                 'forms.id',
                 'forms.date'
@@ -83,8 +84,7 @@ class DuplicatesCheckerService
             $query->whereBetween('forms.date', $dateDiapason);
         }
 
-        return $query->where('type_anketa', 'tech')
-            ->whereNull('forms.deleted_at', 0)
+        return $query->whereNull('forms.deleted_at')
             ->whereNotNull('forms.date')
             ->where(function (Builder $query) {
                 $query
@@ -107,9 +107,9 @@ class DuplicatesCheckerService
                 'forms.id',
                 'forms.date'
             ])
-            ->join('forms', 'forms.id', 'medic_forms.form_id')
+            ->join('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
             ->where('forms.driver_id', $driverId)
-            ->whereNull('forms.deleted_at', 0)
+            ->whereNull('forms.deleted_at')
             ->whereNotNull('date')
             ->where(function (Builder $query) {
                 $query

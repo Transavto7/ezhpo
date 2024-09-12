@@ -39,7 +39,6 @@ class Driver extends Model
         'dismissed',
         'autosync_fields',
         'date_of_employment',
-        'contract_id',
         'deleted_id',
         'pressure_systolic',
         'pressure_diastolic',

@@ -5,8 +5,8 @@ namespace App\Actions\Anketa;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
+use App\Models\Forms\BddForm;
 use App\Models\Forms\Form;
-use App\Models\Forms\PrintPlForm;
 use Illuminate\Support\Carbon;
 
 class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -107,8 +107,8 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
         $formModel = new Form($form);
         $formModel->save();
 
-        $formDetailsModel = new PrintPlForm($form);
-        $formDetailsModel->setAttribute('form_id', $formModel->id);
+        $formDetailsModel = new BddForm($form);
+        $formDetailsModel->setAttribute('forms_uuid', $formModel->uuid);
         $formDetailsModel->save();
 
         $this->createdForms->push($formModel);

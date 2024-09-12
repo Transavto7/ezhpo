@@ -51,19 +51,19 @@ class HomeController extends Controller
          */
         $clearPakQueue = $request->input('clear')
             && $user->hasRole('admin')
-            && ($request->input('type_anketa') === 'pak_queue');
+            && ($request->input('type_anketa') === FormTypeEnum::PAK_QUEUE);
 
         if ($clearPakQueue) {
-            Form::where('type_anketa', 'pak_queue')->delete();
+            Form::where('type_anketa', FormTypeEnum::PAK_QUEUE)->delete();
 
-            return redirect(route('home', 'pak_queue'));
+            return redirect(route('home', FormTypeEnum::PAK_QUEUE));
         }
         /**
          * Очистка корзины в очереди на утверждение от СДПО
          */
 
         $formType = $request->type_ankets;
-        $validTypeForm = User::$userRolesKeys[$user->role] ?? 'medic';
+        $validTypeForm = User::$userRolesKeys[$user->role] ?? FormTypeEnum::MEDIC;
         if (isset(Anketa::$anketsKeys[$formType])) {
             $validTypeForm = $formType;
         }
@@ -78,7 +78,7 @@ class HomeController extends Controller
 
         $formDetailsTable = Form::$relatedTables[$validTypeForm];
         $forms = $forms
-            ->join($formDetailsTable, 'forms.uuid', '=', $formDetailsTable."forms_uuid")
+            ->join($formDetailsTable, 'forms.uuid', '=', "$formDetailsTable.forms_uuid")
             ->leftJoin('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
             ->join('companies', 'forms.company_id', '=', 'companies.hash_id')
             ->join('points', 'forms.point_id', '=', 'points.id')
@@ -300,23 +300,25 @@ class HomeController extends Controller
         if ($filterActivated && $request->input('getCounts')) {
             $formsDistinctQuery = $forms->distinct();
 
+            $counters = [
+                'anketasCountDrivers' => $formsDistinctQuery->count('forms.driver_id'),
+                'anketasCountCars' => 0,
+                'anketasCountCompany' => $formsDistinctQuery->count('forms.company_id'),
+            ];
+
             /**
              * Обогащение данных
              */
-            if ($validTypeForm === 'tech') {
+            if ($validTypeForm === FormTypeEnum::TECH) {
                 $formsDistinctQuery = $formsDistinctQuery
                     ->leftJoin('cars', 'car_id', '=', 'cars.hash_id');
+                $counters['anketasCountCars'] = $formsDistinctQuery->count('car_id');
             }
             /**
              * Обогащение данных
              */
 
-
-            return response()->json([
-                'anketasCountDrivers' => $formsDistinctQuery->count('forms.driver_id'),
-                'anketasCountCars' => $formsDistinctQuery->count('car_id'),
-                'anketasCountCompany' => $formsDistinctQuery->count('forms.company_id'),
-            ]);
+            return response()->json($counters);
         }
         /**
          * <Измеряем количество Авто и Водителей (уникальные ID)>
@@ -334,26 +336,27 @@ class HomeController extends Controller
             'drivers.fio as driver_fio',
             'drivers.gender as driver_gender',
             'drivers.year_birthday as driver_year_birthday',
-            'points.name as pv_id'
+            'points.name as pv_id',
+            'companies.name as company_name'
         ];
 
         /**
          * Обогащение данных
          */
-        if ($validTypeForm === 'tech') {
+        if ($validTypeForm === FormTypeEnum::TECH) {
             $forms = $forms
                 ->leftJoin('cars', 'tech_forms.car_id', '=', 'cars.hash_id')
-                ->select($defaultFieldsToSelect + [
+                ->select(array_merge($defaultFieldsToSelect, [
                     'cars.type_auto as car_type_auto',
                     'cars.mark_model as car_mark_model',
                     'cars.gos_number as car_gos_number',
                     'cars.date_prto as date_prto',
-                ]);
-        } else if (($validTypeForm === 'medic') && $export) {
+                ]));
+        } else if (($validTypeForm === FormTypeEnum::MEDIC) && $export) {
             $forms = $forms
-                ->select($defaultFieldsToSelect + [
+                ->select(array_merge($defaultFieldsToSelect, [
                     DB::raw("COALESCE(medic_forms.pressure, medic_forms.tonometer, NULL) as tonometer")
-                ]);
+                ]));
         } else {
             $forms = $forms
                 ->select($defaultFieldsToSelect);
@@ -398,19 +401,19 @@ class HomeController extends Controller
 
             //TODO: вот тут нужна проверка на разумные лимиты
 
-            if ($validTypeForm == 'tech' && $request->get('exportPrikaz')) {
+            if ($validTypeForm == FormTypeEnum::TECH && $request->get('exportPrikaz')) {
                 $fields = $filterFields(collect(Anketa::$fieldsKeys['tech_export_to']));
                 $forms = $forms->get();
                 $title = 'ЭЖ ПРТО.xlsx';
-            } else if ($validTypeForm == 'tech' && $request->get('exportPrikazPL')) {
+            } else if ($validTypeForm == FormTypeEnum::TECH && $request->get('exportPrikazPL')) {
                 $fields = $filterFields(collect(Anketa::$fieldsKeys['tech_export_pl']));
                 $forms = $forms->where(['type_view' => 'Предрейсовый/Предсменный'])->get();
                 $title = 'ЭЖ учета ПЛ.xlsx';
-            } else if ($validTypeForm == 'medic' && $request->get('exportPrikaz')) {
+            } else if ($validTypeForm === FormTypeEnum::MEDIC && $request->get('exportPrikaz')) {
                 $fields = $filterFields(collect(Anketa::$fieldsKeys['medic_export_pl']));
                 $forms = $forms->get();
                 $title = 'ЭЖ ПРМО.xlsx';
-            } else if ($validTypeForm == 'bdd' && $request->get('exportPrikaz')) {
+            } else if ($validTypeForm === FormTypeEnum::BDD && $request->get('exportPrikaz')) {
                 $fields = $filterFields(collect(Anketa::$fieldsKeys['bdd_export_prikaz']));
                 $forms = $forms->with(['user.roles'])->get()->map(function ($form) {
                     $form->user_id = 'Инженер по безопасности дорожного движения';
@@ -526,7 +529,7 @@ class HomeController extends Controller
     {
         $fromType = $request->type_ankets;
 
-        $validFormType = User::$userRolesKeys[auth()->user()->role] ?? 'medic';
+        $validFormType = User::$userRolesKeys[auth()->user()->role] ?? FormTypeEnum::MEDIC;
         if (isset(Anketa::$anketsKeys[$fromType])) {
             $validFormType = $fromType;
         }

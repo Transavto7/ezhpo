@@ -97,7 +97,7 @@ class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements Crea
         $formModel->save();
 
         $formDetailsModel = new PrintPlForm($form);
-        $formDetailsModel->setAttribute('form_id', $formModel->id);
+        $formDetailsModel->setAttribute('forms_uuid', $formModel->uuid);
         $formDetailsModel->save();
 
         $this->createdForms->push($formModel);

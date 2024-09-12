@@ -6,6 +6,8 @@
 
 @php
     $is_dop = $is_dop ?? request()->get('is_dop', '0') === '1';
+    $created = \Illuminate\Support\Facades\Session::get('created', []);
+    $redDates = \Illuminate\Support\Facades\Session::get('redDates', []);
 @endphp
 
 @section('custom-scripts')
@@ -129,84 +131,67 @@
 
                     <!-- Анкета: {{ $title }} -->
                     <article class="anketa anketa-fields">
-                        @foreach(request()->get('errors', []) as $error)
+                        @foreach($errors ?? [] as $error)
                             <div class="alert alert-danger" role="alert">{{ $error }}</div>
                         @endforeach
 
-                        @if(request()->filled('createdId'))
+                        @if(count($created ?? []))
                             <div class="row">
-                                @foreach(request()->get('createdId', []) as $cId)
-                                    @php $anketa = \App\Anketa::query()->with(['driver', 'car'])->find($cId) @endphp
+                                @foreach($created ?? [] as $form)
+                                    <div class="col-md-12">
+                                        <div class="card p-2 text-xsmall">
+                                            <b>"{{ $title }}" успешно создан!</b>
+                                            <br/> ID осмотра: {{ $form->id }}
 
-                                    @isset($anketa)
-                                        <div class="col-md-12">
-                                            <div class="card p-2 text-xsmall">
-                                                @if($type_anketa === \App\Enums\FormTypeEnum::MEDIC)
-                                                    <b>"{{ $title }}" успешно создан!</b>
-                                                    <br/> ID осмотра: {{ $cId }}
+                                            @if($form->driver && $form->driver->fio)
+                                                <br/>
+                                                <b>Водитель: {{ $form->driver->fio }}</b>
+                                            @endif
 
-                                                    @if($anketa->driver && $anketa->driver->fio)
-                                                        <br/>
-                                                        <b>Водитель: {{ $anketa->driver->fio }}</b>
-                                                    @endif
+                                            @if($form->details->type_view)
+                                                Тип осмотра:<b>{{ $form->details->type_view }}</b>
+                                            @endif
 
-                                                    Тип осмотра:<b>{{ $anketa->type_view }}</b>
+                                            @if($form->details->car && $form->details->car->gos_number)
+                                                <br/>
+                                                <b>Госномер автомобиля: {{ $form->details->car->gos_number }}</b>
+                                            @endif
 
-                                                    @if($anketa->date)
-                                                        <div>
-                                                            <i>Дата проведения осмотра: <br/><b>{{ $anketa->date }}</b></i>
-                                                        </div>
-                                                    @elseif($anketa->period_pl)
-                                                        <div>
-                                                            <i>Период проведения осмотра:<br/><b>{{ $anketa->period_pl }}</b></i>
-                                                        </div>
-                                                    @endif
+                                            @if($form->date)
+                                                <div>
+                                                    <i>Дата проведения осмотра:
+                                                        <br/><b>{{ $form->date }}</b></i>
+                                                </div>
+                                            @elseif($form->details->period_pl)
+                                                <div>
+                                                    <i>Период проведения
+                                                        осмотра:<br/><b>{{ $form->details->period_pl }}</b></i>
+                                                </div>
+                                            @endif
 
-                                                    @if(($anketa->admitted === 'Не допущен') && user()->access('medic_closing_edit'))
-                                                        <a class="btn primary btn-sm btn-table"
-                                                           href="{{ route('docs.get', ['type' => 'closing', 'anketa_id' => $cId]) }}">
-                                                            Мед. заключение
-                                                        </a>
-                                                    @endif
-                                                @else
-                                                    <b>"{{ $title }}" (ID: {{ $cId }}) успешно создан!</b>
+                                            @if(($form->details->admitted === 'Не допущен') && user()->access('medic_closing_edit'))
+                                                <a class="btn primary btn-sm btn-table"
+                                                   href="{{ route('docs.get', ['type' => 'closing', 'anketa_id' => $form->id]) }}">
+                                                    Мед. заключение
+                                                </a>
+                                            @endif
 
-                                                    @if($anketa->driver && $anketa->driver->fio)
-                                                        <br/>
-                                                        <b>Водитель: {{ $anketa->driver->fio }}</b>
-                                                    @endif
+                                            @foreach($redDates ?? [] as $redDateKey => $redDateVal)
+                                                <p class="text-danger">
+                                                    {{ __('ankets.'.$redDateKey) }}
+                                                    : {{ $redDateVal['value'] }}
+                                                </p>
+                                            @endforeach
 
-                                                    @if($type_anketa === \App\Enums\FormTypeEnum::TECH)
-                                                        Тип осмотра:<b>{{ $anketa->type_view }}</b>
-                                                    @endif
-
-                                                    @if($anketa->car && $anketa->car->gos_number)
-                                                        <br/>
-                                                        <b>Госномер автомобиля: {{ $anketa->car->gos_number }}</b>
-                                                    @endif
-
-                                                    <div>
-                                                        Дата проведения осмотра <b>{{ $anketa->date }}</b>
-                                                    </div>
-                                                @endif
-
-                                                @foreach(request()->get('redDates', []) as $redDateKey => $redDateVal)
-                                                    <p class="text-danger">
-                                                        {{ __('ankets.'.$redDateKey) }}
-                                                        : {{ $redDateVal['value'] }}
-                                                    </p>
-                                                @endforeach
-
-                                            </div>
                                         </div>
-                                    @endif
+                                    </div>
                                 @endforeach
                             </div>
                         @endif
 
-                        @if(request()->filled('msg'))
+                        @if(\Illuminate\Support\Facades\Session::has('message'))
                             <div class="alert alert-success">
-                                <b>{{ request()->get('msg') }}</b>
+                                <b>{{ \Illuminate\Support\Facades\Session::get('message') }}</b>
                             </div>
                         @endif
 

@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TechForm extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = [
         'forms_uuid',
 
@@ -15,7 +17,6 @@ class TechForm extends Model
 
         'is_dop',
         'result_dop',
-        'realy',
 
         'car_id',
 

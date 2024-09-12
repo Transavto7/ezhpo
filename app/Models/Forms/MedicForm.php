@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MedicForm extends Model
 {
+    public $timestamps = false;
+
     public $fillable = [
         'form_uuid',
 
@@ -16,10 +18,10 @@ class MedicForm extends Model
 
         'is_dop',
         'result_dop',
-        'realy',
 
         'flag_pak',
         'operator_id',
+        'terminal_id',
 
         'pressure',
         'tonometer',
@@ -39,7 +41,7 @@ class MedicForm extends Model
         'videos',
 
         'protokol_path',
-        'closing_path',
+        'closing_path'
     ];
 
     public function form(): BelongsTo

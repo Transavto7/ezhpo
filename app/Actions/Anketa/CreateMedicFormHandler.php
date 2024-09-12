@@ -8,7 +8,7 @@ use App\Enums\BlockActionReasonsEnum;
 use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
 use App\Models\Forms\Form;
-use App\Models\Forms\PrintPlForm;
+use App\Models\Forms\MedicForm;
 use App\Services\DuplicatesCheckerService;
 use App\ValueObjects\PressureLimits;
 use App\ValueObjects\Pulse;
@@ -171,11 +171,13 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             $form['realy'] = 'да';
         }
 
-        $formModel = new Form($form);
+        $formModel = new Form();
+        $formModel->fill($form);
         $formModel->save();
 
-        $formDetailsModel = new PrintPlForm($form);
-        $formDetailsModel->setAttribute('form_id', $formModel->id);
+        $formDetailsModel = new MedicForm();
+        $formDetailsModel->fill($form);
+        $formDetailsModel->setAttribute('forms_uuid', $formModel->uuid);
         $formDetailsModel->save();
 
         /**
@@ -188,7 +190,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         if ($this->needStoreNormalizedPressure) {
             MedicFormNormalizedPressure::store(
                 $formModel->id,
-                Tonometer::fromString($formModel->tonometer)->getNormalized()
+                Tonometer::fromString($formDetailsModel->tonometer)->getNormalized()
             );
         }
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Anketa;
+use App\Enums\FormTypeEnum;
 use App\Http\Controllers\ReportContractRefactoringController;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -75,9 +76,9 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/anketa/{id}', function ($id) {
         $anketa = Anketa::find($id);
 
-        if ($anketa && $anketa->type_anketa == 'pak_queue') {
+        if ($anketa && $anketa->type_anketa == FormTypeEnum::PAK_QUEUE) {
             if (Carbon::now()->getTimestamp() - Carbon::parse($anketa->created_at)->getTimestamp() > 12) {
-                $anketa->type_anketa = 'medic';
+                $anketa->type_anketa = FormTypeEnum::MEDIC;
                 $anketa->save();
             }
         }

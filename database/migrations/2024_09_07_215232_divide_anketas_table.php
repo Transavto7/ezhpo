@@ -17,7 +17,7 @@ class DivideAnketasTable extends Migration
             $table->bigIncrements('id');
 
             $table->string('uuid', 36)->unique();
-            $table->string('type');
+            $table->string('type_anketa');
 
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users');
@@ -36,6 +36,8 @@ class DivideAnketasTable extends Migration
             $table->foreign('company_id')->references('hash_id')->on('companies');
 
             $table->dateTime('date')->nullable();
+
+            $table->string('realy')->nullable();
 
             $table->timestamps();
             $table->softDeletes();
@@ -82,8 +84,6 @@ class DivideAnketasTable extends Migration
             $table->foreign('terminal_id')->references('id')->on('users');
 
             $table->string('flag_pak')->nullable();
-
-            $table->string('really')->nullable();
         });
 
         Schema::create('tech_forms', function (Blueprint $table) {
@@ -103,8 +103,6 @@ class DivideAnketasTable extends Migration
             $table->boolean('is_dop')->default(false);
             $table->string('period_pl')->nullable();
             $table->string('result_dop')->nullable();
-
-            $table->string('really')->nullable();
         });
 
         Schema::create('bdd_forms', function (Blueprint $table) {
@@ -114,24 +112,18 @@ class DivideAnketasTable extends Migration
             $table->string('type_briefing');
             $table->string('briefing_name')->nullable();
             $table->string('signature')->nullable();
-
-            $table->string('really')->nullable();
         });
 
-        Schema::create('pechat_pl_forms', function (Blueprint $table) {
+        Schema::create('print_pl_forms', function (Blueprint $table) {
             $table->string('forms_uuid', 36)->unique()->primary();
             $table->foreign('forms_uuid')->references('uuid')->on('forms');
 
             $table->integer('count_pl');
-
-            $table->string('really')->nullable();
         });
 
         Schema::create('report_cart_forms', function (Blueprint $table) {
             $table->string('forms_uuid', 36)->unique()->primary();
             $table->foreign('forms_uuid')->references('uuid')->on('forms');
-
-            $table->string('really')->nullable();
         });
     }
 
@@ -142,11 +134,11 @@ class DivideAnketasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('forms');
         Schema::dropIfExists('medic_forms');
         Schema::dropIfExists('tech_forms');
         Schema::dropIfExists('bdd_forms');
-        Schema::dropIfExists('pechat_pl_forms');
+        Schema::dropIfExists('print_pl_forms');
         Schema::dropIfExists('report_cart_forms');
+        Schema::dropIfExists('forms');
     }
 }

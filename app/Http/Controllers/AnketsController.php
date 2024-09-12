@@ -10,10 +10,10 @@ use App\Actions\Anketa\UpdateFormHandler;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueAction;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueHandler;
 use App\Anketa;
-use App\Car;
-use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Enums\QRCodeLinkParameter;
+use App\Models\Forms\Form;
+use App\Models\Forms\MedicForm;
 use App\Point;
 use App\Traits\UserEdsTrait;
 use App\User;
@@ -42,16 +42,16 @@ class AnketsController extends Controller
                 return redirect()->route('renderElements', 'Company');
             }
             if ($user->hasRole('operator_sdpo')) {
-                return redirect()->route('home', 'pak_queue');
+                return redirect()->route('home', ['type_ankets' => FormTypeEnum::PAK_QUEUE]);
             }
             if ($user->hasRole('client')) {
-                return redirect()->route('home', ['type_ankets' => 'medic']);
+                return redirect()->route('home', ['type_ankets' => FormTypeEnum::MEDIC]);
             }
             if ($user->hasRole('tech')) {
-                $type = 'tech';
+                $type = FormTypeEnum::TECH;
             }
             if ($user->hasRole('medic')) {
-                $type = 'medic';
+                $type = FormTypeEnum::TECH;
             }
             if (!$type) {
                 return redirect()->route('index');
@@ -104,8 +104,6 @@ class AnketsController extends Controller
         $data['points'] = Point::getAll();
         $data['type_anketa'] = $type;
         $data['default_pv_id'] = $user->pv_id;
-        $data['Driver'] = Driver::class;
-        $data['Car'] = Car::class;
         $data['car_id'] = $request->input(QRCodeLinkParameter::CAR_ID);
         $data['driver_id'] = $request->input(QRCodeLinkParameter::DRIVER_ID);
 
@@ -119,12 +117,17 @@ class AnketsController extends Controller
 
     public function Get(Request $request)
     {
-        $form = Anketa::where('id', $request->id)->first();
+        /** @var Form $form */
+        $form = Form::where('id', $request->id)->first();
+        $details = $form->details;
 
         $data = [];
 
         foreach ($form->fillable as $attribute) {
             $data[$attribute] = $form[$attribute];
+        }
+        foreach ($details->fillable as $attribute) {
+            $data[$attribute] = $details[$attribute];
         }
 
         $companyFields = config('elements')['Driver']['fields']['company_id'];
@@ -143,7 +146,8 @@ class AnketsController extends Controller
         $data['company_fields'] = $companyFields;
 
         if ($form->type_anketa === FormTypeEnum::PAK_QUEUE) {
-            $data['not_admitted_reasons'] = NotAdmittedReasons::fromForm($form)->getReasons();
+            /** @var MedicForm $details */
+            $data['not_admitted_reasons'] = NotAdmittedReasons::fromForm($details)->getReasons();
         }
 
         return view('profile.anketa', $data);
@@ -258,31 +262,26 @@ class AnketsController extends Controller
 
         try {
             //TODO: нет проверки на существование формы
-            $form = Anketa::find($id);
+            $form = Form::find($id);
 
             $handler->handle($form, $request->all(), Auth::user());
 
-            $referer = $request->input('REFERER');
-            if ($referer) {
-                $response = redirect($referer);
-            } else {
-                $response = redirect(route('forms.get', [
-                    'id' => $id,
-                    'msg' => 'Осмотр успешно обновлён!'
-                ]));
-            }
+            $response = [
+                'id' => $id,
+                'message' => 'Осмотр успешно обновлён!'
+            ];
 
             DB::commit();
         } catch (Throwable $exception) {
-            $response = redirect(route('forms.get', [
+            $response = [
                 'id' => $id,
                 'errors' => [$exception->getMessage()],
-            ]));
+            ];
 
             DB::rollBack();
         }
 
-        return $response;
+        return back()->with($response);
     }
 
     public function AddForm(Request $request, CreateFormHandlerFactory $factory): RedirectResponse
@@ -290,6 +289,8 @@ class AnketsController extends Controller
         DB::beginTransaction();
 
         $formType = $request->input('type_anketa');
+
+        $responseData = [];
 
         try {
             // TODO: добавить время действия
@@ -304,9 +305,7 @@ class AnketsController extends Controller
 
             DB::commit();
         } catch (Throwable $exception) {
-            $responseData = [
-                'errors' => [$exception->getMessage()],
-            ];
+            $responseData['errors'] = [$exception->getMessage()];
 
             DB::rollBack();
         }
@@ -314,7 +313,7 @@ class AnketsController extends Controller
         $responseData['type'] = $formType;
         $responseData['is_dop'] = $responseData['is_dop'] ?? $request->input('is_dop', 0);
 
-        return redirect()->route('forms.index', $responseData);
+        return back()->with($responseData);
     }
 
     /**

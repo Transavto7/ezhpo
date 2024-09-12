@@ -2,16 +2,16 @@
 
 namespace App\Console\Commands;
 
-use App\Anketa;
 use App\Company;
 use App\Driver;
+use App\Enums\FormTypeEnum;
 use App\Instr;
-use App\Point;
+use App\Models\Forms\BddForm;
+use App\Models\Forms\Form;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
 
 class CreateDefaultBriefings extends Command
 {
@@ -46,55 +46,86 @@ class CreateDefaultBriefings extends Command
      */
     public function handle()
     {
-        $entersInto = 0;
-        /** @var $companiesWithAutoBriefing array Массив с hash ID компаний, где требуется базовый инструктаж */
-        $companiesWithAutoBriefing = Company::where("required_type_briefing", true)->select('name', 'id', 'hash_id', 'pv_id')->get();
+        $companiesWithAutoBriefing = Company::query()
+            ->select(['name', 'id', 'hash_id', 'pv_id'])
+            ->where("required_type_briefing", true)
+            ->get();
 
-        /** @var $drivers Массив ID водителей, у которых были осмотры в этом месяце */
-        $drivers = Anketa::whereBetween('date', [
-            Carbon::now()->startOfMonth(),
-            Carbon::now()
-        ])->pluck('driver_id')->unique();
+        if ($companiesWithAutoBriefing->count() === 0) {
+            return;
+        }
 
-        /** @var $drivers Driver Данные водителей, которым нужно прописать инструктаж */
-        $drivers = Driver::select(["hash_id", "fio", "gender", "year_birthday", 'company_id'])
-            ->whereIn("company_id", $companiesWithAutoBriefing->pluck("id"))->whereIn('hash_id', $drivers)->get();
+        $briefing = Instr::query()
+            ->where('is_default', true)
+            ->where('type_briefing', 'Специальный')
+            ->first();
 
-        $briefing = Instr::where('is_default', true)->where('type_briefing', 'Специальный')->first();
+        if ($briefing === null) {
+            return;
+        }
 
-        $bddUser = User::with(['roles'])->whereHas('roles', function (Builder $queryBuilder) {
-            return $queryBuilder->where('id', 7);
-        })->get()->random();
+        $briefingName = $briefing->name;
 
-        $drivers->map(function ($driver) use ($bddUser, $companiesWithAutoBriefing, &$entersInto, $briefing) {
-            $company = $companiesWithAutoBriefing->where('id', $driver->company_id)->first();
-            $point = Point::find($company->pv_id);
+        $bddUser = User::query()
+            ->with(['roles'])
+            ->whereHas('roles', function (Builder $queryBuilder) {
+                return $queryBuilder->where('id', 7);
+            })
+            ->get()
+            ->random();
 
-            Anketa::create([
-                               "type_anketa" => "bdd",
-                               "user_id"     => $bddUser->id,
-                               "user_name"   => $bddUser->name,
-                               'pv_id'       => $point->name,
-                               'user_eds'    => $bddUser->eds,
-                               "driver_id"   => $driver->hash_id,
-                               "driver_fio"  => $driver->fio,
-                               "driver_gender" => $driver->gender,
-                               "driver_year_birthday" => $driver->year_birthday,
-                               "complaint" => "Нет",
-                               "type_briefing" => 'Специальный',
-                               "signature" => "Подписано простой электронной подписью (ПЭП)",
-                               "condition_visible_sliz" => "Без особенностей",
-                               "condition_koj_pokr" => "Без особенностей",
-                               "date" => Carbon::now(),
-                               "type_view" => "Предрейсовый",
-                               "company_id" => $company->hash_id,
-                               "company_name" => $company->name,
-                               'point_id' => $point->id,
-                               "briefing_name" => $briefing->name ?? ''
+        if ($bddUser === null) {
+            return;
+        }
+
+        $drivers = Form::query()
+            ->select(['driver_id'])
+            ->leftJoin('companies', 'companies.id', '=', 'forms.company_id')
+            ->whereBetween('date', [
+                Carbon::now()->startOfMonth(),
+                Carbon::now()
+            ])
+            ->where('companies.required_type_briefing', true)
+            ->get()
+            ->pluck('driver_id')
+            ->unique();
+
+        if ($drivers->count() === 0) {
+            return;
+        }
+
+        $drivers = Driver::query()
+            ->select([
+                "drivers.hash_id",
+                'companies.hash_id as company_id',
+                'companies.pv_id as point_id'
+            ])
+            ->leftJoin('companies', 'companies.id', '=', 'drivers.company_id')
+            ->whereIn('hash_id', $drivers)
+            ->get();
+
+        $drivers->each(function (Driver $driver) use ($bddUser, $briefingName) {
+            $form = Form::create([
+                "driver_id" => $driver->hash_id,
+                'point_id' => $driver->point_id,
+                "company_id" => $driver->company_id,
+                "type_anketa" => FormTypeEnum::BDD,
+                "user_id" => $bddUser->id,
+                'user_eds' => $bddUser->eds,
+                'user_validity_eds_start' => $bddUser->validity_eds_start,
+                'user_validity_eds_end' => $bddUser->validity_eds_end,
+                "date" => Carbon::now(),
             ]);
-            $entersInto++;
+
+            BddForm::create([
+                'forms_uuid' => $form->uuid,
+                "type_briefing" => 'Специальный',
+                "signature" => "Подписано простой электронной подписью (ПЭП)",
+                "briefing_name" => $briefingName
+            ]);
         });
 
-        $this->info("Created $entersInto records.");
+        $count = $drivers->count();
+        $this->info("Created $count records.");
     }
 }

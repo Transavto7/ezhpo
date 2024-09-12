@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ReportCartForm extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = [
         'forms_uuid'
     ];

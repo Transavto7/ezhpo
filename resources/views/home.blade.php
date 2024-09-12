@@ -284,7 +284,7 @@
                 axios
                     .get(anketsApi.massTrash, {
                         params: {
-                            action: '{{ isset($_GET['trash']) ? 0 : 1 }}',
+                            action: '{{ request()->get('trash') ? 0 : 1 }}',
                             ids: anketsStorage.items
                         }
                     })
@@ -312,6 +312,8 @@
 @endsection
 
 @php
+    use App\Enums\FormTypeEnum;
+
     function checkChangeResult($anketa) {
         if (!$anketa->is_dop) {
             return false;
@@ -325,13 +327,13 @@
             return false;
         }
 
-        if ($anketa->type_anketa === 'medic') {
+        if ($anketa->type_anketa === FormTypeEnum::MEDIC) {
             if (!$anketa->driver_id || !$anketa->driver_fio) {
                 return false;
             }
         }
 
-        if ($anketa->type_anketa === 'tech') {
+        if ($anketa->type_anketa === FormTypeEnum::TECH) {
             if (!$anketa->car_id || !$anketa->car_gos_number) {
                 return false;
             }
@@ -341,60 +343,60 @@
     }
 
     $permissionToView = (
-        user()->access('medic_read') && $type_ankets == 'medic'
-        || user()->access('tech_read') && $type_ankets == 'tech'
-        || user()->access('journal_briefing_bdd_read') && $type_ankets == 'bdd'
-        || user()->access('journal_pl_read') && $type_ankets == 'pechat_pl'
-        || user()->access('map_report_read') && $type_ankets == 'report_cart'
-        || user()->access('errors_sdpo_read') && $type_ankets == 'pak'
-        || user()->access('approval_queue_view') && $type_ankets == 'pak_queue'
+        user()->access('medic_read') && $type_ankets == FormTypeEnum::MEDIC
+        || user()->access('tech_read') && $type_ankets == FormTypeEnum::TECH
+        || user()->access('journal_briefing_bdd_read') && $type_ankets == FormTypeEnum::BDD
+        || user()->access('journal_pl_read') && $type_ankets == FormTypeEnum::PRINT_PL
+        || user()->access('map_report_read') && $type_ankets == FormTypeEnum::REPORT_CARD
+        || user()->access('errors_sdpo_read') && $type_ankets == FormTypeEnum::PAK
+        || user()->access('approval_queue_view') && $type_ankets == FormTypeEnum::PAK_QUEUE
     );
 
     $permissionToTrashView = (
-        user()->access('medic_trash') && $type_ankets == 'medic'
-        || user()->access('tech_trash') && $type_ankets == 'tech'
-        || user()->access('journal_briefing_bdd_trash') && $type_ankets == 'bdd'
-        || user()->access('journal_pl_trash') && $type_ankets == 'pechat_pl'
-        || user()->access('map_report_trash') && $type_ankets == 'report_cart'
-        || user()->access('errors_sdpo_trash') && $type_ankets == 'pak'
+        user()->access('medic_trash') && $type_ankets == FormTypeEnum::MEDIC
+        || user()->access('tech_trash') && $type_ankets == FormTypeEnum::TECH
+        || user()->access('journal_briefing_bdd_trash') && $type_ankets == FormTypeEnum::BDD
+        || user()->access('journal_pl_trash') && $type_ankets == FormTypeEnum::PRINT_PL
+        || user()->access('map_report_trash') && $type_ankets == FormTypeEnum::REPORT_CARD
+        || user()->access('errors_sdpo_trash') && $type_ankets == FormTypeEnum::PAK
     );
 
     $permissionToDelete = (
-        $type_ankets == 'medic' && user()->access('medic_delete')
-        || $type_ankets == 'tech' && user()->access('tech_delete')
-        || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_delete')
-        || user()->access('journal_pl_delete') && $type_ankets == 'pechat_pl'
-        || user()->access('map_report_delete') && $type_ankets == 'report_cart'
-        || user()->access('errors_sdpo_delete') && $type_ankets == 'pak'
+        $type_ankets == FormTypeEnum::MEDIC && user()->access('medic_delete')
+        || $type_ankets == FormTypeEnum::TECH && user()->access('tech_delete')
+        || $type_ankets == FormTypeEnum::BDD && user()->access('journal_briefing_bdd_delete')
+        || user()->access('journal_pl_delete') && $type_ankets == FormTypeEnum::PRINT_PL
+        || user()->access('map_report_delete') && $type_ankets == FormTypeEnum::REPORT_CARD
+        || user()->access('errors_sdpo_delete') && $type_ankets == FormTypeEnum::PAK
     );
 
     $permissionToUpdate = (
-        $type_ankets == 'medic' && user()->access('medic_update')
-        || $type_ankets == 'tech' && user()->access('tech_update')
-        || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_update')
-        || user()->access('journal_pl_update') && $type_ankets == 'pechat_pl'
-        || user()->access('map_report_update') && $type_ankets == 'report_cart'
-        || user()->access('errors_sdpo_update') && $type_ankets == 'pak'
+        $type_ankets == FormTypeEnum::MEDIC && user()->access('medic_update')
+        || $type_ankets == FormTypeEnum::TECH && user()->access('tech_update')
+        || $type_ankets == FormTypeEnum::BDD && user()->access('journal_briefing_bdd_update')
+        || user()->access('journal_pl_update') && $type_ankets == FormTypeEnum::PRINT_PL
+        || user()->access('map_report_update') && $type_ankets == FormTypeEnum::REPORT_CARD
+        || user()->access('errors_sdpo_update') && $type_ankets == FormTypeEnum::PAK
     );
 
     $permissionToExport = !user()->hasRole('client') && (
-        $type_ankets == 'tech' && user()->access('tech_export')
-        || $type_ankets == 'medic' && user()->access('medic_export')
-        || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_export')
-        || $type_ankets == 'pechat_pl' && user()->access('journal_pl_export')
-        || $type_ankets == 'report_cart' && user()->access('map_report_export')
+        $type_ankets == FormTypeEnum::TECH && user()->access('tech_export')
+        || $type_ankets == FormTypeEnum::MEDIC && user()->access('medic_export')
+        || $type_ankets == FormTypeEnum::BDD && user()->access('journal_briefing_bdd_export')
+        || $type_ankets == FormTypeEnum::PRINT_PL && user()->access('journal_pl_export')
+        || $type_ankets == FormTypeEnum::REPORT_CARD && user()->access('map_report_export')
     );
 
     $permissionToExportPrikaz = !user()->hasRole('client') && (
-        $type_ankets == 'tech' && user()->access('tech_export_prikaz')
-        || $type_ankets == 'medic' && user()->access('medic_export_prikaz')
-        || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_export_prikaz')
-        || $type_ankets == 'pechat_pl' && user()->access('journal_pl_export_prikaz')
-        || $type_ankets == 'report_cart' && user()->access('map_report_export_prikaz')
+        $type_ankets == FormTypeEnum::TECH && user()->access('tech_export_prikaz')
+        || $type_ankets == FormTypeEnum::MEDIC && user()->access('medic_export_prikaz')
+        || $type_ankets == FormTypeEnum::BDD && user()->access('journal_briefing_bdd_export_prikaz')
+        || $type_ankets == FormTypeEnum::PRINT_PL && user()->access('journal_pl_export_prikaz')
+        || $type_ankets == FormTypeEnum::REPORT_CARD && user()->access('map_report_export_prikaz')
     );
 
     $permissionToExportPrikazPL = !user()->hasRole('client') && (
-        $type_ankets == 'tech' && user()->access('tech_export_prikaz_pl')
+        $type_ankets == FormTypeEnum::TECH && user()->access('tech_export_prikaz_pl')
     );
 
     $notDeletedItems = session('not_deleted_ankets');
@@ -414,14 +416,14 @@
                                     @endif
 
                                     @if($permissionToTrashView)
-                                        @isset($_GET['trash'])
+                                        @if($request()->get('trash', 0))
                                             <a href="{{ route('home', $type_ankets) }}" class="btn btn-sm btn-warning">Назад</a>
                                         @else
                                             <a href="?trash=1" class="btn btn-sm btn-warning">Корзина <i class="fa fa-trash"></i></a>
                                         @endisset
                                     @endif
                                 </div>
-                                @if($type_ankets === 'tech')
+                                @if($type_ankets === FormTypeEnum::TECH)
                                     <div class="col-md-8 text-right">
                                         @if($permissionToExport)
                                             <a href="?export=1&{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
@@ -758,7 +760,7 @@
                                 @endif
 
                                 <td class="td-option not-export d-flex">
-                                    @if($type_ankets === 'pak_queue')
+                                    @if($type_ankets === FormTypeEnum::PAK_QUEUE)
                                         <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-sm btn-info mr-1"><i class="fa fa-search mr-1"></i></a>
                                         <a href="{{ route('forms.changePakQueue', ['admitted' => 'Допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-success mr-1"><i class="fa fa-check"></i></a>
                                         <a href="{{ route('forms.changePakQueue', ['admitted' => 'Не идентифицирован', 'id' => $anketa->id]) }}" class="btn btn-sm btn-secondary mr-1"><i class="fa fa-question"></i></a>
@@ -785,7 +787,7 @@
                                         {{ $anketa->result_dop }}
                                     @endif
 
-                                    @if($type_ankets === 'medic' && mb_strtolower($anketa->admitted ?? '') === 'допущен')
+                                    @if($type_ankets === FormTypeEnum::MEDIC && mb_strtolower($anketa->admitted ?? '') === 'допущен')
                                         <a
                                             href="{{ route('forms.print', ['id' => $anketa->id]) }}"
                                             target="_blank"
@@ -794,12 +796,12 @@
                                         </a>
                                     @endif
 
-                                    @if($type_ankets !== 'pak_queue' && $permissionToDelete)
+                                    @if($type_ankets !== FormTypeEnum::PAK_QUEUE && $permissionToDelete)
                                         <a
-                                            href="{{ route('forms.trash', ['id' => $anketa->id, 'action' => isset($_GET['trash']) ? 0 : 1]) }}"
+                                            href="{{ route('forms.trash', ['id' => $anketa->id, 'action' => request()->get('trash') ? 0 : 1]) }}"
                                             class="btn btn-warning btn-sm hv-btn-trash mr-1"
                                             data-id="{{ $anketa->id }}">
-                                            @isset($_GET['trash'])
+                                            @if(request()->get('trash', 0))
                                                 <i class="fa fa-undo"></i>
                                             @else
                                                 <i class="fa fa-trash"></i>

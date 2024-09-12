@@ -7,10 +7,11 @@ use App\Driver;
 use App\Point;
 use App\User;
 use Carbon\Carbon;
-use DB;
+use DateTime;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Facades\DB;
 
 class BddDriversinstructionsSetting extends Command
 {
@@ -73,17 +74,17 @@ class BddDriversinstructionsSetting extends Command
                         ")
                     )
                     ->whereBetween('anketas.date', [
-                            \DateTime::createFromFormat('Y-m-d', '2022-07-01'),
-                            \DateTime::createFromFormat('Y-m-d', '2023-02-01')]
+                            DateTime::createFromFormat('Y-m-d', '2022-07-01'),
+                            DateTime::createFromFormat('Y-m-d', '2023-02-01')
+                        ]
                     )
-                    ->groupBy([DB::raw("dateMonth")])
-
-                ;
+                    ->groupBy([DB::raw("dateMonth")]);
 
                 foreach ($anketsByMonth->get()->pluck('count', 'dateMonth')->toArray() as $date => $count) {
                     $date = Carbon::parse($date);
                     $bddDate = Carbon::create($date->year, $date->month, 10, 6);
-                    $model = $driver->inspections_bdd()->create([
+
+                    $driver->inspections_bdd()->create([
                         'type_anketa' => 'bdd',
                         'pv_id' => $point->name ?? null,
                         'date' => $bddDate,
@@ -96,9 +97,6 @@ class BddDriversinstructionsSetting extends Command
                         'user_name' => $bddUser->name,
                         'user_id' => $bddUser->id,
                     ]);
-
-                    dump($model->toArray());
-
                 }
             }
         }

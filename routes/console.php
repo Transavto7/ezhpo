@@ -18,40 +18,6 @@ use Illuminate\Support\Facades\Artisan;
 |
 */
 
-Artisan::command('companies:procedure_pv-fix', function () {
-    Company::whereNotIn('procedure_pv', [
-        'Наперед без дат',
-        'Наперёд с датами',
-        'Задним числом',
-        'Фактовый',
-    ])
-        ->orWhereNull('procedure_pv')
-        ->update([
-            'procedure_pv' => 'Фактовый',
-        ]);
-    $this->comment('Компани пофикшенс');
-
-})->describe('Display an inspiring quote');
-
-Artisan::command('anketas:clear', function () {
-    $date = Carbon::parse('2023-09-15');
-    $anketas = Anketa::where('driver_id', 217543)->whereBetween('date', [
-        $date->startOfDay(),
-        $date->endOfDay()
-    ]);
-
-    $saved = $anketas->first();
-
-    if ($saved) {
-        $anketas = $anketas->where('id', '!=', $saved->id);
-    }
-
-    $count = $anketas->count();
-
-    $this->comment('delete ' . $count . ' anketas');
-
-})->describe('Display an inspiring quote');
-
 Artisan::command('inspections:fix-realy-by-date', function () {
     $forms = Anketa::query()
         ->where('created_at', '>=', Carbon::parse('01-07-2022')->startOfDay())
@@ -138,42 +104,3 @@ Artisan::command('inspections:fix', function () {
         ->update(['proba_alko' => 'Отрицательно']);
 
 })->describe('Fix data in inspections');
-
-Artisan::command('inspections:import', function () {
-    $json = file_get_contents(storage_path() . "/inspections.json");
-    $inspections = json_decode($json);
-    $created = [];
-
-    foreach ($inspections as $inspection) {
-        $user = User::find($inspection->user_id);
-        $driver = Driver::where('hash_id', $inspection->driver_id)->first();
-
-        $created[] = Anketa::create([
-            'type_anketa' => 'medic',
-            'user_id' => $inspection->user_id,
-            'user_name' => $user->name,
-            'user_eds' => $inspection->user_eds,
-            'pulse' => mt_rand(60, 80),
-            'pv_id' => 'Кооперативная, 19',
-            'point_id' => 2,
-            'tonometer' => rand(118, 129) . '/' . rand(70, 90),
-            'driver_id' => $inspection->driver_id,
-            'driver_fio' => $driver->fio,
-            'driver_gender' => $driver->gender,
-            'driver_group_risk' => $driver->group_risk,
-            'company_id' => $driver->company->hash_id,
-            'company_name' => $driver->company->name,
-            'med_view' => 'В норме',
-            't_people' => rand(360, 370) / 10,
-            'type_view' => 'Предрейсовый/Предсменный',
-            'flag_pak' => 'СДПО А',
-            'terminal_id' => 2889,
-            'created_at' => Carbon::parse($inspection->created_at),
-            'date' => Carbon::parse($inspection->created_at),
-            'realy' => 'да',
-            'proba_alko' => 'Отрицательно'
-        ])->id;
-    }
-
-    $this->comment(implode(", ", $created));
-})->describe('Import inspections');

@@ -6,8 +6,10 @@ use App\Anketa;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
+use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
+use App\Models\Forms\MedicForm;
 use App\User;
 use App\ValueObjects\Pulse;
 use App\ValueObjects\Temperature;
@@ -33,7 +35,7 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
         }
 
         $formType = $data['type_anketa'];
-        if (!in_array($formType, ['pak_queue', 'medic'])) {
+        if (!in_array($formType, [FormTypeEnum::PAK_QUEUE, FormTypeEnum::MEDIC])) {
             throw new Exception('Регистрация неподдерживаемого осмотра через СДПО');
         }
 
@@ -178,7 +180,7 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
         /**
          * Выставляем ручной режим, если так пришло из ПАК
          */
-        if ($form['type_anketa'] === 'pak_queue') {
+        if ($form['type_anketa'] === FormTypeEnum::PAK_QUEUE) {
             $form['flag_pak'] = 'СДПО Р';
         }
 
@@ -186,6 +188,11 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
          * Создаем анкету
          */
         $formModel = Anketa::create($form);
+
+        $formDetailsModel = new MedicForm($form);
+        $formDetailsModel->setAttribute('forms_uuid', $formModel->uuid);
+        $formDetailsModel->save();
+
         $this->createdForms->push($formModel);
 
         if ($this->needStoreNormalizedPressure) {

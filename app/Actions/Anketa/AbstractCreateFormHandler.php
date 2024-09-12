@@ -2,7 +2,6 @@
 
 namespace App\Actions\Anketa;
 
-use App\Point;
 use App\Services\DuplicatesCheckerService;
 use App\Services\RedDatesCheckerService;
 use App\User;
@@ -50,7 +49,6 @@ abstract class AbstractCreateFormHandler
 
         $pointId = $data['pv_id'] ?? 0;
         $this->data['point_id'] = $pointId;
-        $point = Point::find($pointId);
 
         date_default_timezone_set('UTC');
         $this->time = date('Y-m-d H:i:s', time() + ($user->timezone ?: 3) * 3600);
@@ -69,8 +67,7 @@ abstract class AbstractCreateFormHandler
         }
 
         $responseData = [
-            //TODO: а потом выполняются лишние запросы
-            'createdId' => $this->createdForms->pluck('id')->toArray(),
+            'created' => $this->createdForms->all(),
             'errors' => array_unique($this->errors)
         ];
 

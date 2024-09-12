@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BddForm extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = [
         'forms_uuid',
 
