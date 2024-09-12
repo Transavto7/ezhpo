@@ -8,6 +8,8 @@ use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
+use App\Services\FormHash\FormHashGenerator;
+use App\Services\FormHash\HashData;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
@@ -230,6 +232,16 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             ->diffInMinutes($date);
         if ($date && $diffDateCheck <= 60*12) {
             $form['realy'] = 'да';
+        }
+
+        if ($form['driver_id'] && $form['date'] && $form['type_view']) {
+            $form['day_hash'] = FormHashGenerator::generate(
+                new HashData(
+                    $form['driver_id'],
+                    new \DateTimeImmutable($form['date']),
+                    $form['type_view']
+                )
+            );
         }
 
         $formModel = new Anketa($form);

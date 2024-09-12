@@ -150,6 +150,7 @@ class Anketa extends Model
             'connected_hash',
             'contract_id',
             'contract_snapshot_id',
+            'day_hash',
         ];
 
     public static $anketsKeys

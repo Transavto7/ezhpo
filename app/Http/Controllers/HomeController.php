@@ -10,6 +10,8 @@ use App\Point;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -98,6 +100,33 @@ class HomeController extends Controller
                 'deleted_user'
             ]);
 
+        $duplicates = $request->get('duplicates', false);
+        if (filter_var($duplicates, FILTER_VALIDATE_BOOLEAN) && $request->has('date') && $request->has('TO_date')) {
+            if (! $request->has('date') || ! $request->has('TO_date')) {
+                $request->session()->flash('error', 'Не выбран период проведения осмотров');
+                $request->request->remove('filter');
+            }
+
+            $startDate = Carbon::parse($request->input('date'));
+            $endDate = Carbon::parse($request->input('TO_date'))->addDay();
+
+            if ($endDate->diff($startDate)->days > 31) {
+                $request->session()->flash('error', 'Выбранный период проведения осмотров превышает 31 день');
+                $request->request->remove('filter');
+            }
+
+            if (! $request->session()->has('error')) {
+                $this->setDuplicatesQuery(
+                    $validTypeForm,
+                    $forms,
+                    $startDate,
+                    $endDate
+                );
+            }
+        } else {
+            $request->session()->forget('error');
+        }
+
         /**
          * Фильтрация анкет в ЛКК
          */
@@ -141,8 +170,10 @@ class HomeController extends Controller
             'orderKey',
             'typePrikaz',
             'page',
-            'getFormFilter'
+            'getFormFilter',
+            'duplicates',
         ]);
+
         if (count($filterParams) > 0 && $filterActivated) {
             $formModel = new Anketa();
 
@@ -589,5 +620,26 @@ class HomeController extends Controller
             'fieldsGroupFirst' => $fieldsGroupFirst,
             'exclude' => $exclude
         ]);
+    }
+
+    private function setDuplicatesQuery(string $formType, Builder $builder, $start, $end)
+    {
+        $duplicates = DB::table('anketas')
+            ->select('day_hash')
+            ->where('type_anketa', '=', $formType)
+            ->where('date', '>=', $start->format('Y-m-d'))
+            ->where('date', '<', $end->format('Y-m-d'))
+            ->whereNotNull('day_hash')
+            ->where('in_cart', '<>', 1)
+            ->groupBy(['day_hash'])
+            ->havingRaw('COUNT(day_hash) > 1');
+
+        $builder->whereNotNull('anketas.day_hash')
+            ->joinSub($duplicates, 'duplicates', function (JoinClause $join) {
+                $join->on('anketas.day_hash', '=', 'duplicates.day_hash');
+            })
+            ->orderByDesc(DB::raw('DATE(date)'))
+            ->orderBy('driver_fio')
+            ->orderBy('type_view');
     }
 }

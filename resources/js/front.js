@@ -9,6 +9,7 @@ require('chosen-js')
 require('croppie')
 require('suggestions-jquery')
 require('./common/camera')
+require('./common/findDuplicates')
 
 $.fn.select2.amd.require(['select2/selection/search'], function (Search) {
     Search.prototype.searchRemoveChoice = function (decorated, item) {
@@ -929,6 +930,10 @@ $(document).ready(function () {
         count_anketa++
 
         clone.find('.anketa-delete').html('<a href="" onclick="' + randId + '.remove(); return false;" class="text-danger">Удалить</a>')
+
+        if (! clone.find('.duplicate-indicator').hasClass('d-none')) {
+            window.duplicates['anketa[' + (count_anketa - 1) + ']' + '[date]'] = true
+        }
     })
 
     // Отправка данных с форма по CTRL + ENTER
