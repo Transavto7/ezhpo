@@ -23,7 +23,7 @@ final class CarValidator extends ElementValidator
             'trailer' => 'Прицеп (если есть)',
             'dateTechView' => 'Дата ТО',
             'dateOsago' => 'Дата ОСАГО',
-            'dateSkzi' => 'Срок действия СКЗИ',
+            'dateSkzi' => 'Срок действия СКЗИ\настройки тахографа ЕСТР',
         ];
 
         $validator = IlluminateValidator::make($parsedDataItem, [

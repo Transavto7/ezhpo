@@ -1,9 +1,4 @@
-@php
-    $user_role_text = \App\Http\Controllers\ProfileController::getUserRole();
-    $user_role = \App\Http\Controllers\ProfileController::getUserRole(false);
-@endphp
-
-    <!-- Side Navbar -->
+<!-- Side Navbar -->
 <nav class="side-navbar">
     <!-- Sidebar Header-->
     <div class="sidebar-header d-flex align-items-center">
@@ -164,21 +159,21 @@
                             </a>
                         </li>
                     @endif
-                        <li>
-                            <a href="{{ route('report.company_service') }}">
-                                <i class="fa fa-book"></i>Отчет по услугам компании
-                                <span class="
+                    <li>
+                        <a href="{{ route('report.company_service') }}">
+                            <i class="fa fa-book"></i>Отчет по услугам компании
+                            <span class="
                                     start-100
                                     translate-middle
                                     badge
                                     text-white
                                     rounded-pill
                                     bg-success"
-                                >
+                            >
                                     new
                                 </span>
-                            </a>
-                        </li>
+                        </a>
+                    </li>
                 </ul>
             </li>
         @endif
@@ -271,10 +266,12 @@
                             <a href="{{ route('terminals.index') }}">
                                 Терминалы
                                 @if($lessMonthCount)
-                                    <span class="badge bg-warning text-white">{{ $lessMonthCount < 99 ? $lessMonthCount : '99+' }}</span>
+                                    <span
+                                        class="badge bg-warning text-white">{{ $lessMonthCount < 99 ? $lessMonthCount : '99+' }}</span>
                                 @endif
                                 @if($expiredCount)
-                                    <span class="badge bg-primary text-white">{{ $expiredCount < 99 ? $expiredCount : '99+' }}</span>
+                                    <span
+                                        class="badge bg-primary text-white">{{ $expiredCount < 99 ? $expiredCount : '99+' }}</span>
                                 @endif
                             </a>
                         </li>
