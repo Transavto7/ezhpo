@@ -40,7 +40,7 @@
     </div>
 
     <!-- Добавление элемента -->
-    <div id="elements-modal-add" tabindex="-1" role="dialog" aria-labelledby="elements-modal-label" aria-hidden="true"
+    <div id="elements-modal-add" role="dialog" aria-labelledby="elements-modal-label" aria-hidden="true"
          class="modal fade text-left">
         <div role="document" class="modal-dialog">
             <div class="modal-content">

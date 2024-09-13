@@ -237,15 +237,26 @@ $(document).ready(function () {
         docFields: window.DOC_FIELDS,
 
         initChosen() {
-            $('.filled-select2').select2({
-                placeholder: 'Выберите значение',
-                language: {
-                    noResults: function (params) {
-                        return "Совпадений не найдено";
-                    }
-                },
-                allowClear: false
-            });
+	    $('.filled-select2').each(function (index, element) {
+                const select = $(element)
+
+                const extraOptions = {}
+
+                if (select.closest('#elements-modal-add').length || select.closest('#modalEditor').length) {
+                    extraOptions.dropdownParent = $(this).parent()
+                }
+
+                select.select2({
+                    placeholder: 'Выберите значение',
+                    language: {
+                        noResults: function (params) {
+                            return "Совпадений не найдено"
+                        }
+                    },
+                    allowClear: false,
+                    ...extraOptions,
+                });
+            })
 
             $('.js-chosen').chosen({
                 width: '100%',
