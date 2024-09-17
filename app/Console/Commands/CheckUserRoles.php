@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\GenerateHashIdTrait;
+use App\User;
 use Closure;
 use Exception;
 use Illuminate\Console\Command;
@@ -51,41 +52,104 @@ class CheckUserRoles extends Command
     {
         $this->fixNeeded = $this->option('fix');
 
-        $companies = DB::table('companies as c')
+        DB::beginTransaction();
+
+        try {
+            $this->validateEntitiesWithoutUser(
+                'Компании без пользователя',
+                $this->findCompanies(),
+            );
+            $this->validateEntitiesWithoutUserWithRole(
+                'Компании без пользователя с ролью client',
+                $this->findCompanies(),
+                6
+            );
+            $this->validateEntitiesWithUsersHavingMultipleRoles(
+                'Компании с пользователями, у которых несколько ролей (включая роль client)',
+                $this->findCompanies(),
+                6
+            );
+
+            $this->validateEntitiesWithoutUser(
+                'Водители без пользователя',
+                $this->findDrivers(),
+            );
+            $this->validateEntitiesWithoutUserWithRole(
+                'Водители без пользователя с ролью driver',
+                $this->findDrivers(),
+                3
+            );
+            $this->validateEntitiesWithUsersHavingMultipleRoles(
+                'Водители с пользователями, у которых несколько ролей (включая роль driver)',
+                $this->findDrivers(),
+                3
+            );
+
+            $this->validateUsersWithoutCompany(
+                'Пользователи с ролью client без компании',
+                $this->findUsers(),
+            );
+            $this->validateUsersWithoutDriver(
+                'Пользователи с ролью driver без водителя',
+                $this->findUsers(),
+            );
+
+            DB::commit();
+
+            $this->info('Completed');
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            $this->error("Ошибка: " . $e->getMessage());
+        }
+    }
+
+    private function findCompanies(): array
+    {
+        return DB::table('companies as c')
             ->select([
                 'c.id',
+                'u.id as user_id',
                 DB::raw("json_arrayagg(mhr.role_id) as role_ids"),
             ])
-            ->leftJoin('users as u', function ($join) {
-                $join->on('u.login', '=', DB::raw("'0' + c.hash_id"));
-            })
+            ->leftJoin(
+                DB::raw("(select * from users where deleted_at is null) as u"),
+                function ($join) {
+                    $join->on('u.login', '=', DB::raw("'0' + c.hash_id"));
+                }
+            )
             ->leftJoin('model_has_roles as mhr', 'mhr.model_id', '=', 'u.id')
             ->whereNull('c.deleted_at')
-            ->groupBy(['c.id'])
+            ->whereNull('u.deleted_at')
+            ->groupBy(['c.id', 'u.id'])
             ->get()
             ->toArray();
+    }
 
-        $this->validateEntitiesWithoutUser($companies, 'Компании без пользователя');
-        $this->validateEntitiesWithoutUserWithRole($companies, 'Компании без пользователя с ролью client', 6);
-        $this->validateEntitiesWithUsersHavingMultipleRoles($companies, 'Компании с пользователями, у которых несколько ролей (включая роль client)', 6);
-
-        $drivers = DB::table('drivers as d')
+    private function findDrivers(): array
+    {
+        return DB::table('drivers as d')
             ->select([
                 'd.id',
+                'u.id as user_id',
                 DB::raw("json_arrayagg(mhr.role_id) as role_ids"),
             ])
-            ->leftJoin('users as u', 'u.login', '=', 'd.hash_id')
+            ->leftJoin(
+                DB::raw("(select * from users where deleted_at is null) as u"),
+                'u.login',
+                '=',
+                'd.hash_id'
+            )
             ->leftJoin('model_has_roles as mhr', 'mhr.model_id', '=', 'u.id')
             ->whereNull('d.deleted_at')
-            ->groupBy(['d.id'])
+            ->groupBy(['d.id', 'u.id'])
             ->get()
             ->toArray();
+    }
 
-        $this->validateEntitiesWithoutUser($drivers, 'Водители без пользователя');
-        $this->validateEntitiesWithoutUserWithRole($drivers, 'Водители без пользователя с ролью driver', 3);
-        $this->validateEntitiesWithUsersHavingMultipleRoles($drivers, 'Водители с пользователями, у которых несколько ролей (включая роль driver)', 3);
-
-        $users = DB::table('users as u')
+    private function findUsers(): array
+    {
+        return DB::table('users as u')
             ->select([
                 'u.id',
                 'u.login',
@@ -102,74 +166,79 @@ class CheckUserRoles extends Command
             ->groupBy(['u.id', 'u.login'])
             ->get()
             ->toArray();
-
-        $this->validateUsersWithoutCompany($users, 'Пользователи с ролью client без компании');
-        $this->validateUsersWithoutDriver($users, 'Пользователи с ролью driver без водителя');
-
-        $this->info('Completed');
     }
 
-    private function validateEntitiesWithoutUser(array $entities, string $title)
+    private function validateEntitiesWithoutUser(string $title, array $entities)
     {
         $this->iterate(
-            $entities,
             $title,
+            $entities,
             function ($entity) {
-                $roleIds = $this->castJson($entity->role_ids);
+                $roleIds = $this->extractRoles($entity->role_ids);
                 return !count($roleIds);
-            }
-        );
+            });
     }
 
-    private function validateEntitiesWithoutUserWithRole(array $entities, string $title, int $requiredRole)
+    private function validateEntitiesWithoutUserWithRole(string $title, array $entities, int $requiredRole)
     {
         $this->iterate(
-            $entities,
             $title,
+            $entities,
             function ($entity) use ($requiredRole) {
-                $roleIds = $this->castJson($entity->role_ids);
+                $roleIds = $this->extractRoles($entity->role_ids);
                 return !in_array($requiredRole, $roleIds) && count($roleIds);
             }
         );
     }
 
-    private function validateEntitiesWithUsersHavingMultipleRoles(array $entities, string $title, int $requiredRole)
+    private function validateEntitiesWithUsersHavingMultipleRoles(string $title, array $entities, int $requiredRole)
     {
         $this->iterate(
-            $entities,
             $title,
+            $entities,
             function ($entity) use ($requiredRole) {
-                $roleIds = $this->castJson($entity->role_ids);
+                $roleIds = $this->extractRoles($entity->role_ids);
                 return in_array($requiredRole, $roleIds) && count($roleIds) > 1;
+            },
+            function ($entity) use ($requiredRole) {
+                $user = User::find($entity->user_id);
+
+                if (!$user) {
+                    $this->error('validateEntitiesWithUsersHavingMultipleRoles: user not found');
+                    dd($entity);
+                }
+
+                $user->roles()
+                    ->sync([$requiredRole]);
             }
         );
     }
 
-    private function validateUsersWithoutCompany(array $entities, string $title)
+    private function validateUsersWithoutCompany(string $title, array $entities)
     {
         $this->iterate(
-            $entities,
             $title,
+            $entities,
             function ($entity) {
-                $roleIds = $this->castJson($entity->role_ids);
+                $roleIds = $this->extractRoles($entity->role_ids);
                 return in_array(6, $roleIds) && !$entity->company_id;
             }
         );
     }
 
-    private function validateUsersWithoutDriver(array $entities, string $title)
+    private function validateUsersWithoutDriver(string $title, array $entities)
     {
         $this->iterate(
-            $entities,
             $title,
+            $entities,
             function ($entity) {
-                $roleIds = $this->castJson($entity->role_ids);
+                $roleIds = $this->extractRoles($entity->role_ids);
                 return in_array(3, $roleIds) && !$entity->driver_id;
             }
         );
     }
 
-    private function iterate(array $entities, string $title, Closure $condition, Closure $actionAfterValidate = null)
+    private function iterate(string $title, array $entities, Closure $condition, Closure $actionAfterValidate = null)
     {
         $count = 0;
         $this->comment($title . ':');
@@ -187,20 +256,20 @@ class CheckUserRoles extends Command
         }
 
         if ($count) {
-            $this->error("\nНайдено: $count\n");
-        }
-        else {
+            $this->error("\nНайдено: $count");
+            $this->info('');
+        } else {
             $this->info("Ничего не найдено\n");
         }
     }
 
-    private function castJson($rawValue): ?array
+    private function extractRoles($rolesJson): ?array
     {
-        if ($rawValue === null) {
+        if ($rolesJson === null) {
             return null;
         }
 
-        $value = json_decode($rawValue, true);
+        $value = json_decode($rolesJson, true);
 
         return array_unique(array_filter($value, function ($item) {
             return $item !== null;
