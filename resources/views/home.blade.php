@@ -320,6 +320,14 @@
                     })
             })
 
+            $('#select-all').click(function() {
+                $('input[type="checkbox"]').each(function() {
+                    if (!$(this).prop('checked')) {
+                        $(this).click();
+                    }
+                });
+            })
+
             $('.hv-btn-trash').click(function (e) {
                 e.stopPropagation()
                 const id = $(this).attr('data-id')
@@ -549,6 +557,7 @@
                         <div id="selected-ankets-control" class="d-none align-items-center mt-4 mb-2">
                             <button id="selected-ankets-control-btn-delete" class="btn btn-danger btn-sm"></button>
                             <button id="approve-selected" class="btn btn-success btn-sm ml-2"></button>
+                            <button id="select-all" class="btn btn-success btn-sm ml-2">Выделить все на странице</button>
                             <button id="selected-ankets-control-btn-unset" class="btn btn-success btn-sm ml-2">Снять выделение</button>
                         </div>
                     @endif

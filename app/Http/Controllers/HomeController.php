@@ -94,9 +94,13 @@ class HomeController extends Controller
         $forms = Anketa::query()
             ->where('type_anketa', $validTypeForm)
             ->where('in_cart', $trash)
-            ->with([
-                'deleted_user'
-            ]);
+            ->with(['deleted_user']);
+
+        if ($request->has('result_dop') && $request->input('result_dop') !== null) {
+            filter_var($request->input('result_dop'), FILTER_VALIDATE_BOOLEAN)
+                ? $forms->whereNotNull('result_dop')
+                : $forms->whereNull('result_dop');
+        }
 
         /**
          * Фильтрация анкет в ЛКК
@@ -141,7 +145,8 @@ class HomeController extends Controller
             'orderKey',
             'typePrikaz',
             'page',
-            'getFormFilter'
+            'getFormFilter',
+            'result_dop',
         ]);
         if (count($filterParams) > 0 && $filterActivated) {
             $formModel = new Anketa();
