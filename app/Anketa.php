@@ -480,6 +480,7 @@ class Anketa extends Model
                 'pv_id'              => 'Пункт выпуска',
                 'town_id'            => 'Город',
                 'is_dop'             => 'Режим ввода ПЛ',
+                'result_dop'         => 'Утвержденные осмотры',
             ],
             'bdd' => [
                 'company_id'    => 'Компания',
