@@ -55,6 +55,10 @@ class CheckUserRoles extends Command
         DB::beginTransaction();
 
         try {
+            if ($this->fixNeeded) {
+                $this->fixRolesDuplication();
+            }
+
             $this->validateEntitiesWithoutUser(
                 'Компании без пользователя',
                 $this->findCompanies(),
@@ -115,7 +119,7 @@ class CheckUserRoles extends Command
             ->leftJoin(
                 DB::raw("(select * from users where deleted_at is null) as u"),
                 function ($join) {
-                    $join->on('u.login', '=', DB::raw("'0' + c.hash_id"));
+                    $join->on('u.login', '=', DB::raw("CONCAT('0', c.hash_id)"));
                 }
             )
             ->leftJoin('model_has_roles as mhr', 'mhr.model_id', '=', 'u.id')
@@ -158,12 +162,20 @@ class CheckUserRoles extends Command
                 DB::raw('json_arrayagg(mhr.role_id) as role_ids')
             ])
             ->leftJoin('model_has_roles as mhr', 'mhr.model_id', '=', 'u.id')
-            ->leftJoin('companies as c', function ($join) {
-                $join->on(DB::raw("'0' + c.hash_id"), '=', 'u.login');
-            })
-            ->leftJoin('drivers as d', 'd.hash_id', '=', 'u.login')
+            ->leftJoin(
+                DB::raw("(select * from companies as c where deleted_at is null) as c"),
+                function ($join) {
+                    $join->on('u.login', '=', DB::raw("CONCAT('0', c.hash_id)"));
+                }
+                )
+            ->leftJoin(
+                DB::raw("(select * from drivers as d where deleted_at is null) as d"),
+                'd.hash_id',
+                '=',
+                'u.login'
+            )
             ->whereNull('u.deleted_at')
-            ->groupBy(['u.id', 'u.login'])
+            ->groupBy(['u.id', 'u.login', 'c.id', 'd.id'])
             ->get()
             ->toArray();
     }
@@ -200,12 +212,12 @@ class CheckUserRoles extends Command
                 $roleIds = $this->extractRoles($entity->role_ids);
                 return in_array($requiredRole, $roleIds) && count($roleIds) > 1;
             },
-            function ($entity) use ($requiredRole) {
+            function ($entity) use ($title, $requiredRole) {
                 $user = User::find($entity->user_id);
 
                 if (!$user) {
                     $this->error('validateEntitiesWithUsersHavingMultipleRoles: user not found');
-                    dd($entity);
+                    dd($title, $entity);
                 }
 
                 $user->roles()
@@ -236,6 +248,27 @@ class CheckUserRoles extends Command
                 return in_array(3, $roleIds) && !$entity->driver_id;
             }
         );
+    }
+
+    private function fixRolesDuplication() {
+        $users = User::whereHas('roles', function ($query) {
+            $query->groupBy('role_id', 'model_id')->havingRaw('COUNT(*) > 1');
+        })->get();
+
+        foreach ($users as $user) {
+            $roles = $user->roles()->get();
+
+            $uniqueRoles = [];
+
+            foreach ($roles as $role) {
+                if (!in_array($role->id, $uniqueRoles)) {
+                    $uniqueRoles[] = $role->id;
+                }
+            }
+
+            $user->roles()->detach();
+            $user->roles()->attach($uniqueRoles);
+        }
     }
 
     private function iterate(string $title, array $entities, Closure $condition, Closure $actionAfterValidate = null)
