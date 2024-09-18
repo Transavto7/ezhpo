@@ -16,6 +16,7 @@ class InspectionDuplicatesRepository implements DuplicateRepository
             ->where(DB::raw('DATE(date)'), '=', $inspection->getDate()->format('Y-m-d'))
             ->where('type_view', '=', $inspection->getType())
             ->where('type_anketa', '=', $inspection->getFormType())
+            ->where('in_cart', '<>', 1)
             ->get();
     }
 }
