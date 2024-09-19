@@ -321,7 +321,7 @@
             })
 
             $('#select-all').click(function() {
-                $('input[type="checkbox"]').each(function() {
+                $('.ankets-table input[type="checkbox"]').each(function() {
                     if (!$(this).prop('checked')) {
                         $(this).click();
                     }
