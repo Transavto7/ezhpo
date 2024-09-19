@@ -23,8 +23,12 @@ class CheckUserRoles extends Command
      * @var string
      */
     protected $signature = 'users:check-roles
-                            {--fix : Исправить ошибки ролей пользователей}
-                            {--s|--show-users-with-duplicated-roles : Показывать ID пользователей с дублирующимися ролями}';
+                            {--fix : Исправление ошибок}
+                            {--c|--companies : Валидация компаний}
+                            {--d|--drivers : Валидация водителей}
+                            {--u|--users : Валидация пользователей}
+                            {--r|--duplicated-roles : Валидация пользователей с повторяющимися ролями}
+                            {--s|--show-users-with-duplicated-roles : Отображение ID пользователей с дублирующимися ролями}';
 
     /**
      * The console command description.
@@ -65,46 +69,40 @@ class CheckUserRoles extends Command
         DB::beginTransaction();
 
         try {
-            $this->validateUsersWithDuplicatedRoles($this->entityRepository->findUsersWithDuplicatedRoles());
+            if ($this->option('duplicated-roles')) {
+                $this->validateUsersWithDuplicatedRoles($this->entityRepository->findUsersWithDuplicatedRoles());
+            }
 
-            $this->validateCompaniesWithoutUser(
-                'Компании без пользователя',
-                $this->entityRepository->findCompanies(),
-            );
-            $this->validateEntitiesWithoutUserWithRole(
-                'Компании с пользователем, у которого нет роли client',
-                $this->entityRepository->findCompanies(),
-                6
-            );
-            $this->validateEntitiesWithUsersHavingMultipleRoles(
-                'Компании с пользователями, у которых несколько ролей (включая роль client)',
-                $this->entityRepository->findCompanies(),
-                6
-            );
+            if ($this->option('companies')) {
+                $companies = $this->entityRepository->findCompanies();
 
-            $this->validateDriversWithoutUser(
-                'Водители без пользователя',
-                $this->entityRepository->findDrivers(),
-            );
-            $this->validateEntitiesWithoutUserWithRole(
-                'Водители с пользователем, у которого нет роли driver',
-                $this->entityRepository->findDrivers(),
-                3
-            );
-            $this->validateEntitiesWithUsersHavingMultipleRoles(
-                'Водители с пользователями, у которых несколько ролей (включая роль driver)',
-                $this->entityRepository->findDrivers(),
-                3
-            );
+                $this->validateCompaniesWithoutUser('Компании без пользователя', $companies,);
+                $this->validateEntitiesWithoutUserWithRole('Компании с пользователем, у которого нет роли client', $companies, 6);
+                $this->validateEntitiesWithUsersHavingMultipleRoles(
+                    'Компании с пользователями, у которых несколько ролей (включая роль client)',
+                    $companies,
+                    6
+                );
+            }
 
-            $this->validateUsersWithoutCompany(
-                'Пользователи с ролью client без компании',
-                $this->entityRepository->findUsers(),
-            );
-            $this->validateUsersWithoutDriver(
-                'Пользователи с ролью driver без водителя',
-                $this->entityRepository->findUsers(),
-            );
+            if ($this->option('drivers')) {
+                $drivers = $this->entityRepository->findDrivers();
+
+                $this->validateDriversWithoutUser('Водители без пользователя', $drivers,);
+                $this->validateEntitiesWithoutUserWithRole('Водители с пользователем, у которого нет роли driver', $drivers, 3);
+                $this->validateEntitiesWithUsersHavingMultipleRoles(
+                    'Водители с пользователями, у которых несколько ролей (включая роль driver)',
+                    $drivers,
+                    3
+                );
+            }
+
+            if ($this->option('users')) {
+                $users = $this->entityRepository->findUsers();
+
+                $this->validateUsersWithoutCompany('Пользователи с ролью client без компании', $users);
+                $this->validateUsersWithoutDriver('Пользователи с ролью driver без водителя', $users);
+            }
 
             DB::commit();
 
@@ -232,7 +230,7 @@ class CheckUserRoles extends Command
                 $user = User::find($entity->id);
 
                 if (!$user) {
-                    throw new Exception("validateUsersWithoutCompany: user not found");
+                    throw new Exception("validateUsersWithoutCompany: user {$entity->id} not found");
                 }
 
                 $user->deleted_at = new DateTimeImmutable();
@@ -254,7 +252,7 @@ class CheckUserRoles extends Command
                 $user = User::find($entity->id);
 
                 if (!$user) {
-                    throw new Exception("validateUsersWithoutDriver: user not found");
+                    throw new Exception("validateUsersWithoutDriver: user {$entity->id} not found");
                 }
 
                 $user->deleted_at = new DateTimeImmutable();
@@ -282,9 +280,8 @@ class CheckUserRoles extends Command
                     $fixedCount++;
                 }
                 else {
-                    $separator = $count ? ', ' : '';
-
                     if ($logIds) {
+                        $separator = $count ? ', ' : '';
                         $this->output->write($separator . $entity->id);
                     }
 
@@ -293,13 +290,13 @@ class CheckUserRoles extends Command
             }
         }
 
-        if ($count) {
-            if ($logIds) {
-                $this->line('');
-            }
+        if ($count && $logIds) {
+            $this->line('');
+        }
 
+        if ($count) {
             $this->error("Найдено: $count");
-            $this->info('');
+            $this->line('');
         } else if ($this->fixNeeded) {
             $this->info("Исправлено: $fixedCount\n");
         } else {
@@ -362,6 +359,6 @@ class CheckUserRoles extends Command
 
         $user->roles()->attach($role);
 
-        $this->info('Добавлен новый пользователь (login: ' . $email . ')');
+        $this->info("Добавлен новый пользователь (login: $email)");
     }
 }
