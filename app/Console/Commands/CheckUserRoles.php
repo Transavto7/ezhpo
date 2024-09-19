@@ -3,15 +3,19 @@
 namespace App\Console\Commands;
 
 use App\GenerateHashIdTrait;
+use App\Repositories\CheckUserRoles\CheckUserRolesEntityRepository;
 use App\User;
 use Closure;
+use DateTimeImmutable;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class CheckUserRoles extends Command
 {
     use GenerateHashIdTrait;
+    const FIXED_DUPLICATES = 'fixed_duplicates';
 
     /**
      * The name and signature of the console command.
@@ -19,7 +23,8 @@ class CheckUserRoles extends Command
      * @var string
      */
     protected $signature = 'users:check-roles
-                            {--fix : Исправить ошибки ролей пользователей}';
+                            {--fix : Исправить ошибки ролей пользователей}
+                            {--s|--show-users-with-duplicated-roles : Показывать ID пользователей с дублирующимися ролями}';
 
     /**
      * The console command description.
@@ -32,15 +37,20 @@ class CheckUserRoles extends Command
      * @var boolean
      */
     private $fixNeeded;
+    /**
+     * @var CheckUserRolesEntityRepository
+     */
+    private $entityRepository;
 
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(CheckUserRolesEntityRepository $entityRepository)
     {
         parent::__construct();
+        $this->entityRepository = $entityRepository;
     }
 
     /**
@@ -55,47 +65,45 @@ class CheckUserRoles extends Command
         DB::beginTransaction();
 
         try {
-            if ($this->fixNeeded) {
-                $this->fixRolesDuplication();
-            }
+            $this->validateUsersWithDuplicatedRoles($this->entityRepository->findUsersWithDuplicatedRoles());
 
-            $this->validateEntitiesWithoutUser(
+            $this->validateCompaniesWithoutUser(
                 'Компании без пользователя',
-                $this->findCompanies(),
+                $this->entityRepository->findCompanies(),
             );
             $this->validateEntitiesWithoutUserWithRole(
-                'Компании без пользователя с ролью client',
-                $this->findCompanies(),
+                'Компании с пользователем, у которого нет роли client',
+                $this->entityRepository->findCompanies(),
                 6
             );
             $this->validateEntitiesWithUsersHavingMultipleRoles(
                 'Компании с пользователями, у которых несколько ролей (включая роль client)',
-                $this->findCompanies(),
+                $this->entityRepository->findCompanies(),
                 6
             );
 
-            $this->validateEntitiesWithoutUser(
+            $this->validateDriversWithoutUser(
                 'Водители без пользователя',
-                $this->findDrivers(),
+                $this->entityRepository->findDrivers(),
             );
             $this->validateEntitiesWithoutUserWithRole(
-                'Водители без пользователя с ролью driver',
-                $this->findDrivers(),
+                'Водители с пользователем, у которого нет роли driver',
+                $this->entityRepository->findDrivers(),
                 3
             );
             $this->validateEntitiesWithUsersHavingMultipleRoles(
                 'Водители с пользователями, у которых несколько ролей (включая роль driver)',
-                $this->findDrivers(),
+                $this->entityRepository->findDrivers(),
                 3
             );
 
             $this->validateUsersWithoutCompany(
                 'Пользователи с ролью client без компании',
-                $this->findUsers(),
+                $this->entityRepository->findUsers(),
             );
             $this->validateUsersWithoutDriver(
                 'Пользователи с ролью driver без водителя',
-                $this->findUsers(),
+                $this->entityRepository->findUsers(),
             );
 
             DB::commit();
@@ -108,86 +116,72 @@ class CheckUserRoles extends Command
         }
     }
 
-    private function findCompanies(): array
-    {
-        return DB::table('companies as c')
-            ->select([
-                'c.id',
-                'u.id as user_id',
-                DB::raw("json_arrayagg(mhr.role_id) as role_ids"),
-            ])
-            ->leftJoin(
-                DB::raw("(select * from users where deleted_at is null) as u"),
-                function ($join) {
-                    $join->on('u.login', '=', DB::raw("CONCAT('0', c.hash_id)"));
+    private function validateUsersWithDuplicatedRoles(array $entities) {
+        $logIds = $this->option('show-users-with-duplicated-roles');
+
+        $this->iterate(
+            'Пользователи, с повторяющимися ролями',
+            $entities,
+            function () {
+                return true;
+            },
+            function ($entity) {
+                $user = User::find($entity->id);
+                $roles = $user->roles()->get();
+
+                $uniqueRoles = [];
+
+                foreach ($roles as $role) {
+                    if (!in_array($role->id, $uniqueRoles)) {
+                        $uniqueRoles[] = $role->id;
+                    }
                 }
-            )
-            ->leftJoin('model_has_roles as mhr', 'mhr.model_id', '=', 'u.id')
-            ->whereNull('c.deleted_at')
-            ->whereNull('u.deleted_at')
-            ->groupBy(['c.id', 'u.id'])
-            ->get()
-            ->toArray();
+
+                $user->roles()->detach();
+                $user->roles()->attach($uniqueRoles);
+            },
+            $logIds
+        );
     }
 
-    private function findDrivers(): array
-    {
-        return DB::table('drivers as d')
-            ->select([
-                'd.id',
-                'u.id as user_id',
-                DB::raw("json_arrayagg(mhr.role_id) as role_ids"),
-            ])
-            ->leftJoin(
-                DB::raw("(select * from users where deleted_at is null) as u"),
-                'u.login',
-                '=',
-                'd.hash_id'
-            )
-            ->leftJoin('model_has_roles as mhr', 'mhr.model_id', '=', 'u.id')
-            ->whereNull('d.deleted_at')
-            ->groupBy(['d.id', 'u.id'])
-            ->get()
-            ->toArray();
-    }
-
-    private function findUsers(): array
-    {
-        return DB::table('users as u')
-            ->select([
-                'u.id',
-                'u.login',
-                'c.id as company_id',
-                'd.id as driver_id',
-                DB::raw('json_arrayagg(mhr.role_id) as role_ids')
-            ])
-            ->leftJoin('model_has_roles as mhr', 'mhr.model_id', '=', 'u.id')
-            ->leftJoin(
-                DB::raw("(select * from companies as c where deleted_at is null) as c"),
-                function ($join) {
-                    $join->on('u.login', '=', DB::raw("CONCAT('0', c.hash_id)"));
-                }
-                )
-            ->leftJoin(
-                DB::raw("(select * from drivers as d where deleted_at is null) as d"),
-                'd.hash_id',
-                '=',
-                'u.login'
-            )
-            ->whereNull('u.deleted_at')
-            ->groupBy(['u.id', 'u.login', 'c.id', 'd.id'])
-            ->get()
-            ->toArray();
-    }
-
-    private function validateEntitiesWithoutUser(string $title, array $entities)
+    private function validateCompaniesWithoutUser(string $title, array $companies)
     {
         $this->iterate(
             $title,
-            $entities,
-            function ($entity) {
-                $roleIds = $this->extractRoles($entity->role_ids);
+            $companies,
+            function ($company) {
+                $roleIds = $this->extractRoles($company->role_ids);
                 return !count($roleIds);
+            },
+            function ($company) {
+                $this->createUser(
+                    $company->hash_id,
+                    $company->name,
+                    $company->id,
+                    6,
+                    12,
+                    '0'
+                );
+            });
+    }
+
+    private function validateDriversWithoutUser(string $title, array $drivers)
+    {
+        $this->iterate(
+            $title,
+            $drivers,
+            function ($driver) {
+                $roleIds = $this->extractRoles($driver->role_ids);
+                return !count($roleIds);
+            },
+            function ($driver) {
+                $this->createUser(
+                    $driver->hash_id,
+                    $driver->fio,
+                    $driver->company_id,
+                    3,
+                    3
+                );
             });
     }
 
@@ -216,8 +210,7 @@ class CheckUserRoles extends Command
                 $user = User::find($entity->user_id);
 
                 if (!$user) {
-                    $this->error('validateEntitiesWithUsersHavingMultipleRoles: user not found');
-                    dd($title, $entity);
+                    throw new Exception('validateEntitiesWithUsersHavingMultipleRoles: user not found');
                 }
 
                 $user->roles()
@@ -234,6 +227,16 @@ class CheckUserRoles extends Command
             function ($entity) {
                 $roleIds = $this->extractRoles($entity->role_ids);
                 return in_array(6, $roleIds) && !$entity->company_id;
+            },
+            function ($entity) use ($title) {
+                $user = User::find($entity->id);
+
+                if (!$user) {
+                    throw new Exception("validateUsersWithoutCompany: user not found");
+                }
+
+                $user->deleted_at = new DateTimeImmutable();
+                $user->save();
             }
         );
     }
@@ -246,60 +249,68 @@ class CheckUserRoles extends Command
             function ($entity) {
                 $roleIds = $this->extractRoles($entity->role_ids);
                 return in_array(3, $roleIds) && !$entity->driver_id;
+            },
+            function ($entity) use ($title) {
+                $user = User::find($entity->id);
+
+                if (!$user) {
+                    throw new Exception("validateUsersWithoutDriver: user not found");
+                }
+
+                $user->deleted_at = new DateTimeImmutable();
+                $user->save();
             }
         );
     }
 
-    private function fixRolesDuplication() {
-        $users = User::whereHas('roles', function ($query) {
-            $query->groupBy('role_id', 'model_id')->havingRaw('COUNT(*) > 1');
-        })->get();
-
-        foreach ($users as $user) {
-            $roles = $user->roles()->get();
-
-            $uniqueRoles = [];
-
-            foreach ($roles as $role) {
-                if (!in_array($role->id, $uniqueRoles)) {
-                    $uniqueRoles[] = $role->id;
-                }
-            }
-
-            $user->roles()->detach();
-            $user->roles()->attach($uniqueRoles);
-        }
-    }
-
-    private function iterate(string $title, array $entities, Closure $condition, Closure $actionAfterValidate = null)
+    private function iterate(
+        string  $title,
+        array   $entities,
+        Closure $condition,
+        Closure $fixAction = null,
+        bool    $logIds = true
+    )
     {
         $count = 0;
+        $fixedCount = 0;
         $this->comment($title . ':');
 
         foreach ($entities as $entity) {
             if ($condition($entity)) {
-                $separator = $count ? ', ' : '';
-                $this->output->write($separator . $entity->id);
-                $count++;
+                if ($this->fixNeeded && $fixAction) {
+                    $fixAction($entity);
+                    $fixedCount++;
+                }
+                else {
+                    $separator = $count ? ', ' : '';
 
-                if ($this->fixNeeded && $actionAfterValidate) {
-                    $actionAfterValidate($entity);
+                    if ($logIds) {
+                        $this->output->write($separator . $entity->id);
+                    }
+
+                    $count++;
                 }
             }
         }
 
         if ($count) {
-            $this->error("\nНайдено: $count");
+            if ($logIds) {
+                $this->line('');
+            }
+
+            $this->error("Найдено: $count");
             $this->info('');
+        } else if ($this->fixNeeded) {
+            $this->info("Исправлено: $fixedCount\n");
         } else {
             $this->info("Ничего не найдено\n");
         }
     }
 
-    private function extractRoles($rolesJson): ?array
+    private function extractRoles($rolesJson): array
     {
         if ($rolesJson === null) {
-            return null;
+            return [];
         }
 
         $value = json_decode($rolesJson, true);
@@ -307,5 +318,50 @@ class CheckUserRoles extends Command
         return array_unique(array_filter($value, function ($item) {
             return $item !== null;
         }));
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function createUser(
+        string $hashId,
+        string $name,
+        string $companyId,
+        int $role,
+        int $roleUser,
+        string $loginPrefix = '')
+    {
+        $validator = function (int $hashId) {
+            if (User::where('hash_id', $hashId)->first()) {
+                return false;
+            }
+
+            return true;
+        };
+
+        $userHashId = $this->generateHashId(
+            $validator,
+            config('app.hash_generator.user.min'),
+            config('app.hash_generator.user.max'),
+            config('app.hash_generator.user.tries')
+        );
+
+        $userLogin = $loginPrefix . $hashId;
+        $email = $hashId . '-' . $userHashId . '@ta-7.ru';
+
+        $user = User::create([
+            'hash_id' => $userHashId,
+            'email' => $email,
+            'api_token' => Hash::make(date('H:i:s') . sha1($hashId)),
+            'login' => $userLogin,
+            'password' => Hash::make($userLogin),
+            'name' => $name,
+            'role' => $roleUser,
+            'company_id' => $companyId
+        ]);
+
+        $user->roles()->attach($role);
+
+        $this->info('Добавлен новый пользователь (login: ' . $email . ')');
     }
 }
