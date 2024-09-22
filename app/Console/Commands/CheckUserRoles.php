@@ -3,7 +3,10 @@
 namespace App\Console\Commands;
 
 use App\GenerateHashIdTrait;
-use App\Repositories\CheckUserRoles\CheckUserRolesEntityRepository;
+use App\Repositories\CheckUserRoles\CheckUserRolesRepository;
+use App\Services\CheckUserRoles\CheckUserRolesLogsGenerator;
+use App\Services\CheckUserRoles\CheckUserRolesRestoreService;
+use App\Services\CheckUserRoles\Enums\RestorationDataType;
 use App\User;
 use Closure;
 use DateTimeImmutable;
@@ -15,7 +18,6 @@ use Illuminate\Support\Facades\Hash;
 class CheckUserRoles extends Command
 {
     use GenerateHashIdTrait;
-    const FIXED_DUPLICATES = 'fixed_duplicates';
 
     /**
      * The name and signature of the console command.
@@ -28,7 +30,10 @@ class CheckUserRoles extends Command
                             {--d|--drivers : Валидация водителей}
                             {--u|--users : Валидация пользователей}
                             {--r|--duplicated-roles : Валидация пользователей с повторяющимися ролями}
-                            {--s|--show-users-with-duplicated-roles : Отображение ID пользователей с дублирующимися ролями}';
+                            {--a|--all : Валидация всех типов записей}
+                            {--s|--show-users-with-duplicated-roles : Отображение ID пользователей с дублирующимися ролями}
+                            {--l|--logs-list : Список файлов для восстановления данных}
+                            {--restore= : Имя файла, из которого будут восстановлены данные}';
 
     /**
      * The console command description.
@@ -42,19 +47,33 @@ class CheckUserRoles extends Command
      */
     private $fixNeeded;
     /**
-     * @var CheckUserRolesEntityRepository
+     * @var CheckUserRolesRepository
      */
-    private $entityRepository;
+    private $repository;
+    /**
+     * @var CheckUserRolesLogsGenerator
+     */
+    private $logsGenerator;
+    /**
+     * @var CheckUserRolesRestoreService
+     */
+    private $restoreService;
 
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(CheckUserRolesEntityRepository $entityRepository)
+    public function __construct(
+        CheckUserRolesRepository     $repository,
+        CheckUserRolesLogsGenerator  $logsGenerator,
+        CheckUserRolesRestoreService $restoreService
+    )
     {
         parent::__construct();
-        $this->entityRepository = $entityRepository;
+        $this->repository = $repository;
+        $this->logsGenerator = $logsGenerator;
+        $this->restoreService = $restoreService;
     }
 
     /**
@@ -64,49 +83,90 @@ class CheckUserRoles extends Command
      */
     public function handle()
     {
-        $this->fixNeeded = $this->option('fix');
+        if ($this->option('logs-list')) {
+            $fileNameList = $this->restoreService->getAvailableLogsList();
+
+            if (!count($fileNameList)) {
+                $this->info('Файлов для восстановления данных не найдено');
+            }
+
+            foreach ($fileNameList as $fileName) {
+                $this->info($fileName);
+            }
+
+            return;
+        }
+
+        $restore = $this->option('restore');
+        $this->fixNeeded = !$restore && $this->option('fix');
+
+        $validateAll = $this->option('all');
+        $validateDuplicatedRoles = $this->option('duplicated-roles');
+        $validateCompanies = $this->option('companies');
+        $validateDrivers = $this->option('drivers');
+        $validateUsers = $this->option('users');
 
         DB::beginTransaction();
 
         try {
-            if ($this->option('duplicated-roles')) {
-                $this->validateUsersWithDuplicatedRoles($this->entityRepository->findUsersWithDuplicatedRoles());
+            if ($restore) {
+                $this->restoreService->restore($this->option('restore'));
+                $this->info('Данные восстановлены');
             }
 
-            if ($this->option('companies')) {
-                $companies = $this->entityRepository->findCompanies();
+            if ($validateAll || $validateDuplicatedRoles) {
+                $this->validateUsersWithDuplicatedRoles($this->repository->findUsersWithDuplicatedRoles());
+            }
 
-                $this->validateCompaniesWithoutUser('Компании без пользователя', $companies,);
-                $this->validateEntitiesWithoutUserWithRole('Компании с пользователем, у которого нет роли client', $companies, 6);
+            if ($validateAll || $validateCompanies) {
+                $this->validateCompaniesWithoutUser(
+                    'Компании без пользователя',
+                    $this->repository->findCompanies()
+                );
+                $this->validateEntitiesWithoutUserWithRole(
+                    'Компании с пользователем, у которого нет роли client',
+                    $this->repository->findCompanies(),
+                    6
+                );
                 $this->validateEntitiesWithUsersHavingMultipleRoles(
                     'Компании с пользователями, у которых несколько ролей (включая роль client)',
-                    $companies,
+                    $this->repository->findCompanies(),
                     6
                 );
             }
 
-            if ($this->option('drivers')) {
-                $drivers = $this->entityRepository->findDrivers();
-
-                $this->validateDriversWithoutUser('Водители без пользователя', $drivers,);
-                $this->validateEntitiesWithoutUserWithRole('Водители с пользователем, у которого нет роли driver', $drivers, 3);
+            if ($validateAll || $validateDrivers) {
+                $this->validateDriversWithoutUser('Водители без пользователя',
+                    $this->repository->findDrivers());
+                $this->validateEntitiesWithoutUserWithRole(
+                    'Водители с пользователем, у которого нет роли driver',
+                    $this->repository->findDrivers(),
+                    3);
                 $this->validateEntitiesWithUsersHavingMultipleRoles(
                     'Водители с пользователями, у которых несколько ролей (включая роль driver)',
-                    $drivers,
+                    $this->repository->findDrivers(),
                     3
                 );
             }
 
-            if ($this->option('users')) {
-                $users = $this->entityRepository->findUsers();
+            if ($validateAll || $validateUsers) {
+                $this->validateUsersWithoutCompany(
+                    'Пользователи с ролью client без компании',
+                    $this->repository->findUsers()
+                );
+                $this->validateUsersWithoutDriver(
+                    'Пользователи с ролью driver без водителя',
+                    $this->repository->findUsers()
+                );
+            }
 
-                $this->validateUsersWithoutCompany('Пользователи с ролью client без компании', $users);
-                $this->validateUsersWithoutDriver('Пользователи с ролью driver без водителя', $users);
+            if ($this->fixNeeded) {
+                $this->logsGenerator->generate();
             }
 
             DB::commit();
 
-            $this->info('Completed');
+            $this->info('Завершено');
         } catch (Exception $e) {
             DB::rollBack();
 
@@ -114,7 +174,8 @@ class CheckUserRoles extends Command
         }
     }
 
-    private function validateUsersWithDuplicatedRoles(array $entities) {
+    private function validateUsersWithDuplicatedRoles(array $entities)
+    {
         $logIds = $this->option('show-users-with-duplicated-roles');
 
         $this->iterate(
@@ -148,11 +209,10 @@ class CheckUserRoles extends Command
             $title,
             $companies,
             function ($company) {
-                $roleIds = $this->extractRoles($company->role_ids);
-                return !count($roleIds);
+                return !count($company->role_ids);
             },
             function ($company) {
-                $this->createUser(
+                $id = $this->createUser(
                     $company->hash_id,
                     $company->name,
                     $company->id,
@@ -160,6 +220,8 @@ class CheckUserRoles extends Command
                     12,
                     '0'
                 );
+
+                $this->logsGenerator->putValue(RestorationDataType::createdUsers(), $id);
             });
     }
 
@@ -169,17 +231,18 @@ class CheckUserRoles extends Command
             $title,
             $drivers,
             function ($driver) {
-                $roleIds = $this->extractRoles($driver->role_ids);
-                return !count($roleIds);
+                return !count($driver->role_ids);
             },
             function ($driver) {
-                $this->createUser(
+                $id = $this->createUser(
                     $driver->hash_id,
                     $driver->fio,
                     $driver->company_id,
                     3,
                     3
                 );
+
+                $this->logsGenerator->putValue(RestorationDataType::createdUsers(), $id);
             });
     }
 
@@ -189,7 +252,7 @@ class CheckUserRoles extends Command
             $title,
             $entities,
             function ($entity) use ($requiredRole) {
-                $roleIds = $this->extractRoles($entity->role_ids);
+                $roleIds = $entity->role_ids;
                 return !in_array($requiredRole, $roleIds) && count($roleIds);
             }
         );
@@ -201,7 +264,7 @@ class CheckUserRoles extends Command
             $title,
             $entities,
             function ($entity) use ($requiredRole) {
-                $roleIds = $this->extractRoles($entity->role_ids);
+                $roleIds = $entity->role_ids;
                 return in_array($requiredRole, $roleIds) && count($roleIds) > 1;
             },
             function ($entity) use ($title, $requiredRole) {
@@ -211,8 +274,13 @@ class CheckUserRoles extends Command
                     throw new Exception('validateEntitiesWithUsersHavingMultipleRoles: user not found');
                 }
 
-                $user->roles()
-                    ->sync([$requiredRole]);
+                $result = $user->roles()->sync([$requiredRole]);
+
+                $this->logsGenerator->putByKey(
+                    RestorationDataType::detachedRolesFromUser(),
+                    $user->id,
+                    $result['detached']
+                );
             }
         );
     }
@@ -223,7 +291,7 @@ class CheckUserRoles extends Command
             $title,
             $entities,
             function ($entity) {
-                $roleIds = $this->extractRoles($entity->role_ids);
+                $roleIds = $entity->role_ids;
                 return in_array(6, $roleIds) && !$entity->company_id;
             },
             function ($entity) use ($title) {
@@ -235,6 +303,8 @@ class CheckUserRoles extends Command
 
                 $user->deleted_at = new DateTimeImmutable();
                 $user->save();
+
+                $this->logsGenerator->putValue(RestorationDataType::deletedUsers(), $user->id);
             }
         );
     }
@@ -245,7 +315,7 @@ class CheckUserRoles extends Command
             $title,
             $entities,
             function ($entity) {
-                $roleIds = $this->extractRoles($entity->role_ids);
+                $roleIds = $entity->role_ids;
                 return in_array(3, $roleIds) && !$entity->driver_id;
             },
             function ($entity) use ($title) {
@@ -257,6 +327,8 @@ class CheckUserRoles extends Command
 
                 $user->deleted_at = new DateTimeImmutable();
                 $user->save();
+
+                $this->logsGenerator->putValue(RestorationDataType::deletedUsers(), $user->id);
             }
         );
     }
@@ -278,8 +350,7 @@ class CheckUserRoles extends Command
                 if ($this->fixNeeded && $fixAction) {
                     $fixAction($entity);
                     $fixedCount++;
-                }
-                else {
+                } else {
                     if ($logIds) {
                         $separator = $count ? ', ' : '';
                         $this->output->write($separator . $entity->id);
@@ -304,28 +375,15 @@ class CheckUserRoles extends Command
         }
     }
 
-    private function extractRoles($rolesJson): array
-    {
-        if ($rolesJson === null) {
-            return [];
-        }
-
-        $value = json_decode($rolesJson, true);
-
-        return array_unique(array_filter($value, function ($item) {
-            return $item !== null;
-        }));
-    }
-
     /**
      * @throws Exception
      */
-    protected function createUser(
+    private function createUser(
         string $hashId,
         string $name,
         string $companyId,
-        int $role,
-        int $roleUser,
+        int    $role,
+        int    $roleUser,
         string $loginPrefix = '')
     {
         $validator = function (int $hashId) {
@@ -360,5 +418,7 @@ class CheckUserRoles extends Command
         $user->roles()->attach($role);
 
         $this->info("Добавлен новый пользователь (login: $email)");
+
+        return $user->id;
     }
 }
