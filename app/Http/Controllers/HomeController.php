@@ -63,7 +63,7 @@ class HomeController extends Controller
          */
 
         $formType = $request->type_ankets;
-        $validTypeForm = User::$userRolesKeys[$user->role] ?? FormTypeEnum::MEDIC;
+        $validTypeForm = User::$defaultUserJournalByRole[$user->role] ?? FormTypeEnum::MEDIC;
         if (isset(Anketa::$anketsKeys[$formType])) {
             $validTypeForm = $formType;
         }
@@ -427,7 +427,7 @@ class HomeController extends Controller
                 $title = 'ЭЖ.xlsx';
             }
 
-            return Excel::download(new AnketasExport($forms, $fields), $title);
+            return Excel::download(new AnketasExport($forms, $fields, $request->get('exportPrikaz', false)), $title);
         }
         /**
          * Экспорт журнала
@@ -462,12 +462,12 @@ class HomeController extends Controller
         /**
          * Получение данных
          */
-        $defaultOrderBy = $validTypeForm === 'pak_queue' ? 'ASC' : 'DESC';
+        $defaultOrderBy = $validTypeForm === FormTypeEnum::PAK_QUEUE ? 'ASC' : 'DESC';
         $orderKey = $request->get('orderKey', 'date');
         $orderBy = $request->get('orderBy', $defaultOrderBy);
         $take = $request->get('take') ?? 500;
 
-        if ($filterActivated || $validTypeForm === 'pak_queue') {
+        if ($filterActivated || $validTypeForm === FormTypeEnum::PAK_QUEUE) {
             $forms = $forms->orderBy($orderKey, $orderBy);
             if ($orderKey === 'result_dop') {
                 $forms = $forms->orderBy( 'is_dop', $orderBy === 'ASC' ? 'DESC' : 'ASC');
@@ -486,7 +486,7 @@ class HomeController extends Controller
         $formsFields = array_keys($fieldsKeys);
 
         $currentRole = $validTypeForm;
-        if (($validTypeForm === 'pak_queue') && $user->hasRole('operator_sdpo')) {
+        if (($validTypeForm === FormTypeEnum::PAK_QUEUE) && $user->hasRole('operator_sdpo')) {
             $currentRole = 'operator_sdpo';
         }
 
@@ -527,11 +527,14 @@ class HomeController extends Controller
 
     public function getFilters(Request $request)
     {
-        $fromType = $request->type_ankets;
+        /** @var User $user */
+        $user = Auth::user();
 
-        $validFormType = User::$userRolesKeys[auth()->user()->role] ?? FormTypeEnum::MEDIC;
-        if (isset(Anketa::$anketsKeys[$fromType])) {
-            $validFormType = $fromType;
+        $formType = $request->type_ankets;
+
+        $validFormType = User::$defaultUserJournalByRole[$user->role] ?? FormTypeEnum::MEDIC;
+        if (isset(Anketa::$anketsKeys[$formType])) {
+            $validFormType = $formType;
         }
 
         $fields = Anketa::$fieldsKeys[$validFormType];

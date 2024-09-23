@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Anketa;
 use App\Car;
 use App\Company;
 use App\Driver;
-use App\Enums\FormTypeEnum;
 use App\Http\Requests\GetPreviousOdometerRequest;
+use App\Models\Forms\TechForm;
 use App\Services\RedDatesCheckerService;
-use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -92,26 +90,6 @@ class ApiController extends Controller
         }
 
         return $company->get();
-    }
-
-    public function ResetAllPV()
-    {
-        $users = User::all();
-
-        date_default_timezone_set('UTC');
-
-        foreach ($users as $user) {
-            $time = time();
-
-            $timezone = $user->timezone ?: 3;
-
-            $time += $timezone * 3600;
-            $time = explode(':', date('H:i', $time));
-
-            if ($time[0] === '00' && $time[1] === '00') {
-                $user->update(['pv_id' => $user->pv_id_default]);
-            }
-        }
     }
 
     public function UpdateProperty(Request $request): JsonResponse
@@ -330,17 +308,17 @@ class ApiController extends Controller
 
     public function getPreviousOdometer(GetPreviousOdometerRequest $request): JsonResponse
     {
-        $nearestTechForm = Anketa::query()
+        $nearestTechForm = TechForm::query()
             ->select([
-                'id',
-                'date',
-                'odometer',
+                'forms.id',
+                'forms.date',
+                'tech_forms.odometer',
             ])
-            ->where('type_anketa', FormTypeEnum::TECH)
-            ->where('car_id', $request->input('car_id'))
-            ->whereDate('date', '<=', Carbon::parse($request->input('date')))
-            ->whereNotNull('odometer')
-            ->orderBy('date', 'DESC')
+            ->join('forms', 'forms.uuid', '=', 'tech_forms.forms_uuid')
+            ->where('tech_forms.car_id', $request->input('car_id'))
+            ->whereDate('forms.date', '<=', Carbon::parse($request->input('date')))
+            ->whereNotNull('tech_forms.odometer')
+            ->orderBy('forms.date', 'DESC')
             ->first();
 
         if (!$nearestTechForm) {

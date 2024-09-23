@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ReportContractRefactoringController;
 use App\Http\Middleware\CheckDriver;
 use App\Http\Middleware\StripEmptyParamsFromQueryString;
 use Illuminate\Support\Facades\Auth;
@@ -70,12 +69,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('return_trash', 'RoleController@returnTrash');
     });
 
-    Route::resource('field/prompt', 'FieldPromptController');
+    Route::resource('field/prompt', 'FieldPromptController')->except(['edit', 'show', 'store', 'create']);
     Route::prefix('field/prompt')->as('prompt.')->group(function () {
         Route::any('filter', 'FieldPromptController@getAll');
     });
 
-    Route::resource('stamp', 'StampController')->except(['show']);
+    Route::resource('stamp', 'StampController')->except(['show', 'create', 'edit']);
     Route::prefix('stamp')->as('stamp.')->group(function () {
         Route::any('filter', 'StampController@getAll');
         Route::any('find', 'StampController@find');
@@ -139,11 +138,10 @@ Route::middleware(['auth'])->group(function () {
             Route::get('{id}/change-resultdop-queue/{result_dop}', 'AnketsController@ChangeResultDop')->name('changeResultDop');
         });
 
+        //TODO: объединить с апи
         Route::prefix('report')->as('report.')->group(function () {
-            Route::get('getContractsForCompany', [ReportContractRefactoringController::class, 'getContractsForCompany']);
             Route::get('journal', 'ReportController@index')->name('journal');
-            Route::get('journal_new',[ReportContractRefactoringController::class, 'index'])->name('company_service');
-            Route::get('{type_report}', 'ReportController@GetReport')->name('get');
+            Route::get('{type_report}', 'ReportController@getReport')->name('get');
             Route::get('/dynamic/{journal}', 'ReportController@getDynamic')->name('dynamic');
         });
 

@@ -2,19 +2,19 @@
 
 namespace App\Actions\Anketa;
 
-use App\Anketa;
 use App\Driver;
 use App\Enums\FormTypeEnum;
+use App\Models\Forms\Form;
 use App\User;
 use Carbon\Carbon;
 
 final class TrashFormHandler
 {
-    public function handle(Anketa $form, $action, User $user)
+    public function handle(Form $form, $action, User $user)
     {
         $form->in_cart = $action;
 
-        if ($form->type_anketa === 'medic' && $form->driver_id) {
+        if ($form->type_anketa === FormTypeEnum::MEDIC && $form->driver_id) {
             $this->disableBanIfNeed($form);
         }
 
@@ -29,7 +29,7 @@ final class TrashFormHandler
         $form->save();
     }
 
-    protected function disableBanIfNeed(Anketa $form)
+    protected function disableBanIfNeed(Form $form)
     {
         $driver = Driver::where('hash_id', $form->driver_id)->first();
 
@@ -41,7 +41,7 @@ final class TrashFormHandler
             return;
         }
 
-        $last = Anketa::query()
+        $last = Form::query()
             ->select([
                 'id'
             ])

@@ -220,26 +220,11 @@
 
                     @if($user->access('report_schedule_dynamic_mo'))
                         <li>
-                            <a href="{{ route('report.dynamic', ['journal' => 'medic']) }}">
+                            <a href="{{ route('report.dynamic', ['journal' => FormTypeEnum::MEDIC]) }}">
                                 <i class="fa fa-book"></i>Отчет по количеству осмотров
                             </a>
                         </li>
                     @endif
-                    <li>
-                        <a href="{{ route('report.company_service') }}">
-                            <i class="fa fa-book"></i>Отчет по услугам компании
-                            <span class="
-                                    start-100
-                                    translate-middle
-                                    badge
-                                    text-white
-                                    rounded-pill
-                                    bg-success"
-                            >
-                                    new
-                                </span>
-                        </a>
-                    </li>
                 </ul>
             </li>
         @endif

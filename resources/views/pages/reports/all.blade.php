@@ -40,6 +40,7 @@
                 @endif
 
                 @php
+                    use App\Enums\FormTypeEnum;
                     $pre_month = \Illuminate\Support\Carbon::now()->subMonths();
                     $date_from_field = $pre_month->startOfMonth()->format('Y-m-d');
                     $date_to_field = $pre_month->endOfMonth()->format('Y-m-d');
@@ -64,8 +65,8 @@
                         Тип осмотра:
                     </label>
                     <select name="type_anketa"  class="form-control" >
-                        <option value="medic" @if(request()->input('type_anketa') == 'medic') selected @endif>Медицинский</option>
-                        <option value="tech" @if(request()->input('type_anketa') == 'tech') selected @endif>Техничекий</option>
+                        <option value="medic" @if(request()->input('type_anketa') == FormTypeEnum::MEDIC) selected @endif>Медицинский</option>
+                        <option value="tech" @if(request()->input('type_anketa') == FormTypeEnum::TECH) selected @endif>Технический</option>
                     </select>
                 </div>
 

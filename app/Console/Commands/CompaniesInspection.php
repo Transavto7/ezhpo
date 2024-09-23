@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Anketa;
 use App\Company;
+use App\Models\Forms\Form;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
@@ -40,7 +40,7 @@ class CompaniesInspection extends Command
      */
     public function handle()
     {
-        $companiesWithInspection = Anketa::whereBetween('created_at', [
+        $companiesWithInspection = Form::whereBetween('created_at', [
             Carbon::now()->subMonth()->startOfMonth(),
             Carbon::now()->subMonth()->endOfMonth(),
         ])

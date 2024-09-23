@@ -407,7 +407,7 @@
         <div class="card">
             <div class="card-body">
                 <div>
-                    @if($type_ankets !== 'pak_queue')
+                    @if($type_ankets !== FormTypeEnum::PAK_QUEUE)
                         <div class="col-md-12">
                             <div class="row bg-light p-2">
                                 <div class="col-md-4">
@@ -416,7 +416,7 @@
                                     @endif
 
                                     @if($permissionToTrashView)
-                                        @if($request()->get('trash', 0))
+                                        @if(request()->get('trash', 0))
                                             <a href="{{ route('home', $type_ankets) }}" class="btn btn-sm btn-warning">Назад</a>
                                         @else
                                             <a href="?trash=1" class="btn btn-sm btn-warning">Корзина <i class="fa fa-trash"></i></a>
@@ -599,7 +599,7 @@
                             @endif
 
                             <th class="not-export">
-                                @if($permissionToUpdate && ($type_ankets === 'medic'))
+                                @if($permissionToUpdate && ($type_ankets === FormTypeEnum::MEDIC))
                                     <a class="not-export"
                                        href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=result_dop&{{ $queryString }}">
                                         <i class="fa fa-sort"></i>
@@ -621,7 +621,7 @@
                                     </td>
                                 @endif
 
-                                @if($type_ankets === 'pak_queue')
+                                @if($type_ankets === FormTypeEnum::PAK_QUEUE)
                                     <td class="not-export">
                                         <div
                                             class="App-Timer"
@@ -636,7 +636,7 @@
                                             class="not-export"
                                         @endisset>
                                         @if(($field->field === 'date' || strpos($field->field, '_at') > 0) && $anketa[$field->field])
-                                            @if ($field->field === 'date' && $type_ankets === 'bdd')
+                                            @if ($field->field === 'date' && $type_ankets === FormTypeEnum::BDD)
                                                 {{ date('d-m-Y', strtotime($anketa[$field->field])) }}
                                             @else
                                                 {{ date('d-m-Y H:i:s', strtotime($anketa[$field->field])) }}

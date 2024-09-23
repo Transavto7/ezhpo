@@ -2,125 +2,96 @@
 
 namespace App\Exports;
 
+use App\Enums\FormTypeEnum;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Throwable;
 
 class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
 {
-    private $anketas;
+    private $forms;
     private $fields;
+    private $exportPrikaz;
 
-    public function __construct($anketas, $fields)
+    public function __construct($forms, $fields, $exportPrikaz = false)
     {
-        $this->anketas = $anketas;
+        $this->forms = $forms;
         $this->fields = $fields;
+        $this->exportPrikaz = $exportPrikaz;
     }
 
     public function view(): View
     {
-        $fields = null;
-        // Определить тип анкет
-
         try {
             $fields = [];
-            if($this->anketas[0]['type_anketa'] === "medic"){
-                if(!isset($_GET['exportPrikaz'])){
-                    $fields['id'] = "ID записи";
-                }
 
+            $firstForm = $this->forms[0]['type_anketa'];
+
+            if (in_array($firstForm, [FormTypeEnum::TECH, FormTypeEnum::BDD, FormTypeEnum::PRINT_PL])) {
                 foreach ($this->fields as $key => $value) {
-                    if($key === "driver_id"){
+                    if ($key === "driver_id") {
                         $fields['driver_id'] = "ID водителя";
                         $fields['driver_fio'] = "ФИО водителя";
-                    }elseif ($key === "car_id"){
-                        $fields['car_gos_number'] = $value;
-                    }elseif ($key === "company_id"){
-                        $fields['company_name'] = $value;
-                        $fields['company_id'] = "ID компании";
-                    }else{
-                        $fields[$key] = $value;
-                    }
-                }
-            } elseif ($this->anketas[0]['type_anketa'] === "tech"){
-                if(!isset($_GET['exportPrikaz'])){
-                    $fields['id'] = "ID записи";
-                }
-
-                foreach ($this->fields as $key => $value) {
-                    if ($key === "driver_id"){
-                        $fields['driver_id'] = "ID водителя";
-                        $fields['driver_fio'] = "ФИО водителя";
-                    } elseif ($key === "car_id"){
+                    } elseif ($key === "car_id") {
                         $fields['car_gos_number'] = $value;
                         $fields['car_id'] = "ID автомобиля";
-                    } elseif ($key === "company_id"){
+                    } elseif ($key === "company_id") {
                         $fields['company_name'] = $value;
                         $fields['company_id'] = "ID компании";
                     } else {
                         $fields[$key] = $value;
                     }
                 }
-            }elseif ($this->anketas[0]['type_anketa'] === "bdd") {
-                $fields['id'] = "ID записи";
+            }
+
+            if ($firstForm === FormTypeEnum::MEDIC) {
+                if (!$this->exportPrikaz) {
+                    $fields['id'] = "ID записи";
+                }
+
                 foreach ($this->fields as $key => $value) {
-                    if($key === "driver_id"){
+                    if ($key === "driver_id") {
                         $fields['driver_id'] = "ID водителя";
                         $fields['driver_fio'] = "ФИО водителя";
-                    }elseif ($key === "car_id"){
+                    } elseif ($key === "car_id") {
                         $fields['car_gos_number'] = $value;
-                        $fields['car_id'] = "ID автомобиля";
-                    }elseif ($key === "company_id"){
+                    } elseif ($key === "company_id") {
                         $fields['company_name'] = $value;
                         $fields['company_id'] = "ID компании";
-                    }else{
+                    } else {
                         $fields[$key] = $value;
                     }
                 }
-            }elseif ($this->anketas[0]['type_anketa'] === "pechat_pl"){
-                $fields['id'] = "ID записи";
-                foreach ($this->fields as $key => $value) {
-                    if($key === "driver_id"){
-                        $fields['driver_id'] = "ID водителя";
-                        $fields['driver_fio'] = "ФИО водителя";
-                    }elseif ($key === "car_id"){
-                        $fields['car_gos_number'] = $value;
-                        $fields['car_id'] = "ID автомобиля";
-                    }elseif ($key === "company_id"){
-                        $fields['company_name'] = $value;
-                        $fields['company_id'] = "ID компании";
-                    }else{
-                        $fields[$key] = $value;
-                    }
+            } elseif ($firstForm === FormTypeEnum::TECH) {
+                if (!$this->exportPrikaz) {
+                    $fields['id'] = "ID записи";
                 }
-            }else{
+            } else {
                 $fields['id'] = "ID записи";
                 foreach ($this->fields as $key => $value) {
-                    if($key === "driver_id"){
+                    if ($key === "driver_id") {
                         $fields['driver_id'] = $value;
                         $fields['driver_fio'] = "ФИО водителя";
-                    }elseif ($key === "car_id"){
+                    } elseif ($key === "car_id") {
                         $fields['car_gos_number'] = $value;
-                    }elseif ($key === "company_id"){
+                    } elseif ($key === "company_id") {
                         $fields['company_name'] = $value;
                         $fields['company_id'] = "ID компании";
-                    }else{
+                    } else {
                         $fields[$key] = $value;
                     }
                 }
             }
-
-            return view('home-export', [
-                'data' => $this->anketas,
-                'fields' => $fields,
-            ]);
-        } catch (\Throwable $th) {
-            return view('home-export', [
-                'data' => $this->anketas,
-                'fields' => $this->fields,
-            ]);
+        } catch (Throwable $th) {
+            $fields = $this->fields;
         }
+
+        return view('home-export', [
+            'data' => $this->forms,
+            'fields' => $fields
+        ]);
     }
 
     public function batchSize(): int

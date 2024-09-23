@@ -4,12 +4,12 @@ namespace App\Console\Commands;
 
 use App\Anketa;
 use App\Exports\AnketasExport;
+use App\Models\Forms\Form;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Arr;
 use Maatwebsite\Excel\Facades\Excel;
 
-class exportAnketas extends Command
+class ExportAnketas extends Command
 {
     /**
      * The name and signature of the console command.
@@ -33,7 +33,6 @@ class exportAnketas extends Command
     public function __construct()
     {
         parent::__construct();
-        ini_set('max_execution_time', 0);
     }
 
     /**
@@ -43,6 +42,8 @@ class exportAnketas extends Command
      */
     public function handle()
     {
+        ini_set('max_execution_time', 0);
+
         $type = $this->option('type');
 
         if (!$type) {
@@ -64,20 +65,27 @@ class exportAnketas extends Command
             $to = Carbon::now();
         }
 
+        $query = Form::query()
+            ->where('type_anketa', $type)
+            ->leftJoin()
+            ->whereBetween('created_at', [
+                $from,
+                $to
+            ]);
 
+        $forms = $query->get();
 
-        $request = Anketa::where('type_anketa', 'like', $type)->whereBetween('created_at', [
-            $from,
-            $to
-        ]);
+        $message = sprintf(
+            'Exporting anketas rows %s from %s to %s | %s rows',
+            $type,
+            $from->format('d.m.Y i:s'),
+            $to->format('d.m.Y i:s'),
+            $query->count()
+        );
+        $this->info($message);
 
-        $anketas = $request->get();
-
-        $this->info('Exporting anketas rows ' . $type . ' from ' . $from->format('d.m.Y i:s') .
-        ' to ' . $to->format('d.m.Y i:s') . ' | ' . $anketas->count() . ' rows');
-
-        Excel::store(new AnketasExport($anketas, Anketa::$fieldsKeys[$type]),
-            'exports/anketas/' . $type . '.xlsx');
+        $fileName = "exports/anketas/$type.xlsx";
+        Excel::store(new AnketasExport($forms, Anketa::$fieldsKeys[$type]), $fileName);
 
         $this->info('finish!');
     }

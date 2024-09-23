@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Enums\FormTypeEnum;
 use App\Models\Contract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -54,7 +55,7 @@ class Driver extends Model
             Anketa::class,
             'driver_id',
             'hash_id'
-        )->where('type_anketa', 'medic');
+        )->where('type_anketa', FormTypeEnum::MEDIC);
     }
 
     public function inspections_pechat_pl(): HasMany
@@ -63,7 +64,7 @@ class Driver extends Model
             Anketa::class,
             'driver_id',
             'hash_id'
-        )->where('type_anketa', 'pechat_pl');
+        )->where('type_anketa', FormTypeEnum::PRINT_PL);
     }
 
     public function inspections_bdd(): HasMany
@@ -81,7 +82,7 @@ class Driver extends Model
             Anketa::class,
             'driver_id',
             'hash_id'
-        )->where('type_anketa', 'report_cart');
+        )->where('type_anketa', FormTypeEnum::REPORT_CARD);
     }
 
     public function contracts(): BelongsToMany

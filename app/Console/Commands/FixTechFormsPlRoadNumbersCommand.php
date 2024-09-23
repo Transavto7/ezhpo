@@ -2,8 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Anketa;
 use App\Enums\FormTypeEnum;
+use App\Models\Forms\Form;
+use App\Models\Forms\TechForm;
 use DateTime;
 use Illuminate\Console\Command;
 
@@ -58,21 +59,23 @@ class FixTechFormsPlRoadNumbersCommand extends Command
             'fixed' => 0
         ];
 
-        $forms = Anketa::query()
+        $forms = Form::query()
             ->select([
-                'anketas.*',
+                'forms.*',
+                'tech_forms.*',
                 'companies.id as company_original_id'
             ])
-            ->join('companies', 'companies.hash_id', '=', 'anketas.company_id')
-            ->where('anketas.type_anketa', FormTypeEnum::TECH)
-            ->whereDate('anketas.created_at', '>=', $startDate)
-            ->whereNotNull('anketas.car_id')
-            ->whereNotNull('anketas.number_list_road')
+            ->join('tech_forms', 'tech_forms.form_uuid', '=', 'forms.uuid')
+            ->join('companies', 'companies.hash_id', '=', 'forms.company_id')
+            ->where('forms.type_anketa', FormTypeEnum::TECH)
+            ->whereDate('forms.created_at', '>=', $startDate)
+            ->whereNotNull('tech_forms.car_id')
+            ->whereNotNull('tech_forms.number_list_road')
             ->get();
 
         $this->info(sprintf('Всего осмотров с заполненными номерами ПЛ: %s', $forms->count()));
 
-        $forms->each(function (Anketa $form) use (&$counters, $updateAfterValidate, $showInvalid) {
+        $forms->each(function (Form $form) use (&$counters, $updateAfterValidate, $showInvalid) {
             $numberListRoad = $form->getAttribute('number_list_road');
             $carHashId = $form->getAttribute('car_id');
             $companyId = $form->getAttribute('company_original_id');
@@ -99,8 +102,11 @@ class FixTechFormsPlRoadNumbersCommand extends Command
                 return;
             }
 
-            $form->setAttribute('number_list_road', $fixedNumberListRoad);
-            $form->save();
+            TechForm::query()
+                ->where('forms_uuid', $form->uuid)
+                ->update([
+                    'number_list_road' => $fixedNumberListRoad
+                ]);
 
             $counters['fixed']++;
         });

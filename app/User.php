@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Enums\FormTypeEnum;
+use App\Models\Forms\Form;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,7 +37,6 @@ class User extends Authenticatable
             'pv_id',
             'timezone',
             'role',
-            'role_manager',
             'blocked',
             'pv_id_default',
             'api_token',
@@ -59,15 +60,9 @@ class User extends Authenticatable
             'last_connection_at' => 'datetime',
         ];
 
-    public static $userRolesKeys = [
-            '0' => 'medic',
-            '1' => 'tech',
-            '2' => 'medic',
-            '4' => 'pak_queue',
-            '12' => 'medic',
-            '11' => 'medic',
-            '777' => 'medic',
-            '778' => 'medic',
+    public static $defaultUserJournalByRole = [
+            '1' => FormTypeEnum::TECH,
+            '4' => FormTypeEnum::PAK_QUEUE
         ];
 
     protected static function boot()
@@ -123,7 +118,7 @@ class User extends Authenticatable
 
     public function anketas(): HasMany
     {
-        return $this->hasMany(Anketa::class, 'user_id', 'id')
+        return $this->hasMany(Form::class, 'user_id', 'id')
             ->withDefault();
     }
 

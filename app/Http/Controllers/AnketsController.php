@@ -9,7 +9,6 @@ use App\Actions\Anketa\TrashFormHandler;
 use App\Actions\Anketa\UpdateFormHandler;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueAction;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueHandler;
-use App\Anketa;
 use App\Enums\FormTypeEnum;
 use App\Enums\QRCodeLinkParameter;
 use App\Models\Forms\Form;
@@ -157,7 +156,7 @@ class AnketsController extends Controller
     {
         $id = $request->id;
         $action = $request->action;
-        $form = Anketa::findOrFail($id);
+        $form = Form::withTrashed()->findOrFail($id);
 
         try {
             DB::beginTransaction();
@@ -184,7 +183,7 @@ class AnketsController extends Controller
             try {
                 DB::beginTransaction();
 
-                $form = Anketa::findOrFail($id);
+                $form = Form::withTrashed()->findOrFail($id);
 
                 $handler->handle($form, $action, Auth::user());
 
@@ -237,7 +236,7 @@ class AnketsController extends Controller
 
     public function ChangeResultDop($id, $result_dop, ChangeResultDopHandler $handler): RedirectResponse
     {
-        $form = Anketa::findOrFail($id);
+        $form = Form::findOrFail($id);
 
         try {
             DB::beginTransaction();
@@ -373,7 +372,7 @@ class AnketsController extends Controller
 
     public function print($id)
     {
-        $form = Anketa::findOrFail($id);
+        $form = Form::findOrFail($id);
 
         $stamp = null;
         $terminal = User::find($form->terminal_id);

@@ -3,7 +3,6 @@
 return [
     'Town' => [
         'title' => 'Города',
-        'role' => 777,
         'popupTitle' => 'города',
         'editOnField' => 'name',
         'model' => 'Town',
@@ -27,7 +26,6 @@ return [
 
     'Point' => [
         'title' => 'Пункты выпуска',
-        'role' => 777,
         'popupTitle' => 'Пункта выпуска',
         'editOnField' => 'name',
         'model' => 'Point',
@@ -67,7 +65,6 @@ return [
 
     'Req' => [
         'title' => 'Реквизиты нашей компании',
-        'role' => 777,
         'popupTitle' => 'Реквизитов',
         'editOnField' => 'name',
         'model' => 'Req',
@@ -121,7 +118,6 @@ return [
 
     'DDates' => [
         'title' => 'Даты контроля',
-        'role' => 777,
         'popupTitle' => 'Даты контроля',
         'editOnField' => 'item_model',
         'model' => 'DDates',
@@ -169,7 +165,6 @@ return [
 
     'Settings' => [
         'title' => 'Настройки системы',
-        'role' => 777,
         'popupTitle' => 'Настройки системы',
         'max' => 1,
         'editOnField' => 'id',
@@ -210,7 +205,6 @@ return [
 
     'Driver' => [
         'title' => 'Водители',
-        'role' => 0,
         'popupTitle' => 'Водителя',
         'otherRoles' => [
             'medic',
@@ -398,7 +392,6 @@ return [
 
     'Car' => [
         'title' => 'Автомобили',
-        'role' => 0,
         'popupTitle' => 'Автомобиля',
         'otherRoles' => [
             'medic',
@@ -531,7 +524,6 @@ return [
     'Company' => [
         'title' => 'Компании',
         'popupTitle' => 'Компании',
-        'role' => 0,
         'editOnField' => 'name',
         'model' => 'Company',
         'fields' => [
@@ -681,7 +673,6 @@ return [
 
     'Product' => [
         'title' => 'Услуги',
-        'role' => 0,
         'popupTitle' => 'Услуги',
         'editOnField' => 'name',
         'model' => 'Product',
@@ -753,7 +744,6 @@ return [
 
     'Discount' => [
         'title' => 'Скидки',
-        'role' => 0,
         'popupTitle' => 'Скидка',
         'editOnField' => 'products_id',
         'model' => 'Discount',
@@ -788,7 +778,6 @@ return [
 
     'Instr' => [
         'title' => 'Виды инструктажей',
-        'role' => 0,
         'popupTitle' => 'Инструктажа',
         'editOnField' => 'name',
         'model' => 'Instr',

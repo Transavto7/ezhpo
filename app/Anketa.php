@@ -2,57 +2,11 @@
 
 namespace App;
 
-use App\Enums\FormTypeEnum;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Anketa extends Model
 {
     public const MIN_DIFF_BETWEEN_FORMS_IN_SECONDS = 60;
-
-    public function terminal(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'terminal_id', 'id');
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'user_id', 'id')
-                    ->withDefault();
-    }
-
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class, 'company_id', 'hash_id')
-                    ->withDefault();
-    }
-
-    public function operator(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'operator_id');
-    }
-
-    public function car(): BelongsTo
-    {
-        return $this->belongsTo(Car::class, 'car_id', 'hash_id')
-                    ->withDefault();
-    }
-
-    public function driver(): BelongsTo
-    {
-        return $this->belongsTo(Driver::class, 'driver_id', 'hash_id')
-                    ->withDefault();
-    }
-
-    public function deleted_user(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'deleted_id', 'id')
-                    ->withDefault();
-    }
-
-    protected $casts = [
-        'deleted_at' => 'datetime:d-m-Y H:i:s'
-    ];
 
     public $fillable
         = [
@@ -511,33 +465,4 @@ class Anketa extends Model
                 'videos'     => 'Видео',
             ],
         ];
-
-    public function point(): BelongsTo
-    {
-        return $this->belongsTo(Point::class, 'point_id', 'id');
-    }
-
-    public static function pakQueueCount(User $user): int
-    {
-        return self::query()->pakQueueByUser($user)->count();
-    }
-
-    public function scopePakQueueByUser($query, User $user)
-    {
-        $query->where('type_anketa', FormTypeEnum::PAK_QUEUE);
-
-        if ($user->access('approval_queue_view_all')) {
-
-        } else if ($user->hasRole('head_operator_sdpo')) {
-            $query->select([
-                'anketas.*'
-            ])
-                ->join('points_to_users', function ($join) use ($user) {
-                    $join->on('anketas.point_id', '=', 'points_to_users.point_id')
-                        ->where('points_to_users.user_id', '=', $user->id);
-                });
-        } else {
-            $query->where('user_id', $user->id);
-        }
-    }
 }

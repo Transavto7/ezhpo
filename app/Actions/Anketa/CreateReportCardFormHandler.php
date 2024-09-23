@@ -2,11 +2,11 @@
 
 namespace App\Actions\Anketa;
 
-use App\Anketa;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
+use App\Models\Forms\Form;
 use App\Models\Forms\ReportCartForm;
 use Illuminate\Support\Carbon;
 
@@ -118,7 +118,7 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
             $form['realy'] = 'да';
         }
 
-        $formModel = new Anketa($form);
+        $formModel = new Form($form);
 
         $formModel->save();
 
