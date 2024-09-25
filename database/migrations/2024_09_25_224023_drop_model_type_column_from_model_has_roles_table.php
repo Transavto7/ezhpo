@@ -28,7 +28,7 @@ class DropModelTypeColumnFromModelHasRolesTable extends Migration
     public function down()
     {
         Schema::table('model_has_roles', function (Blueprint $table) {
-            $table->string('model_type');
+            $table->string('model_type')->nullable();
             $table->dropIndex('model_has_roles_model_id_index');
             $table->index(['model_id', 'model_type'], 'model_has_roles_model_id_model_type_index');
         });
