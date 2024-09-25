@@ -3,11 +3,14 @@ declare(strict_types=1);
 
 namespace App\Services\CheckUserRoles\Enums;
 
+use DomainException;
+
 final class RestorationDataType
 {
     const CREATED_USERS = 'created_users';
     const DETACHED_ROLES_FROM_USER = 'detached_roles_from_user';
     const DELETED_USERS = 'deleted_users';
+    const DELETED_ROLE_RELATIONS = 'deleted_role_relations';
 
     /** @var string */
     private $value;
@@ -31,8 +34,10 @@ final class RestorationDataType
                 return self::detachedRolesFromUser();
             case self::DELETED_USERS:
                 return self::deletedUsers();
+            case self::DELETED_ROLE_RELATIONS:
+                return self::deletedRoleRelations();
             default:
-                throw new \DomainException('Unknown restoration data type: ' . $value);
+                throw new DomainException('Unknown restoration data type: ' . $value);
         }
     }
 
@@ -51,6 +56,11 @@ final class RestorationDataType
         return new self(self::DELETED_USERS);
     }
 
+    public static function deletedRoleRelations(): self
+    {
+        return new self(self::DELETED_ROLE_RELATIONS);
+    }
+
     public function __toString(): string
     {
         return $this->value();
@@ -62,6 +72,7 @@ final class RestorationDataType
            self::CREATED_USERS,
            self::DETACHED_ROLES_FROM_USER,
            self::DELETED_USERS,
+           self::DELETED_ROLE_RELATIONS,
         ];
     }
 }

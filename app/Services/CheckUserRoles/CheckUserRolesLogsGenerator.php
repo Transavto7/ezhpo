@@ -13,6 +13,7 @@ final class CheckUserRolesLogsGenerator
         RestorationDataType::CREATED_USERS => [],
         RestorationDataType::DETACHED_ROLES_FROM_USER => [],
         RestorationDataType::DELETED_USERS => [],
+        RestorationDataType::DELETED_ROLE_RELATIONS => [],
     ];
 
     /**
@@ -22,11 +23,6 @@ final class CheckUserRolesLogsGenerator
      */
     public function putValue(RestorationDataType $type, $value): void
     {
-        if (is_array($value)) {
-            $this->changes[$type->value()] = array_merge($this->changes[$type->value()], $value);
-            return;
-        }
-
         $this->changes[$type->value()][] = $value;
     }
 

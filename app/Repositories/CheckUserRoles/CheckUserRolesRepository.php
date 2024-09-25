@@ -19,6 +19,34 @@ final class CheckUserRolesRepository
             ->toArray();
     }
 
+    public function findRoleRelationsWithoutUser(): array
+    {
+        return DB::table('model_has_roles as mhr')
+            ->select([
+                'mhr.role_id',
+                'mhr.model_id',
+            ])
+            ->leftJoin('users as u', 'mhr.model_id', '=', 'u.id')
+            ->whereNull('u.id')
+            ->get()
+            ->toArray();
+    }
+
+    public function deleteRoleRelationsWithoutUser(array $roles, $batchSize = 1000)
+    {
+        $chunks = array_chunk($roles, $batchSize);
+
+        foreach ($chunks as $chunk) {
+            $roleIds = array_column($chunk, 'role_id');
+            $modelIds = array_column($chunk, 'model_id');
+
+            DB::table('model_has_roles')
+                ->whereIn('role_id', $roleIds)
+                ->whereIn('model_id', $modelIds)
+                ->delete();
+        }
+    }
+
     public function findCompanies(): array
     {
         $data = DB::table('companies as c')

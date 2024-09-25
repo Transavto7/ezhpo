@@ -29,9 +29,9 @@ class CheckUserRoles extends Command
                             {--c|--companies : Валидация компаний}
                             {--d|--drivers : Валидация водителей}
                             {--u|--users : Валидация пользователей}
-                            {--r|--duplicated-roles : Валидация пользователей с повторяющимися ролями}
+                            {--r|--roles : Валидация ролей}
+                            {--D|--duplicated-roles : Валидация пользователей с повторяющимися ролями}
                             {--a|--all : Валидация всех типов записей}
-                            {--s|--show-users-with-duplicated-roles : Отображение ID пользователей с дублирующимися ролями}
                             {--l|--logs-list : Список файлов для восстановления данных}
                             {--restore= : Имя файла, из которого будут восстановлены данные}';
 
@@ -102,6 +102,7 @@ class CheckUserRoles extends Command
 
         $validateAll = $this->option('all');
         $validateDuplicatedRoles = $this->option('duplicated-roles');
+        $validateRoles = $this->option('roles');
         $validateCompanies = $this->option('companies');
         $validateDrivers = $this->option('drivers');
         $validateUsers = $this->option('users');
@@ -116,6 +117,10 @@ class CheckUserRoles extends Command
 
             if ($validateAll || $validateDuplicatedRoles) {
                 $this->validateUsersWithDuplicatedRoles($this->repository->findUsersWithDuplicatedRoles());
+            }
+
+            if ($validateAll || $validateRoles) {
+                $this->validateRoleRelationsWithoutUsers($this->repository->findRoleRelationsWithoutUser());
             }
 
             if ($validateAll || $validateCompanies) {
@@ -176,8 +181,6 @@ class CheckUserRoles extends Command
 
     private function validateUsersWithDuplicatedRoles(array $entities)
     {
-        $logIds = $this->option('show-users-with-duplicated-roles');
-
         $this->iterate(
             'Пользователи, с повторяющимися ролями',
             $entities,
@@ -199,7 +202,29 @@ class CheckUserRoles extends Command
                 $user->roles()->detach();
                 $user->roles()->attach($uniqueRoles);
             },
-            $logIds
+            false
+        );
+    }
+
+    private function validateRoleRelationsWithoutUsers(array $roles)
+    {
+        if ($this->fixNeeded) {
+            $this->repository->deleteRoleRelationsWithoutUser($roles);
+        }
+
+        $this->iterate(
+            'Роли у несуществующих пользователей',
+            $roles,
+            function () {
+                return true;
+            },
+            function ($entity) {
+                $this->logsGenerator->putValue(RestorationDataType::deletedRoleRelations(), [
+                    'role_id' => $entity->role_id,
+                    'model_id' => $entity->model_id,
+                ]);
+            },
+            false
         );
     }
 

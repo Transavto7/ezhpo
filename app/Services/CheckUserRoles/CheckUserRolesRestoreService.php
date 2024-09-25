@@ -6,6 +6,7 @@ use App\Services\CheckUserRoles\Enums\RestorationDataType;
 use App\User;
 use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 final class CheckUserRolesRestoreService
@@ -45,6 +46,8 @@ final class CheckUserRolesRestoreService
         foreach ($detachedRolesData as $userId => $roleIds) {
             $this->attachRoles($userId, $roleIds);
         }
+
+        $this->createRoleRelations($data[RestorationDataType::DELETED_ROLE_RELATIONS]);
     }
 
     /**
@@ -63,5 +66,10 @@ final class CheckUserRolesRestoreService
 
     private function attachRoles(string $userId, array $roleIds) {
         User::withTrashed()->find($userId)->roles()->attach($roleIds);
+    }
+
+    private function createRoleRelations(array $relations) {
+        DB::table('model_has_roles')
+            ->insert($relations);
     }
 }
