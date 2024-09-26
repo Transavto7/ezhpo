@@ -455,7 +455,7 @@ class CheckUserRoles extends Command
 
         $user->roles()->attach($role);
 
-        $this->info("Добавлен новый пользователь (login: $email)");
+        $this->info("Добавлен новый пользователь (login: $userLogin)");
 
         return $user->id;
     }
