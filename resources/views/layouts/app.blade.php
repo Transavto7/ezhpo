@@ -145,6 +145,27 @@
     </form>
 @endif
 
+@if(user() && user()->hasRole('client') && config('payment-qr-code.payment_qr_code_enable'))
+    <div id="paymentQrCodeModal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: fit-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body d-flex justify-content-center align-items-center">
+                    <img
+                        src="{{ asset(config('payment-qr-code.payment_qr_code_image')) }}"
+                        alt="Не найдено изображение с QR-кодом для оплаты"
+                        style="max-width: calc(100vw - 45px)"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+@endif
+
 @stack('setup-scripts')
 
 <!-- Scripts -->
