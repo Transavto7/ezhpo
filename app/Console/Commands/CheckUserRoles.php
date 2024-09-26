@@ -33,7 +33,7 @@ class CheckUserRoles extends Command
                             {--D|--duplicated-roles : Валидация пользователей с повторяющимися ролями}
                             {--a|--all : Валидация всех типов записей}
                             {--l|--logs-list : Список файлов для восстановления данных}
-                            {--restore= : Имя файла, из которого будут восстановлены данные}';
+                            {--restore : Восстановить данные}';
 
     /**
      * The console command description.
@@ -111,7 +111,20 @@ class CheckUserRoles extends Command
 
         try {
             if ($restore) {
-                $this->restoreService->restore($this->option('restore'));
+                $fileNameList = $this->restoreService->getAvailableLogsList();
+
+                if (!count($fileNameList)) {
+                    throw new Exception('Не найдено файлов для восстановления');
+                }
+
+                $this->info('Доступные файлы:');
+                foreach ($fileNameList as $fileName) {
+                    $this->info($fileName);
+                }
+
+                $value = $this->askWithCompletion('Восстановить данные?', $fileNameList, $fileNameList[0]);
+
+                $this->restoreService->restore($value);
                 $this->info('Данные восстановлены');
             }
 
