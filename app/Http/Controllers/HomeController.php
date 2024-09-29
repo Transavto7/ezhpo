@@ -251,6 +251,19 @@ class HomeController extends Controller
                             }, $explodeData);
                         }
 
+                        if ($filterKey === 'driver_group_risk') {
+                            $forms = $forms->where(function ($query) use ($explodeData, $filterKey) {
+                                foreach ($explodeData as $fvItemValue) {
+                                    $escapedFvItemValue = str_replace('\\', '\\\\', $fvItemValue);
+                                    $query = $query->orWhere('anketas.' . $filterKey, 'like', '%' . trim($escapedFvItemValue) . '%');
+                                }
+
+                                return $query;
+                            });
+
+                            continue;
+                        }
+
                         $forms = $forms->where(function ($query) use ($explodeData, $filterKey) {
                             foreach ($explodeData as $fvItemValue) {
                                 if ($fvItemValue === null) {
@@ -282,6 +295,12 @@ class HomeController extends Controller
 
                         if ($filterKey === 'flag_pak' && $explodeData === 'internal') {
                             $forms = $forms->whereNull('anketas.flag_pak');
+                            continue;
+                        }
+
+                        if ($filterKey === 'driver_group_risk') {
+                            $escapedExplodeData = str_replace('\\', '\\\\', $explodeData);
+                            $forms = $forms->where('anketas.' . $filterKey, 'like', '%' . trim($escapedExplodeData) . '%');
                             continue;
                         }
 
