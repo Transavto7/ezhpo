@@ -42,7 +42,7 @@ class FormHashFilling extends Command
 
     public function handle()
     {
-        if (config('forms.fill-day-hash', false) === false && !$this->option('force')) {
+        if (config('forms.fill-day-hash', false) === false && ! $this->option('force')) {
             return;
         }
 

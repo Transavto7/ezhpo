@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Enums\FormTypeEnum;
 use App\Services\FormHash\FormHashGenerator;
 use App\Services\FormHash\TechHashData;
+use DateTimeImmutable;
 use DB;
 use Exception;
 use Illuminate\Console\Command;
@@ -18,7 +19,8 @@ class TechFormHashFilling extends Command
      *
      * @var string
      */
-    protected $signature = 'forms:fill-tech-day-hash';
+    protected $signature = 'forms:fill-tech-day-hash
+        {--force : Запуск команды игнорируя конфиг}';
 
     /**
      * The console command description.
@@ -39,11 +41,16 @@ class TechFormHashFilling extends Command
 
     public function handle()
     {
-        $this->info(Carbon::now() . ' Начало работы');
-        Log::info(Carbon::now() . ' Начало работы команды по заполнению day_hash для ТО');
+        if (config('forms.fill-tech-day-hash', false) === false && ! $this->option('force')) {
+            return;
+        }
 
-        $ctr = 0;
-        DB::table('anketas')
+        $this->info(Carbon::now() . ' Начало работы');
+        Log::info('forms:fill-tech-day-hash - Начало работы');
+
+        $chunkSize = config('forms.fill-day-hash-chunk-size', 50000);
+
+        $data = DB::table('anketas')
             ->select([
                 'id',
                 'driver_id',
@@ -55,39 +62,44 @@ class TechFormHashFilling extends Command
             ->whereNotNull('car_id')
             ->whereNotNull('date')
             ->whereNotNull('type_view')
+            ->whereNull('day_hash')
             ->whereNull('deleted_at')
             ->where('type_anketa', '=', FormTypeEnum::TECH)
             ->orderByDesc('id')
-            ->chunk(1000, function ($forms) use (&$ctr) {
-                try {
-                    DB::beginTransaction();
+            ->limit($chunkSize)
+            ->get();
 
-                    foreach ($forms as $form) {
-                        $hash = FormHashGenerator::generate(
-                            new TechHashData(
-                                $form->driver_id,
-                                $form->car_id,
-                                new \DateTimeImmutable($form->date),
-                                $form->type_view
-                            )
-                        );
+        $ctr = 0;
+        foreach ($data->chunk(1000) as $chunk) {
+            try {
+                DB::beginTransaction();
 
-                        DB::table('anketas')
-                            ->where('id', $form->id)
-                            ->update(['day_hash' => $hash]);
-                    }
+                foreach ($chunk as $form) {
+                    $hash = FormHashGenerator::generate(
+                        new TechHashData(
+                            $form->driver_id,
+                            $form->car_id,
+                            new DateTimeImmutable($form->date),
+                            $form->type_view
+                        )
+                    );
 
-                    $ctr += count($forms);
-                    $this->info(Carbon::now() . " Обработано $ctr записей");
-                    Log::info(Carbon::now() . " Обработано $ctr записей");
-
-                    DB::commit();
-                } catch (Exception $e) {
-                    DB::rollBack();
-                    $this->error($e->getMessage());
+                    DB::table('anketas')
+                        ->where('id', $form->id)
+                        ->update(['day_hash' => $hash]);
                 }
-            });
+
+                $ctr += count($chunk);
+                $this->info(Carbon::now() . " Обработано $ctr записей");
+
+                DB::commit();
+            } catch (Exception $e) {
+                DB::rollBack();
+                $this->error($e->getMessage());
+            }
+        }
+
         $this->info(Carbon::now() . ' Завершение работы. Обработано всего: ' . $ctr);
-        Log::info(Carbon::now() . ' Завершение работы команды по заполнению day_hash для ТО. Обработано всего: ' . $ctr);
+        Log::info('forms:fill-tech-day-hash -  Завершение работы. Обработано всего: ' . $ctr);
     }
 }
