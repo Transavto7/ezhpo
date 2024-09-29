@@ -10,6 +10,7 @@ use DB;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Log;
 
 class FormHashFilling extends Command
 {
@@ -40,6 +41,7 @@ class FormHashFilling extends Command
     public function handle()
     {
         $this->info(Carbon::now() . ' Начало работы');
+        Log::info(Carbon::now() . ' Начало работы команды по заполнению day_hash');
 
         $ctr = 0;
         DB::table('anketas')
@@ -51,6 +53,7 @@ class FormHashFilling extends Command
                 'type_view',
             ])
             ->whereNotNull('driver_id')
+            ->whereNotNull('car_id')
             ->whereNotNull('date')
             ->whereNotNull('type_view')
             ->whereNull('day_hash')
@@ -87,6 +90,7 @@ class FormHashFilling extends Command
 
                     $ctr += count($forms);
                     $this->info(Carbon::now() . " Обработано $ctr записей");
+                    Log::info(Carbon::now() . " Обработано $ctr записей");
                     DB::commit();
                 } catch (Exception $e) {
                     DB::rollBack();
@@ -94,5 +98,6 @@ class FormHashFilling extends Command
                 }
             });
         $this->info(Carbon::now() . ' Завершение работы. Обработано всего: ' . $ctr);
+        Log::info(Carbon::now() . ' Завершение работы. Обработано всего: ' . $ctr);
     }
 }
