@@ -77,6 +77,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             'date' => date('Y-m-d H:i:s'),
             'test_narko' => 'Отрицательно',
             'proba_alko' => 'Отрицательно',
+            'alcometer_result' => '0',
             'med_view' => 'В норме',
             'admitted' => 'Допущен',
             'realy' => 'нет',
