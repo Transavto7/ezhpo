@@ -1,50 +1,51 @@
 <?php
 
-namespace App\Services\DuplicateChecker\Dto;
+namespace App\Services\FormHash;
 
 use DateTimeImmutable;
 
-class Inspection
+class TechHashData implements HashData
 {
     /**
      * @var string
      */
-    protected $driverId;
+    private $driverId;
 
     /**
-     * @var string|null
+     * @var string
      */
-    protected $carId;
+    private $carId;
 
     /**
      * @var DateTimeImmutable
      */
-    protected $date;
+    private $date;
 
     /**
      * @var string
      */
-    protected $type;
-
-    /**
-     * @var string
-     */
-    protected $formType;
+    private $type;
 
     /**
      * @param string $driverId
-     * @param $carId
+     * @param string $carId
      * @param DateTimeImmutable $date
      * @param string $type
-     * @param string $formType
      */
-    public function __construct(string $driverId, $carId, DateTimeImmutable $date, string $type, string $formType)
+    public function __construct(string $driverId, string $carId, DateTimeImmutable $date, string $type)
     {
         $this->driverId = $driverId;
         $this->carId = $carId;
         $this->date = $date;
         $this->type = $type;
-        $this->formType = $formType;
+    }
+
+    public function toHashString() : string
+    {
+        return $this->getType()
+            .$this->getDate()->format('Y-m-d')
+            .$this->getDriverId()
+            .$this->getCarId();
     }
 
     public function getDriverId(): string
@@ -52,7 +53,7 @@ class Inspection
         return $this->driverId;
     }
 
-    public function getCarId()
+    public function getCarId(): string
     {
         return $this->carId;
     }
@@ -65,10 +66,5 @@ class Inspection
     public function getType(): string
     {
         return $this->type;
-    }
-
-    public function getFormType(): string
-    {
-        return $this->formType;
     }
 }

@@ -15,6 +15,7 @@ class CheckInspectionDuplicatesController extends Controller
         $hasDuplicates = $checker->check(
             new Inspection(
                 $request->input('driverId'),
+                $request->input('carId'),
                 new DateTimeImmutable($request->input('date')),
                 $request->input('type'),
                 $request->input('formType')

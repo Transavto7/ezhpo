@@ -9,7 +9,7 @@ use App\Enums\BlockActionReasonsEnum;
 use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
 use App\Services\FormHash\FormHashGenerator;
-use App\Services\FormHash\HashData;
+use App\Services\FormHash\MedicHashData;
 use App\ValueObjects\PressureLimits;
 use App\ValueObjects\Pulse;
 use App\ValueObjects\PulseLimits;
@@ -205,7 +205,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
 
         if ($form['driver_id'] && $form['date'] && $form['type_view']) {
             $form['day_hash'] = FormHashGenerator::generate(
-                new HashData(
+                new MedicHashData(
                     $form['driver_id'],
                     new \DateTimeImmutable($form['date']),
                     $form['type_view']

@@ -6,7 +6,7 @@ $(document).ready(function () {
 
     let timer
 
-    ui.driverId.keyup(function (e) {
+    ui.driverId.keyup(function () {
         clearTimeout(timer)
 
         timer = setTimeout(() => {
@@ -27,6 +27,12 @@ $(document).ready(function () {
         changeDate(this)
     })
 
+    $(document).on('keyup', '.car-input', function () {
+        const $carId = $(this)
+        const $date = $carId.closest('.cloning').find('.inspection-date')
+        isDuplicate($date)
+    })
+
     let dateTimer
 
     function changeDate(element) {
@@ -45,9 +51,11 @@ $(document).ready(function () {
     })
 
     function isDuplicate($date) {
+        const $carId = $date.closest('.cloning').find('.car-input')
         const $type = $date.closest('.cloning').find('.type-view')
         const formType = $('input[name="type_anketa"]').val()
-        if (! isValid($date, $type)) {
+
+        if (! isValid($date, $type, $carId)) {
             $type.next().addClass('d-none')
             return
         }
@@ -56,6 +64,9 @@ $(document).ready(function () {
             .get('/api/sdpo/forms/duplicates', {
                 params: {
                     driverId: ui.driverId.val(),
+                    carId: $carId.length
+                        ? $carId.val()
+                        : null,
                     date: $date.val(),
                     type: $type.val(),
                     formType: formType,
@@ -77,8 +88,12 @@ $(document).ready(function () {
             })
     }
 
-    function isValid($date, $type) {
-        return !!(ui.driverId.val().length >= 6 && $date.val() && $type.val())
+    function isValid($date, $type, $carId) {
+        if ($carId.length === 0) {
+            return !!(ui.driverId.val().length >= 6 && $date.val() && $type.val())
+        }
+
+        return !!(ui.driverId.val().length >= 6 && $carId.val().length >= 6 && $date.val() && $type.val())
     }
 
     $(document).on('click', '.anketa-delete', function () {

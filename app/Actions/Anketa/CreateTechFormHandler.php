@@ -9,7 +9,7 @@ use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
 use App\Services\FormHash\FormHashGenerator;
-use App\Services\FormHash\HashData;
+use App\Services\FormHash\TechHashData;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
@@ -234,10 +234,11 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             $form['realy'] = 'да';
         }
 
-        if ($form['driver_id'] && $form['date'] && $form['type_view']) {
+        if ($form['driver_id'] && $form['car_id'] && $form['date'] && $form['type_view']) {
             $form['day_hash'] = FormHashGenerator::generate(
-                new HashData(
+                new TechHashData(
                     $form['driver_id'],
+                    $form['car_id'],
                     new \DateTimeImmutable($form['date']),
                     $form['type_view']
                 )
