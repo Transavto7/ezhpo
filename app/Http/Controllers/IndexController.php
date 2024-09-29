@@ -618,7 +618,7 @@ class IndexController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        if ($user && $user->hasRole('driver')) {
+        if ($user && $user->hasRole('driver') && ($user->roles()->count() === 1)) {
             return redirect(route('driver.index'));
         }
 

@@ -82,7 +82,7 @@
     <main
         class="page-content d-flex align-items-stretch @if (user() && (user()->hasRole('driver') || user()->hasRole('client'))) blue @endif">
 
-        @if (user() && !user()->hasRole('driver'))
+        @if (user() && !(user()->hasRole('driver') && user()->roles()->count() === 1))
             @include('layouts.sidebar')
         @endif
 
