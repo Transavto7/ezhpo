@@ -6,6 +6,7 @@ use App\Enums\FormTypeEnum;
 use App\Services\FormHash\FormHashGenerator;
 use App\Services\FormHash\MedicHashData;
 use App\Services\FormHash\TechHashData;
+use DateTimeImmutable;
 use DB;
 use Exception;
 use Illuminate\Console\Command;
@@ -19,7 +20,8 @@ class FormHashFilling extends Command
      *
      * @var string
      */
-    protected $signature = 'forms:fill-day-hash';
+    protected $signature = 'forms:fill-day-hash
+        {--force : Запуск команды игнорируя конфиг}';
 
     /**
      * The console command description.
@@ -40,11 +42,16 @@ class FormHashFilling extends Command
 
     public function handle()
     {
-        $this->info(Carbon::now() . ' Начало работы');
-        Log::info(Carbon::now() . ' Начало работы команды по заполнению day_hash');
+        if (config('forms.fill-day-hash', false) === false && !$this->option('force')) {
+            return;
+        }
 
-        $ctr = 0;
-        DB::table('anketas')
+        $this->info(Carbon::now() . ' Начало работы');
+        Log::info('forms:fill-day-hash - Запуск команды');
+
+        $chunkSize = config('forms.fill-day-hash-chunk-size', 50000);
+
+        $data = DB::table('anketas')
             ->select([
                 'id',
                 'driver_id',
@@ -63,41 +70,53 @@ class FormHashFilling extends Command
                     ->orWhere('type_anketa', '=', FormTypeEnum::TECH);
             })
             ->orderByDesc('id')
-            ->chunk(1000, function ($forms) use (&$ctr) {
-                try {
-                    DB::beginTransaction();
+            ->limit($chunkSize)
+            ->get();
 
-                    foreach ($forms as $form) {
-                        $hash = FormHashGenerator::generate(
-                            $form->type_view === FormTypeEnum::MEDIC
-                                ? new MedicHashData(
-                                    $form->driver_id,
-                                    new \DateTimeImmutable($form->date),
-                                    $form->type_view
-                                )
-                                : new TechHashData(
-                                    $form->driver_id,
-                                    $form->car_id,
-                                    new \DateTimeImmutable($form->date),
-                                    $form->type_view
-                                )
-                        );
+        $ctr = 0;
+        foreach ($data->chunk(1000) as $chunk) {
+            try {
+                DB::beginTransaction();
 
-                        DB::table('anketas')
-                            ->where('id', $form->id)
-                            ->update(['day_hash' => $hash]);
-                    }
+                $updates = [];
+                foreach ($chunk as $form) {
+                    $hash = FormHashGenerator::generate(
+                        $form->type_view === FormTypeEnum::MEDIC
+                            ? new MedicHashData(
+                            $form->driver_id,
+                            new DateTimeImmutable($form->date),
+                            $form->type_view
+                        )
+                            : new TechHashData(
+                            $form->driver_id,
+                            $form->car_id,
+                            new DateTimeImmutable($form->date),
+                            $form->type_view
+                        )
+                    );
 
-                    $ctr += count($forms);
-                    $this->info(Carbon::now() . " Обработано $ctr записей");
-                    Log::info(Carbon::now() . " Обработано $ctr записей");
-                    DB::commit();
-                } catch (Exception $e) {
-                    DB::rollBack();
-                    $this->error($e->getMessage());
+                    $updates[] = [
+                        'id' => $form->id,
+                        'day_hash' => $hash,
+                    ];
                 }
-            });
+
+                foreach ($updates as $update) {
+                    DB::table('anketas')
+                        ->where('id', $update['id'])
+                        ->update(['day_hash' => $update['day_hash']]);
+                }
+
+                $ctr += count($chunk);
+                $this->info(Carbon::now() . " Обработано $ctr записей");
+                DB::commit();
+            } catch (Exception $e) {
+                DB::rollBack();
+                $this->error($e->getMessage());
+            }
+        }
+
         $this->info(Carbon::now() . ' Завершение работы. Обработано всего: ' . $ctr);
-        Log::info(Carbon::now() . ' Завершение работы. Обработано всего: ' . $ctr);
+        Log::info('forms:fill-day-hash - Завершение работы. Обработано записей: ' . $ctr);
     }
 }
