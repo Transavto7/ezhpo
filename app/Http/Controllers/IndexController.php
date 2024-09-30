@@ -525,6 +525,11 @@ class IndexController extends Controller
                         } else if (strlen($filterValueItem) === 0) {
                             //TODO: странный фильтр только на пустую строку
                             $subQuery = $subQuery->orWhere($filterKey, $filterValueItem);
+                        } else if ($filterKey === 'type_auto') {
+                            $subQuery = $subQuery->orWhere($filterKey, '=', $filterValueItem);
+                        } else if ($filterKey === 'group_risk') {
+                            $escapedFilterValueItem = str_replace('\\', '\\\\', $filterValueItem);
+                            $subQuery = $subQuery->orWhere($filterKey, 'LIKE', '%' . trim($escapedFilterValueItem) . '%');
                         } else {
                             $subQuery = $subQuery->orWhere($filterKey, 'LIKE', '%' . trim($filterValueItem) . '%');
                         }
