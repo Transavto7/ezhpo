@@ -392,6 +392,12 @@
         || user()->access('errors_sdpo_trash') && $type_ankets == 'pak'
     );
 
+    $duplicateView = (
+        $type_ankets === 'medic' && user()->hasRole('medic')
+        || $type_ankets === 'tech' && user()->hasRole('tech')
+        || user()->hasRole('admin') && in_array($type_ankets, ['medic', 'tech'])
+    );
+
     $permissionToDelete = (
         $type_ankets == 'medic' && user()->access('medic_delete')
         || $type_ankets == 'tech' && user()->access('tech_delete')
@@ -454,11 +460,13 @@
                                             <a href="?trash=1" class="btn btn-sm btn-warning">Корзина <i class="fa fa-trash"></i></a>
                                         @endisset
                                     @endif
+                                    @if($duplicateView)
                                         @if(request()->filled('duplicates'))
                                             <a href="{{ route('home', $type_ankets) }}" class="btn btn-sm btn-secondary">Назад</a>
                                         @else
                                             <a href="?duplicates=true" class="btn btn-sm btn-secondary">Показать дубликаты <i class="fa fa-clone"></i></a>
                                         @endif
+                                    @endif
                                 </div>
                                 @if($type_ankets === 'tech')
                                     <div class="text-right">
