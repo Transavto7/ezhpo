@@ -410,7 +410,7 @@
         || user()->access('errors_sdpo_update') && $type_ankets == 'pak'
     );
 
-    $permissionToExport = !user()->hasRole('client') && (
+    $permissionToExport = (
         $type_ankets == 'tech' && user()->access('tech_export')
         || $type_ankets == 'medic' && user()->access('medic_export')
         || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_export')
@@ -418,7 +418,7 @@
         || $type_ankets == 'report_cart' && user()->access('map_report_export')
     );
 
-    $permissionToExportPrikaz = !user()->hasRole('client') && (
+    $permissionToExportPrikaz = (
         $type_ankets == 'tech' && user()->access('tech_export_prikaz')
         || $type_ankets == 'medic' && user()->access('medic_export_prikaz')
         || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_export_prikaz')
@@ -426,7 +426,7 @@
         || $type_ankets == 'report_cart' && user()->access('map_report_export_prikaz')
     );
 
-    $permissionToExportPrikazPL = !user()->hasRole('client') && (
+    $permissionToExportPrikazPL = (
         $type_ankets == 'tech' && user()->access('tech_export_prikaz_pl')
     );
 
