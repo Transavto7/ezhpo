@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Enums\FormTypeEnum;
 use App\Services\FormHash\FormHashGenerator;
-use App\Services\FormHash\MedicHashData;
 use App\Services\FormHash\TechHashData;
 use DateTimeImmutable;
 use DB;
@@ -13,14 +12,14 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Log;
 
-class FormHashFilling extends Command
+class TechFormHashFilling extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'forms:fill-day-hash
+    protected $signature = 'forms:fill-tech-day-hash
         {--force : Запуск команды игнорируя конфиг}';
 
     /**
@@ -28,7 +27,7 @@ class FormHashFilling extends Command
      *
      * @var string
      */
-    protected $description = 'Заполнение поля day_hash таблицы anketas для записей, где оно пустое';
+    protected $description = 'Заполнение поля day_hash таблицы anketas для записей, где вид осмотра - tech';
 
     /**
      * Create a new command instance.
@@ -42,12 +41,12 @@ class FormHashFilling extends Command
 
     public function handle()
     {
-        if (config('forms.fill-day-hash', false) === false && ! $this->option('force')) {
+        if (config('forms.fill-tech-day-hash', false) === false && ! $this->option('force')) {
             return;
         }
 
         $this->info(Carbon::now() . ' Начало работы');
-        Log::info('forms:fill-day-hash - Запуск команды');
+        Log::info('forms:fill-tech-day-hash - Начало работы');
 
         $chunkSize = config('forms.fill-day-hash-chunk-size', 50000);
 
@@ -65,10 +64,7 @@ class FormHashFilling extends Command
             ->whereNotNull('type_view')
             ->whereNull('day_hash')
             ->whereNull('deleted_at')
-            ->where(function ($query) {
-                $query->where('type_anketa', '=', FormTypeEnum::MEDIC)
-                    ->orWhere('type_anketa', '=', FormTypeEnum::TECH);
-            })
+            ->where('type_anketa', '=', FormTypeEnum::TECH)
             ->orderByDesc('id')
             ->limit($chunkSize)
             ->get();
@@ -78,16 +74,9 @@ class FormHashFilling extends Command
             try {
                 DB::beginTransaction();
 
-                $updates = [];
                 foreach ($chunk as $form) {
                     $hash = FormHashGenerator::generate(
-                        $form->type_view === FormTypeEnum::MEDIC
-                            ? new MedicHashData(
-                            $form->driver_id,
-                            new DateTimeImmutable($form->date),
-                            $form->type_view
-                        )
-                            : new TechHashData(
+                        new TechHashData(
                             $form->driver_id,
                             $form->car_id,
                             new DateTimeImmutable($form->date),
@@ -95,20 +84,14 @@ class FormHashFilling extends Command
                         )
                     );
 
-                    $updates[] = [
-                        'id' => $form->id,
-                        'day_hash' => $hash,
-                    ];
-                }
-
-                foreach ($updates as $update) {
                     DB::table('anketas')
-                        ->where('id', $update['id'])
-                        ->update(['day_hash' => $update['day_hash']]);
+                        ->where('id', $form->id)
+                        ->update(['day_hash' => $hash]);
                 }
 
                 $ctr += count($chunk);
                 $this->info(Carbon::now() . " Обработано $ctr записей");
+
                 DB::commit();
             } catch (Exception $e) {
                 DB::rollBack();
@@ -117,6 +100,6 @@ class FormHashFilling extends Command
         }
 
         $this->info(Carbon::now() . ' Завершение работы. Обработано всего: ' . $ctr);
-        Log::info('forms:fill-day-hash - Завершение работы. Обработано записей: ' . $ctr);
+        Log::info('forms:fill-tech-day-hash -  Завершение работы. Обработано всего: ' . $ctr);
     }
 }

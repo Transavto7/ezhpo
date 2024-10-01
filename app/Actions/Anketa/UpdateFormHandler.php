@@ -11,7 +11,8 @@ use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
 use App\Point;
 use App\Services\FormHash\FormHashGenerator;
-use App\Services\FormHash\HashData;
+use App\Services\FormHash\MedicHashData;
+use App\Services\FormHash\TechHashData;
 use App\Settings;
 use App\User;
 use App\ValueObjects\PressureLimits;
@@ -88,13 +89,25 @@ class UpdateFormHandler
         }
 
         if ($form['driver_id'] && $form['date'] && $form['type_view'] && in_array($form['type_anketa'], [FormTypeEnum::MEDIC, FormTypeEnum::TECH])) {
-            $form['day_hash'] = FormHashGenerator::generate(
-                new HashData(
-                    $form['driver_id'],
-                    new \DateTimeImmutable($form['date']),
-                    $form['type_view']
-                )
-            );
+            if ($form['type_anketa'] === FormTypeEnum::MEDIC) {
+                $form['day_hash'] = FormHashGenerator::generate(
+                    new MedicHashData(
+                        $form['driver_id'],
+                        new \DateTimeImmutable($form['date']),
+                        $form['type_view']
+                    )
+                );
+            }
+            if ($form['type_anketa'] === FormTypeEnum::TECH && $form['car_id']) {
+                $form['day_hash'] = FormHashGenerator::generate(
+                    new TechHashData(
+                        $form['driver_id'],
+                        $form['car_id'],
+                        new \DateTimeImmutable($form['date']),
+                        $form['type_view']
+                    )
+                );
+            }
         }
 
         $form->save();

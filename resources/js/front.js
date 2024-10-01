@@ -733,7 +733,7 @@ $(document).ready(function () {
                 const PROP_HAS_EXISTS = data.data.exists
                 const DATA = data.data.message;
 
-                if ((model === 'Driver' || model === 'Car') && DATA.company_hash_id) {
+                if ((model === 'Driver' || model === 'Car') && DATA && DATA.company_hash_id) {
                     const form = parent.closest('#ANKETA_FORM');
                     form.find('input[name="company_id"]').val(DATA.company_hash_id);
                     const select = form.find('select[name="company_id"]');
@@ -754,7 +754,7 @@ $(document).ready(function () {
                     }
                 }
 
-                if ((model === 'Driver' || model === 'Car') && DATA.company_name) {
+                if ((model === 'Driver' || model === 'Car') && DATA && DATA.company_name) {
                     const form = parent.closest('#ANKETA_FORM');
                     const select = form.find('select[name="company_name"]');
 
@@ -803,7 +803,7 @@ $(document).ready(function () {
                     checkInputProp('id', 'Company', DATA.company_id, 'name', companyIdInput.parent().parent())
                 }
 
-                if (model === 'Driver' && DATA.company_hash_id) {
+                if (model === 'Driver' && DATA && DATA.company_hash_id) {
                     parent.find('input').attr('company', DATA.company_hash_id);
                     const driverInput = parent.closest('#ANKETA_FORM').find('.car-input');
                     driverInput.each((id, input) => {
@@ -824,7 +824,7 @@ $(document).ready(function () {
                     });
                 }
 
-                if (model === 'Car' && DATA.company_hash_id) {
+                if (model === 'Car' && DATA && DATA.company_hash_id) {
                     const driverInput = parent.closest('#ANKETA_FORM').find('input[name="driver_id"]');
                     parent.find('input').attr('company', DATA.company_hash_id);
 
@@ -848,7 +848,7 @@ $(document).ready(function () {
         })
     }
 
-    // Открытие/закртие элементов
+    // Открытие/закрытие элементов
     $('[data-toggle-show]').click(function (e) {
         e.preventDefault()
 

@@ -12,6 +12,7 @@ class InspectionDuplicatesRequest extends FormRequest
     {
         return [
             'driverId' => 'required|string',
+            'carId' => 'nullable|string',
             'date' => 'required|date',
             'type' => 'required|string',
             'formType' => [
