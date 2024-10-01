@@ -31,7 +31,10 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('companies:inspect')->monthlyOn(1, '6:00');
         $schedule->command("run:briefings")->monthlyOn(10, '10:00');
-        $schedule->command('forms:fill-day-hash')->withoutOverlapping()->everyMinute();
+        $schedule->command('forms:fill-day-hash')
+            ->withoutOverlapping()
+            ->everyMinute()
+            ->between('00:00', '05:00');
         $schedule->command('forms:fill-tech-day-hash')->withoutOverlapping()->everyMinute();
     }
 
