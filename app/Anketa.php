@@ -3,7 +3,6 @@
 namespace App;
 
 use App\Enums\FormTypeEnum;
-use App\Models\ContractAnketaSnapshot;
 use App\ValueObjects\NotAdmittedReasons;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,25 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Anketa extends Model
 {
     public const MIN_DIFF_BETWEEN_FORMS_IN_SECONDS = 60;
-
-    // archive
-    public function contract_snapshot()
-    {
-        return $this->belongsTo(ContractAnketaSnapshot::class, 'contract_snapshot_id', 'id')
-                    ->withDefault();
-    }
-
-    public function services_snapshot()
-    {
-        return $this->belongsToMany(
-            Product::class,
-            'anketa_services_discount_snapshot_contracts',
-            'anketa_id',
-            'service_id',
-            'id',
-            'id'
-        )->withPivot('service_cost');
-    }
 
     public function our_company()
     {
@@ -422,7 +402,7 @@ class Anketa extends Model
                 'driver_fio'    => 'ФИО водителя',
                 'company_name'  => 'Компания',
                 'user_name'     => 'ФИО лица, проводившего инструктаж',
-                'user_id'       => 'Должность лица, проводившего инструктаж',    // Ну этой хуйни в таблице нет
+                'user_id'       => 'Должность лица, проводившего инструктаж',    // этого в таблице нет
                 'signature'     => 'Подпись водителя, прошедшего инструктаж',
                 'user_eds'      => 'Подпись лица, проводившего инструктаж (ЭЦП)',
             ],
@@ -458,6 +438,7 @@ class Anketa extends Model
                 'town_id'                => 'Город',
                 'flag_pak'               => 'Вид осмотра',
                 'is_dop'                 => 'Режим ввода ПЛ',
+                'result_dop'             => 'Утвержденные осмотры',
             ],
             'tech' => [
                 'company_id'     => 'Компания',
@@ -480,6 +461,7 @@ class Anketa extends Model
                 'pv_id'              => 'Пункт выпуска',
                 'town_id'            => 'Город',
                 'is_dop'             => 'Режим ввода ПЛ',
+                'result_dop'         => 'Утвержденные осмотры',
             ],
             'bdd' => [
                 'company_id'    => 'Компания',

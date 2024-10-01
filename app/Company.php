@@ -15,6 +15,7 @@ class Company extends Model
     public $fillable = [
         'hash_id',
         'name',
+        'dismissed',
         'note',
         'comment',
         'procedure_pv',
@@ -27,7 +28,6 @@ class Company extends Model
         'where_call_name',
         'inn',
         'required_type_briefing',
-        'dismissed',
         'has_actived_prev_month',
         'bitrix_link',
         'document_bdd',

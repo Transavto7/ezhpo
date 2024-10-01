@@ -30,7 +30,8 @@
             {!! implode('', $errors->all('<div>:message</div>')) !!}
         </div>
     @endif
-    <!-- Модалка для редактирования см front.js  -->
+
+    <!-- Редактирование элемента -->
     <div class="modal fade editor-modal" id="modalEditor" role="dialog" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -39,238 +40,41 @@
     </div>
 
     <!-- Добавление элемента -->
-    @if($model !== 'Product' && $model !== 'Service')
-        <div id="elements-modal-add" role="dialog" aria-labelledby="elements-modal-label" aria-hidden="true"
-             class="modal fade text-left">
-            <div role="document" class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Добавление {{ $popupTitle }}</h4>
-                        <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span
-                                aria-hidden="true">×</span></button>
+    <div id="elements-modal-add" role="dialog" aria-labelledby="elements-modal-label" aria-hidden="true"
+         class="modal fade text-left">
+        <div role="document" class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Добавление {{ $popupTitle }}</h4>
+                    <button type="button"
+                            data-dismiss="modal"
+                            aria-label="Close"
+                            class="close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+
+                <form action="{{ route('addElement', $model) }}" enctype="multipart/form-data" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <p>Заполните форму внимательно и нажмите кнопку "Добавить"</p>
+
+                        @if($model === 'Product')
+                            @include('pages.elements.components.modals.add-product-modal')
+                        @else
+                            @include('pages.elements.components.modals.add-element-modal')
+                        @endif
                     </div>
 
-                    <form action="{{ route('addElement', $model) }}" enctype="multipart/form-data" method="POST">
-                        @csrf
-
-                        <div class="modal-body">
-                            <p>Заполните форму внимательно и нажмите кнопку "Добавить"</p>
-
-                            @foreach ($fields as $k => $v)
-                                @php if ($k == 'hash_id') continue; @endphp
-                                @if($k == 'products_id' && user()->hasRole('client'))
-                                    @continue
-                                @endif
-                                @if($k == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
-                                    @continue
-                                @endif
-                                @if($k == 'where_call' && !user()->access('companies_access_field_where_call'))
-                                    @continue
-                                @endif
-
-                                @if($k == 'contracts')
-                                    @continue
-                                @endif
-
-                                @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
-                                    @continue
-                                @endif
-
-                                @if($k == 'procedure_pv' && user()->hasRole(['medic', 'tech']))
-                                    <div class="form-group" data-field="comment">
-                                        <label for="disabledProcedureInput">{{$v['label']}}</label>
-                                        <input type="text" id="disabledProcedureInput" class="form-control"
-                                               placeholder="Закрыто для редактирования" disabled>
-                                    </div>
-                                    @continue
-                                @endif
-
-                                @php
-
-                                    $is_required = isset($v['noRequired']) ? '' : 'required';
-                                    $default_value = $v['defaultValue'] ?? '';
-                                    $disabled = false;
-
-                                    if (user()->hasRole('client')) {
-                                        if ($model === 'Driver' && in_array($k, ['group_risk', 'note', 'procedure_pv', 'pressure_systolic', 'pressure_diastolic', 'only_offline_medic_inspections'])) {
-                                            $disabled = true;
-                                        }
-
-                                        if ($model === 'Car' && in_array($k, ['note', 'procedure_pv'])) {
-                                            $disabled = true;
-                                        }
-                                    }
-
-                                @endphp
-
-                                @if($k !== 'id' && !isset($v['hidden']))
-                                    @if($model === 'Instr' && $k === 'sort')
-                                        <div class="form-group" data-field="{{ $k }}">
-                                            <label>
-                                                @if($is_required)
-                                                    <b class="text-danger text-bold">* </b>
-                                                @endif
-                                                {{ $v['label'] }}
-                                            </label>
-
-                                            @if ($v['label'] == 'ФИО')
-                                                dd($v);
-                                            @endif
-                                            @include('templates.elements_field')
-                                        </div>
-                                        <!-- Сортировка инструктажей доступна админу или инженеру -->
-                                    @elseif($model === 'Instr' && $k === 'signature')
-                                    @else
-                                        <div class="form-group" data-field="{{ $k }}">
-                                            <label>
-                                                @if($is_required)
-                                                    <b class="text-danger text-bold">* </b>
-                                                @endif
-                                                {{ $v['label'] }}
-                                            </label>
-
-                                            @include('templates.elements_field')
-                                        </div>
-                                    @endif
-                                @endif
-                            @endforeach
-
-                            @php $disabled = false; @endphp
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-sm btn-success">Добавить</button>
-                            <button type="button" data-dismiss="modal" class="btn btn-sm btn-secondary">Закрыть</button>
-                        </div>
-                    </form>
-
-                </div>
-            </div>
-        </div>
-    @else
-        <div id="elements-modal-add" tabindex="-1" role="dialog" aria-labelledby="elements-modal-label"
-             class="modal fade text-left" style="display: none;" aria-modal="true">
-            <div role="document" class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Добавление Услуги</h4>
-                        <button type="button" data-dismiss="modal" aria-label="Close" class="close">
-                            <span aria-hidden="true">×</span>
-                        </button>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-sm btn-success">Добавить</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-sm btn-secondary">Закрыть</button>
                     </div>
-                    <form action="{{ route('addElement', $model) }}" enctype="multipart/form-data" method="POST">
-                        @csrf
-                        <div class="modal-body">
-                            <p>Заполните форму внимательно и нажмите кнопку "Добавить"</p>
-                            <div data-field="name" class="form-group">
-                                <label><b class="text-danger text-bold">* </b>Название</label>
-                                <input value="" type="text" required="required" name="name"
-                                       data-label="Название" placeholder="Название"
-                                       data-field="Product_name" class="form-control ">
-                            </div>
-                            <div data-field="type_product" class="form-group">
-                                <label><b class="text-danger text-bold">* </b>Тип</label>
-                                <select name="type_product"
-                                        required="required"
-                                        data-label="Тип"
-                                        data-field="Product_type_product"
-                                        class="js-chosen"
-                                >
-                                    @foreach($fields['type_product']['values'] as $nameOfTypeProduct)
-                                        <option value="{{ $nameOfTypeProduct }}">
-                                            {{ $nameOfTypeProduct }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div data-field="essence" class="form-group">
-                                <label>Сущности</label>
-                                <select name="essence"
-                                        data-label="Сущности"
-                                        data-field="Product_essence"
-                                        class="filled-select2 filled-select"
-                                >
-                                    <option value="">Не установлено</option>
-                                    @foreach(\App\Product::$essence as $essenceKey => $essenceName)
-                                        <option value="{{ $essenceKey }}">
-                                            {{ $essenceName }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div data-field="unit" class="form-group">
-                                <label><b class="text-danger text-bold">* </b>
-                                    Ед.изм.</label>
-                                <input value="" type="text" required="required" name="unit"
-                                       data-label="Ед.изм." placeholder="Ед.изм." data-field="Product_unit"
-                                       class="form-control ">
-                            </div>
-                            <div data-field="price_unit" class="form-group">
-                                <label><b class="text-danger text-bold">* </b>
-                                    Стоимость за единицу</label>
-                                <input value="" type="number" required="required"
-                                       name="price_unit" data-label="Стоимость за единицу"
-                                       placeholder="Стоимость за единицу"
-                                       data-field="Product_price_unit" class="form-control ">
-                            </div>
-                            <div data-field="type_anketa" class="form-group">
-                                <label><b class="text-danger text-bold">* </b> Реестр</label>
-                                <select name="type_anketa" required="required" data-label="Реестр"
-                                        data-field="Product_type_anketa" class="filled-select2 filled-select">
-                                    <option value="">Не установлено</option>
-                                    <option value="bdd">
-                                        БДД
-                                    </option>
-                                    <option value="medic">
-                                        Медицинский
-                                    </option>
-                                    <option value="tech">
-                                        Технический
-                                    </option>
-                                    <option value="pechat_pl">
-                                        Печать ПЛ
-                                    </option>
-                                    <option value="report_cart">
-                                        Отчеты с карт
-                                    </option>
-                                </select>
-                            </div>
-                            <div data-field="type_view" class="form-group">
-                                <label><b class="text-danger text-bold">* </b>Тип осмотра</label>
-                                <select multiple="multiple" name="type_view[]" required="required"
-                                        data-label="Тип осмотра" data-field="Product_type_view"
-                                        class="filled-select2 filled-select">
-                                    <option value="">Не установлено</option>
-                                    <option value="Предрейсовый/Предсменный">
-                                        Предрейсовый/Предсменный
-                                    </option>
-                                    <option value="Послерейсовый/Послесменный">
-                                        Послерейсовый/Послесменный
-                                    </option>
-                                    <option value="БДД">
-                                        БДД
-                                    </option>
-                                    <option value="Отчёты с карт">
-                                        Отчёты с карт
-                                    </option>
-                                    <option value="Учет ПЛ">
-                                        Учет ПЛ
-                                    </option>
-                                    <option value="Печать ПЛ">
-                                        Печать ПЛ
-                                    </option>
-                                </select>
-                            </div>
-
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-sm btn-success">Добавить</button>
-                            <button type="button" data-dismiss="modal" class="btn btn-sm btn-secondary">Закрыть</button>
-                        </div>
-                    </form>
-                </div>
+                </form>
             </div>
         </div>
-    @endif
+    </div>
+
     @php
         $permissionToCreate = (
             user()->access('drivers_create') && $model == 'Driver'
@@ -278,7 +82,6 @@
             || user()->access('company_create') && $model == 'Company'
             || user()->access('discount_create') && $model == 'Discount'
             || user()->access('service_create') && $model == 'Product'
-            || user()->access('service_create') && $model == 'Service'
             || user()->access('briefings_create') && $model == 'Instr'
             || user()->access('city_create') && $model == 'Town'
             || user()->access('requisites_create') && $model == 'Req'
@@ -293,7 +96,6 @@
             || user()->access('company_delete') && $model == 'Company'
             || user()->access('discount_delete') && $model == 'Discount'
             || user()->access('service_delete') && $model == 'Product'
-            || user()->access('service_delete') && $model == 'Service'
             || user()->access('briefings_delete') && $model == 'Instr'
             || user()->access('city_delete') && $model == 'Town'
             || user()->access('requisites_delete') && $model == 'Req'
@@ -308,7 +110,6 @@
             || user()->access('company_update') && $model == 'Company'
             || user()->access('discount_update') && $model == 'Discount'
             || user()->access('service_update') && $model == 'Product'
-            || user()->access('service_update') && $model == 'Service'
             || user()->access('briefings_update') && $model == 'Instr'
             || user()->access('city_update') && $model == 'Town'
             || user()->access('requisites_update') && $model == 'Req'
@@ -323,7 +124,6 @@
             || user()->access('company_read') && $model == 'Company'
             || user()->access('discount_read') && $model == 'Discount'
             || user()->access('service_read') && $model == 'Product'
-            || user()->access('service_read') && $model == 'Service'
             || user()->access('briefings_read') && $model == 'Instr'
             || user()->access('city_read') && $model == 'Town'
             || user()->access('requisites_read') && $model == 'Req'
@@ -338,7 +138,6 @@
             || user()->access('company_trash_read') && $model == 'Company'
             || user()->access('discount_trash_read') && $model == 'Discount'
             || user()->access('service_trash_read') && $model == 'Product'
-            || user()->access('service_trash_read') && $model == 'Service'
             || user()->access('briefings_trash_read') && $model == 'Instr'
             || user()->access('system_trash') && $model == 'Settings'
             || user()->access('city_trash_read') && $model == 'Town'
@@ -357,7 +156,6 @@
             || user()->access('cars_logs_read') && $model == 'Car'
             || user()->access('company_logs_read') && $model == 'Company'
             || user()->access('service_logs_read') && $model == 'Product'
-            || user()->access('service_logs_read') && $model == 'Service'
         );
 
         $permissionToGenerateMetricLKK = ($model === 'Company' && user()->access('generate_metric_lkk'));
@@ -408,7 +206,7 @@
                     <div class="m-2">
                         <button type="button" data-toggle="modal" data-target="#elementsModalGenerateMetric"
                                 class="btn btn-sm btn-secondary">
-                             Метрика ЛКК <i class="fa fa-table"></i>
+                            Метрика ЛКК <i class="fa fa-table"></i>
                         </button>
                     </div>
                     @component('modals.metric-modal')@endcomponent
@@ -905,7 +703,7 @@
                 const start = $(this).val()
                 const end = $('.end-date').val()
 
-                if (! end) {
+                if (!end) {
                     return
                 }
 
@@ -918,7 +716,7 @@
                 const start = $('.start-date').val()
                 const end = $(this).val()
 
-                if (! start) {
+                if (!start) {
                     return
                 }
 
@@ -940,9 +738,9 @@
                         .post(url, {
                             start,
                             end
-                        }, { responseType: 'blob' })
+                        }, {responseType: 'blob'})
                         .then(response => {
-                            const { data } = response
+                            const {data} = response
                             const url = window.URL.createObjectURL(new Blob([data]));
                             const link = document.createElement('a');
                             link.href = url;

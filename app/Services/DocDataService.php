@@ -7,6 +7,7 @@ use App\Company;
 use App\Driver;
 use App\Http\Controllers\ProfileController;
 use App\Point;
+use App\User;
 
 class DocDataService
 {
@@ -51,7 +52,7 @@ class DocDataService
             $data['status'] = 'Есть жалобы';
         }
 
-        $data['user_post'] = ProfileController::getUserRole(true, $form->user_id);
+        $data['user_post'] = $this->getUserRole($form->user_id);
 
         if ($data['alko']) {
             $recommendations = 'Пройдите медицинское освидетельствование на состояние алкогольного опьянения';
@@ -89,6 +90,53 @@ class DocDataService
         $data = $this->getClosing($data);
 
         return $this->getComment($data);
+    }
+
+    protected function getUserRole($userId): string
+    {
+        if (empty($userId)) {
+            return '';
+        }
+
+        $user = User::find($userId);
+
+        if (empty($user)) {
+            return '';
+        }
+
+        switch ($user->role) {
+            case 12:
+                $role = 'Клиент';
+                break;
+            case 4:
+                $role = 'Оператор СДПО';
+                break;
+            case 1:
+                $role = 'Контролёр ТС';
+                break;
+            case 2:
+                $role = 'Медицинский сотрудник';
+                break;
+            case 3:
+                $role = 'Водитель';
+                break;
+            case 11:
+                $role = 'Менеджер';
+                break;
+            case 13:
+                $role = 'Инженер БДД';
+                break;
+            case 777:
+                $role = 'Администратор';
+                break;
+            case 778:
+                $role = 'Терминал';
+                break;
+            default:
+                $role = '';
+        }
+
+        return $role;
     }
 
     protected function getClosing(array $data): array

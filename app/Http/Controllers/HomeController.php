@@ -96,9 +96,13 @@ class HomeController extends Controller
         $forms = Anketa::query()
             ->where('type_anketa', $validTypeForm)
             ->where('in_cart', $trash)
-            ->with([
-                'deleted_user'
-            ]);
+            ->with(['deleted_user']);
+
+        if ($request->has('result_dop') && $request->input('result_dop') !== null) {
+            filter_var($request->input('result_dop'), FILTER_VALIDATE_BOOLEAN)
+                ? $forms->whereNotNull('result_dop')
+                : $forms->whereNull('result_dop');
+        }
 
         $duplicates = $request->get('duplicates', false);
         if (filter_var($duplicates, FILTER_VALIDATE_BOOLEAN) && $request->has('date') && $request->has('TO_date')) {
@@ -172,6 +176,7 @@ class HomeController extends Controller
             'page',
             'getFormFilter',
             'duplicates',
+            'result_dop',
         ]);
 
         if (count($filterParams) > 0 && $filterActivated) {
@@ -246,6 +251,19 @@ class HomeController extends Controller
                             }, $explodeData);
                         }
 
+                        if ($filterKey === 'driver_group_risk') {
+                            $forms = $forms->where(function ($query) use ($explodeData, $filterKey) {
+                                foreach ($explodeData as $fvItemValue) {
+                                    $escapedFvItemValue = str_replace('\\', '\\\\', $fvItemValue);
+                                    $query = $query->orWhere('anketas.' . $filterKey, 'like', '%' . trim($escapedFvItemValue) . '%');
+                                }
+
+                                return $query;
+                            });
+
+                            continue;
+                        }
+
                         $forms = $forms->where(function ($query) use ($explodeData, $filterKey) {
                             foreach ($explodeData as $fvItemValue) {
                                 if ($fvItemValue === null) {
@@ -277,6 +295,12 @@ class HomeController extends Controller
 
                         if ($filterKey === 'flag_pak' && $explodeData === 'internal') {
                             $forms = $forms->whereNull('anketas.flag_pak');
+                            continue;
+                        }
+
+                        if ($filterKey === 'driver_group_risk') {
+                            $escapedExplodeData = str_replace('\\', '\\\\', $explodeData);
+                            $forms = $forms->where('anketas.' . $filterKey, 'like', '%' . trim($escapedExplodeData) . '%');
                             continue;
                         }
 

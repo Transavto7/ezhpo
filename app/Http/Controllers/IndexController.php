@@ -74,10 +74,12 @@ class IndexController extends Controller
                 return 'Поле не найдено';
             }
 
+            $noRequired = filter_var($field['noRequired'] ?? 0, FILTER_VALIDATE_BOOLEAN);
+
             return view('templates.elements_field', [
                 'k' => $fieldKey,
                 'v' => $field,
-                'is_required' => '',
+                'is_required' => $noRequired ? '' : 'required',
                 'model' => $model,
                 'default_value' => $request->default_value ?? 'Не установлено',
             ]);
@@ -523,6 +525,11 @@ class IndexController extends Controller
                         } else if (strlen($filterValueItem) === 0) {
                             //TODO: странный фильтр только на пустую строку
                             $subQuery = $subQuery->orWhere($filterKey, $filterValueItem);
+                        } else if ($filterKey === 'type_auto') {
+                            $subQuery = $subQuery->orWhere($filterKey, '=', $filterValueItem);
+                        } else if ($filterKey === 'group_risk') {
+                            $escapedFilterValueItem = str_replace('\\', '\\\\', $filterValueItem);
+                            $subQuery = $subQuery->orWhere($filterKey, 'LIKE', '%' . trim($escapedFilterValueItem) . '%');
                         } else {
                             $subQuery = $subQuery->orWhere($filterKey, 'LIKE', '%' . trim($filterValueItem) . '%');
                         }
@@ -600,7 +607,7 @@ class IndexController extends Controller
         $data['fieldPrompts'] = FieldPrompt::where('type', strtolower($model))->get();
         $data['isAdminOrClient'] = $isAdminOrClient;
 
-        return view('elements', $data);
+        return view('pages.elements.index', $data);
     }
 
     /**
