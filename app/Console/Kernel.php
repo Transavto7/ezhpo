@@ -2,9 +2,6 @@
 
 namespace App\Console;
 
-use App\Anketa;
-use App\Company;
-use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -35,7 +32,6 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->everyMinute()
             ->between('00:00', '05:00');
-        $schedule->command('forms:fill-tech-day-hash')->withoutOverlapping()->everyMinute();
     }
 
     /**
