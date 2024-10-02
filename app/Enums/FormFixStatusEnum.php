@@ -15,4 +15,8 @@ class FormFixStatusEnum
     const INVALID_CAR_ID = 4;
 
     const INVALID_COMPANY_ID = 5;
+
+    const INVALID_USER_ID = 6;
+
+    const INVALID_TERMINAL_ID = 7;
 }

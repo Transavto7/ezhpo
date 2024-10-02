@@ -12,7 +12,7 @@ class MedicForm extends Model
     public $timestamps = false;
 
     public $fillable = [
-        'form_uuid',
+        'forms_uuid',
 
         'type_view',
 

@@ -1,9 +1,7 @@
 @php
     $default_value = isset($field_default_value) ? $field_default_value : '';
     $default_value = is_array($default_value) ? $default_value : explode(',', $default_value);
-    $index = new \App\Http\Controllers\IndexController();
-
-    $elements = $index->elements['Car']['fields']['type_auto']['values'];
+    $elements = config('elements.Car.fields.type_auto.values');
 @endphp
 
 <select

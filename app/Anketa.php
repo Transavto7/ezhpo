@@ -85,7 +85,9 @@ class Anketa extends Model
             'in_cart',
             'protokol_path',
             'closing_path',
-            'comments'
+            'comments',
+
+            'transfer_status'
         ];
 
     public static $anketsKeys

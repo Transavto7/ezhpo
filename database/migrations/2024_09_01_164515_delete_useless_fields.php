@@ -18,6 +18,7 @@ class DeleteUselessFields extends Migration
                 'contract_id',
                 'contract_snapshot_id',
                 'date_number_list_road',
+                'date_pechat_pl',
                 'type_trip',
                 'questions',
                 'added_to_dop',

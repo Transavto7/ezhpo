@@ -19,6 +19,9 @@ class DivideAnketasTable extends Migration
             $table->string('uuid', 36)->unique();
             $table->string('type_anketa');
 
+            $table->unsignedBigInteger('deleted_id')->nullable();
+            $table->foreign('deleted_id')->references('id')->on('users');
+
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users');
 

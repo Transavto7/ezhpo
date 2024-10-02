@@ -39,7 +39,6 @@ class Form extends Model
 
     public $fillable
         = [
-            'id',
             'uuid',
             'type_anketa',
             'date',
@@ -54,7 +53,7 @@ class Form extends Model
             'driver_id',
             'point_id',
             'company_id',
-            'really'
+            'realy'
         ];
 
     protected static function boot()
