@@ -178,6 +178,7 @@ class Anketa extends Model
                 'test_narko'   => 'Тест на наркотики',
                 'pv_id'        => 'Пункт выпуска',
                 'town_id'      => 'Город',
+                'date_prmo' => 'Дата ПРМО',
             ],
             'tech' => [
                 'company_id'     => 'Компания',
@@ -300,7 +301,8 @@ class Anketa extends Model
             'med_view',
             'flag_pak',
             'is_dop',
-            'operator_id'
+            'operator_id',
+            'date_prmo',
         ],
         'tech' => [
             'company_id',
@@ -429,6 +431,7 @@ class Anketa extends Model
                 'admitted'               => 'Заключение о результатах осмотра',
                 'user_id'                => 'ФИО ответственного',
                 'user_eds'               => 'ЭЦП медицинского работника',
+                'date_prmo'              => 'Дата ПРМО',
                 // Поля не в выгрузку
                 'created_at'             => 'Дата создания',
                 'photos'                 => 'Фото',
