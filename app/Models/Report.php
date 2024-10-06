@@ -14,6 +14,7 @@ class Report extends Model
         'user_id',
         'payload',
         'error',
+        'path',
     ];
 
     protected $casts = [

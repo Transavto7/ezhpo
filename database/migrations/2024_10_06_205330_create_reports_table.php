@@ -20,8 +20,9 @@ class CreateReportsTable extends Migration
             $table->string('status');
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users');
-            $table->jsonb('payload')->nullable();
+            $table->jsonb('payload');
             $table->jsonb('error')->nullable();
+            $table->string('path')->nullable();
             $table->timestamps();
         });
     }

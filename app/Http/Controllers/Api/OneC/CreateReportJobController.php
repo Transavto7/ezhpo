@@ -9,6 +9,7 @@ use App\Enums\ReportStatus;
 use App\Enums\ReportType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReportRequest;
+use App\Jobs\CreateReport;
 use Auth;
 use DateTimeImmutable;
 use Exception;
@@ -31,7 +32,7 @@ class CreateReportJobController extends Controller
                 )
             );
 
-            // todo: dispatch job
+            CreateReport::dispatch($report);
 
             return response()->json($report->uuid);
         } catch (Exception $exception) {
