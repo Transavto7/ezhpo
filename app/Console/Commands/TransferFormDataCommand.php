@@ -13,6 +13,7 @@ use App\Models\Forms\PrintPlForm;
 use App\Models\Forms\ReportCartForm;
 use App\Models\Forms\TechForm;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -90,6 +91,9 @@ class TransferFormDataCommand extends Command
         Log::info($message);
     }
 
+    /**
+     * @throws Throwable
+     */
     private function transferForms(int $chunkSize): int
     {
         $maps = [
@@ -104,7 +108,17 @@ class TransferFormDataCommand extends Command
             ->get();
 
         foreach ($forms as $form) {
-            $this->transferForm($form, $maps);
+            try {
+                DB::beginTransaction();
+
+                $this->transferForm($form, $maps);
+
+                DB::commit();
+            } catch (Throwable $exception) {
+                DB::rollBack();
+
+                throw $exception;
+            }
         }
 
         return $forms->count();

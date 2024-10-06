@@ -63,9 +63,9 @@ class DivideAnketasTable extends Migration
             $table->string('condition_koj_pokr')->default('Без особенностей');
 
             $table->string('pressure')->nullable();
-            $table->string('tonometer');
-            $table->double('t_people');
-            $table->integer('pulse');
+            $table->string('tonometer')->nullable();
+            $table->double('t_people')->nullable();
+            $table->integer('pulse')->nullable();
 
             $table->integer('alcometer_mode')->default(0);
             $table->double('alcometer_result')->nullable();
