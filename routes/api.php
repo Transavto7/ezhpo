@@ -116,7 +116,7 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('1c/v1')->as('1c.v1.')->group(function () {
         Route::get('/companies', 'Api\OneC\GetCompaniesItemsController');
         Route::post('/companies', 'Api\OneC\CreateCompanyController');
-//        Route::post('/reports', '');
+        Route::post('/reports', 'Api\OneC\CreateReportJobController');
 //        Route::get('/{id}/reports', '');
     });
 });
