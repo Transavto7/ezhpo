@@ -60,26 +60,26 @@ class ResetInvalidFormDataCommand extends Command
 
         $this->info("Сброшено записей с ID водителя - 0: $counter");
 
-        DB::table('anketas')
+        $counter = DB::table('anketas')
             ->where('car_id', '')
             ->orWhere('car_id', '0')
             ->update(['car_id' => null]);
 
         $this->info("Сброшено записей с ID авто - 0: $counter");
 
-        DB::table('anketas')
+        $counter = DB::table('anketas')
             ->where('point_id', 0)
             ->update(['point_id' => null]);
 
         $this->info("Сброшено записей с ID ПВ - 0: $counter");
 
-        DB::table('anketas')
+        $counter = DB::table('anketas')
             ->where('company_id', 0)
             ->update(['company_id' => null]);
 
         $this->info("Сброшено записей с ID компании - 0: $counter");
 
-        DB::table('anketas')
+        $counter = DB::table('anketas')
             ->where('terminal_id', 0)
             ->update(['terminal_id' => null]);
 
