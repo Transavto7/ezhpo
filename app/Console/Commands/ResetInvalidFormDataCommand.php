@@ -39,19 +39,7 @@ class ResetInvalidFormDataCommand extends Command
     public function handle()
     {
         $this->resetNullFK();
-        $this->deleteInvalidFormTypes();
         $this->resetDeletedAtTimestamp();
-    }
-
-    private function deleteInvalidFormTypes()
-    {
-        $counter = DB::table('anketas')
-            ->where('type_anketa', 'pak')
-            ->orWhere('type_anketa', 'vid_pl')
-            ->orWhere('type_anketa', 'Dop')
-            ->delete();
-
-        $this->info("Удалено записей с невалидным типом: $counter");
     }
 
     private function resetDeletedAtTimestamp()
