@@ -147,6 +147,10 @@ class TransferFormDataCommand extends Command
             $formData['company_id'] = $maps['companies']['0'.$form->company_id];
         }
 
+        if (!$form->is_dop) {
+            $formData['is_dop'] = 0;
+        }
+
         Form::create($formData);
 
         switch ($form->type_anketa) {
