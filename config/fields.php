@@ -11,6 +11,7 @@ return [
             'date' => 'Дата и время осмотра',
             'period_pl' => 'Период выдачи ПЛ',
             'driver_fio' => 'ФИО работника',
+            'date_prmo' => 'Дата ПРМО',
             'realy' => 'Осмотр реальный?',
             'driver_group_risk' => 'Группа риска',
             'type_view' => 'Тип осмотра',
@@ -450,7 +451,8 @@ return [
             't_people',
             'tonometer',
             'pulse',
-            'period_pl'
+            'period_pl',
+            'date_prmo',
         ],
         'tech' => [
             'company_id',

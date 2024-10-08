@@ -60,7 +60,7 @@
                             @else
                                 {{--ИЗНАЧАЛЬНОЕ ПОЛЕ ФИЛЬТР--}}
                                 <input
-                                        @if($field === 'date' || $field === 'date_prto' || strpos($field, '_at') > 0)
+                                        @if(in_array($field, ['date', 'date_prto', 'date_prmo']) || strpos($field, '_at') > 0)
                                             type="date"
                                         @else
                                             type="search"

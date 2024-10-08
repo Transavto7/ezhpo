@@ -337,6 +337,13 @@ class HomeController extends Controller
                     continue;
                 }
 
+                if ($filterKey === 'date_prmo') {
+                    $dateFrom = Carbon::parse($filterValue)->startOfDay();
+                    $dateTo = Carbon::parse($filterValue)->endOfDay();
+                    $forms = $forms->whereBetween('drivers.date_prmo', [$dateFrom, $dateTo]);
+                    continue;
+                }
+
                 if ($filterKey === 'straight_company_id') {
                     continue;
                 }
@@ -421,23 +428,27 @@ class HomeController extends Controller
                 ->leftJoin('points', 'anketas.pv_id', '=', 'points.id')
                 ->select([
                     'anketas.*',
-                    'points.name as pv_id'
+                    'points.name as pv_id',
                 ]);
         } else if (($validTypeForm == 'medic') && $export) {
             $forms = $forms
                 ->with('operator')
+                ->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
                 ->leftJoin('medic_form_normalized_pressures', 'anketas.id', '=', 'medic_form_normalized_pressures.form_id')
                 ->select([
                     'anketas.*',
                     'anketas.pv_id as pv_id',
-                    DB::raw("COALESCE(medic_form_normalized_pressures.pressure, anketas.tonometer, NULL) as tonometer")
+                    'drivers.date_prmo as date_prmo',
+                    DB::raw("COALESCE(medic_form_normalized_pressures.pressure, anketas.tonometer, NULL) as tonometer"),
                 ]);
-        } else if ($validTypeForm == 'medic') {
+        } else if ($validTypeForm === 'medic') {
             $forms = $forms
                 ->with('operator')
+                ->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
                 ->select([
                     'anketas.*',
                     'anketas.pv_id as pv_id',
+                    'drivers.date_prmo as date_prmo',
                 ]);
         } else {
             $forms = $forms
@@ -556,7 +567,7 @@ class HomeController extends Controller
         if ($filterActivated || $validTypeForm === 'pak_queue') {
             $table = 'anketas.';
 
-            if ($orderKey === 'car_type_auto' || $orderKey === 'date_prto') {
+            if (in_array($orderKey, ['car_type_auto', 'date_prto', 'date_prmo'])) {
                 $table = '';
             }
 
