@@ -620,7 +620,7 @@ class SdpoController extends Controller
         if ($inspection) {
             $inspection->update([
                 'type_anketa' => 'medic',
-                'flag_pak' => 'СДПО-А'
+                'flag_pak' => 'СДПО А'
             ]);
         }
     }
