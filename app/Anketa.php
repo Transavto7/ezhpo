@@ -60,10 +60,6 @@ class Anketa extends Model
                     ->withDefault();
     }
 
-    protected $casts = [
-        'deleted_at' => 'datetime:d-m-Y H:i:s'
-    ];
-
     public $fillable
         = [
             // all
