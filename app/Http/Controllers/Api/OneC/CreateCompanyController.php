@@ -20,7 +20,9 @@ class CreateCompanyController extends Controller
             $companyId = $factory->make('Company')->handle($request->all());
 
             DB::commit();
-            return response()->json($companyId);
+            return response()->json([
+                'id' => $companyId
+            ]);
         } catch (Throwable $exception) {
             DB::rollBack();
 

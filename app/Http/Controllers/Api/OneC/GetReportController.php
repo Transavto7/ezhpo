@@ -6,8 +6,8 @@ use App\Enums\ReportStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Report;
 use Exception;
-use Illuminate\Http\Response;
 use Storage;
+use Symfony\Component\HttpFoundation\Response;
 
 class GetReportController extends Controller
 {
@@ -18,16 +18,23 @@ class GetReportController extends Controller
 
             switch (true) {
                 case $report->status === ReportStatus::CREATED:
-                    return response()->json('Отчет в очереди на выполнение', Response::HTTP_ACCEPTED);
+                    return response()->json([
+                        'status' => 'Отчет в очереди на выполнение'
+                    ], Response::HTTP_ACCEPTED);
                 case $report->status === ReportStatus::PROCESSING:
-                    return response()->json('Отчет формируется', Response::HTTP_ACCEPTED);
+                    return response()->json([
+                        'status' => 'Отчет формируется'
+                    ], Response::HTTP_ACCEPTED);
                 case $report->status === ReportStatus::DELETED:
                 case $report->status === ReportStatus::READY && ! Storage::disk('report')->exists($report->path):
-                    return response()->json('Отчет просрочен, запросите повторное формирование', Response::HTTP_NOT_FOUND);
+                    return response()->json([
+                        'status' => 'Отчет просрочен, запросите повторное формирование'
+                    ], Response::HTTP_NOT_FOUND);
                 case $report->status === ReportStatus::READY && Storage::disk('report')->exists($report->path):
-                    return response()->json(
-                        json_decode(file_get_contents(Storage::disk('report')->path($report->path)), true)
-                    );
+                    return response()->json([
+                        'status' => 'Отчет готов',
+                        'content' =>  json_decode(file_get_contents(Storage::disk('report')->path($report->path)), true)
+                    ]);
                 default:
                     throw new Exception('Undefined report');
             }

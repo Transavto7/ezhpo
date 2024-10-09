@@ -34,7 +34,9 @@ class CreateReportJobController extends Controller
 
             CreateReport::dispatch($report);
 
-            return response()->json($report->uuid);
+            return response()->json([
+                'id' => $report->uuid
+            ]);
         } catch (Exception $exception) {
             return response()->json($exception->getMessage(), 500);
         }
