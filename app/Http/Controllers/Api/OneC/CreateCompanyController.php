@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Throwable;
+use Validator;
 
 class CreateCompanyController extends Controller
 {
@@ -16,6 +17,17 @@ class CreateCompanyController extends Controller
     {
         try {
             DB::beginTransaction();
+            $data = $request->all();
+
+            $validator = Validator::make($data, [
+                'name' => 'required|string',
+                'req_id' => 'required|string',
+                'inn' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json($validator->errors()->all(),Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
 
             $companyId = $factory->make('Company')->handle($request->all());
 
@@ -26,7 +38,11 @@ class CreateCompanyController extends Controller
         } catch (Throwable $exception) {
             DB::rollBack();
 
-            return response()->json($exception->getMessage(),Response::HTTP_INTERNAL_SERVER_ERROR);
+            if ($exception->getMessage() === 'Найден дубликат по названию компании') {
+                return response()->json($exception->getMessage(),Response::HTTP_UNPROCESSABLE_ENTITY);
+            } else {
+                return response()->json($exception->getMessage(),Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
         }
     }
 }

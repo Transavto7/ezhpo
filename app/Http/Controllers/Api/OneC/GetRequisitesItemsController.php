@@ -2,25 +2,22 @@
 
 namespace App\Http\Controllers\Api\OneC;
 
-use App\Company;
 use App\Http\Controllers\Controller;
+use App\Req;
 use Exception;
 use Illuminate\Http\Response;
 
-class GetCompaniesItemsController extends Controller
+class GetRequisitesItemsController extends Controller
 {
     public function __invoke()
     {
         try {
-            $companies = Company::query()
+            $companies = Req::query()
                 ->select([
                     'id',
                     'hash_id',
                     'name',
-                    'inn',
-                    'req_id',
                 ])
-                ->where('dismissed', '<>', 'Да')
                 ->get();
 
             return response()->json($companies);
