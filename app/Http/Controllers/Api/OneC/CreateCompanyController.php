@@ -4,44 +4,40 @@ namespace App\Http\Controllers\Api\OneC;
 
 use App\Actions\Element\CreateElementHandlerFactory;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreateCompanyRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
-use Validator;
 
-class CreateCompanyController extends Controller
+final class CreateCompanyController extends Controller
 {
-    public function __invoke(Request $request, CreateElementHandlerFactory $factory): JsonResponse
+    public function __invoke(CreateCompanyRequest $request, CreateElementHandlerFactory $factory): JsonResponse
     {
         try {
             DB::beginTransaction();
-            $data = $request->all();
 
-            $validator = Validator::make($data, [
-                'name' => 'required|string',
-                'req_id' => 'required|string',
-                'inn' => 'required|string',
+            $companyId = $factory->make('Company')->handle([
+                'name' => $request->input('name'),
+                'req_id' => $request->input('req_id'),
+                'inn' => $request->input('inn'),
             ]);
-
-            if ($validator->fails()) {
-                return response()->json($validator->errors()->all(),Response::HTTP_UNPROCESSABLE_ENTITY);
-            }
-
-            $companyId = $factory->make('Company')->handle($request->all());
 
             DB::commit();
             return response()->json([
                 'id' => $companyId
-            ]);
+            ])->setStatusCode(Response::HTTP_CREATED);
         } catch (Throwable $exception) {
             DB::rollBack();
 
             if ($exception->getMessage() === 'Найден дубликат по названию компании') {
-                return response()->json($exception->getMessage(),Response::HTTP_UNPROCESSABLE_ENTITY);
+                return response()->json([
+                    'message' => $exception->getMessage().' '.$exception->getCode()
+                ],Response::HTTP_CONFLICT);
             } else {
-                return response()->json($exception->getMessage(),Response::HTTP_INTERNAL_SERVER_ERROR);
+                return response()->json([
+                    'message' => $exception->getMessage()
+                ],Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         }
     }

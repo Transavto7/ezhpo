@@ -9,7 +9,7 @@ use Exception;
 use Storage;
 use Symfony\Component\HttpFoundation\Response;
 
-class GetReportController extends Controller
+final class GetReportController extends Controller
 {
     public function __invoke(string $id)
     {
@@ -39,7 +39,9 @@ class GetReportController extends Controller
                     throw new Exception('Undefined report');
             }
         } catch (Exception $exception) {
-            return response()->json($exception->getMessage(), 500);
+            return response()->json([
+                'message' => $exception->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Api\OneC;
 use App\Http\Controllers\Controller;
 use App\Req;
 use Exception;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
-class GetRequisitesItemsController extends Controller
+final class GetRequisitesItemsController extends Controller
 {
     public function __invoke()
     {
@@ -22,7 +22,9 @@ class GetRequisitesItemsController extends Controller
 
             return response()->json($companies);
         } catch (Exception $exception) {
-            return response($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response([
+                'message' => $exception->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

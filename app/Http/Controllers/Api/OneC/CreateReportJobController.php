@@ -8,15 +8,16 @@ use App\Actions\Reports\OneC\Create\ReportPayload;
 use App\Enums\ReportStatus;
 use App\Enums\ReportType;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ReportRequest;
+use App\Http\Requests\CreateReportJobRequest;
 use App\Jobs\CreateReport;
 use Auth;
 use DateTimeImmutable;
 use Exception;
+use Symfony\Component\HttpFoundation\Response;
 
-class CreateReportJobController extends Controller
+final class CreateReportJobController extends Controller
 {
-    public function __invoke(ReportRequest $request, ReportHandler  $handler)
+    public function __invoke(CreateReportJobRequest $request, ReportHandler $handler)
     {
         try {
             $report = $handler->handle(
@@ -38,7 +39,9 @@ class CreateReportJobController extends Controller
                 'id' => $report->uuid
             ]);
         } catch (Exception $exception) {
-            return response()->json($exception->getMessage(), 500);
+            return response()->json([
+                'message' => $exception->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

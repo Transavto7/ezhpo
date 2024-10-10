@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ReportRequest extends FormRequest
+final class CreateReportJobRequest extends FormRequest
 {
     public function rules(): array
     {

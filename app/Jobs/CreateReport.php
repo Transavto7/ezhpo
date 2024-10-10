@@ -4,6 +4,8 @@ namespace App\Jobs;
 
 use App\Enums\ReportStatus;
 use App\Models\Report;
+use DateTimeImmutable;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -34,15 +36,25 @@ class CreateReport implements ShouldQueue
      */
     public function handle()
     {
-        // TODO: добавить реализацию формирования отчета
+        try {
+            // TODO: добавить реализацию формирования отчета
+            $reportData = [];
 
-        $path = Storage::disk('report')->path('report.json');
+            $now = new DateTimeImmutable();
+            $reportFilename = 'report_'.$now->format('Y-m-d_H:i:s').'.json';
 
-        file_put_contents($path, json_encode($this->report));
+            if (!Storage::disk('report')->put($reportFilename, json_encode($reportData))) {
+                throw new Exception('Could not write report file.');
+            }
 
-        $this->report->update([
-            'status' => ReportStatus::READY,
-            'path' => 'report.json',
-        ]);
+            $this->report->update([
+                'status' => ReportStatus::READY,
+                'path' => $reportFilename,
+            ]);
+        } catch (Exception $exception) {
+            $this->report->update([
+                'status' => ReportStatus::error(),
+            ]);
+        }
     }
 }
