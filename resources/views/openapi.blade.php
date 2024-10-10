@@ -15,8 +15,13 @@
 <script>
     window.onload = () => {
         window.ui = SwaggerUIBundle({
-            url: '{{ asset('openapi.json') }}',
+            url: '{{ asset('openapi.yaml') }}',
             dom_id: '#swagger-ui',
+            requestInterceptor: function (request) {
+                request.headers['Authorization'] = 'Bearer {{ $apiToken }}';
+
+                return request
+            }
         });
     };
 </script>

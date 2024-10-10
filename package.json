@@ -5,11 +5,9 @@
         "watch": "mix watch",
         "watch-poll": "mix watch -- --watch-options-poll=1000",
         "hot": "mix watch --hot",
-        "production": "mix --production",
-        "openapi:build": "swagger-cli bundle openapi/openapi.yaml --outfile public/openapi.json --type json"
+        "production": "mix --production"
     },
     "devDependencies": {
-        "ajv": "^8.17.1",
         "bootstrap": "^4.6.1",
         "cross-env": "^5.1",
         "html5-qrcode": "^2.3.8",
@@ -21,7 +19,6 @@
         "sass": "^1.15.2",
         "sass-loader": "^7.1.0",
         "select2": "^4.0.13",
-        "swagger-cli": "^4.0.4",
         "vue": "^2.6",
         "vue-template-compiler": "^2.6.12"
     },
