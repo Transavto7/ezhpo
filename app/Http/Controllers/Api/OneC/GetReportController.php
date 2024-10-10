@@ -19,24 +19,33 @@ final class GetReportController extends Controller
             switch (true) {
                 case $report->status === ReportStatus::CREATED:
                     return response()->json([
-                        'status' => 'Отчет в очереди на выполнение'
+                        'status' => ReportStatus::CREATED,
+                        'message' => 'Отчет в очереди на выполнение',
                     ], Response::HTTP_ACCEPTED);
                 case $report->status === ReportStatus::PROCESSING:
                     return response()->json([
-                        'status' => 'Отчет формируется'
+                        'status' => ReportStatus::PROCESSING,
+                        'message' => 'Отчет формируется',
                     ], Response::HTTP_ACCEPTED);
                 case $report->status === ReportStatus::DELETED:
                 case $report->status === ReportStatus::READY && ! Storage::disk('report')->exists($report->path):
                     return response()->json([
-                        'status' => 'Отчет просрочен, запросите повторное формирование'
+                        'status' => ReportStatus::DELETED,
+                        'message' => 'Отчет просрочен, запросите повторное формирование',
                     ], Response::HTTP_NOT_FOUND);
                 case $report->status === ReportStatus::READY && Storage::disk('report')->exists($report->path):
                     return response()->json([
-                        'status' => 'Отчет готов',
+                        'status' => ReportStatus::READY,
+                        'message' => 'Отчет готов',
                         'content' =>  json_decode(file_get_contents(Storage::disk('report')->path($report->path)), true)
-                    ]);
+                    ], Response::HTTP_OK);
+                case $report->status === ReportStatus::ERROR:
+                    return response()->json([
+                        'status' => ReportStatus::ERROR,
+                        'message' => 'При формировании отчета произошла ошибка',
+                    ], Response::HTTP_OK);
                 default:
-                    throw new Exception('Undefined report');
+                    throw new Exception('Invalid report status');
             }
         } catch (Exception $exception) {
             return response()->json([

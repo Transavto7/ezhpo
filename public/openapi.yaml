@@ -82,6 +82,10 @@ paths:
       responses:
         "200":
           $ref: '#/components/responses/GetReport200'
+        "202":
+          $ref: '#/components/responses/GetReport202'
+        "404":
+          $ref: '#/components/responses/GetReport404'
         "401":
           $ref: '#/components/responses/UnauthenticatedError'
         "500":
@@ -296,29 +300,76 @@ components:
                 description: Идентификатор формируемого отчета
     # get report
     GetReport200:
-      description: Статус отчета и его содержимое, если он готов
+      description: Отчет был успешно сформирован или его формирование не было завершено из-за ошибки
       content:
         application/json:
           schema:
             type: object
             required:
               - status
+              - message
             properties:
               status:
                 $ref: '#/components/schemas/ReportStatus'
+              message:
+                type: string
               content:
                 type: string
                 description: Содержимое отчета в формате json
                 nullable: true
           examples:
-            ReportCreated:
-              value:
-                status: created
             ReportReady:
               value:
                 status: ready
+                message: 'Отчет готов'
                 # todo: кратко описать примерное содержимое отчета
                 content: {}
+            ReportError:
+              value:
+                status: error
+                message: 'Произошла ошибка при формировании отчета'
+    GetReport202:
+      description: Отчет в очереди на выполнение или формируется
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+              - message
+            properties:
+              status:
+                $ref: '#/components/schemas/ReportStatus'
+              message:
+                type: string
+          examples:
+            ReportCreated:
+              value:
+                status: created
+                message: 'Отчет в очереди на выполнение'
+            ReportProcessing:
+              value:
+                status: processing
+                message: 'Отчет формируется'
+    GetReport404:
+      description: Отчет просрочен
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+              - message
+            properties:
+              status:
+                $ref: '#/components/schemas/ReportStatus'
+              message:
+                type: string
+          examples:
+            ReportExpired:
+              value:
+                status: deleted
+                message: 'Отчет просрочен, запросите повторное формирование'
     # get requisites
     GetRequisites200:
       description: Список реквизитов
