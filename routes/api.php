@@ -118,7 +118,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/requisites', 'Api\OneC\GetRequisitesItemsController');
         Route::post('/companies', 'Api\OneC\CreateCompanyController');
         Route::post('/reports', 'Api\OneC\CreateReportJobController');
-        Route::get('/{id}/reports', 'Api\OneC\GetReportController');
+        Route::get('/reports/{id}', 'Api\OneC\GetReportController');
     });
 });
 

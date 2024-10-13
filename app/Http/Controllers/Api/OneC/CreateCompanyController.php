@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\OneC;
 
 use App\Actions\Element\CreateElementHandlerFactory;
+use App\Company;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateCompanyRequest;
 use Illuminate\Http\JsonResponse;
@@ -23,9 +24,12 @@ final class CreateCompanyController extends Controller
                 'inn' => $request->input('inn'),
             ]);
 
+            $company = Company::find($companyId);
+
             DB::commit();
             return response()->json([
-                'id' => $companyId
+                'id' => $companyId,
+                'hash_id' => $company->hash_id,
             ])->setStatusCode(Response::HTTP_CREATED);
         } catch (Throwable $exception) {
             DB::rollBack();

@@ -14,7 +14,7 @@ class ReportHandler
     public function handle(ReportAction $action): Report
     {
         if (! $this->isCompanyValid($action->getPayload()->getCompanyId())) {
-            throw new Exception('Company not found');
+            throw new Exception('Компания не найдена');
         }
 
         $report = Report::create([

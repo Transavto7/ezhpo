@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  title: ЭЖПО OpenAPI
-  description: Интеграция с 1С
+  title: ЭЖПО API
+  description: API для взаимодействия с ЭЖПО
   version: 0.0.1
 servers:
   - url: https://test.ta-7.ru
@@ -64,7 +64,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /api/1c/v1/{id}/reports:
+  /api/1c/v1/reports/{id}:
     get:
       operationId: GetReport
       tags:
@@ -119,10 +119,10 @@ components:
         id:
           type: integer
           description: Идентификатор компании
-          example: 10555
+          example: 1
         hash_id:
           type: string
-          example: '683315544'
+          example: '000000'
         name:
           type: string
           description: Наименование компании
@@ -130,10 +130,10 @@ components:
         inn:
           type: string
           description: ИНН компании
-          example: '886456789'
+          example: '1234567890'
         req_id:
           type: string
-          example: '000000'
+          example: '1'
     ReportStatus:
       type: string
       description: Статус отчета
@@ -176,11 +176,11 @@ components:
                 example: 'ИП Иванов Иван Иванович'
               req_id:
                 type: string
-                example: '000000'
+                example: '1'
               inn:
                 type: string
                 description: ИНН компании
-                example: '886456789'
+                example: '1234567890'
     CreateReportJobRequest:
       content:
         application/json:
@@ -193,13 +193,15 @@ components:
             properties:
               date_to:
                 type: string
+                format: date
                 example: '2024-09-01'
               date_from:
                 type: string
+                format: date
                 example: '2024-10-01'
               company_id:
                 type: string
-                example: '892578944'
+                example: '000000'
   responses:
     # common
     UnauthenticatedError:
@@ -269,10 +271,15 @@ components:
             type: object
             required:
               - id
+              - hash_id
             properties:
               id:
                 type: integer
                 description: Идентификатор созданной компании
+                example: 1
+              hash_id:
+                type: string
+                example: "000000"
     CreateCompany409:
       description: Найден дубликат по названию компании
       content:
@@ -297,7 +304,8 @@ components:
             properties:
               id:
                 type: string
-                description: Идентификатор формируемого отчета
+                format: uuid
+                example: "a3b529ce-cb56-46e6-85a9-3dfcfe53cd26"
     # get report
     GetReport200:
       description: Отчет был успешно сформирован или его формирование не было завершено из-за ошибки
@@ -322,8 +330,8 @@ components:
               value:
                 status: ready
                 message: 'Отчет готов'
-                # todo: кратко описать примерное содержимое отчета
-                content: {}
+                # todo: кратко описать примерное содержимое отчета в виде object
+                content: []
             ReportError:
               value:
                 status: error
