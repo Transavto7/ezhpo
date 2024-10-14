@@ -2,9 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Anketa;
-use App\Enums\FormTypeEnum;
 use App\GenerateHashIdTrait;
+use App\Models\Forms\MedicForm;
 use Illuminate\Console\Command;
 
 class FixFormProbaAlkoCommand extends Command
@@ -45,8 +44,7 @@ class FixFormProbaAlkoCommand extends Command
     {
         $save = $this->option('save');
 
-        $query = Anketa::query()
-            ->where('type_anketa', FormTypeEnum::MEDIC)
+        $query = MedicForm::query()
             ->where('alcometer_result', 1)
             ->whereNotNull('flag_pak');
 

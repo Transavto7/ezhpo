@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Anketa;
 use App\Car;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
@@ -11,6 +10,8 @@ use App\Events\Forms\DriverDismissed;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSdpoCrashRequest;
 use App\MedicFormNormalizedPressure;
+use App\Models\Forms\Form;
+use App\Models\Forms\MedicForm;
 use App\SdpoCrashLog;
 use App\Settings;
 use App\Stamp;
@@ -48,27 +49,31 @@ class SdpoController extends Controller
             return response()->json(['message' => 'Водитель с указанным ID не найден!'], 400);
         }
 
-        $forms = Anketa::query()
+        $forms = Form::query()
             ->select([
-                'anketas.driver_fio',
-                'anketas.admitted',
-                'anketas.date as created_at',
-                'anketas.user_eds',
-                'anketas.user_name',
-                'anketas.type_view',
-                'anketas.user_validity_eds_start',
-                'anketas.user_validity_eds_end',
-                'stamps.company_name as stamp_head',
+                'drivers.fio as driver_fio',
+                'medic_forms.admitted',
+                'forms.date as created_at',
+                'forms.user_eds',
+                'users.name as user_name',
+                'medic_forms.type_view',
+                'forms.user_validity_eds_start',
+                'forms.user_validity_eds_end',
+                'companies.name as stamp_head',
                 'stamps.licence as stamp_licence'
             ])
-            ->leftJoin('users', 'anketas.terminal_id', '=', 'users.id')
-            ->leftJoin('stamps', 'users.stamp_id', '=', 'stamps.id')
-            ->where('driver_id', $id)
-            ->where('type_anketa', FormTypeEnum::MEDIC)
-            ->where('admitted', 'Допущен')
-            ->whereNotNull('flag_pak')
-            ->whereDate('date', '<=', Carbon::now()->toDateTime())
-            ->whereDate('date', '>=', Carbon::now()->startOfMonth()->subMonth()->toDateString())
+            ->join('medic_forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
+            ->join('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
+            ->join('companies', 'forms.company_id', '=', 'companies.hash_id')
+            ->join('users as terminals', 'medic_forms.terminal_id', '=', 'terminals.id')
+            ->join('users', 'forms.user_id', '=', 'users.id')
+            ->leftJoin('stamps', 'terminals.stamp_id', '=', 'terminals.id')
+            ->where('forms.driver_id', $id)
+            ->where('forms.type_anketa', FormTypeEnum::MEDIC)
+            ->where('medic_forms.admitted', 'Допущен')
+            ->whereNotNull('medic_forms.flag_pak')
+            ->whereDate('forms.date', '<=', Carbon::now()->toDateTime())
+            ->whereDate('forms.date', '>=', Carbon::now()->startOfMonth()->subMonth()->toDateString())
             ->get()
             ->toArray();
 
@@ -149,7 +154,7 @@ class SdpoController extends Controller
             }
 
             $medic = [];
-            $medic['type_anketa'] = $request->type_anketa ?? 'medic';
+            $medic['type_anketa'] = $request->type_anketa ?? FormTypeEnum::MEDIC;
             $medic['user_id'] = $user->id;
             $medic['user_name'] = $user->name;
             $medic['user_validity_eds_start'] = $user->validity_eds_start;
@@ -167,7 +172,7 @@ class SdpoController extends Controller
             $medic['med_view'] = $request->med_view ?? 'В норме';
             $medic['t_people'] = $request->t_people ?? 36.6;
             $medic['type_view'] = $request->type_view ?? 'Предрейсовый/Предсменный';
-            $medic['flag_pak'] = $request->type_anketa === 'pak_queue' ? 'СДПО Р' : 'СДПО А';
+            $medic['flag_pak'] = $request->type_anketa === FormTypeEnum::PAK_QUEUE ? 'СДПО Р' : 'СДПО А';
             $medic['terminal_id'] = $apiClient->id;
             $medic['realy'] = "да";
             $medic['proba_alko'] = $request->proba_alko ?? 'Отрицательно';
@@ -270,11 +275,19 @@ class SdpoController extends Controller
             $driver->save();
 
             $medic['admitted'] = $admitted;
-            $form = Anketa::create($medic);
+
+            $formModel = new Form();
+            $formModel->fill($medic);
+            $formModel->save();
+
+            $formDetailsModel = new MedicForm();
+            $formDetailsModel->fill($medic);
+            $formDetailsModel->setAttribute('forms_uuid', $formModel->uuid);
+            $formDetailsModel->save();
 
             if ($pressure->needNormalize($pressureLimits)) {
                 MedicFormNormalizedPressure::store(
-                    $form->id,
+                    $formModel->id,
                     $pressure->getNormalized()
                 );
             }
@@ -282,10 +295,12 @@ class SdpoController extends Controller
             /**
              * ОТПРАВКА УВЕДОМЛЕНИЙ
              */
-            $needNotify = $form['admitted'] === 'Не допущен' && $form['flag_pak'] !== 'СДПО Р';
+            $needNotify = $formDetailsModel['admitted'] === 'Не допущен' && $formDetailsModel['flag_pak'] !== 'СДПО Р';
             if ($needNotify) {
-                event(new DriverDismissed($form));
+                event(new DriverDismissed($formModel));
             }
+
+            $form = $formModel->toArray() + $formDetailsModel->toArray();
 
             $form['timeout'] = Settings::setting('timeout') ?? 20;
 
@@ -303,7 +318,6 @@ class SdpoController extends Controller
             $form['sleep_status'] = $request->sleep_status;
             $form['people_status'] = $request->people_status;
 
-            /** @var Anketa $form */
             if ($form['admitted'] === 'Не допущен') {
                 $form['reasons'] = $notAdmittedReasons;
             }
@@ -588,13 +602,14 @@ class SdpoController extends Controller
     /*
     * Return inspection info
     */
-    public function getInspection(Request $request, $id): JsonResponse
+    public function getInspection($id): JsonResponse
     {
-        $inspection = Anketa::find($id);
+        $inspection = Form::find($id);
+        $details = $inspection->details;
 
-        $data = $inspection->toArray();
+        $data = $inspection->toArray() + $details->toArray();
 
-        $stamp = optional(optional($inspection->terminal))->stamp;
+        $stamp = optional(optional($details->terminal))->stamp;
         if ($stamp) {
             $data['stamp_head'] = $stamp->company_name;
             $data['stamp_licence'] = $stamp->licence;
@@ -614,15 +629,26 @@ class SdpoController extends Controller
     /*
     * Inspection update type
     */
-    public function changeType(Request $request, $id)
+    public function changeType($id)
     {
-        $inspection = Anketa::find($id);
-        if ($inspection) {
-            $inspection->update([
-                'type_anketa' => 'medic',
-                'flag_pak' => 'СДПО-А'
-            ]);
+        $inspection = Form::find($id);
+        if (!$inspection) {
+            return;
         }
+
+        $inspection->update([
+            'type_anketa' => FormTypeEnum::MEDIC,
+        ]);
+
+        $details = $inspection->details;
+
+        if (!$details) {
+            return;
+        }
+
+        $details->update([
+            'flag_pak' => 'СДПО А'
+        ]);
     }
 
     /*

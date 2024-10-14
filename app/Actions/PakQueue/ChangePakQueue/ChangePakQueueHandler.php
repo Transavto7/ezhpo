@@ -2,9 +2,10 @@
 
 namespace App\Actions\PakQueue\ChangePakQueue;
 
-use App\Anketa;
 use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
+use App\Models\Forms\Form;
+use App\Models\Forms\MedicForm;
 use App\Settings;
 use Exception;
 
@@ -23,7 +24,7 @@ class ChangePakQueueHandler
             throw new Exception('Недопустимый результат осмотра');
         }
 
-        $form = Anketa::find($id);
+        $form = Form::find($id);
 
         if (!$form) {
             throw new Exception('Осмотр не найден');
@@ -47,25 +48,29 @@ class ChangePakQueueHandler
         event(new DriverDismissed($form));
     }
 
-    protected function updateForm(Anketa $form, ChangePakQueueAction $action)
+    protected function updateForm(Form $form, ChangePakQueueAction $action)
     {
         $user = $action->getMedic();
 
-        $form->type_anketa = 'medic';
-        $form->flag_pak = 'СДПО Р';
-        $form->admitted = $action->getAdmitted();
+        $form->type_anketa = FormTypeEnum::MEDIC;
 
-        if ($form->admitted === 'Не идентифицирован') {
-            $form->comments = Settings::setting('not_identify_text') ?? 'Водитель не идентифицирован';
+        /** @var MedicForm $details */
+        $details = $form->details;
+
+        $form->flag_pak = 'СДПО Р';
+        $details->admitted = $action->getAdmitted();
+
+        if ($details->admitted === 'Не идентифицирован') {
+            $details->comments = Settings::setting('not_identify_text') ?? 'Водитель не идентифицирован';
         }
 
         $form->user_id = $user->id;
-        $form->user_name = $user->name;
-        $form->operator_id = $user->id;
+        $details->operator_id = $user->id;
         $form->user_eds = $user->eds;
         $form->user_validity_eds_start = $user->validity_eds_start;
         $form->user_validity_eds_end = $user->validity_eds_end;
 
         $form->save();
+        $details->save();
     }
 }

@@ -2,17 +2,15 @@
 
 namespace App\Actions\Anketa;
 
-use App\Anketa;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
-use App\Enums\FormTypeEnum;
+use App\Models\Forms\Form;
+use App\Models\Forms\PrintPlForm;
 use Illuminate\Support\Carbon;
 
 class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
 {
-    const FORM_TYPE = FormTypeEnum::PRINT_PL;
-
     protected function createForm(array $form)
     {
         $driverId = $form['driver_id'] ?? ($this->data['driver_id'] ?? 0);
@@ -20,7 +18,6 @@ class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements Crea
 
         $defaultData = [
             'date' => date('Y-m-d H:i:s'),
-            'admitted' => 'Допущен',
             'realy' => 'нет',
             'created_at' => $this->time
         ];
@@ -54,59 +51,36 @@ class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements Crea
         }
 
         if (!$driver) {
-            $errMsg = 'Водитель не найден';
-
-            $this->errors[] = $errMsg;
-
-            $this->saveSdpoFormWithError($form, $errMsg);
+            $this->errors[] = 'Водитель не найден';
 
             return;
         }
 
-        if ($driver) {
-            if ($driver->dismissed === 'Да') {
-                $this->errors[] = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
-            }
-
-            if (!$driver->company_id) {
-                $message = 'У Водителя не найдена компания';
-
-                $this->errors[] = $message;
-
-                $this->saveSdpoFormWithError($form, $message);
-
-                return;
-            }
-
-            $company = Company::find($driver->company_id);
-
-            if (!$company) {
-                $message = 'У Водителя не верно указано ID компании';
-
-                $this->errors[] = $message;
-
-                $this->saveSdpoFormWithError($form, $message);
-
-                return;
-            }
-
-            if ($company->dismissed === 'Да') {
-                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
-
-                return;
-            }
-
-            if ($driver->year_birthday && $driver->year_birthday !== '0000-00-00') {
-                $form['driver_year_birthday'] = $driver->year_birthday;
-            }
-
-            $form['driver_gender'] = $driver->gender ?? '';
-            $form['driver_fio'] = $driver->fio;
-            $form['driver_group_risk'] = $driver->group_risk;
-
-            $form['company_id'] = $company->hash_id;
-            $form['company_name'] = $company->name;
+        if ($driver->dismissed === 'Да') {
+            $this->errors[] = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
         }
+
+        if (!$driver->company_id) {
+            $this->errors[] = 'У Водителя не найдена компания';
+
+            return;
+        }
+
+        $company = Company::find($driver->company_id);
+
+        if (!$company) {
+            $this->errors[] = 'У Водителя не верно указано ID компании';
+
+            return;
+        }
+
+        if ($company->dismissed === 'Да') {
+            $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+
+            return;
+        }
+
+        $form['company_id'] = $company->hash_id;
 
         /**
          * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
@@ -119,9 +93,13 @@ class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements Crea
             $form['realy'] = 'да';
         }
 
-        $formModel = new Anketa($form);
-
+        $formModel = new Form($form);
         $formModel->save();
+
+        $formDetailsModel = new PrintPlForm($form);
+        $formDetailsModel->setAttribute('forms_uuid', $formModel->uuid);
+        $formDetailsModel->save();
+
         $this->createdForms->push($formModel);
     }
 }

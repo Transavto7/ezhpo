@@ -11,8 +11,10 @@ class Product extends Model
 {
     use SoftDeletes;
 
+    const ESSENCE_COMPANY = 0;
     const ESSENCE_DRIVER = 1;
     const ESSENCE_CAR_DRIVER = 3;
+    const ESSENCE_CAR = 2;
 
     public static $essence = [
         0 => 'Только компанию',

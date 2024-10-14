@@ -1,12 +1,10 @@
 <?php
 
-use App\Anketa;
-use App\Http\Controllers\ReportContractRefactoringController;
+use App\Enums\FormTypeEnum;
+use App\Models\Forms\Form;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Route;
-
 use App\User;
 use App\Point;
 
@@ -23,13 +21,6 @@ use App\Point;
 
 Route::get('/companies/find', 'ApiController@companiesList');
 Route::get('/find/{model}', 'ApiController@modelList');
-
-Route::prefix('reports')->group(function () {
-    Route::prefix('contract')->group(function () {
-        Route::get('/journal_v2', [ReportContractRefactoringController::class, 'getReport']);
-        Route::get('/export/journal_v2', [ReportContractRefactoringController::class, 'export']);
-    });
-});
 
 Route::middleware('auth:api')->group(function () {
     Route::get('getField/{model}/{field}/{default_value?}', 'IndexController@GetFieldHTML');
@@ -70,19 +61,24 @@ Route::middleware('auth:api')->group(function () {
         }
     });
 
-    Route::post('/anketa', 'AnketsController@ApiAddForm')->name('api.addform');
+    /**
+     * Роуты для старых версий СДПО
+     * @deprecated
+     */
+    Route::prefix('anketa')->group(function () {
+        Route::post('/', 'AnketsController@ApiAddForm');
+        Route::get('/{id}', function ($id) {
+            $form = Form::find($id);
 
-    Route::get('/anketa/{id}', function ($id) {
-        $anketa = Anketa::find($id);
-
-        if ($anketa && $anketa->type_anketa == 'pak_queue') {
-            if (Carbon::now()->getTimestamp() - Carbon::parse($anketa->created_at)->getTimestamp() > 12) {
-                $anketa->type_anketa = 'medic';
-                $anketa->save();
+            if ($form && $form->type_anketa == FormTypeEnum::PAK_QUEUE) {
+                if (Carbon::now()->getTimestamp() - Carbon::parse($form->created_at)->getTimestamp() > 12) {
+                    $form->type_anketa = FormTypeEnum::MEDIC;
+                    $form->save();
+                }
             }
-        }
 
-        return response()->json($anketa);
+            return response()->json($form);
+        });
     });
 
     Route::prefix('reports')->group(function () {

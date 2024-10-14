@@ -2,7 +2,7 @@
 
 namespace App\Events\Forms;
 
-use App\Anketa;
+use App\Models\Forms\Form;
 use Illuminate\Queue\SerializesModels;
 
 class DriverDismissed
@@ -10,7 +10,7 @@ class DriverDismissed
     use SerializesModels;
 
     /**
-     * @var Anketa
+     * @var Form
      */
     private $form;
 
@@ -19,15 +19,15 @@ class DriverDismissed
      *
      * @return void
      */
-    public function __construct(Anketa $form)
+    public function __construct(Form $form)
     {
         $this->form = $form;
     }
 
     /**
-     * @return Anketa
+     * @return Form
      */
-    public function getForm(): Anketa
+    public function getForm(): Form
     {
         return $this->form;
     }

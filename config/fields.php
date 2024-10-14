@@ -17,7 +17,7 @@ return [
             'type_view' => 'Тип осмотра',
             'proba_alko' => 'Признаки опьянения',
             'driver_gender' => 'Пол',
-            'Пол' => 'Дата рождения',
+            'driver_year_birthday' => 'Дата рождения',
             'complaint' => 'Жалобы',
             'condition_visible_sliz' => 'condition_visible_sliz',
             'condition_koj_pokr' => 'Состояние кожных покровов',

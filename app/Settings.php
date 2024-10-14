@@ -29,9 +29,4 @@ class Settings extends Model
             'value' => $value
         ]);
     }
-
-    public static function getAll()
-    {
-        return self::all();
-    }
 }
