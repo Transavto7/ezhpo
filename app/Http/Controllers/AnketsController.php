@@ -7,6 +7,8 @@ use App\Actions\Anketa\CreateFormHandlerFactory;
 use App\Actions\Anketa\CreateSdpoFormHandler;
 use App\Actions\Anketa\TrashFormHandler;
 use App\Actions\Anketa\UpdateFormHandler;
+use App\Actions\AnketsExportPdfLabeling\AnketsExportPdfLabelingCommand;
+use App\Actions\AnketsExportPdfLabeling\AnketsExportPdfLabelingHandler;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueAction;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueHandler;
 use App\Anketa;
@@ -479,5 +481,18 @@ class AnketsController extends Controller
         $response = response()->make($pdf->output(), 200);
         $response->header('Content-Type', 'application/pdf');
         return $response;
+    }
+
+    public function exportPdfLabeling(Request $request, AnketsExportPdfLabelingHandler $handler)
+    {
+        $anketIds = $request->input('anket_ids');
+
+        try {
+            return $handler->handle(new AnketsExportPdfLabelingCommand($anketIds));
+        } catch (Throwable $exception) {
+            return response()->json([
+                'message' => $exception->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

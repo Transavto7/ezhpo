@@ -336,6 +336,34 @@
                 updateAnketsControl()
             })
 
+            $('#inspection-labeling-print-btn').click(function () {
+                const anketsStorage = getAnketsStorage()
+
+                axios({
+                    method: 'post',
+                    url: '{{ route('ankets.export-pdf-labeling') }}',
+                    data: {
+                        anket_ids: anketsStorage.items,
+                    },
+                    responseType: 'blob',
+                })
+                    .then((response) => {
+                        const url = window.URL.createObjectURL(new Blob([response.data]))
+                        const link = document.createElement('a')
+
+                        link.href = url
+                        link.setAttribute('download', 'Маркировка осмотров.pdf')
+
+                        document.body.appendChild(link)
+
+                        link.click()
+                        link.remove()
+                    })
+                    .catch((error) => {
+                        console.error('Ошибка при скачивании файла:', error)
+                    })
+            })
+
             $('#hv-alert-error-close').click(function () {
                 $('#hv-alert-error').addClass('d-none')
                 $('#hv-alert-error').removeClass('d-flex')
@@ -572,6 +600,7 @@
                             <button id="approve-selected" class="btn btn-success btn-sm ml-2"></button>
                             <button id="select-all" class="btn btn-success btn-sm ml-2">Выделить все на странице</button>
                             <button id="selected-ankets-control-btn-unset" class="btn btn-success btn-sm ml-2">Снять выделение</button>
+                            <button id="inspection-labeling-print-btn" class="btn btn-success btn-sm ml-2">Печать маркировки</button>
                         </div>
                     @endif
 
