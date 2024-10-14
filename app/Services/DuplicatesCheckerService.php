@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Anketa;
+use App\Models\Forms\MedicForm;
+use App\Models\Forms\TechForm;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
@@ -58,31 +60,31 @@ class DuplicatesCheckerService
     {
         if (count($carsId) === 0) {
             return collect([]);
-        }
+        };
 
-        $query = Anketa::query()
+        $query = TechForm::query()
+            ->join('forms', 'forms.uuid', '=', 'tech_forms.forms_uuid')
             ->select([
-                'id',
-                'date'
+                'forms.id',
+                'forms.date'
             ]);
 
         if (count($carsId) === 1) {
-            $query = $query->where('car_id', $carsId[0]);
+            $query = $query->where('tech_forms.car_id', $carsId[0]);
         } else {
             $query = $query->where(function (Builder $subQuery) use ($carsId) {
                 foreach ($carsId as $car) {
-                    $subQuery->orWhere('car_id', $car);
+                    $subQuery->orWhere('tech_forms.car_id', $car);
                 }
             });
         }
 
         if (count($dateDiapason) == 2) {
-            $query->whereBetween('date', $dateDiapason);
+            $query->whereBetween('forms.date', $dateDiapason);
         }
 
-        return $query->where('type_anketa', 'tech')
-            ->where('in_cart', 0)
-            ->whereNotNull('date')
+        return $query->whereNull('forms.deleted_at')
+            ->whereNotNull('forms.date')
             ->where(function (Builder $query) {
                 $query
                     ->where('is_dop', '<>', 1)
@@ -99,24 +101,24 @@ class DuplicatesCheckerService
      */
     public static function getExistMedicForms($driverId, array $dateDiapason = []): Collection
     {
-        $query = Anketa::query()
+        $query = MedicForm::query()
             ->select([
-                'id',
-                'date'
+                'forms.id',
+                'forms.date'
             ])
-            ->where('driver_id', $driverId)
-            ->where('type_anketa', 'medic')
-            ->where('in_cart', 0)
+            ->join('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
+            ->where('forms.driver_id', $driverId)
+            ->whereNull('forms.deleted_at')
             ->whereNotNull('date')
             ->where(function (Builder $query) {
                 $query
                     ->where('is_dop', '<>', 1)
                     ->orWhereNotNull('result_dop');
             })
-            ->orderBy('date', 'desc');
+            ->orderBy('forms.date', 'desc');
 
         if (count($dateDiapason) == 2) {
-            $query->whereBetween('date', $dateDiapason);
+            $query->whereBetween('forms.date', $dateDiapason);
         }
 
         return $query->get();

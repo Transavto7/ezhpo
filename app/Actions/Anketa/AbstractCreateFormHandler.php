@@ -2,17 +2,15 @@
 
 namespace App\Actions\Anketa;
 
-use App\Anketa;
-use App\Car;
-use App\DDates;
-use App\Driver;
-use App\Point;
+use App\Services\DuplicatesCheckerService;
+use App\Services\RedDatesCheckerService;
 use App\User;
 use DateTime;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Throwable;
 
 abstract class AbstractCreateFormHandler
 {
@@ -49,12 +47,8 @@ abstract class AbstractCreateFormHandler
         $this->createAdditionalForms();
         $this->addUserInfo();
 
-        $pointId = $data['pv_id'] ?? 0;
+        $pointId = $data['pv_id'] ?? null;
         $this->data['point_id'] = $pointId;
-        $point = Point::find($pointId);
-        if ($point) {
-            $this->data['pv_id'] = $point->name;
-        }
 
         date_default_timezone_set('UTC');
         $this->time = date('Y-m-d H:i:s', time() + ($user->timezone ?: 3) * 3600);
@@ -73,7 +67,7 @@ abstract class AbstractCreateFormHandler
         }
 
         $responseData = [
-            'createdId' => $this->createdForms->pluck('id')->toArray(),
+            'created' => $this->createdForms->all(),
             'errors' => array_unique($this->errors)
         ];
 
@@ -94,7 +88,6 @@ abstract class AbstractCreateFormHandler
 
         /** @var User $user */
         $this->data['user_id'] = $user->id;
-        $this->data['user_name'] = $user->name;
         $this->data['operator_id'] = $user->id;
         $this->data['user_eds'] = $user->eds;
         $this->data['user_validity_eds_start'] = $user->validity_eds_start;
@@ -148,18 +141,6 @@ abstract class AbstractCreateFormHandler
         }
     }
 
-    protected function saveSdpoFormWithError(array $form, string $comment = '')
-    {
-        if (!isset($form['is_pak'])) {
-            return;
-        }
-
-        $form['type_anketa'] = 'pak';
-        $form['comments'] = $comment;
-
-        Anketa::create($form);
-    }
-
     protected function validateData()
     {
 
@@ -211,43 +192,10 @@ abstract class AbstractCreateFormHandler
      */
     protected function checkRedDates(string $date, $dateCheckModel)
     {
-        $dateCheckModelClass = get_class($dateCheckModel);
-        switch ($dateCheckModelClass) {
-            case Driver::class:
-                $itemModelName = 'Driver';
-                break;
-            case Car::class:
-                $itemModelName = 'Car';
-                break;
-            default:
-                throw new Exception("Попытка контроля дат для неизвестной модели - {$dateCheckModelClass}");
-        }
-        $dateCheck = DDates::where('item_model', $itemModelName)->get();
+        $redDates = RedDatesCheckerService::check($date, $dateCheckModel);
 
-        foreach ($dateCheck ?? [] as $dateCheckItem) {
-            $fieldDateCheck = $dateCheckItem->field;
-
-            if (!isset($dateCheckModel[$fieldDateCheck])) {
-                continue;
-            }
-
-            $fieldDateItemValue = $dateCheckModel[$fieldDateCheck];
-
-            $dateAction = $dateCheckItem->action . ' ' . $dateCheckItem->days . ' days';
-
-            $dateCheckWithForm = date('Y-m-d', strtotime($fieldDateItemValue . ' ' . $dateAction));
-
-            if ($dateCheckWithForm > $date) {
-                continue;
-            }
-
-            //TODO: здесь берется только по последней анкете
-            $this->redDates[$fieldDateCheck] = [
-                'value' => $fieldDateItemValue,
-                'item_model' => $dateCheckItem->item_model,
-                'item_id' => $dateCheckModel->id,
-                'item_field' => $fieldDateCheck
-            ];
+        foreach ($redDates as $redDate => $data) {
+            $this->redDates[$redDate] = $data;
         }
     }
 
@@ -267,37 +215,15 @@ abstract class AbstractCreateFormHandler
 
         $formTimestamp = Carbon::parse($form['date'])->timestamp;
 
-        $formDuplicates = 0;
-        $errorMessage = null;
-        foreach ($this->data['anketa'] as $otherForm) {
-            if ($this->isDuplicate($formTimestamp, $otherForm['date'])) {
-                $errorMessage = "Найден дубликат осмотра при добавлении (Дата: $otherForm[date])";
-                $formDuplicates++;
-            }
-        }
-
-        if ($formDuplicates > 1) {
-           $this->errors[] = $errorMessage;
+        try {
+            DuplicatesCheckerService::checkCreating($this->data['anketa'], $formTimestamp);
+            DuplicatesCheckerService::checkExist($this->existForms, $formTimestamp);
+        } catch (Throwable $exception) {
+            $this->errors[] = $exception->getMessage();
 
             return false;
         }
 
-        foreach($this->existForms as $existForm) {
-            if ($this->isDuplicate($formTimestamp, $existForm->date)) {
-                $this->errors[] = "Найден дубликат осмотра (ID: $existForm->id, Дата: $existForm->date)";
-
-                return false;
-            }
-        }
-
         return true;
-    }
-
-    //TODO: вынести в трейт или хэлпер
-    protected function isDuplicate($first, $second): bool
-    {
-        $diffInMinutes = abs($first - Carbon::parse($second)->timestamp);
-
-        return ($diffInMinutes < Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS) && ($diffInMinutes >= 0);
     }
 }

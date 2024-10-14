@@ -2,7 +2,7 @@
 
 namespace App\Actions\Reports\GraphPv\GetGraphPvData;
 
-use App\Anketa;
+use App\Models\Forms\Form;
 use Illuminate\Support\Carbon;
 
 class GetGraphPvDataHandler
@@ -14,9 +14,10 @@ class GetGraphPvDataHandler
         $dateFrom = $action->getDateFrom();
         $dateTo = $action->getDateTo();
 
-        $reports = Anketa::whereIn('pv_id', $pvId)
+        $reports = Form::query()
+            //TODO: нужен left join
+            ->whereIn('point_id', $pvId)
             ->where('type_anketa', $formType)
-            ->where('in_cart', 0)
             ->where(function ($q) use ($dateFrom, $dateTo) {
                 $q->where(function ($q) use ($dateFrom, $dateTo) {
                     $q->whereNotNull('date')
@@ -33,9 +34,9 @@ class GetGraphPvDataHandler
                 });
             });
 
-        $reports2 = Anketa::whereIn('pv_id', $pvId)
+        $reports2 = Form::query()
+            ->whereIn('point_id', $pvId)
             ->where('type_anketa', $formType)
-            ->where('in_cart', 0)
             ->whereBetween("created_at", [
                 $dateFrom,
                 $dateTo,

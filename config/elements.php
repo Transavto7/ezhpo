@@ -3,7 +3,6 @@
 return [
     'Town' => [
         'title' => 'Города',
-        'role' => 777,
         'popupTitle' => 'города',
         'editOnField' => 'name',
         'model' => 'Town',
@@ -20,14 +19,13 @@ return [
             'name' => [
                 'label' => 'Город',
                 'type' => 'text',
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
         ],
     ],
 
     'Point' => [
         'title' => 'Пункты выпуска',
-        'role' => 777,
         'popupTitle' => 'Пункта выпуска',
         'editOnField' => 'name',
         'model' => 'Point',
@@ -43,7 +41,7 @@ return [
             'name' => [
                 'label' => 'Пункт выпуска',
                 'type' => 'text',
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'pv_id' => [
                 'label' => 'Город',
@@ -67,7 +65,6 @@ return [
 
     'Req' => [
         'title' => 'Реквизиты нашей компании',
-        'role' => 777,
         'popupTitle' => 'Реквизитов',
         'editOnField' => 'name',
         'model' => 'Req',
@@ -121,7 +118,6 @@ return [
 
     'DDates' => [
         'title' => 'Даты контроля',
-        'role' => 777,
         'popupTitle' => 'Даты контроля',
         'editOnField' => 'item_model',
         'model' => 'DDates',
@@ -169,7 +165,6 @@ return [
 
     'Settings' => [
         'title' => 'Настройки системы',
-        'role' => 777,
         'popupTitle' => 'Настройки системы',
         'max' => 1,
         'editOnField' => 'id',
@@ -210,7 +205,6 @@ return [
 
     'Driver' => [
         'title' => 'Водители',
-        'role' => 0,
         'popupTitle' => 'Водителя',
         'otherRoles' => [
             'medic',
@@ -372,7 +366,7 @@ return [
                 ],
                 'defaultValue' => 'products_id',
                 'multiple' => 1,
-                'hidden' => 1,
+                'hideFilter' => 1,
             ],
             'pressure_systolic' => [
                 'label' => 'Порог верхнего давления',
@@ -398,7 +392,6 @@ return [
 
     'Car' => [
         'title' => 'Автомобили',
-        'role' => 0,
         'popupTitle' => 'Автомобиля',
         'otherRoles' => [
             'medic',
@@ -523,7 +516,7 @@ return [
                 ],
                 'defaultValue' => 'products_id',
                 'multiple' => 1,
-                'hidden' => 1,
+                'hideFilter' => 1,
             ],
         ],
     ],
@@ -531,7 +524,6 @@ return [
     'Company' => [
         'title' => 'Компании',
         'popupTitle' => 'Компании',
-        'role' => 0,
         'editOnField' => 'name',
         'model' => 'Company',
         'fields' => [
@@ -547,7 +539,7 @@ return [
             'name' => [
                 'label' => 'Название компании',
                 'type' => 'text',
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'note' => [
                 'label' => 'Договоренности с клиентом',
@@ -681,7 +673,6 @@ return [
 
     'Product' => [
         'title' => 'Услуги',
-        'role' => 0,
         'popupTitle' => 'Услуги',
         'editOnField' => 'name',
         'model' => 'Product',
@@ -697,7 +688,7 @@ return [
             'name' => [
                 'label' => 'Название',
                 'type' => 'text',
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'type_product' => [
                 'label' => 'Тип',
@@ -753,7 +744,6 @@ return [
 
     'Discount' => [
         'title' => 'Скидки',
-        'role' => 0,
         'popupTitle' => 'Скидка',
         'editOnField' => 'products_id',
         'model' => 'Discount',
@@ -788,7 +778,6 @@ return [
 
     'Instr' => [
         'title' => 'Виды инструктажей',
-        'role' => 0,
         'popupTitle' => 'Инструктажа',
         'editOnField' => 'name',
         'model' => 'Instr',
@@ -797,7 +786,7 @@ return [
                 'label' => 'Фото',
                 'type' => 'file',
                 'noRequired' => 1,
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'hash_id' => [
                 'label' => 'Инструктаж',
@@ -810,7 +799,7 @@ return [
             'name' => [
                 'label' => 'Название',
                 'type' => 'text',
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'descr' => [
                 'label' => 'Описание',
@@ -845,7 +834,7 @@ return [
                 'label' => 'Сортировка',
                 'type' => 'number',
                 'noRequired' => 1,
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'signature' => [
                 'label' => 'ЭЛ подпись водителя',

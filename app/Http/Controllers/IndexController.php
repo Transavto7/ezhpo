@@ -14,7 +14,6 @@ use App\Point;
 use App\User;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -23,7 +22,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class IndexController extends Controller
@@ -33,23 +31,6 @@ class IndexController extends Controller
     public function __construct()
     {
         $this->elements = config('elements');
-    }
-
-    public function deprecated(Request $request): JsonResponse
-    {
-        Log::channel('deprecated-api')->info(json_encode(
-            [
-                'request' => $request->all(),
-                'headers' => $request->headers->all(),
-                'user' => Auth::user(),
-                'ip' => $request->getClientIp() ?? null,
-            ]
-        ));
-
-        return response()->json(
-            ['message' => 'Метод не поддерживается, воспользуйтесь консольной командой'],
-            Response::HTTP_METHOD_NOT_ALLOWED
-        );
     }
 
     public function showVideo(Request $request): View
@@ -525,11 +506,6 @@ class IndexController extends Controller
                         } else if (strlen($filterValueItem) === 0) {
                             //TODO: странный фильтр только на пустую строку
                             $subQuery = $subQuery->orWhere($filterKey, $filterValueItem);
-                        } else if ($filterKey === 'type_auto') {
-                            $subQuery = $subQuery->orWhere($filterKey, '=', $filterValueItem);
-                        } else if ($filterKey === 'group_risk') {
-                            $escapedFilterValueItem = str_replace('\\', '\\\\', $filterValueItem);
-                            $subQuery = $subQuery->orWhere($filterKey, 'LIKE', '%' . trim($escapedFilterValueItem) . '%');
                         } else {
                             $subQuery = $subQuery->orWhere($filterKey, 'LIKE', '%' . trim($filterValueItem) . '%');
                         }

@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Anketa;
+use App\Enums\FormTypeEnum;
 use App\Events\UserActions\ClientActionLogRequest;
 use App\Exports\AnketasExport;
 use App\FieldPrompt;
-use App\Point;
+use App\Models\Forms\Form;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Renderable;
@@ -31,29 +32,6 @@ class HomeController extends Controller
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return Renderable
-     */
-    public static function searchFieldsAnkets($anketa, $anketaModel, $fieldsKeys)
-    {
-        $valueWhere = $anketa[$anketaModel['connectTo']];
-
-        if (isset($anketaModel['connectItemProp'])) {
-            $connectItemProp = $anketaModel['connectItemProp'];
-            $connectModel = $fieldsKeys[$anketaModel['connectTo']];
-
-            $valueWhere = app($connectModel['model'])
-                ->where($connectItemProp['check'], $anketa[$connectModel['connectTo']])
-                ->first()[$connectItemProp['get']];
-        }
-
-        return app($anketaModel['model'])
-            ->where($anketaModel['key'], $valueWhere)
-            ->first()[$anketaModel['resultKey']];
-    }
-
     public function SaveCheckedFieldsFilter(Request $request)
     {
         $fields = $request->all();
@@ -66,6 +44,7 @@ class HomeController extends Controller
         return redirect($_SERVER['HTTP_REFERER']);
     }
 
+    //TODO: перенести в AnketasController
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -75,28 +54,30 @@ class HomeController extends Controller
          */
         $clearPakQueue = $request->input('clear')
             && $user->hasRole('admin')
-            && ($request->input('type_anketa') === 'pak_queue');
+            && ($request->input('type_anketa') === FormTypeEnum::PAK_QUEUE);
 
         if ($clearPakQueue) {
-            Anketa::where('type_anketa', 'pak_queue')->delete();
+            Form::where('type_anketa', FormTypeEnum::PAK_QUEUE)->delete();
 
-            return redirect(route('home', 'pak_queue'));
+            return redirect(route('home', FormTypeEnum::PAK_QUEUE));
         }
         /**
          * Очистка корзины в очереди на утверждение от СДПО
          */
 
         $formType = $request->type_ankets;
-        $validTypeForm = User::$userRolesKeys[$user->role] ?? 'medic';
+        $validTypeForm = User::$defaultUserJournalByRole[$user->role] ?? FormTypeEnum::MEDIC;
         if (isset(Anketa::$anketsKeys[$formType])) {
             $validTypeForm = $formType;
         }
 
         $trash = $request->get('trash', 0);
-        $forms = Anketa::query()
-            ->where('type_anketa', $validTypeForm)
-            ->where('in_cart', $trash)
-            ->with(['deleted_user']);
+
+        if ($trash) {
+            $forms = Form::onlyTrashed();
+        } else {
+            $forms = Form::query();
+        }
 
         if ($request->has('result_dop') && $request->input('result_dop') !== null) {
             filter_var($request->input('result_dop'), FILTER_VALIDATE_BOOLEAN)
@@ -131,27 +112,37 @@ class HomeController extends Controller
             $request->session()->forget('error');
         }
 
+        $formDetailsTable = Form::$relatedTables[$validTypeForm];
+        $forms = $forms
+            ->join($formDetailsTable, 'forms.uuid', '=', "$formDetailsTable.forms_uuid")
+            ->leftJoin('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
+            ->join('companies', 'forms.company_id', '=', 'companies.hash_id')
+            ->join('points', 'forms.point_id', '=', 'points.id')
+            ->join('users', 'forms.user_id', '=', 'users.id');
+
         /**
          * Фильтрация анкет в ЛКК
          */
         if ($user->hasRole('client')) {
             $forms = $forms
-                ->where('anketas.company_id', $user->company->hash_id)
-                ->whereNotNull('date')
-                ->where(function ($query) use ($user) {
-                    $query
-                        ->where('date', '<=', Carbon::now()->addHours($user->timezone ?? 3))
-                        ->orWhere(function ($subQuery) {
+                ->where('forms.company_id', $user->company->hash_id)
+                ->whereNotNull('forms.date')
+                ->where(function ($query) use ($validTypeForm, $user) {
+                    $query->where('forms.date', '<=', Carbon::now()->addHours($user->timezone ?? 3));
+
+                    if ($validTypeForm === FormTypeEnum::MEDIC) {
+                        $query->orWhere(function ($subQuery) {
                             $subQuery
-                                ->whereNotNull('flag_pak')
+                                ->whereNotNull('medic_forms.flag_pak')
                                 ->where('date', '<=', Carbon::now()->addHours(12));
                         });
+                    }
                 });
 
-            if (in_array($validTypeForm, ['medic', 'pechat_pl', 'bdd', 'report_cart'])) {
-                $forms = $forms->whereNotNull('driver_fio');
-            } else if ($validTypeForm === 'tech') {
-                $forms = $forms->whereNotNull('car_gos_number');
+            if ($validTypeForm === FormTypeEnum::TECH) {
+                $forms = $forms->whereNotNull('tech_forms.car_id');
+            } else {
+                $forms = $forms->whereNotNull('forms.driver_id');
             }
         }
         /**
@@ -178,155 +169,44 @@ class HomeController extends Controller
             'duplicates',
             'result_dop',
         ]);
-
         if (count($filterParams) > 0 && $filterActivated) {
-            $formModel = new Anketa();
-
             foreach ($filterParams as $filterKey => $filterValue) {
+                if ($filterValue === null) continue;
+
                 if ($filterKey == 'TO_date' || $filterKey == 'date') {
                     continue;
                 }
 
-                if ($filterValue === null) continue;
+                if (is_array($filterValue)) {
+                    $filterValue = array_unique(array_values($filterValue));
 
-                if ($filterKey == 'hour_from') {
-                    $forms->whereTime('date', '>=', $filterValue . ':00');
-                    continue;
-                }
-                if ($filterKey == 'hour_to') {
-                    $forms->whereTime('date', '<=', $filterValue . ':00');
-                    continue;
-                }
-                if ($filterKey == 'created_at') {
-                    $forms = $forms->where('anketas.created_at', '>=', Carbon::parse($filterValue)->startOfDay());
-                    continue;
-                }
-                if ($filterKey == 'TO_created_at') {
-                    $forms = $forms->where('anketas.created_at', '<=', Carbon::parse($filterValue)->endOfDay());
-                    continue;
-                }
-                if ($filterKey === 'pulse') {
-                    $forms = $forms->where('anketas.pulse', $filterValue);
-                    continue;
-                }
-
-                if ($filterKey === 'town_id') {
-                    $forms = $forms
-                        //TODO: нужно делать селект anketas.pv_id
-                        ->leftJoin('points', 'anketas.point_id', '=', 'points.id')
-                        ->whereIn('points.pv_id', $filterValue);
-                    continue;
-                }
-
-                if (in_array($filterKey, $formModel->fillable)) {
-                    if (in_array($filterKey, ['date', 'created_at'])) continue;
-
-                    if ($filterKey == 'is_dop' && !$filterValue) {
-                        $forms = $forms->where(function ($query) {
-                            $query->whereNull('is_dop')->orWhere('is_dop', 0);
-                        });
-                        continue;
+                    if (count($filterValue) === 1) {
+                        $filterValue = $filterValue[0];
                     }
+                }
 
-                    $explodeData = array_values(is_array($filterValue) ? $filterValue : explode(',', $filterValue));
-                    $explodeData = (count($explodeData) == 1) ? $explodeData[0] : $explodeData;
-
-                    if (is_array($explodeData)) {
-                        if ($filterKey === 'pv_id') {
-                            $points = Point::whereIn('id', $explodeData)->get();
-                            $forms = $forms->where(function ($query) use ($points, $filterKey) {
-                                foreach ($points as $point) {
-                                    $query = $query->orWhere('anketas.pv_id', $point->name)
-                                        ->orWhere('anketas.point_id', $point->id);
-                                }
-
-                                return $query;
-                            });
-                            continue;
-                        }
-
-                        if ($filterKey === 'flag_pak') {
-                            $explodeData = array_map(function($item) {
-                                return $item === 'internal' ? null : $item;
-                            }, $explodeData);
-                        }
-
-                        if ($filterKey === 'driver_group_risk') {
-                            $forms = $forms->where(function ($query) use ($explodeData, $filterKey) {
-                                foreach ($explodeData as $fvItemValue) {
-                                    $escapedFvItemValue = str_replace('\\', '\\\\', $fvItemValue);
-                                    $query = $query->orWhere('anketas.' . $filterKey, 'like', '%' . trim($escapedFvItemValue) . '%');
-                                }
-
-                                return $query;
-                            });
-
-                            continue;
-                        }
-
-                        $forms = $forms->where(function ($query) use ($explodeData, $filterKey) {
-                            foreach ($explodeData as $fvItemValue) {
-                                if ($fvItemValue === null) {
-                                    $query = $query->orWhereNull('anketas.' . $filterKey);
-                                } else {
-                                    $query = $query->orWhere('anketas.' . $filterKey, $fvItemValue);
-                                }
-                            }
-
-                            return $query;
-                        });
-                        continue;
-                    }
-
-                    /**
-                     * Проверяем что данные есть (повлияло на ФЛАГ СДПО)
-                     */
-                    if ($explodeData) {
-                        if ($filterKey === 'pv_id') {
-                            $point = Point::find($explodeData);
-                            $forms = $forms->where(function ($query) use ($point) {
-                                $query->where('anketas.pv_id', $point->name)
-                                    ->orWhere('anketas.point_id', $point->id);
-
-                                return $query;
-                            });
-                            continue;
-                        }
-
-                        if ($filterKey === 'flag_pak' && $explodeData === 'internal') {
-                            $forms = $forms->whereNull('anketas.flag_pak');
-                            continue;
-                        }
-
-                        if ($filterKey === 'driver_group_risk') {
-                            $escapedExplodeData = str_replace('\\', '\\\\', $explodeData);
-                            $forms = $forms->where('anketas.' . $filterKey, 'like', '%' . trim($escapedExplodeData) . '%');
-                            continue;
-                        }
-
-                        $strictFilter = in_array($filterKey, ['company_name', 'driver_fio', 'admitted'])
-                            || strpos($filterKey, '_id')
-                            || $filterKey === 'id';
-
-                        if ($strictFilter) {
-                            $forms = $forms->where('anketas.' . $filterKey, $explodeData);
-                            continue;
-                        }
-
-                        $forms = $forms->where('anketas.' . $filterKey, 'LIKE', '%' . $explodeData . '%');
-                        continue;
-                    }
-
-                    if ($explodeData === null) {
-                        $forms = $forms->where('anketas.' . $filterKey, null);
-                        continue;
-                    }
-
+                if ($filterKey === 'hour_from') {
+                    $forms->whereTime('forms.date', '>=', $filterValue . ':00');
                     continue;
                 }
 
-                if ($filterKey === 'car_type_auto') {
-                    $forms = $forms->whereIn('cars.type_auto', $filterValue);
+                if ($filterKey === 'hour_to') {
+                    $forms->whereTime('forms.date', '<=', $filterValue . ':00');
+                    continue;
+                }
+
+                if ($filterKey === 'created_at') {
+                    $forms = $forms->where('forms.created_at', '>=', Carbon::parse($filterValue)->startOfDay());
+                    continue;
+                }
+
+                if ($filterKey === 'TO_created_at') {
+                    $forms = $forms->where('forms.created_at', '<=', Carbon::parse($filterValue)->endOfDay());
+                    continue;
+                }
+
+                if ($filterKey == 'is_dop' && !$filterValue) {
+                    $forms = $forms->where('is_dop', '<>', 1);
                     continue;
                 }
 
@@ -337,21 +217,105 @@ class HomeController extends Controller
                     continue;
                 }
 
-                if ($filterKey === 'date_prmo') {
-                    //TODO: удалить после перехода на разделенные реестры
-                    continue;
+                if (is_array($filterValue)) {
+                    if ($filterKey === 'town_id') {
+                        $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
+                            foreach ($filterValue as $townIds) {
+                                $query = $query->orWhere('points.pv_id', $townIds);
+                            }
 
-                    $dateFrom = Carbon::parse($filterValue)->startOfDay();
-                    $dateTo = Carbon::parse($filterValue)->endOfDay();
-                    $forms = $forms->whereBetween('drivers.date_prmo', [$dateFrom, $dateTo]);
-                    continue;
+                            return $query;
+                        });
+                        continue;
+                    }
+
+                    if ($filterKey === 'car_type_auto') {
+                        $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
+                            foreach ($filterValue as $carType) {
+                                $query = $query->orWhere('cars.car_type_auto', $carType);
+                            }
+
+                            return $query;
+                        });
+                        continue;
+                    }
+
+                    if ($filterKey === 'pv_id') {
+                        $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
+                            foreach ($filterValue as $pointId) {
+                                $query = $query->orWhere('forms.point_id', $pointId);
+                            }
+
+                            return $query;
+                        });
+                        continue;
+                    }
+
+                    if ($filterKey === 'flag_pak') {
+                        $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
+                            foreach ($filterValue as $flagPakValue) {
+                                if ($flagPakValue === 'internal') {
+                                    $query = $query->orWhereNull('medic_forms.flag_pak');
+                                } else {
+                                    $query = $query->orWhere('medic_forms.flag_pak', $flagPakValue);
+                                }
+                            }
+
+                            return $query;
+                        });
+                        continue;
+                    }
+
+                    if ($filterKey === 'driver_group_risk') {
+                        $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
+                            foreach ($filterValue as $fvItemValue) {
+                                $escapedFvItemValue = str_replace('\\', '\\\\', $fvItemValue);
+                                $query = $query->orWhere('forms.' . $filterKey, 'like', '%' . trim($escapedFvItemValue) . '%');
+                            }
+
+                            return $query;
+                        });
+
+                        continue;
+                    }
+
+                    $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
+                        foreach ($filterValue as $fvItemValue) {
+                            $query = $query->orWhere($filterKey, $fvItemValue);
+                        }
+
+                        return $query;
+                    });
+                } else {
+                    if ($filterKey === 'town_id') {
+                        $forms = $forms->where('points.pv_id', $filterValue);
+                        continue;
+                    }
+
+                    if ($filterKey === 'car_type_auto') {
+                        $forms = $forms->where('cars.car_type_auto', $filterKey);
+                        continue;
+                    }
+
+                    if ($filterKey === 'pv_id') {
+                        $forms = $forms->where('forms.point_id', $filterValue);
+                        continue;
+                    }
+
+                    if ($filterKey === 'flag_pak' && $filterValue === 'internal') {
+                        $forms = $forms->whereNull('medic_forms.flag_pak');
+                        continue;
+                    }
+
+                    $strictFilter = strpos($filterKey, '_id') || $filterKey === 'id';
+
+                    if ($strictFilter) {
+                        $forms = $forms->where($filterKey, $filterValue);
+                        continue;
+                    }
+
+                    $forms = $forms->where($filterKey, 'LIKE', '%' . $filterValue . '%');
                 }
-
-                if ($filterKey === 'straight_company_id') {
-                    continue;
-                }
-
-                $forms = $forms->where('anketas.' . $filterKey, 'LIKE', '%' . $filterValue . '%');
             }
 
             if (($filterParams['date'] ?? null) || ($filterParams['TO_date'] ?? null)) {
@@ -364,11 +328,11 @@ class HomeController extends Controller
                 $forms = $forms->where(function ($query) use ($dateFrom, $dateTo) {
                     $query->where(function ($subQuery) use ($dateFrom, $dateTo) {
                         $subQuery
-                            ->whereNotNull('date')
-                            ->whereBetween('date', [$dateFrom, $dateTo]);
+                            ->whereNotNull('forms.date')
+                            ->whereBetween('forms.date', [$dateFrom, $dateTo]);
                     })->orWhere(function ($subQuery) use ($dateFrom, $dateTo) {
                         $subQuery
-                            ->whereNull('date')
+                            ->whereNull('forms.date')
                             ->whereBetween('period_pl', [
                                 $dateFrom->format('Y-m'),
                                 $dateTo->format('Y-m')
@@ -387,26 +351,25 @@ class HomeController extends Controller
         if ($filterActivated && $request->input('getCounts')) {
             $formsDistinctQuery = $forms->distinct();
 
+            $counters = [
+                'anketasCountDrivers' => $formsDistinctQuery->count('forms.driver_id'),
+                'anketasCountCars' => 0,
+                'anketasCountCompany' => $formsDistinctQuery->count('forms.company_id'),
+            ];
+
             /**
              * Обогащение данных
              */
-            if ($validTypeForm == 'tech') {
+            if ($validTypeForm === FormTypeEnum::TECH) {
                 $formsDistinctQuery = $formsDistinctQuery
-                    ->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id');
-            } else if ($validTypeForm == 'pak') {
-                $formsDistinctQuery = $formsDistinctQuery
-                    ->leftJoin('points', 'anketas.pv_id', '=', 'points.id');
+                    ->leftJoin('cars', 'car_id', '=', 'cars.hash_id');
+                $counters['anketasCountCars'] = $formsDistinctQuery->count('car_id');
             }
             /**
              * Обогащение данных
              */
 
-
-            return response()->json([
-                'anketasCountDrivers' => $formsDistinctQuery->count('anketas.driver_id'),
-                'anketasCountCars' => $formsDistinctQuery->count('anketas.car_id'),
-                'anketasCountCompany' => $formsDistinctQuery->count('anketas.company_id'),
-            ]);
+            return response()->json($counters);
         }
         /**
          * <Измеряем количество Авто и Водителей (уникальные ID)>
@@ -414,54 +377,46 @@ class HomeController extends Controller
 
         $export = $filterActivated && $request->get('export');
 
+        $defaultFieldsToSelect = [
+            'forms.*',
+            $validTypeForm . '_forms.*',
+            'forms.created_at as created_at',
+            'forms.updated_at as updated_at',
+            'forms.deleted_at as deleted_at',
+            'users.name as user_name',
+            'drivers.fio as driver_fio',
+            'drivers.gender as driver_gender',
+            'drivers.year_birthday as driver_year_birthday',
+            'points.name as pv_id',
+            'companies.name as company_name'
+        ];
+
         /**
          * Обогащение данных
          */
-        //TODO: раскомментировать после перехода на разделенные реестры
-        if ($validTypeForm == 'tech') {
+        if ($validTypeForm === FormTypeEnum::TECH) {
             $forms = $forms
-                ->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')
-                ->select([
-                    'anketas.*',
-                    'anketas.pv_id as pv_id',
+                ->leftJoin('cars', 'tech_forms.car_id', '=', 'cars.hash_id')
+                ->select(array_merge($defaultFieldsToSelect, [
                     'cars.type_auto as car_type_auto',
-                    'cars.date_prto as date_prto'
-                ]);
-        } else if ($validTypeForm == 'pak') {
+                    'cars.mark_model as car_mark_model',
+                    'cars.gos_number as car_gos_number',
+                    'cars.date_prto as date_prto',
+                ]));
+        } else if (($validTypeForm === FormTypeEnum::MEDIC) && $export) {
             $forms = $forms
-                ->leftJoin('points', 'anketas.pv_id', '=', 'points.id')
-                ->select([
-                    'anketas.*',
-                    'points.name as pv_id',
-                ]);
-        } else if (($validTypeForm == 'medic') && $export) {
+                ->select(array_merge($defaultFieldsToSelect, [
+                    'drivers.date_prmo as date_prmo',
+                    DB::raw("COALESCE(medic_forms.pressure, medic_forms.tonometer, NULL) as tonometer")
+                ]));
+        } else if ($validTypeForm === FormTypeEnum::MEDIC) {
             $forms = $forms
-                ->with('operator')
-                //->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
-                ->leftJoin('medic_form_normalized_pressures', 'anketas.id', '=', 'medic_form_normalized_pressures.form_id')
-                ->select([
-                    'anketas.*',
-                    'anketas.pv_id as pv_id',
-//                    'drivers.date_prmo as date_prmo',
-                    DB::raw('null as date_prmo'),
-                    DB::raw("COALESCE(medic_form_normalized_pressures.pressure, anketas.tonometer, NULL) as tonometer"),
-                ]);
-        } else if ($validTypeForm === 'medic') {
-            $forms = $forms
-                ->with('operator')
-                //->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
-                ->select([
-                    'anketas.*',
-                    'anketas.pv_id as pv_id',
-//                    'drivers.date_prmo as date_prmo',
-                    DB::raw('null as date_prmo')
-                ]);
+                ->select(array_merge($defaultFieldsToSelect, [
+                    'drivers.date_prmo as date_prmo'
+                ]));
         } else {
             $forms = $forms
-                ->select([
-                    'anketas.*',
-                    'anketas.pv_id as pv_id',
-                ]);
+                ->select($defaultFieldsToSelect);
         }
         /**
          * Обогащение данных
@@ -501,19 +456,21 @@ class HomeController extends Controller
         if ($export) {
             $forms = $forms->orderBy('date');
 
-            if ($validTypeForm == 'tech' && $request->get('exportPrikaz')) {
+            //TODO: вот тут нужна проверка на разумные лимиты
+
+            if ($validTypeForm == FormTypeEnum::TECH && $request->get('exportPrikaz')) {
                 $fields = $filterFields(collect(Anketa::$fieldsKeys['tech_export_to']));
                 $forms = $forms->get();
                 $title = 'ЭЖ ПРТО.xlsx';
-            } else if ($validTypeForm == 'tech' && $request->get('exportPrikazPL')) {
+            } else if ($validTypeForm == FormTypeEnum::TECH && $request->get('exportPrikazPL')) {
                 $fields = $filterFields(collect(Anketa::$fieldsKeys['tech_export_pl']));
                 $forms = $forms->where(['type_view' => 'Предрейсовый/Предсменный'])->get();
                 $title = 'ЭЖ учета ПЛ.xlsx';
-            } else if ($validTypeForm == 'medic' && $request->get('exportPrikaz')) {
+            } else if ($validTypeForm === FormTypeEnum::MEDIC && $request->get('exportPrikaz')) {
                 $fields = $filterFields(collect(Anketa::$fieldsKeys['medic_export_pl']));
                 $forms = $forms->get();
                 $title = 'ЭЖ ПРМО.xlsx';
-            } else if ($validTypeForm == 'bdd' && $request->get('exportPrikaz')) {
+            } else if ($validTypeForm === FormTypeEnum::BDD && $request->get('exportPrikaz')) {
                 $fields = $filterFields(collect(Anketa::$fieldsKeys['bdd_export_prikaz']));
                 $forms = $forms->with(['user.roles'])->get()->map(function ($form) {
                     $form->user_id = 'Инженер по безопасности дорожного движения';
@@ -527,7 +484,7 @@ class HomeController extends Controller
                 $title = 'ЭЖ.xlsx';
             }
 
-            return Excel::download(new AnketasExport($forms, $fields), $title);
+            return Excel::download(new AnketasExport($forms, $fields, $request->get('exportPrikaz', false)), $title);
         }
         /**
          * Экспорт журнала
@@ -562,24 +519,15 @@ class HomeController extends Controller
         /**
          * Получение данных
          */
-        $defaultOrderBy = $validTypeForm === 'pak_queue' ? 'ASC' : 'DESC';
+        $defaultOrderBy = $validTypeForm === FormTypeEnum::PAK_QUEUE ? 'ASC' : 'DESC';
         $orderKey = $request->get('orderKey', 'date');
         $orderBy = $request->get('orderBy', $defaultOrderBy);
         $take = $request->get('take') ?? 500;
-        if ($request->get('export')) {
-            $take = 10000;
-        }
 
-        if ($filterActivated || $validTypeForm === 'pak_queue') {
-            $table = 'anketas.';
-
-            if (in_array($orderKey, ['car_type_auto', 'date_prto', 'date_prmo'])) {
-                $table = '';
-            }
-
-            $forms = $forms->orderBy($table . $orderKey, $orderBy);
+        if ($filterActivated || $validTypeForm === FormTypeEnum::PAK_QUEUE) {
+            $forms = $forms->orderBy($orderKey, $orderBy);
             if ($orderKey === 'result_dop') {
-                $forms = $forms->orderBy($table . 'is_dop', $orderBy === 'ASC' ? 'DESC' : 'ASC');
+                $forms = $forms->orderBy( 'is_dop', $orderBy === 'ASC' ? 'DESC' : 'ASC');
             }
 
             $forms = $forms->paginate($take);
@@ -595,7 +543,7 @@ class HomeController extends Controller
         $formsFields = array_keys($fieldsKeys);
 
         $currentRole = $validTypeForm;
-        if (($validTypeForm === 'pak_queue') && $user->hasRole('operator_sdpo')) {
+        if (($validTypeForm === FormTypeEnum::PAK_QUEUE) && $user->hasRole('operator_sdpo')) {
             $currentRole = 'operator_sdpo';
         }
 
@@ -636,11 +584,14 @@ class HomeController extends Controller
 
     public function getFilters(Request $request)
     {
-        $fromType = $request->type_ankets;
+        /** @var User $user */
+        $user = Auth::user();
 
-        $validFormType = User::$userRolesKeys[auth()->user()->role] ?? 'medic';
-        if (isset(Anketa::$anketsKeys[$fromType])) {
-            $validFormType = $fromType;
+        $formType = $request->type_ankets;
+
+        $validFormType = User::$defaultUserJournalByRole[$user->role] ?? FormTypeEnum::MEDIC;
+        if (isset(Anketa::$anketsKeys[$formType])) {
+            $validFormType = $formType;
         }
 
         $fields = Anketa::$fieldsKeys[$validFormType];
@@ -663,24 +614,40 @@ class HomeController extends Controller
         ]);
     }
 
+    /**
+     * @throws \Exception
+     */
     private function setDuplicatesQuery(string $formType, Builder $builder, $start, $end)
     {
-        $duplicates = DB::table('anketas')
-            ->select('day_hash')
-            ->where('type_anketa', '=', $formType)
-            ->where('date', '>=', $start->format('Y-m-d'))
-            ->where('date', '<', $end->format('Y-m-d'))
-            ->whereNotNull('day_hash')
-            ->where('in_cart', '<>', 1)
-            ->groupBy(['day_hash'])
-            ->havingRaw('COUNT(day_hash) > 1');
+        switch ($formType) {
+            case FormTypeEnum::MEDIC:
+                $table = 'medic_forms';
+                break;
+            case FormTypeEnum::TECH:
+                $table = 'tech_forms';
+                break;
+            default:
+                throw new \Exception("Проверка дубликатов для типа осмотра - $formType не доступна");
+        };
 
-        $builder->whereNotNull('anketas.day_hash')
-            ->joinSub($duplicates, 'duplicates', function (JoinClause $join) {
-                $join->on('anketas.day_hash', '=', 'duplicates.day_hash');
+        $duplicates = DB::table($table)
+            ->select("$table.day_hash")
+            ->join('forms', 'forms.uuid', '=', "$table.forms_uuid")
+            ->where('forms.date', '>=', $start->format('Y-m-d'))
+            ->where('forms.date', '<', $end->format('Y-m-d'))
+            ->where('forms.date', '>=', $start->format('Y-m-d'))
+            ->where('forms.date', '<', $end->format('Y-m-d'))
+            ->whereNotNull("$table.day_hash")
+            ->groupBy(["$table.day_hash"])
+            ->havingRaw("COUNT($table.day_hash) > 1");
+
+        $builder->whereNotNull("$table.day_hash")
+            ->joinSub($duplicates, 'duplicates', function (JoinClause $join) use ($table) {
+                $join->on("$table.day_hash", '=', 'duplicates.day_hash');
             })
-            ->orderByDesc(DB::raw('DATE(date)'))
-            ->orderBy('driver_fio')
-            ->orderBy('type_view');
+            ->orderByDesc(DB::raw('DATE(forms.date)'))
+            //TODO: точно ли это так? в ТО такая же логика?
+            ->orderBy('drivers.fio')
+            ->orderBy("$table.type_view");
     }
 }

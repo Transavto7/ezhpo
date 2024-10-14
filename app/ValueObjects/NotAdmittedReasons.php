@@ -2,8 +2,8 @@
 
 namespace App\ValueObjects;
 
-use App\Anketa;
 use App\Driver;
+use App\Models\Forms\MedicForm;
 
 class NotAdmittedReasons
 {
@@ -17,7 +17,7 @@ class NotAdmittedReasons
         $this->data = $data;
     }
 
-    public static function fromForm(Anketa $form): self
+    public static function fromForm(MedicForm $form): self
     {
         return new self($form->only([
             'alcometer_result',
@@ -28,7 +28,7 @@ class NotAdmittedReasons
             'driver_id',
             'pulse',
             'tonometer'
-        ]));
+        ]) + ['driver_id' => $form->form->driver_id]);
     }
 
     public function getReasons(): array

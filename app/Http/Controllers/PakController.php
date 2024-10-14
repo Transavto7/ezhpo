@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Anketa;
 use App\Enums\FormTypeEnum;
 use App\FieldPrompt;
-use App\ValueObjects\NotAdmittedReasons;
+use App\Models\Forms\Form;
+use App\Models\Forms\MedicForm;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PakController extends Controller
 {
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         if ($request->clear) {
-            Anketa::query()->pakQueueByUser($request->user())->delete();
+            Form::query()->pakQueueByUser($request->user())->delete();
 
             return redirect(route('pak.index'));
         }
@@ -22,8 +24,16 @@ class PakController extends Controller
         ]);
     }
 
-    public function list(Request $request) {
-        $forms = Anketa::query();
+    public function list(Request $request): JsonResponse
+    {
+        $forms = Form::query()
+            ->select([
+                'forms.*',
+                'drivers.fio as driver_fio',
+                'points.name as pv_id'
+            ])
+            ->join('drivers', 'drivers.hash_id', '=', 'forms.driver_id')
+            ->join('points', 'points.id', '=', 'forms.point_id');
 
         $forms->pakQueueByUser($request->user());
 
@@ -33,10 +43,13 @@ class PakController extends Controller
 
         $forms->get();
 
-        $data = $forms->get()->map(function (Anketa $form) {
-            $form->append('not_admitted_reasons');
+        $data = $forms->get()->map(function (Form $form) {
+            $formData = $form->toArray();
+            /** @var MedicForm $formDetails */
+            $formDetails = $form->details;
+            $formDetails->append('not_admitted_reasons');
 
-            return $form;
+            return $formData + $formDetails->toArray();
         });
 
         return response()->json($data);

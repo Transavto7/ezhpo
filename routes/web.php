@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\ReportContractRefactoringController;
 use App\Http\Middleware\CheckDriver;
+use App\Http\Middleware\StripEmptyParamsFromQueryString;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -69,12 +69,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('return_trash', 'RoleController@returnTrash');
     });
 
-    Route::resource('field/prompt', 'FieldPromptController');
+    Route::resource('field/prompt', 'FieldPromptController')->except(['edit', 'show', 'store', 'create']);
     Route::prefix('field/prompt')->as('prompt.')->group(function () {
         Route::any('filter', 'FieldPromptController@getAll');
     });
 
-    Route::resource('stamp', 'StampController')->except(['show']);
+    Route::resource('stamp', 'StampController')->except(['show', 'create', 'edit']);
     Route::prefix('stamp')->as('stamp.')->group(function () {
         Route::any('filter', 'StampController@getAll');
         Route::any('find', 'StampController@find');
@@ -93,7 +93,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('filters', 'HomeController@getFilters');
             Route::get('{type_ankets?}/filters', 'HomeController@getFilters')->name('home.filters');
             Route::get('pak_queue', 'PakController@index');
-            Route::get('{type_ankets?}', 'HomeController@index')->name('home');
+            Route::middleware(StripEmptyParamsFromQueryString::class)->get('{type_ankets?}', 'HomeController@index')->name('home');
         });
 
         Route::prefix('pak')->as('pak.')->group(function () {
@@ -141,10 +141,8 @@ Route::middleware(['auth'])->group(function () {
         });
 
         Route::prefix('report')->as('report.')->group(function () {
-            Route::get('getContractsForCompany', [ReportContractRefactoringController::class, 'getContractsForCompany']);
             Route::get('journal', 'ReportController@index')->name('journal');
-            Route::get('journal_new',[ReportContractRefactoringController::class, 'index'])->name('company_service');
-            Route::get('{type_report}', 'ReportController@GetReport')->name('get');
+            Route::get('{type_report}', 'ReportController@getReport')->name('get');
             Route::get('/dynamic/{journal}', 'ReportController@getDynamic')->name('dynamic');
         });
 

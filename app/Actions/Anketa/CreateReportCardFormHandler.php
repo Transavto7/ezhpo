@@ -2,11 +2,12 @@
 
 namespace App\Actions\Anketa;
 
-use App\Anketa;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
+use App\Models\Forms\Form;
+use App\Models\Forms\ReportCartForm;
 use Illuminate\Support\Carbon;
 
 class CreateReportCardFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -57,11 +58,7 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
         }
 
         if (!$driver) {
-            $errMsg = 'Водитель не найден';
-
-            $this->errors[] = $errMsg;
-
-            $this->saveSdpoFormWithError($form, $errMsg);
+            $this->errors[] = 'Водитель не найден';
 
             return;
         }
@@ -75,11 +72,7 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
             }
 
             if (!$driver->company_id) {
-                $message = 'У Водителя не найдена компания';
-
-                $this->errors[] = $message;
-
-                $this->saveSdpoFormWithError($form, $message);
+                $this->errors[] = 'У Водителя не найдена компания';
 
                 return;
             }
@@ -87,11 +80,7 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
             $company = Company::find($driver->company_id);
 
             if (!$company) {
-                $message = 'У Водителя не верно указано ID компании';
-
-                $this->errors[] = $message;
-
-                $this->saveSdpoFormWithError($form, $message);
+                $this->errors[] = 'У Водителя не верно указано ID компании';
 
                 return;
             }
@@ -129,9 +118,14 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
             $form['realy'] = 'да';
         }
 
-        $formModel = new Anketa($form);
+        $formModel = new Form($form);
 
         $formModel->save();
+
+        $formDetailsModel = new ReportCartForm($form);
+        $formDetailsModel->setAttribute('forms_uuid', $formModel->uuid);
+        $formDetailsModel->save();
+
         $this->createdForms->push($formModel);
     }
 }

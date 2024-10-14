@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\FieldPrompt;
-use App\Req;
 use Illuminate\Http\Request;
 
 class FieldPromptController extends Controller
@@ -52,38 +51,6 @@ class FieldPromptController extends Controller
         }
 
         return $prompts->paginate($request->perPage);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(FieldPrompt $fieldPrompt)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(FieldPrompt $fieldPrompt)
-    {
-        //
     }
 
     /**
