@@ -15,6 +15,12 @@ final class CreateCompanyController extends Controller
 {
     public function __invoke(CreateCompanyRequest $request, CreateElementHandlerFactory $factory): JsonResponse
     {
+        if (!user()->access('integration_1c_write')) {
+            return response()->json([
+                'message' => 'Forbidden'
+            ])->setStatusCode(Response::HTTP_FORBIDDEN);
+        }
+
         try {
             DB::beginTransaction();
 

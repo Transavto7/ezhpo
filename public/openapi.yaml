@@ -25,6 +25,8 @@ paths:
           $ref: '#/components/responses/GetCompanies200'
         "401":
           $ref: '#/components/responses/UnauthenticatedError'
+        "403":
+          $ref: '#/components/responses/ForbiddenError'
         "500":
           $ref: '#/components/responses/InternalServerError'
     post:
@@ -40,6 +42,8 @@ paths:
           $ref: '#/components/responses/CreateCompany201'
         "401":
           $ref: '#/components/responses/UnauthenticatedError'
+        "403":
+          $ref: '#/components/responses/ForbiddenError'
         "409":
           $ref: '#/components/responses/CreateCompany409'
         "422":
@@ -60,6 +64,8 @@ paths:
           $ref: '#/components/responses/CreateReportJob200'
         "401":
           $ref: '#/components/responses/UnauthenticatedError'
+        "403":
+          $ref: '#/components/responses/ForbiddenError'
         "422":
           $ref: '#/components/responses/ValidationError'
         "500":
@@ -88,6 +94,8 @@ paths:
           $ref: '#/components/responses/GetReport404'
         "401":
           $ref: '#/components/responses/UnauthenticatedError'
+        "403":
+          $ref: '#/components/responses/ForbiddenError'
         "500":
           $ref: '#/components/responses/InternalServerError'
   /api/1c/v1/requisites:
@@ -102,6 +110,8 @@ paths:
           $ref: '#/components/responses/GetRequisites200'
         "401":
           $ref: '#/components/responses/UnauthenticatedError'
+        "403":
+          $ref: '#/components/responses/ForbiddenError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -216,6 +226,18 @@ components:
               message:
                 type: string
                 example: Unauthenticated
+    ForbiddenError:
+      description: Доступ запрещен
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+            properties:
+              message:
+                type: string
+                example: Forbidden
     InternalServerError:
       description: Внутренняя ошибка сервера
       content:

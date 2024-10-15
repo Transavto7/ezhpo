@@ -11,6 +11,12 @@ final class GetCompaniesItemsController extends Controller
 {
     public function __invoke()
     {
+        if (!user()->access('integration_1c_read')) {
+            return response()->json([
+                'message' => 'Forbidden'
+            ])->setStatusCode(Response::HTTP_FORBIDDEN);
+        }
+
         try {
             $companies = Company::query()
                 ->select([

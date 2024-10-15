@@ -13,6 +13,12 @@ final class GetReportController extends Controller
 {
     public function __invoke(string $id)
     {
+        if (!user()->access('integration_1c_read')) {
+            return response()->json([
+                'message' => 'Forbidden'
+            ])->setStatusCode(Response::HTTP_FORBIDDEN);
+        }
+
         try {
             $report = Report::where('uuid', $id)->firstOrFail();
 

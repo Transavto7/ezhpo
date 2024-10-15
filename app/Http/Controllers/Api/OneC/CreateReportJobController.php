@@ -19,6 +19,12 @@ final class CreateReportJobController extends Controller
 {
     public function __invoke(CreateReportJobRequest $request, ReportHandler $handler)
     {
+        if (!user()->access('integration_1c_write')) {
+            return response()->json([
+                'message' => 'Forbidden'
+            ])->setStatusCode(Response::HTTP_FORBIDDEN);
+        }
+
         try {
             $report = $handler->handle(
                 new ReportAction(
