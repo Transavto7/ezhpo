@@ -1,6 +1,10 @@
 <style>
     @page {
-        margin: 0;
+        margin: 8px;
+    }
+
+    body {
+        margin: 8px;
     }
 
     .page-break {

@@ -336,7 +336,7 @@
                 updateAnketsControl()
             })
 
-            $('#inspection-labeling-print-btn').click(function () {
+            $('#ankets-labeling-print-btn').click(function () {
                 const anketsStorage = getAnketsStorage()
 
                 axios({
@@ -360,7 +360,7 @@
                         link.remove()
                     })
                     .catch((error) => {
-                        console.error('Ошибка при скачивании файла:', error)
+                        console.error('При формировании файла произошла ошибка:')
                     })
             })
 
@@ -600,7 +600,7 @@
                             <button id="approve-selected" class="btn btn-success btn-sm ml-2"></button>
                             <button id="select-all" class="btn btn-success btn-sm ml-2">Выделить все на странице</button>
                             <button id="selected-ankets-control-btn-unset" class="btn btn-success btn-sm ml-2">Снять выделение</button>
-                            <button id="inspection-labeling-print-btn" class="btn btn-success btn-sm ml-2">Печать маркировки</button>
+                            <button id="ankets-labeling-print-btn" class="btn btn-success btn-sm ml-2">Печать маркировки</button>
                         </div>
                     @endif
 

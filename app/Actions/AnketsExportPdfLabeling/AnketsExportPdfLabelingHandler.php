@@ -2,6 +2,7 @@
 
 namespace App\Actions\AnketsExportPdfLabeling;
 
+use App\Anketa;
 use App\Services\AnketsLabelingPDFGenerator\AnketsLabelingPDFGenerator;
 use App\Services\QRCode\QRCodeGeneratorInterface;
 use Illuminate\Http\Response;
@@ -29,18 +30,15 @@ final class AnketsExportPdfLabelingHandler
 
     public function handle(AnketsExportPdfLabelingCommand $command): Response
     {
-        $this->checkAnkets($command->getAnketIds());
+        $anketIds = Anketa::query()
+            ->whereIn('id', $command->getAnketIds())
+            ->pluck('uuid')
+            ->toArray();
 
-        // todo: uuids
-//        $anketIds = Anketa::query()
-//            ->whereIn('id', $command->getAnketIds())
-//            ->pluck('hash');
-
-        $anketIds = $command->getAnketIds();
-
-        $links = array_map(function (string $id) {
-            // todo: route
-            return route('ankets.validate', ['uuid' => $id]);
+        $links = array_map(function (string $uuid) {
+            return route('anket.validate', [
+                'uuid' => $uuid
+            ]);
         }, $anketIds);
 
         $cqrCodes = array_map(function (string $link) {
@@ -48,13 +46,5 @@ final class AnketsExportPdfLabelingHandler
         }, $links);
 
         return $this->pdfGenerator->generate($cqrCodes);
-    }
-
-    /**
-     * @param string[] $anketIds
-     * @return void
-     */
-    private function checkAnkets(array $anketIds) {
-        // todo: check ankets
     }
 }

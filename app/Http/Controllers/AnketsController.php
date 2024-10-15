@@ -22,6 +22,7 @@ use App\Traits\UserEdsTrait;
 use App\User;
 use App\ValueObjects\NotAdmittedReasons;
 use Barryvdh\DomPDF\Facade as PDF;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -494,5 +495,45 @@ class AnketsController extends Controller
                 'message' => $exception->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function validatePage(string $uuid)
+    {
+        $verified = true;
+        $anketInfo = [
+            'number' => '',
+            'companyName' => '',
+            'date' => '',
+            'driverName' => '',
+            'carGosNumber' => '',
+        ];
+
+        $anket = Anketa::where('uuid', '=', $uuid)->first();
+
+        if (!$anket || $anket->in_cart || $anket->deleted_at) {
+            $verified = false;
+        }
+        else {
+            $anketInfo['number'] = '';
+            $anketInfo['companyName'] = $anket->company_name;
+
+            if ($anket->driver && $anket->driver->name) {
+                $anketInfo['driver'] = $anket->driver->name;
+            }
+
+            if ($anket->date) {
+                $anketInfo['date'] = Carbon::parse($anket->date)->format('d.m.Y');
+            }
+
+            if ($anket->car && $anket->car->gos_number) {
+                $anketInfo['carGosNumber'] = $anket->car->gos_number;
+            }
+        }
+
+
+        return view('pages.ankets.validate', [
+            'verified' => $verified,
+            'anketInfo' => $anketInfo,
+        ]);
     }
 }

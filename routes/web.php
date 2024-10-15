@@ -178,5 +178,7 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
+Route::get('/anket-validate/{uuid}', 'AnketsController@validatePage')->name('anket.validate');
+
 Auth::routes();
 
