@@ -12,6 +12,9 @@ use App\MedicFormNormalizedPressure;
 use App\Models\Forms\Form;
 use App\Point;
 use App\Services\DuplicatesCheckerService;
+use App\Services\FormHash\FormHashGenerator;
+use App\Services\FormHash\MedicHashData;
+use App\Services\FormHash\TechHashData;
 use App\Settings;
 use App\User;
 use App\ValueObjects\PressureLimits;
@@ -68,25 +71,27 @@ class UpdateFormHandler
             $data['realy'] = 'да';
         }
 
-        if ($data['driver_id'] && $data['date'] && $data['type_view'] && in_array($data['type_anketa'], [FormTypeEnum::MEDIC, FormTypeEnum::TECH])) {
+        if ($data['driver_id'] && $data['date'] && $data['type_view']) {
+            $hashData = null;
+
             if ($data['type_anketa'] === FormTypeEnum::MEDIC) {
-                $data['day_hash'] = FormHashGenerator::generate(
-                    new MedicHashData(
-                        $data['driver_id'],
-                        new DateTimeImmutable($data['date']),
-                        $data['type_view']
-                    )
+                $hashData = new MedicHashData(
+                    $data['driver_id'],
+                    new DateTimeImmutable($data['date']),
+                    $data['type_view']
                 );
             }
-            if ($form['type_anketa'] === FormTypeEnum::TECH && $data['car_id']) {
-                $form['day_hash'] = FormHashGenerator::generate(
-                    new TechHashData(
-                        $data['driver_id'],
-                        $data['car_id'],
-                        new DateTimeImmutable($data['date']),
-                        $data['type_view']
-                    )
+            if (($form['type_anketa'] === FormTypeEnum::TECH) && $data['car_id']) {
+                $hashData = new TechHashData(
+                    $data['driver_id'],
+                    $data['car_id'],
+                    new DateTimeImmutable($data['date']),
+                    $data['type_view']
                 );
+            }
+
+            if ($hashData) {
+                $data['day_hash'] = FormHashGenerator::generate($hashData);
             }
         }
 
@@ -185,45 +190,5 @@ class UpdateFormHandler
         }
 
         return collect([]);
-    }
-
-    //TODO: вынести в трейт или хэлпер
-    protected function isDuplicate($first, $second): bool
-    {
-        $diffInMinutes = abs($first - Carbon::parse($second)->timestamp);
-
-        return ($diffInMinutes < Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS) && ($diffInMinutes >= 0);
-    }
-
-    protected function updateConnectedForm(Anketa $form)
-    {
-        if (!$form->connected_hash) {
-            return;
-        }
-
-        $formCopy = Anketa::where('connected_hash', $form->connected_hash)
-            ->where('type_anketa', '!=', $form->type_anketa)
-            ->first();
-
-        if (!$formCopy) {
-            return;
-        }
-
-        $protectedAttributes = [
-            'type_anketa',
-            'id',
-            'created_at',
-            'updated_at'
-        ];
-
-        foreach ($form->fillable as $key) {
-            if (in_array($key, $protectedAttributes)) {
-                continue;
-            }
-
-            $formCopy->$key = $form[$key];
-        }
-
-        $formCopy->save();
     }
 }
