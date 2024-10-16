@@ -360,7 +360,17 @@
                         link.remove()
                     })
                     .catch((error) => {
-                        console.error('При формировании файла произошла ошибка:')
+                        const status = error.response.status;
+                        let message = 'При формировании файла произошла ошибка';
+
+                        if (status === 422) {
+                            message = 'Превышено максимально допустимое количество осмотров для печати'
+                        }
+
+                        swal.fire({
+                            title: message,
+                            icon: 'error'
+                        });
                     })
             })
 
@@ -462,6 +472,11 @@
 
     $permissionToExportPrikazPL = (
         $type_ankets == 'tech' && user()->access('tech_export_prikaz_pl')
+    );
+
+    $permissionToPrintAnketLabeling = (
+        user()->access('medic_read') && $type_ankets == 'medic'
+        || user()->access('tech_read') && $type_ankets == 'tech'
     );
 
     $notDeletedItems = session('not_deleted_ankets');
@@ -600,7 +615,10 @@
                             <button id="approve-selected" class="btn btn-success btn-sm ml-2"></button>
                             <button id="select-all" class="btn btn-success btn-sm ml-2">Выделить все на странице</button>
                             <button id="selected-ankets-control-btn-unset" class="btn btn-success btn-sm ml-2">Снять выделение</button>
-                            <button id="ankets-labeling-print-btn" class="btn btn-success btn-sm ml-2">Печать маркировки</button>
+
+                            @if($permissionToPrintAnketLabeling)
+                                <button id="ankets-labeling-print-btn" class="btn btn-success btn-sm ml-2">Печать маркировки</button>
+                            @endif
                         </div>
                     @endif
 

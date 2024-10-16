@@ -3,6 +3,8 @@
 namespace App\Actions\AnketsExportPdfLabeling;
 
 use App\Anketa;
+use App\Enums\AnketLabelingType;
+use App\Services\AnketsLabelingPDFGenerator\AnketLabelingPDFGeneratorItem;
 use App\Services\AnketsLabelingPDFGenerator\AnketsLabelingPDFGenerator;
 use App\Services\QRCode\QRCodeGeneratorInterface;
 use Illuminate\Http\Response;
@@ -30,21 +32,32 @@ final class AnketsExportPdfLabelingHandler
 
     public function handle(AnketsExportPdfLabelingCommand $command): Response
     {
-        $anketIds = Anketa::query()
+        $ankets = Anketa::query()
+            ->select([
+                'id',
+                'uuid',
+                'type_anketa'
+            ])
             ->whereIn('id', $command->getAnketIds())
-            ->pluck('uuid')
+            ->whereNotNull('uuid')
+            ->whereNull('deleted_at')
+            ->where('in_cart', '<>', 1)
+            ->get()
             ->toArray();
 
-        $links = array_map(function (string $uuid) {
-            return route('anket.validate', [
-                'uuid' => $uuid
+        $items = array_map(function (array $item) {
+            $url = route('anket.validate', [
+                'uuid' => $item['uuid'],
             ]);
-        }, $anketIds);
+            $qrCode = $this->qrCodeGenerator->generate($url);
 
-        $cqrCodes = array_map(function (string $link) {
-            return $this->qrCodeGenerator->generate($link);
-        }, $links);
+            return new AnketLabelingPDFGeneratorItem(
+                $qrCode,
+                $item['id'],
+                AnketLabelingType::fromString($item['type_anketa']),
+            );
+        }, $ankets);
 
-        return $this->pdfGenerator->generate($cqrCodes);
+        return $this->pdfGenerator->generate($items);
     }
 }

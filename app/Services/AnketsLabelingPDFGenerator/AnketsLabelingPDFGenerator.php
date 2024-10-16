@@ -2,26 +2,45 @@
 
 namespace App\Services\AnketsLabelingPDFGenerator;
 
+use App\Enums\AnketLabelingType;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Response;
 use Barryvdh\DomPDF\Facade as PDF;
 
 final class AnketsLabelingPDFGenerator
 {
-    public function generate(array $qrCodes): Response
+    /**
+     * @param AnketLabelingPDFGeneratorItem[] $items
+     * @return Response
+     * @throws BindingResolutionException
+     */
+    public function generate(array $items): Response
     {
-        $imageBg = $this->getBg();
-        $customPaper = array(0, 0, 354.00, 685.00);
+        $logoImage = $this->getAssetImage('anket_labeling_1.png');
+        $arrowsImage = $this->getAssetImage('anket_labeling_2.png');
+        $customPaper = array(0, 0, 250.00, 484.00);
 
-        $views = [];
+        $pages = [];
 
-        foreach ($qrCodes as $qrCode) {
-            $views[] = [
-                'qrCode' => $qrCode,
-                'imageBg' => $imageBg,
+        foreach ($items as $item) {
+            $prefixes = [
+                AnketLabelingType::MEDIC => 'МО',
+                AnketLabelingType::TECH => 'ТО',
+            ];
+
+            $id = $prefixes[$item->getAnketType()->value()] . '-' . $item->getId();
+
+            $pages[] = [
+                'qrCode' => $item->getQrCode(),
+                'id' => $id,
             ];
         }
 
-        $pdf = PDF::loadView('templates.anket-labeling', ['pages' => $views])->setPaper($customPaper, 'landscape');
+        $pdf = PDF::loadView('templates.anket-labeling', [
+            'pages' => $pages,
+            'logoImage' => $logoImage,
+            'arrowsImage' => $arrowsImage,
+        ])->setPaper($customPaper, 'landscape');
 
         $response = response()->make($pdf->output(), 200);
         $response->header('Content-Type', 'application/pdf');
@@ -29,9 +48,9 @@ final class AnketsLabelingPDFGenerator
         return $response;
     }
 
-    private function getBg(): string
+    private function getAssetImage(string $assetName): string
     {
-        $imagePath = public_path('images/anket_labeling.png');
+        $imagePath = public_path('images/anket_labeling/'.$assetName);
         $imageData = file_get_contents($imagePath);
         $base64Image = base64_encode($imageData);
 

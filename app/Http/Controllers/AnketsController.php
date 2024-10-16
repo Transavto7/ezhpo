@@ -488,6 +488,10 @@ class AnketsController extends Controller
     {
         $anketIds = $request->input('anket_ids');
 
+        if (count($anketIds) > 40) {
+            return response()->json()->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
         try {
             return $handler->handle(new AnketsExportPdfLabelingCommand($anketIds));
         } catch (Throwable $exception) {
