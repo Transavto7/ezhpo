@@ -57,7 +57,7 @@ class DeleteUselessFields extends Migration
         foreach ($foreign as $table => $keys) {
             foreach ($keys as $key) {
                 Schema::table($table, function (Blueprint $table) use ($key) {
-                    $table->dropForeign($key);
+                    $table->dropForeign([$key]);
                 });
             }
         }
