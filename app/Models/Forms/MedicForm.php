@@ -14,6 +14,8 @@ class MedicForm extends Model
     public $fillable = [
         'forms_uuid',
 
+        'day_hash',
+
         'type_view',
 
         'is_dop',

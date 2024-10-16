@@ -10,9 +10,11 @@ use App\Actions\Reports\Journal\GetJournalData\GetJournalDataAction;
 use App\Actions\Reports\Journal\GetJournalData\GetJournalDataHandler;
 use App\Company;
 use App\Events\UserActions\ClientReportRequest;
+use App\Exports\ReportJournalExport;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -106,7 +108,6 @@ class ReportController extends Controller
         $company_fields['getFieldKey'] = 'hash_id';
 
         $pv_fields = config('elements.Company.fields.pv_id');
-        $pv_fields['getFieldKey'] = 'name';
         $pv_fields['multiple'] = 1;
 
         return view('pages.reports.all', [
@@ -123,5 +124,26 @@ class ReportController extends Controller
             'pv_id' => $data['pv_id'] ?? 0,
             'data' => []
         ]);
+    }
+
+    public function exportJournalData(Request $request, GetJournalDataHandler $handler)
+    {
+        if ($request->has('month')) {
+            $date_from = Carbon::parse($request->month)->startOfMonth();
+            $date_to = Carbon::parse($request->month)->endOfMonth();
+        } else {
+            $date_from = Carbon::parse($request->date_from)->startOfDay();
+            $date_to = Carbon::parse($request->date_to)->endOfDay();
+        }
+
+        $companyID = $request->input('company_id');
+
+        if (!$companyID || !$date_to || !$date_from) {
+            return response()->json(null, 404);
+        }
+
+        event(new ClientReportRequest($request->user('api'), 'service_report_request'));
+
+        return Excel::download(new ReportJournalExport($handler->handle(new GetJournalDataAction($companyID, $date_from, $date_to))), 'export.xlsx');
     }
 }

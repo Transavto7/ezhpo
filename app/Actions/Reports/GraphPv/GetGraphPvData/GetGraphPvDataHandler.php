@@ -11,23 +11,23 @@ class GetGraphPvDataHandler
     {
         $pvId = $action->getPvId();
         $formType = $action->getFormType();
+        $relatedTable = Form::$relatedTables[$formType];
         $dateFrom = $action->getDateFrom();
         $dateTo = $action->getDateTo();
 
         $reports = Form::query()
-            //TODO: нужен left join
+            ->join($relatedTable, 'forms.uuid', '=', "$relatedTable.forms_uuid")
             ->whereIn('point_id', $pvId)
-            ->where('type_anketa', $formType)
-            ->where(function ($q) use ($dateFrom, $dateTo) {
+            ->where(function ($q) use ($relatedTable, $dateFrom, $dateTo) {
                 $q->where(function ($q) use ($dateFrom, $dateTo) {
                     $q->whereNotNull('date')
                         ->whereBetween('date', [
                             $dateFrom,
                             $dateTo
                         ]);
-                })->orWhere(function ($q) use ($dateFrom, $dateTo) {
+                })->orWhere(function ($q) use ($relatedTable, $dateFrom, $dateTo) {
                     $q->whereNull('date')
-                        ->whereBetween('period_pl', [
+                        ->whereBetween("$relatedTable.period_pl", [
                             Carbon::parse($dateFrom)->format('Y-m'),
                             Carbon::parse($dateTo)->format('Y-m'),
                         ]);
@@ -36,7 +36,7 @@ class GetGraphPvDataHandler
 
         $reports2 = Form::query()
             ->whereIn('point_id', $pvId)
-            ->where('type_anketa', $formType)
+            ->join($relatedTable, 'forms.uuid', '=', "$relatedTable.forms_uuid")
             ->whereBetween("created_at", [
                 $dateFrom,
                 $dateTo,

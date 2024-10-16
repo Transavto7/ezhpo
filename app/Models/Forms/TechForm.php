@@ -13,6 +13,8 @@ class TechForm extends Model
     protected $fillable = [
         'forms_uuid',
 
+        'day_hash',
+
         'type_view',
 
         'is_dop',

@@ -450,7 +450,7 @@
                     @if($type_ankets !== FormTypeEnum::PAK_QUEUE)
                         <div class="col-md-12">
                             <div class="row bg-light p-2">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     @if (!user()->hasRole('client'))
                                         <button type="button" data-toggle-show="#ankets-filters" class="btn btn-sm btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
                                     @endif
@@ -471,7 +471,7 @@
                                     @endif
                                 </div>
                                 @if($type_ankets === FormTypeEnum::TECH)
-                                    <div class="col-md-8 text-right">
+                                    <div class="col-md-6 text-right">
                                         @if($permissionToExport)
                                             <a href="?export=1&{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
                                         @endif

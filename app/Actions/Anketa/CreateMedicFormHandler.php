@@ -10,6 +10,8 @@ use App\MedicFormNormalizedPressure;
 use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
 use App\Services\DuplicatesCheckerService;
+use App\Services\FormHash\FormHashGenerator;
+use App\Services\FormHash\MedicHashData;
 use App\ValueObjects\PressureLimits;
 use App\ValueObjects\Pulse;
 use App\ValueObjects\PulseLimits;

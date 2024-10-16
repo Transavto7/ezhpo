@@ -10,7 +10,6 @@ use App\FieldPrompt;
 use App\Models\Forms\Form;
 use App\User;
 use Carbon\Carbon;
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
@@ -217,6 +216,13 @@ class HomeController extends Controller
                     continue;
                 }
 
+                if ($filterKey === 'date_prmo') {
+                    $dateFrom = Carbon::parse($filterValue)->startOfDay();
+                    $dateTo = Carbon::parse($filterValue)->endOfDay();
+                    $forms = $forms->whereBetween('drivers.date_prmo', [$dateFrom, $dateTo]);
+                    continue;
+                }
+
                 if (is_array($filterValue)) {
                     if ($filterKey === 'town_id') {
                         $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
@@ -325,20 +331,30 @@ class HomeController extends Controller
                 $dateTo = $filterParams['TO_date']
                     ? Carbon::parse($filterParams['TO_date'])->endOfDay()
                     : Carbon::now()->addYears(10);
-                $forms = $forms->where(function ($query) use ($dateFrom, $dateTo) {
-                    $query->where(function ($subQuery) use ($dateFrom, $dateTo) {
-                        $subQuery
-                            ->whereNotNull('forms.date')
-                            ->whereBetween('forms.date', [$dateFrom, $dateTo]);
-                    })->orWhere(function ($subQuery) use ($dateFrom, $dateTo) {
-                        $subQuery
-                            ->whereNull('forms.date')
-                            ->whereBetween('period_pl', [
-                                $dateFrom->format('Y-m'),
-                                $dateTo->format('Y-m')
-                            ]);
+
+                if (!in_array($validTypeForm, [FormTypeEnum::MEDIC, FormTypeEnum::TECH])) {
+                    $forms = $forms
+                        ->whereNull('forms.date')
+                        ->whereBetween("$formDetailsTable.period_pl", [
+                            $dateFrom->format('Y-m'),
+                            $dateTo->format('Y-m')
+                        ]);
+                } else {
+                    $forms = $forms->where(function ($query) use ($formDetailsTable, $validTypeForm, $dateFrom, $dateTo) {
+                        $query->where(function ($subQuery) use ($formDetailsTable, $validTypeForm, $dateFrom, $dateTo) {
+                            $subQuery
+                                ->whereNotNull('forms.date')
+                                ->whereBetween('forms.date', [$dateFrom, $dateTo]);
+                        })->orWhere(function ($subQuery) use ($formDetailsTable, $dateFrom, $dateTo) {
+                            $subQuery
+                                ->whereNull('forms.date')
+                                ->whereBetween("$formDetailsTable.period_pl", [
+                                    $dateFrom->format('Y-m'),
+                                    $dateTo->format('Y-m')
+                                ]);
+                        });
                     });
-                });
+                }
             }
         }
         /**

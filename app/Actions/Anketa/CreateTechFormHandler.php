@@ -9,6 +9,9 @@ use App\Enums\BlockActionReasonsEnum;
 use App\Models\Forms\Form;
 use App\Models\Forms\TechForm;
 use App\Services\DuplicatesCheckerService;
+use App\Services\FormHash\FormHashGenerator;
+use App\Services\FormHash\TechHashData;
+use DateTimeImmutable;
 use Illuminate\Support\Carbon;
 
 class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -173,7 +176,7 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
                 new TechHashData(
                     $form['driver_id'],
                     $form['car_id'],
-                    new \DateTimeImmutable($form['date']),
+                    new DateTimeImmutable($form['date']),
                     $form['type_view']
                 )
             );
