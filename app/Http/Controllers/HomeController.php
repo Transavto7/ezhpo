@@ -184,6 +184,11 @@ class HomeController extends Controller
                     }
                 }
 
+                if ($filterKey === 'id') {
+                    $forms->where('forms.id', $filterValue);
+                    continue;
+                }
+
                 if ($filterKey === 'hour_from') {
                     $forms->whereTime('forms.date', '>=', $filterValue . ':00');
                     continue;
