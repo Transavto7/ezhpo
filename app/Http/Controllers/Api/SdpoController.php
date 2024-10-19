@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\AnketsExportPdfLabeling\AnketsExportPdfLabelingCommand;
+use App\Actions\AnketsExportPdfLabeling\AnketsExportPdfLabelingHandler;
 use App\Anketa;
 use App\Car;
 use App\Driver;
@@ -19,6 +21,7 @@ use App\User;
 use App\ValueObjects\Phone;
 use App\ValueObjects\PressureLimits;
 use App\ValueObjects\Tonometer;
+use DomainException;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -679,6 +682,21 @@ class SdpoController extends Controller
             return response()->json([
                 'message' => "Ошибка не была передана на сервер! " . $exception->getMessage()
             ]);
+        }
+    }
+
+    public function getAnketLabelingQr($id, AnketsExportPdfLabelingHandler $handler)
+    {
+        try {
+            return $handler->handle(new AnketsExportPdfLabelingCommand([$id]));
+        } catch (DomainException $exception) {
+            return response()->json([
+                'message' => $exception->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (Throwable $exception) {
+            return response()->json([
+                'message' => $exception->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -7,6 +7,7 @@ use App\Enums\AnketLabelingType;
 use App\Services\AnketsLabelingPDFGenerator\AnketLabelingPDFGeneratorItem;
 use App\Services\AnketsLabelingPDFGenerator\AnketsLabelingPDFGenerator;
 use App\Services\QRCode\QRCodeGeneratorInterface;
+use DomainException;
 use Illuminate\Http\Response;
 
 final class AnketsExportPdfLabelingHandler
@@ -44,6 +45,10 @@ final class AnketsExportPdfLabelingHandler
             ->where('in_cart', '<>', 1)
             ->get()
             ->toArray();
+
+        if (!count($ankets)) {
+            throw new DomainException('Ankets not found');
+        }
 
         $items = array_map(function (array $item) {
             $url = route('anket.validate', [
