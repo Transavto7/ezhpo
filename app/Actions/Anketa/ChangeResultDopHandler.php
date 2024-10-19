@@ -34,6 +34,8 @@ class ChangeResultDopHandler
      */
     protected function handleTech(Form $form, string $result)
     {
+        $this->validate($form);
+
         /** @var TechForm $details */
         $details = $form->details;
 
@@ -61,6 +63,8 @@ class ChangeResultDopHandler
      */
     protected function handleMedic(Form $form, string $result)
     {
+        $this->validate($form);
+
         $existForms = DuplicatesCheckerService::getExistTechForms([$form->driver_id]);;
 
         DuplicatesCheckerService::checkExist($existForms, Carbon::parse($form->date)->timestamp);
@@ -70,5 +74,21 @@ class ChangeResultDopHandler
 
         $details->result_dop = $result;
         $details->save();
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function validate(Form $form)
+    {
+        $details = $form->details;
+
+        if ($details->is_dop !== 1) {
+            throw new Exception("Осмотр с id $form->id добавлен не в режиме ввода ПЛ");
+        }
+
+        if ($details->result_dop !== null) {
+            throw new Exception("Осмотр с id $form->id уже утвержден");
+        }
     }
 }

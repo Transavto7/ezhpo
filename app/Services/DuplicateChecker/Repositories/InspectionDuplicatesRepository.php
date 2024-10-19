@@ -4,12 +4,16 @@ namespace App\Services\DuplicateChecker\Repositories;
 
 use App\Enums\FormTypeEnum;
 use App\Services\DuplicateChecker\Dto\Inspection;
-use DB;
+use Exception;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class InspectionDuplicatesRepository implements DuplicateRepository
 {
+    /**
+     * @throws Exception
+     */
     public function getDuplicates(Inspection $inspection): Collection
     {
         $formType = $inspection->getFormType();
@@ -22,10 +26,10 @@ class InspectionDuplicatesRepository implements DuplicateRepository
                 $table = 'tech_forms';
                 break;
             default:
-                throw new \Exception("Проверка дубликатов для типа осмотра - $formType не доступна");
+                throw new Exception("Проверка дубликатов для типа осмотра - $formType не доступна");
         };
 
-        return DB::table('forms')
+        return DB::table($table)
             ->select('forms.id')
             ->join('forms', 'forms.uuid', '=', "$table.forms_uuid")
             ->where('forms.driver_id', '=', $inspection->getDriverId())

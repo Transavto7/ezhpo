@@ -629,26 +629,39 @@ class SdpoController extends Controller
     /*
     * Inspection update type
     */
+    /**
+     * @throws Throwable
+     */
     public function changeType($id)
     {
-        $inspection = Form::find($id);
-        if (!$inspection) {
-            return;
+        try {
+            DB::beginTransaction();
+
+            $inspection = Form::find($id);
+            if (!$inspection) {
+                return;
+            }
+
+            $inspection->update([
+                'type_anketa' => FormTypeEnum::MEDIC,
+            ]);
+
+            $details = $inspection->details;
+
+            if (!$details) {
+                return;
+            }
+
+            $details->update([
+                'flag_pak' => 'СДПО А'
+            ]);
+
+            DB::commit();
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            throw $exception;
         }
-
-        $inspection->update([
-            'type_anketa' => FormTypeEnum::MEDIC,
-        ]);
-
-        $details = $inspection->details;
-
-        if (!$details) {
-            return;
-        }
-
-        $details->update([
-            'flag_pak' => 'СДПО А'
-        ]);
     }
 
     /*
