@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PrintPlForm extends Model
 {
+    protected $primaryKey = 'forms_uuid';
+
     public $timestamps = false;
 
     protected $fillable = [

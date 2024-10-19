@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MedicForm extends Model
 {
+    protected $primaryKey = 'forms_uuid';
+
     public $timestamps = false;
 
     public $fillable = [
