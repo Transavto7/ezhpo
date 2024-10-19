@@ -84,6 +84,14 @@ class HomeController extends Controller
                 : $forms->whereNull('result_dop');
         }
 
+        $formDetailsTable = Form::$relatedTables[$validTypeForm];
+        $forms = $forms
+            ->join($formDetailsTable, 'forms.uuid', '=', "$formDetailsTable.forms_uuid")
+            ->leftJoin('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
+            ->join('companies', 'forms.company_id', '=', 'companies.hash_id')
+            ->join('points', 'forms.point_id', '=', 'points.id')
+            ->join('users', 'forms.user_id', '=', 'users.id');
+
         $duplicates = $request->get('duplicates', false);
         if (filter_var($duplicates, FILTER_VALIDATE_BOOLEAN) && $request->has('date') && $request->has('TO_date')) {
             if (! $request->has('date') || ! $request->has('TO_date')) {
@@ -110,14 +118,6 @@ class HomeController extends Controller
         } else {
             $request->session()->forget('error');
         }
-
-        $formDetailsTable = Form::$relatedTables[$validTypeForm];
-        $forms = $forms
-            ->join($formDetailsTable, 'forms.uuid', '=', "$formDetailsTable.forms_uuid")
-            ->leftJoin('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
-            ->join('companies', 'forms.company_id', '=', 'companies.hash_id')
-            ->join('points', 'forms.point_id', '=', 'points.id')
-            ->join('users', 'forms.user_id', '=', 'users.id');
 
         /**
          * Фильтрация анкет в ЛКК
@@ -660,8 +660,6 @@ class HomeController extends Controller
         $duplicates = DB::table($table)
             ->select("$table.day_hash")
             ->join('forms', 'forms.uuid', '=', "$table.forms_uuid")
-            ->where('forms.date', '>=', $start->format('Y-m-d'))
-            ->where('forms.date', '<', $end->format('Y-m-d'))
             ->where('forms.date', '>=', $start->format('Y-m-d'))
             ->where('forms.date', '<', $end->format('Y-m-d'))
             ->whereNotNull("$table.day_hash")
