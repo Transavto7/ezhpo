@@ -483,7 +483,7 @@
                                         @endif
                                     </div>
                                 @else
-                                    <div class="col-md-8 text-right">
+                                    <div class="col-md-6 text-right">
                                         @if($permissionToExport)
                                             <a href="?export=1&{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
                                         @endif
