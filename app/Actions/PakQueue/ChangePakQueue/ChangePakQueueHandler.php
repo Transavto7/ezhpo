@@ -24,10 +24,14 @@ class ChangePakQueueHandler
             throw new Exception('Недопустимый результат осмотра');
         }
 
-        $form = Form::find($id);
+        $form = Form::withTrashed()->find($id);
 
         if (!$form) {
             throw new Exception('Осмотр не найден');
+        }
+
+        if ($form->deleted_at !== null) {
+            throw new Exception('Осмотр удален');
         }
 
         if ($form->type_anketa !== FormTypeEnum::PAK_QUEUE) {
