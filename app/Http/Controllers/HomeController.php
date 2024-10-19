@@ -246,6 +246,17 @@ class HomeController extends Controller
                         continue;
                     }
 
+                    if ($filterKey === 'company_id') {
+                        $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
+                            foreach ($filterValue as $companyId) {
+                                $query = $query->orWhere('forms.company_id', $companyId);
+                            }
+
+                            return $query;
+                        });
+                        continue;
+                    }
+
                     if ($filterKey === 'pv_id') {
                         $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
                             foreach ($filterValue as $pointId) {

@@ -32,13 +32,7 @@ class DocDataService
 
         $details = $form->details;
 
-        foreach ($form->fillable as $field) {
-            $data[$field] = $form[$field];
-        }
-
-        foreach ($form->details as $field) {
-            $data[$field] = $details[$field];
-        }
+        $data = array_merge($data, $form->toArray(), $details->toAttay());
 
         $driver = Driver::where('hash_id', $form->driver_id)->first();
         $data['driver'] = $driver;

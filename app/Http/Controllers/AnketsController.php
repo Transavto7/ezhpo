@@ -30,40 +30,6 @@ use Throwable;
 
 class AnketsController extends Controller
 {
-    public static function ddateCheck($dateAnketa, $dateModel, $id)
-    {
-        $dateCheckModel = app("App\\$dateModel")->find($id);
-        $dateCheck = DDates::where('item_model', $dateModel)->get();
-
-        $redDates = [];
-
-        if ($dateCheck && $dateCheckModel) {
-            foreach ($dateCheck as $dateCheckItem) {
-                $fieldDateCheck = $dateCheckItem->field;
-
-                if (isset($dateCheckModel[$fieldDateCheck])) {
-                    $fieldDateItemValue = $dateCheckModel[$fieldDateCheck];
-
-                    $dateAction = $dateCheckItem->action . ' ' . $dateCheckItem->days . ' days';
-
-                    $dateCheckWithAnketa = date('Y-m-d', strtotime($fieldDateItemValue . ' ' . $dateAction));
-                    $anketaDate = date('Y-m-d', strtotime($dateAnketa));
-
-                    if ($dateCheckWithAnketa <= $anketaDate) {
-                        $redDates[$fieldDateCheck] = [
-                            'value' => $fieldDateItemValue,
-                            'item_model' => $dateCheckItem->item_model,
-                            'item_id' => $dateCheckModel->id,
-                            'item_field' => $fieldDateCheck
-                        ];
-                    }
-                }
-            }
-        }
-
-        return $redDates;
-    }
-
     public function index(Request $request)
     {
         /** @var User $user */
@@ -288,14 +254,10 @@ class AnketsController extends Controller
         $errors = [];
 
         foreach ($ids as $id) {
-            $form = Anketa::query()
-                ->where('id', $id)
-                ->where('is_dop', '=', 1)
-                ->whereNull('result_dop')
-                ->first();
+            $form = Form::find($id);
 
             if ($form === null) {
-                $errors[] = "Осмотр с id $id уже утвержден";
+                $errors[] = "Осмотр с id $id не найден";
                 continue;
             }
 
@@ -447,7 +409,7 @@ class AnketsController extends Controller
         }
 
         $pdf = Pdf::loadView('docs.print', [
-            'anketa' => $form,
+            'form' => $form,
             'stamp' => $stamp,
             'user' => User::find($form->user_id),
             'validity' => UserEdsTrait::getValidityString(

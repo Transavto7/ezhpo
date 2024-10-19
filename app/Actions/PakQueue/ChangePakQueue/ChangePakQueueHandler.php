@@ -57,7 +57,7 @@ class ChangePakQueueHandler
         /** @var MedicForm $details */
         $details = $form->details;
 
-        $form->flag_pak = 'СДПО Р';
+        $details->flag_pak = 'СДПО Р';
         $details->admitted = $action->getAdmitted();
 
         if ($details->admitted === 'Не идентифицирован') {
