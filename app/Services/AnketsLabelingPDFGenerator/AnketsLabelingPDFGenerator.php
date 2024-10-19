@@ -19,6 +19,7 @@ final class AnketsLabelingPDFGenerator
         $logoImage = $this->getAssetImage('anket_labeling_1.png');
         $arrowsImage = $this->getAssetImage('anket_labeling_2.png');
         $customPaper = array(0, 0, 250.00, 484.00);
+        $domain = preg_replace('/^https?:\/\//', '', config('app.url'));
 
         $pages = [];
 
@@ -40,6 +41,7 @@ final class AnketsLabelingPDFGenerator
             'pages' => $pages,
             'logoImage' => $logoImage,
             'arrowsImage' => $arrowsImage,
+            'domain' => $domain,
         ])->setPaper($customPaper, 'landscape');
 
         $response = response()->make($pdf->output(), 200);

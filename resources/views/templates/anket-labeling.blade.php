@@ -30,7 +30,7 @@
 
     .arrows {
         position: absolute;
-        top: 152px;
+        top: 170px;
         right: 185px;
         transform: translateX(-50%);
         height: 60px;
@@ -41,7 +41,7 @@
         position: absolute;
         left: 20px;
         top: 115px;
-        font-size: 36px;
+        font-size: 32px;
         text-transform: uppercase;
         font-family: "DejaVu Sans", sans-serif;
         line-height: 1;
@@ -49,20 +49,28 @@
 
     .qr {
         position: absolute;
-        top: 110px;
+        top: 115px;
         right: 20px;
+        width: 170px;
+        height: 170px;
+    }
+
+    .domain {
+        position: absolute;
+        top: 235px;
+        left: 20px;
         width: 145px;
         height: 145px;
+        font-family: "DejaVu Sans", sans-serif;
+        font-size: 18px;
     }
 
     .id {
         position: absolute;
-        bottom: 15px;
-        right: 20px;
-        width: 145px;
-        text-align: center;
+        top: 260px;
+        left: 20px;
         font-family: "DejaVu Sans", sans-serif;
-        font-size: 20px;
+        font-size: 18px;
     }
 </style>
 
@@ -82,6 +90,9 @@
             </div>
             <div class="qr">
                 <img src="{{ $page['qrCode'] }}" width="100%" height="100%" alt="QR Code"/>
+            </div>
+            <div class="domain">
+                {{ $domain }}
             </div>
             <div class="id">
                 {{ $page['id'] }}
