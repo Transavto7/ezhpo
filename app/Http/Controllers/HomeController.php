@@ -287,7 +287,7 @@ class HomeController extends Controller
                         $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
                             foreach ($filterValue as $fvItemValue) {
                                 $escapedFvItemValue = str_replace('\\', '\\\\', $fvItemValue);
-                                $query = $query->orWhere('forms.' . $filterKey, 'like', '%' . trim($escapedFvItemValue) . '%');
+                                $query = $query->orWhere('medic_forms.' . $filterKey, 'like', '%' . trim($escapedFvItemValue) . '%');
                             }
 
                             return $query;

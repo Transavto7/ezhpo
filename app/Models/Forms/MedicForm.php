@@ -27,6 +27,7 @@ class MedicForm extends Model
         'operator_id',
         'terminal_id',
 
+        'driver_group_risk',
         'pressure',
         'tonometer',
         't_people',
