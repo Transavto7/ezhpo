@@ -117,7 +117,7 @@ class AnketsController extends Controller
     public function Get(Request $request)
     {
         /** @var Form $form */
-        $form = Form::where('id', $request->id)->first();
+        $form = Form::withTrashed()->findOrFail($request->id);
         $details = $form->details;
 
         $data = array_merge($form->toArray(), $details->toArray());
@@ -229,7 +229,7 @@ class AnketsController extends Controller
 
     public function ChangeResultDop($id, $result_dop, ChangeResultDopHandler $handler): RedirectResponse
     {
-        $form = Form::findOrFail($id);
+        $form = Form::withTrashed()->findOrFail($id);
 
         try {
             DB::beginTransaction();
@@ -254,7 +254,7 @@ class AnketsController extends Controller
         $errors = [];
 
         foreach ($ids as $id) {
-            $form = Form::find($id);
+            $form = Form::withTrashed()->find($id);
 
             if ($form === null) {
                 $errors[] = "Осмотр с id $id не найден";
@@ -287,9 +287,9 @@ class AnketsController extends Controller
 
         $id = $request->id;
 
+        $form = Form::withTrashed()->findOrFail($id);
+
         try {
-            //TODO: нет проверки на существование формы
-            $form = Form::find($id);
 
             $handler->handle($form, $request->all(), Auth::user());
 
@@ -400,7 +400,7 @@ class AnketsController extends Controller
 
     public function print($id)
     {
-        $form = Form::findOrFail($id);
+        $form = Form::withTrashed()->findOrFail($id);
 
         $stamp = null;
         $terminal = User::find($form->terminal_id);

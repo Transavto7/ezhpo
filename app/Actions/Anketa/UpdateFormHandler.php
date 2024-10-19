@@ -71,7 +71,7 @@ class UpdateFormHandler
             $data['realy'] = 'да';
         }
 
-        if ($data['driver_id'] && $data['date'] && $data['type_view']) {
+        if ($data['driver_id'] && $data['date'] && ($data['type_view'] ?? null)) {
             $hashData = null;
 
             if ($data['type_anketa'] === FormTypeEnum::MEDIC) {
