@@ -13,6 +13,7 @@ use App\MedicFormNormalizedPressure;
 use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
 use App\SdpoCrashLog;
+use App\Services\FormHash\MedicHashData;
 use App\Settings;
 use App\Stamp;
 use App\Traits\UserEdsTrait;
@@ -20,6 +21,7 @@ use App\User;
 use App\ValueObjects\Phone;
 use App\ValueObjects\PressureLimits;
 use App\ValueObjects\Tonometer;
+use DateTimeImmutable;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -275,6 +277,12 @@ class SdpoController extends Controller
             $driver->save();
 
             $medic['admitted'] = $admitted;
+
+            $medic['day_hash'] = new MedicHashData(
+                $medic['driver_id'],
+                new DateTimeImmutable($medic['date']),
+                $medic['type_view']
+            );
 
             $formModel = new Form();
             $formModel->fill($medic);
