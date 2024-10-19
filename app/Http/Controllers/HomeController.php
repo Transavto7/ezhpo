@@ -88,9 +88,9 @@ class HomeController extends Controller
         $forms = $forms
             ->join($formDetailsTable, 'forms.uuid', '=', "$formDetailsTable.forms_uuid")
             ->leftJoin('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
-            ->join('companies', 'forms.company_id', '=', 'companies.hash_id')
-            ->join('points', 'forms.point_id', '=', 'points.id')
-            ->join('users', 'forms.user_id', '=', 'users.id');
+            ->leftJoin('companies', 'forms.company_id', '=', 'companies.hash_id')
+            ->leftJoin('points', 'forms.point_id', '=', 'points.id')
+            ->leftJoin('users', 'forms.user_id', '=', 'users.id');
 
         $duplicates = $request->get('duplicates', false);
         if (filter_var($duplicates, FILTER_VALIDATE_BOOLEAN) && $request->has('date') && $request->has('TO_date')) {
