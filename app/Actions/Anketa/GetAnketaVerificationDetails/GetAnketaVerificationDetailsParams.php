@@ -2,6 +2,8 @@
 
 namespace App\Actions\Anketa\GetAnketaVerificationDetails;
 
+use App\ValueObjects\ClientHash;
+
 final class GetAnketaVerificationDetailsParams
 {
     /**
@@ -9,7 +11,7 @@ final class GetAnketaVerificationDetailsParams
      */
     private $anketaUuid;
     /**
-     * @var string
+     * @var ClientHash
      */
     private $clientHash;
     /**
@@ -19,10 +21,10 @@ final class GetAnketaVerificationDetailsParams
 
     /**
      * @param string $anketaUuid
-     * @param string $clientHash
+     * @param ClientHash $clientHash
      * @param int|null $userId
      */
-    public function __construct(string $anketaUuid, string $clientHash, ?int $userId)
+    public function __construct(string $anketaUuid, ClientHash $clientHash, ?int $userId)
     {
         $this->anketaUuid = $anketaUuid;
         $this->clientHash = $clientHash;
@@ -34,7 +36,7 @@ final class GetAnketaVerificationDetailsParams
         return $this->anketaUuid;
     }
 
-    public function getClientHash(): string
+    public function getClientHash(): ClientHash
     {
         return $this->clientHash;
     }

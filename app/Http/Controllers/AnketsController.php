@@ -22,6 +22,7 @@ use App\Enums\QRCodeLinkParameter;
 use App\Point;
 use App\Traits\UserEdsTrait;
 use App\User;
+use App\ValueObjects\ClientHash;
 use App\ValueObjects\NotAdmittedReasons;
 use Barryvdh\DomPDF\Facade as PDF;
 use Http\Client\Common\Exception\HttpClientNotFoundException;
@@ -516,12 +517,9 @@ class AnketsController extends Controller
         }
 
         try {
-            $identifierString = $userAgent . '|' . $ipAddress;
-            $clientHash = hash('sha256', $identifierString);
-
             $details = $query->get(new GetAnketaVerificationDetailsParams(
                 $uuid,
-                $clientHash,
+                ClientHash::from($ipAddress, $userAgent),
                 $userId
             ));
 

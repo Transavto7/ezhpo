@@ -40,9 +40,9 @@ final class GetAnketaVerificationDetailsQuery
 
         $verificationDates = $this->verificationRepository->findVerificationDatesByUuid($anketa->uuid);
 
-        $existedVerifications = $this->verificationRepository->findVerificationsByParams($anketa->uuid, $params->getClientHash());
+        $existedVerifications = $this->verificationRepository->findVerificationsByParams($anketa->uuid, $params->getClientHash()->value());
         if (!count($existedVerifications) && !$params->getUserId()) {
-            $this->verificationRepository->addAnketVerification($anketa->uuid, $params->getClientHash());
+            $this->verificationRepository->addAnketVerification($anketa->uuid, $params->getClientHash()->value());
         }
 
         if ($anketa->in_cart || $anketa->deleted_at) {
