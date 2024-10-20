@@ -395,9 +395,9 @@
     );
 
     $duplicateView = (
-        $type_ankets === 'medic' && user()->hasRole('medic')
-        || $type_ankets === 'tech' && user()->hasRole('tech')
-        || user()->hasRole('admin') && in_array($type_ankets, ['medic', 'tech'])
+        $type_ankets === FormTypeEnum::MEDIC && user()->hasRole('medic')
+        || $type_ankets === FormTypeEnum::TECH && user()->hasRole('tech')
+        || user()->hasRole('admin') && in_array($type_ankets, [FormTypeEnum::MEDIC, FormTypeEnum::TECH])
     );
 
     $permissionToDelete = (
@@ -784,7 +784,7 @@
 
                                             {{ $anketa[$field->field] }}
 
-                                            @if($type_ankets === 'medic' && $field->field === 'admitted' && $anketa[$field->field] === 'Не допущен' && user()->access('medic_closing_view'))
+                                            @if($type_ankets === FormTypeEnum::MEDIC && $field->field === 'admitted' && $anketa[$field->field] === 'Не допущен' && user()->access('medic_closing_view'))
                                                 @if(user()->access('medic_closing_edit'))
                                                     <div class="row d-flex"
                                                          style="gap: 3px">

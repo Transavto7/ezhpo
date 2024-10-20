@@ -130,7 +130,7 @@ class UpdateFormHandler
     protected function updatePakQueueForm(Form $form, Authenticatable $user)
     {
         if ($form->details->admitted === 'Не идентифицирован') {
-            $form->comments = Settings::setting('not_identify_text') ?? 'Водитель не идентифицирован';
+            $form->details->comments = Settings::setting('not_identify_text') ?? 'Водитель не идентифицирован';
         }
 
         /** @var User $user */
@@ -141,6 +141,7 @@ class UpdateFormHandler
         $form->user_validity_eds_end = $user->validity_eds_end;
 
         $form->save();
+        $form->details->save();
     }
 
     protected function notifyCancel(Form $form)
