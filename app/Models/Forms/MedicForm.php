@@ -42,6 +42,7 @@ class MedicForm extends Model
         'complaint',
         'condition_visible_sliz',
         'condition_koj_pokr',
+        'comments',
 
         'photos',
         'videos',

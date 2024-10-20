@@ -444,13 +444,13 @@
                                         <nobr>
                                             @if(user()->access('medic_read'))
                                                 <a class="btn btn-sm btn-outline-info"
-                                                   href="{{ route('home', 'medic') }}/?filter=1&{{ $field->type . '_id' }}={{ $el->hash_id }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
+                                                   href="{{ route('home', \App\Enums\FormTypeEnum::MEDIC) }}/?filter=1&{{ $field->type . '_id' }}={{ $el->hash_id }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
                                                     МЕД
                                                 </a>
                                             @endif
                                             @if(user()->access('tech_read') )
                                                 <a class="btn btn-sm btn-outline-info"
-                                                   href="{{ route('home', 'tech') }}/?filter=1&{{ $field->type . '_id' }}={{ $el->hash_id }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
+                                                   href="{{ route('home', \App\Enums\FormTypeEnum::TECH) }}/?filter=1&{{ $field->type . '_id' }}={{ $el->hash_id }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
                                                     ТЕХ
                                                     @endif
                                                 </a>
