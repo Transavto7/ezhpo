@@ -7,14 +7,13 @@ use chillerlan\QRCode\QROptions;
 
 final class QRCodeGenerator implements QRCodeGeneratorInterface
 {
-
     /**
      * @inheritDoc
      */
-    public function generate(string $data)
+    public function generate(string $data, int $version = QRCodeGeneratorInterface::VERSION_4)
     {
         $options = new QROptions;
-        $options->version = 4;
+        $options->version = $version;
         $options->quietzoneSize = 0;
         $options->scale = 8;
 

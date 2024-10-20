@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Actions\Anketa\ChangeResultDopHandler;
 use App\Actions\Anketa\CreateFormHandlerFactory;
 use App\Actions\Anketa\CreateSdpoFormHandler;
+use App\Actions\Anketa\ExportAnketasLabelingPdf\ExportAnketasLabelingPdfCommand;
+use App\Actions\Anketa\ExportAnketasLabelingPdf\ExportAnketasLabelingPdfHandler;
+use App\Actions\Anketa\GetAnketaVerificationDetails\GetAnketaVerificationDetailsParams;
+use App\Actions\Anketa\GetAnketaVerificationDetails\GetAnketaVerificationDetailsQuery;
 use App\Actions\Anketa\TrashFormHandler;
 use App\Actions\Anketa\UpdateFormHandler;
-use App\Actions\AnketsExportPdfLabeling\AnketsExportPdfLabelingCommand;
-use App\Actions\AnketsExportPdfLabeling\AnketsExportPdfLabelingHandler;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueAction;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueHandler;
 use App\Anketa;
@@ -22,7 +24,7 @@ use App\Traits\UserEdsTrait;
 use App\User;
 use App\ValueObjects\NotAdmittedReasons;
 use Barryvdh\DomPDF\Facade as PDF;
-use Carbon\Carbon;
+use Http\Client\Common\Exception\HttpClientNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -484,7 +486,7 @@ class AnketsController extends Controller
         return $response;
     }
 
-    public function exportPdfLabeling(Request $request, AnketsExportPdfLabelingHandler $handler)
+    public function exportPdfLabeling(Request $request, ExportAnketasLabelingPdfHandler $handler)
     {
         $anketIds = $request->input('anket_ids');
 
@@ -493,7 +495,7 @@ class AnketsController extends Controller
         }
 
         try {
-            return $handler->handle(new AnketsExportPdfLabelingCommand($anketIds));
+            return $handler->handle(new ExportAnketasLabelingPdfCommand($anketIds));
         } catch (Throwable $exception) {
             return response()->json([
                 'message' => $exception->getMessage()
@@ -501,43 +503,37 @@ class AnketsController extends Controller
         }
     }
 
-    public function validatePage(string $uuid)
+    public function verificationPage(string $uuid, Request $request, GetAnketaVerificationDetailsQuery $query)
     {
-        $verified = true;
-        $anketInfo = [
-            'number' => '',
-            'companyName' => '',
-            'date' => '',
-            'driverName' => '',
-            'carGosNumber' => '',
-        ];
+        $userAgent = $request->header('User-Agent');
+        $ipAddress = $request->ip();
 
-        $anket = Anketa::where('uuid', '=', $uuid)->first();
+        $user = Auth::user();
 
-        if (!$anket || $anket->in_cart || $anket->deleted_at) {
-            $verified = false;
-        }
-        else {
-            $anketInfo['number'] = '';
-            $anketInfo['companyName'] = $anket->company_name;
-
-            if ($anket->driver && $anket->driver->name) {
-                $anketInfo['driver'] = $anket->driver->name;
-            }
-
-            if ($anket->date) {
-                $anketInfo['date'] = Carbon::parse($anket->date)->format('d.m.Y');
-            }
-
-            if ($anket->car && $anket->car->gos_number) {
-                $anketInfo['carGosNumber'] = $anket->car->gos_number;
-            }
+        $userId = null;
+        if ($user) {
+            $userId = $user->id;
         }
 
+        try {
+            $identifierString = $userAgent . '|' . $ipAddress;
+            $clientHash = hash('sha256', $identifierString);
 
-        return view('pages.ankets.validate', [
-            'verified' => $verified,
-            'anketInfo' => $anketInfo,
-        ]);
+            $details = $query->get(new GetAnketaVerificationDetailsParams(
+                $uuid,
+                $clientHash,
+                $userId
+            ));
+
+            return view('pages.anketas.verification', [
+                'details' => $details,
+            ]);
+        } catch (HttpClientNotFoundException $exception) {
+            return view('pages.anketas.404');
+        } catch (Throwable $exception) {
+            return view('pages.anketas.500', [
+                'message' => $exception->getMessage(),
+            ]);
+        }
     }
 }

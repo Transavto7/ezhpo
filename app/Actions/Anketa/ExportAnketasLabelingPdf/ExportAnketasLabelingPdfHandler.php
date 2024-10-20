@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\AnketsExportPdfLabeling;
+namespace App\Actions\Anketa\ExportAnketasLabelingPdf;
 
 use App\Anketa;
 use App\Enums\AnketLabelingType;
@@ -10,7 +10,7 @@ use App\Services\QRCode\QRCodeGeneratorInterface;
 use DomainException;
 use Illuminate\Http\Response;
 
-final class AnketsExportPdfLabelingHandler
+final class ExportAnketasLabelingPdfHandler
 {
     /**
      * @var QRCodeGeneratorInterface
@@ -31,7 +31,7 @@ final class AnketsExportPdfLabelingHandler
         $this->pdfGenerator = $pdfGenerator;
     }
 
-    public function handle(AnketsExportPdfLabelingCommand $command): Response
+    public function handle(ExportAnketasLabelingPdfCommand $command): Response
     {
         $ankets = Anketa::query()
             ->select([
@@ -51,10 +51,10 @@ final class AnketsExportPdfLabelingHandler
         }
 
         $items = array_map(function (array $item) {
-            $url = route('anket.validate', [
+            $url = route('anketa.verification.page', [
                 'uuid' => $item['uuid'],
             ]);
-            $qrCode = $this->qrCodeGenerator->generate($url);
+            $qrCode = $this->qrCodeGenerator->generate($url, QRCodeGeneratorInterface::VERSION_6);
 
             return new AnketLabelingPDFGeneratorItem(
                 $qrCode,

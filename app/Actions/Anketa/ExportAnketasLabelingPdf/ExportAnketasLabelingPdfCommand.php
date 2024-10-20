@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Actions\AnketsExportPdfLabeling;
+namespace App\Actions\Anketa\ExportAnketasLabelingPdf;
 
-final class AnketsExportPdfLabelingCommand
+final class ExportAnketasLabelingPdfCommand
 {
     /**
      * @var string[]

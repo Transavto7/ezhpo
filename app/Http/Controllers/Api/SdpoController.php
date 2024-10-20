@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Actions\AnketsExportPdfLabeling\AnketsExportPdfLabelingCommand;
-use App\Actions\AnketsExportPdfLabeling\AnketsExportPdfLabelingHandler;
+use App\Actions\Anketa\ExportAnketasLabelingPdf\ExportAnketasLabelingPdfCommand;
+use App\Actions\Anketa\ExportAnketasLabelingPdf\ExportAnketasLabelingPdfHandler;
 use App\Anketa;
 use App\Car;
 use App\Driver;
@@ -685,10 +685,10 @@ class SdpoController extends Controller
         }
     }
 
-    public function getAnketLabelingQr($id, AnketsExportPdfLabelingHandler $handler)
+    public function getAnketLabelingQr($id, ExportAnketasLabelingPdfHandler $handler)
     {
         try {
-            return $handler->handle(new AnketsExportPdfLabelingCommand([$id]));
+            return $handler->handle(new ExportAnketasLabelingPdfCommand([$id]));
         } catch (DomainException $exception) {
             return response()->json([
                 'message' => $exception->getMessage()

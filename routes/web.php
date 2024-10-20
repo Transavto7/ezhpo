@@ -178,7 +178,8 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
-Route::get('/anket-validate/{uuid}', 'AnketsController@validatePage')->name('anket.validate');
+Route::get('/anketa-verification/{uuid}', 'AnketsController@verificationPage')->name('anketa.verification.page');
+Route::get('/anketa-verification/{uuid}/details', 'AnketsController@verificationDetails')->name('anketa.verification.details');
 
 Auth::routes();
 
