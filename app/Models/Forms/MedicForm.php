@@ -20,6 +20,7 @@ class MedicForm extends Model
 
         'type_view',
 
+        'period_pl',
         'is_dop',
         'result_dop',
 
