@@ -350,11 +350,8 @@ class HomeController extends Controller
 
                 if (!in_array($validTypeForm, [FormTypeEnum::MEDIC, FormTypeEnum::TECH])) {
                     $forms = $forms
-                        ->whereNull('forms.date')
-                        ->whereBetween("$formDetailsTable.period_pl", [
-                            $dateFrom->format('Y-m'),
-                            $dateTo->format('Y-m')
-                        ]);
+                        ->whereNotNull('forms.date')
+                        ->whereBetween('forms.date', [$dateFrom, $dateTo]);
                 } else {
                     $forms = $forms->where(function ($query) use ($formDetailsTable, $validTypeForm, $dateFrom, $dateTo) {
                         $query->where(function ($subQuery) use ($formDetailsTable, $validTypeForm, $dateFrom, $dateTo) {
