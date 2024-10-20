@@ -168,8 +168,20 @@ class HomeController extends Controller
             'duplicates',
             'result_dop',
         ]);
+
+        $filtersToTablesMap = [
+            'id' => 'forms.id',
+            'company_id' => 'forms.company_id',
+            'town_id' => 'points.pv_id',
+            'pv_id' => 'forms.point_id'
+        ];
+
         if (count($filterParams) > 0 && $filterActivated) {
             foreach ($filterParams as $filterKey => $filterValue) {
+                if (array_key_exists($filterKey, $filtersToTablesMap)) {
+                    $filterKey = $filtersToTablesMap[$filterKey];
+                }
+
                 if ($filterValue === null) continue;
 
                 if ($filterKey == 'TO_date' || $filterKey == 'date') {
@@ -182,11 +194,6 @@ class HomeController extends Controller
                     if (count($filterValue) === 1) {
                         $filterValue = $filterValue[0];
                     }
-                }
-
-                if ($filterKey === 'id') {
-                    $forms->where('forms.id', $filterValue);
-                    continue;
                 }
 
                 if ($filterKey === 'hour_from') {
@@ -209,8 +216,13 @@ class HomeController extends Controller
                     continue;
                 }
 
-                if ($filterKey == 'is_dop' && !$filterValue) {
-                    $forms = $forms->where('is_dop', '<>', 1);
+                if ($filterKey === 'is_dop') {
+                    if (!$filterValue) {
+                        $compareSign = '<>';
+                    } else {
+                        $compareSign = '=';
+                    }
+                    $forms = $forms->where('is_dop', $compareSign, 1);
                     continue;
                 }
 
@@ -229,50 +241,6 @@ class HomeController extends Controller
                 }
 
                 if (is_array($filterValue)) {
-                    if ($filterKey === 'town_id') {
-                        $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
-                            foreach ($filterValue as $townIds) {
-                                $query = $query->orWhere('points.pv_id', $townIds);
-                            }
-
-                            return $query;
-                        });
-                        continue;
-                    }
-
-                    if ($filterKey === 'car_type_auto') {
-                        $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
-                            foreach ($filterValue as $carType) {
-                                $query = $query->orWhere('cars.car_type_auto', $carType);
-                            }
-
-                            return $query;
-                        });
-                        continue;
-                    }
-
-                    if ($filterKey === 'company_id') {
-                        $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
-                            foreach ($filterValue as $companyId) {
-                                $query = $query->orWhere('forms.company_id', $companyId);
-                            }
-
-                            return $query;
-                        });
-                        continue;
-                    }
-
-                    if ($filterKey === 'pv_id') {
-                        $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
-                            foreach ($filterValue as $pointId) {
-                                $query = $query->orWhere('forms.point_id', $pointId);
-                            }
-
-                            return $query;
-                        });
-                        continue;
-                    }
-
                     if ($filterKey === 'flag_pak') {
                         $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
                             foreach ($filterValue as $flagPakValue) {
@@ -309,27 +277,12 @@ class HomeController extends Controller
                         return $query;
                     });
                 } else {
-                    if ($filterKey === 'town_id') {
-                        $forms = $forms->where('points.pv_id', $filterValue);
-                        continue;
-                    }
-
-                    if ($filterKey === 'car_type_auto') {
-                        $forms = $forms->where('cars.car_type_auto', $filterKey);
-                        continue;
-                    }
-
-                    if ($filterKey === 'pv_id') {
-                        $forms = $forms->where('forms.point_id', $filterValue);
-                        continue;
-                    }
-
                     if ($filterKey === 'flag_pak' && $filterValue === 'internal') {
                         $forms = $forms->whereNull('medic_forms.flag_pak');
                         continue;
                     }
 
-                    $strictFilter = strpos($filterKey, '_id') || $filterKey === 'id';
+                    $strictFilter = strpos($filterKey, '_id') || $filterKey === 'forms.id';
 
                     if ($strictFilter) {
                         $forms = $forms->where($filterKey, $filterValue);
@@ -386,17 +339,9 @@ class HomeController extends Controller
                 'anketasCountCompany' => $formsDistinctQuery->count('forms.company_id'),
             ];
 
-            /**
-             * Обогащение данных
-             */
             if ($validTypeForm === FormTypeEnum::TECH) {
-                $formsDistinctQuery = $formsDistinctQuery
-                    ->leftJoin('cars', 'car_id', '=', 'cars.hash_id');
-                $counters['anketasCountCars'] = $formsDistinctQuery->count('car_id');
+                $counters['anketasCountCars'] = $formsDistinctQuery->count('tech_forms.car_id');
             }
-            /**
-             * Обогащение данных
-             */
 
             return response()->json($counters);
         }
