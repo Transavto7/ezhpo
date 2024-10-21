@@ -338,6 +338,9 @@ class HomeController extends Controller
                 }
 
                 if ($filterKey === 'date_prmo') {
+                    //TODO: удалить после перехода на разделенные реестры
+                    continue;
+
                     $dateFrom = Carbon::parse($filterValue)->startOfDay();
                     $dateTo = Carbon::parse($filterValue)->endOfDay();
                     $forms = $forms->whereBetween('drivers.date_prmo', [$dateFrom, $dateTo]);
@@ -414,6 +417,7 @@ class HomeController extends Controller
         /**
          * Обогащение данных
          */
+        //TODO: раскомментировать после перехода на разделенные реестры
         if ($validTypeForm == 'tech') {
             $forms = $forms
                 ->leftJoin('cars', 'anketas.car_id', '=', 'cars.hash_id')
@@ -433,22 +437,24 @@ class HomeController extends Controller
         } else if (($validTypeForm == 'medic') && $export) {
             $forms = $forms
                 ->with('operator')
-                ->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
+                //->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
                 ->leftJoin('medic_form_normalized_pressures', 'anketas.id', '=', 'medic_form_normalized_pressures.form_id')
                 ->select([
                     'anketas.*',
                     'anketas.pv_id as pv_id',
-                    'drivers.date_prmo as date_prmo',
+//                    'drivers.date_prmo as date_prmo',
+                    'null as date_prmo',
                     DB::raw("COALESCE(medic_form_normalized_pressures.pressure, anketas.tonometer, NULL) as tonometer"),
                 ]);
         } else if ($validTypeForm === 'medic') {
             $forms = $forms
                 ->with('operator')
-                ->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
+                //->leftJoin('drivers', 'anketas.driver_id', '=', 'drivers.hash_id')
                 ->select([
                     'anketas.*',
                     'anketas.pv_id as pv_id',
-                    'drivers.date_prmo as date_prmo',
+//                    'drivers.date_prmo as date_prmo',
+                    'null as date_prmo'
                 ]);
         } else {
             $forms = $forms
