@@ -443,7 +443,7 @@ class HomeController extends Controller
                     'anketas.*',
                     'anketas.pv_id as pv_id',
 //                    'drivers.date_prmo as date_prmo',
-                    'null as date_prmo',
+                    DB::raw('null as date_prmo'),
                     DB::raw("COALESCE(medic_form_normalized_pressures.pressure, anketas.tonometer, NULL) as tonometer"),
                 ]);
         } else if ($validTypeForm === 'medic') {
@@ -454,7 +454,7 @@ class HomeController extends Controller
                     'anketas.*',
                     'anketas.pv_id as pv_id',
 //                    'drivers.date_prmo as date_prmo',
-                    'null as date_prmo'
+                    DB::raw('null as date_prmo')
                 ]);
         } else {
             $forms = $forms
