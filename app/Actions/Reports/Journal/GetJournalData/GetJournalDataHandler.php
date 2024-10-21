@@ -46,7 +46,7 @@ class GetJournalDataHandler
         $nonTechForms = Form::query()
             ->select([
                 'forms.driver_id',
-                'forms.point_id as pv_id',
+                'points.name as pv_id',
                 'drivers.fio as driver_fio',
                 'forms.type_anketa',
                 'medic_forms.type_view',
@@ -61,6 +61,7 @@ class GetJournalDataHandler
                 FormTypeEnum::REPORT_CARD,
                 FormTypeEnum::PRINT_PL
             ])
+            ->leftJoin('points', 'points.id', '=', 'forms.point_id')
             ->leftJoin('medic_forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
             ->leftJoin('print_pl_forms', 'forms.uuid', '=', 'print_pl_forms.forms_uuid')
             ->join('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
@@ -139,13 +140,14 @@ class GetJournalDataHandler
                 'cars.gos_number as car_gos_number',
                 'cars.type_auto',
                 'forms.type_anketa',
-                'forms.point_id as pv_id',
+                'points.name as pv_id',
                 'tech_forms.car_id',
                 'tech_forms.is_dop',
                 'tech_forms.result_dop',
                 'tech_forms.type_view'
             ])
             ->where('type_anketa', FormTypeEnum::TECH)
+            ->leftJoin('points', 'points.id', '=', 'forms.point_id')
             ->join('tech_forms', 'tech_forms.forms_uuid', '=', 'forms.uuid')
             ->join('cars', 'tech_forms.car_id', '=', 'cars.hash_id')
             ->where('forms.company_id', $this->companyHashId)
@@ -197,7 +199,7 @@ class GetJournalDataHandler
         $forms = Form::query()
             ->select([
                 'forms.driver_id',
-                'forms.point_id as pv_id',
+                'points.name as pv_id',
                 'drivers.fio as driver_fio',
                 'forms.type_anketa',
                 'medic_forms.type_view',
@@ -212,6 +214,7 @@ class GetJournalDataHandler
                 FormTypeEnum::REPORT_CARD,
                 FormTypeEnum::PRINT_PL
             ])
+            ->leftJoin('points', 'points.id', '=', 'forms.point_id')
             ->leftJoin('medic_forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
             ->leftJoin('print_pl_forms', 'forms.uuid', '=', 'print_pl_forms.forms_uuid')
             ->join('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
@@ -303,13 +306,14 @@ class GetJournalDataHandler
                 'cars.gos_number as car_gos_number',
                 'cars.type_auto',
                 'forms.type_anketa',
-                'forms.point_id as pv_id',
+                'points.name as pv_id',
                 'tech_forms.car_id',
                 'tech_forms.is_dop',
                 'tech_forms.result_dop',
                 'tech_forms.type_view'
             ])
             ->where('type_anketa', FormTypeEnum::TECH)
+            ->leftJoin('points', 'points.id', '=', 'forms.point_id')
             ->join('tech_forms', 'tech_forms.forms_uuid', '=', 'forms.uuid')
             ->join('cars', 'tech_forms.car_id', '=', 'cars.hash_id')
             ->where('forms.company_id', $this->companyHashId)
