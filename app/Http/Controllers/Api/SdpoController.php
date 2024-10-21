@@ -13,6 +13,7 @@ use App\MedicFormNormalizedPressure;
 use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
 use App\SdpoCrashLog;
+use App\Services\FormHash\FormHashGenerator;
 use App\Services\FormHash\MedicHashData;
 use App\Settings;
 use App\Stamp;
@@ -278,11 +279,11 @@ class SdpoController extends Controller
 
             $medic['admitted'] = $admitted;
 
-            $medic['day_hash'] = new MedicHashData(
+            $medic['day_hash'] = FormHashGenerator::generate(new MedicHashData(
                 $medic['driver_id'],
                 new DateTimeImmutable($medic['date']),
                 $medic['type_view']
-            );
+            ));
 
             $formModel = new Form();
             $formModel->fill($medic);
