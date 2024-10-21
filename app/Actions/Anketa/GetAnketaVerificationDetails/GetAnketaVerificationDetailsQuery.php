@@ -45,7 +45,7 @@ final class GetAnketaVerificationDetailsQuery
             $this->verificationRepository->addAnketVerification($anketa->uuid, $params->getClientHash()->value());
         }
 
-        if ($anketa->in_cart || $anketa->deleted_at) {
+        if ($anketa->in_cart) {
             $verified = false;
         }
         else {
@@ -77,6 +77,8 @@ final class GetAnketaVerificationDetailsQuery
         return new AnketaVerificationDetails(
             $verified,
             $params->getAnketaUuid(),
+            $anketa->id,
+            AnketLabelingType::fromString($anketa->type_anketa),
             $anketaNumber,
             $companyName,
             $anketaDate,

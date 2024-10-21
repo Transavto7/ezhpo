@@ -2,6 +2,7 @@
 
 namespace App\ViewModels;
 
+use App\Enums\AnketLabelingType;
 use Carbon\Carbon;
 
 final class AnketaVerificationDetails
@@ -14,6 +15,14 @@ final class AnketaVerificationDetails
      * @var string
      */
     private $anketaUuid;
+    /**
+     * @var string
+     */
+    private $anketaId;
+    /**
+     * @var AnketLabelingType
+     */
+    private $anketaType;
     /**
      * @var string|null
      */
@@ -42,6 +51,8 @@ final class AnketaVerificationDetails
     /**
      * @param bool $verified
      * @param string $anketaUuid
+     * @param string $anketaId
+     * @param AnketLabelingType $anketaType
      * @param string|null $anketaNumber
      * @param string|null $companyName
      * @param Carbon|null $anketaDate
@@ -49,19 +60,12 @@ final class AnketaVerificationDetails
      * @param string|null $carGosNumber
      * @param Carbon[] $verificationDates
      */
-    public function __construct(
-        bool $verified,
-        string $anketaUuid,
-        ?string $anketaNumber,
-        ?string $companyName,
-        ?Carbon $anketaDate,
-        ?string $driverName,
-        ?string $carGosNumber,
-        array $verificationDates
-    )
+    public function __construct(bool $verified, string $anketaUuid, string $anketaId, AnketLabelingType $anketaType, ?string $anketaNumber, ?string $companyName, ?Carbon $anketaDate, ?string $driverName, ?string $carGosNumber, array $verificationDates)
     {
         $this->verified = $verified;
         $this->anketaUuid = $anketaUuid;
+        $this->anketaId = $anketaId;
+        $this->anketaType = $anketaType;
         $this->anketaNumber = $anketaNumber;
         $this->companyName = $companyName;
         $this->anketaDate = $anketaDate;
@@ -78,6 +82,16 @@ final class AnketaVerificationDetails
     public function getAnketaUuid(): string
     {
         return $this->anketaUuid;
+    }
+
+    public function getAnketaId(): string
+    {
+        return $this->anketaId;
+    }
+
+    public function getAnketaType(): AnketLabelingType
+    {
+        return $this->anketaType;
     }
 
     public function getAnketaNumber(): ?string
@@ -109,4 +123,6 @@ final class AnketaVerificationDetails
     {
         return $this->verificationDates;
     }
+
+
 }

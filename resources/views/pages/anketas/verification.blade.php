@@ -7,6 +7,11 @@
     else {
         $title = 'Осмотр не верифицирован';
     }
+
+    $permissionToDelete = user() && (
+        $details->getAnketaType()->value() == \App\Enums\AnketLabelingType::MEDIC && user()->access('medic_delete') ||
+        $details->getAnketaType()->value() == \App\Enums\AnketLabelingType::TECH && user()->access('tech_delete')
+    );
 @endphp
 
 @extends('pages.anketas.base')
@@ -76,13 +81,12 @@
                             @endif
 
                             <div id="verification-alert-body" class="d-none alert alert-danger mt-2">
-                                <b>Вы уже проверяли данный осмотр</b><br>
-                                <div>Количество проверок: <span id="verification-alert-count"></span></div>
+                                <b>Вы уже проверяли данный осмотр <span id="verification-alert-count"></span></b><br>
                                 <div>Дата последней проверки: <span id="verification-alert-date"></span></div>
                             </div>
 
                             @if($details->isVerified())
-                                <div class="mt-4 d-flex flex-column align-items-center">
+                                <div class="mt-2 d-flex flex-column align-items-center">
                                     @if($details->getAnketaNumber())
                                         <div class="verified-item">
                                             <b>Номер осмотра:</b>
@@ -120,7 +124,29 @@
                                 </div>
 
                                 @auth
-                                    <!-- todo: удаление/восстановление анкеты -->
+                                    @if($permissionToDelete)
+                                        <div class="mt-2">
+                                            <a
+                                                href="{{ route('forms.trash', ['id' => $details->getAnketaId(), 'action' => 1]) }}"
+                                                class="btn btn-warning btn-sm hv-btn-trash mr-1"
+                                                data-id="{{ $details->getAnketaId() }}">
+                                                <i class="fa fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    @endif
+                                @endauth
+                            @else
+                                @auth
+                                    @if($permissionToDelete)
+                                        <div class="mt-2">
+                                            <a
+                                                href="{{ route('forms.trash', ['id' => $details->getAnketaId(), 'action' => 0]) }}"
+                                                class="btn btn-warning btn-sm hv-btn-trash mr-1"
+                                                data-id="{{ $details->getAnketaId() }}">
+                                                <i class="fa fa-undo"></i>
+                                            </a>
+                                        </div>
+                                    @endif
                                 @endauth
                             @endif
                         </div>
@@ -201,6 +227,17 @@
             return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
         }
 
+        function formatCount(count) {
+            const value = Math.abs(count) % 100;
+            const num = value % 10;
+
+            if (value > 10 && value < 20) return `${count} раз`;
+            if (num > 1 && num < 5) return `${count} раза`;
+            if (num === 1) return `${count} раз`;
+
+            return `${count} раз`;
+        }
+
         function checkVerified() {
             const allItems = getVerificationItems();
 
@@ -209,7 +246,7 @@
                 const item = items[items.length - 1];
 
                 ui.verificationAlertBody.removeClass('d-none');
-                ui.verificationAlertCount.html(items.length);
+                ui.verificationAlertCount.html(formatCount(items.length));
                 ui.verificationAlertDate.html(formatDate(item.date));
             }
         }
