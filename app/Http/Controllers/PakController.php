@@ -6,6 +6,7 @@ use App\Enums\FormTypeEnum;
 use App\FieldPrompt;
 use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
+use App\ValueObjects\NotAdmittedReasons;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -26,14 +27,16 @@ class PakController extends Controller
 
     public function list(Request $request): JsonResponse
     {
-        $forms = Form::query()
+        $forms = MedicForm::query()
             ->select([
                 'forms.*',
+                'medic_forms.*',
                 'drivers.fio as driver_fio',
                 'points.name as pv_id'
             ])
-            ->join('drivers', 'drivers.hash_id', '=', 'forms.driver_id')
-            ->join('points', 'points.id', '=', 'forms.point_id');
+            ->leftJoin('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
+            ->leftJoin('drivers', 'drivers.hash_id', '=', 'forms.driver_id')
+            ->leftJoin('points', 'points.id', '=', 'forms.point_id');
 
         $forms->pakQueueByUser($request->user());
 
@@ -43,13 +46,11 @@ class PakController extends Controller
 
         $forms->get();
 
-        $data = $forms->get()->map(function (Form $form) {
-            $formData = $form->toArray();
-            /** @var MedicForm $formDetails */
-            $formDetails = $form->details;
-            $formDetails->append('not_admitted_reasons');
-
-            return $formData + $formDetails->toArray();
+        $data = $forms->get()->map(function (MedicForm $form) {
+            return array_merge(
+                $form->toArray(),
+                ['not_admitted_reasons' => NotAdmittedReasons::fromForm($form)->getReasons()]
+            );
         });
 
         return response()->json($data);
