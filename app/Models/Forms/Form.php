@@ -116,7 +116,7 @@ class Form extends Model
 
     public function scopePakQueueByUser($query, User $user)
     {
-        $query->where('type_anketa', FormTypeEnum::PAK_QUEUE);
+        $query->where('forms.type_anketa', FormTypeEnum::PAK_QUEUE);
 
         if ($user->access('approval_queue_view_all')) {
 
