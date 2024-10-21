@@ -1,5 +1,5 @@
 @php
-    /** @var $details \App\ViewModels\AnketaVerificationDetails */
+    /** @var $details \App\ViewModels\AnketaVerificationDetails\AnketaVerificationDetails */
 
     if($details->isVerified()) {
         $title = 'Осмотр верифицирован';
@@ -130,7 +130,7 @@
                                                 href="{{ route('forms.trash', ['id' => $details->getAnketaId(), 'action' => 1]) }}"
                                                 class="btn btn-warning btn-sm hv-btn-trash mr-1"
                                                 data-id="{{ $details->getAnketaId() }}">
-                                                <i class="fa fa-trash"></i>
+                                                Удалить <i class="fa fa-trash ml-1"></i>
                                             </a>
                                         </div>
                                     @endif
@@ -143,7 +143,7 @@
                                                 href="{{ route('forms.trash', ['id' => $details->getAnketaId(), 'action' => 0]) }}"
                                                 class="btn btn-warning btn-sm hv-btn-trash mr-1"
                                                 data-id="{{ $details->getAnketaId() }}">
-                                                <i class="fa fa-undo"></i>
+                                                Восстановить <i class="fa fa-undo ml-2"></i>
                                             </a>
                                         </div>
                                     @endif
@@ -156,7 +156,7 @@
         </div>
     </main>
 
-    @if(count($details->getVerificationDates()))
+    @if(count($details->getVerifications()))
         <div class="d-flex justify-content-center">
             <a class="text-info" data-toggle="collapse" href="#collapseVerificationHistory" role="button"
                aria-expanded="false" aria-controls="collapseVerificationHistory">
@@ -166,10 +166,15 @@
         <div>
             <div class="collapse p-2" id="collapseVerificationHistory">
                 <div class="alert alert-info verification-history-list">
-                    <div class="d-flex justify-content-center mb-2"><b>Проверок
-                            всего: {{ count($details->getVerificationDates()) }}</b></div>
-                    @foreach($details->getVerificationDates() as $date)
-                        <p class="text-center"><b>{{ $loop->index + 1 }}.</b> {{ $date->format('d.m.Y h:i:s') }}</p>
+                    <div class="d-flex justify-content-center mb-2">
+                        <b>Проверок всего: {{ count($details->getVerifications()) }}</b></div>
+                    @foreach($details->getVerifications() as $verification)
+                        <p class="text-center">
+                            <b>{{ $loop->index + 1 }}.</b> {{ $verification->getDate()->format('d.m.Y h:i:s') }}
+                            @if($verification->isCurrentDevice())
+                                <br><i>(с вашего устройства)</i>
+                            @endif
+                        </p>
                     @endforeach
                 </div>
             </div>

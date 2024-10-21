@@ -9,18 +9,22 @@ final class AnketaVerificationsRepository
 {
     /**
      * @param string $anketaUuid
-     * @return Carbon[]
+     * @return array[]
      */
     public function findVerificationDatesByUuid(string $anketaUuid): array
     {
         return DB::table('anketa_verifications as av')
             ->select([
                 'av.verification_date',
+                'av.client_hash'
             ])
             ->where('av.anketa_uuid', '=', $anketaUuid)
-            ->pluck('av.verification_date')
-            ->map(function (string $date) {
-                return Carbon::parse($date);
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'verification_date' => Carbon::parse($item->verification_date),
+                    'client_hash' => $item->client_hash,
+                ];
             })
             ->toArray();
     }

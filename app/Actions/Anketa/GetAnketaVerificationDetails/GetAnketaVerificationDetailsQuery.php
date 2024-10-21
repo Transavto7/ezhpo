@@ -5,7 +5,8 @@ namespace App\Actions\Anketa\GetAnketaVerificationDetails;
 use App\Anketa;
 use App\Enums\AnketLabelingType;
 use App\Repositories\AnketaVerifications\AnketaVerificationsRepository;
-use App\ViewModels\AnketaVerificationDetails;
+use App\ViewModels\AnketaVerificationDetails\AnketaVerificationDetails;
+use App\ViewModels\AnketaVerificationDetails\Dto\AnketaVerification;
 use Carbon\Carbon;
 use Http\Client\Common\Exception\HttpClientNotFoundException;
 
@@ -38,7 +39,13 @@ final class GetAnketaVerificationDetailsQuery
         $driverName = null;
         $carGosNumber = null;
 
-        $verificationDates = $this->verificationRepository->findVerificationDatesByUuid($anketa->uuid);
+        $verifications = $this->verificationRepository->findVerificationDatesByUuid($anketa->uuid);
+        $verifications = array_map(function ($verification) use ($params) {
+            return new AnketaVerification(
+                $verification['verification_date'],
+                $params->getClientHash()->value() === $verification['client_hash']
+            );
+        }, $verifications);
 
         $existedVerifications = $this->verificationRepository->findVerificationsByParams($anketa->uuid, $params->getClientHash()->value());
         if (!count($existedVerifications) && !$params->getUserId()) {
@@ -84,7 +91,7 @@ final class GetAnketaVerificationDetailsQuery
             $anketaDate,
             $driverName,
             $carGosNumber,
-            $verificationDates
+            $verifications
         );
     }
 }

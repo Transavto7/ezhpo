@@ -1,8 +1,9 @@
 <?php
 
-namespace App\ViewModels;
+namespace App\ViewModels\AnketaVerificationDetails;
 
 use App\Enums\AnketLabelingType;
+use App\ViewModels\AnketaVerificationDetails\Dto\AnketaVerification;
 use Carbon\Carbon;
 
 final class AnketaVerificationDetails
@@ -44,9 +45,9 @@ final class AnketaVerificationDetails
      */
     private $carGosNumber;
     /**
-     * @var Carbon[]
+     * @var AnketaVerification[]
      */
-    private $verificationDates;
+    private $verifications;
 
     /**
      * @param bool $verified
@@ -58,9 +59,20 @@ final class AnketaVerificationDetails
      * @param Carbon|null $anketaDate
      * @param string|null $driverName
      * @param string|null $carGosNumber
-     * @param Carbon[] $verificationDates
+     * @param AnketaVerification[] $verifications
      */
-    public function __construct(bool $verified, string $anketaUuid, string $anketaId, AnketLabelingType $anketaType, ?string $anketaNumber, ?string $companyName, ?Carbon $anketaDate, ?string $driverName, ?string $carGosNumber, array $verificationDates)
+    public function __construct(
+        bool $verified,
+        string $anketaUuid,
+        string $anketaId,
+        AnketLabelingType $anketaType,
+        ?string $anketaNumber,
+        ?string $companyName,
+        ?Carbon $anketaDate,
+        ?string $driverName,
+        ?string $carGosNumber,
+        array $verifications
+    )
     {
         $this->verified = $verified;
         $this->anketaUuid = $anketaUuid;
@@ -71,7 +83,7 @@ final class AnketaVerificationDetails
         $this->anketaDate = $anketaDate;
         $this->driverName = $driverName;
         $this->carGosNumber = $carGosNumber;
-        $this->verificationDates = $verificationDates;
+        $this->verifications = $verifications;
     }
 
     public function isVerified(): bool
@@ -119,9 +131,12 @@ final class AnketaVerificationDetails
         return $this->carGosNumber;
     }
 
-    public function getVerificationDates(): array
+    /**
+     * @return AnketaVerification[]
+     */
+    public function getVerifications(): array
     {
-        return $this->verificationDates;
+        return $this->verifications;
     }
 
 
