@@ -6,6 +6,7 @@ use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Models\Forms\Form;
 use App\User;
+use Illuminate\Support\Carbon;
 
 final class TrashFormHandler
 {
@@ -14,16 +15,16 @@ final class TrashFormHandler
         $form->deleted_id = $user->id;
 
         if (!$action) {
-            $form->restore();
+            $form->deleted_at = null;
+        } else {
+            if ($form->type_anketa === FormTypeEnum::MEDIC && $form->driver_id) {
+                $this->disableBanIfNeed($form);
+            }
 
-            return;
+            $form->deleted_at = Carbon::now();
         }
 
-        if ($form->type_anketa === FormTypeEnum::MEDIC && $form->driver_id) {
-            $this->disableBanIfNeed($form);
-        }
-
-        $form->delete();
+        $form->save();
     }
 
     protected function disableBanIfNeed(Form $form)
