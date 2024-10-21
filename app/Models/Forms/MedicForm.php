@@ -2,6 +2,7 @@
 
 namespace App\Models\Forms;
 
+use App\Enums\FormTypeEnum;
 use App\User;
 use App\ValueObjects\NotAdmittedReasons;
 use Illuminate\Database\Eloquent\Model;
@@ -69,5 +70,23 @@ class MedicForm extends Model
     public function getNotAdmittedReasonsAttribute(): array
     {
         return NotAdmittedReasons::fromForm($this)->getReasons();
+    }
+
+    public function scopePakQueueByUser($query, User $user)
+    {
+        $query
+            ->leftJoin('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
+            ->where('forms.type_anketa', FormTypeEnum::PAK_QUEUE);
+
+        if ($user->access('approval_queue_view_all')) {
+
+        } else if ($user->hasRole('head_operator_sdpo')) {
+            $query->join('points_to_users', function ($join) use ($user) {
+                $join->on('forms.point_id', '=', 'points_to_users.point_id')
+                    ->where('points_to_users.user_id', '=', $user->id);
+            });
+        } else {
+            $query->where('forms.user_id', $user->id);
+        }
     }
 }
