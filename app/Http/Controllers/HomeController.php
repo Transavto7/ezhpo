@@ -92,6 +92,10 @@ class HomeController extends Controller
             ->leftJoin('points', 'forms.point_id', '=', 'points.id')
             ->leftJoin('users', 'forms.user_id', '=', 'users.id');
 
+        if ($trash) {
+            $forms = $forms->leftJoin('users as delete_users', 'forms.deleted_id', '=', 'delete_users.id');
+        }
+
         $duplicates = $request->get('duplicates', false);
         if (filter_var($duplicates, FILTER_VALIDATE_BOOLEAN) && $request->has('date') && $request->has('TO_date')) {
             if (! $request->has('date') || ! $request->has('TO_date')) {
@@ -367,6 +371,10 @@ class HomeController extends Controller
             'points.name as pv_id',
             'companies.name as company_name'
         ];
+
+        if ($trash) {
+            $defaultFieldsToSelect[] = 'delete_users.name as deleted_user_name';
+        }
 
         /**
          * Обогащение данных

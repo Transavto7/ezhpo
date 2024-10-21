@@ -819,7 +819,7 @@
 
                                 @if($permissionToDelete && request()->get('trash'))
                                     <td class="td-option">
-                                        {{ ($anketa->deleted_user->name) }}
+                                        {{ ($anketa->deleted_user_name) }}
                                     </td>
                                     <td class="td-option">
                                         {{ ($anketa->deleted_at) }}
