@@ -141,7 +141,7 @@ class GetDynamicDataHandler
                 }
 
                 if ($companyId) {
-                    $query = $forms->whereIn('forms.company_id', $companyId);
+                    $query = $query->whereIn('forms.company_id', $companyId);
                 }
 
                 $forms = $forms->merge($query->get());
