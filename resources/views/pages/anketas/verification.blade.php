@@ -179,7 +179,8 @@
 
 @push('custom_scripts')
     <script>
-        const SS_KEY = 'anketLabelingVerificationSign';
+        const SS_KEY_SIGN = 'anketLabelingVerificationSign';
+        const SS_KEY_SESSION_KEY = 'anketLabelingVerificationSessionKey';
         const LS_KEY = 'anketLabelingVerificationItems';
 
         const ui = {
@@ -202,7 +203,7 @@
         }
 
         function getVisitedSign() {
-            const rawData = sessionStorage.getItem(SS_KEY)
+            const rawData = sessionStorage.getItem(SS_KEY_SIGN)
 
             if (rawData) {
                 const data = JSON.parse(rawData)
@@ -211,6 +212,17 @@
             }
 
             return false
+        }
+
+        function getSessionKey() {
+            let sessionKey = sessionStorage.getItem(SS_KEY_SESSION_KEY)
+
+            if (!sessionKey) {
+                sessionKey = (new Date()).toISOString()
+                sessionStorage.setItem(SS_KEY_SESSION_KEY, sessionKey)
+            }
+
+            return sessionKey
         }
 
         function formatDate(isoString) {
@@ -239,15 +251,21 @@
         }
 
         function checkVerified() {
+            const sessionKey = getSessionKey()
             const allItems = getVerificationItems();
 
             if (allItems.hasOwnProperty(currentUuid)) {
-                const items = allItems[currentUuid];
-                const item = items[items.length - 1];
+                const items = allItems[currentUuid].filter(function (item) {
+                    return !item?.sessionKey || item.sessionKey !== sessionKey
+                });
 
-                ui.verificationAlertBody.removeClass('d-none');
-                ui.verificationAlertCount.html(formatCount(items.length));
-                ui.verificationAlertDate.html(formatDate(item.date));
+                if (items.length) {
+                    const item = items[items.length - 1];
+
+                    ui.verificationAlertBody.removeClass('d-none');
+                    ui.verificationAlertCount.html(formatCount(items.length));
+                    ui.verificationAlertDate.html(formatDate(item.date));
+                }
             }
         }
 
@@ -259,20 +277,21 @@
             }
 
             allItems[currentUuid].push({
-                date: (new Date()).toISOString()
+                date: (new Date()).toISOString(),
+                sessionKey: getSessionKey()
             });
 
             localStorage.setItem(LS_KEY, JSON.stringify(allItems));
         }
 
         $(document).ready(function () {
-            let visitedSign = getVisitedSign()
+            const visitedSign = getVisitedSign()
 
             checkVerified();
 
             if (!visitedSign) {
                 storeVerification();
-                sessionStorage.setItem(SS_KEY, JSON.stringify({visited: true}))
+                sessionStorage.setItem(SS_KEY_SIGN, JSON.stringify({visited: true}))
             }
         })
     </script>
