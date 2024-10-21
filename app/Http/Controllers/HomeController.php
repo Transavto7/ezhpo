@@ -70,7 +70,7 @@ class HomeController extends Controller
             $validTypeForm = $formType;
         }
 
-        $trash = $request->get('trash', 0);
+        $trash = filter_var($request->get('trash', 0), FILTER_VALIDATE_BOOLEAN);
 
         if ($trash) {
             $forms = Form::onlyTrashed();
