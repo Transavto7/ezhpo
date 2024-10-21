@@ -409,7 +409,6 @@
                                         <a href="#" class="showEditModal"
                                            data-route="{{ route('showEditElementModal', ['id' => $el->id, 'model' => $model]) }}"
                                            data-toggle="modal" data-target="#modalEditor">
-                                        </a>
                                     @endif
 
                                     @if($field->field === 'company_id' && $el->company_id)
