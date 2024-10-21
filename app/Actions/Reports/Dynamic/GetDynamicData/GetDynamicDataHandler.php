@@ -69,71 +69,83 @@ class GetDynamicDataHandler
         $total = [];
 
         if ($townId || $pvId || $orderBy) {
-            $forms = Form::query();
-
-            if ($journal !== 'all') {
-                $formDetailsTable = Form::$relatedTables[$journal];
-                $forms = $forms
-                    ->join($formDetailsTable, 'forms.uuid', '=', "$formDetailsTable.forms_uuid")
-                    ->where('type_anketa', $journal);
+            if ($journal === 'all') {
+                $formTypes = [
+                    FormTypeEnum::MEDIC,
+                    FormTypeEnum::TECH
+                ];
             } else {
-                $forms = $forms
-                    ->leftJoin('medic_forms', 'forms.uuid', '=', "medic_forms.forms_uuid")
-                    ->leftJoin('tech_forms', 'forms.uuid', '=', "tech_forms.forms_uuid")
-                    ->whereIn('type_anketa', [FormTypeEnum::TECH, FormTypeEnum::MEDIC]);
+                $formTypes = [
+                    $journal
+                ];
             }
 
             $dateFrom = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay();
             $dateTo = Carbon::now()->lastOfMonth()->endOfDay();
 
-            if ($orderBy === 'created') {
-                $forms = $forms->whereBetween('created_at', [
-                    $dateFrom,
-                    $dateTo,
-                ]);
-            } else {
-                $forms = $forms->where(function ($q) use ($dateFrom, $dateTo) {
-                    $q->where(function ($q) use ($dateFrom, $dateTo) {
-                        $q->whereNotNull('date')
-                            ->whereBetween('date', [
-                                $dateFrom,
-                                $dateTo,
-                            ]);
-                    })->orWhere(function ($q) use ($dateFrom, $dateTo) {
-                        $q->whereNull('date')
-                            ->whereBetween('period_pl', [
-                                $dateFrom->format('Y-m'),
-                                $dateTo->format('Y-m'),
-                            ]);
+            $forms = collect([]);
+
+            foreach ($formTypes as $formType) {
+                $formDetailsTable = Form::$relatedTables[$formType];
+                $query = Form::query()
+                    ->select([
+                        'forms.*',
+                        "$formDetailsTable.period_pl as period_pl",
+                        'companies.name as company_name'
+                    ])
+                    ->join($formDetailsTable, 'forms.uuid', '=', "$formDetailsTable.forms_uuid")
+                    ->leftJoin('companies', 'forms.company_id', '=', 'companies.hash_id');
+
+                if ($orderBy === 'created') {
+                    $query->whereBetween('forms.created_at', [
+                        $dateFrom,
+                        $dateTo,
+                    ]);
+                } else {
+                    $query->where(function ($q) use ($formDetailsTable, $dateFrom, $dateTo) {
+                        $q->where(function ($q) use ($dateFrom, $dateTo) {
+                            $q->whereNotNull('forms.date')
+                                ->whereBetween('forms.date', [
+                                    $dateFrom,
+                                    $dateTo,
+                                ]);
+                        })->orWhere(function ($q) use ($formDetailsTable, $dateFrom, $dateTo) {
+                            $q->whereNull('forms.date')
+                                ->whereBetween("$formDetailsTable.period_pl", [
+                                    $dateFrom->format('Y-m'),
+                                    $dateTo->format('Y-m'),
+                                ]);
+                        });
                     });
-                });
+                }
+
+                if ($pvId) {
+                    $query->where(function ($query) use ($pvId) {
+                        foreach ($pvId as $point) {
+                            $query->orWhere('forms.point_id', $point->id);
+                        }
+
+                        return $query;
+                    });
+                }
+
+                if ($townId) {
+                    $query->leftJoin('points', 'forms.point_id', '=', 'points.id');
+                    $query->where(function ($query) use ($townId) {
+                        foreach ($townId as $town) {
+                            $query->orWhere('points.pv_id', $town);
+                        }
+
+                        return $query;
+                    });
+                }
+
+                if ($companyId) {
+                    $query = $forms->whereIn('forms.company_id', $companyId);
+                }
+
+                $forms = $forms->merge($query->get());
             }
-
-            if ($pvId) {
-                $points = Point::whereIn('id', $pvId)->get();
-                $forms->where(function ($query) use ($points) {
-                    foreach ($points as $point) {
-                        $query = $query->orWhere('forms.point_id', $point->id);
-                    }
-
-                    return $query;
-                });
-            } else if ($townId) {
-                $points = Point::whereIn('pv_id', $townId)->get();
-                $forms->where(function ($query) use ($points) {
-                    foreach ($points as $point) {
-                        $query = $query->orWhere('forms.point_id', $point->id);
-                    }
-
-                    return $query;
-                });
-            }
-
-            if ($companyId) {
-                $forms = $forms->whereIn('company_id', $companyId);
-            }
-
-            $forms = $forms->get();
 
             foreach ($forms->groupBy('company_id') as $companyId => $formsByCompany) {
                 $company = $formsByCompany->where('company_id', '=', $companyId)->first();
