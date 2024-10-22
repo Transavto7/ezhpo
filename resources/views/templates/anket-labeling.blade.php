@@ -22,55 +22,51 @@
     .logo {
         position: absolute;
         top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        height: 95px;
-        width: 165px;
-    }
-
-    .arrows {
-        position: absolute;
-        top: 170px;
-        right: 185px;
-        transform: translateX(-50%);
-        height: 60px;
-        width: auto;
+        left: 20px;
+        height: 70px;
+        width: 160px;
     }
 
     .intro {
         position: absolute;
         left: 20px;
-        top: 115px;
-        font-size: 32px;
+        top: 100px;
+        font-size: 36px;
         text-transform: uppercase;
         font-family: "DejaVu Sans", sans-serif;
-        line-height: 1;
+        line-height: 0.9;
     }
 
     .qr {
         position: absolute;
-        top: 115px;
+        top: 20px;
         right: 20px;
-        width: 170px;
-        height: 170px;
+        width: 215px;
+        height: 215px;
     }
 
     .domain {
         position: absolute;
-        top: 235px;
+        bottom: 20px;
         left: 20px;
-        width: 145px;
-        height: 145px;
+        width: 335px;
+        max-width: 335px;
         font-family: "DejaVu Sans", sans-serif;
-        font-size: 18px;
+        font-size: 30px;
+        line-height: 0.8;
+        word-wrap: break-word;
     }
 
     .id {
         position: absolute;
-        top: 260px;
-        left: 20px;
+        bottom: 20px;
+        right: 20px;
+        width: 215px;
+        text-align: center;
         font-family: "DejaVu Sans", sans-serif;
-        font-size: 18px;
+        font-size: 30px;
+        line-height: 0.8;
+        font-weight: 600;
     }
 </style>
 
@@ -79,9 +75,6 @@
         <div class="wrapper">
             <div class="logo">
                 <img src="{{ $logoImage }}" width="100%" height="100%" alt=""/>
-            </div>
-            <div class="arrows">
-                <img src="{{ $arrowsImage }}" width="100%" height="100%" alt=""/>
             </div>
             <div class="intro">
                 Проверь<br />

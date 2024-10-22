@@ -17,7 +17,6 @@ final class AnketsLabelingPDFGenerator
     public function generate(array $items): Response
     {
         $logoImage = $this->getAssetImage('anket_labeling_1.png');
-        $arrowsImage = $this->getAssetImage('anket_labeling_2.png');
         $customPaper = array(0, 0, 250.00, 484.00);
         $domain = preg_replace('/^https?:\/\//', '', config('app.url'));
 
@@ -25,8 +24,8 @@ final class AnketsLabelingPDFGenerator
 
         foreach ($items as $item) {
             $prefixes = [
-                AnketLabelingType::MEDIC => 'МО',
-                AnketLabelingType::TECH => 'ТО',
+                AnketLabelingType::MEDIC => 'MO',
+                AnketLabelingType::TECH => 'TO',
             ];
 
             $id = $prefixes[$item->getAnketType()->value()] . '-' . $item->getId();
@@ -40,7 +39,6 @@ final class AnketsLabelingPDFGenerator
         $pdf = PDF::loadView('templates.anket-labeling', [
             'pages' => $pages,
             'logoImage' => $logoImage,
-            'arrowsImage' => $arrowsImage,
             'domain' => $domain,
         ])->setPaper($customPaper, 'landscape');
 
