@@ -507,7 +507,7 @@ class HomeController extends Controller
         $defaultOrderBy = $validTypeForm === FormTypeEnum::PAK_QUEUE ? 'ASC' : 'DESC';
         $orderKey = $request->get('orderKey', 'date');
         $orderBy = $request->get('orderBy', $defaultOrderBy);
-        $take = $request->get('take') ?? 500;
+        $take = $request->get('take') ?? 100;
 
         if ($filterActivated || $validTypeForm === FormTypeEnum::PAK_QUEUE) {
             $forms = $forms->orderBy($orderKey, $orderBy);
