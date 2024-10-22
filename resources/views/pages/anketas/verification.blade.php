@@ -104,7 +104,7 @@
                                     @if($details->getAnketaDate())
                                         <div class="verified-item">
                                             <b>Дата осмотра:</b>
-                                            <span>{{ $details->getAnketaDate()->format('d.m.Y') }}</span>
+                                            <span>{{ $details->getAnketaDate()->format('d.m.Y h:i:s') }}</span>
                                         </div>
                                     @endif
 
@@ -156,51 +156,49 @@
         </div>
     </main>
 
-    @if(count($details->getVerifications()))
-        <div class="d-flex justify-content-center">
-            <a class="text-info" data-toggle="collapse" href="#collapseVerificationHistory" role="button"
-               aria-expanded="false" aria-controls="collapseVerificationHistory">
-                История проверок осмотра
-            </a>
-        </div>
-        <div>
-            <div class="collapse p-2" id="collapseVerificationHistory">
-                <div class="alert alert-info verification-history-list">
-                    <div class="d-flex justify-content-center mb-2">
-                        <b>Проверок всего: {{ count($details->getVerifications()) }}</b></div>
-                    @foreach($details->getVerifications() as $verification)
-                        <p class="text-center">
-                            <b>{{ $loop->index + 1 }}.</b> {{ $verification->getDate()->format('d.m.Y h:i:s') }}
-                            @if($verification->isCurrentDevice())
-                                <br><i>(с вашего устройства)</i>
-                            @endif
-                        </p>
-                    @endforeach
+
+    <div id="history-widget" class="justify-content-center d-none">
+        <a class="text-info" data-toggle="collapse" href="#collapseVerificationHistory" role="button"
+           aria-expanded="false" aria-controls="collapseVerificationHistory">
+            История проверок осмотра
+        </a>
+    </div>
+    <div>
+        <div class="collapse p-2" id="collapseVerificationHistory">
+            <div class="alert alert-info verification-history-list">
+                <div class="d-flex justify-content-center mb-2">
+                    <b>Проверок всего: <span id="history-count"></span></b>
                 </div>
+                <div id="history-items"></div>
             </div>
         </div>
-    @endif
+    </div>
+
 @endsection
 
 @push('custom_scripts')
     <script>
-        const SS_KEY_SIGN = 'anketLabelingVerificationSign';
-        const SS_KEY_SESSION_KEY = 'anketLabelingVerificationSessionKey';
-        const LS_KEY = 'anketLabelingVerificationItems';
+        const SS_KEY_SIGN = 'anketLabelingVerification_Sign';
+        const SS_KEY_SESSION_KEY = 'anketLabelingVerification_SessionKey';
+        const LS_KEY_ITEMS = 'anketLabelingVerification_Items';
+        const LS_KEY_CLIENT_HASH = 'anketLabelingVerification_ClientHash';
 
         const ui = {
             verificationAlertBody: $('#verification-alert-body'),
             verificationAlertCount: $('#verification-alert-count'),
             verificationAlertDate: $('#verification-alert-date'),
+            historyWidget: $('#history-widget'),
+            historyCount: $('#history-count'),
+            historyItems: $('#history-items'),
         };
 
         const currentUuid = '{{ $details->getAnketaUuid() }}';
 
         function getVerificationItems() {
-            const items = localStorage.getItem(LS_KEY);
+            const items = localStorage.getItem(LS_KEY_ITEMS);
 
             if (!items) {
-                localStorage.setItem(LS_KEY, JSON.stringify({}))
+                localStorage.setItem(LS_KEY_ITEMS, JSON.stringify({}))
                 return {};
             }
 
@@ -286,7 +284,46 @@
                 sessionKey: getSessionKey()
             });
 
-            localStorage.setItem(LS_KEY, JSON.stringify(allItems));
+            localStorage.setItem(LS_KEY_ITEMS, JSON.stringify(allItems));
+        }
+
+        function fetchVerificationHistory() {
+            const clientHash = localStorage.getItem(LS_KEY_CLIENT_HASH)
+
+            axios.get('{{ route('anketa.verification.history', $details->getAnketaUuid()) }}', {
+                params: {
+                    clientHash: clientHash
+                }
+            })
+                .then(function (response) {
+                    if (!clientHash) {
+                        localStorage.setItem(LS_KEY_CLIENT_HASH, response.data.clientHash)
+                    }
+
+                    const items = response.data.items
+
+                    if (!items.length) {
+                        return
+                    }
+
+                    items.forEach(function (item, index) {
+                        let hint = ''
+                        if (item.isCurrentDevice) {
+                            hint = '<br><i>(с Вашего устройства)</i>'
+                        }
+
+                        ui.historyItems.append(`
+                            <p class="text-center">
+                                <b>${index + 1}.</b> ${item.date}
+                                ${hint}
+                            </p>
+                        `)
+                    })
+
+                    ui.historyCount.html(items.length)
+                    ui.historyWidget.removeClass('d-none')
+                    ui.historyWidget.addClass('d-flex')
+                })
         }
 
         $(document).ready(function () {
@@ -298,6 +335,8 @@
                 storeVerification();
                 sessionStorage.setItem(SS_KEY_SIGN, JSON.stringify({visited: true}))
             }
+
+            fetchVerificationHistory()
         })
     </script>
 

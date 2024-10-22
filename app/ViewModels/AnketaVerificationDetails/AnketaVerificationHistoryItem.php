@@ -1,10 +1,10 @@
 <?php
 
-namespace App\ViewModels\AnketaVerificationDetails\Dto;
+namespace App\ViewModels\AnketaVerificationDetails;
 
 use Carbon\Carbon;
 
-final class AnketaVerification
+final class AnketaVerificationHistoryItem implements \JsonSerializable
 {
     /**
      * @var Carbon
@@ -25,13 +25,11 @@ final class AnketaVerification
         $this->isCurrentDevice = $isCurrentDevice;
     }
 
-    public function getDate(): Carbon
+    public function jsonSerialize(): array
     {
-        return $this->date;
-    }
-
-    public function isCurrentDevice(): bool
-    {
-        return $this->isCurrentDevice;
+        return [
+            'date' => $this->date->format('d.m.Y h:i:s'),
+            'isCurrentDevice' => $this->isCurrentDevice,
+        ];
     }
 }

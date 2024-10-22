@@ -15,9 +15,10 @@ class CreateAnketaVerificationsTable extends Migration
     {
         Schema::create('anketa_verifications', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('anketa_uuid', 36);
-            $table->string('client_hash');
+            $table->string('anketa_uuid', 36)->index();
             $table->dateTime('verification_date');
+            $table->string('client_hash');
+            $table->string('verification_status');
         });
     }
 

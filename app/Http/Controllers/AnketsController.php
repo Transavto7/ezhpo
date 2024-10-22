@@ -9,6 +9,10 @@ use App\Actions\Anketa\ExportAnketasLabelingPdf\ExportAnketasLabelingPdfCommand;
 use App\Actions\Anketa\ExportAnketasLabelingPdf\ExportAnketasLabelingPdfHandler;
 use App\Actions\Anketa\GetAnketaVerificationDetails\GetAnketaVerificationDetailsParams;
 use App\Actions\Anketa\GetAnketaVerificationDetails\GetAnketaVerificationDetailsQuery;
+use App\Actions\Anketa\GetAnketaVerificationHistory\GetAnketaVerificationHistoryParams;
+use App\Actions\Anketa\GetAnketaVerificationHistory\GetAnketaVerificationHistoryQuery;
+use App\Actions\Anketa\StoreAnketaVerification\StoreAnketaVerificationCommand;
+use App\Actions\Anketa\StoreAnketaVerification\StoreAnketaVerificationHandler;
 use App\Actions\Anketa\TrashFormHandler;
 use App\Actions\Anketa\UpdateFormHandler;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueAction;
@@ -504,11 +508,8 @@ class AnketsController extends Controller
         }
     }
 
-    public function verificationPage(string $uuid, Request $request, GetAnketaVerificationDetailsQuery $query)
+    public function verificationPage(string $uuid, GetAnketaVerificationDetailsQuery $query)
     {
-        $userAgent = $request->header('User-Agent');
-        $ipAddress = $request->ip();
-
         $user = Auth::user();
 
         $userId = null;
@@ -519,7 +520,6 @@ class AnketsController extends Controller
         try {
             $details = $query->get(new GetAnketaVerificationDetailsParams(
                 $uuid,
-                ClientHash::from($ipAddress, $userAgent),
                 $userId
             ));
 
@@ -533,5 +533,47 @@ class AnketsController extends Controller
                 'message' => $exception->getMessage(),
             ]);
         }
+    }
+
+    public function verificationHistory(
+        string $uuid,
+        Request $request,
+        GetAnketaVerificationHistoryQuery $getVerificationHistoryQuery,
+        StoreAnketaVerificationHandler $createVerificationHandler
+
+    ): JsonResponse
+    {
+        $clientHash = $request->input("client_hash");
+
+        if (!$clientHash) {
+            $clientHash = ClientHash::from($request->ip(), $request->header('User-Agent'))->value();
+        }
+
+        try {
+            $historyItems = $getVerificationHistoryQuery->get(new GetAnketaVerificationHistoryParams(
+                $uuid,
+                $clientHash
+            ));
+
+            $createVerificationHandler->handle(new StoreAnketaVerificationCommand(
+                $uuid,
+                $clientHash,
+                Auth::check()
+            ));
+
+            return response()
+                ->json([
+                    'items' => $historyItems,
+                    'clientHash' => $clientHash,
+                ])
+                ->setStatusCode(Response::HTTP_OK);
+        } catch (HttpClientNotFoundException $exception) {
+            return response()->json()->setStatusCode(Response::HTTP_NOT_FOUND);
+        }
+//        catch (Throwable $exception) {
+//            return response()->json([
+//                'message' => $exception->getMessage()
+//            ])->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+//        }
     }
 }

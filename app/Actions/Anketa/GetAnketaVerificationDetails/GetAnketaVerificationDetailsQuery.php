@@ -4,27 +4,12 @@ namespace App\Actions\Anketa\GetAnketaVerificationDetails;
 
 use App\Anketa;
 use App\Enums\AnketLabelingType;
-use App\Repositories\AnketaVerifications\AnketaVerificationsRepository;
 use App\ViewModels\AnketaVerificationDetails\AnketaVerificationDetails;
-use App\ViewModels\AnketaVerificationDetails\Dto\AnketaVerification;
 use Carbon\Carbon;
 use Http\Client\Common\Exception\HttpClientNotFoundException;
 
 final class GetAnketaVerificationDetailsQuery
 {
-    /**
-     * @var AnketaVerificationsRepository
-     */
-    private $verificationRepository;
-
-    /**
-     * @param AnketaVerificationsRepository $verificationRepository
-     */
-    public function __construct(AnketaVerificationsRepository $verificationRepository)
-    {
-        $this->verificationRepository = $verificationRepository;
-    }
-
     public function get(GetAnketaVerificationDetailsParams $params): AnketaVerificationDetails
     {
         $anketa = Anketa::where('uuid', '=', $params->getAnketaUuid())->first();
@@ -39,20 +24,7 @@ final class GetAnketaVerificationDetailsQuery
         $driverName = null;
         $carGosNumber = null;
 
-        $verifications = $this->verificationRepository->findVerificationDatesByUuid($anketa->uuid);
-        $verifications = array_map(function ($verification) use ($params) {
-            return new AnketaVerification(
-                $verification['verification_date'],
-                $params->getClientHash()->value() === $verification['client_hash']
-            );
-        }, $verifications);
-
-        $existedVerifications = $this->verificationRepository->findVerificationsByParams($anketa->uuid, $params->getClientHash()->value());
-        if (!count($existedVerifications) && !$params->getUserId()) {
-            $this->verificationRepository->addAnketVerification($anketa->uuid, $params->getClientHash()->value());
-        }
-
-        if ($anketa->in_cart) {
+        if ($anketa->in_cart === 1) {
             $verified = false;
         }
         else {
@@ -91,7 +63,6 @@ final class GetAnketaVerificationDetailsQuery
             $anketaDate,
             $driverName,
             $carGosNumber,
-            $verifications
         );
     }
 }

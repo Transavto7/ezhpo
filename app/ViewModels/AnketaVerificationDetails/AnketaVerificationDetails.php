@@ -3,7 +3,6 @@
 namespace App\ViewModels\AnketaVerificationDetails;
 
 use App\Enums\AnketLabelingType;
-use App\ViewModels\AnketaVerificationDetails\Dto\AnketaVerification;
 use Carbon\Carbon;
 
 final class AnketaVerificationDetails
@@ -44,10 +43,6 @@ final class AnketaVerificationDetails
      * @var string|null
      */
     private $carGosNumber;
-    /**
-     * @var AnketaVerification[]
-     */
-    private $verifications;
 
     /**
      * @param bool $verified
@@ -59,7 +54,6 @@ final class AnketaVerificationDetails
      * @param Carbon|null $anketaDate
      * @param string|null $driverName
      * @param string|null $carGosNumber
-     * @param AnketaVerification[] $verifications
      */
     public function __construct(
         bool $verified,
@@ -70,8 +64,7 @@ final class AnketaVerificationDetails
         ?string $companyName,
         ?Carbon $anketaDate,
         ?string $driverName,
-        ?string $carGosNumber,
-        array $verifications
+        ?string $carGosNumber
     )
     {
         $this->verified = $verified;
@@ -83,7 +76,6 @@ final class AnketaVerificationDetails
         $this->anketaDate = $anketaDate;
         $this->driverName = $driverName;
         $this->carGosNumber = $carGosNumber;
-        $this->verifications = $verifications;
     }
 
     public function isVerified(): bool
@@ -130,14 +122,4 @@ final class AnketaVerificationDetails
     {
         return $this->carGosNumber;
     }
-
-    /**
-     * @return AnketaVerification[]
-     */
-    public function getVerifications(): array
-    {
-        return $this->verifications;
-    }
-
-
 }

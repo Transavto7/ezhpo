@@ -179,7 +179,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/anketa-verification/{uuid}', 'AnketsController@verificationPage')->name('anketa.verification.page');
-Route::get('/anketa-verification/{uuid}/details', 'AnketsController@verificationDetails')->name('anketa.verification.details');
+Route::get('/anketa-verification/{uuid}/history', 'AnketsController@verificationHistory')->name('anketa.verification.history');
 
 Auth::routes();
 

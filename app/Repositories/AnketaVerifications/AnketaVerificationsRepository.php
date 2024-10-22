@@ -2,6 +2,8 @@
 
 namespace App\Repositories\AnketaVerifications;
 
+use App\Enums\AnketaVerificationStatus;
+use App\Repositories\AnketaVerifications\Entities\AnketaVerification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -9,47 +11,69 @@ final class AnketaVerificationsRepository
 {
     /**
      * @param string $anketaUuid
-     * @return array[]
+     * @return AnketaVerification[]
      */
     public function findVerificationDatesByUuid(string $anketaUuid): array
     {
-        return DB::table('anketa_verifications as av')
+        return DB::table('anketa_verifications')
             ->select([
-                'av.verification_date',
-                'av.client_hash'
+                'id',
+                'anketa_uuid',
+                'verification_date',
+                'client_hash',
+                'verification_status',
             ])
-            ->where('av.anketa_uuid', '=', $anketaUuid)
+            ->where('anketa_uuid', '=', $anketaUuid)
             ->get()
             ->map(function ($item) {
-                return [
-                    'verification_date' => Carbon::parse($item->verification_date),
-                    'client_hash' => $item->client_hash,
-                ];
+                return new AnketaVerification(
+                    $item->id,
+                    $item->anketa_uuid,
+                    Carbon::parse($item->verification_date),
+                    $item->client_hash,
+                    AnketaVerificationStatus::fromString($item->verification_status),
+                );
             })
             ->toArray();
     }
 
+    /**
+     * @param string $anketaUuid
+     * @param string $clientHash
+     * @return AnketaVerification[]
+     */
     public function findVerificationsByParams(string $anketaUuid, string $clientHash): array
     {
-        return DB::table('anketa_verifications as av')
+        return DB::table('anketa_verifications')
             ->select([
-                'av.id',
-                'av.anketa_uuid',
-                'av.verification_date',
-                'av.client_hash',
+                'id',
+                'anketa_uuid',
+                'verification_date',
+                'client_hash',
+                'verification_status',
             ])
-            ->where('av.anketa_uuid', '=', $anketaUuid)
-            ->where('av.client_hash', '=', $clientHash)
+            ->where('anketa_uuid', '=', $anketaUuid)
+            ->where('client_hash', '=', $clientHash)
             ->get()
+            ->map(function ($item) {
+                return new AnketaVerification(
+                    $item->id,
+                    $item->anketa_uuid,
+                    Carbon::parse($item->verification_date),
+                    $item->client_hash,
+                    AnketaVerificationStatus::fromString($item->verification_status),
+                );
+            })
             ->toArray();
     }
 
-    public function addAnketVerification(string $anketaUuid, string $clientHash)
+    public function addAnketVerification(string $anketaUuid, string $clientHash, AnketaVerificationStatus $verificationStatus): void
     {
         DB::table('anketa_verifications')->insert([
             'anketa_uuid' => $anketaUuid,
             'client_hash' => $clientHash,
             'verification_date' => Carbon::now(),
+            'verification_status' => $verificationStatus->value(),
         ]);
     }
 }
