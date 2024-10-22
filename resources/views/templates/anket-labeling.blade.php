@@ -55,6 +55,7 @@
         font-size: 30px;
         line-height: 0.8;
         word-wrap: break-word;
+        font-weight: 600;
     }
 
     .id {
