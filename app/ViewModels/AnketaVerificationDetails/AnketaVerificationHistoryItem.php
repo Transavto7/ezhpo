@@ -28,7 +28,7 @@ final class AnketaVerificationHistoryItem implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'date' => $this->date->format('d.m.Y h:i:s'),
+            'date' => $this->date->format('d.m.Y H:i:s'),
             'isCurrentDevice' => $this->isCurrentDevice,
         ];
     }

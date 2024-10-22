@@ -550,15 +550,15 @@ class AnketsController extends Controller
         }
 
         try {
-            $historyItems = $getVerificationHistoryQuery->get(new GetAnketaVerificationHistoryParams(
-                $uuid,
-                $clientHash
-            ));
-
             $createVerificationHandler->handle(new StoreAnketaVerificationCommand(
                 $uuid,
                 $clientHash,
                 Auth::check()
+            ));
+
+            $historyItems = $getVerificationHistoryQuery->get(new GetAnketaVerificationHistoryParams(
+                $uuid,
+                $clientHash
             ));
 
             return response()

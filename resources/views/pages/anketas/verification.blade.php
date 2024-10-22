@@ -77,7 +77,7 @@
                                 <div>
                                     <i class="fa fa-times-circle status-icon status-icon-wrong" aria-hidden="true"></i>
                                 </div>
-                                <div class="status-title">Осмотр не верифицирован</div>
+                                <div class="status-title">Осмотр не найден</div>
                             @endif
 
                             <div id="verification-alert-body" class="d-none alert alert-danger mt-2">
@@ -104,7 +104,7 @@
                                     @if($details->getAnketaDate())
                                         <div class="verified-item">
                                             <b>Дата осмотра:</b>
-                                            <span>{{ $details->getAnketaDate()->format('d.m.Y h:i:s') }}</span>
+                                            <span>{{ $details->getAnketaDate()->format('d.m.Y H:i:s') }}</span>
                                         </div>
                                     @endif
 
@@ -127,23 +127,11 @@
                                     @if($permissionToDelete)
                                         <div class="mt-2">
                                             <a
+                                                id="anketa-verification-delete-link"
                                                 href="{{ route('forms.trash', ['id' => $details->getAnketaId(), 'action' => 1]) }}"
                                                 class="btn btn-warning btn-sm hv-btn-trash mr-1"
                                                 data-id="{{ $details->getAnketaId() }}">
                                                 Удалить <i class="fa fa-trash ml-1"></i>
-                                            </a>
-                                        </div>
-                                    @endif
-                                @endauth
-                            @else
-                                @auth
-                                    @if($permissionToDelete)
-                                        <div class="mt-2">
-                                            <a
-                                                href="{{ route('forms.trash', ['id' => $details->getAnketaId(), 'action' => 0]) }}"
-                                                class="btn btn-warning btn-sm hv-btn-trash mr-1"
-                                                data-id="{{ $details->getAnketaId() }}">
-                                                Восстановить <i class="fa fa-undo ml-2"></i>
                                             </a>
                                         </div>
                                     @endif
@@ -350,6 +338,28 @@
             }
 
             isExpanded = !isExpanded
+        })
+
+        $(document).ready(function () {
+            $('#anketa-verification-delete-link').click(function(e) {
+                e.preventDefault();
+
+                const url = $(this).attr('href');
+                console.log(url);
+
+                swal.fire({
+                    title: 'Подтверждение',
+                    text: 'Вы уверены, что хотите удалить осмотр?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Да',
+                    cancelButtonText: 'Нет'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = url;
+                    }
+                });
+            });
         })
     </script>
 @endpush
