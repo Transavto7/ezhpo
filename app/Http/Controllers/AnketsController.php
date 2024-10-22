@@ -29,6 +29,7 @@ use App\User;
 use App\ValueObjects\ClientHash;
 use App\ValueObjects\NotAdmittedReasons;
 use Barryvdh\DomPDF\Facade as PDF;
+use Carbon\Carbon;
 use Http\Client\Common\Exception\HttpClientNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -544,6 +545,7 @@ class AnketsController extends Controller
     ): JsonResponse
     {
         $clientHash = $request->input("client_hash");
+        $date = $request->input("date");
 
         if (!$clientHash) {
             $clientHash = ClientHash::from($request->ip(), $request->header('User-Agent'))->value();
@@ -553,7 +555,8 @@ class AnketsController extends Controller
             $createVerificationHandler->handle(new StoreAnketaVerificationCommand(
                 $uuid,
                 $clientHash,
-                Auth::check()
+                Auth::check(),
+                Carbon::parse($date)
             ));
 
             $historyItems = $getVerificationHistoryQuery->get(new GetAnketaVerificationHistoryParams(
@@ -569,11 +572,10 @@ class AnketsController extends Controller
                 ->setStatusCode(Response::HTTP_OK);
         } catch (HttpClientNotFoundException $exception) {
             return response()->json()->setStatusCode(Response::HTTP_NOT_FOUND);
+        } catch (Throwable $exception) {
+            return response()->json([
+                'message' => $exception->getMessage()
+            ])->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-//        catch (Throwable $exception) {
-//            return response()->json([
-//                'message' => $exception->getMessage()
-//            ])->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
-//        }
     }
 }

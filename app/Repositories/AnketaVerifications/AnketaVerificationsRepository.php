@@ -67,12 +67,17 @@ final class AnketaVerificationsRepository
             ->toArray();
     }
 
-    public function addAnketVerification(string $anketaUuid, string $clientHash, AnketaVerificationStatus $verificationStatus): void
+    public function addAnketVerification(
+        string $anketaUuid,
+        string $clientHash,
+        Carbon $verificationDate,
+        AnketaVerificationStatus $verificationStatus
+    ): void
     {
         DB::table('anketa_verifications')->insert([
             'anketa_uuid' => $anketaUuid,
             'client_hash' => $clientHash,
-            'verification_date' => Carbon::now(),
+            'verification_date' => $verificationDate,
             'verification_status' => $verificationStatus->value(),
         ]);
     }

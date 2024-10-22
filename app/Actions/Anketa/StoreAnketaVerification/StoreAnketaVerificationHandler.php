@@ -44,6 +44,7 @@ final class StoreAnketaVerificationHandler
             $this->repository->addAnketVerification(
                 $command->getAnketaUuid(),
                 $command->getClientHash(),
+                $command->getDate(),
                 $verificationStatus
             );
         }

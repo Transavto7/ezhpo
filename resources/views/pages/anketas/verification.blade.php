@@ -180,6 +180,7 @@
             historyItems: $('#history-items'),
         };
 
+        const currentDate = new Date();
         const currentUuid = '{{ $details->getAnketaUuid() }}';
 
         function getVerificationItems() {
@@ -268,7 +269,7 @@
             }
 
             allItems[currentUuid].push({
-                date: (new Date()).toISOString(),
+                date: (currentDate).toISOString(),
                 sessionKey: getSessionKey()
             });
 
@@ -280,7 +281,8 @@
 
             axios.get('{{ route('anketa.verification.history', $details->getAnketaUuid()) }}', {
                 params: {
-                    clientHash: clientHash
+                    clientHash: clientHash,
+                    date: (currentDate).toISOString()
                 }
             })
                 .then(function (response) {

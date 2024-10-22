@@ -2,6 +2,8 @@
 
 namespace App\Actions\Anketa\StoreAnketaVerification;
 
+use Carbon\Carbon;
+
 final class StoreAnketaVerificationCommand
 {
     /**
@@ -16,17 +18,23 @@ final class StoreAnketaVerificationCommand
      * @var bool
      */
     private $isAuthorized;
+    /**
+     * @var Carbon
+     */
+    private $date;
 
     /**
      * @param string $anketaUuid
      * @param string $clientHash
      * @param bool $isAuthorized
+     * @param Carbon $date
      */
-    public function __construct(string $anketaUuid, string $clientHash, bool $isAuthorized)
+    public function __construct(string $anketaUuid, string $clientHash, bool $isAuthorized, Carbon $date)
     {
         $this->anketaUuid = $anketaUuid;
         $this->clientHash = $clientHash;
         $this->isAuthorized = $isAuthorized;
+        $this->date = $date;
     }
 
     public function getAnketaUuid(): string
@@ -43,4 +51,11 @@ final class StoreAnketaVerificationCommand
     {
         return $this->isAuthorized;
     }
+
+    public function getDate(): Carbon
+    {
+        return $this->date;
+    }
+
+
 }
