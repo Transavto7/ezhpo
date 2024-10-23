@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Anketa;
 use App\Car;
 use App\Company;
 use App\Driver;
 use App\Models\Contract;
+use App\Observers\AnketaObserver;
 use App\Observers\CompanyObserver;
 use App\Observers\ContractObserver;
 use App\Observers\DriverObserver;
@@ -168,5 +170,6 @@ class AppServiceProvider extends ServiceProvider
         Contract::observe(ContractObserver::class);
         Driver::observe(DriverObserver::class);
         User::observe(UserObserver::class);
+        Anketa::observe(AnketaObserver::class);
     }
 }

@@ -8,13 +8,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TechForm extends Model
 {
+    protected $primaryKey = 'forms_uuid';
+
+    protected $keyType = 'string';
+
     public $timestamps = false;
 
     protected $fillable = [
         'forms_uuid',
 
+        'day_hash',
+
         'type_view',
 
+        'period_pl',
         'is_dop',
         'result_dop',
 
