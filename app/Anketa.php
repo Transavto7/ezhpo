@@ -6,10 +6,20 @@ use App\Enums\FormTypeEnum;
 use App\ValueObjects\NotAdmittedReasons;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Ramsey\Uuid\Uuid;
 
 class Anketa extends Model
 {
     public const MIN_DIFF_BETWEEN_FORMS_IN_SECONDS = 60;
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->uuid = $model->uuid ?? Uuid::uuid4();
+        });
+    }
 
     public function our_company()
     {

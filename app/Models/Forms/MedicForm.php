@@ -8,13 +8,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MedicForm extends Model
 {
+    protected $primaryKey = 'forms_uuid';
+
+    protected $keyType = 'string';
+
     public $timestamps = false;
 
     public $fillable = [
         'forms_uuid',
 
+        'day_hash',
+
         'type_view',
 
+        'period_pl',
         'is_dop',
         'result_dop',
 
@@ -22,6 +29,7 @@ class MedicForm extends Model
         'operator_id',
         'terminal_id',
 
+        'driver_group_risk',
         'pressure',
         'tonometer',
         't_people',
@@ -35,6 +43,7 @@ class MedicForm extends Model
         'complaint',
         'condition_visible_sliz',
         'condition_koj_pokr',
+        'comments',
 
         'photos',
         'videos',

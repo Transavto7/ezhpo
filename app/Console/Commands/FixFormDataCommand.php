@@ -323,17 +323,15 @@ class FixFormDataCommand extends Command
             }
         }
 
-        if (!$form->realy) {
-            if (!$form->created_at || !$form->date) {
+        if (!$form->created_at || !$form->date) {
+            $form->realy = 'нет';
+        } else {
+            $date = Carbon::parse($form->created_at)->timestamp - Carbon::parse($form->date)->timestamp;
+            $diffInHours = abs($date) / 3600;
+            if ($diffInHours >= 12) {
                 $form->realy = 'нет';
             } else {
-                $date = Carbon::parse($form->created_at)->timestamp - Carbon::parse($form->date)->timestamp;
-                $diffInHours = abs($date) / 3600;
-                if ($diffInHours >= 12) {
-                    $form->realy = 'нет';
-                } else {
-                    $form->realy = 'да';
-                }
+                $form->realy = 'да';
             }
         }
 
@@ -360,7 +358,10 @@ class FixFormDataCommand extends Command
             }
         }
 
-        $form->uuid = Uuid::uuid4();
+        if (!$form->uuid) {
+            $form->uuid = Uuid::uuid4();
+        }
+
         $form->fix_status = $this->convertStatusesListToStatusNumber($statuses);
 
         $form->save();
