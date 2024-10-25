@@ -52,7 +52,7 @@
         width: 335px;
         max-width: 335px;
         font-family: "DejaVu Sans", sans-serif;
-        font-size: 30px;
+        font-size: 36px;
         line-height: 0.8;
         word-wrap: break-word;
         font-weight: 600;
