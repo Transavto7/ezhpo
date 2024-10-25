@@ -94,17 +94,17 @@
                                         </div>
                                     @endif
 
-                                    @if($details->getCompanyName())
-                                        <div class="verified-item">
-                                            <b>Наименование компании:</b>
-                                            <span>{{ $details->getCompanyName() }}</span>
-                                        </div>
-                                    @endif
-
                                     @if($details->getAnketaDate())
                                         <div class="verified-item">
                                             <b>Дата осмотра:</b>
                                             <span>{{ $details->getAnketaDate()->format('d.m.Y H:i:s') }}</span>
+                                        </div>
+                                    @endif
+
+                                    @if($details->getCompanyName())
+                                        <div class="verified-item">
+                                            <b>Наименование компании:</b>
+                                            <span>{{ $details->getCompanyName() }}</span>
                                         </div>
                                     @endif
 
