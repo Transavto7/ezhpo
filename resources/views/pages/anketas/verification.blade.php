@@ -5,7 +5,7 @@
         $title = 'Осмотр верифицирован';
     }
     else {
-        $title = 'Осмотр не верифицирован';
+        $title = 'Осмотр не найден';
     }
 
     $permissionToDelete = user() && (
