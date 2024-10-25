@@ -1,6 +1,6 @@
 @extends('pages.anketas.base')
 
-@section('$title', 'Осмотр не найден')
+@section('title', 'Осмотр не найден')
 
 @push('custom_styles')
     <style>
