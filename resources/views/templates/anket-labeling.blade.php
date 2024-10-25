@@ -65,7 +65,7 @@
         width: 215px;
         text-align: center;
         font-family: "DejaVu Sans", sans-serif;
-        font-size: 30px;
+        font-size: 36px;
         line-height: 0.8;
         font-weight: 600;
     }

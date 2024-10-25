@@ -40,8 +40,8 @@ final class GetAnketaVerificationDetailsQuery
                 $companyName = $anketa->company->name;
             }
 
-            if ($anketa->driver && $anketa->driver->name) {
-                $driverName = $anketa->driver->name;
+            if ($anketa->driver && $anketa->driver->fio) {
+                $driverName = $anketa->driver->fio;
             }
 
             if ($anketa->date) {

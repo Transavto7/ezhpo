@@ -347,7 +347,6 @@
                 e.preventDefault();
 
                 const url = $(this).attr('href');
-                console.log(url);
 
                 swal.fire({
                     title: 'Подтверждение',
