@@ -53,6 +53,7 @@ class SdpoController extends Controller
 
         $forms = Anketa::query()
             ->select([
+                'anketas.id',
                 'anketas.driver_fio',
                 'anketas.admitted',
                 'anketas.date as created_at',
