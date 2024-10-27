@@ -293,22 +293,27 @@ class AnketsController extends Controller
 
             $handler->handle($form, $request->all(), Auth::user());
 
-            $response = [
-                'id' => $id,
-                'message' => 'Осмотр успешно обновлён!'
-            ];
+            $referer = $request->input('REFERER');
+            if ($referer) {
+                $response = redirect($referer);
+            } else {
+                $response = redirect(route('forms.get', [
+                    'id' => $id,
+                    'msg' => 'Осмотр успешно обновлён!'
+                ]));
+            }
 
             DB::commit();
         } catch (Throwable $exception) {
-            $response = [
+            $response = redirect(route('forms.get', [
                 'id' => $id,
                 'errors' => [$exception->getMessage()],
-            ];
+            ]));
 
             DB::rollBack();
         }
 
-        return back()->with($response);
+        return $response;
     }
 
     public function AddForm(Request $request, CreateFormHandlerFactory $factory): RedirectResponse
