@@ -25,13 +25,7 @@ class DeleteUselessFields extends Migration
                 'added_to_mo',
                 'connected_hash'
             ],
-            'cars' => [
-                'old_id',
-                'contract_id'
-            ],
             'drivers' => [
-                'old_id',
-                'contract_id',
                 'time_of_pressure_ban',
                 'time_of_alcohol_ban'
             ],
@@ -46,12 +40,6 @@ class DeleteUselessFields extends Migration
                 'contract_id',
                 'contract_snapshot_id'
             ],
-            'cars' => [
-                'contract_id'
-            ],
-            'drivers' => [
-                'contract_id'
-            ]
         ];
 
         foreach ($foreign as $table => $keys) {
