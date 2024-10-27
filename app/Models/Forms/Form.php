@@ -17,10 +17,6 @@ class Form extends Model
 {
     use SoftDeletes;
 
-    protected $primaryKey = 'uuid';
-
-    protected $keyType = 'string';
-
     public static $related = [
         FormTypeEnum::MEDIC => MedicForm::class,
         FormTypeEnum::PAK_QUEUE => MedicForm::class,

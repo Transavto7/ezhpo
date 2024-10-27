@@ -20,7 +20,7 @@ class AnketaObserver
             return;
         }
 
-        $form = Form::find($anketa->uuid);
+        $form = Form::query()->where('uuid', $anketa->uuid)->first();
         if (!$form) {
             return;
         }
