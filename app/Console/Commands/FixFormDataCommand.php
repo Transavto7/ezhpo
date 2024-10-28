@@ -288,7 +288,7 @@ class FixFormDataCommand extends Command
         }
 
         if (!$form->company_id && $form->car_id) {
-            $form->company_id = $this->getCompanyHashIdById($this->getCompanyIdByCarHashId($form->driver_id, $maps), $maps);
+            $form->company_id = $this->getCompanyHashIdById($this->getCompanyIdByCarHashId($form->car_id, $maps), $maps);
         }
 
         if (!$form->company_id && $form->company_name) {
