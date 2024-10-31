@@ -87,5 +87,7 @@ class CreateDriverHandler extends AbstractCreateElementHandler implements Create
         if ($company->required_type_briefing) {
             BriefingService::createFirstBriefingForDriver($created, $company);
         }
+
+        return $created;
     }
 }

@@ -87,7 +87,8 @@ class Anketa extends Model
             'closing_path',
             'comments',
 
-            'transfer_status'
+            'transfer_status',
+            'fix_status'
         ];
 
     public static $anketsKeys

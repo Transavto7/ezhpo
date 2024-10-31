@@ -362,37 +362,8 @@ class FixFormDataCommand extends Command
             $form->uuid = Uuid::uuid4();
         }
 
-        $form->fix_status = $this->convertStatusesListToStatusNumber($statuses);
+        $form->fix_status = FormFIxStatusConverter::fromStatuses($statuses);
 
         $form->save();
-    }
-
-    /**
-     * @param array<int> $statuses
-     * @return int
-     */
-    private function convertStatusesListToStatusNumber(array $statuses): int
-    {
-        if (count($statuses) === 0) {
-            return FormFixStatusEnum::FIXED;
-        }
-
-        $statuses = array_unique($statuses);
-
-        $statusBits = [
-            FormFixStatusEnum::FIXED => 0,
-            FormFixStatusEnum::INVALID_POINT_ID => 0,
-            FormFixStatusEnum::INVALID_DRIVER_ID => 0,
-            FormFixStatusEnum::INVALID_CAR_ID => 0,
-            FormFixStatusEnum::INVALID_COMPANY_ID => 0,
-            FormFixStatusEnum::INVALID_USER_ID => 0,
-            FormFixStatusEnum::INVALID_TERMINAL_ID => 0
-        ];
-
-        foreach ($statuses as $status) {
-            $statusBits[$status] = 1;
-        }
-
-        return intval(base_convert(implode("", array_reverse(array_values($statusBits))), 2, 10));
     }
 }

@@ -72,5 +72,7 @@ class CreateCarHandler extends AbstractCreateElementHandler implements CreateEle
             $contract->cars()->attach($created->id);
             event(new Attached($contract, [$created->id], Car::class));
         }
+
+        return $created;
     }
 }
