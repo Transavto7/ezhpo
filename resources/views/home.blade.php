@@ -609,10 +609,12 @@
                         <div class="alert alert-danger" role="alert">{{ session()->get('error') }}</div>
                     @endif
 
-                    @if(count($ankets) > 0 && $permissionToView && $permissionToDelete)
+                    @if(count($ankets) > 0 && $permissionToView)
                         <div id="selected-ankets-control" class="d-none align-items-center mt-4 mb-2">
-                            <button id="selected-ankets-control-btn-delete" class="btn btn-danger btn-sm"></button>
-                            <button id="approve-selected" class="btn btn-success btn-sm ml-2"></button>
+                            @if($permissionToDelete)
+                                <button id="selected-ankets-control-btn-delete" class="btn btn-danger btn-sm mr-2"></button>
+                            @endif
+                            <button id="approve-selected" class="btn btn-success btn-sm"></button>
                             <button id="select-all" class="btn btn-success btn-sm ml-2">Выделить все на странице</button>
                             <button id="selected-ankets-control-btn-unset" class="btn btn-success btn-sm ml-2">Снять выделение</button>
 
@@ -675,9 +677,7 @@
                         class="ankets-table table table-striped table-sm">
                         <thead>
                         <tr>
-                            @if($permissionToDelete)
-                                <th>#</th>
-                            @endif
+                            <th>#</th>
 
                             @if($type_ankets === 'pak_queue')
                                 <th class="not-export">Таймер</th>
@@ -724,14 +724,12 @@
                         <tbody>
                         @foreach($ankets as $anketaKey => $anketa)
                             <tr data-field="{{ $anketaKey }}">
-                                @if($permissionToDelete)
-                                    <td>
-                                        <input
-                                            type="checkbox"
-                                            data-id="{{ $anketa->id }}"
-                                            class="hv-checkbox-mass-deletion">
-                                    </td>
-                                @endif
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        data-id="{{ $anketa->id }}"
+                                        class="hv-checkbox-mass-deletion">
+                                </td>
 
                                 @if($type_ankets === 'pak_queue')
                                     <td class="not-export">
