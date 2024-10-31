@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Actions\Element\CreateElementHandlerFactory;
 use App\Actions\User\CreateUserHandler;
 use App\Anketa;
+use App\Car;
 use App\Company;
 use App\Driver;
 use App\Enums\FormFixStatusEnum;
@@ -13,6 +14,7 @@ use App\Req;
 use App\Town;
 use App\User;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Log;
@@ -87,12 +89,14 @@ class RestoreFormDataCommand extends Command
 
         if ($this->option('reset-invalid')) {
             $this->resetInvalid();
-        }
 
-        $this->getDefaults();
+            return;
+        }
 
         if ($this->option('creat-undefined')) {
             $this->createUndefined();
+
+            return;
         }
 
         if ((config('forms.restore-foreign', false) === false) && !$this->option('force')) {
@@ -118,6 +122,7 @@ class RestoreFormDataCommand extends Command
 
     private function resetInvalid()
     {
+        $this->getDefaults();
         $this->resetTerminals();
         $this->resetUsers();
         $this->resetTerminalAndUser();
@@ -365,15 +370,15 @@ class RestoreFormDataCommand extends Command
 
         $created = Company::withTrashed()->where('name', $name)->first();
 
-        if (!$created) {
-            $created = $handler->handle([
-                'name' => $name,
-                'deleted_at' => Carbon::now(),
-                'auto_created' => true
-            ]);
+        if ($created) {
+            return $created;
         }
 
-        return $created;
+        return $handler->handle([
+            'name' => $name,
+            'deleted_at' => Carbon::now(),
+            'auto_created' => true
+        ]);
     }
 
     private function createPoints()
@@ -423,16 +428,16 @@ class RestoreFormDataCommand extends Command
 
         $created = Point::withTrashed()->where('name', $name)->first();
 
-        if (!$created) {
-            $created = $handler->handle([
-                'name' => $name,
-                'pv_id' => $this->defaultTown->id,
-                'deleted_at' => Carbon::now(),
-                'auto_created' => true
-            ]);
+        if ($created) {
+            return $created;
         }
 
-        return $created;
+        return $handler->handle([
+            'name' => $name,
+            'pv_id' => $this->defaultTown->id,
+            'deleted_at' => Carbon::now(),
+            'auto_created' => true
+        ]);
     }
 
     private function createUsers()
@@ -469,37 +474,44 @@ class RestoreFormDataCommand extends Command
         }
     }
 
+    /**
+     * @throws Exception
+     */
     private function createUser(string $name): User
     {
         $handler = new CreateUserHandler();
 
         $created = User::withTrashed()->where('name', $name)->first();
 
-        if (!$created) {
-            $login = str_replace(' ', '', $this->transliterate($name));
-
-            if (strlen($login) === 0) {
-                throw new \Exception("Невалидное имя пользователя пользователя $name");
-            }
-
-            $email = "$login@ta-7.ru";
-
-            $created = $handler->handle([
-                'name' => $name,
-                'email' => $email,
-                'timezone' => 3,
-                'pv' => $this->defaultPoint->id,
-                'eds' => null,
-                'validity_eds_start' => null,
-                'validity_eds_end' => null,
-            ]);
+        if ($created) {
+            return $created;
         }
 
-        return $created;
+        $login = str_replace(' ', '', $this->transliterate($name));
+
+        if (strlen($login) === 0) {
+            throw new Exception("Невалидное имя пользователя пользователя $name");
+        }
+
+        $email = "$login@ta-7.ru";
+
+        return $handler->handle([
+            'name' => $name,
+            'email' => $email,
+            'timezone' => 3,
+            'pv' => $this->defaultPoint->id,
+            'eds' => null,
+            'validity_eds_start' => null,
+            'validity_eds_end' => null,
+            'deleted_at' => Carbon::now(),
+            'auto_created' => true
+        ]);
     }
 
     private function fixForms(int $chunkSize): int
     {
+        $this->getDefaults();
+
         $forms = Anketa::query()
             ->where('fix_status', '>', FormFixStatusEnum::FIXED)
             ->orderBy('id', 'desc')
@@ -517,6 +529,10 @@ class RestoreFormDataCommand extends Command
     {
         $statuses = FormFIxStatusConverter::toStatuses($form->fix_status);
 
+        $statuses = array_filter($statuses, function ($status) {
+            return $status != FormFixStatusEnum::INVALID_TERMINAL_ID;
+        });
+
         if (in_array(FormFixStatusEnum::INVALID_COMPANY_ID, $statuses)) {
             $form = $this->fixCompany($form);
 
@@ -528,34 +544,47 @@ class RestoreFormDataCommand extends Command
         }
 
         if (in_array(FormFixStatusEnum::INVALID_DRIVER_ID, $statuses)) {
-            $statuses = array_filter($statuses, function ($status) {
-                return $status != FormFixStatusEnum::INVALID_DRIVER_ID;
-            });
+            $form = $this->fixDriver($form);
+
+            if ($form->driver_id) {
+                $statuses = array_filter($statuses, function ($status) {
+                    return $status != FormFixStatusEnum::INVALID_DRIVER_ID;
+                });
+            }
         }
 
         if (in_array(FormFixStatusEnum::INVALID_CAR_ID, $statuses)) {
-            $statuses = array_filter($statuses, function ($status) {
-                return $status != FormFixStatusEnum::INVALID_CAR_ID;
-            });
+            $form = $this->fixCar($form);
+
+            if ($form->car_id) {
+                $statuses = array_filter($statuses, function ($status) {
+                    return $status != FormFixStatusEnum::INVALID_CAR_ID;
+                });
+            }
         }
 
         if (in_array(FormFixStatusEnum::INVALID_USER_ID, $statuses)) {
-            $statuses = array_filter($statuses, function ($status) {
-                return $status != FormFixStatusEnum::INVALID_USER_ID;
-            });
-        }
+            $form = $this->fixUser($form);
 
-        if (in_array(FormFixStatusEnum::INVALID_TERMINAL_ID, $statuses)) {
-            $statuses = array_filter($statuses, function ($status) {
-                return $status != FormFixStatusEnum::INVALID_TERMINAL_ID;
-            });
+            if ($form->user_id) {
+                $statuses = array_filter($statuses, function ($status) {
+                    return $status != FormFixStatusEnum::INVALID_USER_ID;
+                });
+            }
         }
 
         if (in_array(FormFixStatusEnum::INVALID_POINT_ID, $statuses)) {
-            $statuses = array_filter($statuses, function ($status) {
-               return $status != FormFixStatusEnum::INVALID_POINT_ID;
-            });
+            $form = $this->fixPoint($form);
+
+            if ($form->point_id) {
+                $statuses = array_filter($statuses, function ($status) {
+                    return $status != FormFixStatusEnum::INVALID_POINT_ID;
+                });
+            }
         }
+
+        $form->fix_status = FormFIxStatusConverter::fromStatuses($statuses);
+        $form->save();
     }
 
     private function fixCompany(Anketa $form): Anketa
@@ -564,22 +593,38 @@ class RestoreFormDataCommand extends Command
             return $form;
         }
 
-        if ($form->driver_id) {
-            $form->company_id = $form->driver->company_id;
+        try {
+            if ($form->driver_id) {
+                $driver = Driver::withTrashed()->where('hash_id', $form->driver_id)->first();
+                if ($driver && $driver->company_id) {
+                    $company = Company::withTrashed()->find($driver->company_id);
+                    if ($company) {
+                        $form->company_id = $company->hash_id;
+                    }
+                }
 
-            return $form;
-        }
+                return $form;
+            }
 
-        if ($form->car_id) {
-            $form->company_id = $form->car->company_id;
+            if ($form->car_id) {
+                $car = Car::withTrashed()->where('hash_id', $form->car_id)->first();
+                if ($car && $car->company_id) {
+                    $company = Company::withTrashed()->find($car->company_id);
+                    if ($company) {
+                        $form->company_id = $company->hash_id;
+                    }
+                }
 
-            return $form;
-        }
+                return $form;
+            }
 
-        if ($form->company_name) {
-            $created = $this->createCompany($form->company_name);
+            if ($form->company_name) {
+                $company = $this->createCompany($form->company_name);
 
-            $form->company_id = $created->hash_id;
+                $form->company_id = $company->hash_id;
+            }
+        } catch (Throwable $exception) {
+            $this->log("Ошибка восстановления записи у компании $form->company_name / $form->driver_id / $form->car_id  - {$exception->getMessage()}");
         }
 
         return $form;
@@ -591,18 +636,141 @@ class RestoreFormDataCommand extends Command
             return $form;
         }
 
-        if ($form->driver_fio) {
-            $companyId = $form->company_id ?? $this->defaultCompany->id;
+        if (!$form->driver_fio) {
+            return $form;
+        }
+
+        try {
+            $companyId = $this->defaultCompany->id;
+
+            if ($form->company_id) {
+                $company = Company::withTrashed()->where('hash_id', $form->company_id)->first();
+
+                $companyId = $company->hash_id;
+            }
 
             $created = $this->createDriver($form->driver_fio, $companyId);
+
+            $form->driver_id = $created->hash_id;
+        } catch (Throwable $exception) {
+            $this->log("Ошибка восстановления записи у водителя $form->driver_fio - {$exception->getMessage()}");
         }
 
         return $form;
     }
 
-    private function createDriver(string $name, string $companyHashId): Driver
+    private function createDriver(string $name, $companyId): Driver
     {
+        $handler = $this->factory->make('Driver');
 
+        $created = Driver::withTrashed()
+            ->where('fio', $name)
+            ->where('company_id', $companyId)
+            ->first();
+
+        if ($created) {
+            return $created;
+        }
+
+        return $handler->handle([
+            'fio' => $name,
+            'company_id' => $companyId,
+            'deleted_at' => Carbon::now(),
+            'auto_created' => true
+        ]);
+    }
+
+    private function fixCar(Anketa $form): Anketa
+    {
+        if ($form->car_id) {
+            return $form;
+        }
+
+        if (!$form->car_gos_number) {
+            return $form;
+        }
+
+        try {
+            $companyId = $this->defaultCompany->id;
+
+            if ($form->company_id) {
+                $company = Company::withTrashed()->where('hash_id', $form->company_id)->first();
+
+                $companyId = $company->hash_id;
+            }
+
+            $created = $this->createCar($form->car_gos_number, $companyId);
+
+            $form->car_id = $created->hash_id;
+        } catch (Throwable $exception) {
+            $this->log("Ошибка восстановления записи у авто $form->user_name - {$exception->getMessage()}");
+        }
+
+        return $form;
+    }
+
+    private function createCar(string $gosNumber, $companyId): Car
+    {
+        $handler = $this->factory->make('Car');
+
+        $created = Car::withTrashed()
+            ->where('gos_number', $gosNumber)
+            ->where('company_id', $companyId)
+            ->first();
+
+        if ($created) {
+            return $created;
+        }
+
+        return $handler->handle([
+            'gos_number' => $gosNumber,
+            'company_id' => $companyId,
+            'deleted_at' => Carbon::now(),
+            'auto_created' => true
+        ]);
+    }
+
+
+    private function fixUser(Anketa $form): Anketa
+    {
+        if ($form->user_id) {
+            return $form;
+        }
+
+        if (!$form->user_name) {
+            return $form;
+        }
+
+        try {
+            $user = $this->createUser($form->user_name);
+
+            $form->user_id = $user->id;
+        } catch (Throwable $exception) {
+            $this->log("Ошибка восстановления записи у пользователя $form->user_name - {$exception->getMessage()}");
+        }
+
+        return $form;
+    }
+
+    private function fixPoint(Anketa $form)
+    {
+        if ($form->point_id) {
+            return $form;
+        }
+
+        if (!$form->pv_id) {
+            return $form;
+        }
+
+        try {
+            $point = $this->createPoint($form->pv_id);
+
+            $form->point_id = $point->id;
+        } catch (Throwable $exception) {
+            $this->log("Ошибка восстановления записи у ПВ $form->pv_id - {$exception->getMessage()}");
+        }
+
+        return $form;
     }
 
     private function transliterate(string $text): string

@@ -32,6 +32,8 @@ class Car extends Model
             'dismissed',
             'autosync_fields',
             'deleted_id',
+            'auto_created',
+            'deleted_at'
         ];
 
     public function deleted_user(): BelongsTo
