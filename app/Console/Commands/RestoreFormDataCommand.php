@@ -16,7 +16,7 @@ use App\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -28,8 +28,8 @@ class RestoreFormDataCommand extends Command
      * @var string
      */
     protected $signature = 'forms:restore-foreign
-                            {--reset-invalid: Убрать статус ошибок с низкой критичностью }
-                            {--creat-undefined: Восстановить несуществующие сущности }
+                            {--reset-invalid : Убрать статус ошибок с низкой критичностью }
+                            {--create-undefined : Восстановить несуществующие сущности }
                             {--count : Количество необработанных осмотров}
                             {--force : Запуск команды игнорируя конфиг}';
     /**
@@ -79,7 +79,7 @@ class RestoreFormDataCommand extends Command
 
         if ($this->option('count')) {
             $nonFixedForms = Anketa::query()
-                ->whereNotIn('fix_status', [FormFixStatusEnum::UNPROCESSED, FormFixStatusEnum::FIXED])
+                ->where('fix_status', '>', FormFixStatusEnum::FIXED)
                 ->count();
 
             $this->log("Всего необработанных осмотров - $nonFixedForms");
@@ -93,7 +93,7 @@ class RestoreFormDataCommand extends Command
             return;
         }
 
-        if ($this->option('creat-undefined')) {
+        if ($this->option('create-undefined')) {
             $this->createUndefined();
 
             return;
@@ -133,13 +133,8 @@ class RestoreFormDataCommand extends Command
 
     private function resetTerminals()
     {
-        $invalidStatuses = [];
-        $invalidStatuses[] = FormFIxStatusConverter::fromStatuses([
-            FormFixStatusEnum::INVALID_TERMINAL_ID
-        ]);
-
         $fixed = Anketa::query()
-            ->where('fix_status', $invalidStatuses)
+            ->where('fix_status', FormFixStatusEnum::INVALID_TERMINAL_ID)
             ->update(['fix_status' => FormFixStatusEnum::FIXED]);
 
         $this->log("Сброшен статус у осмотров без терминала - $fixed");
@@ -147,17 +142,12 @@ class RestoreFormDataCommand extends Command
 
     private function resetUsers()
     {
-        $invalidStatuses = [];
-        $invalidStatuses[] = FormFIxStatusConverter::fromStatuses([
-            FormFixStatusEnum::INVALID_USER_ID
-        ]);
-
         $fixed = Anketa::query()
             ->where(function (Builder $query) {
                 $query->whereNull('user_name')
                     ->orWhere('user_name', '');
             })
-            ->where('fix_status', $invalidStatuses)
+            ->where('fix_status', FormFixStatusEnum::INVALID_USER_ID)
             ->update(['fix_status' => FormFixStatusEnum::FIXED]);
 
         $this->log("Сброшен статус у осмотров без пользователя - $fixed");
@@ -181,17 +171,12 @@ class RestoreFormDataCommand extends Command
 
     private function resetDrivers()
     {
-        $invalidStatuses = [];
-        $invalidStatuses[] = FormFIxStatusConverter::fromStatuses([
-            FormFixStatusEnum::INVALID_DRIVER_ID
-        ]);
-
         $fixed = Anketa::query()
             ->where(function (Builder $query) {
                 $query->whereNull('driver_fio')
                     ->orWhere('driver_fio', '');
             })
-            ->where('fix_status', $invalidStatuses)
+            ->where('fix_status', FormFixStatusEnum::INVALID_DRIVER_ID)
             ->update(['fix_status' => FormFixStatusEnum::FIXED]);
 
         $this->log("Сброшен статус у осмотров без водителя - $fixed");
@@ -199,17 +184,12 @@ class RestoreFormDataCommand extends Command
 
     private function resetCars()
     {
-        $invalidStatuses = [];
-        $invalidStatuses[] = FormFIxStatusConverter::fromStatuses([
-            FormFixStatusEnum::INVALID_CAR_ID
-        ]);
-
         $fixed = Anketa::query()
             ->where(function (Builder $query) {
                 $query->whereNull('car_gos_number')
                     ->orWhere('car_gos_number', '');
             })
-            ->where('fix_status', $invalidStatuses)
+            ->where('fix_status', FormFixStatusEnum::INVALID_CAR_ID)
             ->update(['fix_status' => FormFixStatusEnum::FIXED]);
 
         $this->log("Сброшен статус у осмотров без водителя - $fixed");
@@ -217,18 +197,13 @@ class RestoreFormDataCommand extends Command
 
     private function resetPoints()
     {
-        $invalidStatuses = [];
-        $invalidStatuses[] = FormFIxStatusConverter::fromStatuses([
-            FormFixStatusEnum::INVALID_POINT_ID
-        ]);
-
         $fixed = Anketa::query()
             ->where(function (Builder $query) {
                 $query->whereNull('pv_id')
                     ->orWhere('pv_id', '0')
                     ->orWhere('pv_id', '');
             })
-            ->where('fix_status', $invalidStatuses)
+            ->whereIn('fix_status', FormFixStatusEnum::INVALID_POINT_ID)
             ->update(['fix_status' => FormFixStatusEnum::FIXED]);
 
         $this->log("Сброшен статус у осмотров без ПВ - $fixed");
@@ -322,6 +297,7 @@ class RestoreFormDataCommand extends Command
 
     private function createUndefined()
     {
+        $this->getDefaults();
         $this->createCompanies();
         $this->createPoints();
         $this->createUsers();
@@ -350,6 +326,7 @@ class RestoreFormDataCommand extends Command
 
                 $restored = Anketa::query()
                     ->where('fix_status', '>', FormFixStatusEnum::FIXED)
+                    ->where('company_name', $companyName)
                     ->whereNull('company_id')
                     ->whereNull('car_id')
                     ->whereNull('driver_id')
@@ -479,14 +456,6 @@ class RestoreFormDataCommand extends Command
      */
     private function createUser(string $name): User
     {
-        $handler = new CreateUserHandler();
-
-        $created = User::withTrashed()->where('name', $name)->first();
-
-        if ($created) {
-            return $created;
-        }
-
         $login = str_replace(' ', '', $this->transliterate($name));
 
         if (strlen($login) === 0) {
@@ -495,8 +464,20 @@ class RestoreFormDataCommand extends Command
 
         $email = "$login@ta-7.ru";
 
+        $created = User::withTrashed()
+            ->where('name', $name)
+            ->orWhere('login', $email)
+            ->first();
+
+        if ($created) {
+            return $created;
+        }
+
+        $handler = new CreateUserHandler();
+
         return $handler->handle([
             'name' => $name,
+            'password' => $this->generateRandomString(),
             'email' => $email,
             'timezone' => 3,
             'pv' => $this->defaultPoint->id,
@@ -510,36 +491,60 @@ class RestoreFormDataCommand extends Command
 
     private function fixForms(int $chunkSize): int
     {
+        $this->log("Восстановление $chunkSize записей");
+
         $this->getDefaults();
 
         $forms = Anketa::query()
+            ->select([
+                'id',
+                'fix_status',
+                'user_id',
+                'user_name',
+                'driver_id',
+                'driver_fio',
+                'car_id',
+                'car_gos_number',
+                'company_id',
+                'point_id',
+                'pv_id'
+            ])
             ->where('fix_status', '>', FormFixStatusEnum::FIXED)
             ->orderBy('id', 'desc')
             ->limit($chunkSize)
             ->get();
 
+        $this->log("Получено $chunkSize записей");
+
+        $all = 0;
+        $restored = 0;
+
         foreach ($forms as $form) {
-            $this->fixForm($form);
+            if ($this->fixForm($form)) {
+                $restored++;
+            }
+
+            $all++;
+
+            if (($all % 1000) === 0) {
+                $this->log("Обработано: $all, восстановлено: $restored");
+            }
         }
 
         return $forms->count();
     }
 
-    private function fixForm(Anketa $form)
+    private function fixForm(Anketa $form): bool
     {
         $statuses = FormFIxStatusConverter::toStatuses($form->fix_status);
 
-        $statuses = array_filter($statuses, function ($status) {
-            return $status != FormFixStatusEnum::INVALID_TERMINAL_ID;
-        });
+        $statuses = $this->resetStatus($statuses, FormFixStatusEnum::INVALID_TERMINAL_ID);
 
         if (in_array(FormFixStatusEnum::INVALID_COMPANY_ID, $statuses)) {
             $form = $this->fixCompany($form);
 
             if ($form->company_id) {
-                $statuses = array_filter($statuses, function ($status) {
-                    return $status != FormFixStatusEnum::INVALID_COMPANY_ID;
-                });
+                $statuses = $this->resetStatus($statuses, FormFixStatusEnum::INVALID_COMPANY_ID);
             }
         }
 
@@ -547,9 +552,7 @@ class RestoreFormDataCommand extends Command
             $form = $this->fixDriver($form);
 
             if ($form->driver_id) {
-                $statuses = array_filter($statuses, function ($status) {
-                    return $status != FormFixStatusEnum::INVALID_DRIVER_ID;
-                });
+                $statuses = $this->resetStatus($statuses, FormFixStatusEnum::INVALID_DRIVER_ID);
             }
         }
 
@@ -557,9 +560,7 @@ class RestoreFormDataCommand extends Command
             $form = $this->fixCar($form);
 
             if ($form->car_id) {
-                $statuses = array_filter($statuses, function ($status) {
-                    return $status != FormFixStatusEnum::INVALID_CAR_ID;
-                });
+                $statuses = $this->resetStatus($statuses, FormFixStatusEnum::INVALID_CAR_ID);
             }
         }
 
@@ -567,9 +568,7 @@ class RestoreFormDataCommand extends Command
             $form = $this->fixUser($form);
 
             if ($form->user_id) {
-                $statuses = array_filter($statuses, function ($status) {
-                    return $status != FormFixStatusEnum::INVALID_USER_ID;
-                });
+                $statuses = $this->resetStatus($statuses, FormFixStatusEnum::INVALID_USER_ID);
             }
         }
 
@@ -577,14 +576,22 @@ class RestoreFormDataCommand extends Command
             $form = $this->fixPoint($form);
 
             if ($form->point_id) {
-                $statuses = array_filter($statuses, function ($status) {
-                    return $status != FormFixStatusEnum::INVALID_POINT_ID;
-                });
+                $statuses = $this->resetStatus($statuses, FormFixStatusEnum::INVALID_POINT_ID);
             }
         }
 
         $form->fix_status = FormFIxStatusConverter::fromStatuses($statuses);
+
         $form->save();
+
+        return $form->fix_status === FormFixStatusEnum::FIXED;
+    }
+
+    private function resetStatus(array $statuses, string $filteredStatus): array
+    {
+        return array_filter($statuses, function ($status) use ($filteredStatus) {
+            return $status != $filteredStatus;
+        });
     }
 
     private function fixCompany(Anketa $form): Anketa
@@ -645,8 +652,9 @@ class RestoreFormDataCommand extends Command
 
             if ($form->company_id) {
                 $company = Company::withTrashed()->where('hash_id', $form->company_id)->first();
-
-                $companyId = $company->hash_id;
+                if ($company) {
+                    $companyId = $company->id;
+                }
             }
 
             $created = $this->createDriver($form->driver_fio, $companyId);
@@ -695,8 +703,9 @@ class RestoreFormDataCommand extends Command
 
             if ($form->company_id) {
                 $company = Company::withTrashed()->where('hash_id', $form->company_id)->first();
-
-                $companyId = $company->hash_id;
+                if ($company) {
+                    $companyId = $company->id;
+                }
             }
 
             $created = $this->createCar($form->car_gos_number, $companyId);
@@ -730,7 +739,6 @@ class RestoreFormDataCommand extends Command
         ]);
     }
 
-
     private function fixUser(Anketa $form): Anketa
     {
         if ($form->user_id) {
@@ -752,7 +760,7 @@ class RestoreFormDataCommand extends Command
         return $form;
     }
 
-    private function fixPoint(Anketa $form)
+    private function fixPoint(Anketa $form): Anketa
     {
         if ($form->point_id) {
             return $form;
@@ -784,4 +792,9 @@ class RestoreFormDataCommand extends Command
 
         return str_replace($cyr, $lat, $text);
     }
+
+    function generateRandomString($length = 10) {
+        return substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length/strlen($x)) )),1,$length);
+    }
+
 }
