@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\Anketa\ExportAnketasLabelingPdf\ExportAnketasLabelingPdfCommand;
+use App\Actions\Anketa\ExportAnketasLabelingPdf\ExportAnketasLabelingPdfHandler;
 use App\Anketa;
 use App\Car;
 use App\Driver;
@@ -19,6 +21,7 @@ use App\User;
 use App\ValueObjects\Phone;
 use App\ValueObjects\PressureLimits;
 use App\ValueObjects\Tonometer;
+use DomainException;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -50,6 +53,7 @@ class SdpoController extends Controller
 
         $forms = Anketa::query()
             ->select([
+                'anketas.id',
                 'anketas.driver_fio',
                 'anketas.admitted',
                 'anketas.date as created_at',
@@ -679,6 +683,21 @@ class SdpoController extends Controller
             return response()->json([
                 'message' => "Ошибка не была передана на сервер! " . $exception->getMessage()
             ]);
+        }
+    }
+
+    public function getAnketLabelingQr($id, ExportAnketasLabelingPdfHandler $handler)
+    {
+        try {
+            return $handler->handle(new ExportAnketasLabelingPdfCommand([$id]));
+        } catch (DomainException $exception) {
+            return response()->json([
+                'message' => $exception->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
+        } catch (Throwable $exception) {
+            return response()->json([
+                'message' => $exception->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

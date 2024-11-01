@@ -121,6 +121,7 @@ Route::middleware(['auth:api', 'update-last-connection'])->prefix('sdpo')->name(
         Route::post('/', 'Api\SdpoController@createAnketa');
         Route::post('/{id}', 'Api\SdpoController@changeType');
         Route::get('/{id}', 'Api\SdpoController@getInspection');
+        Route::post('/labeling-qr/{id}', 'Api\SdpoController@getAnketLabelingQr');
     });
 
     Route::get('/drivers', 'Api\SdpoController@getDrivers');

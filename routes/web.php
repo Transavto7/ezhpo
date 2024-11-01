@@ -151,6 +151,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('save-fields-home/{type_ankets}', 'HomeController@SaveCheckedFieldsFilter')->name('home.save-fields');
         Route::get('anketa-trash/{id}/{action}', 'AnketsController@Trash')->name('forms.trash');
         Route::get('anketa-mass-trash', 'AnketsController@MassTrash')->name('forms.mass-trash');
+
+        Route::post('ankets-export-pdf-labeling', 'AnketsController@exportPdfLabeling')->name('ankets.export-pdf-labeling');
     });
 
     /**
@@ -175,6 +177,9 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 });
+
+Route::get('/anketa-verification/{uuid}', 'AnketsController@verificationPage')->name('anketa.verification.page');
+Route::get('/anketa-verification/{uuid}/history', 'AnketsController@verificationHistory')->name('anketa.verification.history');
 
 Auth::routes();
 

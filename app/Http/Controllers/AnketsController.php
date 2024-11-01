@@ -5,6 +5,14 @@ namespace App\Http\Controllers;
 use App\Actions\Anketa\ChangeResultDopHandler;
 use App\Actions\Anketa\CreateFormHandlerFactory;
 use App\Actions\Anketa\CreateSdpoFormHandler;
+use App\Actions\Anketa\ExportAnketasLabelingPdf\ExportAnketasLabelingPdfCommand;
+use App\Actions\Anketa\ExportAnketasLabelingPdf\ExportAnketasLabelingPdfHandler;
+use App\Actions\Anketa\GetAnketaVerificationDetails\GetAnketaVerificationDetailsParams;
+use App\Actions\Anketa\GetAnketaVerificationDetails\GetAnketaVerificationDetailsQuery;
+use App\Actions\Anketa\GetAnketaVerificationHistory\GetAnketaVerificationHistoryParams;
+use App\Actions\Anketa\GetAnketaVerificationHistory\GetAnketaVerificationHistoryQuery;
+use App\Actions\Anketa\StoreAnketaVerification\StoreAnketaVerificationCommand;
+use App\Actions\Anketa\StoreAnketaVerification\StoreAnketaVerificationHandler;
 use App\Actions\Anketa\TrashFormHandler;
 use App\Actions\Anketa\UpdateFormHandler;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueAction;
@@ -18,8 +26,11 @@ use App\Enums\QRCodeLinkParameter;
 use App\Point;
 use App\Traits\UserEdsTrait;
 use App\User;
+use App\ValueObjects\ClientHash;
 use App\ValueObjects\NotAdmittedReasons;
 use Barryvdh\DomPDF\Facade as PDF;
+use Carbon\Carbon;
+use Http\Client\Common\Exception\HttpClientNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -479,5 +490,92 @@ class AnketsController extends Controller
         $response = response()->make($pdf->output(), 200);
         $response->header('Content-Type', 'application/pdf');
         return $response;
+    }
+
+    public function exportPdfLabeling(Request $request, ExportAnketasLabelingPdfHandler $handler)
+    {
+        $anketIds = $request->input('anket_ids');
+
+        if (count($anketIds) > 40) {
+            return response()->json()->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        try {
+            return $handler->handle(new ExportAnketasLabelingPdfCommand($anketIds));
+        } catch (Throwable $exception) {
+            return response()->json([
+                'message' => $exception->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function verificationPage(string $uuid, GetAnketaVerificationDetailsQuery $query)
+    {
+        $user = Auth::user();
+
+        $userId = null;
+        if ($user) {
+            $userId = $user->id;
+        }
+
+        try {
+            $details = $query->get(new GetAnketaVerificationDetailsParams(
+                $uuid,
+                $userId
+            ));
+
+            return view('pages.anketas.verification', [
+                'details' => $details,
+            ]);
+        } catch (HttpClientNotFoundException $exception) {
+            return view('pages.anketas.404');
+        } catch (Throwable $exception) {
+            return view('pages.anketas.500', [
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    public function verificationHistory(
+        string $uuid,
+        Request $request,
+        GetAnketaVerificationHistoryQuery $getVerificationHistoryQuery,
+        StoreAnketaVerificationHandler $createVerificationHandler
+
+    ): JsonResponse
+    {
+        $clientHash = $request->input("client_hash");
+        $date = $request->input("date");
+
+        if (!$clientHash) {
+            $clientHash = ClientHash::from($request->ip(), $request->header('User-Agent'))->value();
+        }
+
+        try {
+            $createVerificationHandler->handle(new StoreAnketaVerificationCommand(
+                $uuid,
+                $clientHash,
+                Auth::check(),
+                Carbon::parse($date)
+            ));
+
+            $historyItems = $getVerificationHistoryQuery->get(new GetAnketaVerificationHistoryParams(
+                $uuid,
+                $clientHash
+            ));
+
+            return response()
+                ->json([
+                    'items' => $historyItems,
+                    'clientHash' => $clientHash,
+                ])
+                ->setStatusCode(Response::HTTP_OK);
+        } catch (HttpClientNotFoundException $exception) {
+            return response()->json()->setStatusCode(Response::HTTP_NOT_FOUND);
+        } catch (Throwable $exception) {
+            return response()->json([
+                'message' => $exception->getMessage()
+            ])->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

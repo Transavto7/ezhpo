@@ -16,6 +16,8 @@ use App\Observers\UserObserver;
 use App\Services\ElementsSearch\ElementSearchService;
 use App\Services\ElementsSearch\ElementsSearchServiceInterface;
 use App\Services\HashIdGenerator\HashIdGeneratorService;
+use App\Services\QRCode\QRCodeGenerator;
+use App\Services\QRCode\QRCodeGeneratorInterface;
 use App\Settings;
 use App\User;
 use Illuminate\Support\Facades\Auth;
@@ -37,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(ElementsSearchServiceInterface::class, ElementSearchService::class);
+        $this->app->bind(QRCodeGeneratorInterface::class, QRCodeGenerator::class);
     }
 
     /**

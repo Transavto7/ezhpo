@@ -336,6 +336,44 @@
                 updateAnketsControl()
             })
 
+            $('#ankets-labeling-print-btn').click(function () {
+                const anketsStorage = getAnketsStorage()
+
+                axios({
+                    method: 'post',
+                    url: '{{ route('ankets.export-pdf-labeling') }}',
+                    data: {
+                        anket_ids: anketsStorage.items,
+                    },
+                    responseType: 'blob',
+                })
+                    .then((response) => {
+                        const url = window.URL.createObjectURL(new Blob([response.data]))
+                        const link = document.createElement('a')
+
+                        link.href = url
+                        link.setAttribute('download', 'Маркировка осмотров.pdf')
+
+                        document.body.appendChild(link)
+
+                        link.click()
+                        link.remove()
+                    })
+                    .catch((error) => {
+                        const status = error.response.status;
+                        let message = 'При формировании файла произошла ошибка';
+
+                        if (status === 422) {
+                            message = 'Превышено максимально допустимое количество осмотров для печати'
+                        }
+
+                        swal.fire({
+                            title: message,
+                            icon: 'error'
+                        });
+                    })
+            })
+
             $('#hv-alert-error-close').click(function () {
                 $('#hv-alert-error').addClass('d-none')
                 $('#hv-alert-error').removeClass('d-flex')
@@ -434,6 +472,11 @@
 
     $permissionToExportPrikazPL = (
         $type_ankets == 'tech' && user()->access('tech_export_prikaz_pl')
+    );
+
+    $permissionToPrintAnketLabeling = (
+        user()->access('medic_read') && $type_ankets == 'medic'
+        || user()->access('tech_read') && $type_ankets == 'tech'
     );
 
     $notDeletedItems = session('not_deleted_ankets');
@@ -566,12 +609,18 @@
                         <div class="alert alert-danger" role="alert">{{ session()->get('error') }}</div>
                     @endif
 
-                    @if(count($ankets) > 0 && $permissionToView && $permissionToDelete)
+                    @if(count($ankets) > 0 && $permissionToView)
                         <div id="selected-ankets-control" class="d-none align-items-center mt-4 mb-2">
-                            <button id="selected-ankets-control-btn-delete" class="btn btn-danger btn-sm"></button>
-                            <button id="approve-selected" class="btn btn-success btn-sm ml-2"></button>
+                            @if($permissionToDelete)
+                                <button id="selected-ankets-control-btn-delete" class="btn btn-danger btn-sm mr-2"></button>
+                            @endif
+                            <button id="approve-selected" class="btn btn-success btn-sm"></button>
                             <button id="select-all" class="btn btn-success btn-sm ml-2">Выделить все на странице</button>
                             <button id="selected-ankets-control-btn-unset" class="btn btn-success btn-sm ml-2">Снять выделение</button>
+
+                            @if($permissionToPrintAnketLabeling)
+                                <button id="ankets-labeling-print-btn" class="btn btn-success btn-sm ml-2">Печать маркировки</button>
+                            @endif
                         </div>
                     @endif
 
@@ -628,9 +677,7 @@
                         class="ankets-table table table-striped table-sm">
                         <thead>
                         <tr>
-                            @if($permissionToDelete)
-                                <th>#</th>
-                            @endif
+                            <th>#</th>
 
                             @if($type_ankets === 'pak_queue')
                                 <th class="not-export">Таймер</th>
@@ -677,14 +724,12 @@
                         <tbody>
                         @foreach($ankets as $anketaKey => $anketa)
                             <tr data-field="{{ $anketaKey }}">
-                                @if($permissionToDelete)
-                                    <td>
-                                        <input
-                                            type="checkbox"
-                                            data-id="{{ $anketa->id }}"
-                                            class="hv-checkbox-mass-deletion">
-                                    </td>
-                                @endif
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        data-id="{{ $anketa->id }}"
+                                        class="hv-checkbox-mass-deletion">
+                                </td>
 
                                 @if($type_ankets === 'pak_queue')
                                     <td class="not-export">
