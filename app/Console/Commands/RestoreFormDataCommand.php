@@ -192,7 +192,7 @@ class RestoreFormDataCommand extends Command
             ->where('fix_status', FormFixStatusEnum::INVALID_CAR_ID)
             ->update(['fix_status' => FormFixStatusEnum::FIXED]);
 
-        $this->log("Сброшен статус у осмотров без водителя - $fixed");
+        $this->log("Сброшен статус у осмотров без авто - $fixed");
     }
 
     private function resetPoints()
@@ -203,7 +203,7 @@ class RestoreFormDataCommand extends Command
                     ->orWhere('pv_id', '0')
                     ->orWhere('pv_id', '');
             })
-            ->whereIn('fix_status', FormFixStatusEnum::INVALID_POINT_ID)
+            ->where('fix_status', FormFixStatusEnum::INVALID_POINT_ID)
             ->update(['fix_status' => FormFixStatusEnum::FIXED]);
 
         $this->log("Сброшен статус у осмотров без ПВ - $fixed");
