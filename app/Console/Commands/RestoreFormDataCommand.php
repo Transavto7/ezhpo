@@ -103,7 +103,7 @@ class RestoreFormDataCommand extends Command
             return;
         }
 
-        $chunkSize = config('forms.restore-foreign-chunk-size', 30000);
+        $chunkSize = config('forms.restore-foreign-chunk-size', 50000);
 
         try {
             $fixedForms = $this->fixForms($chunkSize);
@@ -257,7 +257,7 @@ class RestoreFormDataCommand extends Command
 
     private function getDefaultCompany()
     {
-        $default = Req::withTrashed()
+        $default = Company::withTrashed()
             ->where('auto_created', true)
             ->first();
 
@@ -657,7 +657,7 @@ class RestoreFormDataCommand extends Command
                 }
             }
 
-            $created = $this->createDriver($form->driver_fio, $companyId);
+            $created = $this->createDriver(trim($form->driver_fio), $companyId);
 
             $form->driver_id = $created->hash_id;
         } catch (Throwable $exception) {
