@@ -526,6 +526,7 @@ class RestoreFormDataCommand extends Command
                 'car_id',
                 'car_gos_number',
                 'company_id',
+                'company_name',
                 'point_id',
                 'pv_id'
             ])
