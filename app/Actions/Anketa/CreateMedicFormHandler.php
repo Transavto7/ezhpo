@@ -97,6 +97,12 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             if ($companyDop) {
                 $form['company_id'] = $companyDop->hash_id;
                 $form['company_name'] = $companyDop->name;
+            } elseif (! isset($form['driver_id'])) {
+                $errMsg = 'Компания не найдена';
+                $this->errors[] = $errMsg;
+                $this->saveSdpoFormWithError($form, $errMsg);
+
+                return;
             }
         }
 
@@ -116,9 +122,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
 
         if (!$driver && isset($form['driver_id'])) {
             $errMsg = 'Водитель не найден';
-
             $this->errors[] = $errMsg;
-
             $this->saveSdpoFormWithError($form, $errMsg);
 
             return;
