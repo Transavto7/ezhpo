@@ -133,8 +133,12 @@ class RestoreFormDataCommand extends Command
 
     private function resetTerminals()
     {
+        $invalidStatus = FormFIxStatusConverter::fromStatuses([
+            FormFixStatusEnum::INVALID_TERMINAL_ID
+        ]);
+
         $fixed = Anketa::query()
-            ->where('fix_status', FormFixStatusEnum::INVALID_TERMINAL_ID)
+            ->where('fix_status', $invalidStatus)
             ->update(['fix_status' => FormFixStatusEnum::FIXED]);
 
         $this->log("Сброшен статус у осмотров без терминала - $fixed");
@@ -142,12 +146,16 @@ class RestoreFormDataCommand extends Command
 
     private function resetUsers()
     {
+        $invalidStatus = FormFIxStatusConverter::fromStatuses([
+            FormFixStatusEnum::INVALID_USER_ID
+        ]);
+
         $fixed = Anketa::query()
             ->where(function (Builder $query) {
                 $query->whereNull('user_name')
                     ->orWhere('user_name', '');
             })
-            ->where('fix_status', FormFixStatusEnum::INVALID_USER_ID)
+            ->where('fix_status', $invalidStatus)
             ->update(['fix_status' => FormFixStatusEnum::FIXED]);
 
         $this->log("Сброшен статус у осмотров без пользователя - $fixed");
@@ -171,12 +179,16 @@ class RestoreFormDataCommand extends Command
 
     private function resetDrivers()
     {
+        $invalidStatus = FormFIxStatusConverter::fromStatuses([
+            FormFixStatusEnum::INVALID_DRIVER_ID
+        ]);
+
         $fixed = Anketa::query()
             ->where(function (Builder $query) {
                 $query->whereNull('driver_fio')
                     ->orWhere('driver_fio', '');
             })
-            ->where('fix_status', FormFixStatusEnum::INVALID_DRIVER_ID)
+            ->where('fix_status', $invalidStatus)
             ->update(['fix_status' => FormFixStatusEnum::FIXED]);
 
         $this->log("Сброшен статус у осмотров без водителя - $fixed");
@@ -184,12 +196,16 @@ class RestoreFormDataCommand extends Command
 
     private function resetCars()
     {
+        $invalidStatus = FormFIxStatusConverter::fromStatuses([
+            FormFixStatusEnum::INVALID_CAR_ID
+        ]);
+
         $fixed = Anketa::query()
             ->where(function (Builder $query) {
                 $query->whereNull('car_gos_number')
                     ->orWhere('car_gos_number', '');
             })
-            ->where('fix_status', FormFixStatusEnum::INVALID_CAR_ID)
+            ->where('fix_status', $invalidStatus)
             ->update(['fix_status' => FormFixStatusEnum::FIXED]);
 
         $this->log("Сброшен статус у осмотров без авто - $fixed");
@@ -197,13 +213,17 @@ class RestoreFormDataCommand extends Command
 
     private function resetPoints()
     {
+        $invalidStatus = FormFIxStatusConverter::fromStatuses([
+            FormFixStatusEnum::INVALID_POINT_ID
+        ]);
+
         $fixed = Anketa::query()
             ->where(function (Builder $query) {
                 $query->whereNull('pv_id')
                     ->orWhere('pv_id', '0')
                     ->orWhere('pv_id', '');
             })
-            ->where('fix_status', FormFixStatusEnum::INVALID_POINT_ID)
+            ->where('fix_status', $invalidStatus)
             ->update(['fix_status' => FormFixStatusEnum::FIXED]);
 
         $this->log("Сброшен статус у осмотров без ПВ - $fixed");
