@@ -6,6 +6,7 @@ use App\Anketa;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
+use App\Enums\FlagPakEnum;
 use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
 use App\Services\FormHash\FormHashGenerator;
@@ -81,7 +82,8 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             'med_view' => 'В норме',
             'admitted' => 'Допущен',
             'realy' => 'нет',
-            'created_at' => $this->time
+            'created_at' => $this->time,
+            'flag_pak' => FlagPakEnum::INTERNAL,
         ];
 
         $form = $this->mergeFormData($form, $defaultData);

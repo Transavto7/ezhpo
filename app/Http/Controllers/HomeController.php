@@ -245,12 +245,6 @@ class HomeController extends Controller
                             continue;
                         }
 
-                        if ($filterKey === 'flag_pak') {
-                            $explodeData = array_map(function($item) {
-                                return $item === 'internal' ? null : $item;
-                            }, $explodeData);
-                        }
-
                         if ($filterKey === 'driver_group_risk') {
                             $forms = $forms->where(function ($query) use ($explodeData, $filterKey) {
                                 foreach ($explodeData as $fvItemValue) {
@@ -290,11 +284,6 @@ class HomeController extends Controller
 
                                 return $query;
                             });
-                            continue;
-                        }
-
-                        if ($filterKey === 'flag_pak' && $explodeData === 'internal') {
-                            $forms = $forms->whereNull('anketas.flag_pak');
                             continue;
                         }
 
