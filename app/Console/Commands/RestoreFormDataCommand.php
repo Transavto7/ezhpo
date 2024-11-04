@@ -616,12 +616,8 @@ class RestoreFormDataCommand extends Command
 
     private function fixCompany(Anketa $form): Anketa
     {
-        if ($form->company_id) {
-            return $form;
-        }
-
         try {
-            if ($form->driver_id) {
+            if (!$form->company_id && $form->driver_id) {
                 $driver = Driver::withTrashed()->where('hash_id', $form->driver_id)->first();
                 if ($driver && $driver->company_id) {
                     $company = Company::withTrashed()->find($driver->company_id);
@@ -629,11 +625,9 @@ class RestoreFormDataCommand extends Command
                         $form->company_id = $company->hash_id;
                     }
                 }
-
-                return $form;
             }
 
-            if ($form->car_id) {
+            if (!$form->company_id && $form->car_id) {
                 $car = Car::withTrashed()->where('hash_id', $form->car_id)->first();
                 if ($car && $car->company_id) {
                     $company = Company::withTrashed()->find($car->company_id);
@@ -641,11 +635,9 @@ class RestoreFormDataCommand extends Command
                         $form->company_id = $company->hash_id;
                     }
                 }
-
-                return $form;
             }
 
-            if ($form->company_name) {
+            if (!$form->company_id && $form->company_name) {
                 $company = $this->createCompany($form->company_name);
 
                 $form->company_id = $company->hash_id;
