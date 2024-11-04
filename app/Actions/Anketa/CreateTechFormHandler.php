@@ -73,6 +73,11 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
             if ($companyDop) {
                 $form['company_id'] = $companyDop->hash_id;
+            } elseif (! isset($form['driver_id'])) {
+                $errMsg = 'Компания не найдена';
+                $this->errors[] = $errMsg;
+
+                return;
             }
         }
 
@@ -86,7 +91,19 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
                 $form['driver_id'] = $driverDop->hash_id;
 
                 $driver = $driverDop;
+            } else {
+                $errMsg = 'Водитель не найден';
+                $this->errors[] = $errMsg;
+
+                return;
             }
+        }
+
+        if (isset($form['car_id']) && ! $car) {
+            $errMsg = 'Автомобиль не найден';
+            $this->errors[] = $errMsg;
+
+            return;
         }
 
         /**
