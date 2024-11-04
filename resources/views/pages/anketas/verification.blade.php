@@ -2,10 +2,10 @@
     /** @var $details \App\ViewModels\AnketaVerificationDetails\AnketaVerificationDetails */
 
     if($details->isVerified()) {
-        $title = 'Осмотр верифицирован';
+        $title = 'Путевой лист действителен';
     }
     else {
-        $title = 'Осмотр не найден';
+        $title = 'Путевой лист не найден';
     }
 
     $permissionToDelete = user() && (
@@ -41,6 +41,15 @@
             font-size: 18px;
         }
 
+        .status-phone {
+            display: inline-block;
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-size: 23px;
+            color: inherit!important;
+        }
+
         .verified-item {
             display: flex;
             align-items: center;
@@ -72,12 +81,13 @@
                                     <i class="fa fa-check-circle status-icon status-icon-success"
                                        aria-hidden="true"></i>
                                 </div>
-                                <div class="status-title">Осмотр верифицирован</div>
+                                <div class="status-title">Путевой лист действителен</div>
                             @else
                                 <div>
                                     <i class="fa fa-times-circle status-icon status-icon-wrong" aria-hidden="true"></i>
                                 </div>
-                                <div class="status-title">Осмотр не найден</div>
+                                <div class="status-title">Путевой лист не найден</div>
+                                <a id="phone" href="" class="d-none status-phone"></a>
                             @endif
 
                             <div id="verification-alert-body" class="d-none alert alert-danger mt-2">
@@ -96,9 +106,14 @@
 
                                     @if($details->getAnketaDate())
                                         <div class="verified-item">
-                                            <b>Дата осмотра:</b>
-                                            <span>{{ $details->getAnketaDate()->format('d.m.Y H:i:s') }}</span>
+                                            <b>Пройден:</b>
+                                            <span>{{ $details->getAnketaDate()->format('d.m.Y') }}</span>
                                         </div>
+                                    @elseif($details->getFormattedAnketaPeriod())
+                                       <div class="verified-item">
+                                           <b>Пройден:</b>
+                                           <span>{{ $details->getFormattedAnketaPeriod() }}</span>
+                                       </div>
                                     @endif
 
                                     @if($details->getCompanyName())
@@ -362,5 +377,24 @@
                 });
             });
         })
+    </script>
+
+    <script>
+        const phoneNumber = '{{ config('form_verification.phone') }}'
+        const phoneLink = document.getElementById('phone')
+
+        if (phoneNumber && phoneLink) {
+            let hrefAttr = phoneNumber
+                .replaceAll('(', '')
+                .replaceAll(')', '')
+                .replaceAll('-', '')
+                .replaceAll(' ', '')
+
+            hrefAttr = 'tel:+7' + hrefAttr.slice(1)
+
+            phoneLink.innerHTML = phoneNumber
+            phoneLink.href = hrefAttr
+            phoneLink.classList.remove('d-none')
+        }
     </script>
 @endpush

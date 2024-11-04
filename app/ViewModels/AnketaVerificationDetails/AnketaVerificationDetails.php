@@ -38,6 +38,10 @@ final class AnketaVerificationDetails
     /**
      * @var string|null
      */
+    private $anketaPeriod;
+    /**
+     * @var string|null
+     */
     private $driverName;
     /**
      * @var string|null
@@ -52,6 +56,7 @@ final class AnketaVerificationDetails
      * @param string|null $anketaNumber
      * @param string|null $companyName
      * @param Carbon|null $anketaDate
+     * @param Carbon|null $anketaPeriod
      * @param string|null $driverName
      * @param string|null $carGosNumber
      */
@@ -63,6 +68,7 @@ final class AnketaVerificationDetails
         ?string $anketaNumber,
         ?string $companyName,
         ?Carbon $anketaDate,
+        ?Carbon $anketaPeriod,
         ?string $driverName,
         ?string $carGosNumber
     )
@@ -74,6 +80,7 @@ final class AnketaVerificationDetails
         $this->anketaNumber = $anketaNumber;
         $this->companyName = $companyName;
         $this->anketaDate = $anketaDate;
+        $this->anketaPeriod = $anketaPeriod;
         $this->driverName = $driverName;
         $this->carGosNumber = $carGosNumber;
     }
@@ -111,6 +118,39 @@ final class AnketaVerificationDetails
     public function getAnketaDate(): ?Carbon
     {
         return $this->anketaDate;
+    }
+
+    public function getAnketaPeriod(): ?Carbon
+    {
+        return $this->anketaPeriod;
+    }
+
+    public function getFormattedAnketaPeriod(): ?string
+    {
+        if (!$this->anketaPeriod) {
+            return '';
+        }
+
+        $months = [
+            '1' => 'Январь',
+            '2' => 'Февраль',
+            '3' => 'Март',
+            '4' => 'Апрель',
+            '5' => 'Май',
+            '6' => 'Июнь',
+            '7' => 'Июль',
+            '8' => 'Август',
+            '9' => 'Сентябрь',
+            '10' => 'Октябрь',
+            '11' => 'Ноябрь',
+            '12' => 'Декабрь',
+        ];
+
+        if (array_key_exists($this->anketaPeriod->month, $months)) {
+            return $months[$this->anketaPeriod->month] . ' ' . $this->anketaPeriod->year;
+        }
+
+        return '';
     }
 
     public function getDriverName(): ?string

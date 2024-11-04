@@ -21,6 +21,7 @@ final class GetAnketaVerificationDetailsQuery
         $anketaNumber = null;
         $companyName = null;
         $anketaDate = null;
+        $anketaPeriod = null;
         $driverName = null;
         $carGosNumber = null;
 
@@ -47,6 +48,9 @@ final class GetAnketaVerificationDetailsQuery
             if ($anketa->date) {
                 $anketaDate = Carbon::parse($anketa->date);
             }
+            else if ($anketa->period_pl) {
+                $anketaPeriod = Carbon::parse($anketa->period_pl);
+            }
 
             if ($anketa->car && $anketa->car->gos_number) {
                 $carGosNumber = $anketa->car->gos_number;
@@ -61,6 +65,7 @@ final class GetAnketaVerificationDetailsQuery
             $anketaNumber,
             $companyName,
             $anketaDate,
+            $anketaPeriod,
             $driverName,
             $carGosNumber,
         );
