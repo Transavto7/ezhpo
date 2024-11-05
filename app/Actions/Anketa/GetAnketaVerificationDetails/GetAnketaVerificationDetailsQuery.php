@@ -4,12 +4,16 @@ namespace App\Actions\Anketa\GetAnketaVerificationDetails;
 
 use App\Anketa;
 use App\Enums\AnketLabelingType;
+use App\Exceptions\ExpiredFormPeriodPlException;
 use App\ViewModels\AnketaVerificationDetails\AnketaVerificationDetails;
 use Carbon\Carbon;
 use Http\Client\Common\Exception\HttpClientNotFoundException;
 
 final class GetAnketaVerificationDetailsQuery
 {
+    /**
+     * @throws ExpiredFormPeriodPlException
+     */
     public function get(GetAnketaVerificationDetailsParams $params): AnketaVerificationDetails
     {
         $anketa = Anketa::where('uuid', '=', $params->getAnketaUuid())->first();
@@ -49,7 +53,12 @@ final class GetAnketaVerificationDetailsQuery
                 $anketaDate = Carbon::parse($anketa->date);
             }
             else if ($anketa->period_pl) {
+                $now = Carbon::now();
                 $anketaPeriod = Carbon::parse($anketa->period_pl);
+
+                if ($anketaPeriod->year < $now->year || ($anketaPeriod->year === $now->year && $anketaPeriod->month < $now->month)) {
+                    throw new ExpiredFormPeriodPlException();
+                }
             }
 
             if ($anketa->car && $anketa->car->gos_number) {

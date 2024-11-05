@@ -23,6 +23,7 @@ use App\DDates;
 use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Enums\QRCodeLinkParameter;
+use App\Exceptions\ExpiredFormPeriodPlException;
 use App\Point;
 use App\Traits\UserEdsTrait;
 use App\User;
@@ -527,7 +528,7 @@ class AnketsController extends Controller
             return view('pages.anketas.verification', [
                 'details' => $details,
             ]);
-        } catch (HttpClientNotFoundException $exception) {
+        } catch (HttpClientNotFoundException|ExpiredFormPeriodPlException $exception) {
             return view('pages.anketas.404');
         } catch (Throwable $exception) {
             return view('pages.anketas.500', [
