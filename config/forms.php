@@ -7,4 +7,6 @@ return [
     'fix-chunk-size' => env('FIX_FORMS_COMMAND_CHUNK', 30000),
     'transfer' => filter_var(env('RUN_TRANSFER_FORMS_COMMAND', false), FILTER_VALIDATE_BOOLEAN),
     'transfer-chunk-size' => env('TRANSFER_FORMS_COMMAND_CHUNK', 15000),
+    'restore-foreign' => filter_var(env('RUN_RESTORE_FOREIGN_FORMS_COMMAND', false), FILTER_VALIDATE_BOOLEAN),
+    'restore-foreign-chunk-size' => env('RESTORE_FOREIGN_FORMS_COMMAND_CHUNK', 15000),
 ];
