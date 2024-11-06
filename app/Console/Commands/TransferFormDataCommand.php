@@ -134,7 +134,7 @@ class TransferFormDataCommand extends Command
                     'fix_status' => 0
                 ]);
 
-                throw $exception;
+                $this->log("Ошибка переноса осмотра - " . $exception->getMessage());
             }
         }
 
