@@ -130,6 +130,10 @@ class TransferFormDataCommand extends Command
             } catch (Throwable $exception) {
                 DB::rollBack();
 
+                $form->update([
+                    'fix_status' => 0
+                ]);
+
                 throw $exception;
             }
         }
