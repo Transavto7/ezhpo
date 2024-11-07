@@ -234,6 +234,10 @@ class FixFormDataCommand extends Command
     {
         $statuses = [];
 
+        if ($form->point_id === 0) {
+            $form->point_id = null;
+        }
+
         if ($form->point_id) {
             $form->point_id = $this->getPointIdBySameId($form->point_id, $maps);
         }
