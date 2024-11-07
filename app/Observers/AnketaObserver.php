@@ -20,7 +20,7 @@ class AnketaObserver
             return;
         }
 
-        $form = Form::find($anketa->uuid);
+        $form = Form::withTrashed()->find($anketa->uuid);
         if (!$form) {
             return;
         }

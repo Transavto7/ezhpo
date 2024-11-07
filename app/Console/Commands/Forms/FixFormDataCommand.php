@@ -106,7 +106,7 @@ class FixFormDataCommand extends Command
 
                 $anketa->save();
 
-                $form = Form::find($anketa->uuid);
+                $form = Form::withTrashed()->find($anketa->uuid);
                 if (!$form) {
                     continue;
                 }
