@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Forms;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -84,5 +84,11 @@ class ResetInvalidFormDataCommand extends Command
             ->update(['terminal_id' => null]);
 
         $this->info("Сброшено записей с ID терминала - 0: $counter");
+
+        $counter = DB::table('anketas')
+            ->where('user_id', 0)
+            ->update(['user_id' => null]);
+
+        $this->info("Сброшено записей с ID пользователя - 0: $counter");
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Forms;
 
 use App\Anketa;
 use App\Car;
@@ -253,6 +253,10 @@ class FixFormDataCommand extends Command
             $statuses[] = FormFixStatusEnum::INVALID_POINT_ID;
         }
 
+        if ($form->driver_id === 0) {
+            $form->driver_id = null;
+        }
+
         if ($form->driver_id) {
             $form->driver_id = $this->getDriverHashIdBySameId($form->driver_id, $maps);
         }
@@ -268,6 +272,10 @@ class FixFormDataCommand extends Command
             $statuses[] = FormFixStatusEnum::INVALID_DRIVER_ID;
         }
 
+        if ($form->car_id === 0) {
+            $form->car_id = null;
+        }
+
         if ($form->car_id) {
             $form->car_id = $this->getCarHashIdBySameId($form->car_id, $maps);
         }
@@ -281,6 +289,10 @@ class FixFormDataCommand extends Command
 
         if (($form->type_anketa === FormTypeEnum::TECH) && !$form->car_id && !$form->is_dop) {
             $statuses[] = FormFixStatusEnum::INVALID_CAR_ID;
+        }
+
+        if ($form->company_id === 0) {
+            $form->company_id = null;
         }
 
         if ($form->company_id) {
@@ -306,6 +318,10 @@ class FixFormDataCommand extends Command
             $statuses[] = FormFixStatusEnum::INVALID_COMPANY_ID;
         }
 
+        if ($form->user_id === 0) {
+            $form->user_id = null;
+        }
+
         if ($form->user_id) {
             $form->user_id = $this->getUserIdBySameId($form->user_id, $maps);
         }
@@ -316,6 +332,10 @@ class FixFormDataCommand extends Command
 
         if (($form->type_anketa === FormTypeEnum::MEDIC) && $form->terminal_id && !$form->flag_pak) {
             $form->flag_pak = 'СДПО А';
+        }
+
+        if ($form->terminal_id === 0) {
+            $form->terminal_id = null;
         }
 
         if (($form->type_anketa === FormTypeEnum::MEDIC) && !$form->terminal_id && $form->flag_pak) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Forms;
 
 use App\Enums\FormFixStatusEnum;
 use InvalidArgumentException;
