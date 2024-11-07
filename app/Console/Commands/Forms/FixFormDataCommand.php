@@ -25,6 +25,7 @@ class FixFormDataCommand extends Command
      */
     protected $signature = 'forms:fix
                             {--count : Количество необработанных осмотров}
+                            {--reset-invalid : Сброс статуса валидации у невалидных осмотров }
                             {--force : Запуск команды игнорируя конфиг}';
 
     /**
@@ -57,6 +58,19 @@ class FixFormDataCommand extends Command
                 ->count();
 
             $this->log("Всего необработанных осмотров - $nonFixedForms");
+
+            return;
+        }
+
+        if ($this->option('reset-invalid')) {
+            $invalidForms = Anketa::query()
+                ->where('fix_status', '>', FormFixStatusEnum::FIXED)
+                ->update([
+                    'fix_status' => FormFixStatusEnum::UNPROCESSED,
+                    'transfer_status' => false
+                ]);
+
+            $this->log("Сброшено статусов у невалидных осмотров - $invalidForms");
 
             return;
         }
