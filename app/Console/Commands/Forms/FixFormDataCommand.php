@@ -8,10 +8,12 @@ use App\Company;
 use App\Driver;
 use App\Enums\FormFixStatusEnum;
 use App\Enums\FormTypeEnum;
+use App\Models\Forms\Form;
 use App\Point;
 use App\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Ramsey\Uuid\Uuid;
 use Throwable;
@@ -63,14 +65,7 @@ class FixFormDataCommand extends Command
         }
 
         if ($this->option('reset-invalid')) {
-            $invalidForms = Anketa::query()
-                ->where('fix_status', '>', FormFixStatusEnum::FIXED)
-                ->update([
-                    'fix_status' => FormFixStatusEnum::UNPROCESSED,
-                    'transfer_status' => false
-                ]);
-
-            $this->log("Сброшено статусов у невалидных осмотров - $invalidForms");
+            $this->resetInvalid();
 
             return;
         }
@@ -90,6 +85,44 @@ class FixFormDataCommand extends Command
         } catch (Throwable $exception) {
             $this->log("Ошибка обработки группы осмотров - " . $exception->getMessage());
         }
+    }
+
+    private function resetInvalid()
+    {
+        $invalidForms = Anketa::query()
+            ->select([
+                'uuid',
+                'id'
+            ])
+            ->where('fix_status', '>', FormFixStatusEnum::FIXED)
+            ->get();
+
+        foreach ($invalidForms as $anketa) {
+            try {
+                DB::beginTransaction();
+
+                $anketa->setAttribute('transfer_status', false);
+                $anketa->setAttribute('fix_status', FormFixStatusEnum::UNPROCESSED);
+
+                $anketa->save();
+
+                $form = Form::find($anketa->uuid);
+                if (!$form) {
+                    continue;
+                }
+
+                $form->details()->delete();
+                $form->forceDelete();
+
+                DB::commit();
+            } catch (Throwable $exception) {
+                DB::rollBack();
+
+                $this->log("Ошибка сброса статусов у невалидных осмотров - " . $exception->getMessage());
+            }
+        }
+
+        $this->log("Сброшено статусов у невалидных осмотров - {$invalidForms->count()}");
     }
 
     private function log(string $message)
