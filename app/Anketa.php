@@ -157,7 +157,8 @@ class Anketa extends Model
             'contract_id',
             'contract_snapshot_id',
             'day_hash',
-            'transfer_status'
+            'transfer_status',
+            'fix_status'
         ];
 
     public static $anketsKeys
