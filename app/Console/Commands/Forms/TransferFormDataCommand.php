@@ -155,6 +155,10 @@ class TransferFormDataCommand extends Command
             $formData['is_dop'] = 0;
         }
 
+        if ($form->user_id === 0) {
+            $formData['user_id'] = null;
+        }
+
         Form::create($formData);
 
         switch ($form->type_anketa) {

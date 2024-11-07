@@ -318,10 +318,6 @@ class FixFormDataCommand extends Command
             $statuses[] = FormFixStatusEnum::INVALID_COMPANY_ID;
         }
 
-        if ($form->user_id === 0) {
-            $form->user_id = null;
-        }
-
         if ($form->user_id) {
             $form->user_id = $this->getUserIdBySameId($form->user_id, $maps);
         }

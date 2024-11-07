@@ -84,11 +84,5 @@ class ResetInvalidFormDataCommand extends Command
             ->update(['terminal_id' => null]);
 
         $this->info("Сброшено записей с ID терминала - 0: $counter");
-
-        $counter = DB::table('anketas')
-            ->where('user_id', 0)
-            ->update(['user_id' => null]);
-
-        $this->info("Сброшено записей с ID пользователя - 0: $counter");
     }
 }
