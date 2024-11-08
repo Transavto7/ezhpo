@@ -806,8 +806,6 @@
                                             <a href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'gos_number' => $anketa[$field->field] ]) }}">
                                                 {{ $anketa[$field->field] }}
                                             </a>
-                                        @elseif($field->field === 'flag_pak')
-                                            {{ \App\Enums\FlagPakEnum::getLabel($anketa[$field->field]) }}
                                         @elseif($field->field === 'protokol_path')
                                             @if ($anketa->proba_alko === 'Положительно' && user()->access('medic_protokol_view'))
                                                 @if(user()->access('medic_protokol_edit'))

@@ -23,7 +23,8 @@ class TelegramNotifierService
 
             $query = [
                 'chat_id' => $chatId,
-                'text' => $message
+                'text' => $message,
+                'parse_mode' => 'markdown',
             ];
 
             $response = $client->post($url,  [ 'query' => $query ]);

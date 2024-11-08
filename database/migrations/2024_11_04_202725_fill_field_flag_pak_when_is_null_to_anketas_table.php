@@ -29,5 +29,10 @@ class FillFieldFlagPakWhenIsNullToAnketasTable extends Migration
      */
     public function down()
     {
+        DB::table('anketas')
+            ->where('flag_pak', '=', FlagPakEnum::INTERNAL)
+            ->update([
+                'flag_pak' => null,
+            ]);
     }
 }

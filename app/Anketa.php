@@ -4,13 +4,21 @@ namespace App;
 
 use App\Enums\FormTypeEnum;
 use App\ValueObjects\NotAdmittedReasons;
+use App\ValueObjects\PressureLimits;
+use App\ValueObjects\Pulse;
+use App\ValueObjects\PulseLimits;
+use App\ValueObjects\Temperature;
+use App\ValueObjects\Tonometer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Ramsey\Uuid\Uuid;
 
 class Anketa extends Model
 {
     public const MIN_DIFF_BETWEEN_FORMS_IN_SECONDS = 60;
+
+    protected $appends = ['dismissed_reason'];
 
     protected static function boot()
     {
@@ -68,6 +76,46 @@ class Anketa extends Model
     {
         return $this->belongsTo(User::class, 'deleted_id', 'id')
                     ->withDefault();
+    }
+
+    public function getDismissedReasonAttribute(): array
+    {
+        $result = [];
+        $driver = $this->driver;
+
+        if (($this->attributes['is_dop'] ?? 0) === 1) {
+            return $result;
+        }
+
+        if ($this->attributes['proba_alko'] === 'Положительно') {
+            $result[] = 'алкоголь';
+        }
+
+        if (($this->attributes['test_narko'] !== 'Отрицательно') && ($this->attributes['test_narko'] !== 'Не проводился')) {
+            $result[] = 'наркотики';
+        }
+
+        if ($this->attributes['med_view'] !== 'В норме') {
+            $result[] = 'состояние здоровья';
+        }
+
+        $pressure = Tonometer::fromString($this->attributes['tonometer']);
+        $pressureLimits = PressureLimits::create($driver);
+        if (!$pressure->isAdmitted($pressureLimits)) {
+            $result[] = 'давление';
+        }
+
+        $pulse = new Pulse(intval($this->attributes['pulse']));
+        $pulseLimits = PulseLimits::create($driver);
+        if (!$pulse->isAdmitted($pulseLimits)) {
+            $result[] = 'повышенный пульс';
+        }
+
+        if (!(new Temperature(floatval($this->attributes['t_people'])))->isAdmitted()) {
+            $result[] = 'повышенная температура';
+        }
+
+        return $result;
     }
 
     public $fillable

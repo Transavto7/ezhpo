@@ -32,9 +32,10 @@ class NotifyDismissingByAlkoTG
             return;
         }
 
-        $form = $event->getForm();
+        $form = $event->getForm()->append('dismissed_reason');
+        $dismissedReason = $form->toArray()['dismissed_reason'];
 
-        if ($form->proba_alko !== 'Положительно') {
+        if (! count($dismissedReason)) {
             return;
         }
 
@@ -58,11 +59,23 @@ class NotifyDismissingByAlkoTG
             return;
         }
 
+        $responsiblePerson = $company->responsible
+            ? $company->responsible->name
+            : 'не указан';
+
+        $car = $form->car;
+        $carNumber = $car
+            ? $car->gos_number
+            : null;
+
         $notifyTelegramMessage = new NotifyTelegramMessage(
+            $responsiblePerson,
+            $dismissedReason,
             $form->id,
             $company->hash_id,
             $company->name,
             $driver->fio,
+            $carNumber,
             Carbon::parse($form->date)->toDateTimeImmutable(),
             $point->name,
             $medic->name,
