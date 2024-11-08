@@ -16,7 +16,7 @@ class SettingsController extends Controller
             'sms_api_key' => Settings::setting('sms_api_key') ?? null,
             'sms_text_phone' => Settings::setting('sms_text_phone') ?? null,
             'sms_text_driver' => Settings::setting('sms_text_driver') ?? null,
-            'sms_text_car' => Settings::setting('sms_text_driver') ?? null,
+            'sms_text_car' => Settings::setting('sms_text_car') ?? null,
             'sms_text_default' => Settings::setting('sms_text_default') ?? null,
             'phone' => Settings::setting('phone') ?? null,
             'telegram' => Settings::setting('telegram') ?? null,
