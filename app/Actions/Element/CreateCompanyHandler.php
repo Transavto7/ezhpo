@@ -15,7 +15,7 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
      */
     public function handle($data)
     {
-        $existItem = Company::query()
+        $existItem = Company::withTrashed()
             ->where('name', trim($data['name']))
             ->first();
         if ($existItem) {
@@ -34,11 +34,11 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
         }
 
         $validator = function (int $hashId) {
-            if (Company::where('hash_id', $hashId)->first()) {
+            if (Company::withTrashed()->where('hash_id', $hashId)->first()) {
                 return false;
             }
 
-            if (User::where('login', $this->getUserLogin($hashId))->first()) {
+            if (User::withTrashed()->where('login', $this->getUserLogin($hashId))->first()) {
                 return false;
             }
 
@@ -70,7 +70,7 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
     protected function createUser(Company $created)
     {
         $validator = function (int $hashId) {
-            if (User::where('hash_id', $hashId)->first()) {
+            if (User::withTrashed()->where('hash_id', $hashId)->first()) {
                 return false;
             }
 

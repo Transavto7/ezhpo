@@ -19,12 +19,12 @@ class CreateCarHandler extends AbstractCreateElementHandler implements CreateEle
     public function handle($data)
     {
         $companyId = $data['company_id'];
-        $company = Company::query()->find($companyId);
+        $company = Company::withTrashed()->find($companyId);
         if (!$company) {
             throw new Exception('Компания не найдена');
         }
 
-        $existItem = Car::query()
+        $existItem = Car::withTrashed()
             ->where('company_id', $companyId)
             ->where('gos_number', trim($data['gos_number']))
             ->first();
@@ -60,7 +60,10 @@ class CreateCarHandler extends AbstractCreateElementHandler implements CreateEle
 
         $created = $this->createElement($data);
 
-        event(new ClientAddRecord(Auth::user(), UserActionTypesEnum::ADD_CAR_VIA_FORM));
+        $user = Auth::user();
+        if ($user) {
+            event(new ClientAddRecord($user, UserActionTypesEnum::ADD_CAR_VIA_FORM));
+        }
 
         /** @var Contract $contract */
         $contract = Contract::query()

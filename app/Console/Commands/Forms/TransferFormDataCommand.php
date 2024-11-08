@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Forms;
 
 use App\Anketa;
 use App\Company;
@@ -27,6 +27,7 @@ class TransferFormDataCommand extends Command
     protected $signature = 'forms:transfer
                             {--count : Количество необработанных осмотров}
                             {--inc : Обновление инкремента в новой таблице}
+                            {--invalid : Перенос невалидных осмотров }
                             {--force : Запуск команды игнорируя конфиг}';
 
     /**
@@ -113,10 +114,16 @@ class TransferFormDataCommand extends Command
             'companies' => Company::withTrashed()->where('hash_id', 'like', '0%')->get()->pluck('hash_id', 'hash_id')->toArray()
         ];
 
-        $forms = Anketa::query()
-            ->where('fix_status', FormFixStatusEnum::FIXED)
-            ->where('transfer_status', false)
-            ->orderBy('id')
+        $query = Anketa::query()
+            ->where('transfer_status', false);
+
+        if ($this->option('invalid')) {
+            $query->where('fix_status', '!=', FormFixStatusEnum::UNPROCESSED);
+        } else {
+            $query->where('fix_status', FormFixStatusEnum::FIXED);
+        }
+
+        $forms = $query->orderBy('id')
             ->limit($chunkSize)
             ->get();
 
@@ -130,7 +137,11 @@ class TransferFormDataCommand extends Command
             } catch (Throwable $exception) {
                 DB::rollBack();
 
-                throw $exception;
+                $form->update([
+                    'fix_status' => 0
+                ]);
+
+                $this->log("Ошибка переноса осмотра - " . $exception->getMessage());
             }
         }
 
@@ -149,6 +160,10 @@ class TransferFormDataCommand extends Command
 
         if (!$form->is_dop) {
             $formData['is_dop'] = 0;
+        }
+
+        if ($form->user_id === 0) {
+            $formData['user_id'] = null;
         }
 
         Form::create($formData);

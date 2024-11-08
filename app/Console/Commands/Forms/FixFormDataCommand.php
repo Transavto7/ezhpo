@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Forms;
 
 use App\Anketa;
 use App\Car;
@@ -8,10 +8,12 @@ use App\Company;
 use App\Driver;
 use App\Enums\FormFixStatusEnum;
 use App\Enums\FormTypeEnum;
+use App\Models\Forms\Form;
 use App\Point;
 use App\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Ramsey\Uuid\Uuid;
 use Throwable;
@@ -25,6 +27,7 @@ class FixFormDataCommand extends Command
      */
     protected $signature = 'forms:fix
                             {--count : Количество необработанных осмотров}
+                            {--reset-invalid : Сброс статуса валидации у невалидных осмотров }
                             {--force : Запуск команды игнорируя конфиг}';
 
     /**
@@ -61,6 +64,12 @@ class FixFormDataCommand extends Command
             return;
         }
 
+        if ($this->option('reset-invalid')) {
+            $this->resetInvalid();
+
+            return;
+        }
+
         if ((config('forms.fix', false) === false) && !$this->option('force')) {
             return;
         }
@@ -76,6 +85,44 @@ class FixFormDataCommand extends Command
         } catch (Throwable $exception) {
             $this->log("Ошибка обработки группы осмотров - " . $exception->getMessage());
         }
+    }
+
+    private function resetInvalid()
+    {
+        $invalidForms = Anketa::query()
+            ->select([
+                'uuid',
+                'id'
+            ])
+            ->where('fix_status', '>', FormFixStatusEnum::FIXED)
+            ->get();
+
+        foreach ($invalidForms as $anketa) {
+            try {
+                DB::beginTransaction();
+
+                $anketa->setAttribute('transfer_status', false);
+                $anketa->setAttribute('fix_status', FormFixStatusEnum::UNPROCESSED);
+
+                $anketa->save();
+
+                $form = Form::withTrashed()->find($anketa->uuid);
+                if (!$form) {
+                    continue;
+                }
+
+                $form->details()->delete();
+                $form->forceDelete();
+
+                DB::commit();
+            } catch (Throwable $exception) {
+                DB::rollBack();
+
+                $this->log("Ошибка сброса статусов у невалидных осмотров - " . $exception->getMessage());
+            }
+        }
+
+        $this->log("Сброшено статусов у невалидных осмотров - {$invalidForms->count()}");
     }
 
     private function log(string $message)
@@ -234,6 +281,10 @@ class FixFormDataCommand extends Command
     {
         $statuses = [];
 
+        if ($form->point_id === 0) {
+            $form->point_id = null;
+        }
+
         if ($form->point_id) {
             $form->point_id = $this->getPointIdBySameId($form->point_id, $maps);
         }
@@ -247,6 +298,10 @@ class FixFormDataCommand extends Command
 
         if (!$form->point_id) {
             $statuses[] = FormFixStatusEnum::INVALID_POINT_ID;
+        }
+
+        if ($form->driver_id === 0) {
+            $form->driver_id = null;
         }
 
         if ($form->driver_id) {
@@ -264,6 +319,10 @@ class FixFormDataCommand extends Command
             $statuses[] = FormFixStatusEnum::INVALID_DRIVER_ID;
         }
 
+        if ($form->car_id === 0) {
+            $form->car_id = null;
+        }
+
         if ($form->car_id) {
             $form->car_id = $this->getCarHashIdBySameId($form->car_id, $maps);
         }
@@ -277,6 +336,10 @@ class FixFormDataCommand extends Command
 
         if (($form->type_anketa === FormTypeEnum::TECH) && !$form->car_id && !$form->is_dop) {
             $statuses[] = FormFixStatusEnum::INVALID_CAR_ID;
+        }
+
+        if ($form->company_id === 0) {
+            $form->company_id = null;
         }
 
         if ($form->company_id) {
@@ -312,6 +375,10 @@ class FixFormDataCommand extends Command
 
         if (($form->type_anketa === FormTypeEnum::MEDIC) && $form->terminal_id && !$form->flag_pak) {
             $form->flag_pak = 'СДПО А';
+        }
+
+        if ($form->terminal_id === 0) {
+            $form->terminal_id = null;
         }
 
         if (($form->type_anketa === FormTypeEnum::MEDIC) && !$form->terminal_id && $form->flag_pak) {

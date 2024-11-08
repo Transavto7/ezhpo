@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Forms;
 
 use App\GenerateHashIdTrait;
 use App\Models\Forms\MedicForm;

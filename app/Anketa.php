@@ -86,7 +86,7 @@ class Anketa extends Model
             'protokol_path',
             'closing_path',
             'comments',
-
+            'day_hash',
             'transfer_status',
             'fix_status'
         ];

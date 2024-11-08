@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Forms;
 
 use App\Services\FormHash\FormHashGenerator;
 use App\Services\FormHash\MedicHashData;
