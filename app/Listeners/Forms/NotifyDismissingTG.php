@@ -2,13 +2,14 @@
 
 namespace App\Listeners\Forms;
 
+use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\Models\Forms\MedicForm;
 use App\Services\Notifier\TelegramNotifierService;
 use App\ValueObjects\NotifyTelegramMessage;
 use Illuminate\Support\Carbon;
 
-class NotifyDismissingByAlkoTG
+class NotifyDismissingTG
 {
     /**
      * Create the event listener.
@@ -46,6 +47,8 @@ class NotifyDismissingByAlkoTG
             return;
         }
 
+        $type = FormTypeEnum::getLabel($form->type_anketa);
+
         $driver = $form->driver;
         if ($driver === null) {
             return;
@@ -77,6 +80,7 @@ class NotifyDismissingByAlkoTG
 
         $notifyTelegramMessage = new NotifyTelegramMessage(
             $responsiblePerson,
+            $type,
             $dismissedReason,
             $form->id,
             $company->hash_id,

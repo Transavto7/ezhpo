@@ -34,4 +34,18 @@ class FormTypeEnum
             self::VID_PL,
         ];
     }
+
+    public static function getLabel(string $type): string
+    {
+        switch ($type) {
+            case self::MEDIC:
+                return 'медосмотр';
+            case self::TECH:
+                return 'техосмотр';
+            case self::BDD:
+                return 'инструктаж БДД';
+            default:
+                return $type;
+        }
+    }
 }

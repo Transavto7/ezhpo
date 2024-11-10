@@ -11,7 +11,7 @@ use App\Events\UserActions\ClientDocExport;
 use App\Events\UserActions\ClientDocImport;
 use App\Events\UserActions\ClientDocumentRequest;
 use App\Events\UserActions\ClientReportRequest;
-use App\Listeners\Forms\NotifyDismissingByAlkoTG;
+use App\Listeners\Forms\NotifyDismissingTG;
 use App\Listeners\Forms\NotifyDismissingSMS;
 use App\Listeners\LogAttachedEvent;
 use App\Listeners\LogDetachedEvent;
@@ -62,7 +62,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         DriverDismissed::class => [
             NotifyDismissingSMS::class,
-            NotifyDismissingByAlkoTG::class
+            NotifyDismissingTG::class
         ]
     ];
 

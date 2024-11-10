@@ -12,6 +12,11 @@ class NotifyTelegramMessage
     private $responsiblePerson;
 
     /**
+     * @var string
+     */
+    private $type;
+
+    /**
      * @var array
      */
     private $reasons;
@@ -68,6 +73,7 @@ class NotifyTelegramMessage
 
     /**
      * @param string $responsiblePerson
+     * @param string $type
      * @param array $reasons
      * @param int $formId
      * @param string $companyId
@@ -82,6 +88,7 @@ class NotifyTelegramMessage
      */
     public function __construct(
         string $responsiblePerson,
+        string $type,
         array $reasons,
         int $formId,
         string $companyId,
@@ -96,6 +103,7 @@ class NotifyTelegramMessage
     )
     {
         $this->responsiblePerson = $responsiblePerson;
+        $this->type = $type;
         $this->reasons = $reasons;
         $this->formId = $formId;
         $this->companyHashId = $companyId;
@@ -115,7 +123,7 @@ class NotifyTelegramMessage
 
         $lines = [
             "*Ответственный за компанию — $this->responsiblePerson.*",
-            "Поступил осмотр с отстранением по причине: _{$this->reasonsToString()}_.",
+            "Поступил $this->type с отстранением по причине: _{$this->reasonsToString()}_.",
             "ID осмотра — $this->formId.",
             "ID компании — $this->companyHashId.",
             "Название компании — $this->companyName.",

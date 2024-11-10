@@ -9,6 +9,8 @@ use App\Enums\BlockActionReasonsEnum;
 use App\Models\Forms\Form;
 use App\Models\Forms\TechForm;
 use App\Services\DuplicatesCheckerService;
+use App\Enums\FormTypeEnum;
+use App\Events\Forms\DriverDismissed;
 use App\Services\FormHash\FormHashGenerator;
 use App\Services\FormHash\TechHashData;
 use DateTimeImmutable;
@@ -190,5 +192,9 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         $formDetailsModel->save();
 
         $this->createdForms->push($formModel);
+
+        if ($form['point_reys_control'] === 'Не пройден') {
+            event(new DriverDismissed($formModel));
+        }
     }
 }
