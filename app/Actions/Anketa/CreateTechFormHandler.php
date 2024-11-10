@@ -8,6 +8,7 @@ use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
+use App\Events\Forms\DriverDismissed;
 use App\Services\FormHash\FormHashGenerator;
 use App\Services\FormHash\TechHashData;
 use Illuminate\Database\Eloquent\Builder;
@@ -249,5 +250,9 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
         $formModel->save();
         $this->createdForms->push($formModel);
+
+        if ($form['point_reys_control'] === 'Не пройден') {
+            event(new DriverDismissed($formModel));
+        }
     }
 }

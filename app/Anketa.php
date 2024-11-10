@@ -82,37 +82,44 @@ class Anketa extends Model
     {
         $result = [];
         $driver = $this->driver;
+        $type = $this->attributes['type_anketa'];
 
         if (($this->attributes['is_dop'] ?? 0) === 1) {
             return $result;
         }
 
-        if ($this->attributes['proba_alko'] === 'Положительно') {
-            $result[] = 'алкоголь';
-        }
+        if ($type === FormTypeEnum::MEDIC) {
+            if ($this->attributes['proba_alko'] === 'Положительно') {
+                $result[] = 'алкоголь';
+            }
 
-        if (($this->attributes['test_narko'] !== 'Отрицательно') && ($this->attributes['test_narko'] !== 'Не проводился')) {
-            $result[] = 'наркотики';
-        }
+            if (($this->attributes['test_narko'] !== 'Отрицательно') && ($this->attributes['test_narko'] !== 'Не проводился')) {
+                $result[] = 'наркотики';
+            }
 
-        if ($this->attributes['med_view'] !== 'В норме') {
-            $result[] = 'состояние здоровья';
-        }
+            if ($this->attributes['med_view'] !== 'В норме') {
+                $result[] = 'состояние здоровья';
+            }
 
-        $pressure = Tonometer::fromString($this->attributes['tonometer']);
-        $pressureLimits = PressureLimits::create($driver);
-        if (!$pressure->isAdmitted($pressureLimits)) {
-            $result[] = 'давление';
-        }
+            $pressure = Tonometer::fromString($this->attributes['tonometer']);
+            $pressureLimits = PressureLimits::create($driver);
+            if (!$pressure->isAdmitted($pressureLimits)) {
+                $result[] = 'давление';
+            }
 
-        $pulse = new Pulse(intval($this->attributes['pulse']));
-        $pulseLimits = PulseLimits::create($driver);
-        if (!$pulse->isAdmitted($pulseLimits)) {
-            $result[] = 'повышенный пульс';
-        }
+            $pulse = new Pulse(intval($this->attributes['pulse']));
+            $pulseLimits = PulseLimits::create($driver);
+            if (!$pulse->isAdmitted($pulseLimits)) {
+                $result[] = 'повышенный пульс';
+            }
 
-        if (!(new Temperature(floatval($this->attributes['t_people'])))->isAdmitted()) {
-            $result[] = 'повышенная температура';
+            if (!(new Temperature(floatval($this->attributes['t_people'])))->isAdmitted()) {
+                $result[] = 'повышенная температура';
+            }
+        } else if ($type === FormTypeEnum::TECH) {
+            if ($this->attributes['point_reys_control'] === 'Не пройден') {
+                $result[] = 'ТО не пройден';
+            }
         }
 
         return $result;
