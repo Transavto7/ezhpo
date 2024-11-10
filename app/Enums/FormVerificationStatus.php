@@ -5,7 +5,7 @@ namespace App\Enums;
 use LogicException;
 use ReflectionClass;
 
-final class AnketaVerificationStatus
+final class FormVerificationStatus
 {
     const VERIFIED = 'verified';
     const DELETED = 'deleted';
@@ -31,7 +31,7 @@ final class AnketaVerificationStatus
             case self::DELETED:
                 return self::deleted();
             default:
-                throw new LogicException('Unknown anketa verification status' . $value);
+                throw new LogicException('Unknown form verification status' . $value);
         }
     }
 

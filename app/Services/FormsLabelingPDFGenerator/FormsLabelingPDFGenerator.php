@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Services\AnketsLabelingPDFGenerator;
+namespace App\Services\FormsLabelingPDFGenerator;
 
-use App\Enums\AnketLabelingType;
+use App\Enums\FormLabelingType;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Response;
 use Barryvdh\DomPDF\Facade as PDF;
 
-final class AnketsLabelingPDFGenerator
+final class FormsLabelingPDFGenerator
 {
     /**
-     * @param AnketLabelingPDFGeneratorItem[] $items
+     * @param FormLabelingPDFGeneratorItem[] $items
      * @return Response
      * @throws BindingResolutionException
      */
@@ -24,8 +24,8 @@ final class AnketsLabelingPDFGenerator
 
         foreach ($items as $item) {
             $prefixes = [
-                AnketLabelingType::MEDIC => 'MO',
-                AnketLabelingType::TECH => 'TO',
+                FormLabelingType::MEDIC => 'MO',
+                FormLabelingType::TECH => 'TO',
             ];
 
             $id = $prefixes[$item->getAnketType()->value()] . '-' . $item->getId();

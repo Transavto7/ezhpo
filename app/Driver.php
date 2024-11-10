@@ -2,12 +2,10 @@
 
 namespace App;
 
-use App\Enums\FormTypeEnum;
 use App\Models\Contract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Driver extends Model
@@ -50,42 +48,6 @@ class Driver extends Model
     protected $casts = [
         'date_of_employment' => 'datetime',
     ];
-
-    public function inspections_medic(): HasMany
-    {
-        return $this->hasMany(
-            Anketa::class,
-            'driver_id',
-            'hash_id'
-        )->where('type_anketa', FormTypeEnum::MEDIC);
-    }
-
-    public function inspections_pechat_pl(): HasMany
-    {
-        return $this->hasMany(
-            Anketa::class,
-            'driver_id',
-            'hash_id'
-        )->where('type_anketa', FormTypeEnum::PRINT_PL);
-    }
-
-    public function inspections_bdd(): HasMany
-    {
-        return $this->hasMany(
-            Anketa::class,
-            'driver_id',
-            'hash_id'
-        )->where('type_anketa', 'bdd');
-    }
-
-    public function inspections_report_cart(): HasMany
-    {
-        return $this->hasMany(
-            Anketa::class,
-            'driver_id',
-            'hash_id'
-        )->where('type_anketa', FormTypeEnum::REPORT_CARD);
-    }
 
     public function contracts(): BelongsToMany
     {

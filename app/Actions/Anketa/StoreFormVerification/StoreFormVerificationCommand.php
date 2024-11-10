@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Actions\Anketa\StoreAnketaVerification;
+namespace App\Actions\Anketa\StoreFormVerification;
 
 use Carbon\Carbon;
 
-final class StoreAnketaVerificationCommand
+final class StoreFormVerificationCommand
 {
     /**
      * @var string
      */
-    private $anketaUuid;
+    private $formUuid;
     /**
      * @var string
      */
@@ -24,22 +24,22 @@ final class StoreAnketaVerificationCommand
     private $date;
 
     /**
-     * @param string $anketaUuid
+     * @param string $formUuid
      * @param string $clientHash
      * @param bool $isAuthorized
      * @param Carbon $date
      */
-    public function __construct(string $anketaUuid, string $clientHash, bool $isAuthorized, Carbon $date)
+    public function __construct(string $formUuid, string $clientHash, bool $isAuthorized, Carbon $date)
     {
-        $this->anketaUuid = $anketaUuid;
+        $this->formUuid = $formUuid;
         $this->clientHash = $clientHash;
         $this->isAuthorized = $isAuthorized;
         $this->date = $date;
     }
 
-    public function getAnketaUuid(): string
+    public function getFormUuid(): string
     {
-        return $this->anketaUuid;
+        return $this->formUuid;
     }
 
     public function getClientHash(): string
@@ -56,6 +56,4 @@ final class StoreAnketaVerificationCommand
     {
         return $this->date;
     }
-
-
 }

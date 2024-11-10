@@ -5,14 +5,14 @@ namespace App\Http\Controllers;
 use App\Actions\Anketa\ChangeResultDopHandler;
 use App\Actions\Anketa\CreateFormHandlerFactory;
 use App\Actions\Anketa\CreateSdpoFormHandler;
-use App\Actions\Anketa\ExportAnketasLabelingPdf\ExportAnketasLabelingPdfCommand;
-use App\Actions\Anketa\ExportAnketasLabelingPdf\ExportAnketasLabelingPdfHandler;
-use App\Actions\Anketa\GetAnketaVerificationDetails\GetAnketaVerificationDetailsParams;
-use App\Actions\Anketa\GetAnketaVerificationDetails\GetAnketaVerificationDetailsQuery;
-use App\Actions\Anketa\GetAnketaVerificationHistory\GetAnketaVerificationHistoryParams;
-use App\Actions\Anketa\GetAnketaVerificationHistory\GetAnketaVerificationHistoryQuery;
-use App\Actions\Anketa\StoreAnketaVerification\StoreAnketaVerificationCommand;
-use App\Actions\Anketa\StoreAnketaVerification\StoreAnketaVerificationHandler;
+use App\Actions\Anketa\ExportFormsLabelingPdf\ExportFormsLabelingPdfCommand;
+use App\Actions\Anketa\ExportFormsLabelingPdf\ExportFormsLabelingPdfHandler;
+use App\Actions\Anketa\GetFormVerificationDetails\GetFormVerificationDetailsParams;
+use App\Actions\Anketa\GetFormVerificationDetails\GetFormVerificationDetailsQuery;
+use App\Actions\Anketa\GetFormVerificationHistory\GetFormVerificationHistoryParams;
+use App\Actions\Anketa\GetFormVerificationHistory\GetFormVerificationHistoryQuery;
+use App\Actions\Anketa\StoreFormVerification\StoreFormVerificationCommand;
+use App\Actions\Anketa\StoreFormVerification\StoreFormVerificationHandler;
 use App\Actions\Anketa\TrashFormHandler;
 use App\Actions\Anketa\UpdateFormHandler;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueAction;
@@ -166,8 +166,7 @@ class AnketsController extends Controller
         try {
             DB::beginTransaction();
 
-        if ($anketa) {
-            $saved = $handler->handle($anketa, $action);
+            $handler->handle($form, $action, Auth::user());
 
             DB::commit();
         } catch (Throwable $exception) {
@@ -442,7 +441,7 @@ class AnketsController extends Controller
         return $response;
     }
 
-    public function exportPdfLabeling(Request $request, ExportAnketasLabelingPdfHandler $handler)
+    public function exportPdfLabeling(Request $request, ExportFormsLabelingPdfHandler $handler)
     {
         $anketIds = $request->input('anket_ids');
 
@@ -451,7 +450,7 @@ class AnketsController extends Controller
         }
 
         try {
-            return $handler->handle(new ExportAnketasLabelingPdfCommand($anketIds));
+            return $handler->handle(new ExportFormsLabelingPdfCommand($anketIds));
         } catch (Throwable $exception) {
             return response()->json([
                 'message' => $exception->getMessage()
@@ -459,7 +458,7 @@ class AnketsController extends Controller
         }
     }
 
-    public function verificationPage(string $uuid, GetAnketaVerificationDetailsQuery $query)
+    public function verificationPage(string $uuid, GetFormVerificationDetailsQuery $query)
     {
         $user = Auth::user();
 
@@ -469,7 +468,7 @@ class AnketsController extends Controller
         }
 
         try {
-            $details = $query->get(new GetAnketaVerificationDetailsParams(
+            $details = $query->get(new GetFormVerificationDetailsParams(
                 $uuid,
                 $userId
             ));
@@ -487,10 +486,10 @@ class AnketsController extends Controller
     }
 
     public function verificationHistory(
-        string $uuid,
-        Request $request,
-        GetAnketaVerificationHistoryQuery $getVerificationHistoryQuery,
-        StoreAnketaVerificationHandler $createVerificationHandler
+        string                          $uuid,
+        Request                         $request,
+        GetFormVerificationHistoryQuery $getVerificationHistoryQuery,
+        StoreFormVerificationHandler    $createVerificationHandler
 
     ): JsonResponse
     {
@@ -502,14 +501,14 @@ class AnketsController extends Controller
         }
 
         try {
-            $createVerificationHandler->handle(new StoreAnketaVerificationCommand(
+            $createVerificationHandler->handle(new StoreFormVerificationCommand(
                 $uuid,
                 $clientHash,
                 Auth::check(),
                 Carbon::parse($date)
             ));
 
-            $historyItems = $getVerificationHistoryQuery->get(new GetAnketaVerificationHistoryParams(
+            $historyItems = $getVerificationHistoryQuery->get(new GetFormVerificationHistoryParams(
                 $uuid,
                 $clientHash
             ));

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\ViewModels\AnketaVerificationDetails;
+namespace App\ViewModels\FormVerificationDetails;
 
-use App\Enums\AnketLabelingType;
+use App\Enums\FormLabelingType;
 use Carbon\Carbon;
 
-final class AnketaVerificationDetails
+final class FormVerificationDetails
 {
     /**
      * @var bool
@@ -14,19 +14,19 @@ final class AnketaVerificationDetails
     /**
      * @var string
      */
-    private $anketaUuid;
+    private $formUuid;
     /**
      * @var string
      */
-    private $anketaId;
+    private $formId;
     /**
-     * @var AnketLabelingType
+     * @var FormLabelingType
      */
-    private $anketaType;
+    private $formType;
     /**
      * @var string|null
      */
-    private $anketaNumber;
+    private $formNumber;
     /**
      * @var string|null
      */
@@ -34,11 +34,11 @@ final class AnketaVerificationDetails
     /**
      * @var Carbon|null
      */
-    private $anketaDate;
+    private $formDate;
     /**
      * @var string|null
      */
-    private $anketaPeriod;
+    private $formPeriod;
     /**
      * @var string|null
      */
@@ -50,37 +50,37 @@ final class AnketaVerificationDetails
 
     /**
      * @param bool $verified
-     * @param string $anketaUuid
-     * @param string $anketaId
-     * @param AnketLabelingType $anketaType
-     * @param string|null $anketaNumber
+     * @param string $formUuid
+     * @param string $formId
+     * @param FormLabelingType $formType
+     * @param string|null $formNumber
      * @param string|null $companyName
-     * @param Carbon|null $anketaDate
-     * @param Carbon|null $anketaPeriod
+     * @param Carbon|null $formDate
+     * @param Carbon|null $formPeriod
      * @param string|null $driverName
      * @param string|null $carGosNumber
      */
     public function __construct(
-        bool $verified,
-        string $anketaUuid,
-        string $anketaId,
-        AnketLabelingType $anketaType,
-        ?string $anketaNumber,
-        ?string $companyName,
-        ?Carbon $anketaDate,
-        ?Carbon $anketaPeriod,
-        ?string $driverName,
-        ?string $carGosNumber
+        bool             $verified,
+        string           $formUuid,
+        string           $formId,
+        FormLabelingType $formType,
+        ?string          $formNumber,
+        ?string          $companyName,
+        ?Carbon          $formDate,
+        ?Carbon          $formPeriod,
+        ?string          $driverName,
+        ?string          $carGosNumber
     )
     {
         $this->verified = $verified;
-        $this->anketaUuid = $anketaUuid;
-        $this->anketaId = $anketaId;
-        $this->anketaType = $anketaType;
-        $this->anketaNumber = $anketaNumber;
+        $this->formUuid = $formUuid;
+        $this->formId = $formId;
+        $this->formType = $formType;
+        $this->formNumber = $formNumber;
         $this->companyName = $companyName;
-        $this->anketaDate = $anketaDate;
-        $this->anketaPeriod = $anketaPeriod;
+        $this->formDate = $formDate;
+        $this->formPeriod = $formPeriod;
         $this->driverName = $driverName;
         $this->carGosNumber = $carGosNumber;
     }
@@ -90,24 +90,24 @@ final class AnketaVerificationDetails
         return $this->verified;
     }
 
-    public function getAnketaUuid(): string
+    public function getFormUuid(): string
     {
-        return $this->anketaUuid;
+        return $this->formUuid;
     }
 
-    public function getAnketaId(): string
+    public function getFormId(): string
     {
-        return $this->anketaId;
+        return $this->formId;
     }
 
-    public function getAnketaType(): AnketLabelingType
+    public function getFormType(): FormLabelingType
     {
-        return $this->anketaType;
+        return $this->formType;
     }
 
-    public function getAnketaNumber(): ?string
+    public function getFormNumber(): ?string
     {
-        return $this->anketaNumber;
+        return $this->formNumber;
     }
 
     public function getCompanyName(): ?string
@@ -115,19 +115,19 @@ final class AnketaVerificationDetails
         return $this->companyName;
     }
 
-    public function getAnketaDate(): ?Carbon
+    public function getFormDate(): ?Carbon
     {
-        return $this->anketaDate;
+        return $this->formDate;
     }
 
-    public function getAnketaPeriod(): ?Carbon
+    public function getFormPeriod(): ?Carbon
     {
-        return $this->anketaPeriod;
+        return $this->formPeriod;
     }
 
-    public function getFormattedAnketaPeriod(): ?string
+    public function getFormattedFormPeriod(): ?string
     {
-        if (!$this->anketaPeriod) {
+        if (!$this->formPeriod) {
             return '';
         }
 
@@ -146,8 +146,8 @@ final class AnketaVerificationDetails
             '12' => 'Декабрь',
         ];
 
-        if (array_key_exists($this->anketaPeriod->month, $months)) {
-            return $months[$this->anketaPeriod->month] . ' ' . $this->anketaPeriod->year;
+        if (array_key_exists($this->formPeriod->month, $months)) {
+            return $months[$this->formPeriod->month] . ' ' . $this->formPeriod->year;
         }
 
         return '';

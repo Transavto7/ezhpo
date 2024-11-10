@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Repositories\AnketaVerifications;
+namespace App\Repositories\FormVerifications;
 
-use App\Enums\AnketaVerificationStatus;
-use App\Repositories\AnketaVerifications\Entities\AnketaVerification;
+use App\Enums\FormVerificationStatus;
+use App\Repositories\FormVerifications\Entities\FormVerification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
-final class AnketaVerificationsRepository
+final class FormVerificationsRepository
 {
     /**
-     * @param string $anketaUuid
-     * @return AnketaVerification[]
+     * @param string $formUuid
+     * @return FormVerification[]
      */
-    public function findVerificationDatesByUuid(string $anketaUuid): array
+    public function findVerificationDatesByUuid(string $formUuid): array
     {
         return DB::table('anketa_verifications')
             ->select([
@@ -23,26 +23,26 @@ final class AnketaVerificationsRepository
                 'client_hash',
                 'verification_status',
             ])
-            ->where('anketa_uuid', '=', $anketaUuid)
+            ->where('anketa_uuid', '=', $formUuid)
             ->get()
             ->map(function ($item) {
-                return new AnketaVerification(
+                return new FormVerification(
                     $item->id,
                     $item->anketa_uuid,
                     Carbon::parse($item->verification_date),
                     $item->client_hash,
-                    AnketaVerificationStatus::fromString($item->verification_status),
+                    FormVerificationStatus::fromString($item->verification_status),
                 );
             })
             ->toArray();
     }
 
     /**
-     * @param string $anketaUuid
+     * @param string $formUuid
      * @param string $clientHash
-     * @return AnketaVerification[]
+     * @return FormVerification[]
      */
-    public function findVerificationsByParams(string $anketaUuid, string $clientHash): array
+    public function findVerificationsByParams(string $formUuid, string $clientHash): array
     {
         return DB::table('anketa_verifications')
             ->select([
@@ -52,30 +52,30 @@ final class AnketaVerificationsRepository
                 'client_hash',
                 'verification_status',
             ])
-            ->where('anketa_uuid', '=', $anketaUuid)
+            ->where('anketa_uuid', '=', $formUuid)
             ->where('client_hash', '=', $clientHash)
             ->get()
             ->map(function ($item) {
-                return new AnketaVerification(
+                return new FormVerification(
                     $item->id,
                     $item->anketa_uuid,
                     Carbon::parse($item->verification_date),
                     $item->client_hash,
-                    AnketaVerificationStatus::fromString($item->verification_status),
+                    FormVerificationStatus::fromString($item->verification_status),
                 );
             })
             ->toArray();
     }
 
-    public function addAnketVerification(
-        string $anketaUuid,
-        string $clientHash,
-        Carbon $verificationDate,
-        AnketaVerificationStatus $verificationStatus
+    public function addFormVerification(
+        string                 $formUuid,
+        string                 $clientHash,
+        Carbon                 $verificationDate,
+        FormVerificationStatus $verificationStatus
     ): void
     {
         DB::table('anketa_verifications')->insert([
-            'anketa_uuid' => $anketaUuid,
+            'anketa_uuid' => $formUuid,
             'client_hash' => $clientHash,
             'verification_date' => $verificationDate,
             'verification_status' => $verificationStatus->value(),

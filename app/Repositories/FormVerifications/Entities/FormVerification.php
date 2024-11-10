@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Repositories\AnketaVerifications\Entities;
+namespace App\Repositories\FormVerifications\Entities;
 
-use App\Enums\AnketaVerificationStatus;
+use App\Enums\FormVerificationStatus;
 use Carbon\Carbon;
 
-final class AnketaVerification
+final class FormVerification
 {
     /**
      * @var int
@@ -14,7 +14,7 @@ final class AnketaVerification
     /**
      * @var string
      */
-    private $anketaUuid;
+    private $formUuid;
     /**
      * @var Carbon
      */
@@ -24,27 +24,27 @@ final class AnketaVerification
      */
     private $clientHash;
     /**
-     * @var AnketaVerificationStatus
+     * @var FormVerificationStatus
      */
     private $verificationStatus;
 
     /**
      * @param int $id
-     * @param string $anketaUuid
+     * @param string $formUuid
      * @param Carbon $verificationDate
      * @param string $clientHash
-     * @param AnketaVerificationStatus $verificationStatus
+     * @param FormVerificationStatus $verificationStatus
      */
     public function __construct(
-        int $id,
-        string $anketaUuid,
-        Carbon $verificationDate,
-        string $clientHash,
-        AnketaVerificationStatus $verificationStatus
+        int                    $id,
+        string                 $formUuid,
+        Carbon                 $verificationDate,
+        string                 $clientHash,
+        FormVerificationStatus $verificationStatus
     )
     {
         $this->id = $id;
-        $this->anketaUuid = $anketaUuid;
+        $this->formUuid = $formUuid;
         $this->verificationDate = $verificationDate;
         $this->clientHash = $clientHash;
         $this->verificationStatus = $verificationStatus;
@@ -55,9 +55,9 @@ final class AnketaVerification
         return $this->id;
     }
 
-    public function getAnketaUuid(): string
+    public function getFormUuid(): string
     {
-        return $this->anketaUuid;
+        return $this->formUuid;
     }
 
     public function getVerificationDate(): Carbon
@@ -70,7 +70,7 @@ final class AnketaVerification
         return $this->clientHash;
     }
 
-    public function getVerificationStatus(): AnketaVerificationStatus
+    public function getVerificationStatus(): FormVerificationStatus
     {
         return $this->verificationStatus;
     }

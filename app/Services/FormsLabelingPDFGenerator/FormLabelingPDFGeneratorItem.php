@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services\AnketsLabelingPDFGenerator;
+namespace App\Services\FormsLabelingPDFGenerator;
 
-use App\Enums\AnketLabelingType;
+use App\Enums\FormLabelingType;
 
-final class AnketLabelingPDFGeneratorItem
+final class FormLabelingPDFGeneratorItem
 {
     /**
      * @var string
@@ -15,16 +15,16 @@ final class AnketLabelingPDFGeneratorItem
      */
     private $id;
     /**
-     * @var AnketLabelingType
+     * @var FormLabelingType
      */
     private $anketType;
 
     /**
      * @param string $qrCode
      * @param int $id
-     * @param AnketLabelingType $anketType
+     * @param FormLabelingType $anketType
      */
-    public function __construct(string $qrCode, int $id, AnketLabelingType $anketType)
+    public function __construct(string $qrCode, int $id, FormLabelingType $anketType)
     {
         $this->qrCode = $qrCode;
         $this->id = $id;
@@ -41,7 +41,7 @@ final class AnketLabelingPDFGeneratorItem
         return $this->id;
     }
 
-    public function getAnketType(): AnketLabelingType
+    public function getAnketType(): FormLabelingType
     {
         return $this->anketType;
     }

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\ViewModels\AnketaVerificationDetails;
+namespace App\ViewModels\FormVerificationDetails;
 
 use Carbon\Carbon;
+use JsonSerializable;
 
-final class AnketaVerificationHistoryItem implements \JsonSerializable
+final class FormVerificationHistoryItem implements JsonSerializable
 {
     /**
      * @var Carbon

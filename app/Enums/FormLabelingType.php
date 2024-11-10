@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-final class AnketLabelingType
+final class FormLabelingType
 {
     const TECH = 'tech';
     const MEDIC = 'medic';
