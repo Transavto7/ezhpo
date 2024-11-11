@@ -5,24 +5,22 @@ namespace App\Http\Controllers;
 use App\Actions\Anketa\ChangeResultDopHandler;
 use App\Actions\Anketa\CreateFormHandlerFactory;
 use App\Actions\Anketa\CreateSdpoFormHandler;
-use App\Actions\Anketa\ExportAnketasLabelingPdf\ExportAnketasLabelingPdfCommand;
-use App\Actions\Anketa\ExportAnketasLabelingPdf\ExportAnketasLabelingPdfHandler;
-use App\Actions\Anketa\GetAnketaVerificationDetails\GetAnketaVerificationDetailsParams;
-use App\Actions\Anketa\GetAnketaVerificationDetails\GetAnketaVerificationDetailsQuery;
-use App\Actions\Anketa\GetAnketaVerificationHistory\GetAnketaVerificationHistoryParams;
-use App\Actions\Anketa\GetAnketaVerificationHistory\GetAnketaVerificationHistoryQuery;
-use App\Actions\Anketa\StoreAnketaVerification\StoreAnketaVerificationCommand;
-use App\Actions\Anketa\StoreAnketaVerification\StoreAnketaVerificationHandler;
+use App\Actions\Anketa\ExportFormsLabelingPdf\ExportFormsLabelingPdfCommand;
+use App\Actions\Anketa\ExportFormsLabelingPdf\ExportFormsLabelingPdfHandler;
+use App\Actions\Anketa\GetFormVerificationDetails\GetFormVerificationDetailsParams;
+use App\Actions\Anketa\GetFormVerificationDetails\GetFormVerificationDetailsQuery;
+use App\Actions\Anketa\GetFormVerificationHistory\GetFormVerificationHistoryParams;
+use App\Actions\Anketa\GetFormVerificationHistory\GetFormVerificationHistoryQuery;
+use App\Actions\Anketa\StoreFormVerification\StoreFormVerificationCommand;
+use App\Actions\Anketa\StoreFormVerification\StoreFormVerificationHandler;
 use App\Actions\Anketa\TrashFormHandler;
 use App\Actions\Anketa\UpdateFormHandler;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueAction;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueHandler;
-use App\Anketa;
-use App\Car;
-use App\DDates;
-use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Enums\QRCodeLinkParameter;
+use App\Models\Forms\Form;
+use App\Models\Forms\MedicForm;
 use App\Exceptions\ExpiredFormPeriodPlException;
 use App\Point;
 use App\Traits\UserEdsTrait;
@@ -44,40 +42,6 @@ use Throwable;
 
 class AnketsController extends Controller
 {
-    public static function ddateCheck($dateAnketa, $dateModel, $id)
-    {
-        $dateCheckModel = app("App\\$dateModel")->find($id);
-        $dateCheck = DDates::where('item_model', $dateModel)->get();
-
-        $redDates = [];
-
-        if ($dateCheck && $dateCheckModel) {
-            foreach ($dateCheck as $dateCheckItem) {
-                $fieldDateCheck = $dateCheckItem->field;
-
-                if (isset($dateCheckModel[$fieldDateCheck])) {
-                    $fieldDateItemValue = $dateCheckModel[$fieldDateCheck];
-
-                    $dateAction = $dateCheckItem->action . ' ' . $dateCheckItem->days . ' days';
-
-                    $dateCheckWithAnketa = date('Y-m-d', strtotime($fieldDateItemValue . ' ' . $dateAction));
-                    $anketaDate = date('Y-m-d', strtotime($dateAnketa));
-
-                    if ($dateCheckWithAnketa <= $anketaDate) {
-                        $redDates[$fieldDateCheck] = [
-                            'value' => $fieldDateItemValue,
-                            'item_model' => $dateCheckItem->item_model,
-                            'item_id' => $dateCheckModel->id,
-                            'item_field' => $fieldDateCheck
-                        ];
-                    }
-                }
-            }
-        }
-
-        return $redDates;
-    }
-
     public function index(Request $request)
     {
         /** @var User $user */
@@ -89,16 +53,16 @@ class AnketsController extends Controller
                 return redirect()->route('renderElements', 'Company');
             }
             if ($user->hasRole('operator_sdpo')) {
-                return redirect()->route('home', 'pak_queue');
+                return redirect()->route('home', ['type_ankets' => FormTypeEnum::PAK_QUEUE]);
             }
             if ($user->hasRole('client')) {
-                return redirect()->route('home', ['type_ankets' => 'medic']);
+                return redirect()->route('home', ['type_ankets' => FormTypeEnum::MEDIC]);
             }
             if ($user->hasRole('tech')) {
-                $type = 'tech';
+                $type = FormTypeEnum::TECH;
             }
             if ($user->hasRole('medic')) {
-                $type = 'medic';
+                $type = FormTypeEnum::TECH;
             }
             if (!$type) {
                 return redirect()->route('index');
@@ -151,8 +115,6 @@ class AnketsController extends Controller
         $data['points'] = Point::getAll();
         $data['type_anketa'] = $type;
         $data['default_pv_id'] = $user->pv_id;
-        $data['Driver'] = Driver::class;
-        $data['Car'] = Car::class;
         $data['car_id'] = $request->input(QRCodeLinkParameter::CAR_ID);
         $data['driver_id'] = $request->input(QRCodeLinkParameter::DRIVER_ID);
 
@@ -166,13 +128,11 @@ class AnketsController extends Controller
 
     public function Get(Request $request)
     {
-        $form = Anketa::where('id', $request->id)->first();
+        /** @var Form $form */
+        $form = Form::withTrashed()->findOrFail($request->id);
+        $details = $form->details;
 
-        $data = [];
-
-        foreach ($form->fillable as $attribute) {
-            $data[$attribute] = $form[$attribute];
-        }
+        $data = array_merge($form->toArray(), $details->toArray());
 
         $companyFields = config('elements')['Driver']['fields']['company_id'];
         $companyFields['getFieldKey'] = 'name';
@@ -190,60 +150,58 @@ class AnketsController extends Controller
         $data['company_fields'] = $companyFields;
 
         if ($form->type_anketa === FormTypeEnum::PAK_QUEUE) {
-            $data['not_admitted_reasons'] = NotAdmittedReasons::fromForm($form)->getReasons();
+            /** @var MedicForm $details */
+            $data['not_admitted_reasons'] = NotAdmittedReasons::fromForm($details)->getReasons();
         }
 
         return view('profile.anketa', $data);
-    }
-
-    public function Delete(Request $request)
-    {
-        $id = $request->id;
-
-        if (Anketa::find($id)->delete()) {
-            return redirect(url()->previous());
-        }
-
-        return abort(403);
     }
 
     public function Trash(Request $request, TrashFormHandler $handler)
     {
         $id = $request->id;
         $action = $request->action;
-        $anketa = Anketa::find($id);
+        $form = Form::withTrashed()->findOrFail($id);
 
-        if ($anketa) {
-            $saved = $handler->handle($anketa, $action);
+        try {
+            DB::beginTransaction();
 
-            if ($saved) {
-                return redirect(url()->previous());
-            }
+            $handler->handle($form, $action, Auth::user());
+
+            DB::commit();
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            session()->flash('not_deleted_ankets', [$id]);
         }
 
-        return abort(403);
+        return redirect(url()->previous());
     }
 
-    public function MassTrash(Request $request, TrashFormHandler $handler)
+    public function MassTrash(Request $request, TrashFormHandler $handler): JsonResponse
     {
         $ids = $request->input('ids') ?? [];
         $action = $request->input('action');
-        $notDeletedAnkets = [];
+        $notDeletedForms = [];
 
         foreach ($ids as $id) {
             try {
-                $anketa = Anketa::findOrFail($id);
+                DB::beginTransaction();
 
-                if ($anketa && !$anketa->deleted_at) {
-                    $handler->handle($anketa, $action);
-                }
+                $form = Form::withTrashed()->findOrFail($id);
+
+                $handler->handle($form, $action, Auth::user());
+
+                DB::commit();
             } catch (Throwable $exception) {
-                $notDeletedAnkets[] = $id;
+                DB::rollBack();
+
+                $notDeletedForms[] = $id;
             }
         }
 
-        if (count($notDeletedAnkets)) {
-            session()->flash('not_deleted_ankets', $notDeletedAnkets);
+        if (count($notDeletedForms)) {
+            session()->flash('not_deleted_ankets', $notDeletedForms);
         }
 
         return response()->json();
@@ -283,7 +241,7 @@ class AnketsController extends Controller
 
     public function ChangeResultDop($id, $result_dop, ChangeResultDopHandler $handler): RedirectResponse
     {
-        $form = Anketa::findOrFail($id);
+        $form = Form::withTrashed()->findOrFail($id);
 
         try {
             DB::beginTransaction();
@@ -308,14 +266,10 @@ class AnketsController extends Controller
         $errors = [];
 
         foreach ($ids as $id) {
-            $form = Anketa::query()
-                ->where('id', $id)
-                ->where('is_dop', '=', 1)
-                ->whereNull('result_dop')
-                ->first();
+            $form = Form::withTrashed()->find($id);
 
             if ($form === null) {
-                $errors[] = "Осмотр с id $id уже утвержден";
+                $errors[] = "Осмотр с id $id не найден";
                 continue;
             }
 
@@ -345,9 +299,9 @@ class AnketsController extends Controller
 
         $id = $request->id;
 
+        $form = Form::withTrashed()->findOrFail($id);
+
         try {
-            //TODO: нет проверки на существование формы
-            $form = Anketa::find($id);
 
             $handler->handle($form, $request->all(), Auth::user());
 
@@ -380,6 +334,8 @@ class AnketsController extends Controller
 
         $formType = $request->input('type_anketa');
 
+        $responseData = [];
+
         try {
             // TODO: добавить время действия
             session(['anketa_pv_id' => [
@@ -393,9 +349,7 @@ class AnketsController extends Controller
 
             DB::commit();
         } catch (Throwable $exception) {
-            $responseData = [
-                'errors' => [$exception->getMessage()],
-            ];
+            $responseData['errors'] = [$exception->getMessage()];
 
             DB::rollBack();
         }
@@ -403,7 +357,7 @@ class AnketsController extends Controller
         $responseData['type'] = $formType;
         $responseData['is_dop'] = $responseData['is_dop'] ?? $request->input('is_dop', 0);
 
-        return redirect()->route('forms.index', $responseData);
+        return back()->with($responseData);
     }
 
     /**
@@ -461,39 +415,33 @@ class AnketsController extends Controller
         }
     }
 
-    public function print(Request $request, $id)
+    public function print($id)
     {
-        $anketa = Anketa::find($id);
+        $form = Form::withTrashed()->findOrFail($id);
 
-        if (!$anketa) {
-            return abort(404);
-        }
-
-        $terminal = User::find($anketa->terminal_id);
         $stamp = null;
-
+        $terminal = User::find($form->terminal_id);
         if ($terminal) {
             $stamp = $terminal->stamp;
         }
 
-        $user = User::find($anketa->user_id);
-
         $pdf = Pdf::loadView('docs.print', [
-            'anketa' => $anketa,
+            'form' => $form,
             'stamp' => $stamp,
-            'user' => $user,
+            'user' => User::find($form->user_id),
             'validity' => UserEdsTrait::getValidityString(
-                $anketa->user_validity_eds_start,
-                $anketa->user_validity_eds_end
+                $form->user_validity_eds_start,
+                $form->user_validity_eds_end
             )
         ]);
 
         $response = response()->make($pdf->output(), 200);
         $response->header('Content-Type', 'application/pdf');
+
         return $response;
     }
 
-    public function exportPdfLabeling(Request $request, ExportAnketasLabelingPdfHandler $handler)
+    public function exportPdfLabeling(Request $request, ExportFormsLabelingPdfHandler $handler)
     {
         $anketIds = $request->input('anket_ids');
 
@@ -502,7 +450,7 @@ class AnketsController extends Controller
         }
 
         try {
-            return $handler->handle(new ExportAnketasLabelingPdfCommand($anketIds));
+            return $handler->handle(new ExportFormsLabelingPdfCommand($anketIds));
         } catch (Throwable $exception) {
             return response()->json([
                 'message' => $exception->getMessage()
@@ -510,7 +458,7 @@ class AnketsController extends Controller
         }
     }
 
-    public function verificationPage(string $uuid, GetAnketaVerificationDetailsQuery $query)
+    public function verificationPage(string $uuid, GetFormVerificationDetailsQuery $query)
     {
         $user = Auth::user();
 
@@ -520,7 +468,7 @@ class AnketsController extends Controller
         }
 
         try {
-            $details = $query->get(new GetAnketaVerificationDetailsParams(
+            $details = $query->get(new GetFormVerificationDetailsParams(
                 $uuid,
                 $userId
             ));
@@ -538,10 +486,10 @@ class AnketsController extends Controller
     }
 
     public function verificationHistory(
-        string $uuid,
-        Request $request,
-        GetAnketaVerificationHistoryQuery $getVerificationHistoryQuery,
-        StoreAnketaVerificationHandler $createVerificationHandler
+        string                          $uuid,
+        Request                         $request,
+        GetFormVerificationHistoryQuery $getVerificationHistoryQuery,
+        StoreFormVerificationHandler    $createVerificationHandler
 
     ): JsonResponse
     {
@@ -553,14 +501,14 @@ class AnketsController extends Controller
         }
 
         try {
-            $createVerificationHandler->handle(new StoreAnketaVerificationCommand(
+            $createVerificationHandler->handle(new StoreFormVerificationCommand(
                 $uuid,
                 $clientHash,
                 Auth::check(),
                 Carbon::parse($date)
             ));
 
-            $historyItems = $getVerificationHistoryQuery->get(new GetAnketaVerificationHistoryParams(
+            $historyItems = $getVerificationHistoryQuery->get(new GetFormVerificationHistoryParams(
                 $uuid,
                 $clientHash
             ));

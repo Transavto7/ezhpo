@@ -2,7 +2,9 @@
 
 namespace App\Models\Forms;
 
+use App\Enums\FormTypeEnum;
 use App\User;
+use App\ValueObjects\NotAdmittedReasons;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -65,5 +67,10 @@ class MedicForm extends Model
     public function operator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'operator_id', 'id');
+    }
+
+    public function getNotAdmittedReasonsAttribute(): array
+    {
+        return NotAdmittedReasons::fromForm($this)->getReasons();
     }
 }

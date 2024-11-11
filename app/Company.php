@@ -80,36 +80,6 @@ class Company extends Model
         );
     }
 
-    public function inspections_tech(): HasMany
-    {
-        return $this->hasMany(Anketa::class, 'company_id', 'id')
-            ->where('type_anketa', 'tech');
-    }
-
-    public function inspections_medic(): HasMany
-    {
-        return $this->hasMany(Anketa::class, 'company_id', 'id')
-            ->where('type_anketa', 'medic');
-    }
-
-    public function inspections_pechat_pl(): HasMany
-    {
-        return $this->hasMany(Anketa::class, 'company_id', 'id')
-            ->where('type_anketa', 'pechat_pl');
-    }
-
-    public function inspections_bdd(): HasMany
-    {
-        return $this->hasMany(Anketa::class, 'company_id', 'id')
-            ->where('type_anketa', 'bdd');
-    }
-
-    public function inspections_report_cart(): HasMany
-    {
-        return $this->hasMany(Anketa::class, 'company_id', 'id')
-            ->where('type_anketa', 'report_cart');
-    }
-
     public function cars(): HasMany
     {
         return $this->hasMany(Car::class, 'company_id', 'id');

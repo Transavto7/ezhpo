@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Reports\Dynamic\GetDynamicData\GetDynamicDataAction;
+use App\Actions\Reports\Dynamic\GetDynamicData\GetDynamicDataHandler;
 use App\Actions\Reports\GraphPv\GetGraphPvData\GetGraphPvDataAction;
 use App\Actions\Reports\GraphPv\GetGraphPvData\GetGraphPvDataHandler;
 use App\Actions\Reports\Journal\GetJournalData\GetJournalDataAction;
 use App\Actions\Reports\Journal\GetJournalData\GetJournalDataHandler;
-use App\Anketa;
 use App\Company;
 use App\Events\UserActions\ClientReportRequest;
-use App\Point;
-use App\Town;
-use Carbon\CarbonPeriod;
+use App\Exports\ReportJournalExport;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -43,188 +43,36 @@ class ReportController extends Controller
         ]);
     }
 
-    public function getDynamic(Request $request, $journal)
+    public function getDynamic(Request $request, string $journal, GetDynamicDataHandler $handler)
     {
-        $months = [];
-        $periodStart = Carbon::now()->subMonths(11);
-        $period = CarbonPeriod::create($periodStart, '1 month', Carbon::now());
-        foreach ($period as $month) {
-            $months[] = $month->format('F');
-        }
-        $months = array_reverse($months);
-
         if ($request->town_id || $request->pv_id || $request->order_by) {
             event(new ClientReportRequest($request->user(), "dynamic_$journal"));
-
-            $date_from = Carbon::now()->subMonths(11)->firstOfMonth()->startOfDay();
-            $date_to = Carbon::now()->lastOfMonth()->endOfDay();
-            $result = [];
-            $total = [];
-
-            $forms = Anketa::query();
-
-            if ($journal !== 'all') {
-                $forms = $forms->where('type_anketa', $journal);
-            } else {
-                $forms = $forms->whereIn('type_anketa', ['tech', 'medic']);
-            }
-
-            $forms = $forms->where('in_cart', 0);
-
-            if ($request->order_by === 'created') {
-                $forms = $forms->whereBetween('created_at', [
-                    $date_from,
-                    $date_to,
-                ]);
-            } else {
-                $forms = $forms->where(function ($q) use ($date_from, $date_to) {
-                    $q->where(function ($q) use ($date_from, $date_to) {
-                        $q->whereNotNull('date')
-                            ->whereBetween('date', [
-                                $date_from,
-                                $date_to,
-                            ]);
-                    })->orWhere(function ($q) use ($date_from, $date_to) {
-                        $q->whereNull('date')
-                            ->whereBetween('period_pl', [
-                                $date_from->format('Y-m'),
-                                $date_to->format('Y-m'),
-                            ]);
-                    });
-                });
-            }
-
-            if ($request->pv_id) {
-                $points = Point::whereIn('id', $request->pv_id)->get();
-                $forms->where(function ($query) use ($points) {
-                    foreach ($points as $point) {
-                        $query = $query
-                            ->orWhere('anketas.pv_id', $point->name)
-                            ->orWhere('anketas.point_id', $point->id);
-                    }
-
-                    return $query;
-                });
-            } else if ($request->town_id) {
-                $points = Point::whereIn('pv_id', $request->town_id)->get();
-                $forms->where(function ($query) use ($points) {
-                    foreach ($points as $point) {
-                        $query = $query
-                            ->orWhere('anketas.pv_id', $point->name)
-                            ->orWhere('anketas.point_id', $point->id);
-                    }
-
-                    return $query;
-                });
-            }
-
-            if ($request->company_id) {
-                $forms = $forms->whereIn('company_id', $request->company_id);
-            }
-
-            $forms = $forms->get();
-
-            foreach ($forms->groupBy('company_id') as $companies => $formsByCompany) {
-                $company = $formsByCompany->where('company_name', '!=', null)->first();
-                if ($company) {
-                    $result[$companies]['name'] = $company->company_name;
-                } else {
-                    $result[$companies]['name'] = 'Неизвестная компания';
-                }
-
-                for ($monthIndex = 0; $monthIndex < 12; $monthIndex++) {
-                    $date_from = Carbon::now()->subMonths($monthIndex)->firstOfMonth()->startOfDay();
-                    $date_to = Carbon::now()->subMonths($monthIndex)->lastOfMonth()->endOfDay();
-                    $date = Carbon::now()->subMonths($monthIndex);
-
-                    if ($request->order_by === 'created') {
-                        $count = $formsByCompany
-                            ->whereBetween('created_at', [
-                                $date_from,
-                                $date_to,
-                            ])
-                            ->count();
-                    } else {
-                        $formsByCompanyWithDateCount = $formsByCompany
-                            ->where('date', '!=', null)
-                            ->whereBetween('date', [
-                                $date_from,
-                                $date_to,
-                            ])
-                            ->count();
-
-                        $formsByCompanyWithPeriodCount = $formsByCompany
-                            ->where('date', null)
-                            ->whereBetween('period_pl', [
-                                $date_from->format('Y-m'),
-                                $date_to->format('Y-m'),
-                            ])
-                            ->count();
-
-                        $count = $formsByCompanyWithDateCount + $formsByCompanyWithPeriodCount;
-                    }
-
-                    $result[$companies][$date->format('F')] = $count;
-                    $total[$date->format('F')] = ($total[$date->format('F')] ?? 0) + $count;
-                }
-            }
         }
 
-        $towns = Town::get(['hash_id', 'id', 'name']);
-        $points = Point::get(['hash_id', 'id', 'name', 'pv_id']);
+        $data = $handler->handle(new GetDynamicDataAction(
+            $journal,
+            $request->pv_id,
+            $request->town_id,
+            $request->order_by,
+            $request->company_id
+        ));
 
-        if ($request->company_id) {
-            $selectedCompanies = Company::query()
-                ->select([
-                    'hash_id',
-                    'name'
-                ])
-                ->whereIn('hash_id', $request->company_id)
-                ->get();
-
-            $companies = Company::query()
-                ->select([
-                    'hash_id',
-                    'name'
-                ])
-                ->whereNotIn('hash_id', $request->company_id)
-                ->limit(100)
-                ->get()
-                ->concat($selectedCompanies);
-        } else {
-            $companies = Company::select('hash_id', 'name')->limit(100)->get();
-        }
-
-        return view('reports.dynamic.medic.index', [
-            'months' => $months,
-            'companies' => $result ?? null,
-            'total' => $total ?? null,
-            'towns' => $towns,
-            'company_id' => $companies,
-            'points' => $points,
-            'journal' => $journal
-        ]);
+        return view('reports.dynamic.index', $data);
     }
 
     public function getJournalData(Request $request, GetJournalDataHandler $handler): JsonResponse
     {
-        if ($request->has('month')) {
-            $date_from = Carbon::parse($request->month)->startOfMonth();
-            $date_to = Carbon::parse($request->month)->endOfMonth();
-        } else {
-            $date_from = Carbon::parse($request->date_from)->startOfDay();
-            $date_to = Carbon::parse($request->date_to)->endOfDay();
-        }
-
+        $dateFrom = Carbon::parse($request->month)->startOfMonth();
+        $dateTo = Carbon::parse($request->month)->endOfMonth();
         $companyID = $request->input('company_id');
 
-        if (!$companyID || !$date_to || !$date_from) {
+        if (!$companyID || !$dateTo || !$dateFrom) {
             return response()->json(null, 404);
         }
 
         event(new ClientReportRequest($request->user('api'), 'service_report_request'));
 
-        return response()->json($handler->handle(new GetJournalDataAction($companyID, $date_from, $date_to)));
+        return response()->json($handler->handle(new GetJournalDataAction($companyID, $dateFrom, $dateTo)));
     }
 
     public function getGraphPvData(Request $request, GetGraphPvDataHandler $handler): JsonResponse
@@ -247,7 +95,7 @@ class ReportController extends Controller
         return response()->json($handler->handle(new GetGraphPvDataAction($pvId, $formType, $dateFrom, $dateTo)));
     }
 
-    public function GetReport(Request $request)
+    public function getReport(Request $request)
     {
         $data = $request->all();
 
@@ -260,7 +108,6 @@ class ReportController extends Controller
         $company_fields['getFieldKey'] = 'hash_id';
 
         $pv_fields = config('elements.Company.fields.pv_id');
-        $pv_fields['getFieldKey'] = 'name';
         $pv_fields['multiple'] = 1;
 
         return view('pages.reports.all', [
@@ -277,5 +124,26 @@ class ReportController extends Controller
             'pv_id' => $data['pv_id'] ?? 0,
             'data' => []
         ]);
+    }
+
+    public function exportJournalData(Request $request, GetJournalDataHandler $handler)
+    {
+        if ($request->has('month')) {
+            $date_from = Carbon::parse($request->month)->startOfMonth();
+            $date_to = Carbon::parse($request->month)->endOfMonth();
+        } else {
+            $date_from = Carbon::parse($request->date_from)->startOfDay();
+            $date_to = Carbon::parse($request->date_to)->endOfDay();
+        }
+
+        $companyID = $request->input('company_id');
+
+        if (!$companyID || !$date_to || !$date_from) {
+            return response()->json(null, 404);
+        }
+
+        event(new ClientReportRequest($request->user('api'), 'service_report_request'));
+
+        return Excel::download(new ReportJournalExport($handler->handle(new GetJournalDataAction($companyID, $date_from, $date_to))), 'export.xlsx');
     }
 }

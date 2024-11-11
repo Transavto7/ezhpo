@@ -34,18 +34,12 @@
     @auth
         <script type="text/javascript">
             window.API_TOKEN = '{{ Auth::user()->api_token }}';
-            window.userRole = function () {
-                return {{ auth()->user()->role }}
-            };
         </script>
     @endauth
 
     @guest
         <script type="text/javascript">
             window.API_TOKEN = '';
-            window.userRole = function () {
-                return 0;
-            };
         </script>
     @endguest
 

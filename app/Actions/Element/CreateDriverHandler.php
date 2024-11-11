@@ -11,8 +11,8 @@ use App\Models\Contract;
 use App\Services\BriefingService;
 use App\Services\UserService;
 use App\User;
-use Auth;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class CreateDriverHandler extends AbstractCreateElementHandler implements CreateElementHandlerInterface
 {

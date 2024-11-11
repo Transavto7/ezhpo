@@ -3,6 +3,7 @@
 namespace App\Listeners\Forms;
 
 use App\Events\Forms\DriverDismissed;
+use App\Models\Forms\MedicForm;
 use App\Services\Notifier\TelegramNotifierService;
 use App\ValueObjects\NotifyTelegramMessage;
 use Illuminate\Support\Carbon;
@@ -33,6 +34,15 @@ class NotifyDismissingByAlkoTG
         }
 
         $form = $event->getForm();
+        /** @var MedicForm|null $formDetails */
+        $formDetails = $form->details;
+        if ($formDetails === null) {
+            return;
+        }
+
+        if (!($formDetails instanceof MedicForm)) {
+            return;
+        }
 
         if ($form->proba_alko !== 'Положительно') {
             return;

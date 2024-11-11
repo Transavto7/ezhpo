@@ -160,7 +160,7 @@
             @endif
         @endforeach
 
-        @if($type_ankets == 'tech' || $type_ankets == 'medic')
+        @if($type_ankets == \App\Enums\FormTypeEnum::TECH || $type_ankets == \App\Enums\FormTypeEnum::MEDIC)
             <div class="col-md-3">
                 <div class="form-group">
                     <label><b>Время проведения осмотра с:</b></label>

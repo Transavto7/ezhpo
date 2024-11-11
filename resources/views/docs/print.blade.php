@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Наклейка осмотра {{ $anketa->id }}</title>
+    <title>Наклейка осмотра {{ $form->id }}</title>
     <style>
         @font-face {
             font-family: 'Arial';
@@ -14,7 +14,9 @@
             font-style: normal;
         }
 
-        @page { margin: 0; }
+        @page {
+            margin: 0;
+        }
 
         body {
             font-family: "Arial";
@@ -65,26 +67,26 @@
 </head>
 <body>
 
-    <div class="print">
-        <span class="title">{{ $stamp ? $stamp->company_name : 'ООО "Трансавто-7"' }}</span><br>
-        <span class="licence">
+<div class="print">
+    <span class="title">{{ $stamp ? $stamp->company_name : 'ООО "Трансавто-7"' }}</span><br>
+    <span class="licence">
             {{ $stamp ? $stamp->licence : 'Бессрочная лицензия от 09.12.2020 № Л041-1177-91/00366739' }}
         </span><br>
-        <span class="name">{{ $anketa->driver_fio }}</span><br>
-        прошел {{ $anketa->type_view }}<br>
-        Медицинский осмотр<br>
-        @if(Str::contains(Str::lower($anketa->type_view), 'пред'))
-            к исполнению трудовых обязаностей<br>
-            допущен
-        @endif
+    <span class="name">{{ $form->driver->fio }}</span><br>
+    прошел {{ $form->details->type_view }}<br>
+    Медицинский осмотр<br>
+    @if(Str::contains(Str::lower($form->details->type_view), 'пред'))
+        к исполнению трудовых обязаностей<br>
+        допущен
+    @endif
 
-        <br><br>
-        {{ $anketa->date ?? '0000-00-00 00:00:00' }}<br>
-        {{ $anketa->user_name ?? 'неизвестный сотрудник' }}<br>
-        ЭЦП {{ $anketa->user_eds ?? 'неизвестная-подпись' }}<br>
-        @if ($validity)
-            <span class="validity">{{ $validity }}</span>
-        @endif
-    </div>
+    <br><br>
+    {{ $form->date ?? '0000-00-00 00:00:00' }}<br>
+    {{ $user->name ?? 'неизвестный сотрудник' }}<br>
+    ЭЦП {{ $form->user_eds ?? 'неизвестная-подпись' }}<br>
+    @if ($validity)
+        <span class="validity">{{ $validity }}</span>
+    @endif
+</div>
 </body>
 </html>

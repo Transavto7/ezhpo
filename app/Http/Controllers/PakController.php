@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Anketa;
 use App\Enums\FormTypeEnum;
 use App\FieldPrompt;
+use App\Models\Forms\Form;
+use App\Models\Forms\MedicForm;
 use App\ValueObjects\NotAdmittedReasons;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PakController extends Controller
 {
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         if ($request->clear) {
-            Anketa::query()->pakQueueByUser($request->user())->delete();
+            Form::query()->pakQueueByUser($request->user())->delete();
 
             return redirect(route('pak.index'));
         }
@@ -22,10 +25,33 @@ class PakController extends Controller
         ]);
     }
 
-    public function list(Request $request) {
-        $forms = Anketa::query();
+    public function list(Request $request): JsonResponse
+    {
+        $forms = MedicForm::query()
+            ->select([
+                'forms.*',
+                'medic_forms.*',
+                'drivers.fio as driver_fio',
+                'points.name as pv_id'
+            ])
+            ->leftJoin('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
+            ->leftJoin('drivers', 'drivers.hash_id', '=', 'forms.driver_id')
+            ->leftJoin('points', 'points.id', '=', 'forms.point_id');
 
-        $forms->pakQueueByUser($request->user());
+        $user = $request->user();
+
+        if ($user->access('approval_queue_view_all')) {
+
+        } else if ($user->hasRole('head_operator_sdpo')) {
+            $forms->join('points_to_users', function ($join) use ($user) {
+                $join->on('forms.point_id', '=', 'points_to_users.point_id')
+                    ->where('points_to_users.user_id', '=', $user->id);
+            });
+        } else {
+            $forms->where('forms.user_id', $user->id);
+        }
+
+        $forms->where('forms.type_anketa', FormTypeEnum::PAK_QUEUE);
 
         if ($request->order_key) {
             $forms = $forms->orderBy($request->order_key, $request->order_by ?? 'ASC');
@@ -33,10 +59,11 @@ class PakController extends Controller
 
         $forms->get();
 
-        $data = $forms->get()->map(function (Anketa $form) {
-            $form->append('not_admitted_reasons');
-
-            return $form;
+        $data = $forms->get()->map(function (MedicForm $form) {
+            return array_merge(
+                $form->toArray(),
+                ['not_admitted_reasons' => NotAdmittedReasons::fromForm($form)->getReasons()]
+            );
         });
 
         return response()->json($data);

@@ -2,16 +2,15 @@
 
 namespace App\Services;
 
-use App\Anketa;
 use App\Company;
 use App\Driver;
-use App\Http\Controllers\ProfileController;
+use App\Models\Forms\Form;
 use App\Point;
 use App\User;
 
 class DocDataService
 {
-    public function get(Anketa $form): array
+    public function get(Form $form): array
     {
         $data = [
             'anketa_id' => $form->id,
@@ -31,24 +30,24 @@ class DocDataService
             'point' => ''
         ];
 
-        foreach ($form->fillable as $field) {
-            $data[$field] = $form[$field];
-        }
+        $details = $form->details;
+
+        $data = array_merge($data, $form->toArray(), $details->toAttay());
 
         $driver = Driver::where('hash_id', $form->driver_id)->first();
         $data['driver'] = $driver;
 
-        if ($form->test_narko === 'Положительно') {
+        if ($details->test_narko === 'Положительно') {
             $data['drugs'] = true;
         }
 
-        if ($form->proba_alko === 'Положительно') {
+        if ($details->proba_alko === 'Положительно') {
             $data['alko'] = true;
         }
 
         $data['alcometer_result'] = $data['alcometer_result'] ?? 0;
 
-        if ($form->med_view === 'Отстранение') {
+        if ($details->med_view === 'Отстранение') {
             $data['status'] = 'Есть жалобы';
         }
 
@@ -64,7 +63,7 @@ class DocDataService
         if ($form->company_id) {
             $company = Company::where('hash_id', $form->company_id)->first();
 
-            if($company) {
+            if ($company) {
                 $point = Point::find($company->pv_id);
 
                 if ($point) {
@@ -73,8 +72,8 @@ class DocDataService
             }
         }
 
-        if ($form->pv_id) {
-            $point = Point::where('name', $form->pv_id)->with('town')->first();
+        if ($form->point_id) {
+            $point = Point::where('name', $form->point_id)->with('town')->first();
 
             if ($point) {
                 $data['town'] = $point->town->name;

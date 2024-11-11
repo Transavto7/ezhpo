@@ -1,7 +1,8 @@
 @php
-    /** @var $details \App\ViewModels\AnketaVerificationDetails\AnketaVerificationDetails */
+    use App\Enums\FormLabelingType;
+    /** @var $details \App\ViewModels\FormVerificationDetails\FormVerificationDetails */
 
-    if($details->isVerified()) {
+    if ($details->isVerified()) {
         $title = 'Путевой лист действителен';
     }
     else {
@@ -9,8 +10,8 @@
     }
 
     $permissionToDelete = user() && (
-        $details->getAnketaType()->value() == \App\Enums\AnketLabelingType::MEDIC && user()->access('medic_delete') ||
-        $details->getAnketaType()->value() == \App\Enums\AnketLabelingType::TECH && user()->access('tech_delete')
+        $details->getFormType()->value() == FormLabelingType::MEDIC && user()->access('medic_delete') ||
+        $details->getFormType()->value() == FormLabelingType::TECH && user()->access('tech_delete')
     );
 @endphp
 
@@ -47,7 +48,7 @@
             margin-top: 15px;
             margin-bottom: 10px;
             font-size: 23px;
-            color: inherit!important;
+            color: inherit !important;
         }
 
         .verified-item {
@@ -97,24 +98,21 @@
 
                             @if($details->isVerified())
                                 <div class="mt-2 d-flex flex-column align-items-center">
-                                    @if($details->getAnketaNumber())
+                                    @if($details->getFormNumber())
                                         <div class="verified-item">
                                             <b>Номер осмотра:</b>
-                                            <span>{{ $details->getAnketaNumber() }}</span>
+                                            <span>{{ $details->getFormNumber() }}</span>
                                         </div>
                                     @endif
 
-                                    @if($details->getAnketaDate())
-                                        <div class="verified-item">
-                                            <b>Пройден:</b>
-                                            <span>{{ $details->getAnketaDate()->format('d.m.Y') }}</span>
-                                        </div>
-                                    @elseif($details->getFormattedAnketaPeriod())
-                                       <div class="verified-item">
-                                           <b>Пройден:</b>
-                                           <span>{{ $details->getFormattedAnketaPeriod() }}</span>
-                                       </div>
-                                    @endif
+                                    <div class="verified-item">
+                                        <b>Пройден:</b>
+                                        @if($details->getFormDate())
+                                            <span>{{ $details->getFormDate()->format('d.m.Y') }}</span>
+                                        @elseif($details->getFormattedFormPeriod())
+                                            <span>{{ $details->getFormattedFormPeriod() }}</span>
+                                        @endif
+                                    </div>
 
                                     @if($details->getCompanyName())
                                         <div class="verified-item">
@@ -143,9 +141,9 @@
                                         <div class="mt-2">
                                             <a
                                                 id="anketa-verification-delete-link"
-                                                href="{{ route('forms.trash', ['id' => $details->getAnketaId(), 'action' => 1]) }}"
+                                                href="{{ route('forms.trash', ['id' => $details->getFormId(), 'action' => 1]) }}"
                                                 class="btn btn-warning btn-sm hv-btn-trash mr-1"
-                                                data-id="{{ $details->getAnketaId() }}">
+                                                data-id="{{ $details->getFormId() }}">
                                                 Удалить <i class="fa fa-trash ml-1"></i>
                                             </a>
                                         </div>
@@ -196,7 +194,7 @@
         };
 
         const currentDate = new Date();
-        const currentUuid = '{{ $details->getAnketaUuid() }}';
+        const currentUuid = '{{ $details->getFormUuid() }}';
 
         function getVerificationItems() {
             const items = localStorage.getItem(LS_KEY_ITEMS);
@@ -294,7 +292,7 @@
         function fetchVerificationHistory() {
             const clientHash = localStorage.getItem(LS_KEY_CLIENT_HASH)
 
-            axios.get('{{ route('anketa.verification.history', $details->getAnketaUuid()) }}', {
+            axios.get('{{ route('anketa.verification.history', $details->getFormUuid()) }}', {
                 params: {
                     clientHash: clientHash,
                     date: (currentDate).toISOString()
@@ -358,7 +356,7 @@
         })
 
         $(document).ready(function () {
-            $('#anketa-verification-delete-link').click(function(e) {
+            $('#anketa-verification-delete-link').click(function (e) {
                 e.preventDefault();
 
                 const url = $(this).attr('href');

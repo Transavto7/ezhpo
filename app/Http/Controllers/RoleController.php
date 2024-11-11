@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\FieldPrompt;
-use App\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
@@ -12,7 +11,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 use App\Role;
-//use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
@@ -23,9 +22,9 @@ class RoleController extends Controller
      */
     public function index()
     {
-        if(request()->get('deleted')){
+        if (request()->get('deleted')) {
             $roles = Role::onlyTrashed()->get();
-        }else{
+        } else {
             $roles = Role::whereNull('deleted_at')->get();
         }
 
@@ -34,7 +33,7 @@ class RoleController extends Controller
         return view('admin.groups.index')
             ->with([
                 'roles' => $roles,
-                'all_permissions' => \Spatie\Permission\Models\Permission::orderBy('guard_name')->get(),
+                'all_permissions' => Permission::orderBy('guard_name')->get(),
                 'fields' => $fields,
             ]);
     }
@@ -47,14 +46,14 @@ class RoleController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'       => ['required', 'string', 'min:1', 'max:255'],
+            'name' => ['required', 'string', 'min:1', 'max:255'],
             'guard_name' => ['required', 'string', 'min:1', 'max:255'],
         ]);
 
         if ($validator->fails()) {
             return response([
                 'message' => $validator->errors(),
-                'status'  => false,
+                'status' => false,
             ]);
         }
 
@@ -85,7 +84,7 @@ class RoleController extends Controller
      * Редактирование
      *
      * @param Request $request
-     * @param int     $id
+     * @param int $id
      *
      * @return Response
      */
@@ -114,32 +113,23 @@ class RoleController extends Controller
     public function destroy($id)
     {
         $role = Role::with(['users', 'permissions'])
-                    ->find($id);
+            ->find($id);
 
         $role->deleted_id = user()->id;
         $role->deleted_at = now();
 
-//        dd($role->users());
-//        $role->users()->pivot->deleted = 1;
-//        $role->permissions()->pivot->deleted = 1;
-//        dd($role);
         $role->users()
-             ->get()
-             ->each(function($option) {
+            ->get()
+            ->each(function ($option) {
                 $option->pivot->deleted = 1;
                 $option->pivot->save();
             });
         $role->permissions()
-             ->get()
-             ->each(function($option) {
+            ->get()
+            ->each(function ($option) {
                 $option->pivot->deleted = 1;
                 $option->pivot->save();
             });
-//        $role->users()->save();
-//        $role->permissions()->save();
-
-//        $role->users()->updateExistingPivot($id, ['deleted' => 1]);
-//        $role->permissions()->updateExistingPivot($id, ['deleted' => 1]);
 
         $role->save();
 
@@ -155,22 +145,19 @@ class RoleController extends Controller
         $role->deleted_id = null;
         $role->deleted_at = null;
 
-//        $role->users()->updateExistingPivot($request->post('id'), ['deleted' => 1]);
-//        $role->permissions()->updateExistingPivot($request->post('id'), ['deleted' => 1]);
-
         $role->users(true)
-             ->get()
-             ->each(function($option) {
-                 $option->pivot->deleted = 0;
-                 $option->pivot->save();
-             });
+            ->get()
+            ->each(function ($option) {
+                $option->pivot->deleted = 0;
+                $option->pivot->save();
+            });
 
         $role->permissions(true)
-             ->get()
-             ->each(function($option) {
-                 $option->pivot->deleted = 0;
-                 $option->pivot->save();
-             });
+            ->get()
+            ->each(function ($option) {
+                $option->pivot->deleted = 0;
+                $option->pivot->save();
+            });
 
         $role->save();
 

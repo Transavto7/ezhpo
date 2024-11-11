@@ -2,12 +2,14 @@
 
 namespace App\Actions\Anketa;
 
-use App\Anketa;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
+use App\Models\Forms\Form;
+use App\Models\Forms\MedicForm;
+use App\Services\DuplicatesCheckerService;
 use App\Services\FormHash\FormHashGenerator;
 use App\Services\FormHash\MedicHashData;
 use App\ValueObjects\PressureLimits;
@@ -15,7 +17,8 @@ use App\ValueObjects\Pulse;
 use App\ValueObjects\PulseLimits;
 use App\ValueObjects\Temperature;
 use App\ValueObjects\Tonometer;
-use Illuminate\Database\Eloquent\Builder;
+use DateTimeImmutable;
+use Exception;
 use Illuminate\Support\Carbon;
 
 class CreateMedicFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -26,22 +29,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
     {
         $driver = $this->data['driver_id'] ?? 0;
 
-        $this->existForms = Anketa::query()
-            ->select([
-                'id',
-                'date'
-            ])
-            ->where('driver_id', $driver)
-            ->where('type_anketa', 'medic')
-            ->where('in_cart', 0)
-            ->whereNotNull('date')
-            ->where(function (Builder $query) {
-                $query
-                    ->where('is_dop', '<>', 1)
-                    ->orWhereNotNull('result_dop');
-            })
-            ->orderBy('date', 'desc')
-            ->get();
+        $this->existForms = DuplicatesCheckerService::getExistMedicForms($driver);
     }
 
     protected function validateData()
@@ -65,6 +53,9 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function createForm(array $form)
     {
         $driverId = $this->data['driver_id'] ?? 0;
@@ -115,12 +106,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         }
 
         if (!$driver && isset($form['driver_id'])) {
-            $errMsg = 'Водитель не найден';
-
-            $this->errors[] = $errMsg;
-
-            $this->saveSdpoFormWithError($form, $errMsg);
-
+            $this->errors[] = 'Водитель не найден';
             return;
         }
 
@@ -128,6 +114,27 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
          * Проверка водителя по: тесту наркотиков, возрасту
          */
         if ($driver) {
+            if ($driver->dismissed === 'Да') {
+                $this->errors[] = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
+            }
+
+            if (!$driver->company_id) {
+                $this->errors[] = 'У Водителя не найдена компания';
+                return;
+            }
+
+            $company = Company::find($driver->company_id);
+
+            if (!$company) {
+                $this->errors[] = 'У Водителя не верно указано ID компании';
+                return;
+            }
+
+            if ($company->dismissed === 'Да') {
+                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+                return;
+            }
+
             /** @var Driver $driver */
             $driver->checkGroupRisk(
                 $form['tonometer'],
@@ -135,48 +142,8 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
                 $form['proba_alko']
             );
 
-            if ($driver->dismissed === 'Да') {
-                $this->errors[] = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
-            }
-
-            if (!$driver->company_id) {
-                $message = 'У Водителя не найдена компания';
-
-                $this->errors[] = $message;
-
-                $this->saveSdpoFormWithError($form, $message);
-
-                return;
-            }
-
-            $company = Company::find($driver->company_id);
-
-            if (!$company) {
-                $message = 'У Водителя не верно указано ID компании';
-
-                $this->errors[] = $message;
-
-                $this->saveSdpoFormWithError($form, $message);
-
-                return;
-            }
-
-            if ($company->dismissed === 'Да') {
-                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
-
-                return;
-            }
-
-            if ($driver->year_birthday && $driver->year_birthday !== '0000-00-00') {
-                $form['driver_year_birthday'] = $driver->year_birthday;
-            }
-
-            $form['driver_gender'] = $driver->gender ?? '';
-            $form['driver_fio'] = $driver->fio;
             $form['driver_group_risk'] = $driver->group_risk;
-
             $form['company_id'] = $company->hash_id;
-            $form['company_name'] = $company->name;
 
             $this->checkRedDates(
                 date('Y-m-d', strtotime($form['date'])),
@@ -208,7 +175,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             $form['day_hash'] = FormHashGenerator::generate(
                 new MedicHashData(
                     $form['driver_id'],
-                    new \DateTimeImmutable($form['date']),
+                    new DateTimeImmutable($form['date']),
                     $form['type_view']
                 )
             );
@@ -225,9 +192,14 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             $form['realy'] = 'да';
         }
 
-        $formModel = new Anketa($form);
-
+        $formModel = new Form();
+        $formModel->fill($form);
         $formModel->save();
+
+        $formDetailsModel = new MedicForm();
+        $formDetailsModel->fill($form);
+        $formDetailsModel->setAttribute('forms_uuid', $formModel->uuid);
+        $formDetailsModel->save();
 
         /**
          * ОТПРАВКА SMS
@@ -239,7 +211,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         if ($this->needStoreNormalizedPressure) {
             MedicFormNormalizedPressure::store(
                 $formModel->id,
-                Tonometer::fromString($formModel->tonometer)->getNormalized()
+                Tonometer::fromString($formDetailsModel->tonometer)->getNormalized()
             );
         }
 
