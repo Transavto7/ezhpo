@@ -390,9 +390,10 @@ class HomeController extends Controller
                 ]));
         } else if (($validTypeForm === FormTypeEnum::MEDIC) && $export) {
             $forms = $forms
+                ->leftJoin('medic_form_normalized_pressures', 'forms.id', '=', 'medic_form_normalized_pressures.form_id')
                 ->select(array_merge($defaultFieldsToSelect, [
                     'drivers.date_prmo as date_prmo',
-                    DB::raw("COALESCE(medic_forms.pressure, medic_forms.tonometer, NULL) as tonometer")
+                    DB::raw("COALESCE(medic_form_normalized_pressures.pressure, medic_forms.tonometer, NULL) as tonometer")
                 ]));
         } else if ($validTypeForm === FormTypeEnum::MEDIC) {
             $forms = $forms
