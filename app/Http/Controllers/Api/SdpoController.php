@@ -163,19 +163,14 @@ class SdpoController extends Controller
             $medic = [];
             $medic['type_anketa'] = $request->type_anketa ?? FormTypeEnum::MEDIC;
             $medic['user_id'] = $user->id;
-            $medic['user_name'] = $user->name;
             $medic['user_validity_eds_start'] = $user->validity_eds_start;
             $medic['user_validity_eds_end'] = $user->validity_eds_end;
             $medic['user_eds'] = $user->eds;
             $medic['pulse'] = $request->pulse ?? mt_rand(60, 80);
-            $medic['pv_id'] = $apiClient->pv->name;
             $medic['point_id'] = $apiClient->pv->id;
             $medic['tonometer'] = $tonometer;
             $medic['driver_id'] = $driver->hash_id;
-            $medic['driver_fio'] = $driver->fio;
-            $medic['driver_gender'] = $driver->gender ?? '';
             $medic['company_id'] = $company->hash_id;
-            $medic['company_name'] = $company->name;
             $medic['med_view'] = $request->med_view ?? 'В норме';
             $medic['t_people'] = $request->t_people ?? 36.6;
             $medic['type_view'] = $request->type_view ?? 'Предрейсовый/Предсменный';
@@ -330,6 +325,8 @@ class SdpoController extends Controller
 
             $form['sleep_status'] = $request->sleep_status;
             $form['people_status'] = $request->people_status;
+            $form['user_name'] = $user->name;
+            $form['driver_fio'] = $driver->fio;
 
             if ($form['admitted'] === 'Не допущен') {
                 $form['reasons'] = $notAdmittedReasons;
@@ -634,6 +631,15 @@ class SdpoController extends Controller
         );
         if ($validity) {
             $data['validity'] = $validity;
+        }
+
+        if ($inspection->user) {
+            $form['user_name'] = $inspection->user->name;
+        }
+
+        if ($inspection->driver) {
+
+            $form['driver_fio'] = $inspection->driver->fio;
         }
 
         return response()->json($data);
