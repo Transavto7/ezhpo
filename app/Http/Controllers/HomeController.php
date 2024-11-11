@@ -352,6 +352,8 @@ class HomeController extends Controller
             ];
 
             if ($validTypeForm === FormTypeEnum::TECH) {
+                $formsDistinctQuery = $formsDistinctQuery
+                    ->leftJoin('cars', 'tech_forms.car_id', '=', 'cars.hash_id');
                 $counters['anketasCountCars'] = $formsDistinctQuery->count('tech_forms.car_id');
             }
 
