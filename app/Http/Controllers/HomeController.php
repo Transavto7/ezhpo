@@ -360,7 +360,7 @@ class HomeController extends Controller
 
         $defaultFieldsToSelect = [
             'forms.*',
-            '$formDetailsTable.*',
+            "$formDetailsTable.*",
             'forms.created_at as created_at',
             'forms.updated_at as updated_at',
             'forms.deleted_at as deleted_at',
