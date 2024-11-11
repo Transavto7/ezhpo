@@ -248,6 +248,10 @@ class HomeController extends Controller
                 }
 
                 if (is_array($filterValue)) {
+                    $filterValue = array_map(function ($fvItemValue) {
+                        return trim(str_replace('\\', '\\\\', $fvItemValue));
+                    }, $filterValue);
+
                     if ($filterKey === 'flag_pak') {
                         $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
                             foreach ($filterValue as $flagPakValue) {
@@ -266,8 +270,7 @@ class HomeController extends Controller
                     if ($filterKey === 'driver_group_risk') {
                         $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
                             foreach ($filterValue as $fvItemValue) {
-                                $escapedFvItemValue = str_replace('\\', '\\\\', $fvItemValue);
-                                $query = $query->orWhere('medic_forms.' . $filterKey, 'like', '%' . trim($escapedFvItemValue) . '%');
+                                $query = $query->orWhere('driver_group_risk', 'like', '%' . $fvItemValue . '%');
                             }
 
                             return $query;
@@ -284,6 +287,8 @@ class HomeController extends Controller
                         return $query;
                     });
                 } else {
+                    $filterValue = trim(str_replace('\\', '\\\\', $filterValue));
+
                     if ($filterKey === 'flag_pak' && $filterValue === 'internal') {
                         $forms = $forms->whereNull('medic_forms.flag_pak');
                         continue;
