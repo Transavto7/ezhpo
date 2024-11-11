@@ -301,10 +301,10 @@ class HomeController extends Controller
             }
 
             if (($filterParams['date'] ?? null) || ($filterParams['TO_date'] ?? null)) {
-                $dateFrom = $filterParams['date']
+                $dateFrom = isset($filterParams['date'])
                     ? Carbon::parse($filterParams['date'])->startOfDay()
                     : Carbon::now()->subYears(10);
-                $dateTo = $filterParams['TO_date']
+                $dateTo = isset($filterParams['TO_date'])
                     ? Carbon::parse($filterParams['TO_date'])->endOfDay()
                     : Carbon::now()->addYears(10);
 
@@ -360,7 +360,7 @@ class HomeController extends Controller
 
         $defaultFieldsToSelect = [
             'forms.*',
-            $validTypeForm . '_forms.*',
+            '$formDetailsTable.*',
             'forms.created_at as created_at',
             'forms.updated_at as updated_at',
             'forms.deleted_at as deleted_at',
