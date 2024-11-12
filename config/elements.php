@@ -119,7 +119,7 @@ return [
     'DDates' => [
         'title' => 'Даты контроля',
         'popupTitle' => 'Даты контроля',
-        'editOnField' => 'item_model',
+        'editOnField' => 'field',
         'model' => 'DDates',
         'fields' => [
             'item_model' => [
