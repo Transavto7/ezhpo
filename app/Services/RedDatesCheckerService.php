@@ -26,7 +26,7 @@ class RedDatesCheckerService
             throw new Exception("Попытка контроля дат для неизвестной модели - {$modelClass}");
         }
 
-        $datesToCheck = DDates::where('item_model', $modelClass)->get();
+        $datesToCheck = DDates::where('item_model', $datesMap[$modelClass])->get();
 
         $redDates = [];
         foreach ($datesToCheck as $dateToCheck) {
