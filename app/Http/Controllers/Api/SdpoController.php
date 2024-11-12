@@ -634,12 +634,11 @@ class SdpoController extends Controller
         }
 
         if ($inspection->user) {
-            $form['user_name'] = $inspection->user->name;
+            $data['user_name'] = $inspection->user->name;
         }
 
         if ($inspection->driver) {
-
-            $form['driver_fio'] = $inspection->driver->fio;
+            $data['driver_fio'] = $inspection->driver->fio;
         }
 
         return response()->json($data);
