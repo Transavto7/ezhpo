@@ -9,15 +9,12 @@ use App\Services\DocDataService;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rules\File;
 use Illuminate\Support\Facades\Storage;
 
 class DocsController extends Controller
 {
     public function Get (Request $request, DocDataService $service)
     {
-        $this->sendEvent(UserActionTypesEnum::DOCUMENT_REQUEST);
-
         $formId = $request->anketa_id;
         $type = $request->type;
 
@@ -26,11 +23,13 @@ class DocsController extends Controller
         }
 
         /** @var Form $form */
-        $form = Form::find($formId);
+        $form = Form::withTrashed()->find($formId);
 
         if (empty($form)) {
             return view("docs.undefined");
         }
+
+        $this->sendEvent(UserActionTypesEnum::DOCUMENT_REQUEST);
 
         $data = $service->get($form);
         $data['type'] = $type;
@@ -40,12 +39,13 @@ class DocsController extends Controller
 
     public function update(Request $request, $type)
     {
-        $form = Form::find($request->id);
-        $details = $form->details;
+        $form = Form::withTrashed()->find($request->id);
 
         if (!$form) {
             return response()->json(['message' => 'Осмотр не найден']);
         }
+
+        $details = $form->details;
 
         $data = array_merge($form->toArray(), $request->all(), $details->toArray());
         $pdf = Pdf::loadView('docs.exports.' . $type, $data);
@@ -59,7 +59,13 @@ class DocsController extends Controller
 
     public function delete($type, $anketa_id)
     {
-        Form::find($anketa_id)->details->update([
+        $form = Form::withTrashed()->find($anketa_id);
+
+        if (!$form) {
+            return back()->withErrors(['Осмотр не найден']);
+        }
+
+        $form->details->update([
             $type. '_path' => null
         ]);
 
@@ -68,14 +74,15 @@ class DocsController extends Controller
 
     public function getPdf($type, $formId, DocDataService $service)
     {
-        $this->sendEvent(UserActionTypesEnum::DOCUMENT_REQUEST_PDF);
-
-        $form = Form::find($formId);
-        $details = $form->details;
+        $form = Form::withTrashed()->find($formId);
 
         if (!$form) {
             return response('Осмотр не найден');
         }
+
+        $this->sendEvent(UserActionTypesEnum::DOCUMENT_REQUEST_PDF);
+
+        $details = $form->details;
 
         $path = $details[$type . '_path'];
         if (Storage::disk('public')->exists($path)) {
@@ -107,14 +114,15 @@ class DocsController extends Controller
 
     public function setPdf(Request $request, $type, $anketa_id)
     {
-        $form = Form::find($anketa_id);
-        $request->validate([
-            'pdf' => ['required', 'mimes:pdf']
-        ]);
+        $form = Form::withTrashed()->find($anketa_id);
 
         if (!$form) {
             return response('Осмотр не найден');
         }
+
+        $request->validate([
+            'pdf' => ['required', 'mimes:pdf']
+        ]);
 
         $pdf = $request->file('pdf');
         if (!$pdf) {
