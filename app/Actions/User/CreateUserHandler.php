@@ -81,7 +81,7 @@ class CreateUserHandler
             $user = User::find($userId);
         }
 
-        if ($password = $data['password']) {
+        if ($password = $data['password'] ?? null) {
             $password = Hash::make($password);
             $apiToken = Hash::make(date('H:i:s') . sha1($password));
 
