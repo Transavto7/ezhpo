@@ -34,7 +34,7 @@
                         <textarea rows="1" class="doc-input" name="town">{{ $town }}</textarea>
                     </td>
                     <td>
-                        <textarea rows="1" class="doc-input large" name="pv_id">{{ $pv_id }}</textarea>
+                        <textarea rows="1" class="doc-input large" name="point">{{ $point }}</textarea>
                     </td>
                 </tr>
                 <tr>
@@ -55,7 +55,7 @@
                 </tr>
                 <tr>
                     <td colspan="3">
-                        <textarea rows="1" class="doc-input" name="company_id">{{ $company_name }}</textarea>
+                        <textarea rows="1" class="doc-input" name="company_name">{{ $company_name }}</textarea>
                     </td>
                     <td>
                         <textarea rows="1" class="doc-input" name="post">Водитель</textarea>

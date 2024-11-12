@@ -60,7 +60,7 @@
                 {{ $town }}
             </td>
             <td>
-                {{ $pv_id }}
+                {{ $point }}
             </td>
         </tr>
         <tr>
@@ -80,8 +80,8 @@
             <td class="head">Должность</td>
         </tr>
         <tr>
-            <td colspan="3">{{ $company_name }}</td>
-            <td>{{ $post }}</td>
+            <td colspan="3">{{ $company_name ?? '' }}</td>
+            <td>{{ $post ?? 'Водитель' }}</td>
         </tr>
         <tr>
             <td class="head">Жалобы</td>

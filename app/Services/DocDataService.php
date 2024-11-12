@@ -15,8 +15,10 @@ class DocDataService
         $data = [
             'anketa_id' => $form->id,
             'driver_fio' => '',
+            'driver_year_birthday' => '',
             'driver_yb' => '',
             'driver_pv' => '',
+            'company_name' => '',
             'user_name' => '',
             'user_fio' => '',
             'user_company' => '',
@@ -34,8 +36,10 @@ class DocDataService
 
         $data = array_merge($data, $form->toArray(), $details->toArray());
 
-        $driver = Driver::where('hash_id', $form->driver_id)->first();
+        $driver = Driver::withTrashed()->where('hash_id', $form->driver_id)->first();
         $data['driver'] = $driver;
+        $data['driver_year_birthday'] = $driver->year_birtday;
+        $data['driver_fio'] = $driver->fio;
 
         if ($details->test_narko === 'Положительно') {
             $data['drugs'] = true;
@@ -61,10 +65,12 @@ class DocDataService
         $data['recommendations'] = $recommendations;
 
         if ($form->company_id) {
-            $company = Company::where('hash_id', $form->company_id)->first();
+            $company = Company::withTrashed()->where('hash_id', $form->company_id)->first();
 
             if ($company) {
                 $point = Point::find($company->pv_id);
+
+                $data['company_name'] = $company->name;
 
                 if ($point) {
                     $data['driver_pv'] = $point->name;
@@ -73,11 +79,19 @@ class DocDataService
         }
 
         if ($form->point_id) {
-            $point = Point::where('name', $form->point_id)->with('town')->first();
+            $point = Point::withTrashed()->with('town')->find($form->point_id);
 
             if ($point) {
                 $data['town'] = $point->town->name;
                 $data['point'] = $point->name;
+            }
+        }
+
+        if ($form->user_id) {
+            $user = User::withTrashed()->find($form->user_id);
+
+            if ($user) {
+                $data['user_name'] = $user->name;
             }
         }
 
