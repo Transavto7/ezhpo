@@ -198,6 +198,7 @@ class GetJournalDataHandler
 
         $forms = Form::query()
             ->select([
+                'forms.date',
                 'forms.driver_id',
                 'points.name as pv_id',
                 'drivers.fio as driver_fio',
@@ -206,7 +207,6 @@ class GetJournalDataHandler
                 'medic_forms.result_dop',
                 'medic_forms.is_dop',
                 'medic_forms.admitted',
-                'print_pl_forms.count_pl'
             ])
             ->whereIn('type_anketa', [
                 FormTypeEnum::MEDIC,
@@ -216,8 +216,7 @@ class GetJournalDataHandler
             ])
             ->leftJoin('points', 'points.id', '=', 'forms.point_id')
             ->leftJoin('medic_forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
-            ->leftJoin('print_pl_forms', 'forms.uuid', '=', 'print_pl_forms.forms_uuid')
-            ->join('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
+            ->leftJoin('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
             ->where('forms.company_id', $this->companyHashId)
             ->whereBetween('forms.created_at', [
                 $dateFrom,
@@ -303,6 +302,7 @@ class GetJournalDataHandler
 
         $forms = Form::query()
             ->select([
+                'forms.date',
                 'cars.gos_number as car_gos_number',
                 'cars.type_auto',
                 'forms.type_anketa',
@@ -315,7 +315,7 @@ class GetJournalDataHandler
             ->where('type_anketa', FormTypeEnum::TECH)
             ->leftJoin('points', 'points.id', '=', 'forms.point_id')
             ->join('tech_forms', 'tech_forms.forms_uuid', '=', 'forms.uuid')
-            ->join('cars', 'tech_forms.car_id', '=', 'cars.hash_id')
+            ->leftJoin('cars', 'tech_forms.car_id', '=', 'cars.hash_id')
             ->where('forms.company_id', $this->companyHashId)
             ->whereBetween('forms.created_at', [
                 $dateFrom,
@@ -349,7 +349,7 @@ class GetJournalDataHandler
             }
             $key = $date->year . '-' . $date->month;
 
-            $carId = $form->carId;
+            $carId = $form->car_id;
 
             if (!isset($result[$key]['reports'][$carId])) {
                 $points = implode('; ', array_unique($forms->where('car_id', $carId)->pluck('pv_id')->toArray()));
@@ -373,6 +373,12 @@ class GetJournalDataHandler
                 $result[$key]['reports'][$carId]['types'][$typeView] = [
                     'total' => 0
                 ];
+            }
+
+            $result[$key]['reports'][$carId]['types'][$form->type_view]['total'] += 1;
+
+            if ($form->is_dop && $form->result_dop == null) {
+                $result[$key]['reports'][$carId]['types']['is_dop']['total'] += 1;
             }
         }
 
