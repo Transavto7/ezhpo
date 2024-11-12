@@ -168,7 +168,6 @@ class HomeController extends Controller
             'orderKey',
             'typePrikaz',
             'page',
-            'getFormFilter',
             'duplicates',
             'result_dop',
         ]);
@@ -552,8 +551,7 @@ class HomeController extends Controller
 
         event(new ClientActionLogRequest(Auth::user(), $validTypeForm));
 
-        $view = $request->get('getFormFilter') ? 'home_filters' : 'home';
-        return view($view, [
+        return view('home', [
             'title' => Anketa::$anketsKeys[$validTypeForm],
             'name' => $user->name,
             'ankets' => $forms,
