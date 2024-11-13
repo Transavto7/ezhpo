@@ -1111,6 +1111,12 @@ $(document).ready(function () {
                 title: successTitle,
                 icon: 'info'
             });
+        }).catch(error => {
+            swal.fire({
+                title: "Ошибка!",
+                text: "Обратитесь к администратору!",
+                icon: 'error'
+            });
         })
 
         document.querySelector('#page-preloader').classList.add('hide');

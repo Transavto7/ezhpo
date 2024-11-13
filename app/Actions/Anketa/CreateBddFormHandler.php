@@ -7,6 +7,7 @@ use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Models\Forms\BddForm;
 use App\Models\Forms\Form;
+use App\Point;
 use Illuminate\Support\Carbon;
 
 class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -38,6 +39,22 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
         ];
 
         $form = $this->mergeFormData($form, $defaultData);
+
+        if (isset($form['point_id'])) {
+            if ($form['point_id'] == 0) {
+                $form['point_id'] = null;
+            } else {
+                $point = Point::find($form['point_id']);
+
+                if (!$point) {
+                    $errMsg = 'ПВ не найден';
+
+                    $this->errors[] = $errMsg;
+
+                    return;
+                }
+            }
+        }
 
         /**
          * Водитель
@@ -85,6 +102,13 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
             $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
 
             return;
+        }
+
+        if ($form['point_id']) {
+            $point = Point::find($form['point_id']);
+            if (!$point) {
+
+            }
         }
 
         $form['company_id'] = $company->hash_id;
