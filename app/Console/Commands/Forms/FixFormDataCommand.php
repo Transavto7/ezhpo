@@ -6,6 +6,7 @@ use App\Anketa;
 use App\Car;
 use App\Company;
 use App\Driver;
+use App\Enums\FlagPakEnum;
 use App\Enums\FormFixStatusEnum;
 use App\Enums\FormTypeEnum;
 use App\Models\Forms\Form;
@@ -374,7 +375,7 @@ class FixFormDataCommand extends Command
         }
 
         if (($form->type_anketa === FormTypeEnum::MEDIC) && $form->terminal_id && !$form->flag_pak) {
-            $form->flag_pak = 'СДПО А';
+            $form->flag_pak = FlagPakEnum::SDPO_A;
         }
 
         if ($form->terminal_id === 0) {

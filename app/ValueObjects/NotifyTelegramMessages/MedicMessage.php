@@ -1,20 +1,15 @@
 <?php
 
-namespace App\ValueObjects;
+namespace App\ValueObjects\NotifyTelegramMessages;
 
 use DateTimeImmutable;
 
-class NotifyTelegramMessage
+class MedicMessage implements MessageInterface
 {
     /**
      * @var string
      */
     private $responsiblePerson;
-
-    /**
-     * @var string
-     */
-    private $type;
 
     /**
      * @var array
@@ -40,11 +35,6 @@ class NotifyTelegramMessage
      * @var string
      */
     private $driverFullName;
-
-    /**
-     * @var string|null
-     */
-    private $carNumber;
 
     /**
      * @var DateTimeImmutable
@@ -73,13 +63,11 @@ class NotifyTelegramMessage
 
     /**
      * @param string $responsiblePerson
-     * @param string $type
      * @param array $reasons
      * @param int $formId
      * @param string $companyId
      * @param string $companyName
      * @param string $driverFullName
-     * @param $carNumber
      * @param DateTimeImmutable $formDate
      * @param string $pointName
      * @param string $medicFullName
@@ -88,13 +76,11 @@ class NotifyTelegramMessage
      */
     public function __construct(
         string $responsiblePerson,
-        string $type,
         array $reasons,
         int $formId,
         string $companyId,
         string $companyName,
         string $driverFullName,
-        $carNumber,
         DateTimeImmutable $formDate,
         string $pointName,
         string $medicFullName,
@@ -103,13 +89,11 @@ class NotifyTelegramMessage
     )
     {
         $this->responsiblePerson = $responsiblePerson;
-        $this->type = $type;
         $this->reasons = $reasons;
         $this->formId = $formId;
         $this->companyHashId = $companyId;
         $this->companyName = $companyName;
         $this->driverFullName = $driverFullName;
-        $this->carNumber = $carNumber;
         $this->formDate = $formDate;
         $this->pointName = $pointName;
         $this->medicFullName = $medicFullName;
@@ -123,13 +107,11 @@ class NotifyTelegramMessage
 
         $lines = [
             "*Ответственный за компанию — $this->responsiblePerson.*",
-            "Поступил $this->type с отстранением по причине: _{$this->reasonsToString()}_.",
+            "Поступил медосмотр с отстранением по причине: _{$this->reasonsToString()}_.",
             "ID осмотра — $this->formId.",
             "ID компании — $this->companyHashId.",
             "Название компании — $this->companyName.",
-            $this->carNumber
-                ? "ФИО водителя — $this->driverFullName.\nГосномер ТС — $this->carNumber."
-                : "ФИО водителя — $this->driverFullName.",
+            "ФИО водителя — $this->driverFullName.",
             "Время осмотра — $date.",
             "Пункт выпуска — $this->pointName.",
             "Сотрудник — $this->medicFullName.",

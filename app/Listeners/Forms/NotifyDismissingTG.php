@@ -2,12 +2,15 @@
 
 namespace App\Listeners\Forms;
 
-use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\Models\Forms\MedicForm;
+use App\Models\Forms\TechForm;
 use App\Services\Notifier\TelegramNotifierService;
-use App\ValueObjects\NotifyTelegramMessage;
+use App\ValueObjects\NotifyTelegramMessages\MedicMessage;
+use App\ValueObjects\NotifyTelegramMessages\MessageInterface;
+use App\ValueObjects\NotifyTelegramMessages\TechMessage;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class NotifyDismissingTG
 {
@@ -40,14 +43,18 @@ class NotifyDismissingTG
         if ($formDetails === null) {
             return;
         }
-        $formDetails->append('dismissed_reason');
-        $dismissedReason = $formDetails->toArray()['dismissed_reason'];
+
+        if (!($formDetails instanceof MedicForm || $formDetails instanceof TechForm)) {
+            return;
+        }
+
+        $dismissedReason = $formDetails->dismissedReason;
+
+        Log::info(json_encode($dismissedReason));
 
         if (! count($dismissedReason)) {
             return;
         }
-
-        $type = FormTypeEnum::getLabel($form->type_anketa);
 
         $driver = $form->driver;
         if ($driver === null) {
@@ -73,14 +80,32 @@ class NotifyDismissingTG
             ? $company->responsible->name
             : 'не указан';
 
-        $car = $details->car;
-        $carNumber = $car
-            ? $car->gos_number
+        if ($formDetails instanceof MedicForm) {
+            $message = new MedicMessage(
+                $responsiblePerson,
+                $dismissedReason,
+                $form->id,
+                $company->hash_id,
+                $company->name,
+                $driver->fio,
+                Carbon::parse($form->date)->toDateTimeImmutable(),
+                $point->name,
+                $medic->name,
+                route('docs.get.pdf', ['type' => 'protokol', 'anketa_id' => $form->id]),
+                route('docs.get.pdf', ['type' => 'closing', 'anketa_id' => $form->id])
+            );
+
+            $this->notify($chatId, $message);
+
+            return;
+        }
+
+        $carNumber = $formDetails->car
+            ? $formDetails->car->gos_number
             : null;
 
-        $notifyTelegramMessage = new NotifyTelegramMessage(
+        $message = new TechMessage(
             $responsiblePerson,
-            $type,
             $dismissedReason,
             $form->id,
             $company->hash_id,
@@ -90,10 +115,13 @@ class NotifyDismissingTG
             Carbon::parse($form->date)->toDateTimeImmutable(),
             $point->name,
             $medic->name,
-            route('docs.get.pdf', ['type' => 'protokol', 'anketa_id' => $form->id]),
-            route('docs.get.pdf', ['type' => 'closing', 'anketa_id' => $form->id])
         );
 
-        (new TelegramNotifierService())->notify($chatId, strval($notifyTelegramMessage));
+        $this->notify($chatId, $message);
+    }
+
+    private function notify(string $chatId, MessageInterface $message)
+    {
+        (new TelegramNotifierService())->notify($chatId, strval($message));
     }
 }

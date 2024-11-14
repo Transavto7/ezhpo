@@ -7,6 +7,7 @@ use App\Actions\Anketa\ExportFormsLabelingPdf\ExportFormsLabelingPdfHandler;
 use App\Car;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
+use App\Enums\FlagPakEnum;
 use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\Http\Controllers\Controller;
@@ -174,7 +175,7 @@ class SdpoController extends Controller
             $medic['med_view'] = $request->med_view ?? 'В норме';
             $medic['t_people'] = $request->t_people ?? 36.6;
             $medic['type_view'] = $request->type_view ?? 'Предрейсовый/Предсменный';
-            $medic['flag_pak'] = $request->type_anketa === FormTypeEnum::PAK_QUEUE ? 'СДПО Р' : 'СДПО А';
+            $medic['flag_pak'] = $request->type_anketa === FormTypeEnum::PAK_QUEUE ? FlagPakEnum::SDPO_R : FlagPakEnum::SDPO_A;
             $medic['terminal_id'] = $apiClient->id;
             $medic['realy'] = "да";
             $medic['proba_alko'] = $request->proba_alko ?? 'Отрицательно';
@@ -303,7 +304,7 @@ class SdpoController extends Controller
             /**
              * ОТПРАВКА УВЕДОМЛЕНИЙ
              */
-            $needNotify = $formDetailsModel['admitted'] === 'Не допущен' && $formDetailsModel['flag_pak'] !== 'СДПО Р';
+            $needNotify = $formDetailsModel['admitted'] === 'Не допущен' && $formDetailsModel['flag_pak'] !== FlagPakEnum::SDPO_R;
             if ($needNotify) {
                 event(new DriverDismissed($formModel));
             }
@@ -671,7 +672,7 @@ class SdpoController extends Controller
             }
 
             $details->update([
-                'flag_pak' => 'СДПО А'
+                'flag_pak' => FlagPakEnum::SDPO_A
             ]);
 
             DB::commit();

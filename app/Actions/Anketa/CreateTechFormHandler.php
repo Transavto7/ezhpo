@@ -9,7 +9,6 @@ use App\Enums\BlockActionReasonsEnum;
 use App\Models\Forms\Form;
 use App\Models\Forms\TechForm;
 use App\Services\DuplicatesCheckerService;
-use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\Services\FormHash\FormHashGenerator;
 use App\Services\FormHash\TechHashData;

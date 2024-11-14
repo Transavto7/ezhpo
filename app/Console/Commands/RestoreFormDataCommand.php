@@ -28,8 +28,8 @@ class RestoreFormDataCommand extends Command
      * @var string
      */
     protected $signature = 'forms:restore-foreign
-                            {--reset-invalid: Убрать статус ошибок с низкой критичностью }
-                            {--creat-undefined: Восстановить несуществующие сущности }
+                            {--reset-invalid : Убрать статус ошибок с низкой критичностью }
+                            {--creat-undefined : Восстановить несуществующие сущности }
                             {--count : Количество необработанных осмотров}
                             {--force : Запуск команды игнорируя конфиг}';
     /**

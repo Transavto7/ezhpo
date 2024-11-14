@@ -80,7 +80,6 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         $form = $this->mergeFormData($form, $defaultData);
         $form['is_dop'] = $form['is_dop'] ?? 0;
 
-        $company = null;
         /**
          * Компания
          */
