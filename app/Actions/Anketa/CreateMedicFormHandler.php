@@ -89,6 +89,10 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             if ($companyDop) {
                 $form['company_id'] = $companyDop->hash_id;
                 $form['company_name'] = $companyDop->name;
+            } elseif (! isset($form['driver_id'])) {
+                $this->errors[] = 'Компания не найдена';
+
+                return;
             }
         }
 
