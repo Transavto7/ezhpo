@@ -10,7 +10,6 @@ use App\ValueObjects\NotifyTelegramMessages\MedicMessage;
 use App\ValueObjects\NotifyTelegramMessages\MessageInterface;
 use App\ValueObjects\NotifyTelegramMessages\TechMessage;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class NotifyDismissingTG
 {
@@ -49,8 +48,6 @@ class NotifyDismissingTG
         }
 
         $dismissedReason = $formDetails->dismissedReason;
-
-        Log::info(json_encode($dismissedReason));
 
         if (! count($dismissedReason)) {
             return;
