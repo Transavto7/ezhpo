@@ -340,6 +340,7 @@
 
                     @if($user->access('logs_read'))
                         <li><a href="{{ route('logs.index') }}">Журнал действий</a></li>
+                        <li><a href="{{ route('form-logs.index') }}">Журнал действий с осмотрами</a></li>
                     @endif
 
                     @if($user->access('sdpo_crash_logs_read'))

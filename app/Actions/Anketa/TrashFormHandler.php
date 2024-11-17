@@ -3,10 +3,13 @@
 namespace App\Actions\Anketa;
 
 use App\Driver;
+use App\Enums\FormLogActionTypesEnum;
 use App\Enums\FormTypeEnum;
+use App\Events\Forms\FormAction;
 use App\Models\Forms\Form;
 use App\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 final class TrashFormHandler
 {
@@ -23,6 +26,12 @@ final class TrashFormHandler
 
             $form->deleted_at = Carbon::now();
         }
+
+        $eventType = ! $action
+            ? FormLogActionTypesEnum::RESTORING
+            : FormLogActionTypesEnum::DELETING;
+
+        event(new FormAction(Auth::user(), $form, $eventType));
 
         $form->save();
     }

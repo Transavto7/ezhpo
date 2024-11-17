@@ -9,10 +9,12 @@ use App\Actions\Anketa\ExportFormsLabelingPdf\ExportFormsLabelingPdfHandler;
 use App\Car;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
+use App\Enums\FormLogActionTypesEnum;
 use App\Enums\FlagPakEnum;
 use App\Enums\FormEventType;
 use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
+use App\Events\Forms\FormAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSdpoCrashRequest;
 use App\Http\Requests\StoreSdpoFormFeedbackRequest;
@@ -670,19 +672,25 @@ class SdpoController extends Controller
                 return;
             }
 
-            $inspection->update([
+            $inspection->fill([
                 'type_anketa' => FormTypeEnum::MEDIC,
             ]);
 
             $details = $inspection->details;
 
             if (!$details) {
+                event(new FormAction(Auth::user(), $inspection, FormLogActionTypesEnum::APPROVAL));
+                $inspection->save();
                 return;
             }
 
-            $details->update([
+            $details->fill([
                 'flag_pak' => FlagPakEnum::SDPO_A
             ]);
+
+            event(new FormAction(Auth::user(), $inspection, FormLogActionTypesEnum::APPROVAL));
+            $inspection->save();
+            $details->save();
 
             DB::commit();
         } catch (Throwable $exception) {

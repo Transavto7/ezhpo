@@ -25,7 +25,7 @@ class CreateFormHandlerFactory
                 return new CreatePrintPlFormHandler();
             case FormTypeEnum::PAK:
             case FormTypeEnum::VID_PL:
-                throw new Exception("Ти анкеты - $formType не может быть создан через веб-интерфейс");
+                throw new Exception("Тип анкеты - $formType не может быть создан через веб-интерфейс");
             default:
                 throw new Exception("Неизвестный тип анкеты - $formType");
         }
