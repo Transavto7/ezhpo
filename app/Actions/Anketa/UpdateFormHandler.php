@@ -6,8 +6,10 @@ use App\Anketa;
 use App\Car;
 use App\Company;
 use App\Driver;
+use App\Enums\FormLogActionTypesEnum;
 use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
+use App\Events\Forms\FormAction;
 use App\MedicFormNormalizedPressure;
 use App\Models\Forms\Form;
 use App\Point;
@@ -24,6 +26,7 @@ use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class UpdateFormHandler
 {
@@ -96,9 +99,11 @@ class UpdateFormHandler
         }
 
         $form->fill($data);
-        $form->save();
-
         $form->details->fill($data);
+
+        event(new FormAction(Auth::user(), $form, FormLogActionTypesEnum::UPDATING));
+
+        $form->save();
         $form->details->save();
 
         if ($isPakQueueForm) {
