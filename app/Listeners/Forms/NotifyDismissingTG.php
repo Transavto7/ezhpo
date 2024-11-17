@@ -2,6 +2,8 @@
 
 namespace App\Listeners\Forms;
 
+use App\Enums\FlagPakEnum;
+use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\Models\Forms\MedicForm;
 use App\Models\Forms\TechForm;
@@ -78,6 +80,11 @@ class NotifyDismissingTG
             : 'не указан';
 
         if ($formDetails instanceof MedicForm) {
+            if (in_array($formDetails->flag_pak, [FlagPakEnum::SDPO_A, FlagPakEnum::SDPO_R])
+                && $formDetails->proba_alko !== 'Положительно') {
+                return;
+            }
+
             $message = new MedicMessage(
                 $responsiblePerson,
                 $dismissedReason,
