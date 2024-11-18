@@ -121,8 +121,8 @@ class GetDynamicDataHandler
 
                 if ($pvId) {
                     $query->where(function ($query) use ($pvId) {
-                        foreach ($pvId as $point) {
-                            $query->orWhere('forms.point_id', $point->id);
+                        foreach ($pvId as $pointId) {
+                            $query->orWhere('forms.point_id', $pointId);
                         }
 
                         return $query;
