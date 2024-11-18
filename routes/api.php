@@ -134,6 +134,7 @@ Route::middleware(['auth:api', 'update-last-connection'])->prefix('sdpo')->name(
 
     Route::prefix('/forms')->group(function () {
         Route::get('/duplicates', 'Api\Forms\CheckInspectionDuplicatesController');
+        Route::post('/{id}/feedback', 'Api\SdpoController@storeFormFeedback');
     });
 
     Route::get('/pv', 'Api\SdpoController@getPoint');
