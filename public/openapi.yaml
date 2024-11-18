@@ -1,0 +1,411 @@
+openapi: 3.0.3
+info:
+  title: ЭЖПО API
+  description: API для взаимодействия с ЭЖПО
+  version: 0.0.1
+servers:
+  - url: https://test.ta-7.ru
+    description: Тестовый сервер
+  - url: http://ezhpo.localhost
+    description: Сервер для разработки
+tags:
+  - name: Компании
+  - name: Отчеты
+  - name: Реквизиты
+paths:
+  /api/1c/v1/companies:
+    get:
+      operationId: GetCompanies
+      tags:
+        - Компании
+      summary: Список всех компаний
+      description: Метод получения списка всех компаний
+      responses:
+        "200":
+          $ref: '#/components/responses/GetCompanies200'
+        "401":
+          $ref: '#/components/responses/UnauthenticatedError'
+        "403":
+          $ref: '#/components/responses/ForbiddenError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      operationId: CreateCompany
+      tags:
+        - Компании
+      summary: Добавление компании
+      description: Метод добавления компании
+      requestBody:
+        $ref: '#/components/requestBodies/CreateCompanyRequest'
+      responses:
+        "201":
+          $ref: '#/components/responses/CreateCompany201'
+        "401":
+          $ref: '#/components/responses/UnauthenticatedError'
+        "403":
+          $ref: '#/components/responses/ForbiddenError'
+        "409":
+          $ref: '#/components/responses/CreateCompany409'
+        "422":
+          $ref: '#/components/responses/ValidationError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /api/1c/v1/reports:
+    post:
+      operationId: CreateReportJob
+      tags:
+        - Отчеты
+      summary: Формирование отчета
+      description: Метод запроса формирования отчета
+      requestBody:
+        $ref: '#/components/requestBodies/CreateReportJobRequest'
+      responses:
+        "200":
+          $ref: '#/components/responses/CreateReportJob200'
+        "401":
+          $ref: '#/components/responses/UnauthenticatedError'
+        "403":
+          $ref: '#/components/responses/ForbiddenError'
+        "422":
+          $ref: '#/components/responses/ValidationError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /api/1c/v1/reports/{id}:
+    get:
+      operationId: GetReport
+      tags:
+        - Отчеты
+      summary: Получение отчета
+      description: Метод получения отчета
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Идентификатор отчета
+          example: '453e00db-9016-4c40-b97f-8d65b12a8219'
+      responses:
+        "200":
+          $ref: '#/components/responses/GetReport200'
+        "202":
+          $ref: '#/components/responses/GetReport202'
+        "404":
+          $ref: '#/components/responses/GetReport404'
+        "401":
+          $ref: '#/components/responses/UnauthenticatedError'
+        "403":
+          $ref: '#/components/responses/ForbiddenError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /api/1c/v1/requisites:
+    get:
+      operationId: GetRequisites
+      tags:
+        - Реквизиты
+      summary: Получение реквизитов
+      description: Метод получения реквизитов
+      responses:
+        "200":
+          $ref: '#/components/responses/GetRequisites200'
+        "401":
+          $ref: '#/components/responses/UnauthenticatedError'
+        "403":
+          $ref: '#/components/responses/ForbiddenError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    Company:
+      type: object
+      required:
+        - id
+        - hash_id
+        - name
+        - inn
+        - req_id
+      properties:
+        id:
+          type: integer
+          description: Идентификатор компании
+          example: 1
+        hash_id:
+          type: string
+          example: '000000'
+        name:
+          type: string
+          description: Наименование компании
+          example: 'ИП Иванов Иван Иванович'
+        inn:
+          type: string
+          description: ИНН компании
+          example: '1234567890'
+        req_id:
+          type: string
+          example: '1'
+    ReportStatus:
+      type: string
+      description: Статус отчета
+      enum:
+        - created
+        - processing
+        - ready
+        - deleted
+        - error
+    Requisite:
+      type: object
+      required:
+        - id
+        - hash_id
+        - name
+      properties:
+        id:
+          type: number
+          example: 1
+        hash_id:
+          type: number
+          example: '000000'
+        name:
+          type: number
+          example: 'ООО "Наименование"'
+  requestBodies:
+    CreateCompanyRequest:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+              - req_id
+              - inn
+            properties:
+              name:
+                type: string
+                description: Наименование компании
+                example: 'ИП Иванов Иван Иванович'
+              req_id:
+                type: string
+                example: '1'
+              inn:
+                type: string
+                description: ИНН компании
+                example: '1234567890'
+    CreateReportJobRequest:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - date_to
+              - date_from
+              - company_id
+            properties:
+              date_to:
+                type: string
+                format: date
+                example: '2024-09-01'
+              date_from:
+                type: string
+                format: date
+                example: '2024-10-01'
+              company_id:
+                type: string
+                example: '000000'
+  responses:
+    # common
+    UnauthenticatedError:
+      description: Ошибка аутентификации
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+            properties:
+              message:
+                type: string
+                example: Unauthenticated
+    ForbiddenError:
+      description: Доступ запрещен
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+            properties:
+              message:
+                type: string
+                example: Forbidden
+    InternalServerError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+            properties:
+              message:
+                type: string
+                example: Internal server error
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+              - errors
+            properties:
+              message:
+                type: string
+                example: "The given data was invalid."
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+                example:
+                  field_1:
+                    - "Поле field_1 to обязательно для заполнения."
+                  field_2:
+                    - "Поле field_2 from должно быть строкой."
+                    - "Количество символов в поле field_2 не может превышать 255."
+    # get company
+    GetCompanies200:
+      description: Список компаний
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Company'
+    # create company
+    CreateCompany201:
+      description: Успешное добавление компании
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - id
+              - hash_id
+            properties:
+              id:
+                type: integer
+                description: Идентификатор созданной компании
+                example: 1
+              hash_id:
+                type: string
+                example: "000000"
+    CreateCompany409:
+      description: Найден дубликат по названию компании
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+            properties:
+              message:
+                type: string
+                example: Найден дубликат по названию компании
+    # create report job
+    CreateReportJob200:
+      description: Информация о формируемом отчета
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: string
+                format: uuid
+                example: "a3b529ce-cb56-46e6-85a9-3dfcfe53cd26"
+    # get report
+    GetReport200:
+      description: Отчет был успешно сформирован или его формирование не было завершено из-за ошибки
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+              - message
+            properties:
+              status:
+                $ref: '#/components/schemas/ReportStatus'
+              message:
+                type: string
+              content:
+                type: string
+                description: Содержимое отчета в формате json
+                nullable: true
+          examples:
+            ReportReady:
+              value:
+                status: ready
+                message: 'Отчет готов'
+                # todo: кратко описать примерное содержимое отчета в виде object
+                content: []
+            ReportError:
+              value:
+                status: error
+                message: 'Произошла ошибка при формировании отчета'
+    GetReport202:
+      description: Отчет в очереди на выполнение или формируется
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+              - message
+            properties:
+              status:
+                $ref: '#/components/schemas/ReportStatus'
+              message:
+                type: string
+          examples:
+            ReportCreated:
+              value:
+                status: created
+                message: 'Отчет в очереди на выполнение'
+            ReportProcessing:
+              value:
+                status: processing
+                message: 'Отчет формируется'
+    GetReport404:
+      description: Отчет просрочен
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+              - message
+            properties:
+              status:
+                $ref: '#/components/schemas/ReportStatus'
+              message:
+                type: string
+          examples:
+            ReportExpired:
+              value:
+                status: deleted
+                message: 'Отчет просрочен, запросите повторное формирование'
+    # get requisites
+    GetRequisites200:
+      description: Список реквизитов
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Requisite'
