@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\Forms\StoreFormEvent\StoreFormEventCommand;
+use App\Actions\Forms\StoreFormEvent\StoreFormEventHandler;
 use App\Actions\Anketa\ExportFormsLabelingPdf\ExportFormsLabelingPdfCommand;
 use App\Actions\Anketa\ExportFormsLabelingPdf\ExportFormsLabelingPdfHandler;
 use App\Car;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FlagPakEnum;
+use App\Enums\FormEventType;
 use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSdpoCrashRequest;
+use App\Http\Requests\StoreSdpoFormFeedbackRequest;
 use App\MedicFormNormalizedPressure;
 use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
@@ -22,6 +26,7 @@ use App\Settings;
 use App\Stamp;
 use App\Traits\UserEdsTrait;
 use App\User;
+use App\ValueObjects\FormFeedback;
 use App\ValueObjects\Phone;
 use App\ValueObjects\PressureLimits;
 use App\ValueObjects\Tonometer;
@@ -36,6 +41,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class SdpoController extends Controller
@@ -343,6 +349,9 @@ class SdpoController extends Controller
                     ]
                 ));
             }
+
+            $wishMessages = config('wishes.messages');
+            $form['wish_message'] = $wishMessages[array_rand($wishMessages)];
 
             DB::commit();
 
@@ -737,6 +746,53 @@ class SdpoController extends Controller
             return response()->json([
                 'message' => "Ошибка не была передана на сервер! " . $exception->getMessage()
             ]);
+        }
+    }
+
+    public function storeFormFeedback(
+        StoreSdpoFormFeedbackRequest $request,
+        string $id,
+        StoreFormEventHandler $handler
+    )
+    {
+        /** @var User $user */
+        $user = $request->user('api');
+
+        if ($user->blocked) {
+            return response()->json(['message' => 'Этот терминал заблокирован!'], Response::HTTP_BAD_REQUEST);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $formFeedback = FormFeedback::fromItems($request->input('feedback'));
+
+            $handler->handle(new StoreFormEventCommand(
+                $id,
+                FormEventType::setFeedback(),
+                $formFeedback->toArray(),
+                $user->id
+            ));
+
+            DB::commit();
+
+            $wishMessages = config('wishes.messages');
+
+            return response()
+                ->json(['wish_message' => $wishMessages[array_rand($wishMessages)]])
+                ->setStatusCode(Response::HTTP_CREATED);
+        } catch (NotFoundHttpException $exception) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => $exception->getMessage()
+            ])->setStatusCode(Response::HTTP_NOT_FOUND);
+        } catch (Exception $exception) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => $exception->getMessage()
+            ])->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
