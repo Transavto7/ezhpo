@@ -3,6 +3,7 @@
 namespace App\Actions\Element;
 
 use App\Company;
+use App\Exceptions\EntityAlreadyExistException;
 use App\User;
 use App\ValueObjects\Phone;
 use Exception;
@@ -13,13 +14,22 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
     /**
      * @throws Exception
      */
+    public function __construct()
+    {
+        parent::__construct('Company');
+    }
+
+    /**
+     * @throws EntityAlreadyExistException
+     * @throws Exception
+     */
     public function handle($data)
     {
         $existItem = Company::withTrashed()
             ->where('name', trim($data['name']))
             ->first();
         if ($existItem) {
-            throw new Exception('Найден дубликат по названию компании');
+            throw new EntityAlreadyExistException('Найден дубликат по названию компании');
         }
 
         $phoneNumber = $data['where_call'] ?? null;
