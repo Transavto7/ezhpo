@@ -2,11 +2,11 @@
 import LogsFilter from "./form-logs-filter.vue";
 import LogsTable from "./form-logs-table.vue";
 import swal from "sweetalert2";
-import ModelSearcher from "../searcher/model-searcher";
+import FormModelSearcher from "./form-model-searcher.vue";
 
 export default {
     name: "form-logs-index",
-    components: {ModelSearcher, LogsTable, LogsFilter},
+    components: {FormModelSearcher, LogsTable, LogsFilter},
     data() {
         return {
             pageSetup: window.PAGE_SETUP,
@@ -138,7 +138,7 @@ export default {
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <model-searcher/>
+                    <form-model-searcher/>
                 </div>
             </div>
         </div>

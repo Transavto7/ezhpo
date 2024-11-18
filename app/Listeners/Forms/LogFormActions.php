@@ -4,7 +4,6 @@ namespace App\Listeners\Forms;
 
 use App\Events\Forms\FormAction;
 use App\FormLog;
-use App\User;
 
 class LogFormActions
 {
