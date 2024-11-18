@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Actions\Reports\Journal\GetJournalData\GetJournalDataAction;
+use App\Actions\Reports\Journal\GetJournalData\GetJournalDataHandler;
 use App\Enums\ReportStatus;
 use App\Models\Report;
 use DateTimeImmutable;
@@ -11,7 +13,8 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Storage;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class CreateReport implements ShouldQueue
 {
@@ -34,11 +37,16 @@ class CreateReport implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(GetJournalDataHandler $handler)
     {
         try {
-            // TODO: добавить реализацию формирования отчета
-            $reportData = [];
+            $payload = $this->report->payload;
+
+            $companyHashId = $payload['company_id'];
+            $dateTo = Carbon::createFromFormat('Y-m-d', $payload['date_to'])->endOfDay();
+            $dateFrom = Carbon::createFromFormat('Y-m-d', $payload['date_from'])->startOfDay();
+
+            $reportData = $handler->handle(new GetJournalDataAction($companyHashId, $dateFrom, $dateTo));
 
             $now = new DateTimeImmutable();
             $reportFilename = 'report_'.$now->format('Y-m-d_H:i:s').'.json';
@@ -54,6 +62,10 @@ class CreateReport implements ShouldQueue
         } catch (Exception $exception) {
             $this->report->update([
                 'status' => ReportStatus::error(),
+                'error' => json_encode([
+                    'error' => $exception->getMessage() . " ({$exception->getFile()}:{$exception->getLine()}) ",
+                    'trace' => $exception->getTraceAsString(),
+                ])
             ]);
         }
     }

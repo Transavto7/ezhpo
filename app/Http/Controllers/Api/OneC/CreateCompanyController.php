@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api\OneC;
 
+use App\Actions\Element\CreateCompanyHandler;
 use App\Actions\Element\CreateElementHandlerFactory;
-use App\Company;
+use App\Actions\User\CreateUserHandler;
+use App\Exceptions\EntityAlreadyExistException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateCompanyRequest;
 use Illuminate\Http\JsonResponse;
@@ -24,31 +26,32 @@ final class CreateCompanyController extends Controller
         try {
             DB::beginTransaction();
 
-            $companyId = $factory->make('Company')->handle([
+            $handler = new CreateCompanyHandler();
+
+            $company = $handler->handle([
                 'name' => $request->input('name'),
                 'req_id' => $request->input('req_id'),
                 'inn' => $request->input('inn'),
             ]);
 
-            $company = Company::find($companyId);
-
             DB::commit();
+
             return response()->json([
-                'id' => $companyId,
+                'id' => $company->id,
                 'hash_id' => $company->hash_id,
             ])->setStatusCode(Response::HTTP_CREATED);
+        } catch (EntityAlreadyExistException $exception) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => $exception->getMessage().' '.$exception->getCode()
+            ],Response::HTTP_CONFLICT);
         } catch (Throwable $exception) {
             DB::rollBack();
 
-            if ($exception->getMessage() === 'Найден дубликат по названию компании') {
-                return response()->json([
-                    'message' => $exception->getMessage().' '.$exception->getCode()
-                ],Response::HTTP_CONFLICT);
-            } else {
-                return response()->json([
-                    'message' => $exception->getMessage()
-                ],Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
+            return response()->json([
+                'message' => $exception->getMessage()
+            ],Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

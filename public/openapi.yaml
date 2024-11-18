@@ -197,18 +197,18 @@ components:
           schema:
             type: object
             required:
-              - date_to
               - date_from
+              - date_to
               - company_id
             properties:
-              date_to:
-                type: string
-                format: date
-                example: '2024-09-01'
               date_from:
                 type: string
                 format: date
-                example: '2024-10-01'
+                example: '2024-11-01'
+              date_to:
+                type: string
+                format: date
+                example: '2024-11-30'
               company_id:
                 type: string
                 example: '000000'
