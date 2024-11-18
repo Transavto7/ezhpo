@@ -172,6 +172,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::prefix('form-logs')->as('form-logs.')->group(function () {
             Route::get('/', 'FormLogController@index')->name('index');
+            Route::get('/get-form/', 'FormLogController@getFrom')->name('get-from');
             Route::post('list', 'FormLogController@list')->name('list');
             Route::post('list-model', 'FormLogController@listByModel')->name('list-model');
             Route::post('list-model-map', 'FormLogController@listByModelMaps')->name('list-model-map');

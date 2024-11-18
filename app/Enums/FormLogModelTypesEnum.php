@@ -40,6 +40,21 @@ class FormLogModelTypesEnum
         ];
     }
 
+    public static function labelByType(string $type): string
+    {
+        $labels = [
+            'tech' => 'Технический осмотр',
+            'medic' => 'Медицинский осмотр',
+            'bdd' => 'Инструктаж по БДД',
+            'pechat_pl' => 'Печать путевых листов',
+            'report_cart' => 'Снятие отчета с карт',
+        ];
+
+        return array_key_exists($type, $labels)
+            ? $labels[$type]
+            : $type;
+    }
+
     public static function label(string $value = null): string
     {
         if (empty($value)) {

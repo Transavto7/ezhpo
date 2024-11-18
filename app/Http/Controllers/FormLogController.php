@@ -6,6 +6,7 @@ use App\Enums\FormLogActionTypesEnum;
 use App\Enums\FormLogModelTypesEnum;
 use App\FieldPrompt;
 use App\FormLog;
+use App\Models\Forms\Form;
 use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -66,6 +67,35 @@ class FormLogController extends Controller
             'admin.form-logs.index',
             compact('actionTypes', 'modelTypes', 'users', 'fieldPromptsMap')
         );
+    }
+
+    public function getFrom(Request $request): JsonResponse
+    {
+        $items = Form::query()
+            ->withTrashed()
+            ->select([
+                'forms.id',
+                'uuid',
+                'type_anketa',
+                'users.name as user_name',
+            ])
+            ->join('users', 'users.id', '=', 'forms.user_id')
+            ->where('forms.id', $request->input('identifier'))
+            ->get()
+            ->toArray();
+
+        $items = array_reduce($items, function ($carry, $item) {
+            $carry[] = [
+                'id' => $item['id'],
+                'uuid' => $item['uuid'],
+                'type' => FormLogModelTypesEnum::labelByType($item['type_anketa']),
+                'user' => $item['user_name']
+            ];
+
+            return $carry;
+        }, []);
+
+        return response()->json($items);
     }
 
     public function list(Request $request): JsonResponse

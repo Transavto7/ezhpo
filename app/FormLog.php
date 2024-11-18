@@ -39,49 +39,49 @@ class FormLog extends Model
     public function scopeDateFrom($query, $value)
     {
         return $query->when($value, function ($subQuery) use ($value) {
-            return $subQuery->whereDate('logs.created_at', '>=', Carbon::parse($value));
+            return $subQuery->whereDate('form_logs.created_at', '>=', Carbon::parse($value));
         });
     }
 
     public function scopeDateTo($query, $value)
     {
         return $query->when($value, function ($subQuery) use ($value) {
-            return $subQuery->whereDate('logs.created_at', '<=', Carbon::parse($value));
+            return $subQuery->whereDate('form_logs.created_at', '<=', Carbon::parse($value));
         });
     }
 
     public function scopeModelTypes($query, $values = [])
     {
         return $query->when(count($values), function ($subQuery) use ($values) {
-            return $subQuery->whereIn('logs.model_type', $values);
+            return $subQuery->whereIn('form_logs.model_type', $values);
         });
     }
 
     public function scopeModelId($query, $value)
     {
         return $query->when($value, function ($subQuery) use ($value) {
-            return $subQuery->where('logs.model_id', 'like', "%$value%");
+            return $subQuery->where('form_logs.model_id', 'like', "%$value%");
         });
     }
 
     public function scopeUuid($query, $value)
     {
         return $query->when($value, function ($subQuery) use ($value) {
-            return $subQuery->where('logs.uuid', 'like', "%$value%");
+            return $subQuery->where('form_logs.uuid', 'like', "%$value%");
         });
     }
 
     public function scopeUserIds($query, $values = [])
     {
         return $query->when(count($values), function ($subQuery) use ($values) {
-            return $subQuery->whereIn('logs.user_id', $values);
+            return $subQuery->whereIn('form_logs.user_id', $values);
         });
     }
 
     public function scopeActionTypes($query, $values)
     {
         return $query->when(count($values), function ($subQuery) use ($values) {
-            return $subQuery->whereIn('logs.type', $values);
+            return $subQuery->whereIn('form_logs.type', $values);
         });
     }
 }
