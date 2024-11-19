@@ -28,14 +28,15 @@ class PakController extends Controller
 
     public function list(Request $request): JsonResponse
     {
-        $forms = Form::query()->pakQueueByUser($request->user())
+        $forms = MedicForm::query()
             ->select([
                 'forms.*',
                 'medic_forms.*',
                 'drivers.fio as driver_fio',
                 'points.name as pv_id'
             ])
-            ->join('medic_forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
+            ->join('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
+            ->pakQueueByUser($request->user())
             ->leftJoin('drivers', 'drivers.hash_id', '=', 'forms.driver_id')
             ->leftJoin('points', 'points.id', '=', 'forms.point_id')
             ->where('forms.date', '>=', Carbon::now()->subDay());

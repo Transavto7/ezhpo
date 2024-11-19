@@ -114,7 +114,7 @@ class Form extends Model
     {
         return self::query()
             ->pakQueueByUser($user)
-            ->where('forms.date', '<=', Carbon::now()->subDay())
+            ->where('forms.date', '>=', Carbon::now()->subDay())
             ->count();
     }
 
