@@ -2,19 +2,11 @@
 
 namespace App\Enums;
 
-use App\Car;
-use App\Company;
-use App\Driver;
-use App\Models\Contract;
 use App\Models\Forms\BddForm;
-use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
 use App\Models\Forms\PrintPlForm;
 use App\Models\Forms\ReportCartForm;
 use App\Models\Forms\TechForm;
-use App\Product;
-use App\Stamp;
-use App\User;
 
 class FormLogModelTypesEnum
 {

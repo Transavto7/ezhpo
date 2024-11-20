@@ -3,7 +3,7 @@
 namespace App\Listeners\Forms;
 
 use App\Events\Forms\FormAction;
-use App\FormLog;
+use App\Models\FormEvent;
 
 class LogFormActions
 {
@@ -32,11 +32,11 @@ class LogFormActions
             return;
         }
 
-        FormLog::create([
+        FormEvent::create([
             'user_id' => $event->getUser()->id,
-            'type' => $event->getType(),
-            'data' => $logData,
-            'model_id' => $event->getForm()->id,
+            'event_type' => $event->getType(),
+            'payload' => $logData,
+            'form_uuid' => $event->getForm()->uuid,
             'model_type' => get_class($event->getForm()->details),
         ]);
     }
