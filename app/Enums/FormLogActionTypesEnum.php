@@ -37,4 +37,14 @@ class FormLogActionTypesEnum
     {
         return self::labels()[$value] ?? 'Неизвестное действие';
     }
+
+    public static function values(): array
+    {
+        return [
+            self::UPDATING,
+            self::DELETING,
+            self::RESTORING,
+            self::APPROVAL,
+        ];
+    }
 }
