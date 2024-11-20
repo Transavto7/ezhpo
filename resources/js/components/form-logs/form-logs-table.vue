@@ -33,8 +33,8 @@ export default {
                 {key: 'created_at', label: 'Дата, время', class: 'text-left'},
                 {key: 'type', label: 'Действие', class: 'text-left'},
                 {key: 'model_type', label: 'Модель', class: 'text-left'},
-                {key: 'model_id', label: 'ID Модели', class: 'text-center'},
-                {key: 'data', label: 'Изменения', class: 'text-left'},
+                {key: 'form_id', label: 'ID Модели', class: 'text-center'},
+                {key: 'payload', label: 'Изменения', class: 'text-left'},
             ],
         }
     },
@@ -76,8 +76,8 @@ export default {
                 <uuid-cell :uuid="item.uuid"></uuid-cell>
             </template>
 
-            <template #cell(data)="{ item }">
-                <div v-for="(changeItem, index) of item.data" :key="index" class="p-1 mb-1" style="line-height: 19px">
+            <template #cell(payload)="{ item }">
+                <div v-for="(changeItem, index) of item.payload" :key="index" class="p-1 mb-1" style="line-height: 19px">
                     <div>
                         <b>{{ changeItem.name }}</b>
                     </div>

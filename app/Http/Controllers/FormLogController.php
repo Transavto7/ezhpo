@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\FormLogActionTypesEnum;
 use App\Enums\FormLogModelTypesEnum;
 use App\FieldPrompt;
-use App\FormLog;
+use App\Models\FormEvent;
 use App\Models\Forms\Form;
 use App\User;
 use Illuminate\Http\JsonResponse;
@@ -19,7 +19,7 @@ class FormLogController extends Controller
     {
         $actionTypes = FormLogActionTypesEnum::options()->toArray();
 
-        $modelTypes = FormLog::query()
+        $modelTypes = FormEvent::query()
             ->select(['model_type'])
             ->distinct()
             ->get()
@@ -38,8 +38,8 @@ class FormLogController extends Controller
                 DB::raw("CONCAT('[',users.hash_id,'] ',users.name) as text")
             ])
             ->distinct()
-            ->leftJoin('form_logs', 'form_logs.user_id', '=', 'users.id')
-            ->whereNotNull('form_logs.user_id')
+            ->leftJoin('form_events', 'form_events.user_id', '=', 'users.id')
+            ->whereNotNull('form_events.user_id')
             ->get();
 
         $fieldPromptsMap = FormLogModelTypesEnum::fieldPromptsTypeMap();
@@ -80,7 +80,7 @@ class FormLogController extends Controller
                 'users.name as user_name',
             ])
             ->join('users', 'users.id', '=', 'forms.user_id')
-            ->where('forms.id', $request->input('identifier'))
+            ->where('forms.id', 'like', "%{$request->input('identifier')}%")
             ->get()
             ->toArray();
 
@@ -100,9 +100,11 @@ class FormLogController extends Controller
 
     public function list(Request $request): JsonResponse
     {
-        $data = FormLog::query()
+        $data = FormEvent::query()
             ->select([
-                'form_logs.*',
+                'form_events.*',
+                'form_events.event_type as type',
+                'forms.id as form_id',
                 DB::raw("IF(ISNULL(users.hash_id), '-', CONCAT('[', users.hash_id, '] ', users.name)) as user")
             ])
             ->dateFrom($request->input('filter.date_start'))
@@ -112,7 +114,8 @@ class FormLogController extends Controller
             ->uuid($request->input('filter.uuid'))
             ->userIds($request->input('filter.users'))
             ->actionTypes($request->input('filter.actions'))
-            ->leftJoin('users', 'form_logs.user_id', '=', 'users.id')
+            ->leftJoin('users', 'form_events.user_id', '=', 'users.id')
+            ->leftJoin('forms', 'form_events.form_uuid', '=', 'forms.uuid')
             ->orderBy('created_at', 'desc')
             ->paginate(
                 $request->input('limit', 100),
@@ -135,14 +138,16 @@ class FormLogController extends Controller
             return response()->json([]);
         }
 
-        $data = FormLog::query()
+        $data = FormEvent::query()
             ->select([
-                'form_logs.*',
+                'form_events.*',
+                'forms.id',
                 DB::raw("IF(ISNULL(users.hash_id), '-', CONCAT('[', users.hash_id, '] ', users.name)) as user")
             ])
             ->modelTypes([$modelType])
             ->modelId($request->input('id'))
-            ->leftJoin('users', 'form_logs.user_id', '=', 'users.id')
+            ->leftJoin('users', 'form_events.user_id', '=', 'users.id')
+            ->leftJoin('forms', 'form_events.form_uuid', '=', 'forms.uuid')
             ->get();
 
         return response()->json($data);
