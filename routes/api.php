@@ -23,6 +23,7 @@ Route::get('/companies/find', 'ApiController@companiesList');
 Route::get('/find/{model}', 'ApiController@modelList');
 
 Route::middleware('auth:api')->group(function () {
+    Route::get('wish-message', 'ApiController@getRandomWish');
     Route::get('getField/{model}/{field}/{default_value?}', 'IndexController@GetFieldHTML');
     Route::get('parse-qr-code', 'Api\Forms\TechnicalInspection\ParseQRCodeController');
 
@@ -41,7 +42,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/get-user-from-token', function (Request $request) {
         $user = $request->user();
 
-        if($user->hasRole('terminal')) {
+        if ($user->hasRole('terminal')) {
             if (isset($request->token)) {
                 $user = User::where('api_token', $request->token)->first();
             }
@@ -53,7 +54,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/get-user/{user_id}', function (Request $request) {
         $user = $request->user();
 
-        if($user->hasRole('terminal')) {
+        if ($user->hasRole('terminal')) {
             $user_id = $request->user_id;
             $user = User::find($user_id);
 
@@ -91,7 +92,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('pvs/{id?}', function () {
         $id = isset(request()->id) ? request()->id : null;
 
-        if($id) {
+        if ($id) {
             $points = Point::find($id);
         } else {
             $points = Point::all();
