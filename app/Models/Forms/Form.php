@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Ramsey\Uuid\Uuid;
 
 class Form extends Model
@@ -111,7 +112,10 @@ class Form extends Model
 
     public static function pakQueueCount(User $user): int
     {
-        return self::query()->pakQueueByUser($user)->count();
+        return self::query()
+            ->pakQueueByUser($user)
+            ->where('forms.date', '>=', Carbon::now()->subDay())
+            ->count();
     }
 
     public function scopePakQueueByUser($query, User $user)

@@ -9,6 +9,7 @@ use App\Models\Forms\MedicForm;
 use App\ValueObjects\NotAdmittedReasons;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class PakController extends Controller
 {
@@ -34,24 +35,11 @@ class PakController extends Controller
                 'drivers.fio as driver_fio',
                 'points.name as pv_id'
             ])
-            ->leftJoin('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
+            ->join('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
+            ->pakQueueByUser($request->user())
             ->leftJoin('drivers', 'drivers.hash_id', '=', 'forms.driver_id')
-            ->leftJoin('points', 'points.id', '=', 'forms.point_id');
-
-        $user = $request->user();
-
-        if ($user->access('approval_queue_view_all')) {
-
-        } else if ($user->hasRole('head_operator_sdpo')) {
-            $forms->join('points_to_users', function ($join) use ($user) {
-                $join->on('forms.point_id', '=', 'points_to_users.point_id')
-                    ->where('points_to_users.user_id', '=', $user->id);
-            });
-        } else {
-            $forms->where('forms.user_id', $user->id);
-        }
-
-        $forms->where('forms.type_anketa', FormTypeEnum::PAK_QUEUE);
+            ->leftJoin('points', 'points.id', '=', 'forms.point_id')
+            ->where('forms.date', '>=', Carbon::now()->subDay());
 
         if ($request->order_key) {
             $forms = $forms->orderBy($request->order_key, $request->order_by ?? 'ASC');
