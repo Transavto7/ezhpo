@@ -11,13 +11,13 @@ class CreateElementHandlerFactory
     {
         switch ($type) {
             case 'Company':
-                return new CreateCompanyHandler($type);
+                return new CreateCompanyHandler();
             case 'Car':
-                return new CreateCarHandler($type);
+                return new CreateCarHandler();
             case 'Driver':
-                return new CreateDriverHandler($type);
+                return new CreateDriverHandler();
             case 'Product':
-                return new CreateProductHandler($type);
+                return new CreateProductHandler();
             default:
                 return new CreateDefaultHandler($type);
         }

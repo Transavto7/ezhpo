@@ -7,6 +7,7 @@ use App\Driver;
 use App\Enums\UserActionTypesEnum;
 use App\Events\Relations\Attached;
 use App\Events\UserActions\ClientAddRecord;
+use App\Exceptions\EntityAlreadyExistException;
 use App\Models\Contract;
 use App\Services\BriefingService;
 use App\Services\UserService;
@@ -16,6 +17,14 @@ use Illuminate\Support\Facades\Auth;
 
 class CreateDriverHandler extends AbstractCreateElementHandler implements CreateElementHandlerInterface
 {
+    /**
+     * @throws Exception
+     */
+    public function __construct()
+    {
+        parent::__construct('Driver');
+    }
+
     /**
      * @throws Exception
      */
@@ -33,7 +42,7 @@ class CreateDriverHandler extends AbstractCreateElementHandler implements Create
             ->where('fio', trim($data['fio']))
             ->first();
         if ($existItem) {
-            throw new Exception('Найден дубликат по ФИО Водителя');
+            throw new EntityAlreadyExistException('Найден дубликат по ФИО Водителя');
         }
 
         $validator = function (int $hashId) {

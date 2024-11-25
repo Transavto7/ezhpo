@@ -5,6 +5,7 @@ namespace App\Actions\Anketa;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
+use App\Enums\FlagPakEnum;
 use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
@@ -84,7 +85,7 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
             'realy' => 'да',
             'is_dop' => 0,
             'created_at' => $this->time,
-            'flag_pak' => 'СДПО А'
+            'flag_pak' => FlagPakEnum::SDPO_A
         ];
 
         $form = $this->mergeFormData($form, $defaultDatas);
@@ -182,7 +183,7 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
          * Выставляем ручной режим, если так пришло из ПАК
          */
         if ($form['type_anketa'] === FormTypeEnum::PAK_QUEUE) {
-            $form['flag_pak'] = 'СДПО Р';
+            $form['flag_pak'] = FlagPakEnum::SDPO_R;
         }
 
         /**
@@ -206,7 +207,7 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
         /**
          * ОТПРАВКА SMS
          */
-        $needNotify = $form['admitted'] === 'Не допущен' && $form['flag_pak'] !== 'СДПО Р';
+        $needNotify = $form['admitted'] === 'Не допущен' && $form['flag_pak'] !== FlagPakEnum::SDPO_R;
         if ($needNotify) {
             event(new DriverDismissed($formModel));
         }

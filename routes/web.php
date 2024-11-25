@@ -11,6 +11,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('show-edit-element-modal/{model}/{id}', 'IndexController@showEditModal')->name('showEditElementModal');
 
     Route::get('/', 'IndexController@index')->name('index');
+    Route::get('/openapi', 'OpenApiUiPageController@index')->name('index');
 
     Route::prefix('contract')->group(function () {
         Route::get('/', 'ContractController@view');

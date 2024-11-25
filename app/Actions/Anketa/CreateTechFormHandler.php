@@ -9,6 +9,7 @@ use App\Enums\BlockActionReasonsEnum;
 use App\Models\Forms\Form;
 use App\Models\Forms\TechForm;
 use App\Services\DuplicatesCheckerService;
+use App\Events\Forms\DriverDismissed;
 use App\Services\FormHash\FormHashGenerator;
 use App\Services\FormHash\TechHashData;
 use DateTimeImmutable;
@@ -73,6 +74,11 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
             if ($companyDop) {
                 $form['company_id'] = $companyDop->hash_id;
+            } elseif (! isset($form['driver_id'])) {
+                $errMsg = 'Компания не найдена';
+                $this->errors[] = $errMsg;
+
+                return;
             }
         }
 
@@ -86,7 +92,19 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
                 $form['driver_id'] = $driverDop->hash_id;
 
                 $driver = $driverDop;
+            } else {
+                $errMsg = 'Водитель не найден';
+                $this->errors[] = $errMsg;
+
+                return;
             }
+        }
+
+        if (isset($form['car_id']) && ! $car) {
+            $errMsg = 'Автомобиль не найден';
+            $this->errors[] = $errMsg;
+
+            return;
         }
 
         /**
@@ -190,5 +208,9 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         $formDetailsModel->save();
 
         $this->createdForms->push($formModel);
+
+        if ($form['point_reys_control'] === 'Не пройден') {
+            event(new DriverDismissed($formModel));
+        }
     }
 }

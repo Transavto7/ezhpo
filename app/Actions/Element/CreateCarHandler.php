@@ -7,12 +7,21 @@ use App\Company;
 use App\Enums\UserActionTypesEnum;
 use App\Events\Relations\Attached;
 use App\Events\UserActions\ClientAddRecord;
+use App\Exceptions\EntityAlreadyExistException;
 use App\Models\Contract;
 use Auth;
 use Exception;
 
 class CreateCarHandler extends AbstractCreateElementHandler implements CreateElementHandlerInterface
 {
+    /**
+     * @throws Exception
+     */
+    public function __construct()
+    {
+        parent::__construct('Car');
+    }
+
     /**
      * @throws Exception
      */
@@ -29,7 +38,7 @@ class CreateCarHandler extends AbstractCreateElementHandler implements CreateEle
             ->where('gos_number', trim($data['gos_number']))
             ->first();
         if ($existItem) {
-            throw new Exception('Найден дубликат по гос.номеру Автомобиля');
+            throw new EntityAlreadyExistException('Найден дубликат по гос.номеру Автомобиля');
         }
 
         $validator = function (int $hashId) {

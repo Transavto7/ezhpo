@@ -5,6 +5,7 @@ namespace App\Actions\Anketa;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
+use App\Enums\FlagPakEnum;
 use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
 use App\Models\Forms\Form;
@@ -72,13 +73,13 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             'med_view' => 'В норме',
             'admitted' => 'Допущен',
             'realy' => 'нет',
-            'created_at' => $this->time
+            'created_at' => $this->time,
+            'flag_pak' => FlagPakEnum::INTERNAL,
         ];
 
         $form = $this->mergeFormData($form, $defaultData);
         $form['is_dop'] = $form['is_dop'] ?? 0;
 
-        $company = null;
         /**
          * Компания
          */
@@ -88,6 +89,10 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             if ($companyDop) {
                 $form['company_id'] = $companyDop->hash_id;
                 $form['company_name'] = $companyDop->name;
+            } elseif (! isset($form['driver_id'])) {
+                $this->errors[] = 'Компания не найдена';
+
+                return;
             }
         }
 

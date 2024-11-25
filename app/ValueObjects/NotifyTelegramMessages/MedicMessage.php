@@ -1,11 +1,21 @@
 <?php
 
-namespace App\ValueObjects;
+namespace App\ValueObjects\NotifyTelegramMessages;
 
 use DateTimeImmutable;
 
-class NotifyTelegramMessage
+class MedicMessage implements MessageInterface
 {
+    /**
+     * @var string
+     */
+    private $responsiblePerson;
+
+    /**
+     * @var array
+     */
+    private $reasons;
+
     /**
      * @var int
      */
@@ -52,6 +62,8 @@ class NotifyTelegramMessage
     private $closingUrl;
 
     /**
+     * @param string $responsiblePerson
+     * @param array $reasons
      * @param int $formId
      * @param string $companyId
      * @param string $companyName
@@ -62,8 +74,22 @@ class NotifyTelegramMessage
      * @param string $protokolUrl
      * @param string $closingUrl
      */
-    public function __construct(int $formId, string $companyId, string $companyName, string $driverFullName, DateTimeImmutable $formDate, string $pointName, string $medicFullName, string $protokolUrl, string $closingUrl)
+    public function __construct(
+        string $responsiblePerson,
+        array $reasons,
+        int $formId,
+        string $companyId,
+        string $companyName,
+        string $driverFullName,
+        DateTimeImmutable $formDate,
+        string $pointName,
+        string $medicFullName,
+        string $protokolUrl,
+        string $closingUrl
+    )
     {
+        $this->responsiblePerson = $responsiblePerson;
+        $this->reasons = $reasons;
         $this->formId = $formId;
         $this->companyHashId = $companyId;
         $this->companyName = $companyName;
@@ -80,19 +106,25 @@ class NotifyTelegramMessage
         $date = $this->formDate->format("Y-m-d H:i:s");
 
         $lines = [
-            "Поступил осмотр с отстранением по алкоголю.",
+            "*Ответственный за компанию — $this->responsiblePerson.*",
+            "Поступил медосмотр с отстранением по причине: _{$this->reasonsToString()}_.",
             "ID осмотра — $this->formId.",
             "ID компании — $this->companyHashId.",
             "Название компании — $this->companyName.",
-            "ФИО водителя - $this->driverFullName.",
+            "ФИО водителя — $this->driverFullName.",
             "Время осмотра — $date.",
             "Пункт выпуска — $this->pointName.",
-            "Медицинский сотрудник  — $this->medicFullName.",
+            "Сотрудник — $this->medicFullName.",
             "Документы:",
-            "- заключение $this->closingUrl;",
-            "- протокол $this->protokolUrl."
+            "— заключение $this->closingUrl;",
+            "— протокол $this->protokolUrl."
         ];
 
         return implode("\n", $lines);
+    }
+
+    private function reasonsToString(): string
+    {
+        return implode(', ', $this->reasons);
     }
 }

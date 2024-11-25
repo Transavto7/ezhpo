@@ -5,6 +5,11 @@ namespace App\Models\Forms;
 use App\Enums\FormTypeEnum;
 use App\User;
 use App\ValueObjects\NotAdmittedReasons;
+use App\ValueObjects\PressureLimits;
+use App\ValueObjects\Pulse;
+use App\ValueObjects\PulseLimits;
+use App\ValueObjects\Temperature;
+use App\ValueObjects\Tonometer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -72,6 +77,46 @@ class MedicForm extends Model
     public function getNotAdmittedReasonsAttribute(): array
     {
         return NotAdmittedReasons::fromForm($this)->getReasons();
+    }
+
+    public function getDismissedReasonAttribute(): array
+    {
+        if (($this->attributes['is_dop'] ?? 0) === 1) {
+            return [];
+        }
+
+        $result = [];
+        $driver = $this->form->driver;
+
+        if ($this->attributes['proba_alko'] === 'Положительно') {
+            $result[] = 'алкоголь';
+        }
+
+        if (($this->attributes['test_narko'] !== 'Отрицательно') && ($this->attributes['test_narko'] !== 'Не проводился')) {
+            $result[] = 'наркотики';
+        }
+
+        if ($this->attributes['med_view'] !== 'В норме') {
+            $result[] = 'состояние здоровья';
+        }
+
+        $pressure = Tonometer::fromString($this->attributes['tonometer']);
+        $pressureLimits = PressureLimits::create($driver);
+        if (!$pressure->isAdmitted($pressureLimits)) {
+            $result[] = 'давление';
+        }
+
+        $pulse = new Pulse(intval($this->attributes['pulse']));
+        $pulseLimits = PulseLimits::create($driver);
+        if (!$pulse->isAdmitted($pulseLimits)) {
+            $result[] = 'повышенный пульс';
+        }
+
+        if (!(new Temperature(floatval($this->attributes['t_people'])))->isAdmitted()) {
+            $result[] = 'повышенная температура';
+        }
+
+        return $result;
     }
 
     public function scopePakQueueByUser($query, User $user)

@@ -78,12 +78,6 @@ class HomeController extends Controller
             $forms = Form::query();
         }
 
-        if ($request->has('result_dop') && $request->input('result_dop') !== null) {
-            filter_var($request->input('result_dop'), FILTER_VALIDATE_BOOLEAN)
-                ? $forms->whereNotNull('result_dop')
-                : $forms->whereNull('result_dop');
-        }
-
         $formDetailsTable = Form::$relatedTables[$validTypeForm];
         $forms = $forms
             ->join($formDetailsTable, 'forms.uuid', '=', "$formDetailsTable.forms_uuid")
@@ -169,7 +163,6 @@ class HomeController extends Controller
             'typePrikaz',
             'page',
             'duplicates',
-            'result_dop',
         ]);
 
         $filtersToTablesMap = [
@@ -243,6 +236,13 @@ class HomeController extends Controller
                     $dateFrom = Carbon::parse($filterValue)->startOfDay();
                     $dateTo = Carbon::parse($filterValue)->endOfDay();
                     $forms = $forms->whereBetween('drivers.date_prmo', [$dateFrom, $dateTo]);
+                    continue;
+                }
+
+                if ($filterKey === 'result_dop') {
+                    filter_var($filterValue, FILTER_VALIDATE_BOOLEAN)
+                        ? $forms->whereNotNull('result_dop')
+                        : $forms->whereNull('result_dop');
                     continue;
                 }
 

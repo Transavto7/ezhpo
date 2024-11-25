@@ -2,6 +2,7 @@
 
 namespace App\Actions\PakQueue\ChangePakQueue;
 
+use App\Enums\FlagPakEnum;
 use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\Models\Forms\Form;
@@ -61,7 +62,7 @@ class ChangePakQueueHandler
         /** @var MedicForm $details */
         $details = $form->details;
 
-        $details->flag_pak = 'СДПО Р';
+        $details->flag_pak = FlagPakEnum::SDPO_R;
         $details->admitted = $action->getAdmitted();
 
         if ($details->admitted === 'Не идентифицирован') {

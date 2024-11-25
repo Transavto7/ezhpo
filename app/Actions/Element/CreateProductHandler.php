@@ -3,9 +3,18 @@
 namespace App\Actions\Element;
 
 use App\Product;
+use Exception;
 
 class CreateProductHandler extends AbstractCreateElementHandler implements CreateElementHandlerInterface
 {
+    /**
+     * @throws Exception
+     */
+    public function __construct()
+    {
+        parent::__construct('Product');
+    }
+
     public function handle($data)
     {
         $validator = function (int $hashId) {
