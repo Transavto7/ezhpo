@@ -25,7 +25,6 @@ class NotAdmittedReasons
             'test_narko',
             'med_view',
             't_people',
-            'driver_id',
             'pulse',
             'tonometer'
         ]) + ['driver_id' => $form->form->driver_id]);
