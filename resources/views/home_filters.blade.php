@@ -57,7 +57,7 @@
 
                         @if(View::exists($field_view))
                             @include($field_view, [
-                                'field_default_value' => request()->get($field_view_key, 'Не установлено')
+                                'field_default_value' => request()->get($field_view_key, null)
                             ])
                         @else
                             {{--ИЗНАЧАЛЬНОЕ ПОЛЕ ФИЛЬТР--}}
@@ -137,7 +137,7 @@
 
                     @if(View::exists($field_view))
                         @include($field_view, [
-                            'field_default_value' => request()->get($field_view_key, 'Не установлено')
+                            'field_default_value' => request()->get($field_view_key, null)
                         ])
                     @else
                         {{--ИЗНАЧАЛЬНОЕ ПОЛЕ ФИЛЬТР--}}
