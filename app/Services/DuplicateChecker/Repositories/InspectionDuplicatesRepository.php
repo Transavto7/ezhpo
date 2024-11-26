@@ -38,6 +38,7 @@ class InspectionDuplicatesRepository implements DuplicateRepository
             })
             ->where(DB::raw('DATE(date)'), '=', $inspection->getDate()->format('Y-m-d'))
             ->where("$table.type_view", '=', $inspection->getType())
+            ->whereNull('forms.deleted_at')
             ->get();
     }
 }
