@@ -810,4 +810,11 @@ class SdpoController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function getRandomWish()
+    {
+        $wishMessages = config('wishes.messages');
+        return response()
+            ->json(['wish_message' => $wishMessages[array_rand($wishMessages)]]);
+    }
 }

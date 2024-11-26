@@ -41,7 +41,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/get-user-from-token', function (Request $request) {
         $user = $request->user();
 
-        if($user->hasRole('terminal')) {
+        if ($user->hasRole('terminal')) {
             if (isset($request->token)) {
                 $user = User::where('api_token', $request->token)->first();
             }
@@ -53,7 +53,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/get-user/{user_id}', function (Request $request) {
         $user = $request->user();
 
-        if($user->hasRole('terminal')) {
+        if ($user->hasRole('terminal')) {
             $user_id = $request->user_id;
             $user = User::find($user_id);
 
@@ -91,7 +91,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('pvs/{id?}', function () {
         $id = isset(request()->id) ? request()->id : null;
 
-        if($id) {
+        if ($id) {
             $points = Point::find($id);
         } else {
             $points = Point::all();
@@ -152,6 +152,7 @@ Route::middleware(['auth:api', 'update-last-connection'])->prefix('sdpo')->name(
     Route::get('/medics', 'Api\SdpoController@getMedics');
 
     Route::post('/crash', 'Api\SdpoController@storeCrash');
+    Route::get('wish-message', 'Api\SdpoController@getRandomWish');
 });
 
 Route::get('/sdpo/check', 'Api\SdpoController@checkConnection');
