@@ -14,9 +14,6 @@ class DocDataService
     {
         $data = [
             'anketa_id' => $form->id,
-            'driver_fio' => '',
-            'driver_year_birthday' => '',
-            'driver_yb' => '',
             'driver_pv' => '',
             'company_name' => '',
             'user_name' => '',
@@ -38,7 +35,7 @@ class DocDataService
 
         $driver = Driver::withTrashed()->where('hash_id', $form->driver_id)->first();
         $data['driver'] = $driver;
-        $data['driver_year_birthday'] = $driver->year_birtday;
+        $data['driver_year_birthday'] = $driver->year_birthday;
         $data['driver_fio'] = $driver->fio;
 
         if ($details->test_narko === 'Положительно') {
