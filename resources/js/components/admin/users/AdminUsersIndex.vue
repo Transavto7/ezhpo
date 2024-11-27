@@ -562,6 +562,25 @@ export default {
                 },
             }).then(({data}) => {
                 if (!data.status) {
+                    let message = 'При сохранении произошла ошибка'
+
+                    if (typeof data.message === 'string') {
+                        message += ':</br></br>'
+                        message += data.message
+                    } else if (typeof data.message === 'object' && data.message !== null) {
+                        message += ':</br></br>';
+                        message += Object
+                            .values(data.message)
+                            .reduce((carry, fieldErrors) => {
+                                if (Array.isArray(fieldErrors)) {
+                                    return carry + (carry ? '</br>' : '') + fieldErrors.join('</br>')
+                                }
+                                return carry;
+                            }, '')
+                    }
+
+                    Swal2.fire('Ошибка', message, 'error');
+
                     return
                 }
 

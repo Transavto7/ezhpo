@@ -56,7 +56,11 @@ class CreateUserHandler
             ]
         ];
 
-        $validator = Validator::make($data, $rules);
+        $validator = Validator::make($data, $rules, [], [
+            'password' => 'Пароль',
+            'email' => 'E-mail',
+            'login' => 'Login',
+        ]);
 
         $validator->validate();
 
