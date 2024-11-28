@@ -169,7 +169,7 @@ class UserController extends Controller
      * */
     public function fetchUserData(Request $request): JsonResponse
     {
-        $result = User::query()
+        $result = User::withTrashed()
             ->with([
                 'roles',
                 'roles.permissions',

@@ -20,12 +20,18 @@ class CreateUserHandler
             $company = $data['company'];
         } else {
             $company = null;
-            $pv = $data['pv'];
+            $pv = $data['pv'] ?? null;
         }
 
         $userId = $data['user_id'] ?? null;
 
         $rules = [
+            'name' => [
+                'required',
+                'string',
+                'min:1',
+                'max:191'
+            ],
             'password' => [
                 'required_without:user_id',
                 'nullable',
@@ -46,7 +52,7 @@ class CreateUserHandler
                     : Rule::unique('users', 'login')->ignore($userId),
             ],
             'login' => [
-                'nullable',
+                'required',
                 'string',
                 'min:1',
                 'max:255',
@@ -56,11 +62,19 @@ class CreateUserHandler
             ]
         ];
 
-        $validator = Validator::make($data, $rules, [], [
-            'password' => 'Пароль',
-            'email' => 'E-mail',
-            'login' => 'Login',
-        ]);
+        $validator = Validator::make(
+            $data,
+            $rules,
+            [
+                'password.required_without' => 'Поле пароль обязательно при добавлении сотрудника'
+            ],
+            [
+                'name' => 'ФИО',
+                'password' => 'Пароль',
+                'email' => 'E-mail',
+                'login' => 'Login',
+            ]
+        );
 
         $validator->validate();
 
@@ -82,7 +96,7 @@ class CreateUserHandler
                 config('app.hash_generator.user.tries')
             );
         } else {
-            $user = User::find($userId);
+            $user = User::withTrashed()->find($userId);
         }
 
         if ($password = $data['password'] ?? null) {
@@ -95,11 +109,11 @@ class CreateUserHandler
 
         $user->name = $data['name'];
         $user->email = $data['email'];
-        $user->eds = $data['eds'];
-        $user->timezone = $data['timezone'];
+        $user->eds = $data['eds'] ?? null;
+        $user->timezone = $data['timezone'] ?? null;
         $user->blocked = $data['blocked'] ?? 0;
-        $user->validity_eds_start = $data['validity_eds_start'];
-        $user->validity_eds_end = $data['validity_eds_end'];
+        $user->validity_eds_start = $data['validity_eds_start'] ?? null;
+        $user->validity_eds_end = $data['validity_eds_end'] ?? null;
         $user->login = $data['login'] ?? $data['email'];
 
         $user->save();
@@ -112,7 +126,7 @@ class CreateUserHandler
         $user->save();
 
         /** @var User $user */
-        $user = User::query()
+        $user = User::withTrashed()
             ->with([
                 'roles',
                 'permissions',

@@ -562,14 +562,12 @@ export default {
                 },
             }).then(({data}) => {
                 if (!data.status) {
-                    let message = 'При сохранении произошла ошибка'
+                    let message
 
                     if (typeof data.message === 'string') {
-                        message += ':</br></br>'
-                        message += data.message
+                        message = data.message
                     } else if (typeof data.message === 'object' && data.message !== null) {
-                        message += ':</br></br>';
-                        message += Object
+                        message = Object
                             .values(data.message)
                             .reduce((carry, fieldErrors) => {
                                 if (Array.isArray(fieldErrors)) {
@@ -577,6 +575,8 @@ export default {
                                 }
                                 return carry;
                             }, '')
+                    } else {
+                        message = 'При сохранении произошла ошибка'
                     }
 
                     Swal2.fire('Ошибка', message, 'error');
