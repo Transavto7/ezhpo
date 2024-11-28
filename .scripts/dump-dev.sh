@@ -24,4 +24,8 @@ if [ "$HOUR" = "00" ]; then
     if [ ! -z "${RESERVE_DUMPS_SERVER}" ]; then
         scp $DUMP_PATH "${RESERVE_DUMPS_SERVER}/daily/"
     fi
+
+    if [ ! -z "${YDL_DUMPS_SERVER}" ]; then
+        scp $DUMP_PATH "${YDL_DUMPS_SERVER}"
+    fi
 fi
