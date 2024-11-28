@@ -536,30 +536,28 @@ export default {
         saveUser() {
             this.loading = true;
 
-            axios.get('/users/saveUser', {
-                params: {
-                    user_id: this.infoModalUser.id,
-                    name: this.infoModalUser.name,
-                    login: this.infoModalUser.login,
-                    email: this.infoModalUser.email,
-                    eds: this.infoModalUser.eds,
-                    timezone: this.infoModalUser.timezone,
-                    password: this.infoModalUser.password,
-                    pv: this.infoModalUser.pv,
-                    pvs: this.infoModalUser.pvs,
-                    company: this.infoModalUser.company?.id,
-                    roles: this.infoModalUser_roles.map((item) => {
-                        return item.id;
-                    }),
-                    blocked: this.infoModalUser.blocked,
-                    validity_eds_start: this.infoModalUser.validity_eds_start,
-                    validity_eds_end: this.infoModalUser.validity_eds_end,
-                    permissions: this.infoModalUser.permissions.filter((item) => {
-                        return !(this.allPermissions.filter((all_prm) => {
-                            return all_prm.id == item
-                        })[0]?.disable)
-                    }),
-                },
+            axios.post('/users/saveUser', {
+                user_id: this.infoModalUser.id,
+                name: this.infoModalUser.name,
+                login: this.infoModalUser.login,
+                email: this.infoModalUser.email,
+                eds: this.infoModalUser.eds,
+                timezone: this.infoModalUser.timezone,
+                password: this.infoModalUser.password,
+                pv: this.infoModalUser.pv ?? null,
+                pvs: this.infoModalUser.pvs,
+                company: this.infoModalUser.company?.id ?? null,
+                roles: this.infoModalUser_roles.map((item) => {
+                    return item.id;
+                }),
+                blocked: this.infoModalUser.blocked,
+                validity_eds_start: this.infoModalUser.validity_eds_start ?? null,
+                validity_eds_end: this.infoModalUser.validity_eds_end ?? null,
+                permissions: this.infoModalUser.permissions.filter((item) => {
+                    return !(this.allPermissions.filter((all_prm) => {
+                        return all_prm.id == item
+                    })[0]?.disable)
+                }),
             }).then(({data}) => {
                 if (!data.status) {
                     let message

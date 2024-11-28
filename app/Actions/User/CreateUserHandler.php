@@ -43,19 +43,13 @@ class CreateUserHandler
                 'required',
                 'string',
                 'min:1',
-                'max:255',
-                empty($userId)
-                    ? Rule::unique('users')
-                    : Rule::unique('users')->ignore($userId),
-                empty($userId)
-                    ? Rule::unique('users', 'login')
-                    : Rule::unique('users', 'login')->ignore($userId),
+                'max:191',
             ],
             'login' => [
                 'required',
                 'string',
                 'min:1',
-                'max:255',
+                'max:191',
                 empty($userId)
                     ? Rule::unique('users')
                     : Rule::unique('users')->ignore($userId),
@@ -70,9 +64,9 @@ class CreateUserHandler
             ],
             [
                 'name' => 'ФИО',
-                'password' => 'Пароль',
-                'email' => 'E-mail',
-                'login' => 'Login',
+                'password' => 'пароль',
+                'email' => 'e-mail',
+                'login' => 'login',
             ]
         );
 
