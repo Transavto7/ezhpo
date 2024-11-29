@@ -456,7 +456,7 @@
         || user()->access('errors_sdpo_update') && $type_ankets == FormTypeEnum::PAK
     );
 
-    $permissionToExport = !user()->hasRole('client') && (
+    $permissionToExport = (
         $type_ankets == FormTypeEnum::TECH && user()->access('tech_export')
         || $type_ankets == FormTypeEnum::MEDIC && user()->access('medic_export')
         || $type_ankets == FormTypeEnum::BDD && user()->access('journal_briefing_bdd_export')
@@ -464,7 +464,7 @@
         || $type_ankets == FormTypeEnum::REPORT_CARD && user()->access('map_report_export')
     );
 
-    $permissionToExportPrikaz = !user()->hasRole('client') && (
+    $permissionToExportPrikaz = (
         $type_ankets == FormTypeEnum::TECH && user()->access('tech_export_prikaz')
         || $type_ankets == FormTypeEnum::MEDIC && user()->access('medic_export_prikaz')
         || $type_ankets == FormTypeEnum::BDD && user()->access('journal_briefing_bdd_export_prikaz')
@@ -472,7 +472,7 @@
         || $type_ankets == FormTypeEnum::REPORT_CARD && user()->access('map_report_export_prikaz')
     );
 
-    $permissionToExportPrikazPL = !user()->hasRole('client') && (
+    $permissionToExportPrikazPL = (
         $type_ankets == FormTypeEnum::TECH && user()->access('tech_export_prikaz_pl')
     );
 
