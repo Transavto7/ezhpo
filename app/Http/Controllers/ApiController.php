@@ -21,7 +21,9 @@ class ApiController extends Controller
             "Driver" => "fio",
             "Car" => "gos_number",
             "Product" => "name",
-            "Instr" => "name"
+            "Instr" => "name",
+            'Stamp' => 'name',
+            'Req' => 'name',
         ];
 
         $field = 'name';

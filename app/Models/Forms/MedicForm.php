@@ -2,7 +2,9 @@
 
 namespace App\Models\Forms;
 
+use App\Enums\FlagPakEnum;
 use App\Enums\FormTypeEnum;
+use App\Stamp;
 use App\User;
 use App\ValueObjects\NotAdmittedReasons;
 use App\ValueObjects\PressureLimits;
@@ -133,5 +135,32 @@ class MedicForm extends Model
         } else {
             $query->where('forms.user_id', $user->id);
         }
+    }
+
+    public function getStamp(): ?Stamp
+    {
+        if ($this->getAttribute('flag_pak') !== FlagPakEnum::INTERNAL) {
+            $terminal = $this->terminal;
+
+            if ($terminal) {
+                $terminalStamp = $terminal->stamp;
+
+                if ($terminalStamp) {
+                    return $terminalStamp;
+                }
+            }
+        }
+
+        $pointStamp = $this->form->point->stamp;
+        if ($pointStamp) {
+            return $pointStamp;
+        }
+
+        $townStamp = $this->form->point->town->stamp;
+        if ($townStamp) {
+            return $townStamp;
+        }
+
+        return null;
     }
 }

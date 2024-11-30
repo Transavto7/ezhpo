@@ -18,6 +18,7 @@ class Car extends Model
             'gos_number',
             'mark_model',
             'type_auto',
+            'official_type_auto',
             'products_id',
             'trailer',
             'company_id',

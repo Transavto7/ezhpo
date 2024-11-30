@@ -15,6 +15,7 @@ class Point extends Model
             'hash_id',
             'name',
             'pv_id',
+            'stamp_id',
             'company_id',
             'deleted_at',
             'auto_created'
@@ -64,4 +65,8 @@ class Point extends Model
             ->toArray();
     }
 
+    public function stamp(): BelongsTo
+    {
+        return $this->belongsTo(Stamp::class);
+    }
 }

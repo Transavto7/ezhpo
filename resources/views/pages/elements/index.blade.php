@@ -466,6 +466,8 @@
                                         {{ app('App\Town')->getName($el->pv_id) }}
                                     @elseif ($field->field === 'products_id')
                                         {{ app('App\Product')->getName($el->products_id) }}
+                                    @elseif ($field->field === 'stamp_id')
+                                        {{ app('App\Stamp')->getName($el->stamp_id) }}
                                     @elseif ($field->field === 'essence')
                                         {{ app('App\Product')::$essence[$el->essence] ?? ''  }}
                                     @elseif ( $field->field === 'contracts')

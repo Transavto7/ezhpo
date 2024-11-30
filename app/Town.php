@@ -15,6 +15,7 @@ class Town extends Model
         = [
             'id',
             'hash_id',
+            'stamp_id',
             'name',
             'deleted_id',
             'deleted_at',
@@ -55,5 +56,10 @@ class Town extends Model
             ->toArray();
 
         return implode(', ', $data) ?? '';
+    }
+
+    public function stamp(): BelongsTo
+    {
+        return $this->belongsTo(Stamp::class);
     }
 }

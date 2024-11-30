@@ -175,7 +175,6 @@ class Anketa extends Model
                 'admitted'   => 'Заключение о результатах осмотра',
                 'photos'     => 'Фото',
                 'videos'     => 'Видео',
-
             ],
         ];
 
@@ -292,7 +291,7 @@ class Anketa extends Model
             'pv_id',
             'user_eds',
             'signature',
-        ]
+        ],
     ];
 
     public static $fieldsKeys

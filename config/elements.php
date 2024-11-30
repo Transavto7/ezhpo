@@ -21,6 +21,14 @@ return [
                 'type' => 'text',
                 'hideFilter' => 1
             ],
+            'stamp_id' => [
+                'label' => 'Штамп',
+                'type' => 'select',
+                'values' => 'Stamp',
+                'getField' => 'name',
+                'getFieldKey' => 'id',
+                'concatField' => null,
+            ],
         ],
     ],
 
@@ -59,6 +67,14 @@ return [
                 'getFieldKey' => 'id',
                 'concatField' => 'hash_id',
                 'noRequired' => 1,
+            ],
+            'stamp_id' => [
+                'label' => 'Штамп',
+                'type' => 'select',
+                'values' => 'Stamp',
+                'getField' => 'name',
+                'getFieldKey' => 'id',
+                'concatField' => null,
             ],
         ],
     ],
@@ -439,6 +455,11 @@ return [
                     'Е - прицепы' => 'Е - прицепы',
                 ],
                 'defaultValue' => 'Не установлено',
+            ],
+            'official_type_auto' => [
+                'label' => 'Категория Т\С (из документов)',
+                'type' => 'text',
+                'noRequired' => 1
             ],
             'trailer' => [
                 'label' => 'Прицеп',

@@ -153,6 +153,22 @@ Route::middleware(['auth'])->group(function () {
         Route::get('anketa-mass-trash', 'AnketsController@MassTrash')->name('forms.mass-trash');
 
         Route::post('ankets-export-pdf-labeling', 'AnketsController@exportPdfLabeling')->name('ankets.export-pdf-labeling');
+
+        Route::prefix('trip-tickets')->as('trip-tickets.')->group(function () {
+            Route::get('/', 'TripTickets\TripTicketIndexPageController')->name('index');
+            Route::post('generate', 'TripTickets\TripTicketGenerateFromFormsController')->name('generate');
+            Route::get('create', 'TripTickets\TripTicketCreatePage')->name('create');
+            Route::post('store', 'TripTickets\StoreTripTicketController')->name('store');
+            Route::get('{id}/edit', 'TripTickets\TripTicketEditPageController')->name('edit');
+            Route::post('{id}/update', 'TripTickets\UpdateTripTicketController')->name('update');
+            Route::get('trash', 'TripTickets\TripTicketTrashController')->name('trash');
+            Route::get('mass-trash', 'TripTickets\TripTicketMassTrashController')->name('mass-trash');
+            Route::get('{id}/{type}', 'TripTickets\TripTicketCreateFormPageController')->name('create-form');
+            Route::post('{id}/store-form', 'TripTickets\TripTicketStoreFormController')->name('store-form');
+            Route::post('print', 'TripTickets\PrintTripTicketController')->name('print');
+            Route::post('mass-print', 'TripTickets\MassPrintTripTicketsController')->name('mass-print');
+            Route::get('table-export', 'TripTickets\TripTicketTableExportController')->name('table-export');
+        });
     });
 
     /**
