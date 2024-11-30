@@ -152,6 +152,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('anketa-mass-trash', 'AnketsController@MassTrash')->name('forms.mass-trash');
 
         Route::post('ankets-export-pdf-labeling', 'AnketsController@exportPdfLabeling')->name('ankets.export-pdf-labeling');
+
+        Route::prefix('trip-tickets')->as('trip-tickets.')->group(function () {
+            Route::get('/', 'TripTicketController@indexPage')->name('index');
+            Route::post('list', 'TripTicketController@list')->name('list');
+            Route::get('filters', 'TripTicketController@getFilters')->name('filters');
+        });
     });
 
     /**
