@@ -163,6 +163,12 @@
 
                     @if($user->access('journal_pl_read'))
                         <li>
+                            <a href="{{ route('trip-tickets.index') }}"><i class="fa fa-book"></i>Реестр путевых листов</a>
+                        </li>
+                    @endif
+
+                    @if($user->access('journal_pl_read'))
+                        <li>
                             <a href="{{ route('home', FormTypeEnum::PRINT_PL) }}"><i class="fa fa-book"></i>Журнал
                                 печати
                                 ПЛ</a>
