@@ -20,12 +20,18 @@ class CreateUserHandler
             $company = $data['company'];
         } else {
             $company = null;
-            $pv = $data['pv'];
+            $pv = $data['pv'] ?? null;
         }
 
         $userId = $data['user_id'] ?? null;
 
         $rules = [
+            'name' => [
+                'required',
+                'string',
+                'min:1',
+                'max:191'
+            ],
             'password' => [
                 'required_without:user_id',
                 'nullable',
@@ -37,26 +43,32 @@ class CreateUserHandler
                 'required',
                 'string',
                 'min:1',
-                'max:255',
-                empty($userId)
-                    ? Rule::unique('users')
-                    : Rule::unique('users')->ignore($userId),
-                empty($userId)
-                    ? Rule::unique('users', 'login')
-                    : Rule::unique('users', 'login')->ignore($userId),
+                'max:191',
             ],
             'login' => [
-                'nullable',
+                'required',
                 'string',
                 'min:1',
-                'max:255',
+                'max:191',
                 empty($userId)
                     ? Rule::unique('users')
                     : Rule::unique('users')->ignore($userId),
             ]
         ];
 
-        $validator = Validator::make($data, $rules);
+        $validator = Validator::make(
+            $data,
+            $rules,
+            [
+                'password.required_without' => 'Поле пароль обязательно при добавлении сотрудника'
+            ],
+            [
+                'name' => 'ФИО',
+                'password' => 'пароль',
+                'email' => 'e-mail',
+                'login' => 'login',
+            ]
+        );
 
         $validator->validate();
 
@@ -78,7 +90,7 @@ class CreateUserHandler
                 config('app.hash_generator.user.tries')
             );
         } else {
-            $user = User::find($userId);
+            $user = User::withTrashed()->find($userId);
         }
 
         if ($password = $data['password'] ?? null) {
@@ -91,11 +103,11 @@ class CreateUserHandler
 
         $user->name = $data['name'];
         $user->email = $data['email'];
-        $user->eds = $data['eds'];
-        $user->timezone = $data['timezone'];
+        $user->eds = $data['eds'] ?? null;
+        $user->timezone = $data['timezone'] ?? null;
         $user->blocked = $data['blocked'] ?? 0;
-        $user->validity_eds_start = $data['validity_eds_start'];
-        $user->validity_eds_end = $data['validity_eds_end'];
+        $user->validity_eds_start = $data['validity_eds_start'] ?? null;
+        $user->validity_eds_end = $data['validity_eds_end'] ?? null;
         $user->login = $data['login'] ?? $data['email'];
 
         $user->save();
@@ -108,7 +120,7 @@ class CreateUserHandler
         $user->save();
 
         /** @var User $user */
-        $user = User::query()
+        $user = User::withTrashed()
             ->with([
                 'roles',
                 'permissions',

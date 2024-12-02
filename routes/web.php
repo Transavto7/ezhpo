@@ -55,7 +55,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('fetchRoleData', 'UserController@fetchRoleData');
         Route::get('fetchUserData', 'UserController@fetchUserData');
         Route::post('return_trash', 'UserController@returnTrash');
-        Route::get('saveUser', 'UserController@saveUser');
+        Route::post('saveUser', 'UserController@saveUser');
     });
 
     Route::prefix('terminals')->as('terminals.')->group(function () {

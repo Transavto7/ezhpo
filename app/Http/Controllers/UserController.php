@@ -94,6 +94,10 @@ class UserController extends Controller
         $pointsToTable = $points->map(function ($model) {
             $option['label'] = $model->name;
 
+            if (!count($model->pvs)) {
+                $option['options'] = [];
+            }
+
             foreach ($model->pvs as $pv){
                 $option['options'][] = [
                     'value' => $pv['id'],
@@ -165,7 +169,7 @@ class UserController extends Controller
      * */
     public function fetchUserData(Request $request): JsonResponse
     {
-        $result = User::query()
+        $result = User::withTrashed()
             ->with([
                 'roles',
                 'roles.permissions',
