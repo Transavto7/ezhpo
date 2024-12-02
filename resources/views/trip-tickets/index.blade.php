@@ -230,8 +230,6 @@
                                  aria-labelledby="registry-update" style="display: none">
                                 <form action="{{ route('trip-tickets.generate') }}" method="GET"
                                       class="tab-content ankets-form-filter p-3">
-                                    <h4>Обновление реестра</h4>
-
                                     <div class="row">
                                         <div class="col-md-3">
                                             <div class="form-group">
@@ -356,9 +354,6 @@
                                  aria-labelledby="filter-group" style="display: none">
                                 <form onsubmit="document.querySelector('#page-preloader').classList.remove('hide')"
                                       action="" method="GET" class="tab-content ankets-form-filter p-3">
-
-                                    <h4>Фильтры</h4>
-
                                     <input type="hidden" name="filter" value="1">
 
                                     @if(request()->filled('trash'))
