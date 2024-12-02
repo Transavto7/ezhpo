@@ -10,39 +10,7 @@ class TripTicket extends Model
 {
     use SoftDeletes;
 
-    const TITLE = 'Реестр путевых листов';
-
     const SLUG = 'trip_ticket';
-
-    const FIELDS = [
-        'ticket_number' => 'Номер ПЛ',
-        'created_at' => 'Дата оформления',
-        'company_name' => 'Компания',
-        'start_date' => 'Дата начала действия',
-        'validity_period' => 'Дней действует',
-        'medic_form_id' => 'ID медосмотра',
-        'driver_name' => 'ФИО водителя',
-        'tech_form_id' => 'ID техосмотра',
-        'car_number' => 'Госномер Т/С',
-        'logistics_method' => 'Вид сообщения',
-        'transportation_type' => 'Вид перевозки',
-        'template_code' => 'Печатный шаблон',
-    ];
-
-    const TABLE_FIELD_KEYS = [
-        'ticket_number',
-        'created_at',
-        'company_name',
-        'start_date',
-        'validity_period',
-        'medic_form_id',
-        'driver_name',
-        'tech_form_id',
-        'car_number',
-        'logistics_method',
-        'transportation_type',
-        'template_code',
-    ];
 
     const FILTERS = [
         'ticket_number' => 'Номер ПЛ',
