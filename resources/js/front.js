@@ -409,7 +409,7 @@ $(document).ready(function () {
     initCroppies()
 
     // Подгрузка в полей в Журналах: CHOSEN
-    if (location.pathname.indexOf('home') > -1 || location.pathname.indexOf('trip-tickets') > -1) {
+    if (location.pathname.indexOf('home') > -1) {
         let path = location.origin + location.pathname;
 
         if (!path.endsWith('/')) {

@@ -4,12 +4,12 @@ namespace App\Enums;
 
 class TripTicketTemplateEnum
 {
-    const S_4 = '4_s';
+    const S4 = '4s';
 
     public static function labels(): array
     {
         return [
-            self::S_4 => '4_s',
+            self::S4 => '4-С',
         ];
     }
 }

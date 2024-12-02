@@ -20,9 +20,6 @@ class TripTicketController extends Controller
 
         $filterActivated = ! empty($request->get('filter'));
 
-        $fieldsKeys = TripTicket::FIELDS;
-        $formsFields = array_keys($fieldsKeys);
-
         $fieldPrompts = FieldPrompt::query()
             ->where('type', $type)
             ->orderBy('sort')
@@ -35,21 +32,17 @@ class TripTicketController extends Controller
         $orderKey = $request->get('orderKey', 'date');
         $orderBy = $request->get('orderBy', 'ASC');
 
-        return view('home', [
-            'title' => TripTicket::TITLE,
+        $filters = TripTicket::FILTERS;
+
+        return view('trip-tickets.index', [
+            'filters' => $filters,
+            'exclude' => [],
             'name' => $user->name,
-            'ankets' => $tripTickets,
+            'tripTickets' => $tripTickets,
             'filter_activated' => $filterActivated,
-            'type_ankets' => $type,
-            'anketsFields' => $formsFields,
-            'anketsFieldsTable' => TripTicket::TABLE_FIELD_KEYS,
-            'fieldsKeys' => $fieldsKeys,
             'fieldPrompts' => $fieldPrompts,
-            'fieldsGroupFirst' => TripTicket::FILTERS,
             'blockedToExportFields' => [],
-            'anketasCountResult' => $formsCountResult,
-            'typePrikaz' => $request->get('typePrikaz'),
-            'currentRole' => $type,
+            'tripTicketsCountResult' => $formsCountResult,
             'take' => $take,
             'orderBy' => $orderBy,
             'orderKey' => $orderKey,
@@ -57,18 +50,19 @@ class TripTicketController extends Controller
         ]);
     }
 
-    public function getFilters(Request $request)
+    public function editPage()
     {
-        $fields = TripTicket::TABLE_FIELD_KEYS;
-        $fieldsGroupFirst = TripTicket::FILTERS;
 
-        return view('home_filters', [
-            'anketsFields' => $fields,
-            'type_ankets' => TripTicket::SLUG,
-            'fieldsKeys' => $fieldsGroupFirst,
-            'fieldsGroupFirst' => $fieldsGroupFirst,
-            'exclude' => []
-        ]);
+    }
+
+    public function trash()
+    {
+
+    }
+
+    public function generate()
+    {
+
     }
 
     public function list(Request $request)
