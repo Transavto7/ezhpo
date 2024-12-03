@@ -536,6 +536,10 @@ return [
                 'concatField' => 'hash_id',
                 'getFieldKey' => 'hash_id'
             ],
+            'official_name' => [
+                'label' => 'Официальное название компании',
+                'type' => 'text',
+            ],
             'name' => [
                 'label' => 'Название компании',
                 'type' => 'text',
@@ -624,6 +628,28 @@ return [
             'inn' => [
                 'label' => 'ИНН',
                 'type' => 'text'
+            ],
+            'kpp' => [
+                'label' => 'КПП',
+                'type' => 'text',
+                'noRequired' => 1,
+            ],
+            'reqs_validated' => [
+                'label' => 'Корректные реквизиты',
+                'type' => 'select',
+                'values' => [
+                    0 => 'Нет',
+                    1 => 'Да',
+                ],
+            ],
+            'one_c_synced' => [
+                'label' => 'Синхронизация 1С',
+                'type' => 'select',
+                'values' => [
+                    \App\Enums\OneCSyncStatusEnum::NON_CREATED => 'Нет',
+                    \App\Enums\OneCSyncStatusEnum::NEED_UPDATE => 'Нужно обновление в 1С',
+                    \App\Enums\OneCSyncStatusEnum::SYNCED => 'Да',
+                ],
             ],
             'dismissed' => [
                 'label' => 'Временная блокировка',
