@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Actions\Reports\Journal\GetJournalData\GetJournalDataAction;
-use App\Actions\Reports\Journal\GetJournalData\GetJournalDataHandler;
+use App\Contractcs\GetServicesReportForCompanyByPeriodInterface;
 use App\Enums\ReportStatus;
 use App\Models\Report;
 use DateTimeImmutable;
@@ -37,7 +37,7 @@ class CreateReport implements ShouldQueue
      *
      * @return void
      */
-    public function handle(GetJournalDataHandler $handler)
+    public function handle(GetServicesReportForCompanyByPeriodInterface $handler)
     {
         try {
             $payload = $this->report->payload;

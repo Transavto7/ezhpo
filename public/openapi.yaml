@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: ЭЖПО API
   description: API для взаимодействия с ЭЖПО
-  version: 0.0.1
+  version: 0.0.2
 servers:
   - url: https://test.ta-7.ru
     description: Тестовый сервер
@@ -124,6 +124,7 @@ components:
         - hash_id
         - name
         - inn
+        - kpp
         - req_id
       properties:
         id:
@@ -140,10 +141,25 @@ components:
         inn:
           type: string
           description: ИНН компании
-          example: '1234567890'
+          example: '9204562727'
+        kpp:
+          type: string
+          nullable: true
+          description: КПП компании
+          example: '910401001'
         req_id:
           type: string
           example: '1'
+        ogrn:
+          type: string
+          nullable: true
+          description: ОГРН юридического лица
+          example: '313132804400022'
+        address:
+          type: string
+          nullable: true
+          description: Адрес
+          example: 'г. Москва, ул. Тверская, д. 1'
     ReportStatus:
       type: string
       description: Статус отчета

@@ -25,25 +25,19 @@
     @include('layouts.analytics.yandex-metric')
 
     <script>
+        window.API_TOKEN = '';
+        window.DADATA_TOKEN = '';
+
+        @auth
+            window.API_TOKEN = '{{ Auth::user()->api_token }}';
+            window.DADATA_TOKEN = '{{ config('services.dadata.token') }}';
+        @endauth
+
         window.PAGE_SETUP = {
             baseUrl: '{{ config('app.url') }}'
         }
         window.DOC_FIELDS = @json(config('docs.fields'));
-    </script>
 
-    @auth
-        <script type="text/javascript">
-            window.API_TOKEN = '{{ Auth::user()->api_token }}';
-        </script>
-    @endauth
-
-    @guest
-        <script type="text/javascript">
-            window.API_TOKEN = '';
-        </script>
-    @endguest
-
-    <script type="text/javascript">
         window.addEventListener("load", function (event) {
             const preloader = document.querySelector('#page-preloader');
             preloader.classList.add('hide');

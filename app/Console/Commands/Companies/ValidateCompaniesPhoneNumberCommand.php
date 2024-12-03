@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Companies;
 
 use App\Company;
 use App\ValueObjects\Phone;
@@ -13,7 +13,7 @@ class ValidateCompaniesPhoneNumberCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'company:validate-phones
+    protected $signature = 'companies:validate-phones
                             {--update : Обновить валидные номера}
                             {--show : Показать валидные номера}';
 

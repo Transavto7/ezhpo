@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Element\CreateElementHandlerFactory;
+use App\Actions\Element\Remove\RemoveElementHandlerFactory;
 use App\Actions\Element\SyncFieldsHandler;
 use App\Actions\Element\Update\UpdateElementHandlerFactory;
 use App\Car;
@@ -12,8 +13,10 @@ use App\Enums\LogActionTypesEnum;
 use App\FieldPrompt;
 use App\Point;
 use App\User;
+use App\ValueObjects\CompanyReqs;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -158,29 +161,14 @@ class IndexController extends Controller
         }
     }
 
-    public function RemoveElement(Request $request): RedirectResponse
+    public function RemoveElement(Request $request, RemoveElementHandlerFactory $factory): RedirectResponse
     {
         try {
-            $model = $request->type;
-            $id = $request->id;
-
-            $modelClass = app("App\\$model");
-            if (!$modelClass) {
-                throw new Exception("Модель $model не найдена");
-            }
-
-            $existModel = $modelClass::withTrashed()->find($id);
-            if (!$existModel) {
-                throw new Exception("Модель $model с ID $id не найдена");
-            }
+            $handler = $factory->make($request->type);
 
             DB::beginTransaction();
 
-            if ($request->get('undo')) {
-                $existModel->restore();
-            } else {
-                $existModel->delete();
-            }
+            $handler->handle($request->id, !$request->undo);
 
             DB::commit();
 
@@ -328,10 +316,12 @@ class IndexController extends Controller
             $query = $query->with(['contracts.services']);
         }
 
+        $element = $query->find($id);
+
         $page = $this->elements[$model];
         $page['model'] = $model;
         $page['id'] = $id;
-        $page['el'] = $query->find($id);
+        $page['el'] = $element;
 
         $disabledFields = [];
         if (($model === 'Company') && (user()->hasRole('client') || !user()->access('company_update_pressure_fields'))) {
@@ -355,12 +345,37 @@ class IndexController extends Controller
             $disabledFields[] = 'pressure_systolic';
             $disabledFields[] = 'pressure_diastolic';
         }
+
+        /** @var Model|null $element */
+        if (($model === 'Company') && $element->getAttribute('reqs_validated')) {
+            $disabledFields[] = 'inn';
+            $disabledFields[] = 'kpp';
+            $disabledFields[] = 'ogrn';
+
+            $companyReqs = new CompanyReqs(
+                $element->getAttribute('inn'),
+            $element->getAttribute('kpp') ?? '',
+                $element->getAttribute('ogrn') ?? '',
+            );
+
+            if ($companyReqs->isOrganizationFormat()) {
+                $disabledFields[] = 'official_name';
+            }
+        }
+
+        /** @var Model|null $element */
+        if (($model === 'Company') && !user()->access('companies_access_field_note')) {
+            $disabledFields[] = 'note';
+        }
+
         $page['disabledFields'] = $disabledFields;
 
         $fieldsToSkip = [
             'essence',
             'hash_id',
-            'id'
+            'id',
+            'reqs_validated',
+            'one_c_synced'
         ];
         if (user()->hasRole('client')) {
             $fieldsToSkip[] = 'products_id';
@@ -580,7 +595,11 @@ class IndexController extends Controller
         $data['otherRoles'][] = 'manager';
         $data['otherRoles'][] = 'admin';
         $data['queryString'] = Arr::query(array_filter($request->except([$oKey, $oBy])));
-        $data['fieldPrompts'] = FieldPrompt::where('type', strtolower($model))->get();
+        $data['fieldPrompts'] = FieldPrompt::query()
+            ->where('type', strtolower($model))
+            ->orderBy('sort')
+            ->orderBy('id')
+            ->get();
         $data['isAdminOrClient'] = $isAdminOrClient;
 
         return view('pages.elements.index', $data);

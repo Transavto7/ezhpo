@@ -35,8 +35,7 @@ class ReportHandler
 
     private function isCompanyValid(string $companyId): bool
     {
-        $company = Company::where('hash_id', $companyId)
-            ->where('dismissed', '=', 'Нет');
+        $company = Company::where('hash_id', $companyId);
 
         return $company->count() > 0;
     }

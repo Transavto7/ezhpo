@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Anketa;
 use App\Car;
 use App\Company;
+use App\Contractcs\GetServicesReportForCompanyByPeriodInterface;
 use App\Driver;
 use App\Models\Contract;
 use App\Observers\AnketaObserver;
@@ -13,9 +14,14 @@ use App\Observers\CompanyObserver;
 use App\Observers\ContractObserver;
 use App\Observers\DriverObserver;
 use App\Observers\UserObserver;
+use App\Services\CompanyReqsChecker\CompanyReqsCheckerInterface;
+use App\Services\CompanyReqsChecker\DaDataCompanyReqsChecker;
 use App\Services\ElementsSearch\ElementSearchService;
 use App\Services\ElementsSearch\ElementsSearchServiceInterface;
 use App\Services\HashIdGenerator\HashIdGeneratorService;
+use App\Services\OneC\CompanySync\CompanySyncService;
+use App\Services\OneC\CompanySync\CompanySyncServiceInterface;
+use App\Services\OneC\Reports\GetServicesReportForCompanyByPeriod;
 use App\Services\QRCode\QRCodeGenerator;
 use App\Services\QRCode\QRCodeGeneratorInterface;
 use App\User;
@@ -24,6 +30,13 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    public $bindings = [
+        CompanySyncServiceInterface::class => CompanySyncService::class,
+        CompanyReqsCheckerInterface::class => DaDataCompanyReqsChecker::class,
+        ElementsSearchServiceInterface::class => ElementSearchService::class,
+        QRCodeGeneratorInterface::class => QRCodeGenerator::class,
+        GetServicesReportForCompanyByPeriodInterface::class => GetServicesReportForCompanyByPeriod::class
+    ];
     /**
      * Register any application services.
      *
@@ -34,9 +47,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('hash-id-generator', function () {
             return new HashIdGeneratorService();
         });
-
-        $this->app->bind(ElementsSearchServiceInterface::class, ElementSearchService::class);
-        $this->app->bind(QRCodeGeneratorInterface::class, QRCodeGenerator::class);
     }
 
     /**

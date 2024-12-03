@@ -26,7 +26,6 @@
     @include('modals.export-modal', ['model' => $model])
     @if($errors->any())
         <div class="alert alert-danger" role="alert">
-            <i class="mdi mdi-block-helper mr-2"></i> Ошибка валидации.
             {!! implode('', $errors->all('<div>:message</div>')) !!}
         </div>
     @endif
@@ -329,12 +328,6 @@
         @dump('Нет доступа для просмотра')
     @else
         <div class="card table-card my-4">
-            @error('errors')
-            <div class="text-red">
-                <b>{{ $errors->first('errors') }}</b>
-            </div>
-            @enderror
-
             <div class="card-body">
                 <table id="elements-table" class="table table-striped table-sm">
                     <thead>
@@ -454,6 +447,10 @@
                                                     @endif
                                                 </a>
                                         </nobr>
+                                    @elseif($field->field === 'reqs_validated' && $model === 'Company')
+                                        {{ $el[$field->field] == 1 ? 'Да' : 'Нет' }}
+                                    @elseif($field->field === 'one_c_synced' && $model === 'Company')
+                                        {{ \App\Enums\OneCSyncStatusEnum::getTitle($el[$field->field]) }}
                                     @elseif ($field->field === 'user_id')
                                         {{ app('App\User')->getName($el->user_id, false) }}
                                     @elseif ($field->field === 'req_id')
