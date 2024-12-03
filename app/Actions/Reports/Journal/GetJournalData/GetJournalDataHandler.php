@@ -2,11 +2,12 @@
 
 namespace App\Actions\Reports\Journal\GetJournalData;
 
+use App\Contractcs\GetServicesReportForCompanyByPeriodInterface;
 use App\Enums\FormTypeEnum;
 use App\Models\Forms\Form;
 use Carbon\Carbon;
 
-class GetJournalDataHandler
+class GetJournalDataHandler implements GetServicesReportForCompanyByPeriodInterface
 {
     /**
      * @var \Illuminate\Support\Carbon

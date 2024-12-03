@@ -1233,31 +1233,40 @@ $(document).ready(function () {
         triggerField()
     })
 
-    function initCompanyNameSuggestion(companyNameInput, innInput) {
-        if (!companyNameInput) return;
+    function initCompanyNameSuggestion(companyOfficialNameInput, innInput, kppInput, nameInput) {
+        if (!companyOfficialNameInput) return;
 
         if (!innInput) return;
 
-        companyNameInput.suggestions({
-            //TODO: вынести в енв
-            token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
+        companyOfficialNameInput.suggestions({
+            token: window.DADATA_TOKEN,
             type: "PARTY",
+            count: 20,
             /* Вызывается, когда пользователь выбирает одну из подсказок */
             onSelect: function (suggestion) {
                 if (!suggestion.data) {
                     return
                 }
 
-                console.log('test', suggestion)
-
-                const {inn} = suggestion.data
+                const {name,inn,kpp} = suggestion.data
 
                 innInput.val(inn)
+                kppInput.val(kpp)
+                nameInput.val(name.short_with_opf)
+            },
+            /* Определяет текст, подставляемый в инпут при выборе одной из подсказок */
+            formatSelected: function (suggestion) {
+                return suggestion?.data?.name?.full_with_opf
             }
         });
     }
 
-    initCompanyNameSuggestion($('*[data-field="Company_name"]'), $('#elements-modal-add input[name="inn"]'))
+    initCompanyNameSuggestion(
+        $('#elements-modal-add input[data-field="Company_official_name"]'),
+        $('#elements-modal-add input[name="inn"]'),
+        $('#elements-modal-add input[name="kpp"]'),
+        $('#elements-modal-add input[name="name"]')
+    )
 
     $('.header #toggle-btn').each(function () {
         let localStatusSidebar = () => {
@@ -1300,7 +1309,12 @@ $(document).ready(function () {
             .then(({data}) => {
                 modalContent.text('').append(data);
                 LIBS.initAll()
-                initCompanyNameSuggestion($('#modalEditor *[data-field="Company_name"]'), $('#modalEditor input[name="inn"]'))
+                initCompanyNameSuggestion(
+                    $('#modalEditor textarea[data-field="Company_official_name"]'),
+                    $('#modalEditor input[name="inn"]'),
+                    $('#modalEditor input[name="kpp"]'),
+                    $('#modalEditor textarea[name="name"]')
+                )
             })
 
     })

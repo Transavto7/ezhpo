@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f084ba83b247edc3df35672677adb55d",
+    "content-hash": "f18257384737204ebfedaee01a00b17a",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -1735,6 +1735,56 @@
                 }
             ],
             "time": "2024-07-18T11:15:46+00:00"
+        },
+        {
+            "name": "hflabs/dadata",
+            "version": "24.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hflabs/dadata-php.git",
+                "reference": "b73e6dc334dbf2f4170d5b6d760d722eda5b57f2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hflabs/dadata-php/zipball/b73e6dc334dbf2f4170d5b6d760d722eda5b57f2",
+                "reference": "b73e6dc334dbf2f4170d5b6d760d722eda5b57f2",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "~6.0|^7.0",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Dadata\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "HFLabs and contributors",
+                    "homepage": "https://github.com/hflabs/dadata-php/contributors"
+                }
+            ],
+            "description": "Data cleansing, enrichment and suggestions via Dadata API",
+            "homepage": "https://github.com/nalgeon/dadata-php",
+            "keywords": [
+                "DaData",
+                "api",
+                "php",
+                "suggestions"
+            ],
+            "support": {
+                "source": "https://github.com/hflabs/dadata-php/tree/24.4.0"
+            },
+            "time": "2024-04-11T06:57:31+00:00"
         },
         {
             "name": "http-interop/http-factory-guzzle",

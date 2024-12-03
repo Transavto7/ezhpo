@@ -11,18 +11,25 @@
                 @if(isset($v['hidden']) || in_array($k, $fieldsToSkip))
                     @continue
                 @endif
-                @if(($k === 'name') && $model === 'Company')
-                    <div class="form-group" data-field="name">
+                @php
+                    $is_required = !isset($v['noRequired']);
+                @endphp
+                @if(in_array($k, ['name', 'official_name', 'note', 'comment']) && $model === 'Company')
+                    <div class="form-group" data-field="{{ $k }}">
                         <label>
+                            @if($is_required)
+                                <b class="text-danger text-bold">* </b>
+                            @endif
                             {{ $v['label'] }}
                         </label>
-                        <textarea name="name"
+                        <textarea name="{{ $k }}"
+                                  @if($is_required) required @endif
+                                  @if(in_array($k, $disabledFields)) disabled @endif
                                   data-label="{{ $v['label'] }}"
                                   placeholder="{{ $v['label'] }}"
-                                  data-field="Company_name"
-                                  class="form-control">
-                        {{ $el[$k] ?? '' }}
-                    </textarea>
+                                  data-field="Company_{{ $k }}"
+                                  class="form-control">{{ $el[$k] ?? '' }}
+                        </textarea>
                     </div>
                     @continue
                 @endif
@@ -36,28 +43,12 @@
                                   data-label="{{ $v['label'] }}"
                                   placeholder="{{ $v['label'] }}"
                                   data-field="Company_note"
-                                  class="form-control">
-                            {{ $el[$k] ?? '' }}
+                                  class="form-control">{{ $el[$k] ?? '' }}
                         </textarea>
                     </div>
                     @continue
                 @endif
-                @if(( $k === 'comment') && $model === 'Company')
-                    <div class="form-group" data-field="comment">
-                        <label>
-                            {{ $v['label'] }}
-                        </label>
-                        <textarea
-                            name="comment"
-                            data-label="{{ $v['label'] }}"
-                            placeholder="{{ $v['label'] }}"
-                            data-field="Company_comment"
-                            class="form-control">
-                            {{ $el[$k] ?? '' }}
-                        </textarea>
-                    </div>
-                    @continue
-                @endif
+
                 @if($k == 'procedure_pv' && user()->hasRole(['medic', 'tech']))
                     <div class="form-group" data-field="comment">
                         <label for="disabledProcedureInput">{{$v['label']}}</label>
@@ -177,10 +168,6 @@
                     @continue
                 @endif
                 <div class="form-group" data-field="{{ $k }}">
-                    @php
-                        $is_required = !isset($v['noRequired']);
-                    @endphp
-
                     <label>
                         @if($is_required)
                             <b class="text-danger text-bold">* </b>
