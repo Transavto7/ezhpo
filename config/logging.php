@@ -115,6 +115,11 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/tg-api.log')
         ],
+
+        'da-data-api' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/da-data-api.log')
+        ],
     ],
 
 ];

@@ -4,7 +4,9 @@ namespace App\Actions\Element;
 
 use App\Company;
 use App\Exceptions\EntityAlreadyExistException;
+use App\Services\CompanyReqsChecker\CompanyReqsCheckerInterface;
 use App\User;
+use App\ValueObjects\CompanyReqs;
 use App\ValueObjects\Phone;
 use Exception;
 use Illuminate\Support\Facades\Hash;
@@ -30,6 +32,33 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
             ->first();
         if ($existItem) {
             throw new EntityAlreadyExistException('Найден дубликат по названию компании');
+        }
+
+        $inn = trim($data['inn'] ?? '');
+        $kpp = trim($data['kpp'] ?? '');
+
+        $companyReqs = new CompanyReqs($inn, $kpp);
+        if ($companyReqs->isValidFormat()) {
+            /** @var CompanyReqsCheckerInterface $companyReqsChecker */
+            $companyReqsChecker = resolve(CompanyReqsCheckerInterface::class);
+            if ($companyReqsChecker->check($companyReqs)) {
+                $data['reqs_validated'] = true;
+            } else {
+                throw new Exception('Невалидные реквизиты компании');
+            }
+        }
+
+        $query = Company::query()
+            ->withTrashed()
+            ->where('inn', $inn);
+
+        if ($companyReqs->isOrganizationInnFormat()) {
+            $query->where('kpp', $kpp);
+        }
+
+        $duplicateElement = $query->first();
+        if ($duplicateElement) {
+            throw new EntityAlreadyExistException('Найден дубликат компании по ИНН (+КПП)');
         }
 
         $phoneNumber = $data['where_call'] ?? null;

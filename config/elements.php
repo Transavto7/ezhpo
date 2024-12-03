@@ -625,6 +625,19 @@ return [
                 'label' => 'ИНН',
                 'type' => 'text'
             ],
+            'kpp' => [
+                'label' => 'КПП',
+                'type' => 'text',
+                'noRequired' => 1,
+            ],
+            'reqs_validated' => [
+                'label' => 'Корректные реквизиты',
+                'type' => 'select',
+                'values' => [
+                    0 => 'Нет',
+                    1 => 'Да',
+                ],
+            ],
             'dismissed' => [
                 'label' => 'Временная блокировка',
                 'type' => 'select',

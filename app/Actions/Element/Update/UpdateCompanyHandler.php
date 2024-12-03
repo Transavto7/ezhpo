@@ -3,6 +3,10 @@
 namespace App\Actions\Element\Update;
 
 use App\Actions\Element\SyncFieldsHandler;
+use App\Company;
+use App\Exceptions\EntityAlreadyExistException;
+use App\Services\CompanyReqsChecker\CompanyReqsCheckerInterface;
+use App\ValueObjects\CompanyReqs;
 use App\ValueObjects\Phone;
 use Exception;
 
@@ -23,20 +27,62 @@ class UpdateCompanyHandler extends UpdateElementHandler
     public function handle($id, array $data)
     {
         $this->setData($data);
-        $this->validateData();
+        $this->validateData($id);
         $this->findElement($id);
         $this->wrapNullFieldsToEmptyString();
         $this->updateFiles();
         $this->updateFields();
         $this->syncCompanyProducts();
         $this->resetEmptyFields();
+        $this->updateReqsValidated();
         $this->element->save();
     }
 
     /**
      * @throws Exception
      */
-    protected function validateData()
+    protected function validateData($id)
+    {
+        $this->validateReqs($id);
+        $this->validatePhoneNumber();
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function validateReqs($id)
+    {
+        $inn = trim($this->data['inn'] ?? '');
+        $kpp = trim($this->data['kpp'] ?? '');
+
+        $companyReqs = new CompanyReqs($inn, $kpp);
+
+        if ($companyReqs->isValidFormat()) {
+            /** @var CompanyReqsCheckerInterface $companyReqsChecker */
+            $companyReqsChecker = resolve(CompanyReqsCheckerInterface::class);
+            if ($companyReqsChecker->check($companyReqs)) {
+                $this->data['reqs_validated'] = true;
+            } else {
+                throw new Exception('Невалидные реквизиты компании');
+            }
+        }
+
+        $query = Company::query()
+            ->withTrashed()
+            ->where('id', '!=', $id)
+            ->where('inn', $inn);
+
+        if ($companyReqs->isOrganizationInnFormat()) {
+            $query->where('kpp', $kpp);
+        }
+
+        $duplicateElement = $query->first();
+        if ($duplicateElement) {
+            throw new EntityAlreadyExistException('Найден дубликат компании по ИНН (+КПП)');
+        }
+    }
+
+    protected function validatePhoneNumber()
     {
         if (!array_key_exists('where_call', $this->data)) {
             return;
@@ -55,6 +101,29 @@ class UpdateCompanyHandler extends UpdateElementHandler
         }
 
         $this->data['where_call'] = $phone->getSanitized();
+    }
+
+    protected function updateReqsValidated()
+    {
+        if ($this->element->getAttribute('reqs_validated') === true) {
+            return;
+        }
+
+        $inn = $this->element->getAttribute('inn');
+        $innLength = strlen($inn ?? '');
+        $isPersonInn = $innLength === 12;
+        $isOrganizationInn = $innLength === 10;
+        $kpp = $this->element->getAttribute('kpp');
+
+        if (!$isPersonInn && !$isOrganizationInn) {
+            return;
+        }
+
+        if ($isOrganizationInn && (strlen($kpp ?? '') !== 9)) {
+            return;
+        }
+
+        $this->element->setAttribute('reqs_validated', true);
     }
 
     protected function syncCompanyProducts()

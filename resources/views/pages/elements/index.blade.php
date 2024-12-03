@@ -454,6 +454,8 @@
                                                     @endif
                                                 </a>
                                         </nobr>
+                                    @elseif($field->field === 'reqs_validated' && $model === 'Company')
+                                        {{ $el[$field->field] == 1 ? 'Да' : 'Нет' }}
                                     @elseif ($field->field === 'user_id')
                                         {{ app('App\User')->getName($el->user_id, false) }}
                                     @elseif ($field->field === 'req_id')

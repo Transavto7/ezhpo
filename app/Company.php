@@ -27,6 +27,7 @@ class Company extends Model
         'where_call',
         'where_call_name',
         'inn',
+        'kpp',
         'required_type_briefing',
         'has_actived_prev_month',
         'bitrix_link',
@@ -36,7 +37,8 @@ class Company extends Model
         'pressure_diastolic',
         'link_waybill',
         'auto_created',
-        'deleted_at'
+        'deleted_at',
+        'reqs_validated'
     ];
 
     public static function getAll()

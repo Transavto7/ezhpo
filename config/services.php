@@ -34,4 +34,7 @@ return [
         'secret' => env('SPARKPOST_SECRET'),
     ],
 
+    'dadata' => [
+        'token' => env('DADATA_TOKEN')
+    ]
 ];

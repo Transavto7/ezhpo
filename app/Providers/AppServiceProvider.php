@@ -13,6 +13,8 @@ use App\Observers\ContractObserver;
 use App\Observers\DriverObserver;
 use App\Observers\CarObserver;
 use App\Observers\UserObserver;
+use App\Services\CompanyReqsChecker\CompanyReqsCheckerInterface;
+use App\Services\CompanyReqsChecker\DaDataCompanyReqsChecker;
 use App\Services\ElementsSearch\ElementSearchService;
 use App\Services\ElementsSearch\ElementsSearchServiceInterface;
 use App\Services\HashIdGenerator\HashIdGeneratorService;
@@ -24,6 +26,11 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    public $bindings = [
+        CompanyReqsCheckerInterface::class => DaDataCompanyReqsChecker::class,
+        ElementsSearchServiceInterface::class => ElementSearchService::class,
+        QRCodeGeneratorInterface::class => QRCodeGenerator::class
+    ];
     /**
      * Register any application services.
      *
@@ -34,9 +41,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('hash-id-generator', function () {
             return new HashIdGeneratorService();
         });
-
-        $this->app->bind(ElementsSearchServiceInterface::class, ElementSearchService::class);
-        $this->app->bind(QRCodeGeneratorInterface::class, QRCodeGenerator::class);
     }
 
     /**

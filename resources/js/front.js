@@ -1233,14 +1233,13 @@ $(document).ready(function () {
         triggerField()
     })
 
-    function initCompanyNameSuggestion(companyNameInput, innInput) {
+    function initCompanyNameSuggestion(companyNameInput, innInput, kppInput) {
         if (!companyNameInput) return;
 
         if (!innInput) return;
 
         companyNameInput.suggestions({
-            //TODO: вынести в енв
-            token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
+            token: window.DADATA_TOKEN,
             type: "PARTY",
             /* Вызывается, когда пользователь выбирает одну из подсказок */
             onSelect: function (suggestion) {
@@ -1248,16 +1247,20 @@ $(document).ready(function () {
                     return
                 }
 
-                console.log('test', suggestion)
-
-                const {inn} = suggestion.data
+                const {inn,kpp} = suggestion.data
 
                 innInput.val(inn)
+
+                kppInput.val(kpp)
             }
         });
     }
 
-    initCompanyNameSuggestion($('*[data-field="Company_name"]'), $('#elements-modal-add input[name="inn"]'))
+    initCompanyNameSuggestion(
+        $('*[data-field="Company_name"]'),
+        $('#elements-modal-add input[name="inn"]'),
+        $('#elements-modal-add input[name="kpp"]'),
+    )
 
     $('.header #toggle-btn').each(function () {
         let localStatusSidebar = () => {
@@ -1300,7 +1303,11 @@ $(document).ready(function () {
             .then(({data}) => {
                 modalContent.text('').append(data);
                 LIBS.initAll()
-                initCompanyNameSuggestion($('#modalEditor *[data-field="Company_name"]'), $('#modalEditor input[name="inn"]'))
+                initCompanyNameSuggestion(
+                    $('#modalEditor *[data-field="Company_name"]'),
+                    $('#modalEditor input[name="inn"]'),
+                    $('#modalEditor input[name="kpp"]')
+                )
             })
 
     })

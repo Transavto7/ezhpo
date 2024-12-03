@@ -193,7 +193,7 @@
                         'k' => $k,
                         'default_value' => $el[$k],
                         'element_id' => $el['id'],
-                        'disabled' => in_array($k, $disabledFields)
+                        'readonly' => in_array($k, $disabledFields)
                     ])
 
                     @if(isset($v['syncData']) && $model !== 'Company')

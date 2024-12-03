@@ -14,6 +14,7 @@ use App\Point;
 use App\User;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -328,10 +329,12 @@ class IndexController extends Controller
             $query = $query->with(['contracts.services']);
         }
 
+        $element = $query->find($id);
+
         $page = $this->elements[$model];
         $page['model'] = $model;
         $page['id'] = $id;
-        $page['el'] = $query->find($id);
+        $page['el'] = $element;
 
         $disabledFields = [];
         if (($model === 'Company') && (user()->hasRole('client') || !user()->access('company_update_pressure_fields'))) {
@@ -355,12 +358,20 @@ class IndexController extends Controller
             $disabledFields[] = 'pressure_systolic';
             $disabledFields[] = 'pressure_diastolic';
         }
+
+        /** @var Model|null $element */
+        if (($model === 'Company') && $element->getAttribute('reqs_validated')) {
+            $disabledFields[] = 'inn';
+            $disabledFields[] = 'kpp';
+        }
+
         $page['disabledFields'] = $disabledFields;
 
         $fieldsToSkip = [
             'essence',
             'hash_id',
-            'id'
+            'id',
+            'reqs_validated'
         ];
         if (user()->hasRole('client')) {
             $fieldsToSkip[] = 'products_id';
@@ -580,7 +591,11 @@ class IndexController extends Controller
         $data['otherRoles'][] = 'manager';
         $data['otherRoles'][] = 'admin';
         $data['queryString'] = Arr::query(array_filter($request->except([$oKey, $oBy])));
-        $data['fieldPrompts'] = FieldPrompt::where('type', strtolower($model))->get();
+        $data['fieldPrompts'] = FieldPrompt::query()
+            ->where('type', strtolower($model))
+            ->orderBy('sort')
+            ->orderBy('id')
+            ->get();
         $data['isAdminOrClient'] = $isAdminOrClient;
 
         return view('pages.elements.index', $data);

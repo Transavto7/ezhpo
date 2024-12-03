@@ -14,6 +14,10 @@
         @continue
     @endif
 
+    @if($k == 'reqs_validated')
+        @continue
+    @endif
+
     @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
         @continue
     @endif

@@ -60,4 +60,35 @@ class FieldPrompt extends Model
 
         return parent::delete();
     }
+
+    public static function moveAfterOther(string $type, string $field, string $previousField)
+    {
+        $sort = 0;
+        $resultSort = 0;
+
+        FieldPrompt::query()
+            ->where('type', $type)
+            ->where('field', '!=', $field)
+            ->orderBy('sort')
+            ->orderBy('id')
+            ->get()
+            ->each(function (FieldPrompt $fieldPrompt) use ($previousField, &$sort, &$resultSort)  {
+                $fieldPrompt->update(['sort' => $sort]);
+                $sort++;
+
+                if ($fieldPrompt->field === $previousField) {
+                    $resultSort = $sort;
+                    $sort++;
+                }
+            });
+
+        if ($resultSort === 0) {
+            return;
+        }
+
+        FieldPrompt::query()
+            ->where('type', $type)
+            ->where('field', $field)
+            ->update(['sort' => $resultSort]);
+    }
 }
