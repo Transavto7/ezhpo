@@ -17,7 +17,7 @@ class CreateTripTicketsTable extends Migration
             $table->bigIncrements('id');
             $table->string('uuid', 36)->unique();
 
-            $table->string('ticket_number');
+            $table->string('ticket_number')->nullable();
 
             $table->string('company_id')->nullable();
             $table->foreign('company_id')->references('hash_id')->on('companies');

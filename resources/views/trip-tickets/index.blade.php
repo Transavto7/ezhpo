@@ -240,13 +240,12 @@
                                                         'values' => 'Company',
                                                         'getField' => 'name',
                                                         'getFieldKey' => 'hash_id',
-                                                        'multiple' => 1,
                                                         'concatField' => 'hash_id',
                                                         'trashed' => true
                                                     ],
                                                     'model' => 'trip-tickets',
                                                     'k' => 'company_id',
-                                                    'is_required' => '',
+                                                    'is_required' => 'required',
                                                     'default_value' => null
                                                 ])
                                             </div>
@@ -260,7 +259,6 @@
                                                         'values' => 'Driver',
                                                         'getField' => 'fio',
                                                         'getFieldKey' => 'hash_id',
-                                                        'multiple' => 1,
                                                         'concatField' => 'hash_id',
                                                         'trashed' => true
                                                     ],
@@ -279,7 +277,7 @@
                                             <div class="form-group">
                                                 <label>Дата ПЛ от</label>
                                                 <input type="date" value="{{ $date_from_filter }}"
-                                                       name="created_at_from"
+                                                       name="date_from"
                                                        class="form-control"/>
                                             </div>
                                         </div>
@@ -287,7 +285,7 @@
                                             <div class="form-group">
                                                 <label>Дата ПЛ до</label>
                                                 <input type="date"
-                                                       value="{{ $date_to_filter }}" name="created_at_to"
+                                                       value="{{ $date_to_filter }}" name="date_to"
                                                        class="form-control"/>
                                             </div>
                                         </div>
@@ -301,11 +299,10 @@
                                                     'v' => [
                                                         'type' => 'select',
                                                         'values' => App\Enums\LogisticsMethodEnum::labels(),
-                                                        'multiple' => 1
                                                     ],
                                                     'model' => 'trip-tickets',
                                                     'k' => 'logistics_method',
-                                                    'is_required' => '',
+                                                    'is_required' => 'required',
                                                     'default_value' => null
                                                 ])
                                             </div>
@@ -317,11 +314,10 @@
                                                     'v' => [
                                                         'type' => 'select',
                                                         'values' => App\Enums\TransportationTypeEnum::labels(),
-                                                        'multiple' => 1
                                                     ],
                                                     'model' => 'trip-tickets',
                                                     'k' => 'transportation_type',
-                                                    'is_required' => '',
+                                                    'is_required' => 'required',
                                                     'default_value' => null
                                                 ])
                                             </div>
@@ -333,11 +329,10 @@
                                                     'v' => [
                                                         'type' => 'select',
                                                         'values' => App\Enums\TripTicketTemplateEnum::labels(),
-                                                        'multiple' => 1
                                                     ],
                                                     'model' => 'trip-tickets',
                                                     'k' => 'template_code',
-                                                    'is_required' => '',
+                                                    'is_required' => 'required',
                                                     'default_value' => null
                                                 ])
                                             </div>
@@ -411,7 +406,7 @@
                                             <div class="form-group">
                                                 <label>Дата ПЛ от</label>
                                                 <input type="date" value="{{ $date_from_filter }}"
-                                                       name="created_at_from"
+                                                       name="date_from"
                                                        class="form-control"/>
                                             </div>
                                         </div>
@@ -419,7 +414,7 @@
                                             <div class="form-group">
                                                 <label>Дата ПЛ до</label>
                                                 <input type="date"
-                                                       value="{{ $date_to_filter }}" name="created_at_to"
+                                                       value="{{ $date_to_filter }}" name="date_to"
                                                        class="form-control"/>
                                             </div>
                                         </div>
@@ -508,6 +503,12 @@
                                             <a href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'gos_number' => $tripTicket[$field->field] ]) }}">
                                                 {{ $tripTicket[$field->field] }}
                                             </a>
+                                        @elseif($field->field === 'logistics_method')
+                                            {{ \App\Enums\LogisticsMethodEnum::getLabel($tripTicket[$field->field]) }}
+                                        @elseif($field->field === 'transportation_type')
+                                            {{ \App\Enums\TransportationTypeEnum::getLabel($tripTicket[$field->field]) }}
+                                        @elseif($field->field === 'template_code')
+                                            {{ \App\Enums\TripTicketTemplateEnum::getLabel($tripTicket[$field->field]) }}
                                         @else
                                             {{ $tripTicket[$field->field] }}
                                         @endif
@@ -525,13 +526,13 @@
 
                                 <td class="td-option not-export d-flex justify-content-end">
                                     @if($permissionToUpdate)
-                                        <a href="{{ route('trip-ticket.edit', $tripTicket->id) }}"
+                                        <a href="{{ route('trip-tickets.edit', $tripTicket->id) }}"
                                            class="btn btn-info btn-sm mr-1"><i class="fa fa-edit"></i></a>
                                     @endif
 
                                     @if($permissionToDelete)
                                         <a
-                                            href="{{ route('trip-ticket.trash', ['id' => $tripTicket->id, 'action' => request()->get('trash') ? 0 : 1]) }}"
+                                            href="{{ route('trip-tickets.trash', ['id' => $tripTicket->id, 'action' => request()->get('trash') ? 0 : 1]) }}"
                                             class="btn btn-warning btn-sm hv-btn-trash mr-1"
                                             data-id="{{ $tripTicket->id }}">
                                             @if(request()->get('trash', 0))
