@@ -18,6 +18,10 @@
         @continue
     @endif
 
+    @if($k == 'one_c_synced')
+        @continue
+    @endif
+
     @if($k == 'contract_id' && ($model == 'Driver' || $model == 'Car'))
         @continue
     @endif

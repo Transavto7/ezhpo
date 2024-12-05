@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Companies;
 
 use App\Company;
 use App\Models\Forms\Form;

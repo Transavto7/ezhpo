@@ -38,7 +38,8 @@ class Company extends Model
         'link_waybill',
         'auto_created',
         'deleted_at',
-        'reqs_validated'
+        'reqs_validated',
+        'one_c_synced'
     ];
 
     public static function getAll()

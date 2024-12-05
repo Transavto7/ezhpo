@@ -4,6 +4,7 @@ namespace App\Actions\Element;
 
 use App\Company;
 use App\Exceptions\EntityAlreadyExistException;
+use App\Exceptions\WrongCompanyReqsException;
 use App\Services\CompanyReqsChecker\CompanyReqsCheckerInterface;
 use App\User;
 use App\ValueObjects\CompanyReqs;
@@ -85,7 +86,7 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
             if ($companyReqsChecker->check($companyReqs)) {
                 $data['reqs_validated'] = true;
             } else {
-                throw new Exception('Невалидные реквизиты компании');
+                throw new WrongCompanyReqsException();
             }
         }
 

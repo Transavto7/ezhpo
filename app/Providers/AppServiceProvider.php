@@ -18,6 +18,8 @@ use App\Services\CompanyReqsChecker\DaDataCompanyReqsChecker;
 use App\Services\ElementsSearch\ElementSearchService;
 use App\Services\ElementsSearch\ElementsSearchServiceInterface;
 use App\Services\HashIdGenerator\HashIdGeneratorService;
+use App\Services\OneC\CompanySync\CompanySyncService;
+use App\Services\OneC\CompanySync\CompanySyncServiceInterface;
 use App\Services\QRCode\QRCodeGenerator;
 use App\Services\QRCode\QRCodeGeneratorInterface;
 use App\User;
@@ -27,6 +29,7 @@ use Illuminate\Support\ServiceProvider;
 class AppServiceProvider extends ServiceProvider
 {
     public $bindings = [
+        CompanySyncServiceInterface::class => CompanySyncService::class,
         CompanyReqsCheckerInterface::class => DaDataCompanyReqsChecker::class,
         ElementsSearchServiceInterface::class => ElementSearchService::class,
         QRCodeGeneratorInterface::class => QRCodeGenerator::class

@@ -36,5 +36,11 @@ return [
 
     'dadata' => [
         'token' => env('DADATA_TOKEN')
+    ],
+
+    'one-c' => [
+        'url' => env('ONE_C_URL'),
+        'login' => env('ONE_C_LOGIN'),
+        'password' => env('ONE_C_PASSWORD')
     ]
 ];

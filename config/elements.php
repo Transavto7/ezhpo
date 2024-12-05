@@ -638,6 +638,14 @@ return [
                     1 => 'Да',
                 ],
             ],
+            'one_c_synced' => [
+                'label' => 'Синхронизация 1С',
+                'type' => 'select',
+                'values' => [
+                    0 => 'Нет',
+                    1 => 'Да',
+                ],
+            ],
             'dismissed' => [
                 'label' => 'Временная блокировка',
                 'type' => 'select',

@@ -5,6 +5,7 @@ namespace App\Actions\Element\Update;
 use App\Actions\Element\SyncFieldsHandler;
 use App\Company;
 use App\Exceptions\EntityAlreadyExistException;
+use App\Exceptions\WrongCompanyReqsException;
 use App\Services\CompanyReqsChecker\CompanyReqsCheckerInterface;
 use App\ValueObjects\CompanyReqs;
 use App\ValueObjects\Phone;
@@ -74,7 +75,7 @@ class UpdateCompanyHandler extends UpdateElementHandler
             if ($companyReqsChecker->check($companyReqs)) {
                 $this->data['reqs_validated'] = true;
             } else {
-                throw new Exception('Невалидные реквизиты компании');
+                throw new WrongCompanyReqsException();
             }
         }
 
