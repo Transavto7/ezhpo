@@ -27,14 +27,13 @@ class UpdateCompanyHandler extends UpdateElementHandler
     public function handle($id, array $data)
     {
         $this->setData($data);
-        $this->validateData($id);
         $this->findElement($id);
+        $this->validateData($id);
         $this->wrapNullFieldsToEmptyString();
         $this->updateFiles();
         $this->updateFields();
         $this->syncCompanyProducts();
         $this->resetEmptyFields();
-        $this->updateReqsValidated();
         $this->element->save();
     }
 
@@ -43,20 +42,32 @@ class UpdateCompanyHandler extends UpdateElementHandler
      */
     protected function validateData($id)
     {
-        $this->validateReqs($id);
+        $existItem = Company::query()
+            ->where('id', '!=', $id)
+            ->where('name', trim($this->data['name'] ?? ''))
+            ->first();
+        if ($existItem) {
+            throw new EntityAlreadyExistException('Найден дубликат по названию компании');
+        }
+
+        $this->validateReqs($id, $this->element);
         $this->validatePhoneNumber();
     }
 
     /**
      * @throws Exception
      */
-    protected function validateReqs($id)
+    protected function validateReqs($id, Company $company)
     {
-        $inn = trim($this->data['inn'] ?? '');
-        $kpp = trim($this->data['kpp'] ?? '');
+        if (!(isset($this->data['inn']))) {
+            return;
+        }
 
-        $companyReqs = new CompanyReqs($inn, $kpp);
+        if ($company->getAttribute('reqs_validated')) {
+            throw new Exception('Попытка смены корректных реквизитов компании!');
+        }
 
+        $companyReqs = new CompanyReqs($this->data['inn'] ?? '', $this->data['kpp'] ?? '');
         if ($companyReqs->isValidFormat()) {
             /** @var CompanyReqsCheckerInterface $companyReqsChecker */
             $companyReqsChecker = resolve(CompanyReqsCheckerInterface::class);
@@ -67,21 +78,22 @@ class UpdateCompanyHandler extends UpdateElementHandler
             }
         }
 
-        $query = Company::query()
-            ->withTrashed()
+        $existItem = Company::query()
             ->where('id', '!=', $id)
-            ->where('inn', $inn);
+            ->where('inn', $companyReqs->getInn())
+            ->when($companyReqs->isOrganizationInnFormat(), function ($query) use ($companyReqs) {
+                $query->where('kpp', $companyReqs->getKpp());
+            })
+            ->first();
 
-        if ($companyReqs->isOrganizationInnFormat()) {
-            $query->where('kpp', $kpp);
-        }
-
-        $duplicateElement = $query->first();
-        if ($duplicateElement) {
+        if ($existItem) {
             throw new EntityAlreadyExistException('Найден дубликат компании по ИНН (+КПП)');
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function validatePhoneNumber()
     {
         if (!array_key_exists('where_call', $this->data)) {
@@ -101,29 +113,6 @@ class UpdateCompanyHandler extends UpdateElementHandler
         }
 
         $this->data['where_call'] = $phone->getSanitized();
-    }
-
-    protected function updateReqsValidated()
-    {
-        if ($this->element->getAttribute('reqs_validated') === true) {
-            return;
-        }
-
-        $inn = $this->element->getAttribute('inn');
-        $innLength = strlen($inn ?? '');
-        $isPersonInn = $innLength === 12;
-        $isOrganizationInn = $innLength === 10;
-        $kpp = $this->element->getAttribute('kpp');
-
-        if (!$isPersonInn && !$isOrganizationInn) {
-            return;
-        }
-
-        if ($isOrganizationInn && (strlen($kpp ?? '') !== 9)) {
-            return;
-        }
-
-        $this->element->setAttribute('reqs_validated', true);
     }
 
     protected function syncCompanyProducts()

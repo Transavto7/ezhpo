@@ -20,9 +20,8 @@
                                   data-label="{{ $v['label'] }}"
                                   placeholder="{{ $v['label'] }}"
                                   data-field="Company_name"
-                                  class="form-control">
-                        {{ $el[$k] ?? '' }}
-                    </textarea>
+                                  class="form-control">{{ $el[$k] ?? '' }}
+                        </textarea>
                     </div>
                     @continue
                 @endif
@@ -36,8 +35,7 @@
                                   data-label="{{ $v['label'] }}"
                                   placeholder="{{ $v['label'] }}"
                                   data-field="Company_note"
-                                  class="form-control">
-                            {{ $el[$k] ?? '' }}
+                                  class="form-control">{{ $el[$k] ?? '' }}
                         </textarea>
                     </div>
                     @continue
@@ -52,8 +50,7 @@
                             data-label="{{ $v['label'] }}"
                             placeholder="{{ $v['label'] }}"
                             data-field="Company_comment"
-                            class="form-control">
-                            {{ $el[$k] ?? '' }}
+                            class="form-control">{{ $el[$k] ?? '' }}
                         </textarea>
                     </div>
                     @continue
@@ -193,7 +190,7 @@
                         'k' => $k,
                         'default_value' => $el[$k],
                         'element_id' => $el['id'],
-                        'readonly' => in_array($k, $disabledFields)
+                        'disabled' => in_array($k, $disabledFields)
                     ])
 
                     @if(isset($v['syncData']) && $model !== 'Company')

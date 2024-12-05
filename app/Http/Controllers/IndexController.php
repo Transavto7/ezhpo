@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Element\CreateElementHandlerFactory;
+use App\Actions\Element\Remove\RemoveElementHandlerFactory;
 use App\Actions\Element\SyncFieldsHandler;
 use App\Actions\Element\Update\UpdateElementHandlerFactory;
 use App\Car;
@@ -159,29 +160,14 @@ class IndexController extends Controller
         }
     }
 
-    public function RemoveElement(Request $request): RedirectResponse
+    public function RemoveElement(Request $request, RemoveElementHandlerFactory $factory): RedirectResponse
     {
         try {
-            $model = $request->type;
-            $id = $request->id;
-
-            $modelClass = app("App\\$model");
-            if (!$modelClass) {
-                throw new Exception("Модель $model не найдена");
-            }
-
-            $existModel = $modelClass::withTrashed()->find($id);
-            if (!$existModel) {
-                throw new Exception("Модель $model с ID $id не найдена");
-            }
+            $handler = $factory->make($request->type);
 
             DB::beginTransaction();
 
-            if ($request->get('undo')) {
-                $existModel->restore();
-            } else {
-                $existModel->delete();
-            }
+            $handler->handle($request->id, !$request->undo);
 
             DB::commit();
 

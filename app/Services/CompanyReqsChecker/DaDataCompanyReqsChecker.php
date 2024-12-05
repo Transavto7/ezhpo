@@ -37,13 +37,8 @@ class DaDataCompanyReqsChecker implements CompanyReqsCheckerInterface
     {
         $companies = $this->getCompaniesByInn($companyReqs->getInn());
 
-        $companiesCount = count($companies);
-        if ($companiesCount === 0) {
-            return false;
-        }
-
         if ($companyReqs->isPersonalInnFormat()) {
-            return count($companies) === 1;
+            return $this->checkPerson($companyReqs, $companies);
         }
 
         if ($companyReqs->isOrganizationInnFormat()) {
@@ -86,28 +81,43 @@ class DaDataCompanyReqsChecker implements CompanyReqsCheckerInterface
      * @param DaDataCompany[] $companies
      * @return bool
      */
-    private function checkOrganization(CompanyReqs $companyReqs, array $companies): bool
+    private function checkPerson(CompanyReqs $companyReqs, array $companies): bool
     {
-        if (count($companies) === 1) {
-            $organization = array_values($companies)[0];
+        //TODO: нужно позднее не просто разделять на ИНН человека\компании, а еще проверять, ИП это или физик
+        if (count($companies) === 0) {
+            return true;
+        }
 
-            if (!$organization->getKpp()) {
+        foreach ($companies as $company) {
+            if ($company->getInn() === $companyReqs->getInn()) {
                 return true;
             }
+        }
 
-            return $organization->getKpp() === $companyReqs->getKpp();
+        return false;
+    }
+
+    /**
+     * @param CompanyReqs $companyReqs
+     * @param DaDataCompany[] $companies
+     * @return bool
+     */
+    private function checkOrganization(CompanyReqs $companyReqs, array $companies): bool
+    {
+        if (count($companies) === 0) {
+            return false;
         }
 
         $hasSubCompanyWithoutKpp = false;
 
-        foreach ($companies as $organization) {
-            if (empty($organization->getKpp())) {
+        foreach ($companies as $company) {
+            if (empty($company->getKpp())) {
                 $hasSubCompanyWithoutKpp = true;
 
                 continue;
             }
 
-            if ($organization->getKpp() === $companyReqs->getKpp()) {
+            if ($company->getKpp() === $companyReqs->getKpp()) {
                 return true;
             }
         }

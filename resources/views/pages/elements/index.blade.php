@@ -26,7 +26,6 @@
     @include('modals.export-modal', ['model' => $model])
     @if($errors->any())
         <div class="alert alert-danger" role="alert">
-            <i class="mdi mdi-block-helper mr-2"></i> Ошибка валидации.
             {!! implode('', $errors->all('<div>:message</div>')) !!}
         </div>
     @endif
@@ -329,12 +328,6 @@
         @dump('Нет доступа для просмотра')
     @else
         <div class="card table-card my-4">
-            @error('errors')
-            <div class="text-red">
-                <b>{{ $errors->first('errors') }}</b>
-            </div>
-            @enderror
-
             <div class="card-body">
                 <table id="elements-table" class="table table-striped table-sm">
                     <thead>
