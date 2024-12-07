@@ -1,4 +1,4 @@
-<div class="tab-pane fade" id="filter-group" role="tabpanel"
+<div class="tab-pane fade show active" id="filter-group" role="tabpanel"
      aria-labelledby="filter-group" style="display: none">
     <form onsubmit="document.querySelector('#page-preloader').classList.remove('hide')"
           action="" method="GET" class="tab-content p-3">
@@ -27,7 +27,11 @@
                         'model' => 'trip-tickets',
                         'k' => 'company_id',
                         'is_required' => '',
-                        'default_value' => null
+                        'default_value' => request()->filled('filter')
+                            ? request()->get('company_id', null) !== [null]
+                                ? request()->get('company_id', null)
+                                : null
+                            : null
                     ])
                 </div>
             </div>
@@ -47,7 +51,11 @@
                         'model' => 'trip-tickets',
                         'k' => 'driver_id',
                         'is_required' => '',
-                        'default_value' => null
+                        'default_value' => request()->filled('filter')
+                            ? request()->get('driver_id', null) !== [null]
+                                ? request()->get('driver_id', null)
+                                : null
+                            : null
                     ])
                 </div>
             </div>
@@ -58,7 +66,9 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <label>Дата ПЛ от</label>
-                    <input type="date" value="{{ $date_from_filter }}"
+                    <input type="date" value="{{ request()->filled('filter')
+                            ? request()->get('date_from', null)
+                            : $date_from_filter }}"
                            name="date_from"
                            class="form-control"/>
                 </div>
@@ -67,17 +77,18 @@
                 <div class="form-group">
                     <label>Дата ПЛ до</label>
                     <input type="date"
-                           value="{{ $date_to_filter }}" name="date_to"
+                           value="{{ request()->filled('filter')
+                            ? request()->get('date_to', null)
+                            : $date_to_filter }}" name="date_to"
                            class="form-control"/>
                 </div>
             </div>
         </div>
 
         <button type="submit" class="btn btn-info">Поиск</button>
-        <button type="button" class="btn btn-danger reload-filters">
+        <a class="btn btn-danger reload-filters" href="{{ route('trip-tickets.index') }}">
             <span class="spinner spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
             Сбросить
-        </button>
-
+        </a>
     </form>
 </div>
