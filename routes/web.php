@@ -155,9 +155,10 @@ Route::middleware(['auth'])->group(function () {
 
         Route::prefix('trip-tickets')->as('trip-tickets.')->group(function () {
             Route::get('/', 'TripTicketController@indexPage')->name('index');
-            Route::get('generate', 'TripTicketController@generate')->name('generate');
+            Route::post('generate', 'TripTicketController@generate')->name('generate');
+            Route::get('create', 'TripTicketController@createPage')->name('create');
+            Route::post('store', 'TripTicketController@store')->name('store');
             Route::get('{id}/edit', 'TripTicketController@editPage')->name('edit');
-            Route::post('list', 'TripTicketController@list')->name('list');
             Route::get('trash', 'TripTicketController@trash')->name('trash');
             Route::get('mass-trash', 'TripTicketController@massTrash')->name('mass-trash');
         });

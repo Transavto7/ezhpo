@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Query\Builder;
 
-class TripTicketsHandler
+final class TripTicketsHandler
 {
     public function handle(TripTicketsAction $action): array
     {

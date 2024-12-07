@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Actions\TripTicket\CreateTripTickets\TripTicketsAction;
 use App\Actions\TripTicket\CreateTripTickets\TripTicketsHandler;
 use App\Actions\TripTicket\DeleteTripTickets\TrashTripTicketHandler;
+use App\Actions\TripTicket\StoreTripTicket\StoreTripTicketAction;
+use App\Actions\TripTicket\StoreTripTicket\StoreTripTicketHandler;
 use App\Company;
 use App\Driver;
 use App\Enums\LogisticsMethodEnum;
@@ -100,6 +102,12 @@ class TripTicketController extends Controller
                 $tripTickets = $tripTickets
                     ->whereBetween('start_date', [$filterParams['date_from'], $filterParams['date_to']]);
             }
+        } else {
+            $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
+            $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
+
+            $tripTickets = $tripTickets
+                ->whereBetween('start_date', [$date_from_filter, $date_to_filter]);
         }
 
         $fieldPrompts = FieldPrompt::query()
@@ -131,6 +139,51 @@ class TripTicketController extends Controller
             'orderKey' => $orderKey,
             'queryString' => Arr::query($request->except(['orderKey', 'orderBy']))
         ]);
+    }
+
+    public function createPage()
+    {
+        date_default_timezone_set('UTC');
+        $time = time();
+        $user = Auth::user();
+        $timezone = $user->timezone ?: 3;
+        $time += $timezone * 3600;
+        $time = date('Y-m-d', $time);
+
+        return view('trip-tickets.create', [
+            'title' => 'Создание путевого листа',
+            'default_current_date' => $time
+        ]);
+    }
+
+    public function store(Request $request, StoreTripTicketHandler $handler)
+    {
+        $response = [];
+        try {
+            DB::beginTransaction();
+            $response = $handler->handle(new StoreTripTicketAction(
+                $request->input('company_id'),
+                $request->input('driver_id'),
+                $request->input('car_id'),
+                $request->input('start_date'),
+                $request->input('additional_dates')
+                    ? explode(', ', $request->input('additional_dates'))
+                    : [],
+                $request->input('validity_period', 1),
+                $request->input('ticket_number'),
+                LogisticsMethodEnum::fromString($request->input('logistics_method')),
+                TransportationTypeEnum::fromString($request->input('transportation_type')),
+                TripTicketTemplateEnum::fromString($request->input('template_code')),
+            ));
+
+            DB::commit();
+        } catch (Throwable $exception) {
+            $response['errors'] = [$exception->getMessage()];
+
+            DB::rollBack();
+        }
+
+        return back()->with($response);
     }
 
     public function editPage()
@@ -208,11 +261,6 @@ class TripTicketController extends Controller
         ));
 
         return $this->indexPage($request, $tripTicketIds);
-    }
-
-    public function list(Request $request)
-    {
-        return response()->json();
     }
 
     public function massTrash(Request $request, TrashTripTicketHandler $handler): JsonResponse
