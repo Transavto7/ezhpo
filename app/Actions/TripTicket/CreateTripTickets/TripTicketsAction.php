@@ -9,7 +9,7 @@ use App\Enums\TransportationTypeEnum;
 use App\Enums\TripTicketTemplateEnum;
 use Carbon\Carbon;
 
-class TripTicketsAction
+final class TripTicketsAction
 {
     /**
      * @var Company

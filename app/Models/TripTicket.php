@@ -2,7 +2,12 @@
 
 namespace App\Models;
 
+use App\Car;
+use App\Company;
+use App\Driver;
+use App\Models\Forms\Form;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Ramsey\Uuid\Uuid;
 
@@ -49,4 +54,29 @@ class TripTicket extends Model
         'transportation_type',
         'template_code',
     ];
+
+    public function driver(): BelongsTo
+    {
+        return $this->belongsTo(Driver::class, 'driver_id', 'hash_id');
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'company_id', 'hash_id');
+    }
+
+    public function car(): BelongsTo
+    {
+        return $this->belongsTo(Car::class, 'car_id', 'hash_id');
+    }
+
+    public function medicForm(): BelongsTo
+    {
+        return $this->belongsTo(Form::class, 'medic_form_id', 'uuid');
+    }
+
+    public function techForm(): BelongsTo
+    {
+        return $this->belongsTo(Form::class, 'tech_form_id', 'uuid');
+    }
 }

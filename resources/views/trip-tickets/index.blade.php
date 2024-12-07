@@ -363,7 +363,6 @@
 @endsection
 
 @php
-    use App\Models\TripTicket;
     //todo: permissions for trip tickets
     $permissionToView = true;
     $permissionToTrashView = true;
@@ -568,6 +567,7 @@
                                 <th width="60">Удаливший</th>
                                 <th width="60">Время удаления</th>
                             @endif
+                            <th>#</th>
                         </tr>
                         </thead>
                         <tbody>

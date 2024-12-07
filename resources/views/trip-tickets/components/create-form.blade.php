@@ -1,7 +1,8 @@
 <div class="tab-pane fade" id="registry-update" role="tabpanel"
      aria-labelledby="registry-update" style="display: none">
-    <form action="{{ route('trip-tickets.generate') }}" method="GET"
+    <form action="{{ route('trip-tickets.generate') }}" method="POST"
           class="tab-content p-3">
+        @csrf
         <input type="hidden" name="create" value="1">
 
         <div class="row">
@@ -20,10 +21,8 @@
                         'model' => 'trip-tickets',
                         'k' => 'company_id',
                         'is_required' => 'required',
-                        'default_value' => ! request()->filled('filter')
-                            ? request()->get('driver_id', null) !== [null]
-                                ? request()->get('driver_id', null)
-                                : null
+                        'default_value' => ! request()->filled('filter', null)
+                            ? request()->get('company_id', null)
                             : null
                     ])
                 </div>
@@ -43,10 +42,8 @@
                         'model' => 'trip-tickets',
                         'k' => 'driver_id',
                         'is_required' => '',
-                        'default_value' => ! request()->filled('filter')
-                            ? request()->get('driver_id', null) !== [null]
-                                ? request()->get('driver_id', null)
-                                : null
+                        'default_value' => ! request()->filled('filter', null)
+                            ? request()->get('driver_id', null)
                             : null
                     ])
                 </div>
@@ -59,7 +56,7 @@
                 <div class="form-group">
                     <label>Дата ПЛ от</label>
                     <input type="date" value="{{ ! request()->filled('filter')
-                            ? request()->get('date_from', null)
+                            ? request()->get('date_from', $date_from_filter)
                             : $date_from_filter }}"
                            name="date_from"
                            class="form-control"/>
@@ -70,7 +67,7 @@
                     <label>Дата ПЛ до</label>
                     <input type="date"
                            value="{{ ! request()->filled('filter')
-                            ? request()->get('date_to', null)
+                            ? request()->get('date_to', $date_to_filter)
                             : $date_to_filter }}" name="date_to"
                            class="form-control"/>
                 </div>
@@ -89,10 +86,8 @@
                         'model' => 'trip-tickets',
                         'k' => 'logistics_method',
                         'is_required' => 'required',
-                        'default_value' => ! request()->filled('filter')
-                            ? request()->get('logistics_method', null) !== [null]
-                                ? request()->get('logistics_method', null)
-                                : null
+                        'default_value' => ! request()->filled('filter', null)
+                            ? request()->get('logistics_method', null)
                             : null
                     ])
                 </div>
@@ -108,10 +103,8 @@
                         'model' => 'trip-tickets',
                         'k' => 'transportation_type',
                         'is_required' => 'required',
-                        'default_value' => ! request()->filled('filter')
-                            ? request()->get('transportation_type', null) !== [null]
-                                ? request()->get('transportation_type', null)
-                                : null
+                        'default_value' => ! request()->filled('filter', null)
+                            ? request()->get('transportation_type', null)
                             : null
                     ])
                 </div>
@@ -127,10 +120,8 @@
                         'model' => 'trip-tickets',
                         'k' => 'template_code',
                         'is_required' => 'required',
-                        'default_value' => ! request()->filled('filter')
-                            ? request()->get('template_code', null) !== [null]
-                                ? request()->get('template_code', null)
-                                : null
+                        'default_value' => ! request()->filled('filter', null)
+                            ? request()->get('template_code', null)
                             : null
                     ])
                 </div>

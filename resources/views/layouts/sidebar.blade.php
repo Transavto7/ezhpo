@@ -110,6 +110,13 @@
             </li>
         @endif
 
+{{--        @if($user->access('trip_ticket_create'))--}}
+            <li>
+                <a href="{{ route('trip-tickets.create') }}" class="bg-gray"><i
+                        class="icon-padnote"></i>Внести путевой лист</a>
+            </li>
+{{--        @endif--}}
+
         @if($user->access('journal_briefing_bdd_create'))
             <li>
                 <a href="{{ route('forms.index', ['type' => FormTypeEnum::BDD]) }}" class="bg-gray"><i
