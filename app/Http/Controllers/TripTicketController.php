@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\TripTicket\CreateTripTickets\TripTicketsAction;
+use App\Actions\TripTicket\CreateTripTickets\TripTicketsHandler;
+use App\Actions\TripTicket\DeleteTripTickets\TrashTripTicketHandler;
 use App\Company;
 use App\Driver;
 use App\Enums\LogisticsMethodEnum;
@@ -9,12 +12,13 @@ use App\Enums\TransportationTypeEnum;
 use App\Enums\TripTicketTemplateEnum;
 use App\FieldPrompt;
 use App\Models\TripTicket;
-use App\Services\TripTicket\TripTicketsAction;
-use App\Services\TripTicket\TripTicketsHandler;
 use Arr;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class TripTicketController extends Controller
 {
@@ -23,8 +27,49 @@ class TripTicketController extends Controller
         $type = TripTicket::SLUG;
         $user = Auth::user();
         $take = $request->get('take') ?? 100;
+        $trash = filter_var($request->get('trash', 0), FILTER_VALIDATE_BOOLEAN);
 
-        $tripTickets = TripTicket::query()
+        if ($trash) {
+            $tripTickets = TripTicket::onlyTrashed();
+        } else {
+            $tripTickets = TripTicket::query();
+        }
+
+        $tripTickets = $tripTickets->select([
+                'trip_tickets.id',
+                'trip_tickets.uuid',
+                'trip_tickets.ticket_number',
+                'trip_tickets.start_date',
+                'trip_tickets.validity_period',
+                'trip_tickets.medic_form_id',
+                'trip_tickets.tech_form_id',
+                'trip_tickets.logistics_method',
+                'trip_tickets.transportation_type',
+                'trip_tickets.template_code',
+                'trip_tickets.created_at',
+
+                'companies.name as company_name',
+                'drivers.fio as driver_name',
+                'cars.gos_number as car_number',
+            ])
+            ->leftJoin(
+                'companies',
+                'companies.hash_id',
+                '=',
+                'trip_tickets.company_id',
+            )
+            ->leftJoin(
+                'drivers',
+                'drivers.hash_id',
+                '=',
+                'trip_tickets.driver_id',
+            )
+            ->leftJoin(
+                'cars',
+                'cars.hash_id',
+                '=',
+                'trip_tickets.car_id',
+            )
             ->when($tripTicketIds !== null, function ($query) use ($tripTicketIds) {
                 $query->whereIn('uuid', $tripTicketIds);
             })
@@ -39,7 +84,7 @@ class TripTicketController extends Controller
             ->whereNotIn('field', ['hour_from', 'hour_to'])
             ->get();
 
-        $formsCountResult = $tripTickets->total();
+        $countResult = $tripTickets->total();
 
         $orderKey = $request->get('orderKey', 'date');
         $orderBy = $request->get('orderBy', 'ASC');
@@ -54,7 +99,7 @@ class TripTicketController extends Controller
             'filter_activated' => $filterActivated,
             'fieldPrompts' => $fieldPrompts,
             'blockedToExportFields' => [],
-            'tripTicketsCountResult' => $formsCountResult,
+            'tripTicketsCountResult' => $countResult,
             'take' => $take,
             'orderBy' => $orderBy,
             'orderKey' => $orderKey,
@@ -67,9 +112,25 @@ class TripTicketController extends Controller
 
     }
 
-    public function trash()
+    public function trash(Request $request, TrashTripTicketHandler $handler)
     {
+        $id = $request->input('id');
+        $action = $request->input('action');
+        $tripTicket = TripTicket::withTrashed()->findOrFail($id);
 
+        try {
+            DB::beginTransaction();
+
+            $handler->handle($tripTicket, $action, Auth::user());
+
+            DB::commit();
+        } catch (Throwable $exception) {
+            DB::rollBack();
+
+            session()->flash('not_deleted_items', [$id]);
+        }
+
+        return redirect(url()->previous());
     }
 
     public function generate(Request $request, TripTicketsHandler $handler)
@@ -110,15 +171,14 @@ class TripTicketController extends Controller
         }
 
         $tripTicketIds = $handler->handle(new TripTicketsAction(
-            $company->hash_id,
-            $driver
-                ? $driver->hash_id
-                : null,
+            $company,
+            $driver,
             $startDate,
             $endDate,
             LogisticsMethodEnum::fromString($request->input('logistics_method')),
             TransportationTypeEnum::fromString($request->input('transportation_type')),
             TripTicketTemplateEnum::fromString($request->input('template_code')),
+            $request->input('validity_period', 1)
         ));
 
         return $this->indexPage($request, $tripTicketIds);
@@ -126,6 +186,34 @@ class TripTicketController extends Controller
 
     public function list(Request $request)
     {
+        return response()->json();
+    }
+
+    public function massTrash(Request $request, TrashTripTicketHandler $handler): JsonResponse
+    {
+        $ids = $request->input('ids') ?? [];
+        $action = $request->input('action');
+        $notDeleted = [];
+
+        foreach ($ids as $id) {
+            try {
+                DB::beginTransaction();
+
+                $tripTicket = TripTicket::withTrashed()->findOrFail($id);
+                $handler->handle($tripTicket, $action, Auth::user());
+
+                DB::commit();
+            } catch (Throwable $exception) {
+                DB::rollBack();
+
+                $notDeleted[] = $id;
+            }
+        }
+
+        if (count($notDeleted)) {
+            session()->flash('not_deleted_items', $notDeleted);
+        }
+
         return response()->json();
     }
 }

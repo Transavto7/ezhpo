@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Services\TripTicket;
+namespace App\Actions\TripTicket\CreateTripTickets;
 
+use App\Company;
+use App\Driver;
 use App\Enums\LogisticsMethodEnum;
 use App\Enums\TransportationTypeEnum;
 use App\Enums\TripTicketTemplateEnum;
@@ -10,14 +12,14 @@ use Carbon\Carbon;
 class TripTicketsAction
 {
     /**
-     * @var string
+     * @var Company
      */
-    private $companyId;
+    private $company;
 
     /**
-     * @var string|null
+     * @var Driver|null
      */
-    private $driverId;
+    private $driver;
 
     /**
      * @var Carbon
@@ -45,40 +47,49 @@ class TripTicketsAction
     private $templateCode;
 
     /**
-     * @param string $companyId
-     * @param string|null $driverId
+     * @var integer
+     */
+    private $validityPeriod;
+
+    /**
+     * @param Company $company
+     * @param Driver|null $driver
      * @param Carbon $dateFrom
      * @param Carbon $dateTo
      * @param LogisticsMethodEnum $logisticsMethod
      * @param TransportationTypeEnum $transportationType
      * @param TripTicketTemplateEnum $templateCode
+     * @param int $validityPeriod
      */
     public function __construct(
-        string $companyId,
-        ?string $driverId,
+        Company $company,
+        ?Driver $driver,
         Carbon $dateFrom,
         Carbon $dateTo,
         LogisticsMethodEnum $logisticsMethod,
         TransportationTypeEnum $transportationType,
-        TripTicketTemplateEnum $templateCode
-    ) {
-        $this->companyId = $companyId;
-        $this->driverId = $driverId;
+        TripTicketTemplateEnum $templateCode,
+        int $validityPeriod
+    )
+    {
+        $this->company = $company;
+        $this->driver = $driver;
         $this->dateFrom = $dateFrom;
         $this->dateTo = $dateTo;
         $this->logisticsMethod = $logisticsMethod;
         $this->transportationType = $transportationType;
         $this->templateCode = $templateCode;
+        $this->validityPeriod = $validityPeriod;
     }
 
-    public function getCompanyId(): string
+    public function getCompany(): Company
     {
-        return $this->companyId;
+        return $this->company;
     }
 
-    public function getDriverId(): ?string
+    public function getDriver(): ?Driver
     {
-        return $this->driverId;
+        return $this->driver;
     }
 
     public function getDateFrom(): Carbon
@@ -104,5 +115,10 @@ class TripTicketsAction
     public function getTemplateCode(): TripTicketTemplateEnum
     {
         return $this->templateCode;
+    }
+
+    public function getValidityPeriod(): int
+    {
+        return $this->validityPeriod;
     }
 }
