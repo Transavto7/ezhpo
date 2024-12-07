@@ -72,10 +72,35 @@ class TripTicketController extends Controller
             )
             ->when($tripTicketIds !== null, function ($query) use ($tripTicketIds) {
                 $query->whereIn('uuid', $tripTicketIds);
-            })
-            ->paginate($take);
+            });
 
         $filterActivated = ! empty($request->get('filter'));
+        $filterParams = $request->except([
+            'trash',
+            'export',
+            'exportPrikazPL',
+            'exportPrikaz',
+            'filter',
+            'take',
+            'orderBy',
+            'orderKey',
+            'page',
+        ]);
+
+        if (count($filterParams) > 0 && $filterActivated) {
+            foreach ($filterParams as $filterKey => $filterValue) {
+                if ($filterValue === null || in_array($filterKey, ['date_from', 'date_to'])) {
+                    continue;
+                }
+
+                $tripTickets->where("trip_tickets.$filterKey", '=', $filterValue);
+            }
+
+            if ($filterParams['date_from'] || $filterParams['date_to']) {
+                $tripTickets = $tripTickets
+                    ->whereBetween('start_date', [$filterParams['date_from'], $filterParams['date_to']]);
+            }
+        }
 
         $fieldPrompts = FieldPrompt::query()
             ->where('type', $type)
@@ -84,6 +109,7 @@ class TripTicketController extends Controller
             ->whereNotIn('field', ['hour_from', 'hour_to'])
             ->get();
 
+        $tripTickets = $tripTickets->paginate($take);
         $countResult = $tripTickets->total();
 
         $orderKey = $request->get('orderKey', 'date');

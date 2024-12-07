@@ -354,6 +354,10 @@
                 $('#hv-alert-error').addClass('d-none')
                 $('#hv-alert-error').removeClass('d-flex')
             })
+
+            @if(request()->get('create', null) === '1')
+                $('#filters-div a[href="#registry-update"]').tab('show')
+            @endif
         })
     </script>
 @endsection
@@ -455,11 +459,11 @@
                                     class="nav-link active"
                                     id="registry-update-1-tab"
                                     data-toggle="tab"
-                                    href="#registry-update"
+                                    href="#filter-group"
                                     role="tab"
-                                    aria-controls="registry-update"
+                                    aria-controls="filter-group"
                                     aria-selected="true">
-                                    Обновление реестра
+                                    <i class="fa fa-filter"></i>Фильтры
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -467,22 +471,22 @@
                                     class="nav-link"
                                     id="filter-group-2-tab"
                                     data-toggle="tab"
-                                    href="#filter-group"
+                                    href="#registry-update"
                                     role="tab"
-                                    aria-controls="filter-group"
+                                    aria-controls="registry-update"
                                     aria-selected="false">
-                                    <i class="fa fa-filter"></i>Фильтры
+                                    Обновление реестра
                                 </a>
                             </li>
                         </ul>
 
-                        @if($permissionToCreate)
-                            @component('trip-tickets.components.create-form')
+                        @if($permissionToView)
+                            @component('trip-tickets.components.filters')
                             @endcomponent
                         @endif
 
-                        @if($permissionToView)
-                            @component('trip-tickets.components.filters')
+                        @if($permissionToCreate)
+                            @component('trip-tickets.components.create-form')
                             @endcomponent
                         @endif
                     </div>
