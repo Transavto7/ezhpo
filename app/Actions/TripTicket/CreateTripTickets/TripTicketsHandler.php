@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\TripTicket;
+namespace App\Actions\TripTicket\CreateTripTickets;
 
 use App\Enums\FormTypeEnum;
 use App\Models\TripTicket;
@@ -23,28 +23,42 @@ class TripTicketsHandler
             for ($i = 0; $i < $maxLength; $i++) {
                 $medicForm = $medicForms[$i] ?? null;
                 $techForm = $techForms[$i] ?? null;
+                $carId = null;
+                $number = null;
 
-                $number = $techForm
-                    ? $techForm->number
-                    : null;
+                if ($techForm !== null) {
+                    $carId = $techForm->car_id;
+                    $number = $techForm->number;
+                }
+
+                if ($number === null) {
+                    $number = $action->getCompany()->hash_id
+                        .'-'
+                        .date('d.m.Y', strtotime($date));
+                }
 
                 if ($i) {
                     $number .= '/' . ($i + 1);
                 }
 
-                if ($this->isSameTripTicket(
+                $tripTicketId = $this->existedTripTicket(
                     $medicForm ? $medicForm->uuid : null,
-                    $techForm ? $techForm->uuid : null)
-                ) {
+                    $techForm ? $techForm->uuid : null);
+
+                if ($tripTicketId !== null) {
+                    $tripTicketIds[] = $tripTicketId;
                     continue;
                 }
 
                 $tripTicket = TripTicket::create([
                     'ticket_number' => $number,
+                    'company_id' => $action->getCompany()->hash_id,
                     'start_date' => $date,
-                    'validity_period' => 1,
+                    'validity_period' => $action->getValidityPeriod(),
                     'medic_form_id' => $medicForm ? $medicForm->uuid : null,
+                    'driver_id' => $action->getDriver() ? $action->getDriver()->hash_id : null,
                     'tech_form_id' => $techForm ? $techForm->uuid : null,
+                    'car_id' => $carId,
                     'logistics_method' => $action->getLogisticsMethod(),
                     'transportation_type' => $action->getTransportationType(),
                     'template_code' => $action->getTemplateCode(),
@@ -80,6 +94,7 @@ class TripTicketsHandler
             ->select([
                 'uuid',
                 'number_list_road as number',
+                'car_id',
             ])
             ->join(
                 'tech_forms',
@@ -97,14 +112,14 @@ class TripTicketsHandler
     private function getFormBuilder(TripTicketsAction $action, Carbon $date): Builder
     {
         return DB::table('forms')
-            ->where('company_id', '=', $action->getCompanyId())
-            ->where('driver_id', '=', $action->getDriverId())
+            ->where('company_id', '=', $action->getCompany()->hash_id)
+            ->where('driver_id', '=', $action->getDriver() ? $action->getDriver()->hash_id : null)
             ->where(DB::raw('DATE(date)'), '=', $date)
             ->whereNull('deleted_id')
             ->whereNull('deleted_at');
     }
 
-    private function isSameTripTicket($medicFormId, $techFormId): bool
+    private function existedTripTicket($medicFormId, $techFormId)
     {
         $tripTicket = DB::table('trip_tickets')
             ->when($medicFormId, function ($query) use ($medicFormId) {
@@ -115,6 +130,8 @@ class TripTicketsHandler
             })
             ->first();
 
-        return $tripTicket !== null;
+        return $tripTicket !== null
+            ? $tripTicket->uuid
+            : null;
     }
 }

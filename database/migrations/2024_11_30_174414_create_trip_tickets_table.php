@@ -43,6 +43,7 @@ class CreateTripTicketsTable extends Migration
 
             $table->timestamps();
             $table->softDeletes();
+            $table->string('deleted_id')->nullable();
         });
     }
 

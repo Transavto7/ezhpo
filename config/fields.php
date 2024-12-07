@@ -438,7 +438,21 @@ return [
             'type_view' => true,
             'comments' => true,
             'flag_pak' => true,
-        ]
+        ],
+        'trip_tickets' => [
+            'ticket_number' => true,
+            'created_at' => true,
+            'company_name' => true,
+            'start_date' => true,
+            'validity_period' => true,
+            'medic_form_id' => true,
+            'driver_name' => true,
+            'tech_form_id' => true,
+            'car_number' => true,
+            'logistics_method' => true,
+            'transportation_type' => true,
+            'template_code' => true,
+        ],
     ],
 
     'client_exclude' => [
