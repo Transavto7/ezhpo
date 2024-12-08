@@ -158,6 +158,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('generate', 'TripTicketController@generate')->name('generate');
             Route::get('create', 'TripTicketController@createPage')->name('create');
             Route::post('store', 'TripTicketController@store')->name('store');
+            Route::post('print', 'TripTicketController@print')->name('print');
             Route::get('{id}/edit', 'TripTicketController@editPage')->name('edit');
             Route::post('{id}', 'TripTicketController@update')->name('update');
             Route::get('trash', 'TripTicketController@trash')->name('trash');
