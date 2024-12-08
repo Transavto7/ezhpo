@@ -523,8 +523,8 @@
                             @endif
                             <button id="select-all" class="btn btn-success btn-sm ml-2">Выделить все на странице
                             </button>
-                            <button id="selected-items-control-btn-unset" class="btn btn-success btn-sm ml-2">Снять
-                                выделение
+                            <button id="selected-items-control-btn-unset" class="btn btn-success btn-sm ml-2">
+                                Снять выделение
                             </button>
                         </div>
                     @endif
@@ -564,8 +564,7 @@
                             <th>#</th>
 
                             @foreach($fieldPrompts as $field)
-                                <th
-                                    data-field-key="{{ $field->field }}"
+                                <th data-field-key="{{ $field->field }}"
                                     @isset($blockedToExportFields[$field->field])
                                         class="not-export"
                                     @endisset>
@@ -598,7 +597,7 @@
                                 <td>
                                     <input
                                         type="checkbox"
-                                        data-id="{{ $tripTicket->id }}"
+                                        data-id="{{ $tripTicket->uuid }}"
                                         class="hv-checkbox-mass-deletion">
                                 </td>
 
@@ -643,7 +642,7 @@
 
                                 <td class="td-option not-export d-flex justify-content-end">
                                     @if($permissionToUpdate)
-                                        <a href="{{ route('trip-tickets.edit', $tripTicket->id) }}"
+                                        <a href="{{ route('trip-tickets.edit', $tripTicket->uuid) }}"
                                            class="btn btn-info btn-sm mr-1"><i class="fa fa-edit"></i></a>
                                     @endif
 
@@ -655,7 +654,7 @@
 
                                     @if($permissionToDelete)
                                         <a
-                                            href="{{ route('trip-tickets.trash', ['id' => $tripTicket->id, 'action' => request()->get('trash') ? 0 : 1]) }}"
+                                            href="{{ route('trip-tickets.trash', ['id' => $tripTicket->uuid, 'action' => request()->get('trash') ? 0 : 1]) }}"
                                             class="btn btn-warning btn-sm hv-btn-trash mr-1"
                                             data-id="{{ $tripTicket->id }}">
                                             @if(request()->get('trash', 0))
