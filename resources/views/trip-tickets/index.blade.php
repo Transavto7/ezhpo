@@ -157,7 +157,7 @@
     <script type="text/javascript">
         const tripTicketsApi = {
             massTrash: '{{ route('trip-tickets.mass-trash') }}',
-            print: '',
+            print: '{{ route('trip-tickets.print') }}',
         }
         const data = {
             items: [],
@@ -312,42 +312,58 @@
                 updateTripTicketsControl()
             })
 
-            $('#trip-tickets-print-btn').click(function () {
-                const tripTicketsStorage = getTripTicketsStorage()
+            $('.export-excel-btn').click((event) => {
+                const btn = $(event.currentTarget)
+                const uuid = btn.attr('data-uuid')
 
                 axios({
                     method: 'post',
                     url: tripTicketsApi.print,
                     data: {
-                        ids: tripTicketsStorage.items,
+                        id: uuid
                     },
                     responseType: 'blob',
                 })
                     .then((response) => {
-                        const url = window.URL.createObjectURL(new Blob([response.data]))
-                        const link = document.createElement('a')
+                        const url = window.URL.createObjectURL(new Blob([response.data]));
+                        const link = document.createElement('a');
 
-                        link.href = url
-                        link.setAttribute('download', 'Путевые листы.pdf')
+                        link.href = url;
+                        link.setAttribute('download', 'Путевой лист.xlsx');
 
-                        document.body.appendChild(link)
-
-                        link.click()
-                        link.remove()
+                        document.body.appendChild(link);
+                        link.click();
+                        link.remove();
                     })
                     .catch((error) => {
-                        const status = error.response.status;
-                        let message = 'При формировании файла произошла ошибка';
+                        if (error.response && error.response.data instanceof Blob) {
+                            const blob = error.response.data;
 
-                        if (status === 422) {
-                            message = 'Превышено максимально допустимое количество осмотров для печати'
+                            blob.text().then((text) => {
+                                try {
+                                    const errorData = JSON.parse(text);
+                                    let message = errorData.message ?? '';
+
+                                    swal.fire({
+                                        title: 'При формировании файла произошла ошибка',
+                                        text: message,
+                                        icon: 'error'
+                                    });
+                                } catch (e) {
+                                    swal.fire({
+                                        title: 'При формировании файла произошла ошибка',
+                                        text: text,
+                                        icon: 'error'
+                                    });
+                                }
+                            });
+                        } else {
+                            swal.fire({
+                                title: 'При формировании файла произошла ошибка',
+                                icon: 'error'
+                            });
                         }
-
-                        swal.fire({
-                            title: message,
-                            icon: 'error'
-                        });
-                    })
+                    });
             })
 
             $('#hv-alert-error-close').click(function () {
@@ -629,6 +645,12 @@
                                     @if($permissionToUpdate)
                                         <a href="{{ route('trip-tickets.edit', $tripTicket->id) }}"
                                            class="btn btn-info btn-sm mr-1"><i class="fa fa-edit"></i></a>
+                                    @endif
+
+                                    @if($permissionToExport)
+                                        <a class="btn btn-success btn-sm mr-1 export-excel-btn" data-uuid="{{ $tripTicket->uuid }}">
+                                            <i class="fa fa-file-excel-o"></i>
+                                        </a>
                                     @endif
 
                                     @if($permissionToDelete)
