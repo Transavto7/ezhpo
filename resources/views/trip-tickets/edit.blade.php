@@ -6,6 +6,7 @@
 @php
     use Carbon\Carbon;
     $created = \Illuminate\Support\Facades\Session::get('created', []);
+    /** @var App\Models\TripTicket $tripTicket */
 @endphp
 
 @section('custom-scripts')
@@ -43,51 +44,6 @@
                     <p><b>{{ $title }}</b></p>
 
                     <article class="anketa anketa-fields">
-                        @foreach($errors ?? [] as $error)
-                            <div class="alert alert-danger" role="alert">{{ $error }}</div>
-                        @endforeach
-
-                        @if(count($created ?? []))
-                            <div class="row">
-                                @foreach($created ?? [] as $tripTicket)
-                                    <div class="col-md-12">
-                                        <div class="card p-2 text-xsmall">
-                                            <b>Путевой лист успешно создан!</b>
-                                            <br/> Номер путевого листа: {{ $tripTicket->ticket_number }}
-
-                                            @if($tripTicket->company && $tripTicket->company->name)
-                                                <br/>
-                                                <b>Компания: {{ $tripTicket->company->name }}</b>
-                                            @endif
-
-                                            @if($tripTicket->driver && $tripTicket->driver->fio)
-                                                <br/>
-                                                <b>Водитель: {{ $tripTicket->driver->fio }}</b>
-                                            @endif
-
-                                            @if($tripTicket->car && $tripTicket->car->gos_number)
-                                                <br/>
-                                                <b>Госномер автомобиля: {{ $tripTicket->car->gos_number }}</b>
-                                            @endif
-
-                                            @if($tripTicket->start_date)
-                                                <div>
-                                                    <i>Дата оформления:
-                                                    <br/><b>{{ Carbon::parse($tripTicket->start_date)->format('d.m.Y') }}</b></i>
-                                                </div>
-                                            @endif
-
-                                            @if($tripTicket->validity_period)
-                                                <div>
-                                                    <i>Срок действия:<b> {{ $tripTicket->validity_period }}</b></i>
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
-
                         @if(\Illuminate\Support\Facades\Session::has('message'))
                             <div class="alert alert-success">
                                 <b>{{ \Illuminate\Support\Facades\Session::get('message') }}</b>
@@ -95,20 +51,18 @@
                         @endif
 
                         <form method="POST"
-                              action="{{ route('trip-tickets.store') }}"
+                              action="{{ route('trip-tickets.update', ['id' => $tripTicket->id]) }}"
                               class="form-horizontal"
                               onsubmit="document.querySelector('#page-preloader').classList.remove('hide')"
                               enctype="multipart/form-data" id="ANKETA_FORM">
                             @csrf
 
-                            @if(isset($anketa_route) && $id)
-                                <input type="hidden" name="REFERER" value="{{ url()->previous() }}">
-                            @endif
+                            <input type="hidden" name="REFERER" value="{{ url()->previous() }}">
 
                             <div class="form-group">
                                 <label class="form-control-label">ID компании:</label>
                                 <article>
-                                    <input value="{{ $company_id ?? '' }}"
+                                    <input value="{{ $tripTicket->company_id  }}"
                                            required
                                            type="number"
                                            oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Company', event.target.value, 'name', $(event.target).parent(), {{ !($id ?? false) ? 'true' : 'false' }})"
@@ -123,7 +77,7 @@
                                 <label class="form-control-label">ID водителя:</label>
                                 <article>
                                     <div class="d-flex">
-                                        <input value="{{ $driver_id ?? '' }}" type="number"
+                                        <input value="{{ $tripTicket->driver_id }}" type="number"
                                                oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent().parent(), {{ 'false' }})"
                                                min="6"
                                                name="driver_id"
@@ -137,7 +91,7 @@
                                 <label class="form-control-label">ID автомобиля:</label>
                                 <article>
                                     <div class="d-flex">
-                                        <input value="{{ $car_id ?? '' }}" type="number"
+                                        <input value="{{ $tripTicket->car_id }}" type="number"
                                                oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent().parent(), {{ 'false' }})"
                                                min="6"
                                                name="car_id"
@@ -153,31 +107,22 @@
                                     <input min="1970-01-01"
                                            max="2100-01-01"
                                            type="date"
-                                           value="{{ $default_current_date ?? '' }}"
+                                           value="{{ $tripTicket->start_date }}"
                                            name="start_date"
                                            class="form-control">
                                 </article>
                             </div>
 
                             <div class="form-group">
-                                <label class="form-control-label">Доп. даты:</label>
-                                <article>
-                                    <input type="date"
-                                           name="additional_dates"
-                                           class="form-control date-range">
-                                </article>
-                            </div>
-
-                            <div class="form-group">
                                 <label class="form-control-label">Срок действия, дней:</label>
-                                <input type="number" value="{{ $validity_period ?? '1' }}"
+                                <input type="number" value="{{ $tripTicket->validity_period }}"
                                        name="validity_period" class="form-control" min="1">
                             </div>
 
                             <div class="form-group">
                                 <label class="form-control-label">Номер путевого листа:</label>
-                                <input type="text" value="{{ $number_list_road ?? '' }}"
-                                       name="ticket_number"
+                                <input type="text" value="{{ $tripTicket->ticket_number }}"
+                                       name="ticket_number" disabled
                                        class="form-control">
                             </div>
 
@@ -186,7 +131,9 @@
                                 <article>
                                     <select name="logistics_method" required class="form-control type-view">
                                         @foreach(\App\Enums\LogisticsMethodEnum::labels() as $key => $label)
-                                            <option value="{{ $key }}">{{ $label }}</option>
+                                            <option value="{{ $key }}"
+                                                    @if($tripTicket->logistics_method === $key){{'selected'}}@endif
+                                            >{{ $label }}</option>
                                         @endforeach
                                     </select>
                                 </article>
@@ -197,7 +144,9 @@
                                 <article>
                                     <select name="transportation_type" required class="form-control type-view">
                                         @foreach(\App\Enums\TransportationTypeEnum::labels() as $key => $label)
-                                            <option value="{{ $key }}">{{ $label }}</option>
+                                            <option value="{{ $key }}"
+                                                @if($tripTicket->transportation_type === $key){{'selected'}}@endif
+                                            >{{ $label }}</option>
                                         @endforeach
                                     </select>
                                 </article>
@@ -208,23 +157,17 @@
                                 <article>
                                     <select name="template_code" required class="form-control type-view">
                                         @foreach(\App\Enums\TripTicketTemplateEnum::labels() as $key => $label)
-                                            <option value="{{ $key }}">{{ $label }}</option>
+                                            <option value="{{ $key }}"
+                                                @if($tripTicket->template_code === $key){{'selected'}}@endif
+                                            >{{ $label }}</option>
                                         @endforeach
                                     </select>
                                 </article>
                             </div>
 
                             <div class="form-group row mb-0">
-                                @if(isset($anketa_route))
-                                    <a href="{{ url()->previous() }}"
-                                       class="m-center btn btn-info">
-                                        Вернуться в журнал
-                                    </a>
-                                @endif
-                                <button type="submit"
-                                        class="m-center btn btn-sm btn-success submit-btn">
-                                    Сохранить
-                                </button>
+                                <a href="{{ url()->previous() }}" class="m-center btn btn-sm btn-info">Вернуться в реестр</a>
+                                <button type="submit" class="m-center btn btn-sm btn-success submit-btn">Сохранить</button>
                             </div>
                         </form>
                     </article>
