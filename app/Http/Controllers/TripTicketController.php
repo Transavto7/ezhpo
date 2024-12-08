@@ -7,6 +7,8 @@ use App\Actions\TripTicket\CreateTripTickets\TripTicketsHandler;
 use App\Actions\TripTicket\DeleteTripTickets\TrashTripTicketHandler;
 use App\Actions\TripTicket\StoreTripTicket\StoreTripTicketAction;
 use App\Actions\TripTicket\StoreTripTicket\StoreTripTicketHandler;
+use App\Actions\TripTicket\UpdateTripTicket\UpdateTripTicketAction;
+use App\Actions\TripTicket\UpdateTripTicket\UpdateTripTicketHandler;
 use App\Company;
 use App\Driver;
 use App\Enums\LogisticsMethodEnum;
@@ -186,9 +188,41 @@ class TripTicketController extends Controller
         return back()->with($response);
     }
 
-    public function editPage()
+    public function editPage(string $id)
     {
+        $tripTicket = TripTicket::findOrFail($id);
 
+        return view('trip-tickets.edit', [
+            'title' => 'Редактирование путевого листа',
+            'tripTicket' => $tripTicket,
+        ]);
+    }
+
+    public function update(string $id, Request $request, UpdateTripTicketHandler $handler)
+    {
+        $referer = $request->input('REFERER');
+
+        try {
+            $tripTicket = TripTicket::findOrFail($id);
+
+            $tripTicket = $handler->handle(new UpdateTripTicketAction(
+                $tripTicket,
+                $request->input('company_id'),
+                $request->input('driver_id'),
+                $request->input('car_id'),
+                $request->input('start_date'),
+                $request->input('validity_period', 1),
+                $request->input('ticket_number'),
+                LogisticsMethodEnum::fromString($request->input('logistics_method')),
+                TransportationTypeEnum::fromString($request->input('transportation_type')),
+                TripTicketTemplateEnum::fromString($request->input('template_code')),
+            ));
+
+        } catch (Throwable $exception) {
+            return redirect($referer)->with(['error' => $exception->getMessage()]);
+        }
+
+        return redirect($referer)->with(['success' => "Путевой лист №$tripTicket->ticket_number обновлен"]);
     }
 
     public function trash(Request $request, TrashTripTicketHandler $handler)

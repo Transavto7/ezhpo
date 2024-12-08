@@ -356,7 +356,7 @@
             })
 
             @if(request()->get('create', null) === '1')
-                $('#filters-div a[href="#registry-update"]').tab('show')
+            $('#filters-div a[href="#registry-update"]').tab('show')
             @endif
         })
     </script>
@@ -379,6 +379,12 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
+                <div class="col-md-12">
+                    @if(session()->has('success'))
+                        <div class="alert alert-success" role="alert">{{ session()->get('success') }}</div>
+                    @endif
+                </div>
+
                 <div>
                     <div class="col-md-12">
                         <div class="row bg-light p-2">
@@ -485,7 +491,7 @@
                         @endif
 
                         @if($permissionToCreate)
-                            @component('trip-tickets.components.create-form')
+                            @component('trip-tickets.components.create-tab')
                             @endcomponent
                         @endif
                     </div>

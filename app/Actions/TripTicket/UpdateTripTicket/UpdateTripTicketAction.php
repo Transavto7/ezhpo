@@ -1,13 +1,19 @@
 <?php
 
-namespace App\Actions\TripTicket\StoreTripTicket;
+namespace App\Actions\TripTicket\UpdateTripTicket;
 
 use App\Enums\LogisticsMethodEnum;
 use App\Enums\TransportationTypeEnum;
 use App\Enums\TripTicketTemplateEnum;
+use App\Models\TripTicket;
 
-final class StoreTripTicketAction
+final class UpdateTripTicketAction
 {
+    /**
+     * @var TripTicket
+     */
+    private $tripTicket;
+
     /**
      * @var string
      */
@@ -27,11 +33,6 @@ final class StoreTripTicketAction
      * @var string
      */
     private $startDate;
-
-    /**
-     * @var string[]
-     */
-    private $additionalDates;
 
     /**
      * @var integer
@@ -59,11 +60,11 @@ final class StoreTripTicketAction
     private $templateCode;
 
     /**
+     * @param TripTicket $tripTicket
      * @param string $companyId
      * @param string|null $driverId
      * @param string|null $carId
      * @param string $startDate
-     * @param string[] $additionalDates
      * @param int $validityPeriod
      * @param string|null $ticketNumber
      * @param LogisticsMethodEnum $logisticsMethod
@@ -71,27 +72,32 @@ final class StoreTripTicketAction
      * @param TripTicketTemplateEnum $templateCode
      */
     public function __construct(
+        TripTicket $tripTicket,
         string $companyId,
         ?string $driverId,
         ?string $carId,
         string $startDate,
-        array $additionalDates,
         int $validityPeriod,
         ?string $ticketNumber,
         LogisticsMethodEnum $logisticsMethod,
         TransportationTypeEnum $transportationType,
         TripTicketTemplateEnum $templateCode
     ) {
+        $this->tripTicket = $tripTicket;
         $this->companyId = $companyId;
         $this->driverId = $driverId;
         $this->carId = $carId;
         $this->startDate = $startDate;
-        $this->additionalDates = $additionalDates;
         $this->validityPeriod = $validityPeriod;
         $this->ticketNumber = $ticketNumber;
         $this->logisticsMethod = $logisticsMethod;
         $this->transportationType = $transportationType;
         $this->templateCode = $templateCode;
+    }
+
+    public function getTripTicket(): TripTicket
+    {
+        return $this->tripTicket;
     }
 
     public function getCompanyId(): string
@@ -112,11 +118,6 @@ final class StoreTripTicketAction
     public function getStartDate(): string
     {
         return $this->startDate;
-    }
-
-    public function getAdditionalDates(): array
-    {
-        return $this->additionalDates;
     }
 
     public function getValidityPeriod(): int
