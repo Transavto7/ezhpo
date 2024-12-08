@@ -193,9 +193,9 @@ class TripTicketController extends Controller
         return back()->with($response);
     }
 
-    public function editPage(string $id)
+    public function editPage(string $uuid)
     {
-        $tripTicket = TripTicket::findOrFail($id);
+        $tripTicket = TripTicket::where('uuid', '=', $uuid)->first();
 
         return view('trip-tickets.edit', [
             'title' => 'Редактирование путевого листа',
@@ -203,12 +203,12 @@ class TripTicketController extends Controller
         ]);
     }
 
-    public function update(string $id, Request $request, UpdateTripTicketHandler $handler)
+    public function update(string $uuid, Request $request, UpdateTripTicketHandler $handler)
     {
         $referer = $request->input('REFERER');
 
         try {
-            $tripTicket = TripTicket::findOrFail($id);
+            $tripTicket = TripTicket::where('uuid', '=', $uuid)->first();
 
             $tripTicket = $handler->handle(new UpdateTripTicketAction(
                 $tripTicket,
@@ -232,9 +232,9 @@ class TripTicketController extends Controller
 
     public function trash(Request $request, TrashTripTicketHandler $handler)
     {
-        $id = $request->input('id');
+        $uuid = $request->input('id');
         $action = $request->input('action');
-        $tripTicket = TripTicket::withTrashed()->findOrFail($id);
+        $tripTicket = TripTicket::withTrashed()->where('uuid', '=', $uuid)->first();
 
         try {
             DB::beginTransaction();
@@ -245,10 +245,38 @@ class TripTicketController extends Controller
         } catch (Throwable $exception) {
             DB::rollBack();
 
-            session()->flash('not_deleted_items', [$id]);
+            session()->flash('not_deleted_items', [$uuid]);
         }
 
         return redirect(url()->previous());
+    }
+
+    public function massTrash(Request $request, TrashTripTicketHandler $handler): JsonResponse
+    {
+        $ids = $request->input('ids') ?? [];
+        $action = $request->input('action');
+        $notDeleted = [];
+
+        foreach ($ids as $uuid) {
+            try {
+                DB::beginTransaction();
+
+                $tripTicket = TripTicket::withTrashed()->where('uuid', '=', $uuid)->first();
+                $handler->handle($tripTicket, $action, Auth::user());
+
+                DB::commit();
+            } catch (Throwable $exception) {
+                DB::rollBack();
+
+                $notDeleted[] = $uuid;
+            }
+        }
+
+        if (count($notDeleted)) {
+            session()->flash('not_deleted_items', $notDeleted);
+        }
+
+        return response()->json();
     }
 
     public function generate(Request $request, TripTicketsHandler $handler)
@@ -300,34 +328,6 @@ class TripTicketController extends Controller
         ));
 
         return $this->indexPage($request, $tripTicketIds);
-    }
-
-    public function massTrash(Request $request, TrashTripTicketHandler $handler): JsonResponse
-    {
-        $ids = $request->input('ids') ?? [];
-        $action = $request->input('action');
-        $notDeleted = [];
-
-        foreach ($ids as $id) {
-            try {
-                DB::beginTransaction();
-
-                $tripTicket = TripTicket::withTrashed()->findOrFail($id);
-                $handler->handle($tripTicket, $action, Auth::user());
-
-                DB::commit();
-            } catch (Throwable $exception) {
-                DB::rollBack();
-
-                $notDeleted[] = $id;
-            }
-        }
-
-        if (count($notDeleted)) {
-            session()->flash('not_deleted_items', $notDeleted);
-        }
-
-        return response()->json();
     }
 
     public function print(Request $request, ExportExcelTripTicketQuery $query)

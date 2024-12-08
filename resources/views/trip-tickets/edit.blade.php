@@ -51,7 +51,7 @@
                         @endif
 
                         <form method="POST"
-                              action="{{ route('trip-tickets.update', ['id' => $tripTicket->id]) }}"
+                              action="{{ route('trip-tickets.update', ['id' => $tripTicket->uuid]) }}"
                               class="form-horizontal"
                               onsubmit="document.querySelector('#page-preloader').classList.remove('hide')"
                               enctype="multipart/form-data" id="ANKETA_FORM">
