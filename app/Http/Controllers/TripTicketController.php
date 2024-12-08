@@ -11,6 +11,7 @@ use App\Actions\TripTicket\StoreTripTicket\StoreTripTicketAction;
 use App\Actions\TripTicket\StoreTripTicket\StoreTripTicketHandler;
 use App\Actions\TripTicket\UpdateTripTicket\UpdateTripTicketAction;
 use App\Actions\TripTicket\UpdateTripTicket\UpdateTripTicketHandler;
+use App\Car;
 use App\Company;
 use App\Driver;
 use App\Enums\LogisticsMethodEnum;
@@ -22,6 +23,7 @@ use App\ValueObjects\EntityId;
 use Arr;
 use Carbon\Carbon;
 use Exception;
+use Http\Discovery\Exception\NotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -167,6 +169,12 @@ class TripTicketController extends Controller
     {
         $response = [];
         try {
+            $this->validateIds(
+                $request->input('company_id'),
+                $request->input('driver_id'),
+                $request->input('car_id')
+            );
+
             DB::beginTransaction();
             $response = $handler->handle(new StoreTripTicketAction(
                 $request->input('company_id'),
@@ -193,6 +201,24 @@ class TripTicketController extends Controller
         return back()->with($response);
     }
 
+    private function validateIds(string $companyId, string $driverId = null, string $carId = null)
+    {
+        $company = Company::where('hash_id', '=', $companyId)->first();
+        if ($companyId && $company === null) {
+            throw new NotFoundException("Ошибка. Компания с hash_id $companyId не найдена");
+        }
+
+        $driver = Driver::where('hash_id', '=', $driverId)->first();
+        if ($driverId && $driver === null) {
+            throw new NotFoundException("Ошибка. Водитель с hash_id $driverId не найден");
+        }
+
+        $car = Car::where('hash_id', '=', $carId)->first();
+        if ($carId && $car === null) {
+            throw new NotFoundException("Ошибка. Автомобиль с hash_id $carId не найден");
+        }
+    }
+
     public function editPage(string $uuid)
     {
         $tripTicket = TripTicket::where('uuid', '=', $uuid)->first();
@@ -209,6 +235,12 @@ class TripTicketController extends Controller
 
         try {
             $tripTicket = TripTicket::where('uuid', '=', $uuid)->first();
+
+            $this->validateIds(
+                $request->input('company_id'),
+                $request->input('driver_id'),
+                $request->input('car_id')
+            );
 
             $tripTicket = $handler->handle(new UpdateTripTicketAction(
                 $tripTicket,
