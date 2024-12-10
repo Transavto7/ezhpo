@@ -98,25 +98,27 @@ class TripTicketController extends Controller
             'page',
         ]);
 
-        if (count($filterParams) > 0 && $filterActivated) {
-            foreach ($filterParams as $filterKey => $filterValue) {
-                if ($filterValue === null || in_array($filterKey, ['date_from', 'date_to'])) {
-                    continue;
+        if ($tripTicketIds === null) {
+            if (count($filterParams) > 0 && $filterActivated) {
+                foreach ($filterParams as $filterKey => $filterValue) {
+                    if ($filterValue === null || in_array($filterKey, ['date_from', 'date_to'])) {
+                        continue;
+                    }
+
+                    $tripTickets->where("trip_tickets.$filterKey", '=', $filterValue);
                 }
 
-                $tripTickets->where("trip_tickets.$filterKey", '=', $filterValue);
-            }
+                if ($filterParams['date_from'] || $filterParams['date_to']) {
+                    $tripTickets = $tripTickets
+                        ->whereBetween('start_date', [$filterParams['date_from'], $filterParams['date_to']]);
+                }
+            } else {
+                $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
+                $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
 
-            if ($filterParams['date_from'] || $filterParams['date_to']) {
                 $tripTickets = $tripTickets
-                    ->whereBetween('start_date', [$filterParams['date_from'], $filterParams['date_to']]);
+                    ->whereBetween('start_date', [$date_from_filter, $date_to_filter]);
             }
-        } else {
-            $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
-            $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
-
-            $tripTickets = $tripTickets
-                ->whereBetween('start_date', [$date_from_filter, $date_to_filter]);
         }
 
         $fieldPrompts = FieldPrompt::query()
@@ -237,19 +239,17 @@ class TripTicketController extends Controller
             $tripTicket = TripTicket::where('uuid', '=', $uuid)->first();
 
             $this->validateIds(
-                $request->input('company_id'),
+                $tripTicket->company_id,
                 $request->input('driver_id'),
                 $request->input('car_id')
             );
 
             $tripTicket = $handler->handle(new UpdateTripTicketAction(
                 $tripTicket,
-                $request->input('company_id'),
                 $request->input('driver_id'),
                 $request->input('car_id'),
                 $request->input('start_date'),
                 $request->input('validity_period', 1),
-                $request->input('ticket_number'),
                 LogisticsMethodEnum::fromString($request->input('logistics_method')),
                 TransportationTypeEnum::fromString($request->input('transportation_type')),
                 TripTicketTemplateEnum::fromString($request->input('template_code')),

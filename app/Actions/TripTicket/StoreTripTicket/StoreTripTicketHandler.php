@@ -2,11 +2,15 @@
 
 namespace App\Actions\TripTicket\StoreTripTicket;
 
+use App\Actions\TripTicket\TripTicketNumberGenerator;
 use App\Models\TripTicket;
-use Carbon\Carbon;
+use Exception;
 
-final class StoreTripTicketHandler
+final class StoreTripTicketHandler extends TripTicketNumberGenerator
 {
+    /**
+     * @throws Exception
+     */
     public function handle(StoreTripTicketAction $action): array
     {
         $dates = $action->getAdditionalDates() ?: [];
@@ -15,13 +19,17 @@ final class StoreTripTicketHandler
             $dates[] = $action->getStartDate();
         }
 
-        $number = $this->getNumber($action);
+        if ($action->getTicketNumber() && $this->findSimilar($action->getTicketNumber())) {
+            throw new Exception("Путевой лист с номером {$action->getTicketNumber()} уже существует");
+        }
+
+        $first = false;
         $tripTickets = [];
         foreach ($dates as $date) {
-            $nextNumber = $this->nextNumber($number, $date);
-
             $tripTicket = TripTicket::create([
-                'ticket_number' => $nextNumber,
+                'ticket_number' => $action->getTicketNumber() && ! $first
+                    ? $action->getTicketNumber()
+                    : $this->nextTicketNumber(),
                 'company_id' => $action->getCompanyId(),
                 'start_date' => $date,
                 'validity_period' => $action->getValidityPeriod(),
@@ -32,6 +40,7 @@ final class StoreTripTicketHandler
                 'template_code' => $action->getTemplateCode(),
             ]);
 
+            $first = true;
             $tripTickets[] = $tripTicket;
         }
 
@@ -40,38 +49,10 @@ final class StoreTripTicketHandler
 
     private function findSimilar(string $number): bool
     {
-        $similar = TripTicket::query()
+        $similar = TripTicket::withTrashed()
             ->where( 'ticket_number', '=', $number)
-            ->whereNull('deleted_at')
             ->first();
 
         return $similar !== null;
-    }
-
-    private function getNumber(StoreTripTicketAction $action): string
-    {
-        if ($action->getTicketNumber() !== null) {
-            return $action->getTicketNumber();
-        }
-
-        if ($action->getCarId() !== null) {
-            return $action->getCarId();
-        }
-
-        return $action->getCompanyId();
-    }
-
-    private function nextNumber(string $number, string $date): string
-    {
-        $date = Carbon::parse($date)->format('d.m.Y');
-        $nextNumber = $number.'-'.$date;
-
-        $ctr = 2;
-        while ($this->findSimilar($nextNumber)) {
-            $nextNumber = $number.'-'.$date.'/'.$ctr;
-            $ctr++;
-        }
-
-        return $nextNumber;
     }
 }

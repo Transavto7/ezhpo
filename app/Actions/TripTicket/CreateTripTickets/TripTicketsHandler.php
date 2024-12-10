@@ -2,13 +2,14 @@
 
 namespace App\Actions\TripTicket\CreateTripTickets;
 
+use App\Actions\TripTicket\TripTicketNumberGenerator;
 use App\Enums\FormTypeEnum;
 use App\Models\TripTicket;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Query\Builder;
 
-final class TripTicketsHandler
+final class TripTicketsHandler extends TripTicketNumberGenerator
 {
     public function handle(TripTicketsAction $action): array
     {
@@ -24,21 +25,9 @@ final class TripTicketsHandler
                 $medicForm = $medicForms[$i] ?? null;
                 $techForm = $techForms[$i] ?? null;
                 $carId = null;
-                $number = null;
 
                 if ($techForm !== null) {
                     $carId = $techForm->car_id;
-                    $number = $techForm->number;
-                }
-
-                if ($number === null) {
-                    $number = $action->getCompany()->hash_id
-                        .'-'
-                        .date('d.m.Y', strtotime($date));
-                }
-
-                if ($i) {
-                    $number .= '/' . ($i + 1);
                 }
 
                 $tripTicketId = $this->existedTripTicket(
@@ -51,7 +40,7 @@ final class TripTicketsHandler
                 }
 
                 $tripTicket = TripTicket::create([
-                    'ticket_number' => $number,
+                    'ticket_number' => $this->nextTicketNumber(),
                     'company_id' => $action->getCompany()->hash_id,
                     'start_date' => $date,
                     'validity_period' => $action->getValidityPeriod(),
