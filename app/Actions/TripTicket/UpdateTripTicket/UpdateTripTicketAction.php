@@ -15,11 +15,6 @@ final class UpdateTripTicketAction
     private $tripTicket;
 
     /**
-     * @var string
-     */
-    private $companyId;
-
-    /**
      * @var string|null
      */
     private $driverId;
@@ -40,11 +35,6 @@ final class UpdateTripTicketAction
     private $validityPeriod;
 
     /**
-     * @var string|null
-     */
-    private $ticketNumber;
-
-    /**
      * @var LogisticsMethodEnum
      */
     private $logisticsMethod;
@@ -61,35 +51,29 @@ final class UpdateTripTicketAction
 
     /**
      * @param TripTicket $tripTicket
-     * @param string $companyId
      * @param string|null $driverId
      * @param string|null $carId
      * @param string $startDate
      * @param int $validityPeriod
-     * @param string|null $ticketNumber
      * @param LogisticsMethodEnum $logisticsMethod
      * @param TransportationTypeEnum $transportationType
      * @param TripTicketTemplateEnum $templateCode
      */
     public function __construct(
         TripTicket $tripTicket,
-        string $companyId,
         ?string $driverId,
         ?string $carId,
         string $startDate,
         int $validityPeriod,
-        ?string $ticketNumber,
         LogisticsMethodEnum $logisticsMethod,
         TransportationTypeEnum $transportationType,
         TripTicketTemplateEnum $templateCode
     ) {
         $this->tripTicket = $tripTicket;
-        $this->companyId = $companyId;
         $this->driverId = $driverId;
         $this->carId = $carId;
         $this->startDate = $startDate;
         $this->validityPeriod = $validityPeriod;
-        $this->ticketNumber = $ticketNumber;
         $this->logisticsMethod = $logisticsMethod;
         $this->transportationType = $transportationType;
         $this->templateCode = $templateCode;
@@ -98,11 +82,6 @@ final class UpdateTripTicketAction
     public function getTripTicket(): TripTicket
     {
         return $this->tripTicket;
-    }
-
-    public function getCompanyId(): string
-    {
-        return $this->companyId;
     }
 
     public function getDriverId(): ?string
@@ -123,11 +102,6 @@ final class UpdateTripTicketAction
     public function getValidityPeriod(): int
     {
         return $this->validityPeriod;
-    }
-
-    public function getTicketNumber(): ?string
-    {
-        return $this->ticketNumber;
     }
 
     public function getLogisticsMethod(): LogisticsMethodEnum

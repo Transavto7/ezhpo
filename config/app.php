@@ -272,6 +272,11 @@ return [
             'max' => 499999,
             'tries' => 10
         ],
+        'trip_ticket' => [
+            'min' => 100000,
+            'max' => 99999999,
+            'tries' => 10
+        ],
         'default' => [
             'min' => 0,
             'max' => 999999,

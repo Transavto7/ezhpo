@@ -54,7 +54,7 @@
                               action="{{ route('trip-tickets.update', ['id' => $tripTicket->uuid]) }}"
                               class="form-horizontal"
                               onsubmit="document.querySelector('#page-preloader').classList.remove('hide')"
-                              enctype="multipart/form-data" id="ANKETA_FORM">
+                              enctype="multipart/form-data">
                             @csrf
 
                             <input type="hidden" name="REFERER" value="{{ url()->previous() }}">
@@ -62,13 +62,13 @@
                             <div class="form-group">
                                 <label class="form-control-label">ID компании:</label>
                                 <article>
-                                    <input value="{{ $tripTicket->company_id  }}"
-                                           required
-                                           type="number"
-                                           oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Company', event.target.value, 'name', $(event.target).parent(), {{ !($id ?? false) ? 'true' : 'false' }})"
-                                           min="5"
-                                           name="company_id"
-                                           class="MASK_ID_ELEM form-control">
+                                    <input value="{{ $tripTicket->company_id }}"
+                                        type="number"
+                                        oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Company', event.target.value, 'name', $(event.target).parent(), {{ !($id ?? false) ? 'true' : 'false' }})"
+                                        min="5"
+                                        name="company_id"
+                                        class="MASK_ID_ELEM form-control"
+                                        disabled>
                                     <p class="app-checker-prop"></p>
                                 </article>
                             </div>
@@ -77,11 +77,15 @@
                                 <label class="form-control-label">ID водителя:</label>
                                 <article>
                                     <div class="d-flex">
-                                        <input value="{{ $tripTicket->driver_id }}" type="number"
-                                               oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent().parent(), {{ 'false' }})"
-                                               min="6"
-                                               name="driver_id"
-                                               class="MASK_ID_ELEM form-control">
+                                        <input type="number"
+                                            @if($tripTicket->driver_id !== null)
+                                                value="{{ $tripTicket->driver_id }}"
+                                                disabled
+                                            @endif
+                                            oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent().parent(), {{ 'false' }})"
+                                            min="6"
+                                            name="driver_id"
+                                            class="MASK_ID_ELEM form-control">
                                     </div>
                                     <p class="app-checker-prop"></p>
                                 </article>
@@ -91,7 +95,11 @@
                                 <label class="form-control-label">ID автомобиля:</label>
                                 <article>
                                     <div class="d-flex">
-                                        <input value="{{ $tripTicket->car_id }}" type="number"
+                                        <input type="number"
+                                               @if($tripTicket->driver_id !== null)
+                                                   value="{{ $tripTicket->car_id }}"
+                                                   disabled
+                                               @endif
                                                oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent().parent(), {{ 'false' }})"
                                                min="6"
                                                name="car_id"
@@ -132,7 +140,9 @@
                                     <select name="logistics_method" required class="form-control type-view">
                                         @foreach(\App\Enums\LogisticsMethodEnum::labels() as $key => $label)
                                             <option value="{{ $key }}"
-                                                    @if($tripTicket->logistics_method === $key){{'selected'}}@endif
+                                            @if($tripTicket->logistics_method === $key)
+                                                {{'selected'}}
+                                                @endif
                                             >{{ $label }}</option>
                                         @endforeach
                                     </select>
@@ -145,7 +155,9 @@
                                     <select name="transportation_type" required class="form-control type-view">
                                         @foreach(\App\Enums\TransportationTypeEnum::labels() as $key => $label)
                                             <option value="{{ $key }}"
-                                                @if($tripTicket->transportation_type === $key){{'selected'}}@endif
+                                            @if($tripTicket->transportation_type === $key)
+                                                {{'selected'}}
+                                                @endif
                                             >{{ $label }}</option>
                                         @endforeach
                                     </select>
@@ -158,7 +170,9 @@
                                     <select name="template_code" required class="form-control type-view">
                                         @foreach(\App\Enums\TripTicketTemplateEnum::labels() as $key => $label)
                                             <option value="{{ $key }}"
-                                                @if($tripTicket->template_code === $key){{'selected'}}@endif
+                                            @if($tripTicket->template_code === $key)
+                                                {{'selected'}}
+                                                @endif
                                             >{{ $label }}</option>
                                         @endforeach
                                     </select>
@@ -166,8 +180,10 @@
                             </div>
 
                             <div class="form-group row mb-0">
-                                <a href="{{ url()->previous() }}" class="m-center btn btn-sm btn-info">Вернуться в реестр</a>
-                                <button type="submit" class="m-center btn btn-sm btn-success submit-btn">Сохранить</button>
+                                <a href="{{ url()->previous() }}" class="m-center btn btn-sm btn-info">Вернуться в
+                                    реестр</a>
+                                <button type="submit" class="m-center btn btn-sm btn-success submit-btn">Сохранить
+                                </button>
                             </div>
                         </form>
                     </article>
