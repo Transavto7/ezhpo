@@ -24,14 +24,9 @@ final class StoreTripTicketAction
     private $carId;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $startDate;
-
-    /**
-     * @var string[]
-     */
-    private $additionalDates;
 
     /**
      * @var integer
@@ -62,8 +57,7 @@ final class StoreTripTicketAction
      * @param string $companyId
      * @param string|null $driverId
      * @param string|null $carId
-     * @param string $startDate
-     * @param string[] $additionalDates
+     * @param string|null $startDate
      * @param int $validityPeriod
      * @param string|null $ticketNumber
      * @param LogisticsMethodEnum $logisticsMethod
@@ -74,8 +68,7 @@ final class StoreTripTicketAction
         string $companyId,
         ?string $driverId,
         ?string $carId,
-        string $startDate,
-        array $additionalDates,
+        ?string $startDate,
         int $validityPeriod,
         ?string $ticketNumber,
         LogisticsMethodEnum $logisticsMethod,
@@ -86,7 +79,6 @@ final class StoreTripTicketAction
         $this->driverId = $driverId;
         $this->carId = $carId;
         $this->startDate = $startDate;
-        $this->additionalDates = $additionalDates;
         $this->validityPeriod = $validityPeriod;
         $this->ticketNumber = $ticketNumber;
         $this->logisticsMethod = $logisticsMethod;
@@ -109,14 +101,9 @@ final class StoreTripTicketAction
         return $this->carId;
     }
 
-    public function getStartDate(): string
+    public function getStartDate(): ?string
     {
         return $this->startDate;
-    }
-
-    public function getAdditionalDates(): array
-    {
-        return $this->additionalDates;
     }
 
     public function getValidityPeriod(): int

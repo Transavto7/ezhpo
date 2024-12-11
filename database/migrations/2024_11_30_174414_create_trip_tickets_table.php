@@ -17,12 +17,12 @@ class CreateTripTicketsTable extends Migration
             $table->bigIncrements('id');
             $table->string('uuid', 36)->unique();
 
-            $table->string('ticket_number')->nullable();
+            $table->string('ticket_number');
 
-            $table->string('company_id')->nullable();
+            $table->string('company_id');
             $table->foreign('company_id')->references('hash_id')->on('companies');
 
-            $table->date('start_date');
+            $table->date('start_date')->nullable();
             $table->integer('validity_period')->default(1);
 
             $table->string('medic_form_id')->nullable();

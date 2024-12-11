@@ -25,7 +25,7 @@ final class UpdateTripTicketAction
     private $carId;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $startDate;
 
@@ -53,7 +53,7 @@ final class UpdateTripTicketAction
      * @param TripTicket $tripTicket
      * @param string|null $driverId
      * @param string|null $carId
-     * @param string $startDate
+     * @param string|null $startDate
      * @param int $validityPeriod
      * @param LogisticsMethodEnum $logisticsMethod
      * @param TransportationTypeEnum $transportationType
@@ -63,7 +63,7 @@ final class UpdateTripTicketAction
         TripTicket $tripTicket,
         ?string $driverId,
         ?string $carId,
-        string $startDate,
+        ?string $startDate,
         int $validityPeriod,
         LogisticsMethodEnum $logisticsMethod,
         TransportationTypeEnum $transportationType,
@@ -94,7 +94,7 @@ final class UpdateTripTicketAction
         return $this->carId;
     }
 
-    public function getStartDate(): string
+    public function getStartDate(): ?string
     {
         return $this->startDate;
     }

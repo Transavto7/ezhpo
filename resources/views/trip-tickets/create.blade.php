@@ -6,6 +6,7 @@
 @php
     use Carbon\Carbon;
     $created = \Illuminate\Support\Facades\Session::get('created', []);
+    $createByForms = $createByForms ?? request()->get('createByForms', '0') === '1';
 @endphp
 
 @section('custom-scripts')
@@ -72,8 +73,8 @@
 
                                             @if($tripTicket->start_date)
                                                 <div>
-                                                    <i>Дата оформления:
-                                                    <br/><b>{{ Carbon::parse($tripTicket->start_date)->format('d.m.Y') }}</b></i>
+                                                    <i>Дата начала действия:
+                                                        <br/><b>{{ Carbon::parse($tripTicket->start_date)->format('d.m.Y') }}</b></i>
                                                 </div>
                                             @endif
 
@@ -95,7 +96,9 @@
                         @endif
 
                         <form method="POST"
-                              action="{{ route('trip-tickets.store') }}"
+                              action="{{ $createByForms
+                                  ? route('trip-tickets.generate')
+                                  : route('trip-tickets.store') }}"
                               class="form-horizontal"
                               onsubmit="document.querySelector('#page-preloader').classList.remove('hide')"
                               enctype="multipart/form-data" id="ANKETA_FORM">
@@ -104,6 +107,17 @@
                             @if(isset($anketa_route) && $id)
                                 <input type="hidden" name="REFERER" value="{{ url()->previous() }}">
                             @endif
+
+                            <div class="form-group d-flex">
+                                <a class="text-small"
+                                   href="{{ route('trip-tickets.create', ['createByForms' => ! $createByForms]) }}">
+                                    <input onchange="this.parentNode.click()" type="checkbox"
+                                           @if($createByForms) checked @endif id="create_by_forms">
+                                </a>
+                                <label class="form-control-label mb-0 ml-2" for="create_by_forms">Создать на основе
+                                    МО/ТО</label>
+                                <input type="hidden" name="createByForms" value="{{ $createByForms ?? 0 }}">
+                            </div>
 
                             <div class="form-group">
                                 <label class="form-control-label">ID компании:</label>
@@ -148,25 +162,41 @@
                             </div>
 
                             <div class="form-group">
-                                <label class="form-control-label">Дата начала действия:</label>
+                                <label class="form-control-label">
+                                    @if($createByForms)
+                                        Дата первого осмотра:
+                                    @else
+                                        Дата начала действия:
+                                    @endif
+                                </label>
                                 <article>
                                     <input min="1970-01-01"
                                            max="2100-01-01"
                                            type="date"
                                            value="{{ $default_current_date ?? '' }}"
-                                           name="start_date"
-                                           class="form-control">
+                                           name="date_from"
+                                           class="form-control"
+                                           @if($createByForms)
+                                               required
+                                           @endif>
                                 </article>
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-control-label">Доп. даты:</label>
-                                <article>
-                                    <input type="date"
-                                           name="additional_dates"
-                                           class="form-control date-range">
-                                </article>
-                            </div>
+                            @if($createByForms)
+                                <div class="form-group">
+                                    <label class="form-control-label">Дата последнего осмотра (не более 31 дня от
+                                        первого):</label>
+                                    <article>
+                                        <input min="1970-01-01"
+                                               max="2100-01-01"
+                                               type="date"
+                                               value="{{ $default_current_date ?? '' }}"
+                                               name="date_to"
+                                               class="form-control"
+                                               required>
+                                    </article>
+                                </div>
+                            @endif
 
                             <div class="form-group">
                                 <label class="form-control-label">Срок действия, дней:</label>
@@ -174,12 +204,14 @@
                                        name="validity_period" class="form-control" min="1">
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-control-label">Номер путевого листа:</label>
-                                <input type="text" value="{{ $number_list_road ?? '' }}"
-                                       name="ticket_number"
-                                       class="form-control">
-                            </div>
+                            @if(! $createByForms)
+                                <div class="form-group">
+                                    <label class="form-control-label">Номер путевого листа:</label>
+                                    <input type="text" value="{{ $number_list_road ?? '' }}"
+                                           name="ticket_number"
+                                           class="form-control">
+                                </div>
+                            @endif
 
                             <div class="form-group">
                                 <label class="form-control-label">Вид сообщения:</label>
@@ -223,7 +255,11 @@
                                 @endif
                                 <button type="submit"
                                         class="m-center btn btn-sm btn-success submit-btn">
-                                    Сохранить
+                                    @if($createByForms)
+                                        Отправить задание
+                                    @else
+                                        Сохранить
+                                    @endif
                                 </button>
                             </div>
                         </form>
