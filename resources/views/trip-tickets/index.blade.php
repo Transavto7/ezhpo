@@ -157,7 +157,7 @@
     <script type="text/javascript">
         const tripTicketsApi = {
             massTrash: '{{ route('trip-tickets.mass-trash') }}',
-            print: '{{ route('trip-tickets.print') }}',
+            export: '{{ route('trip-tickets.export') }}',
         }
         const data = {
             items: [],
@@ -318,7 +318,7 @@
 
                 axios({
                     method: 'post',
-                    url: tripTicketsApi.print,
+                    url: tripTicketsApi.export,
                     data: {
                         id: uuid
                     },

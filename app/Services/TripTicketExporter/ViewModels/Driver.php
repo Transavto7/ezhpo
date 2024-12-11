@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Services\TripTicketExporter\ValueObjects;
+namespace App\Services\TripTicketExporter\ViewModels;
 
-use App\Driver as DriverModel;
 use Carbon\Carbon;
 
 class Driver
 {
+    /**
+     * @var string
+     */
+    private $id;
     /**
      * @var string
      */
@@ -25,37 +28,30 @@ class Driver
     private $snils;
 
     /**
+     * @param string $id
      * @param string $fio
      * @param string|null $driverLicense
      * @param Carbon|null $driverLicenseDate
      * @param string|null $snils
      */
-    private function __construct(
+    public function __construct(
+        string  $id,
         string  $fio,
         ?string $driverLicense,
         ?Carbon $driverLicenseDate,
         ?string $snils
     )
     {
+        $this->id = $id;
         $this->fio = $fio;
         $this->driverLicense = $driverLicense;
         $this->driverLicenseDate = $driverLicenseDate;
         $this->snils = $snils;
     }
 
-    public static function fromEloquent(DriverModel $driver): self
+    public function getId(): string
     {
-        $driverLicenseData = null;
-        if ($driver->date_driver_license) {
-            $driverLicenseData = Carbon::parse($driver->date_driver_license);
-        }
-
-        return new self(
-            $driver->fio,
-            $driver->driver_license,
-            $driverLicenseData,
-            $driver->snils
-        );
+        return $this->id;
     }
 
     public function getFio(): string
@@ -77,5 +73,6 @@ class Driver
     {
         return $this->snils;
     }
+
 
 }
