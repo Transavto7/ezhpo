@@ -13,6 +13,7 @@ use App\Enums\LogActionTypesEnum;
 use App\FieldPrompt;
 use App\Point;
 use App\User;
+use App\ValueObjects\CompanyReqs;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
@@ -349,6 +350,20 @@ class IndexController extends Controller
         if (($model === 'Company') && $element->getAttribute('reqs_validated')) {
             $disabledFields[] = 'inn';
             $disabledFields[] = 'kpp';
+
+            $companyReqs = new CompanyReqs(
+                $element->getAttribute('inn'),
+                $element->getAttribute('kpp') ?? ''
+            );
+
+            if ($companyReqs->isOrganizationInnFormat()) {
+                $disabledFields[] = 'official_name';
+            }
+        }
+
+        /** @var Model|null $element */
+        if (($model === 'Company') && !user()->access('companies_access_field_note')) {
+            $disabledFields[] = 'note';
         }
 
         $page['disabledFields'] = $disabledFields;

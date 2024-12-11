@@ -16,14 +16,15 @@ class ValidateCompaniesReqs extends Command
      * @var string
      */
     protected $signature = 'companies:validate-reqs
-                            {--force : Подтверждение обновления}';
+                            {--force : Подтверждение обновления}
+                            {--reset : Очистка статуса у всех компаний}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Валидация и обновление ИНН и КПП компаний';
+    protected $description = 'Валидация и обновление ИНН, КПП, официальных наименований компаний';
 
     /**
      * Create a new command instance.
@@ -42,6 +43,17 @@ class ValidateCompaniesReqs extends Command
      */
     public function handle(CompanyReqsCheckerInterface $companyReqsChecker)
     {
+        if ($this->option('reset')) {
+            Company::withTrashed()
+                ->update([
+                    'reqs_validated' => false
+                ]);
+
+            $this->info('Статус корректности реквизитов сброшен у всех компаний!');
+
+            return;
+        }
+
         if (!$this->option('force')) {
             $this->error('Для подтверждения восстановления данных - выполните команду с флагом --force! Проверьте, что есть лимиты в сервисе DaData!');
 
@@ -65,6 +77,7 @@ class ValidateCompaniesReqs extends Command
         foreach ($companies as $company) {
             $inn = $company->getAttribute('inn') ?? '';
             $kpp = $company->getAttribute('kpp') ?? '';
+            $officialName = $company->getAttribute('official_name') ?? '';
             $innWithKpp = $inn . $kpp;
 
             if (isset($uniqueInn[$innWithKpp])) {
@@ -72,7 +85,7 @@ class ValidateCompaniesReqs extends Command
             }
             $uniqueInn[$innWithKpp] = true;
 
-            $companyReqs = new CompanyReqs($inn, $kpp);
+            $companyReqs = new CompanyReqs($inn, $kpp, $officialName);
 
             if ($companyReqs->isPersonalInnFormat()) {
                 $company->setAttribute('inn', $companyReqs->getInn());
@@ -88,6 +101,7 @@ class ValidateCompaniesReqs extends Command
                     continue;
                 }
 
+                $company->setAttribute('official_name', $restoredCompanyReqs->getOfficialName());
                 $company->setAttribute('kpp', $restoredCompanyReqs->getKpp());
                 $company->setAttribute('inn', $restoredCompanyReqs->getInn());
                 $company->setAttribute('reqs_validated', true);

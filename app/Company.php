@@ -15,6 +15,7 @@ class Company extends Model
     public $fillable = [
         'hash_id',
         'name',
+        'official_name',
         'dismissed',
         'note',
         'comment',

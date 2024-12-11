@@ -60,7 +60,7 @@ class DaDataCompanyReqsChecker implements CompanyReqsCheckerInterface
 
             $result = array_map(function ($result) {
                 return new DaDataCompany(
-                    $result['value'],
+                    $result['data']['name']['full_with_opf'],
                     $result['data']['inn'],
                     $result['data']['kpp'] ?? null
                 );
@@ -140,40 +140,17 @@ class DaDataCompanyReqsChecker implements CompanyReqsCheckerInterface
         }
 
         $companies = $this->getCompaniesByInn($companyReqs->getInn());
-        $companiesCount = count($companies);
 
-        if ($companiesCount === 1) {
-            $organization = array_values($companies)[0];
-
-            if ($organization->getKpp()) {
-                return new CompanyReqs($companyReqs->getInn(), $organization->getKpp());
-            }
-
-            if ($companyReqs->isValidFormat()) {
-                return $companyReqs;
-            }
-
+        if (count($companies) !== 1) {
             return null;
         }
 
-        $hasSubCompanyWithoutKpp = false;
+        $company = array_values($companies)[0];
 
-        foreach ($companies as $organization) {
-            if (empty($organization->getKpp())) {
-                $hasSubCompanyWithoutKpp = true;
-
-                continue;
-            }
-
-            if ($organization->getKpp() === $companyReqs->getKpp()) {
-                return $companyReqs;
-            }
-        }
-
-        if ($hasSubCompanyWithoutKpp && $companyReqs->isValidFormat()) {
-            return $companyReqs;
-        }
-
-        return null;
+        return new CompanyReqs(
+            $companyReqs->getInn(),
+            $company->getKpp(),
+            $company->getOfficialName()
+        );
     }
 }

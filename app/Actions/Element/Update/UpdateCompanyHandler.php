@@ -4,12 +4,15 @@ namespace App\Actions\Element\Update;
 
 use App\Actions\Element\SyncFieldsHandler;
 use App\Company;
+use App\Enums\OneCSyncStatusEnum;
 use App\Exceptions\EntityAlreadyExistException;
 use App\Exceptions\WrongCompanyReqsException;
 use App\Services\CompanyReqsChecker\CompanyReqsCheckerInterface;
+use App\Services\OneC\CompanySync\CompanySyncServiceInterface;
 use App\ValueObjects\CompanyReqs;
 use App\ValueObjects\Phone;
 use Exception;
+use Throwable;
 
 class UpdateCompanyHandler extends UpdateElementHandler
 {
@@ -18,9 +21,16 @@ class UpdateCompanyHandler extends UpdateElementHandler
      */
     private $syncFieldsHandler;
 
+    /**
+     * @var CompanySyncServiceInterface
+     */
+    private $companySyncService;
+
     public function __construct(string $type)
     {
         parent::__construct($type);
+
+        $this->companySyncService = resolve(CompanySyncServiceInterface::class);
 
         $this->syncFieldsHandler = new SyncFieldsHandler();
     }
@@ -35,6 +45,7 @@ class UpdateCompanyHandler extends UpdateElementHandler
         $this->updateFields();
         $this->syncCompanyProducts();
         $this->resetEmptyFields();
+        $this->syncWith1CIfNeed();
         $this->element->save();
     }
 
@@ -68,7 +79,8 @@ class UpdateCompanyHandler extends UpdateElementHandler
             throw new Exception('Попытка смены корректных реквизитов компании!');
         }
 
-        $companyReqs = new CompanyReqs($this->data['inn'] ?? '', $this->data['kpp'] ?? '');
+        $companyReqs = new CompanyReqs($this->data['inn'] ?? '', $this->data['kpp'] ?? '', $this->data['official_name'] ?? '');
+        //TODO: проверять отдельно ЮЛ, СЗ и ФЛ
         if ($companyReqs->isValidFormat()) {
             /** @var CompanyReqsCheckerInterface $companyReqsChecker */
             $companyReqsChecker = resolve(CompanyReqsCheckerInterface::class);
@@ -137,5 +149,52 @@ class UpdateCompanyHandler extends UpdateElementHandler
         }
 
         $this->element = $element;
+    }
+
+    protected function syncWith1CIfNeed()
+    {
+        if (!$this->element->getAttribute('reqs_validated')) {
+            return;
+        }
+
+        if ($this->element->getAttribute('one_c_synced') === OneCSyncStatusEnum::NON_CREATED) {
+            $this->createCompanyInOneC();
+
+            return;
+        }
+
+        $changedProperties = array_keys($this->element->getDirty());
+        $propertiesToUpdateInOneC = [
+            'name',
+            'official_name'
+        ];
+        $needUpdate = count(array_intersect($propertiesToUpdateInOneC, $changedProperties)) > 0;
+        if ($needUpdate) {
+            $this->element->setAttribute('one_c_synced', OneCSyncStatusEnum::NEED_UPDATE);
+
+            $this->updateCompanyInOneC();
+        }
+    }
+
+    protected function createCompanyInOneC()
+    {
+        try {
+            $this->companySyncService->create($this->element);
+
+            $this->element->setAttribute('one_c_synced', OneCSyncStatusEnum::SYNCED);
+        } catch (Throwable $exception) {
+
+        }
+    }
+
+    protected function updateCompanyInOneC()
+    {
+        try {
+            $this->companySyncService->update($this->element);
+
+            $this->element->setAttribute('one_c_synced', OneCSyncStatusEnum::SYNCED);
+        } catch (Throwable $exception) {
+
+        }
     }
 }

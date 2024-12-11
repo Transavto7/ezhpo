@@ -1233,12 +1233,12 @@ $(document).ready(function () {
         triggerField()
     })
 
-    function initCompanyNameSuggestion(companyNameInput, innInput, kppInput) {
-        if (!companyNameInput) return;
+    function initCompanyNameSuggestion(companyOfficialNameInput, innInput, kppInput, nameInput) {
+        if (!companyOfficialNameInput) return;
 
         if (!innInput) return;
 
-        companyNameInput.suggestions({
+        companyOfficialNameInput.suggestions({
             token: window.DADATA_TOKEN,
             type: "PARTY",
             /* Вызывается, когда пользователь выбирает одну из подсказок */
@@ -1247,19 +1247,20 @@ $(document).ready(function () {
                     return
                 }
 
-                const {inn,kpp} = suggestion.data
+                const {value,inn,kpp} = suggestion.data
 
                 innInput.val(inn)
-
                 kppInput.val(kpp)
+                nameInput.val(value)
             }
         });
     }
 
     initCompanyNameSuggestion(
-        $('*[data-field="Company_name"]'),
+        $('#elements-modal-add input[data-field="Company_official_name"]'),
         $('#elements-modal-add input[name="inn"]'),
         $('#elements-modal-add input[name="kpp"]'),
+        $('#elements-modal-add input[name="name"]')
     )
 
     $('.header #toggle-btn').each(function () {
@@ -1304,9 +1305,10 @@ $(document).ready(function () {
                 modalContent.text('').append(data);
                 LIBS.initAll()
                 initCompanyNameSuggestion(
-                    $('#modalEditor *[data-field="Company_name"]'),
+                    $('#modalEditor textarea[data-field="Company_official_name"]'),
                     $('#modalEditor input[name="inn"]'),
-                    $('#modalEditor input[name="kpp"]')
+                    $('#modalEditor input[name="kpp"]'),
+                    $('#modalEditor textarea[name="name"]')
                 )
             })
 

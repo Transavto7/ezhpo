@@ -4,20 +4,20 @@ namespace App\Services\CompanyReqsChecker;
 
 class DaDataCompany
 {
-    private $name;
+    private $officialName;
 
     private $inn;
 
     private $kpp;
 
     /**
-     * @param string $name
+     * @param string $officialName
      * @param string $inn
      * @param string|null $kpp
      */
-    public function __construct(string $name, string $inn, string $kpp = null)
+    public function __construct(string $officialName, string $inn, string $kpp = null)
     {
-        $this->name = $name;
+        $this->officialName = $officialName;
         $this->inn = $inn;
         $this->kpp = $kpp;
     }
@@ -25,9 +25,9 @@ class DaDataCompany
     /**
      * @return string
      */
-    public function getName(): string
+    public function getOfficialName(): string
     {
-        return $this->name;
+        return $this->officialName;
     }
 
     /**

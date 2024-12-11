@@ -79,8 +79,9 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
      */
     protected function validateReqs($data): array
     {
-        $companyReqs = new CompanyReqs($data['inn'] ?? '', $data['kpp'] ?? '');
+        $companyReqs = new CompanyReqs($data['inn'] ?? '', $data['kpp'] ?? '', $data['official_name']);
         if ($companyReqs->isValidFormat()) {
+            //TODO: проверять отдельно ЮЛ, СЗ и ФЛ
             /** @var CompanyReqsCheckerInterface $companyReqsChecker */
             $companyReqsChecker = resolve(CompanyReqsCheckerInterface::class);
             if ($companyReqsChecker->check($companyReqs)) {

@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Anketa;
 use App\Car;
 use App\Company;
+use App\Contractcs\GetServicesReportForCompanyByPeriodInterface;
 use App\Driver;
 use App\Models\Contract;
 use App\Observers\AnketaObserver;
@@ -20,6 +21,7 @@ use App\Services\ElementsSearch\ElementsSearchServiceInterface;
 use App\Services\HashIdGenerator\HashIdGeneratorService;
 use App\Services\OneC\CompanySync\CompanySyncService;
 use App\Services\OneC\CompanySync\CompanySyncServiceInterface;
+use App\Services\OneC\Reports\GetServicesReportForCompanyByPeriod;
 use App\Services\QRCode\QRCodeGenerator;
 use App\Services\QRCode\QRCodeGeneratorInterface;
 use App\User;
@@ -32,7 +34,8 @@ class AppServiceProvider extends ServiceProvider
         CompanySyncServiceInterface::class => CompanySyncService::class,
         CompanyReqsCheckerInterface::class => DaDataCompanyReqsChecker::class,
         ElementsSearchServiceInterface::class => ElementSearchService::class,
-        QRCodeGeneratorInterface::class => QRCodeGenerator::class
+        QRCodeGeneratorInterface::class => QRCodeGenerator::class,
+        GetServicesReportForCompanyByPeriodInterface::class => GetServicesReportForCompanyByPeriod::class
     ];
     /**
      * Register any application services.

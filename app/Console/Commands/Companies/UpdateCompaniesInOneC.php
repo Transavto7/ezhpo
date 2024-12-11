@@ -9,22 +9,22 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class CreateCompaniesInOneC extends Command
+class UpdateCompaniesInOneC extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'companies:create-in-one-c
-                            {--force : Подтверждение создания}';
+    protected $signature = 'companies:update-in-one-c
+                            {--force : Подтверждение обновления}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Создание компаний с корректными реквизитами в 1С';
+    protected $description = 'Обновление компаний, синхронизированных с 1С';
 
     /**
      * Create a new command instance.
@@ -44,7 +44,7 @@ class CreateCompaniesInOneC extends Command
     public function handle(CompanySyncServiceInterface $companySyncService)
     {
         if (!$this->option('force')) {
-            $this->error('Для подтверждения создания - выполните команду с флагом --force! Проверьте, что работаете с тестовым доменом или валидными данными!');
+            $this->error('Для подтверждения обновления - выполните команду с флагом --force! Проверьте, что работаете с тестовым доменом или валидными данными!');
 
             return;
         }
@@ -61,36 +61,31 @@ class CreateCompaniesInOneC extends Command
                 'hash_id',
                 'name',
                 'official_name',
-                'inn',
-                'kpp',
                 'reqs_validated',
                 'one_c_synced'
             ])
-            ->where('reqs_validated', true)
-            ->where('one_c_synced', OneCSyncStatusEnum::NON_CREATED)
+            ->where('one_c_synced', OneCSyncStatusEnum::NEED_UPDATE)
             ->get();
 
         foreach ($companies as $company) {
             try {
-                $companySyncService->create($company);
+                $companySyncService->update($company);
 
                 $company->setAttribute('one_c_synced', OneCSyncStatusEnum::SYNCED);
                 $company->save();
 
                 $this->info(sprintf(
-                    "Создание компании в 1С %s (%s) ИНН: %s, КПП: %s",
+                    "Обновление компании в 1С %s (%s), полное наименование: %s",
                     $company->getAttribute('name'),
                     $company->getAttribute('hash_id'),
-                    $company->getAttribute('inn'),
-                    $company->getAttribute('kpp')
+                    $company->getAttribute('official_name')
                 ));
             } catch (Throwable $exception) {
                 $message = sprintf(
-                    "Ошибка создания компании в 1С %s (%s) ИНН: %s, КПП: %s. %s",
+                    "Ошибка обновления компании в 1С %s (%s), полное наименование: %s. %s",
                     $company->getAttribute('name'),
                     $company->getAttribute('hash_id'),
-                    $company->getAttribute('inn'),
-                    $company->getAttribute('kpp'),
+                    $company->getAttribute('official_name'),
                     $exception->getMessage()
                 );
 

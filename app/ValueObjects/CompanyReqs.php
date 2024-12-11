@@ -2,22 +2,24 @@
 
 namespace App\ValueObjects;
 
-use App\Services\CompanyReqsChecker\CompanyReqsCheckerInterface;
-
 class CompanyReqs
 {
     private $inn;
 
     private $kpp;
 
+    private $officialName;
+
     /**
      * @param string $inn
      * @param string $kpp
+     * @param string $officialName
      */
-    public function __construct(string $inn, string $kpp = '')
+    public function __construct(string $inn, string $kpp = '', string $officialName = '')
     {
         $this->inn = trim($inn);
         $this->kpp = trim($kpp);
+        $this->officialName = trim($officialName);
     }
 
     public function isValidFormat(): bool
@@ -53,15 +55,6 @@ class CompanyReqs
         return strlen($this->inn) === 10;
     }
 
-    public function isValid(CompanyReqsCheckerInterface $companyReqsChecker): bool
-    {
-        if (!$this->isValidFormat()) {
-            return false;
-        }
-
-        return $companyReqsChecker->check($this);
-    }
-
     public function getInn(): string
     {
         return $this->inn;
@@ -70,5 +63,10 @@ class CompanyReqs
     public function getKpp(): string
     {
         return $this->kpp;
+    }
+
+    public function getOfficialName(): string
+    {
+        return $this->officialName;
     }
 }

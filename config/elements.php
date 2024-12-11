@@ -536,6 +536,10 @@ return [
                 'concatField' => 'hash_id',
                 'getFieldKey' => 'hash_id'
             ],
+            'official_name' => [
+                'label' => 'Официальное название компании',
+                'type' => 'text',
+            ],
             'name' => [
                 'label' => 'Название компании',
                 'type' => 'text',
@@ -642,8 +646,9 @@ return [
                 'label' => 'Синхронизация 1С',
                 'type' => 'select',
                 'values' => [
-                    0 => 'Нет',
-                    1 => 'Да',
+                    \App\Enums\OneCSyncStatusEnum::NON_CREATED => 'Нет',
+                    \App\Enums\OneCSyncStatusEnum::NEED_UPDATE => 'Нужно обновление в 1С',
+                    \App\Enums\OneCSyncStatusEnum::SYNCED => 'Да',
                 ],
             ],
             'dismissed' => [
