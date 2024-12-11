@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Services\TripTicketExporter\ValueObjects;
-
-use App\Company as CompanyModel;
+namespace App\Services\TripTicketExporter\ViewModels;
 
 class Company
 {
@@ -19,15 +17,10 @@ class Company
      * @param string $name
      * @param string|null $whereCall
      */
-    private function __construct(string $name, ?string $whereCall)
+    public function __construct(string $name, ?string $whereCall)
     {
         $this->name = $name;
         $this->whereCall = $whereCall;
-    }
-
-    public static function fromEloquent(CompanyModel $company): self
-    {
-        return new self($company->name, $company->where_call);
     }
 
     public function getName(): string

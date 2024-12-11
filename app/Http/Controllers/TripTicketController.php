@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Actions\TripTicket\CreateTripTickets\TripTicketsAction;
 use App\Actions\TripTicket\CreateTripTickets\TripTicketsHandler;
 use App\Actions\TripTicket\DeleteTripTickets\TrashTripTicketHandler;
-use App\Actions\TripTicket\ExportExcelTripTicket\ExportExcelTripTicketParams;
-use App\Actions\TripTicket\ExportExcelTripTicket\ExportExcelTripTicketQuery;
 use App\Actions\TripTicket\StoreTripTicket\StoreTripTicketAction;
 use App\Actions\TripTicket\StoreTripTicket\StoreTripTicketHandler;
 use App\Actions\TripTicket\UpdateTripTicket\UpdateTripTicketAction;
@@ -19,6 +17,7 @@ use App\Enums\TransportationTypeEnum;
 use App\Enums\TripTicketTemplateEnum;
 use App\FieldPrompt;
 use App\Models\TripTicket;
+use App\Services\TripTicketExporter\TripTicketExporter;
 use App\ValueObjects\EntityId;
 use Arr;
 use Carbon\Carbon;
@@ -28,6 +27,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -361,16 +361,10 @@ class TripTicketController extends Controller
         return back()->with($response);
     }
 
-    public function print(Request $request, ExportExcelTripTicketQuery $query)
+    public function export(Request $request, TripTicketExporter $exporter)
     {
-        $query->get(new ExportExcelTripTicketParams(
-            EntityId::fromString($request->input('id')),
-        ));
-
         try {
-
-
-            return response()->json();
+            return $exporter->export(EntityId::fromString($request->input('id')));
         } catch (Exception $e) {
             return response()
                 ->json(['error' => $e->getMessage(),])

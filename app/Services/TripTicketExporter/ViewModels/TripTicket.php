@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Services\TripTicketExporter\ValueObjects;
+namespace App\Services\TripTicketExporter\ViewModels;
 
 use App\Enums\LogisticsMethodEnum;
 use App\Enums\TransportationTypeEnum;
 use App\Enums\TripTicketTemplateEnum;
-use App\Models\TripTicket as TripTicketModel;
 use Illuminate\Support\Carbon;
 
 class TripTicket
@@ -30,10 +29,6 @@ class TripTicket
      * @var TransportationTypeEnum
      */
     private $transportationType;
-    /**
-     * @var TripTicketTemplateEnum
-     */
-    private $templateCode;
 
     /**
      * @param string|null $ticketNumber
@@ -41,15 +36,13 @@ class TripTicket
      * @param int $validityPeriod
      * @param LogisticsMethodEnum $logisticsMethod
      * @param TransportationTypeEnum $transportationType
-     * @param TripTicketTemplateEnum $templateCode
      */
-    private function __construct(
+    public function __construct(
         ?string                $ticketNumber,
         Carbon                 $startDate,
         int                    $validityPeriod,
         LogisticsMethodEnum    $logisticsMethod,
-        TransportationTypeEnum $transportationType,
-        TripTicketTemplateEnum $templateCode
+        TransportationTypeEnum $transportationType
     )
     {
         $this->ticketNumber = $ticketNumber;
@@ -57,19 +50,6 @@ class TripTicket
         $this->validityPeriod = $validityPeriod;
         $this->logisticsMethod = $logisticsMethod;
         $this->transportationType = $transportationType;
-        $this->templateCode = $templateCode;
-    }
-
-    public static function fromEloquent(TripTicketModel $tripTicket): self
-    {
-        return new self(
-            $tripTicket->ticket_number,
-            Carbon::parse($tripTicket->start_date),
-            $tripTicket->validity_period,
-            LogisticsMethodEnum::fromString($tripTicket->logistics_method),
-            TransportationTypeEnum::fromString($tripTicket->transportation_type),
-            TripTicketTemplateEnum::fromString($tripTicket->template_code)
-        );
     }
 
     public function getTicketNumber(): ?string
@@ -96,11 +76,4 @@ class TripTicket
     {
         return $this->transportationType;
     }
-
-    public function getTemplateCode(): TripTicketTemplateEnum
-    {
-        return $this->templateCode;
-    }
-
-
 }

@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Services\TripTicketExporter\ValueObjects;
-
-use App\Car as CarModel;
+namespace App\Services\TripTicketExporter\ViewModels;
 
 class Car
 {
+    /**
+     * @var string
+     */
+    private $id;
     /**
      * @var string
      */
@@ -20,20 +22,27 @@ class Car
     private $typeAuto;
 
     /**
+     * @param string $id
      * @param string $gosNumber
      * @param string $markModel
      * @param string $typeAuto
      */
-    private function __construct(string $gosNumber, string $markModel, string $typeAuto)
+    public function __construct(
+        string $id,
+        string $gosNumber,
+        string $markModel,
+        string $typeAuto
+    )
     {
+        $this->id = $id;
         $this->gosNumber = $gosNumber;
         $this->markModel = $markModel;
         $this->typeAuto = $typeAuto;
     }
 
-    public static function fromEloquent(CarModel $car): self
+    public function getId(): string
     {
-        return new self($car->gos_number, $car->mark_model, $car->type_auto);
+        return $this->id;
     }
 
     public function getGosNumber(): string
@@ -50,4 +59,6 @@ class Car
     {
         return $this->typeAuto;
     }
+
+
 }

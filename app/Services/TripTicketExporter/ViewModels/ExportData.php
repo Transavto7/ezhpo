@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Services\TripTicketExporter;
+namespace App\Services\TripTicketExporter\ViewModels;
 
+use App\Enums\TripTicketTemplateEnum;
 
-use App\Services\TripTicketExporter\ValueObjects\Car;
-use App\Services\TripTicketExporter\ValueObjects\Company;
-use App\Services\TripTicketExporter\ValueObjects\Driver;
-use App\Services\TripTicketExporter\ValueObjects\TripTicket;
-
-class TripTicketExporterParams
+class ExportData
 {
+    /**
+     * @var TripTicketTemplateEnum
+     */
+    private $templateCode;
     /**
      * @var TripTicket
      */
@@ -19,45 +19,39 @@ class TripTicketExporterParams
      */
     private $company;
     /**
-     * @var string|null
-     */
-    private $driverId;
-    /**
      * @var Driver|null
      */
     private $driver;
-    /**
-     * @var string|null
-     */
-    private $carId;
     /**
      * @var Car|null
      */
     private $car;
 
     /**
+     * @param TripTicketTemplateEnum $templateCode
      * @param TripTicket $tripTicket
      * @param Company|null $company
-     * @param string|null $driverId
      * @param Driver|null $driver
-     * @param string|null $carId
      * @param Car|null $car
      */
     public function __construct(
-        TripTicket $tripTicket,
-        ?Company   $company,
-        ?string    $driverId,
-        ?Driver    $driver,
-        ?string    $carId,
-        ?Car       $car
+        TripTicketTemplateEnum $templateCode,
+        TripTicket             $tripTicket,
+        ?Company               $company,
+        ?Driver                $driver,
+        ?Car                   $car
     )
     {
+        $this->templateCode = $templateCode;
         $this->tripTicket = $tripTicket;
         $this->company = $company;
-        $this->driverId = $driverId;
         $this->driver = $driver;
-        $this->carId = $carId;
         $this->car = $car;
+    }
+
+    public function getTemplateCode(): TripTicketTemplateEnum
+    {
+        return $this->templateCode;
     }
 
     public function getTripTicket(): TripTicket
@@ -70,23 +64,15 @@ class TripTicketExporterParams
         return $this->company;
     }
 
-    public function getDriverId(): ?string
-    {
-        return $this->driverId;
-    }
-
     public function getDriver(): ?Driver
     {
         return $this->driver;
-    }
-
-    public function getCarId(): ?string
-    {
-        return $this->carId;
     }
 
     public function getCar(): ?Car
     {
         return $this->car;
     }
+
+
 }
