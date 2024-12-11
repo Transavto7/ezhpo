@@ -370,10 +370,6 @@
                 $('#hv-alert-error').addClass('d-none')
                 $('#hv-alert-error').removeClass('d-flex')
             })
-
-            @if(request()->get('create', null) === '1')
-            $('#filters-div a[href="#registry-update"]').tab('show')
-            @endif
         })
     </script>
 @endsection
@@ -471,43 +467,11 @@
                     </div>
 
                     <div id="filters-div" style="display: none">
-                        <ul
-                            class="nav nav-tabs"
-                            id="filter-groups"
-                            role="tablist">
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link active"
-                                    id="registry-update-1-tab"
-                                    data-toggle="tab"
-                                    href="#filter-group"
-                                    role="tab"
-                                    aria-controls="filter-group"
-                                    aria-selected="true">
-                                    <i class="fa fa-filter"></i>Фильтры
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link"
-                                    id="filter-group-2-tab"
-                                    data-toggle="tab"
-                                    href="#registry-update"
-                                    role="tab"
-                                    aria-controls="registry-update"
-                                    aria-selected="false">
-                                    Обновление реестра
-                                </a>
-                            </li>
-                        </ul>
-
+                        <div class="col-md-12 pl-3 pr-3 mt-2">
+                            <i class="fa fa-filter"></i> Фильтры
+                        </div>
                         @if($permissionToView)
                             @component('trip-tickets.components.filters')
-                            @endcomponent
-                        @endif
-
-                        @if($permissionToCreate)
-                            @component('trip-tickets.components.create-tab')
                             @endcomponent
                         @endif
                     </div>

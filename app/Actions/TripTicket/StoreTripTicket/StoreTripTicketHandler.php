@@ -4,6 +4,7 @@ namespace App\Actions\TripTicket\StoreTripTicket;
 
 use App\Actions\TripTicket\TripTicketNumberGenerator;
 use App\Models\TripTicket;
+use Carbon\Carbon;
 use Exception;
 
 final class StoreTripTicketHandler extends TripTicketNumberGenerator
@@ -13,44 +14,31 @@ final class StoreTripTicketHandler extends TripTicketNumberGenerator
      */
     public function handle(StoreTripTicketAction $action): array
     {
-        $dates = $action->getAdditionalDates() ?: [];
-
-        if (! in_array($action->getStartDate(), $dates)) {
-            $dates[] = $action->getStartDate();
-        }
-
-        if ($action->getTicketNumber() && $this->findSimilar($action->getTicketNumber())) {
+        if ($action->getTicketNumber() && $this->findSimilar($action)) {
             throw new Exception("Путевой лист с номером {$action->getTicketNumber()} уже существует");
         }
 
-        $first = false;
-        $tripTickets = [];
-        foreach ($dates as $date) {
-            $tripTicket = TripTicket::create([
-                'ticket_number' => $action->getTicketNumber() && ! $first
-                    ? $action->getTicketNumber()
-                    : $this->nextTicketNumber(),
-                'company_id' => $action->getCompanyId(),
-                'start_date' => $date,
-                'validity_period' => $action->getValidityPeriod(),
-                'driver_id' => $action->getDriverId(),
-                'car_id' => $action->getCarId(),
-                'logistics_method' => $action->getLogisticsMethod(),
-                'transportation_type' => $action->getTransportationType(),
-                'template_code' => $action->getTemplateCode(),
-            ]);
+        $tripTicket = TripTicket::create([
+            'ticket_number' => $action->getTicketNumber() ?: $this->nextTicketNumber($action->getCompanyId()),
+            'company_id' => $action->getCompanyId(),
+            'start_date' => $action->getStartDate(),
+            'validity_period' => $action->getValidityPeriod(),
+            'driver_id' => $action->getDriverId(),
+            'car_id' => $action->getCarId(),
+            'logistics_method' => $action->getLogisticsMethod(),
+            'transportation_type' => $action->getTransportationType(),
+            'template_code' => $action->getTemplateCode(),
+        ]);
 
-            $first = true;
-            $tripTickets[] = $tripTicket;
-        }
-
-        return ['created' => $tripTickets];
+        return [$tripTicket];
     }
 
-    private function findSimilar(string $number): bool
+    private function findSimilar(StoreTripTicketAction $action): bool
     {
         $similar = TripTicket::withTrashed()
-            ->where( 'ticket_number', '=', $number)
+            ->where('ticket_number', '=', $action->getTicketNumber())
+            ->where('company_id', '=', $action->getCompanyId())
+            ->where('created_at', '>=', Carbon::now()->subYear())
             ->first();
 
         return $similar !== null;

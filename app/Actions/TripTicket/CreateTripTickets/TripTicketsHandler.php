@@ -7,10 +7,14 @@ use App\Enums\FormTypeEnum;
 use App\Models\TripTicket;
 use Carbon\Carbon;
 use DB;
+use Exception;
 use Illuminate\Database\Query\Builder;
 
 final class TripTicketsHandler extends TripTicketNumberGenerator
 {
+    /**
+     * @throws Exception
+     */
     public function handle(TripTicketsAction $action): array
     {
         $tripTicketIds = [];
@@ -35,14 +39,13 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
                     $techForm ? $techForm->uuid : null);
 
                 if ($tripTicketId !== null) {
-                    $tripTicketIds[] = $tripTicketId;
                     continue;
                 }
 
                 $tripTicket = TripTicket::create([
-                    'ticket_number' => $this->nextTicketNumber(),
+                    'ticket_number' => $this->nextTicketNumber($action->getCompany()->hash_id),
                     'company_id' => $action->getCompany()->hash_id,
-                    'start_date' => $date,
+                    'start_date' => $date->copy(),
                     'validity_period' => $action->getValidityPeriod(),
                     'medic_form_id' => $medicForm ? $medicForm->uuid : null,
                     'driver_id' => $action->getDriver() ? $action->getDriver()->hash_id : null,
@@ -53,7 +56,7 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
                     'template_code' => $action->getTemplateCode(),
                 ]);
 
-                $tripTicketIds[] = $tripTicket->uuid;
+                $tripTicketIds[] = $tripTicket;
             }
         }
 

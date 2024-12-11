@@ -33,7 +33,7 @@ use Throwable;
 
 class TripTicketController extends Controller
 {
-    public function indexPage(Request $request, $tripTicketIds = null)
+    public function indexPage(Request $request)
     {
         $type = TripTicket::SLUG;
         $user = Auth::user();
@@ -80,10 +80,7 @@ class TripTicketController extends Controller
                 'cars.hash_id',
                 '=',
                 'trip_tickets.car_id',
-            )
-            ->when($tripTicketIds !== null, function ($query) use ($tripTicketIds) {
-                $query->whereIn('uuid', $tripTicketIds);
-            });
+            );
 
         $filterActivated = ! empty($request->get('filter'));
         $filterParams = $request->except([
@@ -98,27 +95,25 @@ class TripTicketController extends Controller
             'page',
         ]);
 
-        if ($tripTicketIds === null) {
-            if (count($filterParams) > 0 && $filterActivated) {
-                foreach ($filterParams as $filterKey => $filterValue) {
-                    if ($filterValue === null || in_array($filterKey, ['date_from', 'date_to'])) {
-                        continue;
-                    }
-
-                    $tripTickets->where("trip_tickets.$filterKey", '=', $filterValue);
+        if (count($filterParams) > 0 && $filterActivated) {
+            foreach ($filterParams as $filterKey => $filterValue) {
+                if ($filterValue === null || in_array($filterKey, ['date_from', 'date_to'])) {
+                    continue;
                 }
 
-                if ($filterParams['date_from'] || $filterParams['date_to']) {
-                    $tripTickets = $tripTickets
-                        ->whereBetween('start_date', [$filterParams['date_from'], $filterParams['date_to']]);
-                }
-            } else {
-                $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
-                $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
-
-                $tripTickets = $tripTickets
-                    ->whereBetween('start_date', [$date_from_filter, $date_to_filter]);
+                $tripTickets->where("trip_tickets.$filterKey", '=', $filterValue);
             }
+
+            if ($filterParams['date_from'] || $filterParams['date_to']) {
+                $tripTickets = $tripTickets
+                    ->whereBetween('start_date', [$filterParams['date_from'], $filterParams['date_to']]);
+            }
+        } else {
+            $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
+            $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
+
+            $tripTickets = $tripTickets
+                ->whereBetween('start_date', [$date_from_filter, $date_to_filter]);
         }
 
         $fieldPrompts = FieldPrompt::query()
@@ -178,14 +173,11 @@ class TripTicketController extends Controller
             );
 
             DB::beginTransaction();
-            $response = $handler->handle(new StoreTripTicketAction(
+            $response['created'] = $handler->handle(new StoreTripTicketAction(
                 $request->input('company_id'),
                 $request->input('driver_id'),
                 $request->input('car_id'),
-                $request->input('start_date'),
-                $request->input('additional_dates')
-                    ? explode(', ', $request->input('additional_dates'))
-                    : [],
+                $request->input('date_from'),
                 $request->input('validity_period', 1),
                 $request->input('ticket_number'),
                 LogisticsMethodEnum::fromString($request->input('logistics_method')),
@@ -314,28 +306,24 @@ class TripTicketController extends Controller
     public function generate(Request $request, TripTicketsHandler $handler)
     {
         if (! $request->has('date_from') || ! $request->has('date_to')) {
-            $request->session()->flash('error', 'Не выбран период ПЛ');
-            return redirect(url()->previous());
+            return back()->with(['error' => 'Не выбран период ПЛ'])->withInput();
         }
 
         $startDate = Carbon::parse($request->input('date_from'));
         $endDate = Carbon::parse($request->input('date_to'));
 
         if ($endDate->diff($startDate)->days > 31) {
-            $request->session()->flash('error', 'Выбранный период ПЛ превышает 31 день');
-            return redirect(url()->previous());
+            return back()->with(['error' => 'Выбранный период ПЛ превышает 31 день'])->withInput();
         }
 
         if ($request->input('company_id')) {
             $company = Company::where('hash_id', '=', $request->input('company_id'))->first();
 
             if ($company === null) {
-                $request->session()->flash('error', "Компания с id {$request->input('company_id')} не найдена");
-                return redirect(url()->previous());
+                return back()->with(['error' => "Компания с id {$request->input('company_id')} не найдена"])->withInput();
             }
         } else {
-            $request->session()->flash('error', 'Поле "Компания" обязательно для заполнения');
-            return redirect(url()->previous());
+            return back()->with(['error' => 'Поле "Компания" обязательно для заполнения'])->withInput();
         }
 
         $driver = null;
@@ -343,23 +331,34 @@ class TripTicketController extends Controller
             $driver = Driver::where('hash_id', '=', $request->input('driver_id'))->first();
 
             if ($driver === null) {
-                $request->session()->flash('error', "Водитель с id {$request->input('driver_id')} не найден");
-                return redirect(url()->previous());
+                return back()->with(['error' => "Водитель с id {$request->input('driver_id')} не найден"])->withInput();
             }
         }
 
-        $tripTicketIds = $handler->handle(new TripTicketsAction(
-            $company,
-            $driver,
-            $startDate,
-            $endDate,
-            LogisticsMethodEnum::fromString($request->input('logistics_method')),
-            TransportationTypeEnum::fromString($request->input('transportation_type')),
-            TripTicketTemplateEnum::fromString($request->input('template_code')),
-            $request->input('validity_period', 1)
-        ));
+        try {
+            DB::beginTransaction();
+            $response['created'] = $handler->handle(new TripTicketsAction(
+                $company,
+                $driver,
+                $startDate,
+                $endDate,
+                LogisticsMethodEnum::fromString($request->input('logistics_method')),
+                TransportationTypeEnum::fromString($request->input('transportation_type')),
+                TripTicketTemplateEnum::fromString($request->input('template_code')),
+                $request->input('validity_period', 1)
+            ));
+            DB::commit();
+        } catch (Throwable $exception) {
+            DB::rollBack();
 
-        return $this->indexPage($request, $tripTicketIds);
+            $response['errors'] = [$exception->getMessage()];
+        }
+
+        if (count($response) === 0) {
+            $response['errors'] = ['По заданным параметрам осмотры не найдены или они уже используются в других путевых листах'];
+        }
+
+        return back()->with($response);
     }
 
     public function print(Request $request, ExportExcelTripTicketQuery $query)
