@@ -70,7 +70,7 @@ class CompanySyncService extends OneCIntegrationService implements CompanySyncSe
             RequestOptions::JSON => $body
         ]);
 
-        if ($response->getStatusCode() === Response::HTTP_OK) {
+        if ($response->getStatusCode() !== Response::HTTP_OK) {
             $this->handleError($response);
         }
     }
