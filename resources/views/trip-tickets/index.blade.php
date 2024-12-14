@@ -63,6 +63,10 @@
         .show {
             display: block !important;
         }
+
+        .dropleft .dropdown-toggle::before {
+            display: none;
+        }
     </style>
 @endsection
 
@@ -370,6 +374,16 @@
                 $('#hv-alert-error').addClass('d-none')
                 $('#hv-alert-error').removeClass('d-flex')
             })
+
+            $('#medic-form-checkbox').change(function () {
+                if (this.checked) {
+                    $('.full-medic-form').removeClass('show')
+                    $('.short-medic-form').addClass('show')
+                } else {
+                    $('.full-medic-form').addClass('show')
+                    $('.short-medic-form').removeClass('show')
+                }
+            })
         })
     </script>
 @endsection
@@ -604,36 +618,64 @@
                                     </td>
                                 @endif
 
-                                <td class="td-option not-export d-flex justify-content-end">
-                                    @if($permissionToUpdate)
-                                        <a href="{{ route('trip-tickets.edit', $tripTicket->uuid) }}"
-                                           class="btn btn-info btn-sm mr-1"><i class="fa fa-edit"></i></a>
-                                    @endif
+                                <td class="td-option not-export dropleft d-flex justify-content-end">
+                                    <a class="dropdown-toggle" type="button" data-toggle="dropdown"
+                                       aria-expanded="false" style="font-size: 1.5rem">
+                                        <i class="fa fa-ellipsis-h"></i>
+                                    </a>
+                                    <div class="dropdown-menu">
+                                        @if($permissionToUpdate)
+                                            <a href="{{ route('trip-tickets.edit', $tripTicket->uuid) }}"
+                                               class="dropdown-item"><i class="fa fa-edit"></i> Редактировать ПЛ</a>
+                                            @if($tripTicket['medic_form_id'])
+                                                <a href="{{ route('forms.get', $tripTicket->medicForm->id) }}"
+                                                   class="dropdown-item"><i class="fa fa-edit"></i> Редактировать МО</a>
+                                            @endif
+                                            @if($tripTicket['tech_form_id'])
+                                                <a href="{{ route('forms.get', $tripTicket->techForm->id) }}"
+                                                   class="dropdown-item"><i class="fa fa-edit"></i> Редактировать ТО</a>
+                                            @endif
+                                        @endif
 
-                                    @if($permissionToExport)
-                                        <a class="btn btn-success btn-sm mr-1 export-excel-btn" data-uuid="{{ $tripTicket->uuid }}">
-                                            <i class="fa fa-file-excel-o"></i>
-                                        </a>
-                                    @endif
+                                        @if(! $tripTicket['medic_form_id'])
+                                            <a href="#" class="dropdown-item" id="create-medic" data-toggle="modal"
+                                               data-target="#create-medic-form"><i
+                                                    class="fa fa-plus"></i> Добавить МО</a>
+                                        @endif
+                                        @if(! $tripTicket['tech_form_id'])
+                                            <a href="#" class="dropdown-item" id="create-tech" data-toggle="modal"
+                                               data-target="#create-tech-form"><i
+                                                    class="fa fa-plus"></i> Добавить ТО</a>
+                                        @endif
 
-                                    @if($permissionToDelete)
-                                        <a
-                                            href="{{ route('trip-tickets.trash', ['id' => $tripTicket->uuid, 'action' => request()->get('trash') ? 0 : 1]) }}"
-                                            class="btn btn-warning btn-sm hv-btn-trash mr-1"
-                                            data-id="{{ $tripTicket->id }}">
-                                            @if(request()->get('trash', 0))
-                                                <i class="fa fa-undo"></i>
-                                            @else
-                                                <i class="fa fa-trash"></i>
-                                            @endisset
-                                        </a>
-                                    @endif
+                                        @if($permissionToExport)
+                                            <a class="dropdown-item export-excel-btn"
+                                               data-uuid="{{ $tripTicket->uuid }}" style="cursor: pointer">
+                                                <i class="fa fa-file-excel-o"></i> Печать ПЛ
+                                            </a>
+                                        @endif
+
+                                        @if($permissionToDelete)
+                                            <a
+                                                href="{{ route('trip-tickets.trash', ['id' => $tripTicket->uuid, 'action' => request()->get('trash') ? 0 : 1]) }}"
+                                                class="hv-btn-trash dropdown-item"
+                                                data-id="{{ $tripTicket->id }}">
+                                                @if(request()->get('trash', 0))
+                                                    <i class="fa fa-undo"></i> Восстановить
+                                                @else
+                                                    <i class="fa fa-trash"></i> Удалить
+                                                @endisset
+                                            </a>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
                         </tbody>
                     </table>
 
+                    @component('trip-tickets.components.create-medic-form-modal')
+                    @endcomponent
                 @endif
             </div>
         </div>

@@ -39,6 +39,8 @@ class TripTicketController extends Controller
         $user = Auth::user();
         $take = $request->get('take') ?? 100;
         $trash = filter_var($request->get('trash', 0), FILTER_VALIDATE_BOOLEAN);
+        $orderKey = $request->get('orderKey', 'start_date');
+        $orderBy = $request->get('orderBy', 'DESC');
 
         if ($trash) {
             $tripTickets = TripTicket::onlyTrashed();
@@ -80,7 +82,8 @@ class TripTicketController extends Controller
                 'cars.hash_id',
                 '=',
                 'trip_tickets.car_id',
-            );
+            )
+            ->orderBy($orderKey, $orderBy);
 
         $filterActivated = ! empty($request->get('filter'));
         $filterParams = $request->except([
@@ -125,9 +128,6 @@ class TripTicketController extends Controller
 
         $tripTickets = $tripTickets->paginate($take);
         $countResult = $tripTickets->total();
-
-        $orderKey = $request->get('orderKey', 'date');
-        $orderBy = $request->get('orderBy', 'ASC');
 
         $filters = TripTicket::FILTERS;
 
