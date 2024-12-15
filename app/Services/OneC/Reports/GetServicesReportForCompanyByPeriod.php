@@ -41,7 +41,8 @@ class GetServicesReportForCompanyByPeriod implements GetServicesReportForCompany
             ->select([
                 DB::raw('count(forms.id) as counter'),
                 'medic_forms.type_view',
-                'towns.name as town_name'
+                'towns.name as town_name',
+                'forms.driver_id'
             ])
             ->join('medic_forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
             ->leftJoin('points', 'forms.point_id', '=', 'points.id')
@@ -58,13 +59,14 @@ class GetServicesReportForCompanyByPeriod implements GetServicesReportForCompany
                             ->whereNotNull('medic_forms.result_dop');
                     });
             })
-            ->groupBy(['medic_forms.type_view', 'towns.name'])
+            ->groupBy(['towns.name', 'forms.driver_id', 'medic_forms.type_view'])
             ->where('forms.company_id', $this->companyHashId)
             ->get()
             ->toArray();
 
         return array_map(function ($item) {
             return [
+                'водитель' => $item->driver_id,
                 'вид_услуги' => 'МО',
                 'тип_услуги' => $item->type_view,
                 'город' => $item->town_name,
@@ -80,7 +82,8 @@ class GetServicesReportForCompanyByPeriod implements GetServicesReportForCompany
                 DB::raw('count(forms.id) as counter'),
                 'tech_forms.type_view',
                 'towns.name as town_name',
-                'cars.type_auto as car_type_auto'
+                'cars.type_auto as car_type_auto',
+                'tech_forms.car_id'
             ])
             ->join('tech_forms', 'forms.uuid', '=', 'tech_forms.forms_uuid')
             ->leftJoin('cars', 'tech_forms.car_id', '=', 'cars.hash_id')
@@ -98,13 +101,14 @@ class GetServicesReportForCompanyByPeriod implements GetServicesReportForCompany
                             ->whereNotNull('tech_forms.result_dop');
                     });
             })
-            ->groupBy(['tech_forms.type_view', 'towns.name', 'cars.type_auto'])
+            ->groupBy(['towns.name', 'tech_forms.car_id', 'cars.type_auto', 'tech_forms.type_view'])
             ->where('forms.company_id', $this->companyHashId)
             ->get()
             ->toArray();
 
         return array_map(function ($item) {
             return [
+                'авто' => $item->car_id,
                 'вид_услуги' => 'ТО',
                 'тип_услуги' => $item->type_view,
                 'город' => $item->town_name,
@@ -120,6 +124,7 @@ class GetServicesReportForCompanyByPeriod implements GetServicesReportForCompany
             ->select([
                 DB::raw('count(forms.id) as counter'),
                 'towns.name as town_name',
+                'forms.driver_id'
             ])
             ->join('bdd_forms', 'forms.uuid', '=', 'bdd_forms.forms_uuid')
             ->leftJoin('points', 'forms.point_id', '=', 'points.id')
@@ -129,15 +134,16 @@ class GetServicesReportForCompanyByPeriod implements GetServicesReportForCompany
                 $this->dateFrom,
                 $this->dateTo,
             ])
-            ->groupBy(['towns.name'])
+            ->groupBy(['towns.name', 'forms.driver_id'])
             ->where('forms.company_id', $this->companyHashId)
             ->get()
             ->toArray();
 
         return array_map(function ($item) {
             return [
+                'водитель' => $item->driver_id,
                 'вид_услуги' => 'БДД',
-                'город' => $item->town_name,
+                'город' => $item->town_name ?? '',
                 'кол_услуг' => $item->counter
             ];
         }, $items);
@@ -149,6 +155,7 @@ class GetServicesReportForCompanyByPeriod implements GetServicesReportForCompany
             ->select([
                 DB::raw('count(forms.id) as counter'),
                 'towns.name as town_name',
+                'forms.driver_id'
             ])
             ->join('report_cart_forms', 'forms.uuid', '=', 'report_cart_forms.forms_uuid')
             ->leftJoin('points', 'forms.point_id', '=', 'points.id')
@@ -158,13 +165,14 @@ class GetServicesReportForCompanyByPeriod implements GetServicesReportForCompany
                 $this->dateFrom,
                 $this->dateTo,
             ])
-            ->groupBy(['towns.name'])
+            ->groupBy(['towns.name', 'forms.driver_id'])
             ->where('forms.company_id', $this->companyHashId)
             ->get()
             ->toArray();
 
         return array_map(function ($item) {
             return [
+                'водитель' => $item->driver_id,
                 'вид_услуги' => 'Отчеты с карты',
                 'город' => $item->town_name,
                 'кол_услуг' => $item->counter
@@ -178,6 +186,7 @@ class GetServicesReportForCompanyByPeriod implements GetServicesReportForCompany
             ->select([
                 DB::raw('sum(print_pl_forms.count_pl) as counter'),
                 'towns.name as town_name',
+                'forms.driver_id'
             ])
             ->join('print_pl_forms', 'forms.uuid', '=', 'print_pl_forms.forms_uuid')
             ->leftJoin('points', 'forms.point_id', '=', 'points.id')
@@ -187,13 +196,14 @@ class GetServicesReportForCompanyByPeriod implements GetServicesReportForCompany
                 $this->dateFrom,
                 $this->dateTo,
             ])
-            ->groupBy(['towns.name'])
+            ->groupBy(['towns.name', 'forms.driver_id'])
             ->where('forms.company_id', $this->companyHashId)
             ->get()
             ->toArray();
 
         return array_map(function ($item) {
             return [
+                'водитель' => $item->driver_id,
                 'вид_услуги' => 'Печать ПЛ',
                 'город' => $item->town_name,
                 'кол_услуг' => intval($item->counter)
