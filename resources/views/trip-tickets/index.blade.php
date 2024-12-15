@@ -374,16 +374,6 @@
                 $('#hv-alert-error').addClass('d-none')
                 $('#hv-alert-error').removeClass('d-flex')
             })
-
-            $('#medic-form-checkbox').change(function () {
-                if (this.checked) {
-                    $('.full-medic-form').removeClass('show')
-                    $('.short-medic-form').addClass('show')
-                } else {
-                    $('.full-medic-form').addClass('show')
-                    $('.short-medic-form').removeClass('show')
-                }
-            })
         })
     </script>
 @endsection
@@ -529,6 +519,12 @@
                     @if(session()->has('error'))
                         <div class="alert alert-danger" role="alert">{{ session()->get('error') }}</div>
                     @endif
+
+                    @if(isset($errors))
+                        @foreach($errors as $error)
+                            <div class="alert alert-danger" role="alert">{{ $error }}</div>
+                        @endforeach
+                    @endif
                 </div>
             </div>
         </div>
@@ -618,7 +614,7 @@
                                     </td>
                                 @endif
 
-                                <td class="td-option not-export dropleft d-flex justify-content-end">
+                                <td class="td-option not-export dropleft d-flex" style="width: 40px">
                                     <a class="dropdown-toggle" type="button" data-toggle="dropdown"
                                        aria-expanded="false" style="font-size: 1.5rem">
                                         <i class="fa fa-ellipsis-h"></i>
@@ -638,9 +634,8 @@
                                         @endif
 
                                         @if(! $tripTicket['medic_form_id'])
-                                            <a href="#" class="dropdown-item" id="create-medic" data-toggle="modal"
-                                               data-target="#create-medic-form"><i
-                                                    class="fa fa-plus"></i> Добавить МО</a>
+                                            <a href="{{ route('trip-tickets.create-medic-form', ['id' => $tripTicket->uuid]) }}" class="dropdown-item">
+                                                <i class="fa fa-plus"></i> Добавить МО</a>
                                         @endif
                                         @if(! $tripTicket['tech_form_id'])
                                             <a href="#" class="dropdown-item" id="create-tech" data-toggle="modal"
@@ -673,9 +668,6 @@
                         @endforeach
                         </tbody>
                     </table>
-
-                    @component('trip-tickets.components.create-medic-form-modal')
-                    @endcomponent
                 @endif
             </div>
         </div>

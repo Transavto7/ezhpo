@@ -157,6 +157,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'TripTicketController@indexPage')->name('index');
             Route::post('generate', 'TripTicketController@generate')->name('generate');
             Route::get('create', 'TripTicketController@createPage')->name('create');
+            Route::get('{id}/create-medic-form', 'TripTicketController@createMedicFormPage')->name('create-medic-form');
+            Route::post('{id}/store-medic-form', 'TripTicketController@storeMedicForm')->name('store-medic-form');
             Route::post('store', 'TripTicketController@store')->name('store');
             Route::post('export', 'TripTicketController@export')->name('export');
             Route::get('{id}/edit', 'TripTicketController@editPage')->name('edit');

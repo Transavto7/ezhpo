@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Anketa\CreateFormHandlerFactory;
 use App\Actions\TripTicket\CreateTripTickets\TripTicketsAction;
 use App\Actions\TripTicket\CreateTripTickets\TripTicketsHandler;
 use App\Actions\TripTicket\DeleteTripTickets\TrashTripTicketHandler;
@@ -9,9 +10,12 @@ use App\Actions\TripTicket\StoreTripTicket\StoreTripTicketAction;
 use App\Actions\TripTicket\StoreTripTicket\StoreTripTicketHandler;
 use App\Actions\TripTicket\UpdateTripTicket\UpdateTripTicketAction;
 use App\Actions\TripTicket\UpdateTripTicket\UpdateTripTicketHandler;
+use App\Actions\TripTicket\UpdateTripTicketForm\UpdateTripTicketFormAction;
+use App\Actions\TripTicket\UpdateTripTicketForm\UpdateTripTicketFormHandler;
 use App\Car;
 use App\Company;
 use App\Driver;
+use App\Enums\FormTypeEnum;
 use App\Enums\LogisticsMethodEnum;
 use App\Enums\TransportationTypeEnum;
 use App\Enums\TripTicketTemplateEnum;
@@ -24,10 +28,10 @@ use Carbon\Carbon;
 use Exception;
 use Http\Discovery\Exception\NotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -370,5 +374,65 @@ class TripTicketController extends Controller
                 ->json(['error' => $e->getMessage(),])
                 ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function createMedicFormPage(string $id)
+    {
+        $tripTicket = TripTicket::where('uuid', '=', $id)->first();
+
+        date_default_timezone_set('UTC');
+        $time = time();
+        $user = Auth::user();
+        $timezone = $user->timezone ?: 3;
+        $time += $timezone * 3600;
+        $time = date('Y-m-d', $time);
+
+        if (session()->exists('anketa_pv_id') && ((date('d.m') > session('anketa_pv_id')['expired']))) {
+            session()->remove('anketa_pv_id');
+        }
+
+        return view('trip-tickets.create-medic-form', [
+            'tripTicket' => $tripTicket,
+            'title' => 'Добавления медосмотра по данным путевого листа',
+            'default_current_date' => $time,
+            'default_pv_id' => $user->pv_id,
+        ]);
+    }
+
+    public function storeMedicForm(string  $id, Request $request, CreateFormHandlerFactory $factory, UpdateTripTicketFormHandler $ticketHandler): RedirectResponse
+    {
+        $tripTicket = TripTicket::where('uuid', '=', $id)->first();
+        $prevUrl = $request->input('REFERER');
+        $data = $request->all();
+        $data['company_id'] = $tripTicket->company_id;
+        $data['driver_id'] = $tripTicket->driver_id;
+
+        try {
+            session(['anketa_pv_id' => [
+                'value' => $request->get('pv_id', 0),
+                'expired' => date('d.m')
+            ]]);
+
+            $handler = $factory->make(FormTypeEnum::MEDIC);
+
+            $responseData = $handler->handle($data, Auth::user());
+            if (array_key_exists('created', $responseData) && count($responseData['created']) === 1) {
+                $responseData['success'] = "Медицинский осмотр для ПЛ № $tripTicket->ticket_number успешно добавлен";
+
+                $ticketHandler->handle(new UpdateTripTicketFormAction(
+                    $tripTicket,
+                    FormTypeEnum::MEDIC,
+                    $responseData['created'][0]
+                ));
+            }
+
+            DB::commit();
+        } catch (Throwable $exception) {
+            $responseData['error'] = $exception->getMessage();
+
+            DB::rollBack();
+        }
+
+        return redirect($prevUrl)->with($responseData);
     }
 }
