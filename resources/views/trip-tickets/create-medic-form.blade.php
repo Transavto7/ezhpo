@@ -56,8 +56,6 @@
                               id="ANKETA_FORM">
                             @csrf
 
-                            <input type="hidden" name="type_anketa" value="{{ \App\Enums\FormTypeEnum::MEDIC }}"/>
-
                             <input type="hidden" name="REFERER" value="{{ $previousUrl }}">
 
                             @include('profile.ankets.components.pvs', ['points' => App\Point::getAll()])
