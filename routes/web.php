@@ -154,17 +154,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('ankets-export-pdf-labeling', 'AnketsController@exportPdfLabeling')->name('ankets.export-pdf-labeling');
 
         Route::prefix('trip-tickets')->as('trip-tickets.')->group(function () {
-            Route::get('/', 'TripTicketController@indexPage')->name('index');
-            Route::post('generate', 'TripTicketController@generate')->name('generate');
-            Route::get('create', 'TripTicketController@createPage')->name('create');
-            Route::get('{id}/create-medic-form', 'TripTicketController@createMedicFormPage')->name('create-medic-form');
-            Route::post('{id}/store-medic-form', 'TripTicketController@storeMedicForm')->name('store-medic-form');
-            Route::post('store', 'TripTicketController@store')->name('store');
-            Route::post('export', 'TripTicketController@export')->name('export');
-            Route::get('{id}/edit', 'TripTicketController@editPage')->name('edit');
-            Route::post('{id}', 'TripTicketController@update')->name('update');
-            Route::get('trash', 'TripTicketController@trash')->name('trash');
-            Route::get('mass-trash', 'TripTicketController@massTrash')->name('mass-trash');
+            Route::get('/', 'TripTickets\TripTicketIndexPageController')->name('index');
+            Route::post('generate', 'TripTickets\TripTicketGenerateFromFormsController')->name('generate');
+            Route::get('create', 'TripTickets\TripTicketCreatePage')->name('create');
+            Route::post('store', 'TripTickets\StoreTripTicketController')->name('store');
+            Route::get('{id}/edit', 'TripTickets\TripTicketEditPageController')->name('edit');
+            Route::post('{id}', 'TripTickets\UpdateTripTicketController')->name('update');
+            Route::get('trash', 'TripTickets\TripTicketTrashController')->name('trash');
+            Route::get('mass-trash', 'TripTickets\TripTicketMassTrashController')->name('mass-trash');
+            Route::get('{id}/create-medic-form', 'TripTickets\TripTicketCreateMedicFormPageController')->name('create-medic-form');
+            Route::post('{id}/store-medic-form', 'TripTickets\TripTicketStoreMedicFormController')->name('store-medic-form');
+            Route::post('export', 'TripTickets\TripTicketExportController')->name('export');
         });
     });
 

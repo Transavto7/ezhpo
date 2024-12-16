@@ -35,8 +35,8 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
                 }
 
                 $tripTicketId = $this->existedTripTicket(
-                    $medicForm ? $medicForm->uuid : null,
-                    $techForm ? $techForm->uuid : null);
+                    $medicForm ? $medicForm->id : null,
+                    $techForm ? $techForm->id : null);
 
                 if ($tripTicketId !== null) {
                     continue;
@@ -47,9 +47,9 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
                     'company_id' => $action->getCompany()->hash_id,
                     'start_date' => $date->copy(),
                     'validity_period' => $action->getValidityPeriod(),
-                    'medic_form_id' => $medicForm ? $medicForm->uuid : null,
+                    'medic_form_id' => $medicForm ? $medicForm->id : null,
                     'driver_id' => $action->getDriver() ? $action->getDriver()->hash_id : null,
-                    'tech_form_id' => $techForm ? $techForm->uuid : null,
+                    'tech_form_id' => $techForm ? $techForm->id : null,
                     'car_id' => $carId,
                     'logistics_method' => $action->getLogisticsMethod(),
                     'transportation_type' => $action->getTransportationType(),
@@ -66,7 +66,7 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
     private function getMedicForms(TripTicketsAction $action, Carbon $date): array
     {
         return $this->getFormBuilder($action, $date)
-            ->select('uuid')
+            ->select('id')
             ->join(
                 'medic_forms',
                 'medic_forms.forms_uuid',
@@ -84,8 +84,7 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
     {
         return $this->getFormBuilder($action, $date)
             ->select([
-                'uuid',
-                'number_list_road as number',
+                'id',
                 'car_id',
             ])
             ->join(
@@ -123,7 +122,7 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
             ->first();
 
         return $tripTicket !== null
-            ? $tripTicket->uuid
+            ? $tripTicket->id
             : null;
     }
 }

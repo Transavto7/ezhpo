@@ -23,7 +23,7 @@ final class UpdateTripTicketFormHandler
         }
 
         $action->getTripTicket()->update([
-            $action->getFormType().'_form_id' => $action->getForm()->uuid
+            $action->getFormType().'_form_id' => $action->getForm()->id
         ]);
 
         return $action->getTripTicket();
@@ -33,10 +33,10 @@ final class UpdateTripTicketFormHandler
     {
         $tripTicket = TripTicket::query()
             ->when($action->getFormType() === FormTypeEnum::MEDIC, function (Builder $query) use ($action) {
-                $query->where('medic_form_id', '=', $action->getForm()->uuid);
+                $query->where('medic_form_id', '=', $action->getForm()->id);
             })
             ->when($action->getFormType() === FormTypeEnum::TECH, function (Builder $query) use ($action) {
-                $query->where('tech_form_id', '=', $action->getForm()->uuid);
+                $query->where('tech_form_id', '=', $action->getForm()->id);
             })
             ->first();
 

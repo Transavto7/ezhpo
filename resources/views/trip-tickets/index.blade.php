@@ -596,9 +596,6 @@
                                             {{ \App\Enums\TransportationTypeEnum::getLabel($tripTicket[$field->field]) }}
                                         @elseif($field->field === 'template_code')
                                             {{ \App\Enums\TripTicketTemplateEnum::getLabel($tripTicket[$field->field]) }}
-                                        @elseif(in_array($field->field, ['medic_form_id', 'tech_form_id']))
-                                            @component('trip-tickets.common.uuid-cell', ['uuid' => $tripTicket[$field->field]])
-                                            @endcomponent
                                         @else
                                             {{ $tripTicket[$field->field] }}
                                         @endif
@@ -624,11 +621,11 @@
                                             <a href="{{ route('trip-tickets.edit', $tripTicket->uuid) }}"
                                                class="dropdown-item"><i class="fa fa-edit"></i> Редактировать ПЛ</a>
                                             @if($tripTicket['medic_form_id'])
-                                                <a href="{{ route('forms.get', $tripTicket->medicForm->id) }}"
+                                                <a href="{{ route('forms.get', $tripTicket->id) }}"
                                                    class="dropdown-item"><i class="fa fa-edit"></i> Редактировать МО</a>
                                             @endif
                                             @if($tripTicket['tech_form_id'])
-                                                <a href="{{ route('forms.get', $tripTicket->techForm->id) }}"
+                                                <a href="{{ route('forms.get', $tripTicket->id) }}"
                                                    class="dropdown-item"><i class="fa fa-edit"></i> Редактировать ТО</a>
                                             @endif
                                         @endif

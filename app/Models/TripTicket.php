@@ -72,11 +72,11 @@ class TripTicket extends Model
 
     public function medicForm(): BelongsTo
     {
-        return $this->belongsTo(Form::class, 'medic_form_id', 'uuid');
+        return $this->belongsTo(Form::class, 'medic_form_id', 'id');
     }
 
     public function techForm(): BelongsTo
     {
-        return $this->belongsTo(Form::class, 'tech_form_id', 'uuid');
+        return $this->belongsTo(Form::class, 'tech_form_id', 'id');
     }
 }
