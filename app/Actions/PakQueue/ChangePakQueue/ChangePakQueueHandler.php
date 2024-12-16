@@ -78,7 +78,7 @@ class ChangePakQueueHandler
         $form->user_validity_eds_start = $user->validity_eds_start;
         $form->user_validity_eds_end = $user->validity_eds_end;
 
-        event(new FormAction(Auth::user(), $form, FormLogActionTypesEnum::APPROVAL));
+        event(new FormAction(Auth::user(), $form, FormLogActionTypesEnum::QUEUE_PROCESSING));
 
         $form->save();
         $details->save();

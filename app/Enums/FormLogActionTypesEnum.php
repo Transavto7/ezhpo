@@ -10,6 +10,7 @@ class FormLogActionTypesEnum
     const DELETING = 'deleting';
     const RESTORING = 'restoring';
     const APPROVAL = 'approval';
+    const QUEUE_PROCESSING = 'queue_processing';
 
     public static function labels(): array
     {
@@ -18,6 +19,7 @@ class FormLogActionTypesEnum
             self::DELETING => 'Удаление',
             self::RESTORING => 'Восстановление',
             self::APPROVAL => 'Утверждение',
+            self::QUEUE_PROCESSING => 'Обработка очереди'
         ];
     }
 
@@ -45,6 +47,7 @@ class FormLogActionTypesEnum
             self::DELETING,
             self::RESTORING,
             self::APPROVAL,
+            self::QUEUE_PROCESSING
         ];
     }
 }

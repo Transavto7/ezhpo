@@ -30,7 +30,6 @@ class FormLogController extends Controller
                     'text' => FormLogModelTypesEnum::label($item)
                 ];
             })
-            ->whereIn('event_type', FormLogActionTypesEnum::values())
             ->toArray();
 
         $users = User::query()
@@ -62,6 +61,7 @@ class FormLogController extends Controller
 
             $value['deleted_id'] = 'ID удалившего пользователя';
             $value['deleted_at'] = 'Дата и время удаления';
+            $value['result_dop'] = 'Статус выданного наперед ПЛ';
         }
 
         return view(
@@ -108,7 +108,6 @@ class FormLogController extends Controller
                 'forms.id as form_id',
                 DB::raw("IF(ISNULL(users.hash_id), '-', CONCAT('[', users.hash_id, '] ', users.name)) as user")
             ])
-            ->whereIn('event_type', FormLogActionTypesEnum::values())
             ->dateFrom($request->input('filter.date_start'))
             ->dateTo($request->input('filter.date_end'))
             ->modelTypes($request->input('filter.models'))
