@@ -21,6 +21,7 @@ class FormLogController extends Controller
 
         $modelTypes = FormEvent::query()
             ->select(['model_type'])
+            ->whereIn('event_type', FormLogActionTypesEnum::values())
             ->distinct()
             ->get()
             ->pluck('model_type')
@@ -108,6 +109,7 @@ class FormLogController extends Controller
                 'forms.id as form_id',
                 DB::raw("IF(ISNULL(users.hash_id), '-', CONCAT('[', users.hash_id, '] ', users.name)) as user")
             ])
+            ->whereIn('event_type', FormLogActionTypesEnum::values())
             ->dateFrom($request->input('filter.date_start'))
             ->dateTo($request->input('filter.date_end'))
             ->modelTypes($request->input('filter.models'))
