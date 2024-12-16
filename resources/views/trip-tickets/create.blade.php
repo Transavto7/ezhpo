@@ -18,6 +18,42 @@
         $(document).ready(function () {
             const datesSelector = $("input[name='additional_dates']")
             initDatePicker(datesSelector)
+
+            let ctr = 1;
+
+            $('#trip-ticket-clone-btn').click(e => {
+                const CLONE_ID = 'clone'
+
+                if (ctr + 1 === 32) {
+                    swal.fire({
+                        title: 'Нельзя добавлять более 31 путевого листа',
+                        icon: 'warning'
+                    });
+
+                    return
+                }
+
+                let firstClone = $(`#first-${CLONE_ID}`)
+                let cloneTo = $('#clone-stack')
+                let clone = firstClone.clone()
+                let randId = 'trip_ticket_' + ctr
+
+                if (cloneTo.find('.cloning-clone').length) {
+                    clone = cloneTo.find('.cloning-clone').last().clone()
+                }
+
+                clone.removeAttr('id').addClass('cloning-clone')
+                clone.attr('id', randId)
+                cloneTo.append(clone)
+
+                clone.find('input,select').each(function () {
+                    this.name = this.name.replace('trip_ticket[' + (ctr - 1) + ']', 'trip_ticket[' + ctr + ']')
+                })
+
+                ctr++
+
+                clone.find('.trip-ticket-delete').html('<a href="" onclick="' + randId + '.remove(); return false;" class="text-danger">Удалить</a>')
+            })
         })
     </script>
 @endsection
@@ -104,10 +140,6 @@
                               enctype="multipart/form-data" id="ANKETA_FORM">
                             @csrf
 
-                            @if(isset($anketa_route) && $id)
-                                <input type="hidden" name="REFERER" value="{{ url()->previous() }}">
-                            @endif
-
                             <div class="form-group d-flex">
                                 <a class="text-small"
                                    href="{{ route('trip-tickets.create', ['createByForms' => ! $createByForms]) }}">
@@ -161,98 +193,107 @@
                                 </article>
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-control-label">
-                                    @if($createByForms)
-                                        Дата первого осмотра:
-                                    @else
-                                        Дата начала действия:
-                                    @endif
-                                </label>
-                                <article>
-                                    <input min="1970-01-01"
-                                           max="2100-01-01"
-                                           type="date"
-                                           value="{{ $default_current_date ?? '' }}"
-                                           name="date_from"
-                                           class="form-control"
-                                           @if($createByForms)
-                                               required
-                                           @endif>
-                                </article>
-                            </div>
-
-                            @if($createByForms)
+                            <div class="clone" id="first-clone">
                                 <div class="form-group">
-                                    <label class="form-control-label">Дата последнего осмотра (не более 31 дня от
-                                        первого):</label>
+                                    <label class="form-control-label">
+                                        @if($createByForms)
+                                            Дата первого осмотра:
+                                        @else
+                                            Дата начала действия:
+                                        @endif
+                                    </label>
                                     <article>
                                         <input min="1970-01-01"
                                                max="2100-01-01"
                                                type="date"
                                                value="{{ $default_current_date ?? '' }}"
-                                               name="date_to"
                                                class="form-control"
-                                               required>
+                                               @if($createByForms)
+                                                   required
+                                                   name="date_from"
+                                               @else
+                                                   name="trip_ticket[0][date_from]"
+                                               @endif
+                                        >
                                     </article>
                                 </div>
-                            @endif
 
-                            <div class="form-group">
-                                <label class="form-control-label">Срок действия, дней:</label>
-                                <input type="number" value="{{ $validity_period ?? '1' }}"
-                                       name="validity_period" class="form-control" min="1">
+                                @if($createByForms)
+                                    <div class="form-group">
+                                        <label class="form-control-label">Дата последнего осмотра (не более 31 дня от
+                                            первого):</label>
+                                        <article>
+                                            <input min="1970-01-01"
+                                                   max="2100-01-01"
+                                                   type="date"
+                                                   value="{{ $default_current_date ?? '' }}"
+                                                   name="date_to"
+                                                   class="form-control"
+                                                   required>
+                                        </article>
+                                    </div>
+                                @endif
+
+                                <div class="form-group">
+                                    <label class="form-control-label">Срок действия, дней:</label>
+                                    <input type="number" value="{{ $validity_period ?? '1' }}"
+                                           name="trip_ticket[0][validity_period]" class="form-control" min="1">
+                                </div>
+
+                                @if(! $createByForms)
+                                    <div class="form-group">
+                                        <label class="form-control-label">Номер путевого листа:</label>
+                                        <input type="text" value="{{ $number_list_road ?? '' }}"
+                                               name="trip_ticket[0][ticket_number]"
+                                               class="form-control">
+                                    </div>
+                                @endif
+
+                                <div class="form-group">
+                                    <label class="form-control-label">Вид сообщения:</label>
+                                    <article>
+                                        <select name="trip_ticket[0][logistics_method]" required class="form-control type-view">
+                                            @foreach(\App\Enums\LogisticsMethodEnum::labels() as $key => $label)
+                                                <option value="{{ $key }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                    </article>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-control-label">Вид перевозки:</label>
+                                    <article>
+                                        <select name="trip_ticket[0][transportation_type]" required class="form-control type-view">
+                                            @foreach(\App\Enums\TransportationTypeEnum::labels() as $key => $label)
+                                                <option value="{{ $key }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                    </article>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-control-label">Код бумажного шаблона:</label>
+                                    <article>
+                                        <select name="trip_ticket[0][template_code]" required class="form-control type-view">
+                                            @foreach(\App\Enums\TripTicketTemplateEnum::labels() as $key => $label)
+                                                <option value="{{ $key }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                    </article>
+                                </div>
+
+                                <div class="trip-ticket-delete"></div>
                             </div>
 
                             @if(! $createByForms)
-                                <div class="form-group">
-                                    <label class="form-control-label">Номер путевого листа:</label>
-                                    <input type="text" value="{{ $number_list_road ?? '' }}"
-                                           name="ticket_number"
-                                           class="form-control">
-                                </div>
+                                <div id="clone-stack"></div>
+
+                                <button type="button" id="trip-ticket-clone-btn" class="anketa__addnew">
+                                    <i class="fa fa-plus"></i>
+                                </button>
                             @endif
 
-                            <div class="form-group">
-                                <label class="form-control-label">Вид сообщения:</label>
-                                <article>
-                                    <select name="logistics_method" required class="form-control type-view">
-                                        @foreach(\App\Enums\LogisticsMethodEnum::labels() as $key => $label)
-                                            <option value="{{ $key }}">{{ $label }}</option>
-                                        @endforeach
-                                    </select>
-                                </article>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-control-label">Вид перевозки:</label>
-                                <article>
-                                    <select name="transportation_type" required class="form-control type-view">
-                                        @foreach(\App\Enums\TransportationTypeEnum::labels() as $key => $label)
-                                            <option value="{{ $key }}">{{ $label }}</option>
-                                        @endforeach
-                                    </select>
-                                </article>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-control-label">Код бумажного шаблона:</label>
-                                <article>
-                                    <select name="template_code" required class="form-control type-view">
-                                        @foreach(\App\Enums\TripTicketTemplateEnum::labels() as $key => $label)
-                                            <option value="{{ $key }}">{{ $label }}</option>
-                                        @endforeach
-                                    </select>
-                                </article>
-                            </div>
-
                             <div class="form-group row mb-0">
-                                @if(isset($anketa_route))
-                                    <a href="{{ url()->previous() }}"
-                                       class="m-center btn btn-info">
-                                        Вернуться в журнал
-                                    </a>
-                                @endif
                                 <button type="submit"
                                         class="m-center btn btn-sm btn-success submit-btn">
                                     @if($createByForms)

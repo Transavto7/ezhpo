@@ -96,7 +96,7 @@
                                 <article>
                                     <div class="d-flex">
                                         <input type="number"
-                                               @if($tripTicket->driver_id !== null)
+                                               @if($tripTicket->car_id !== null)
                                                    value="{{ $tripTicket->car_id }}"
                                                    disabled
                                                @endif
