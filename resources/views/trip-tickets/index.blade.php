@@ -621,11 +621,11 @@
                                             <a href="{{ route('trip-tickets.edit', $tripTicket->uuid) }}"
                                                class="dropdown-item"><i class="fa fa-edit"></i> Редактировать ПЛ</a>
                                             @if($tripTicket['medic_form_id'])
-                                                <a href="{{ route('forms.get', $tripTicket->id) }}"
+                                                <a href="{{ route('forms.get', $tripTicket->medic_form_id) }}"
                                                    class="dropdown-item"><i class="fa fa-edit"></i> Редактировать МО</a>
                                             @endif
                                             @if($tripTicket['tech_form_id'])
-                                                <a href="{{ route('forms.get', $tripTicket->id) }}"
+                                                <a href="{{ route('forms.get', $tripTicket->tech_form_id) }}"
                                                    class="dropdown-item"><i class="fa fa-edit"></i> Редактировать ТО</a>
                                             @endif
                                         @endif
@@ -635,9 +635,8 @@
                                                 <i class="fa fa-plus"></i> Добавить МО</a>
                                         @endif
                                         @if(! $tripTicket['tech_form_id'])
-                                            <a href="#" class="dropdown-item" id="create-tech" data-toggle="modal"
-                                               data-target="#create-tech-form"><i
-                                                    class="fa fa-plus"></i> Добавить ТО</a>
+                                            <a href="{{ route('trip-tickets.create-tech-form', ['id' => $tripTicket->uuid]) }}" class="dropdown-item">
+                                                <i class="fa fa-plus"></i> Добавить ТО</a>
                                         @endif
 
                                         @if($permissionToExport)

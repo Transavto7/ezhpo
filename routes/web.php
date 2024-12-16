@@ -164,6 +164,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('mass-trash', 'TripTickets\TripTicketMassTrashController')->name('mass-trash');
             Route::get('{id}/create-medic-form', 'TripTickets\TripTicketCreateMedicFormPageController')->name('create-medic-form');
             Route::post('{id}/store-medic-form', 'TripTickets\TripTicketStoreMedicFormController')->name('store-medic-form');
+            Route::get('{id}/create-tech-form', 'TripTickets\TripTicketCreateTechFormPageController')->name('create-tech-form');
+            Route::post('{id}/store-tech-form', 'TripTickets\TripTicketStoreTechFormController')->name('store-tech-form');
             Route::post('export', 'TripTickets\TripTicketExportController')->name('export');
         });
     });
