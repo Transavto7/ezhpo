@@ -78,6 +78,7 @@ jobs:
           - smirnova
           - soyuzmed
           - tomilko
+          - trans-kontinent
           - tverkooptrans
     steps:
     - name: Update domains
