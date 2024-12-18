@@ -64,7 +64,7 @@ class DaDataCompanyReqsChecker implements CompanyReqsCheckerInterface
                     $result['data']['inn'],
                     $result['data']['kpp'] ?? null
                 );
-            }, $this->daData->findById("party", $inn));
+            }, $this->daData->findById("party", $inn, 300));
 
             Log::channel('da-data-api')->info('Поиск по ИНН: ' . $inn . ' ,найдено: ' . count($result));
 
@@ -111,6 +111,8 @@ class DaDataCompanyReqsChecker implements CompanyReqsCheckerInterface
         $hasSubCompanyWithoutKpp = false;
 
         foreach ($companies as $company) {
+            Log::info($company->getKpp());
+
             if (empty($company->getKpp())) {
                 $hasSubCompanyWithoutKpp = true;
 

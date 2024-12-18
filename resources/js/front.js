@@ -1241,17 +1241,22 @@ $(document).ready(function () {
         companyOfficialNameInput.suggestions({
             token: window.DADATA_TOKEN,
             type: "PARTY",
+            count: 20,
             /* Вызывается, когда пользователь выбирает одну из подсказок */
             onSelect: function (suggestion) {
                 if (!suggestion.data) {
                     return
                 }
 
-                const {value,inn,kpp} = suggestion.data
+                const {name,inn,kpp} = suggestion.data
 
                 innInput.val(inn)
                 kppInput.val(kpp)
-                nameInput.val(value)
+                nameInput.val(name.short_with_opf)
+            },
+            /* Определяет текст, подставляемый в инпут при выборе одной из подсказок */
+            formatSelected: function (suggestion) {
+                return suggestion?.data?.name?.full_with_opf
             }
         });
     }
