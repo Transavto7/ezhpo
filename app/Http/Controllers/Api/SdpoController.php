@@ -56,7 +56,7 @@ class SdpoController extends Controller
         $user = $request->user('api');
 
         if ($user->blocked) {
-            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
+            return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK)], 400);
         }
 
         $driver = Driver::where('hash_id', $id)->first();
@@ -120,7 +120,7 @@ class SdpoController extends Controller
             $user = $request->user('api');
             $apiClient = $user;
             if ($user->blocked) {
-                throw new Exception('Этот терминал заблокирован!', 400);
+                throw new Exception(BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK), 400);
             }
 
             if ($request->user_id) {
@@ -149,7 +149,7 @@ class SdpoController extends Controller
             }
 
             if ($driver->dismissed === 'Да') {
-                throw new Exception('Водитель с указанным ID уволен!', 303);
+                throw new Exception(BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::DRIVER_BLOCK), 303);
             }
 
             $company = $driver->company;
@@ -159,7 +159,7 @@ class SdpoController extends Controller
             }
 
             if ($driver->only_offline_medic_inspections) {
-                $message = 'Водителю ограничен дистанционный выпуск, обратитесь к медицинскому сотруднику на Пункте Выпуска!';
+                $message = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::DRIVER_OFFLINE_ONLY);
                 throw new Exception($message, 400);
             }
 
@@ -483,7 +483,7 @@ class SdpoController extends Controller
         $apiClient = $request->user('api');
 
         if ($apiClient->blocked) {
-            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
+            return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK)], 400);
         }
 
         $driver = Driver::where('hash_id', $id)
@@ -518,15 +518,15 @@ class SdpoController extends Controller
         }
 
         if ($driver->dismissed === 'Да') {
-            return response()->json(['message' => 'Водитель с указанным ID уволен!'], 303);
+            return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::DRIVER_BLOCK)], 303);
         }
 
         if ($driver->company->dismissed === 'Да') {
-            return response()->json(['message' => 'Компания указанного водителя заблокирована!'], 303);
+            return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK)], 303);
         }
 
         if ($driver->only_offline_medic_inspections) {
-            return response()->json(['message' => 'Водителю ограничен дистанционный выпуск, обратитесь к медицинскому сотруднику на Пункте Выпуска!'], 400);
+            return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::DRIVER_OFFLINE_ONLY)], 400);
         }
 
         return response()->json($driver);
@@ -540,7 +540,7 @@ class SdpoController extends Controller
         $apiClient = $request->user('api');
 
         if ($apiClient->blocked) {
-            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
+            return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK)], 400);
         }
 
         $car = Car::where('hash_id', $id)
@@ -558,11 +558,11 @@ class SdpoController extends Controller
         }
 
         if ($car->dismissed === 'Да') {
-            return response()->json(['message' => 'Авто с указанным ID уволено!'], 303);
+            return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::CAR_BLOCK)], 303);
         }
 
         if ($car->company->dismissed === 'Да') {
-            return response()->json(['message' => 'Компания указанного авто заблокирована!'], 303);
+            return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK)], 303);
         }
 
         return response()->json($car);
@@ -573,7 +573,7 @@ class SdpoController extends Controller
         $apiClient = $request->user('api');
 
         if ($apiClient->blocked) {
-            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
+            return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK)], 400);
         }
 
         /** @var Driver $driver */
@@ -587,15 +587,15 @@ class SdpoController extends Controller
         }
 
         if ($driver->dismissed === 'Да') {
-            return response()->json(['message' => 'Водитель с указанным ID уволен!'], 303);
+            return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::DRIVER_BLOCK)], 303);
         }
 
         if ($driver->company->dismissed === 'Да') {
-            return response()->json(['message' => 'Компания указанного водителя заблокирована!'], 303);
+            return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK)], 303);
         }
 
         if ($driver->only_offline_medic_inspections) {
-            return response()->json(['message' => 'Водителю ограничен дистанционный выпуск, обратитесь к медицинскому сотруднику на Пункте Выпуска!'], 400);
+            return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::DRIVER_OFFLINE_ONLY)], 400);
         }
 
         $phone = new Phone($request->input('phone'));
@@ -729,7 +729,7 @@ class SdpoController extends Controller
         $user = $request->user('api');
 
         if ($user->blocked) {
-            return response()->json(['message' => 'Этот терминал заблокирован!'], 400);
+            return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK)], 400);
         }
 
         try {
@@ -767,7 +767,7 @@ class SdpoController extends Controller
         $user = $request->user('api');
 
         if ($user->blocked) {
-            return response()->json(['message' => 'Этот терминал заблокирован!'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK)], Response::HTTP_BAD_REQUEST);
         }
 
         DB::beginTransaction();
