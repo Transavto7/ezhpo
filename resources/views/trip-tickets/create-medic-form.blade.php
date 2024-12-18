@@ -5,7 +5,8 @@
 
 @php
     use Carbon\Carbon;
-    $shortForm = $shortForm ?? request()->get('shortForm', '0') === '1';
+    $shortForm = ! $tripTicket->driver_id;
+    $shortForm = request()->get('shortForm', '0') === '1' || $shortForm;
     $previousUrl = request()->get('previousUrl', url()->previous());
 @endphp
 

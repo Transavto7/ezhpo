@@ -21,6 +21,7 @@ class TripTicketStoreMedicFormController extends Controller
         $tripTicket = TripTicket::where('uuid', '=', $id)->first();
         $prevUrl = $request->input('REFERER');
         $data = $request->all();
+        $data['type_anketa'] = FormTypeEnum::MEDIC;
         $data['company_id'] = $tripTicket->company_id;
         $data['driver_id'] = $tripTicket->driver_id;
 
@@ -30,7 +31,7 @@ class TripTicketStoreMedicFormController extends Controller
                 'expired' => date('d.m')
             ]]);
 
-            $handler = $factory->make(FormTypeEnum::MEDIC);
+            $handler = $factory->make($data['type_anketa']);
 
             $responseData = $handler->handle($data, Auth::user());
             if (array_key_exists('created', $responseData) && count($responseData['created']) === 1) {
@@ -38,7 +39,7 @@ class TripTicketStoreMedicFormController extends Controller
 
                 $ticketHandler->handle(new UpdateTripTicketFormAction(
                     $tripTicket,
-                    FormTypeEnum::MEDIC,
+                    $data['type_anketa'],
                     $responseData['created'][0]
                 ));
             }

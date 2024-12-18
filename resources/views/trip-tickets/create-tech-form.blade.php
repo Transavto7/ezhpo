@@ -5,7 +5,8 @@
 
 @php
     use Carbon\Carbon;
-    $shortForm = $shortForm ?? request()->get('shortForm', '0') === '1';
+    $shortForm = ! $tripTicket->driver_id || ! $tripTicket->car_id;
+    $shortForm = request()->get('shortForm', '0') === '1' || $shortForm;
     $previousUrl = request()->get('previousUrl', url()->previous());
 @endphp
 
@@ -191,6 +192,8 @@
                                 <div class="form-group">
                                     <label class="form-control-label">Номер путевого листа:</label>
                                     <input type="text"
+                                           disabled
+                                           value="{{ $tripTicket->ticket_number }}"
                                            name="anketa[0][number_list_road]"
                                            class="form-control">
                                 </div>
