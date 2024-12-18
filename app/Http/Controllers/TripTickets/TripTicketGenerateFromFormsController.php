@@ -49,6 +49,8 @@ class TripTicketGenerateFromFormsController extends Controller
             }
         }
 
+        $ticketData = $request->input('trip_ticket')[0];
+
         try {
             DB::beginTransaction();
             $response['created'] = $handler->handle(new TripTicketsAction(
@@ -56,10 +58,10 @@ class TripTicketGenerateFromFormsController extends Controller
                 $driver,
                 $startDate,
                 $endDate,
-                LogisticsMethodEnum::fromString($request->input('logistics_method')),
-                TransportationTypeEnum::fromString($request->input('transportation_type')),
-                TripTicketTemplateEnum::fromString($request->input('template_code')),
-                $request->input('validity_period', 1)
+                LogisticsMethodEnum::fromString($ticketData['logistics_method']),
+                TransportationTypeEnum::fromString($ticketData['transportation_type']),
+                TripTicketTemplateEnum::fromString($ticketData['template_code']),
+                $ticketData['validity_period'] ?: 1
             ));
             DB::commit();
         } catch (Throwable $exception) {
@@ -68,7 +70,7 @@ class TripTicketGenerateFromFormsController extends Controller
             $response['errors'] = [$exception->getMessage()];
         }
 
-        if (count($response['created']) === 0) {
+        if (array_key_exists('created', $response) && count($response['created']) === 0) {
             $response['errors'] = ['По заданным параметрам осмотры не найдены или они уже используются в других путевых листах'];
         }
 
