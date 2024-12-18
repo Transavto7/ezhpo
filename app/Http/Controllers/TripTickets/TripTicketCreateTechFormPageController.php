@@ -25,7 +25,7 @@ class TripTicketCreateTechFormPageController extends Controller
 
         return view('trip-tickets.create-tech-form', [
             'tripTicket' => $tripTicket,
-            'title' => 'Добавления техосмотра по данным путевого листа',
+            'title' => 'Добавление техосмотра по данным путевого листа',
             'default_current_date' => $time,
             'default_pv_id' => $user->pv_id,
         ]);

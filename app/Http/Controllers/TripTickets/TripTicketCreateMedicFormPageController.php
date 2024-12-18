@@ -25,7 +25,7 @@ class TripTicketCreateMedicFormPageController extends Controller
 
         return view('trip-tickets.create-medic-form', [
             'tripTicket' => $tripTicket,
-            'title' => 'Добавления медосмотра по данным путевого листа',
+            'title' => 'Добавление медосмотра по данным путевого листа',
             'default_current_date' => $time,
             'default_pv_id' => $user->pv_id,
         ]);
