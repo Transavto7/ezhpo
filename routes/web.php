@@ -159,7 +159,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('create', 'TripTickets\TripTicketCreatePage')->name('create');
             Route::post('store', 'TripTickets\StoreTripTicketController')->name('store');
             Route::get('{id}/edit', 'TripTickets\TripTicketEditPageController')->name('edit');
-            Route::post('{id}', 'TripTickets\UpdateTripTicketController')->name('update');
+            Route::post('{id}/update', 'TripTickets\UpdateTripTicketController')->name('update');
             Route::get('trash', 'TripTickets\TripTicketTrashController')->name('trash');
             Route::get('mass-trash', 'TripTickets\TripTicketMassTrashController')->name('mass-trash');
             Route::get('{id}/create-medic-form', 'TripTickets\TripTicketCreateMedicFormPageController')->name('create-medic-form');

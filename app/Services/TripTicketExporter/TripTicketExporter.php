@@ -25,7 +25,6 @@ class TripTicketExporter
         $this->mapper = $mapper;
     }
 
-
     public function export(EntityId $id): BinaryFileResponse
     {
         $tripTicket = TripTicket::where('uuid', '=', $id);

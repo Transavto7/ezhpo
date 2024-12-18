@@ -525,6 +525,13 @@
                             <div class="alert alert-danger" role="alert">{{ $error }}</div>
                         @endforeach
                     @endif
+
+                    @if(count($tripTickets) > 0)
+                    <hr>
+                    <div class="d-flex justify-content-center">
+                        {{ $tripTickets->appends($_GET)->render() }}
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
