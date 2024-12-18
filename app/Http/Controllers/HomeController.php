@@ -377,6 +377,7 @@ class HomeController extends Controller
             'drivers.fio as driver_fio',
             'drivers.gender as driver_gender',
             'drivers.year_birthday as driver_year_birthday',
+            'drivers.phone as driver_phone',
             'points.name as pv_id',
             'companies.name as company_name'
         ];
@@ -486,7 +487,7 @@ class HomeController extends Controller
          */
 
         /**
-         * Выбор полей
+         * Выбор полей фильтров
          */
         $fieldsKeys = Anketa::$fieldsKeys[$validTypeForm];
         if ($trash) {
@@ -561,11 +562,9 @@ class HomeController extends Controller
             'filter_activated' => $filterActivated,
             'type_ankets' => $validTypeForm,
             'anketsFields' => $formsFields,
-            'anketsFieldsTable' => Anketa::$fieldsKeysTable[$validTypeForm] ?? $formsFields,
             'fieldsKeys' => $fieldsKeys,
             'fieldPrompts' => $fieldPrompts,
             'fieldsGroupFirst' => Anketa::$fieldsGroupFirst[$validTypeForm] ?? [],
-            'blockedToExportFields' => Anketa::$blockedToExportFields[$validTypeForm] ?? [],
             'anketasCountResult' => $formsCountResult,
             'typePrikaz' => $request->get('typePrikaz'),
             'currentRole' => $currentRole,
