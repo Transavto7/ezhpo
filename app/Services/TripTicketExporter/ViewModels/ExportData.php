@@ -26,6 +26,14 @@ class ExportData
      * @var Car|null
      */
     private $car;
+    /**
+     * @var string|null
+     */
+    private $medicFormUserName;
+    /**
+     * @var string|null
+     */
+    private $techFormUserName;
 
     /**
      * @param TripTicketTemplateEnum $templateCode
@@ -33,13 +41,17 @@ class ExportData
      * @param Company|null $company
      * @param Driver|null $driver
      * @param Car|null $car
+     * @param string|null $medicFormUserName
+     * @param string|null $techFormUserName
      */
     public function __construct(
         TripTicketTemplateEnum $templateCode,
         TripTicket             $tripTicket,
         ?Company               $company,
         ?Driver                $driver,
-        ?Car                   $car
+        ?Car                   $car,
+        ?string                $medicFormUserName,
+        ?string                $techFormUserName
     )
     {
         $this->templateCode = $templateCode;
@@ -47,6 +59,8 @@ class ExportData
         $this->company = $company;
         $this->driver = $driver;
         $this->car = $car;
+        $this->medicFormUserName = $medicFormUserName;
+        $this->techFormUserName = $techFormUserName;
     }
 
     public function getTemplateCode(): TripTicketTemplateEnum
@@ -74,5 +88,13 @@ class ExportData
         return $this->car;
     }
 
+    public function getMedicFormUserName(): ?string
+    {
+        return $this->medicFormUserName;
+    }
 
+    public function getTechFormUserName(): ?string
+    {
+        return $this->techFormUserName;
+    }
 }

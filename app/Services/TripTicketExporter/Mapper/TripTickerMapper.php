@@ -56,12 +56,24 @@ class TripTickerMapper
             );
         }
 
+        $medicFormUserName = null;
+        if ($model->medicForm && $model->medicForm->user) {
+            $medicFormUserName = $model->medicForm->user->name;
+        }
+
+        $techFormUserName = null;
+        if ($model->techForm && $model->techForm->user) {
+            $techFormUserName = $model->techForm->user->name;
+        }
+
         return new ExportData(
             TripTicketTemplateEnum::fromString($model->template_code),
             $tripTicket,
             $company,
             $driver,
-            $car
+            $car,
+            $medicFormUserName,
+            $techFormUserName
         );
     }
 }

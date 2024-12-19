@@ -3,6 +3,7 @@
 namespace App\Services\TripTicketExporter\ExcelGenerator;
 
 use App\Services\TripTicketExporter\ViewModels\ExportData;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Sheet;
 
 class TripTicket4sExport implements ExportStrategy
@@ -32,14 +33,15 @@ class TripTicket4sExport implements ExportStrategy
             ->fillCompany()
             ->fillCar()
             ->fillDriver()
-            ->fillEmployees();
+            ->fillEmployees()
+            ->fillStamps();
 
         return $this->sheet;
     }
 
     private function fillIds(): self
     {
-        $value = "";
+        $value = '';
 
         $driver = $this->data->getDriver();
         $car = $this->data->getCar();
@@ -49,10 +51,10 @@ class TripTicket4sExport implements ExportStrategy
         }
 
         if ($car) {
-            $value .= "ID - ".$car->getId().' Автомобиль';
+            $value .= 'ID - '.$car->getId().' Автомобиль';
         }
 
-        $this->sheet->setCellValue('EZ1', $value);
+        $this->sheet->setCellValue('DZ1', $value);
 
         return $this;
     }
@@ -120,13 +122,13 @@ class TripTicket4sExport implements ExportStrategy
             return $this;
         }
 
-        $driverLicense = "";
+        $driverLicense = '';
         if ($driver->getDriverLicense()) {
             $driverLicense = $driver->getDriverLicense();
         }
 
         if ($driver->getDriverLicenseDate()) {
-            $driverLicense .= ' от ' . $driver->getDriverLicenseDate()->format("d.m.Y");
+            $driverLicense .= ' от ' . $driver->getDriverLicenseDate()->format('d.m.Y');
         }
 
         $this->sheet->setCellValue('H10', $driver->getFio());
@@ -138,11 +140,32 @@ class TripTicket4sExport implements ExportStrategy
 
     private function fillEmployees(): self
     {
+        $this->sheet->setCellValue('Z52', $this->data->getMedicFormUserName() ?? '');
+        $this->sheet->setCellValue('CG52', $this->data->getTechFormUserName() ?? '');
+
         $driver = $this->data->getDriver();
         if ($driver) {
             $this->sheet->setCellValue('EY47', $driver->getFio());
             $this->sheet->setCellValue('EY52', $driver->getFio());
         }
+
+        return $this;
+    }
+
+    public function fillStamps(): self
+    {
+        $now = Carbon::now();
+
+        $companyStamp = config('trip-ticket.stamps.company');
+        $permitStamp = config('trip-ticket.stamps.permit');
+
+        $date = 'Дата: '.$now->day;
+        $date .= ' '.trans('date.months_genitive.'.$now->month);
+        $date .= ' '.$now->year;
+        $date .= '    Время: '.$now->format('H:i');
+
+        $this->sheet->setCellValue('R44', $companyStamp."\n\n".$date);
+        $this->sheet->setCellValue('BY44', $permitStamp."\n\n".$date);
 
         return $this;
     }
