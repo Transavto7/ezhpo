@@ -22,9 +22,17 @@ final class UpdateTripTicketFormHandler
             throw new \Exception("Данный $type осмотр уже связан с другим путевым листом");
         }
 
-        $action->getTripTicket()->update([
-            $action->getFormType().'_form_id' => $action->getForm()->id
-        ]);
+        $updates = [$action->getFormType().'_form_id' => $action->getForm()->id];
+
+        if ($action->getDriverId() !== null) {
+            $updates['driver_id'] = $action->getDriverId();
+        }
+
+        if ($action->getCarId() !== null) {
+            $updates['car_id'] = $action->getCarId();
+        }
+
+        $action->getTripTicket()->update($updates);
 
         return $action->getTripTicket();
     }

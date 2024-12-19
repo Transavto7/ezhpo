@@ -236,7 +236,7 @@
 
                                 <div class="form-group">
                                     <label class="form-control-label">Срок действия, дней:</label>
-                                    <input type="number" value="{{ $validity_period ?? '1' }}"
+                                    <input type="number" value="{{ $validity_period ?? '1' }}" required
                                            name="trip_ticket[0][validity_period]" class="form-control" min="1">
                                 </div>
 

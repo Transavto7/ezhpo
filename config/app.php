@@ -278,9 +278,4 @@ return [
             'tries' => 10
         ],
     ],
-    'ticket_number' => [
-        'min' => 100000,
-        'max' => 999999,
-        'tries' => 10
-    ],
 ];

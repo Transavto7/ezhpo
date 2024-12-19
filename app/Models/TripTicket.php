@@ -42,6 +42,7 @@ class TripTicket extends Model
     }
 
     protected $fillable = [
+        'uuid',
         'ticket_number',
         'company_id',
         'start_date',

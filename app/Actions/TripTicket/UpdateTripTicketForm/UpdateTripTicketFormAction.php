@@ -23,15 +23,29 @@ final class UpdateTripTicketFormAction
     private $form;
 
     /**
+     * @var string|null
+     */
+    private $driverId;
+
+    /**
+     * @var string|null
+     */
+    private $carId;
+
+    /**
      * @param TripTicket $tripTicket
      * @param string $formType
      * @param Form $form
+     * @param string|null $driverId
+     * @param string|null $carId
      */
-    public function __construct(TripTicket $tripTicket, string $formType, Form $form)
+    public function __construct(TripTicket $tripTicket, string $formType, Form $form, ?string $driverId, ?string $carId = null)
     {
         $this->tripTicket = $tripTicket;
         $this->formType = $formType;
         $this->form = $form;
+        $this->driverId = $driverId;
+        $this->carId = $carId;
     }
 
     public function getTripTicket(): TripTicket
@@ -47,5 +61,15 @@ final class UpdateTripTicketFormAction
     public function getForm(): Form
     {
         return $this->form;
+    }
+
+    public function getDriverId(): ?string
+    {
+        return $this->driverId;
+    }
+
+    public function getCarId(): ?string
+    {
+        return $this->carId;
     }
 }

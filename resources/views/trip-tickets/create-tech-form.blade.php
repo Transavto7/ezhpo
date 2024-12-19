@@ -5,8 +5,7 @@
 
 @php
     use Carbon\Carbon;
-    $shortForm = ! $tripTicket->driver_id || ! $tripTicket->car_id;
-    $shortForm = request()->get('shortForm', '0') === '1' || $shortForm;
+    $shortForm = $shortForm ?? request()->get('shortForm', '0') === '1';
     $previousUrl = request()->get('previousUrl', url()->previous());
 @endphp
 
@@ -82,8 +81,6 @@
                                            value="{{ $tripTicket->company_id }}"
                                            type="number"
                                            oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Company', event.target.value, 'name', $(event.target).parent(), {{ !($id ?? false) ? 'true' : 'false' }})"
-                                           min="5"
-                                           name="company_id"
                                            class="MASK_ID_ELEM form-control">
                                     <p class="app-checker-prop"></p>
                                 </article>
@@ -93,7 +90,7 @@
                                 <label class="form-control-label">ID водителя:</label>
                                 <article>
                                     <input type="number"
-                                           disabled
+                                           @if($tripTicket->driver_id)disabled @endif
                                            @if(! $shortForm)required @endif
                                            value="{{ $tripTicket->driver_id }}"
                                            oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ 'false' }})"
@@ -110,7 +107,7 @@
                                     <article>
                                         <div class="d-flex">
                                             <input type="number"
-                                                   disabled
+                                                   @if($tripTicket->car_id)disabled @endif
                                                    @if(! $shortForm)required @endif
                                                    value="{{ $tripTicket->car_id }}"
                                                    oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent().parent(), {{ 'false' }})"

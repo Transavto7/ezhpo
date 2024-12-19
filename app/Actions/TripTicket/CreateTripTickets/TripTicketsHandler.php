@@ -5,6 +5,7 @@ namespace App\Actions\TripTicket\CreateTripTickets;
 use App\Actions\TripTicket\TripTicketNumberGenerator;
 use App\Enums\FormTypeEnum;
 use App\Models\TripTicket;
+use App\ValueObjects\EntityId;
 use Carbon\Carbon;
 use DB;
 use Exception;
@@ -29,6 +30,7 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
                 $medicForm = $medicForms[$i] ?? null;
                 $techForm = $techForms[$i] ?? null;
                 $carId = null;
+                $id = EntityId::next()->getId();
 
                 if ($techForm !== null) {
                     $carId = $techForm->car_id;
@@ -43,7 +45,8 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
                 }
 
                 $tripTicket = TripTicket::create([
-                    'ticket_number' => $this->nextTicketNumber($action->getCompany()->hash_id),
+                    'uuid' => $id,
+                    'ticket_number' => $this->getTicketNumber($id),
                     'company_id' => $action->getCompany()->hash_id,
                     'start_date' => $date->copy(),
                     'validity_period' => $action->getValidityPeriod(),
