@@ -5,6 +5,7 @@ namespace App\Http\Controllers\TripTickets;
 use App\Actions\Anketa\CreateFormHandlerFactory;
 use App\Actions\TripTicket\UpdateTripTicketForm\UpdateTripTicketFormAction;
 use App\Actions\TripTicket\UpdateTripTicketForm\UpdateTripTicketFormHandler;
+use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Models\TripTicket;
@@ -23,9 +24,11 @@ class TripTicketStoreMedicFormController extends Controller
         $data = $request->all();
         $data['type_anketa'] = FormTypeEnum::MEDIC;
         $data['company_id'] = $tripTicket->company_id;
-        $data['driver_id'] = $tripTicket->driver_id;
+        $data['driver_id'] = $tripTicket->driver_id ?: $request->input('driver_id');
 
         try {
+            $this->checkDriver($tripTicket->company_id, $request->input('driver_id'));
+
             session(['anketa_pv_id' => [
                 'value' => $request->get('pv_id', 0),
                 'expired' => date('d.m')
@@ -40,7 +43,8 @@ class TripTicketStoreMedicFormController extends Controller
                 $ticketHandler->handle(new UpdateTripTicketFormAction(
                     $tripTicket,
                     $data['type_anketa'],
-                    $responseData['created'][0]
+                    $responseData['created'][0],
+                    $request->input('driver_id')
                 ));
             }
 
@@ -52,5 +56,22 @@ class TripTicketStoreMedicFormController extends Controller
         }
 
         return redirect($prevUrl)->with($responseData);
+    }
+
+    private function checkDriver(string $companyId, $driverId)
+    {
+        if (! $driverId) {
+            return;
+        }
+
+        $driver = Driver::where('hash_id',  '=', $driverId)->first();
+
+        if ($driver) {
+            if ($driver->company->hash_id !== $companyId) {
+                throw new \Exception('Компания водителя не соответствует компании ПЛ');
+            }
+        } else {
+            throw new \Exception("Водитель с ID $driverId не найден");
+        }
     }
 }

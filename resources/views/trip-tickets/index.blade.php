@@ -539,7 +539,7 @@
         <div class="card table-card">
             <div class="card-body">
                 @if((count($tripTickets) > 0) && $permissionToView)
-                    <table id="trip-tickets-table" class="trip-tickets-table table table-striped table-sm">
+                    <table id="trip-tickets-table" class="trip-tickets-table table table-striped table-sm" style="min-height: 170px">
                         <thead>
                         <tr>
                             <th>#</th>

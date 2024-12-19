@@ -4,6 +4,7 @@ namespace App\Actions\TripTicket\StoreTripTicket;
 
 use App\Actions\TripTicket\TripTicketNumberGenerator;
 use App\Models\TripTicket;
+use App\ValueObjects\EntityId;
 use Carbon\Carbon;
 use Exception;
 
@@ -20,9 +21,11 @@ final class StoreTripTicketHandler extends TripTicketNumberGenerator
             if ($item->getTicketNumber() && $this->findSimilar($item->getTicketNumber(), $action->getCompanyId())) {
                 throw new Exception("Путевой лист с номером {$item->getTicketNumber()} уже существует");
             }
+            $id = EntityId::next()->getId();
 
             $tripTickets[] = TripTicket::create([
-                'ticket_number' => $item->getTicketNumber() ?: $this->nextTicketNumber($action->getCompanyId()),
+                'uuid' => $id,
+                'ticket_number' => $item->getTicketNumber() ?: $this->getTicketNumber($id),
                 'company_id' => $action->getCompanyId(),
                 'start_date' => $item->getStartDate(),
                 'validity_period' => $item->getValidityPeriod(),
