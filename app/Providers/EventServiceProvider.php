@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Events\Forms\DriverDismissed;
+use App\Events\Forms\FormAction;
 use App\Events\Relations\Attached;
 use App\Events\Relations\Detached;
 use App\Events\UserActions\ClientActionLogRequest;
@@ -12,6 +13,7 @@ use App\Events\UserActions\ClientDocImport;
 use App\Events\UserActions\ClientDocumentRequest;
 use App\Events\UserActions\ClientReportRequest;
 use App\Listeners\Forms\NotifyDismissingTG;
+use App\Listeners\Forms\LogFormActions;
 use App\Listeners\Forms\NotifyDismissingSMS;
 use App\Listeners\LogAttachedEvent;
 use App\Listeners\LogDetachedEvent;
@@ -62,8 +64,12 @@ class EventServiceProvider extends ServiceProvider
         ],
         DriverDismissed::class => [
             NotifyDismissingSMS::class,
+            NotifyDismissingByAlkoTG::class,
             NotifyDismissingTG::class
-        ]
+        ],
+        FormAction::class => [
+            LogFormActions::class,
+        ],
     ];
 
     /**

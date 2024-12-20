@@ -2,13 +2,16 @@
 
 namespace App\Actions\PakQueue\ChangePakQueue;
 
+use App\Enums\FormLogActionTypesEnum;
 use App\Enums\FlagPakEnum;
 use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
+use App\Events\Forms\FormAction;
 use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
 use App\Settings;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class ChangePakQueueHandler
 {
@@ -74,6 +77,8 @@ class ChangePakQueueHandler
         $form->user_eds = $user->eds;
         $form->user_validity_eds_start = $user->validity_eds_start;
         $form->user_validity_eds_end = $user->validity_eds_end;
+
+        event(new FormAction($user, $form, FormLogActionTypesEnum::QUEUE_PROCESSING));
 
         $form->save();
         $details->save();

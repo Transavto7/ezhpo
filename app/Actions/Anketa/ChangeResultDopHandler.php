@@ -2,13 +2,16 @@
 
 namespace App\Actions\Anketa;
 
+use App\Enums\FormLogActionTypesEnum;
 use App\Enums\FormTypeEnum;
+use App\Events\Forms\FormAction;
 use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
 use App\Models\Forms\TechForm;
 use App\Services\DuplicatesCheckerService;
 use Exception;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ChangeResultDopHandler
 {
@@ -52,9 +55,11 @@ class ChangeResultDopHandler
         }
 
         $details->result_dop = $result;
-        $details->save();
-
         $form->touch();
+
+        $this->fireEvent($form);
+
+        $details->save();
         $form->save();
     }
 
@@ -73,6 +78,9 @@ class ChangeResultDopHandler
         $details = $form->details;
 
         $details->result_dop = $result;
+
+        $this->fireEvent($form);
+
         $details->save();
     }
 
@@ -90,5 +98,10 @@ class ChangeResultDopHandler
         if ($details->result_dop !== null) {
             throw new Exception("Осмотр с id $form->id уже утвержден");
         }
+    }
+
+    private function fireEvent(Form $form)
+    {
+        event(new FormAction(Auth::user(), $form, FormLogActionTypesEnum::APPROVAL));
     }
 }
