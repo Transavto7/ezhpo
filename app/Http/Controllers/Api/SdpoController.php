@@ -11,7 +11,6 @@ use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormLogActionTypesEnum;
 use App\Enums\FlagPakEnum;
-use App\Enums\FormEventType;
 use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\Events\Forms\FormAction;
@@ -679,8 +678,6 @@ class SdpoController extends Controller
             $details = $inspection->details;
 
             if (!$details) {
-                event(new FormAction(Auth::user(), $inspection, FormLogActionTypesEnum::APPROVAL));
-                $inspection->save();
                 return;
             }
 
@@ -689,6 +686,7 @@ class SdpoController extends Controller
             ]);
 
             event(new FormAction(Auth::user(), $inspection, FormLogActionTypesEnum::APPROVAL));
+
             $inspection->save();
             $details->save();
 
@@ -777,7 +775,6 @@ class SdpoController extends Controller
 
             $handler->handle(new StoreFormEventCommand(
                 $id,
-                FormEventType::setFeedback(),
                 $formFeedback->toArray(),
                 $user->id
             ));

@@ -44,6 +44,20 @@ export default {
 
                 this.total = data.total
                 this.items = data.data.map((item) => {
+                    if (item.type === 'set_feedback') {
+                        if (item.payload.feedback) {
+                            item.payload = [
+                                {
+                                    name: 'feedback',
+                                    oldValue: null,
+                                    newValue: item.payload.feedback === 'positive' ? 'Хорошо' : 'Плохо'
+                                }
+                            ]
+                        } else {
+                            item.payload = []
+                        }
+                    }
+
                     item.payload = (item.payload ?? []).map((field) => {
                         field.name = this.pageSetup.fieldPromptsMap[item.model_type]?.[field.name] ?? field.name
 

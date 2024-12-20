@@ -101,7 +101,8 @@ class UpdateFormHandler
         $form->fill($data);
         $form->details->fill($data);
 
-        event(new FormAction(Auth::user(), $form, FormLogActionTypesEnum::UPDATING));
+        /** @var User $user */
+        event(new FormAction($user, $form, FormLogActionTypesEnum::UPDATING));
 
         $form->save();
         $form->details->save();

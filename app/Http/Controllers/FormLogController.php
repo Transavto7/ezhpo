@@ -59,6 +59,7 @@ class FormLogController extends Controller
                 ->pluck('name', 'field')
                 ->toArray();
 
+            $value['feedback'] = 'Оценка осмотра';
             $value['deleted_id'] = 'ID удалившего пользователя';
             $value['deleted_at'] = 'Дата и время удаления';
             $value['result_dop'] = 'Статус выданного наперед ПЛ';
@@ -145,7 +146,6 @@ class FormLogController extends Controller
                 'forms.id',
                 DB::raw("IF(ISNULL(users.hash_id), '-', CONCAT('[', users.hash_id, '] ', users.name)) as user")
             ])
-            ->whereIn('event_type', FormLogActionTypesEnum::values())
             ->modelTypes([$modelType])
             ->modelId($request->input('id'))
             ->leftJoin('users', 'form_events.user_id', '=', 'users.id')
@@ -170,6 +170,7 @@ class FormLogController extends Controller
             ->pluck('name', 'field')
             ->toArray();
 
+        $fieldPrompts['feedback'] = 'Оценка осмотра';
         $fieldPrompts['deleted_id'] = 'ID удалившего пользователя';
         $fieldPrompts['deleted_at'] = 'Дата и время удаления';
 

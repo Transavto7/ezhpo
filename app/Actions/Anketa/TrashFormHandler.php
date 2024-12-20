@@ -9,7 +9,6 @@ use App\Events\Forms\FormAction;
 use App\Models\Forms\Form;
 use App\User;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 final class TrashFormHandler
 {
@@ -31,7 +30,7 @@ final class TrashFormHandler
             ? FormLogActionTypesEnum::RESTORING
             : FormLogActionTypesEnum::DELETING;
 
-        event(new FormAction(Auth::user(), $form, $eventType));
+        event(new FormAction($user, $form, $eventType));
 
         $form->save();
     }
