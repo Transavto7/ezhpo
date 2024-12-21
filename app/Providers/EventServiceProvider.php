@@ -64,7 +64,6 @@ class EventServiceProvider extends ServiceProvider
         ],
         DriverDismissed::class => [
             NotifyDismissingSMS::class,
-            NotifyDismissingByAlkoTG::class,
             NotifyDismissingTG::class
         ],
         FormAction::class => [
