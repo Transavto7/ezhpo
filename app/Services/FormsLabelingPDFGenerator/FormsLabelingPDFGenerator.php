@@ -16,8 +16,10 @@ final class FormsLabelingPDFGenerator
      */
     public function generate(array $items): Response
     {
-        $logoImage = $this->getAssetImage('anket_labeling_1.png');
-        $customPaper = array(0, 0, 250.00, 484.00);
+        $labelingTemplate = FormLabelingTemplate::fromTemplateName(config('forms.labeling.template'));
+
+        $logoImage = $this->getAssetImage('logo.png');
+        $customPaper = $labelingTemplate->getPaper();
         $domain = preg_replace('/^https?:\/\//', '', config('app.url'));
 
         $pages = [];
@@ -36,7 +38,7 @@ final class FormsLabelingPDFGenerator
             ];
         }
 
-        $pdf = PDF::loadView('templates.anket-labeling', [
+        $pdf = PDF::loadView($labelingTemplate->getView(), [
             'pages' => $pages,
             'logoImage' => $logoImage,
             'domain' => $domain,
@@ -50,7 +52,7 @@ final class FormsLabelingPDFGenerator
 
     private function getAssetImage(string $assetName): string
     {
-        $imagePath = public_path('images/anket_labeling/'.$assetName);
+        $imagePath = public_path('images/form-labeling/'.$assetName);
         $imageData = file_get_contents($imagePath);
         $base64Image = base64_encode($imageData);
 
