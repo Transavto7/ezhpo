@@ -473,13 +473,13 @@ class AnketsController extends Controller
                 $userId
             ));
 
-            return view('pages.anketas.verification', [
+            return view('pages.form-verification.show', [
                 'details' => $details,
             ]);
         } catch (HttpClientNotFoundException|ExpiredFormPeriodPlException $exception) {
-            return view('pages.anketas.404');
+            return view('pages.form-verification.404');
         } catch (Throwable $exception) {
-            return view('pages.anketas.500', [
+            return view('pages.form-verification.500', [
                 'message' => $exception->getMessage(),
             ]);
         }

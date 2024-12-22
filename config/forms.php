@@ -9,4 +9,11 @@ return [
     'transfer-chunk-size' => env('TRANSFER_FORMS_COMMAND_CHUNK', 15000),
     'restore-foreign' => filter_var(env('RUN_RESTORE_FOREIGN_FORMS_COMMAND', false), FILTER_VALIDATE_BOOLEAN),
     'restore-foreign-chunk-size' => env('RESTORE_FOREIGN_FORMS_COMMAND_CHUNK', 15000),
+
+    'verification' => [
+        'phone' => env('FORM_VERIFICATION_PHONE', ''),
+    ],
+    'labeling' => [
+        'template' => env('FORM_LABELING_TEMPLATE', ''),
+    ],
 ];
