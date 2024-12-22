@@ -481,6 +481,9 @@ return [
             'company_id',
             'company_name',
             'created_at',
-        ]
+        ],
+        'trip_tickets' => [
+
+        ],
     ]
 ];
