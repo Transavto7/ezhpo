@@ -424,11 +424,11 @@
                             </div>
                             <div class="col-md-6 text-right">
                                 @if($permissionToExport)
-                                    <a href="?export=1&{{ $queryString }}" class="btn btn-sm btn-default">Экспорт
+                                    <a href="{{ route('trip-tickets.table-export', request()->query()) }}" class="btn btn-sm btn-default">Экспорт
                                         таблицы <i class="fa fa-download"></i></a>
                                 @endif
                                 @if($permissionToExportPrikaz)
-                                    <a href="?export=1&{{ $queryString }}&exportPrikaz=1"
+                                    <a href="{{ route('trip-tickets.table-export', array_merge(request()->query(), ['exportPrikaz' => true])) }}"
                                        class="btn btn-sm btn-default">Экспорт таблицы по приказу <i
                                             class="fa fa-download"></i></a>
                                 @endif

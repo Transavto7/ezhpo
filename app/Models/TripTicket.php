@@ -32,6 +32,31 @@ class TripTicket extends Model
         'template_code' => 'Печатный шаблон',
     ];
 
+    const EXPORT_FIELDS = [
+        'ticket_number' => 'Номер ПЛ',
+        'created_at' => 'Дата оформления',
+        'company_name' => 'Компания',
+        'start_date' => 'Дата выдачи',
+        'validity_period' => 'Дней действует',
+        'medic_form_id' => 'ID медосмотра',
+        'driver_name' => 'ФИО водителя',
+        'tech_form_id' => 'ID техосмотра',
+        'car_number' => 'Гос. регистрационный номер ТС',
+        'logistics_method' => 'Вид сообщения',
+        'transportation_type' => 'Вид перевозки',
+        'template_code' => 'Печатный шаблон',
+    ];
+
+    const EXPORT_PRIKAZ_FIELDS = [
+        'ticket_number' => 'Номер ПЛ',
+        'start_date' => 'Дата выдачи',
+        'car_name' => 'Наименование марки, модели транспортного средства',
+        'car_number' => 'Гос. регистрационный номер ТС',
+        'driver_name' => 'ФИО водителя',
+        'user_name' => 'ФИО лица, выдавшего ПЛ',
+        'user_sign' => 'Подпись лица, выдавшего ПЛ (ЭПЦ)'
+    ];
+
     protected static function boot()
     {
         parent::boot();
