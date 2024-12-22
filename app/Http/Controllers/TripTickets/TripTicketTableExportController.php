@@ -42,7 +42,12 @@ final class TripTicketTableExportController extends Controller
         ));
 
         if ($request->get('exportPrikaz', false)) {
-            $tripTickets->addSelect(['cars.mark_model as car_name']);
+            $tripTickets->addSelect([
+                'cars.mark_model as car_name',
+                'users.name as user_name',
+                'users.eds as user_sign',
+            ])
+                ->leftJoin('users', 'users.id', '=', 'trip_tickets.user_id');
             $fields = $this->filter(collect(TripTicket::EXPORT_PRIKAZ_FIELDS));
             $title = 'Экспорт реестра ПЛ по приказу.xlsx';
         } else {

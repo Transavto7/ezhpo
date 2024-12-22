@@ -5,6 +5,7 @@ namespace App\Actions\TripTicket\TripTicketsTableExport;
 use App\Enums\LogisticsMethodEnum;
 use App\Enums\TransportationTypeEnum;
 use App\Enums\TripTicketTemplateEnum;
+use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
@@ -32,6 +33,7 @@ class ExportTripTicketsTableHandler implements FromView, WithBatchInserts, WithC
             $tripTicket->logistics_method = $logisticsMethods[$tripTicket->logistics_method];
             $tripTicket->transportation_type = $transportationTypes[$tripTicket->transportation_type];
             $tripTicket->template_code = $templateCodes[$tripTicket->template_code];
+            $tripTicket->start_date = Carbon::parse($tripTicket->start_date)->format('d.m.Y');
         }
 
         return view('home-export', [

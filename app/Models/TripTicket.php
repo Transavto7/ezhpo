@@ -79,6 +79,7 @@ class TripTicket extends Model
         'logistics_method',
         'transportation_type',
         'template_code',
+        'user_id',
     ];
 
     public function driver(): BelongsTo

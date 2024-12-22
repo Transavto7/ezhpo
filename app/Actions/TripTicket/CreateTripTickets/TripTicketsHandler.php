@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use DB;
 use Exception;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\Auth;
 
 final class TripTicketsHandler extends TripTicketNumberGenerator
 {
@@ -18,6 +19,7 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
      */
     public function handle(TripTicketsAction $action): array
     {
+        $user = Auth::user();
         $tripTicketIds = [];
 
         for ($date = $action->getDateFrom(); $action->getDateFrom() <= $action->getDateTo(); $action->getDateFrom()->addDay()) {
@@ -57,6 +59,7 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
                     'logistics_method' => $action->getLogisticsMethod(),
                     'transportation_type' => $action->getTransportationType(),
                     'template_code' => $action->getTemplateCode(),
+                    'user_id' => $user->id,
                 ]);
 
                 $tripTicketIds[] = $tripTicket;
