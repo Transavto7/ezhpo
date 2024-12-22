@@ -7,6 +7,7 @@ use App\Models\TripTicket;
 use App\ValueObjects\EntityId;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 final class StoreTripTicketHandler extends TripTicketNumberGenerator
 {
@@ -15,6 +16,7 @@ final class StoreTripTicketHandler extends TripTicketNumberGenerator
      */
     public function handle(StoreTripTicketAction $action): array
     {
+        $user = Auth::user();
         $tripTickets = [];
 
         foreach ($action->getItems() as $item) {
@@ -34,6 +36,7 @@ final class StoreTripTicketHandler extends TripTicketNumberGenerator
                 'logistics_method' => $item->getLogisticsMethod(),
                 'transportation_type' => $item->getTransportationType(),
                 'template_code' => $item->getTemplateCode(),
+                'user_id' => $user->id,
             ]);
         }
 
