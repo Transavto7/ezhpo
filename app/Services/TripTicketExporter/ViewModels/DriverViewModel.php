@@ -4,7 +4,7 @@ namespace App\Services\TripTicketExporter\ViewModels;
 
 use Carbon\Carbon;
 
-class Driver
+class DriverViewModel
 {
     /**
      * @var string

@@ -11,47 +11,47 @@ class ExportData
      */
     private $templateCode;
     /**
-     * @var TripTicket
+     * @var TripTicketViewModel
      */
     private $tripTicket;
     /**
-     * @var Company|null
+     * @var CompanyViewModel|null
      */
     private $company;
     /**
-     * @var Driver|null
+     * @var DriverViewModel|null
      */
     private $driver;
     /**
-     * @var Car|null
+     * @var CarViewModel|null
      */
     private $car;
     /**
-     * @var string|null
+     * @var FormViewModel|null
      */
-    private $medicFormUserName;
+    private $medicForm;
     /**
-     * @var string|null
+     * @var FormViewModel|null
      */
-    private $techFormUserName;
+    private $techForm;
 
     /**
      * @param TripTicketTemplateEnum $templateCode
-     * @param TripTicket $tripTicket
-     * @param Company|null $company
-     * @param Driver|null $driver
-     * @param Car|null $car
-     * @param string|null $medicFormUserName
-     * @param string|null $techFormUserName
+     * @param TripTicketViewModel $tripTicket
+     * @param CompanyViewModel|null $company
+     * @param DriverViewModel|null $driver
+     * @param CarViewModel|null $car
+     * @param FormViewModel|null $medicForm
+     * @param FormViewModel|null $techForm
      */
     public function __construct(
         TripTicketTemplateEnum $templateCode,
-        TripTicket             $tripTicket,
-        ?Company               $company,
-        ?Driver                $driver,
-        ?Car                   $car,
-        ?string                $medicFormUserName,
-        ?string                $techFormUserName
+        TripTicketViewModel    $tripTicket,
+        ?CompanyViewModel      $company,
+        ?DriverViewModel       $driver,
+        ?CarViewModel          $car,
+        ?FormViewModel         $medicForm,
+        ?FormViewModel         $techForm
     )
     {
         $this->templateCode = $templateCode;
@@ -59,8 +59,8 @@ class ExportData
         $this->company = $company;
         $this->driver = $driver;
         $this->car = $car;
-        $this->medicFormUserName = $medicFormUserName;
-        $this->techFormUserName = $techFormUserName;
+        $this->medicForm = $medicForm;
+        $this->techForm = $techForm;
     }
 
     public function getTemplateCode(): TripTicketTemplateEnum
@@ -68,33 +68,33 @@ class ExportData
         return $this->templateCode;
     }
 
-    public function getTripTicket(): TripTicket
+    public function getTripTicket(): TripTicketViewModel
     {
         return $this->tripTicket;
     }
 
-    public function getCompany(): ?Company
+    public function getCompany(): ?CompanyViewModel
     {
         return $this->company;
     }
 
-    public function getDriver(): ?Driver
+    public function getDriver(): ?DriverViewModel
     {
         return $this->driver;
     }
 
-    public function getCar(): ?Car
+    public function getCar(): ?CarViewModel
     {
         return $this->car;
     }
 
-    public function getMedicFormUserName(): ?string
+    public function getMedicForm(): ?FormViewModel
     {
-        return $this->medicFormUserName;
+        return $this->medicForm;
     }
 
-    public function getTechFormUserName(): ?string
+    public function getTechForm(): ?FormViewModel
     {
-        return $this->techFormUserName;
+        return $this->techForm;
     }
 }

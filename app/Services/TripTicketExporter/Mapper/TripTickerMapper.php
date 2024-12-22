@@ -2,15 +2,21 @@
 
 namespace App\Services\TripTicketExporter\Mapper;
 
+use App\Enums\FormTypeEnum;
 use App\Enums\LogisticsMethodEnum;
 use App\Enums\TransportationTypeEnum;
 use App\Enums\TripTicketTemplateEnum;
+use App\Models\Forms\Form;
+use App\Models\Forms\MedicForm;
+use App\Models\Forms\TechForm;
 use App\Models\TripTicket;
-use App\Services\TripTicketExporter\ViewModels\Car;
-use App\Services\TripTicketExporter\ViewModels\Company;
-use App\Services\TripTicketExporter\ViewModels\Driver;
+use App\Services\TripTicketExporter\ValueObjects\PeriodPl;
+use App\Services\TripTicketExporter\ViewModels\CarViewModel;
+use App\Services\TripTicketExporter\ViewModels\CompanyViewModel;
+use App\Services\TripTicketExporter\ViewModels\DriverViewModel;
 use App\Services\TripTicketExporter\ViewModels\ExportData;
-use App\Services\TripTicketExporter\ViewModels\TripTicket as TripTicketViewModel;
+use App\Services\TripTicketExporter\ViewModels\FormViewModel;
+use App\Services\TripTicketExporter\ViewModels\TripTicketViewModel as TripTicketViewModel;
 use Illuminate\Support\Carbon;
 
 class TripTickerMapper
@@ -27,7 +33,7 @@ class TripTickerMapper
 
         $company = null;
         if ($model->company) {
-            $company = new Company($model->company->name, $model->company->where_call);
+            $company = new CompanyViewModel($model->company->name, $model->company->where_call);
         }
 
         $driver = null;
@@ -37,7 +43,7 @@ class TripTickerMapper
                 $driverLicenseDate = Carbon::parse($model->driver->driver_license_issued_at);
             }
 
-            $driver = new Driver(
+            $driver = new DriverViewModel(
                 $model->driver->hash_id,
                 $model->driver->fio,
                 $model->driver->driver_license,
@@ -48,7 +54,7 @@ class TripTickerMapper
 
         $car = null;
         if ($model->car) {
-            $car = new Car(
+            $car = new CarViewModel(
                 $model->car->hash_id,
                 $model->car->gos_number,
                 $model->car->mark_model,
@@ -56,14 +62,14 @@ class TripTickerMapper
             );
         }
 
-        $medicFormUserName = null;
-        if ($model->medicForm && $model->medicForm->user) {
-            $medicFormUserName = $model->medicForm->user->name;
+        $medicForm = null;
+        if ($model->medicForm) {
+            $medicForm = $this->getTypedForm($model->medicForm);
         }
 
-        $techFormUserName = null;
-        if ($model->techForm && $model->techForm->user) {
-            $techFormUserName = $model->techForm->user->name;
+        $techForm = null;
+        if ($model->techForm) {
+            $techForm = $this->getTypedForm($model->techForm);
         }
 
         return new ExportData(
@@ -72,8 +78,44 @@ class TripTickerMapper
             $company,
             $driver,
             $car,
-            $medicFormUserName,
-            $techFormUserName
+            $medicForm,
+            $techForm
+        );
+    }
+
+    private function getTypedForm(Form $form): ?FormViewModel
+    {
+        $typedForm = null;
+        $odometer = null;
+
+        if ($form->type_anketa === FormTypeEnum::MEDIC) {
+            $typedForm = MedicForm::find($form->uuid)->first();
+        }
+        else if ($form->type_anketa === FormTypeEnum::TECH) {
+            $typedForm = TechForm::find($form->uuid)->first();
+            $odometer = $typedForm->odometer;
+        }
+
+        $periodPl = null;
+        if ($typedForm && $typedForm->period_pl) {
+            $periodPl = PeriodPl::fromString($typedForm->period_pl);
+        }
+
+        $username = null;
+        if ($form->user) {
+            $username = $form->user->name;
+        }
+
+        $date = $form->date;
+        if ($date) {
+            $date = Carbon::parse($date);
+        }
+
+        return new FormViewModel(
+            $date,
+            $periodPl,
+            $username,
+            $odometer
         );
     }
 }
