@@ -7,7 +7,7 @@ use App\Enums\TransportationTypeEnum;
 use App\Enums\TripTicketTemplateEnum;
 use Illuminate\Support\Carbon;
 
-class TripTicket
+class TripTicketViewModel
 {
     /**
      * @var string|null

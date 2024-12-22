@@ -33,8 +33,9 @@ class TripTicket4sExport implements ExportStrategy
             ->fillCompany()
             ->fillCar()
             ->fillDriver()
-            ->fillEmployees()
-            ->fillStamps();
+            ->fillOdometer()
+            ->fillEmployees();
+//            ->fillStamps();
 
         return $this->sheet;
     }
@@ -138,10 +139,27 @@ class TripTicket4sExport implements ExportStrategy
         return $this;
     }
 
+    private function fillOdometer(): self
+    {
+        $techForm = $this->data->getTechForm();
+        if ($techForm) {
+            $this->sheet->setCellValue('EO13', $techForm->getOdometer() ?? '');
+        }
+
+        return $this;
+    }
+
     private function fillEmployees(): self
     {
-        $this->sheet->setCellValue('Z52', $this->data->getMedicFormUserName() ?? '');
-        $this->sheet->setCellValue('CG52', $this->data->getTechFormUserName() ?? '');
+        $medicForm = $this->data->getMedicForm();
+        if ($medicForm) {
+            $this->sheet->setCellValue('Z52', $medicForm->getUsername() ?? '');
+        }
+
+        $techForm = $this->data->getTechForm();
+        if ($techForm) {
+            $this->sheet->setCellValue('CG52', $techForm->getUsername() ?? '');
+        }
 
         $driver = $this->data->getDriver();
         if ($driver) {
