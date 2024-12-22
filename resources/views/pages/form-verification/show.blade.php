@@ -15,7 +15,7 @@
     );
 @endphp
 
-@extends('pages.anketas.base')
+@extends('pages.form-verification.base')
 
 @section('title', $title)
 
@@ -140,7 +140,7 @@
                                     @if($permissionToDelete)
                                         <div class="mt-2">
                                             <a
-                                                id="anketa-verification-delete-link"
+                                                id="form-verification-delete-link"
                                                 href="{{ route('forms.trash', ['id' => $details->getFormId(), 'action' => 1]) }}"
                                                 class="btn btn-warning btn-sm hv-btn-trash mr-1"
                                                 data-id="{{ $details->getFormId() }}">
@@ -356,7 +356,7 @@
         })
 
         $(document).ready(function () {
-            $('#anketa-verification-delete-link').click(function (e) {
+            $('#form-verification-delete-link').click(function (e) {
                 e.preventDefault();
 
                 const url = $(this).attr('href');

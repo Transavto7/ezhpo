@@ -1,4 +1,4 @@
-@extends('pages.anketas.base')
+@extends('pages.form-verification.base')
 
 @section('title', 'Путевой лист не найден')
 
