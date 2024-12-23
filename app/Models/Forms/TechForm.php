@@ -32,6 +32,7 @@ class TechForm extends Model
         'result_dop',
 
         'car_id',
+        'car_type_auto',
 
         'odometer',
         'number_list_road',

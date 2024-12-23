@@ -154,7 +154,7 @@ class AnketsController extends Controller
             $data['not_admitted_reasons'] = NotAdmittedReasons::fromForm($details)->getReasons();
         }
 
-        return view('profile.anketa', $data);
+        return view('profile.anketa', $data)->with('errors', $request->get('errors', []));
     }
 
     public function Trash(Request $request, TrashFormHandler $handler)

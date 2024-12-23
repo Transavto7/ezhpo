@@ -10,8 +10,10 @@ use App\Enums\FormLogActionTypesEnum;
 use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\Events\Forms\FormAction;
+use App\Exceptions\InvalidCarTypeAutoForIsDopTechForm;
 use App\MedicFormNormalizedPressure;
 use App\Models\Forms\Form;
+use App\Models\Forms\TechForm;
 use App\Point;
 use App\Services\DuplicatesCheckerService;
 use App\Services\FormHash\FormHashGenerator;
@@ -26,7 +28,6 @@ use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 
 class UpdateFormHandler
 {
@@ -56,6 +57,15 @@ class UpdateFormHandler
         $carId = $data['car_id'] ?? 0;
         $car = Car::where('hash_id', $carId)->first();
         if ($car) {
+            if ($form->type_anketa === FormTypeEnum::TECH) {
+                /** @var TechForm $details */
+                $details = $form->details;
+
+                if ($details->is_dop && $details->car_type_auto && ($details->car_type_auto !== $car->type_auto)) {
+                    throw new InvalidCarTypeAutoForIsDopTechForm();
+                }
+            }
+
             $companyId = $car->company_id;
         }
 

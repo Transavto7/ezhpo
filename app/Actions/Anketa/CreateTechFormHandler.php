@@ -19,20 +19,7 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 {
     protected function validateData()
     {
-        if ($this->data['is_dop'] ?? 0 === 1) {
-            return;
-        }
 
-        $carExist = Car::where('hash_id', $this->data['anketa'][0]['car_id'])->first();
-        if (!$carExist) {
-            $this->errors[] = 'Не найдена машина.';
-            return;
-        }
-
-        $driverExist = Driver::where('hash_id', $this->data['driver_id'])->first();
-        if (!$driverExist) {
-            $this->errors[] = 'Не найден водитель.';
-        }
     }
 
     protected function fetchExistForms()
@@ -51,12 +38,6 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
     protected function createForm(array $form)
     {
-        $carId = $form['car_id'] ?? 0;
-        $car = Car::where('hash_id', $carId)->first();
-
-        $driverId = $form['driver_id'] ?? ($this->data['driver_id'] ?? 0);
-        $driver = Driver::where('hash_id', $driverId)->first();
-
         $defaultData = [
             'date' => date('Y-m-d H:i:s'),
             'realy' => 'нет',
@@ -64,97 +45,90 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         ];
 
         $form = $this->mergeFormData($form, $defaultData);
-        $form['is_dop'] = $form['is_dop'] ?? 0;
+        $formIsDop = $form['is_dop'] ?? 0;
+        $form['is_dop'] = $formIsDop;
 
-        /**
-         * Компания
-         */
-        if (isset($form['company_id'])) {
-            $companyDop = Company::where('hash_id', $form['company_id'])->first();
-
-            if ($companyDop) {
-                $form['company_id'] = $companyDop->hash_id;
-            } elseif (! isset($form['driver_id'])) {
-                $errMsg = 'Компания не найдена';
-                $this->errors[] = $errMsg;
-
-                return;
-            }
-        }
-
-        /**
-         * Водитель
-         */
-        if (isset($form['driver_id'])) {
-            $driverDop = Driver::where('hash_id', $form['driver_id'])->first();
-
-            if ($driverDop) {
-                $form['driver_id'] = $driverDop->hash_id;
-
-                $driver = $driverDop;
-            } else {
-                $errMsg = 'Водитель не найден';
-                $this->errors[] = $errMsg;
-
-                return;
-            }
-        }
-
-        if (isset($form['car_id']) && ! $car) {
-            $errMsg = 'Автомобиль не найден';
-            $this->errors[] = $errMsg;
-
+        if (empty($form['company_id'])) {
+            $this->errors[] = 'Не указана компания.';
             return;
         }
 
-        /**
-         * Проверка водителя по: тесту наркотиков, возрасту
-         */
-        if ($driver) {
-            if ($driver->dismissed === 'Да') {
-                $this->errors[] = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
+        $companyId = $form['company_id'];
+        $company = Company::where('hash_id', $companyId)->first();
+        if (!$company) {
+            $this->errors[] = 'Компания не найдена.';
+            return;
+        }
+
+        if ($company->dismissed === 'Да') {
+            $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+            return;
+        }
+
+        $driverId = $form['driver_id'] ?? null;
+        if (!$formIsDop && empty($driverId)) {
+            $this->errors[] = 'Не указан Водитель.';
+            return;
+        }
+
+        if (!empty($driverId)) {
+            $driver = Driver::where('hash_id', $driverId)->first();
+
+            if (!$driver) {
+                $this->errors[] = 'Водитель не найден.';
+                return;
             }
 
             if (!$driver->company_id) {
-                $this->errors[] = 'У Водителя не найдена компания';
+                $this->errors[] = 'У Водителя не найдена Компания';
                 return;
             }
 
-            $company = Company::find($driver->company_id);
-
-            if (!$company) {
-                $this->errors[] = 'У Водителя не верно указано ID компании';
+            if ($driver->company_id !== $companyId) {
+                $this->errors[] = 'Компания Водителя не совпадает с Компанией осмотра.';
                 return;
             }
 
-            if ($company->dismissed === 'Да') {
-                $this->errors[] = BlockActionReasonsEnum::COMPANY_BLOCK;
+            if ($driver->dismissed === 'Да') {
+                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::DRIVER_BLOCK);
                 return;
             }
-
-            $form['company_id'] = $company->hash_id;
-        } else if ($car) {
-            $carCompany = Company::find($car->company_id);
-
-            if (!$carCompany) {
-                $this->errors[] = 'У Автомобиля не найдена компания';
-                return;
-            }
-
-            if ($carCompany->dismissed === 'Да') {
-                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
-                return;
-            }
-
-            $form['company_id'] = $carCompany->hash_id;
         }
 
-        if ($car) {
-            if ($car->dismissed === 'Да') {
-                $this->errors[] = 'Автомобиль уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
+        $carId = $form['car_id'] ?? null;
+        if (!$formIsDop && empty($carId)) {
+            $this->errors[] = 'Не указан Автомобиль.';
+            return;
+        }
+
+        if (!empty($carId)) {
+            $car = Car::where('hash_id', $carId)->first();
+
+            if (!$car) {
+                $this->errors[] = 'Автомобиль не найдено.';
+                return;
             }
 
-            $form['car_id'] = $car->hash_id;
+            if (!$car->company_id) {
+                $this->errors[] = 'У Автомобиля не найдена Компания';
+                return;
+            }
+
+            if ($car->company_id !== $companyId) {
+                $this->errors[] = 'Компания Автомобиля не совпадает с Компанией осмотра.';
+                return;
+            }
+
+            if ($car->dismissed === 'Да') {
+                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::CAR_BLOCK);
+                return;
+            }
+
+            if ($formIsDop && ($car->type_auto !== $form['car_type_auto'])) {
+                $this->errors[] = 'Категория ТС не совпадает с категорией Автомобиля!';
+
+                return;
+            }
 
             $this->checkRedDates(
                 date('Y-m-d', strtotime($form['date'])),
@@ -167,14 +141,27 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             return;
         }
 
+        $date = $form['date'] ?? null;
+        if (!$formIsDop && empty($date)) {
+            $this->errors[] = 'Не указана дата осмотра!';
+
+            return;
+        }
+
+        if ($formIsDop && empty($date) && empty($form['period_pl'])) {
+            $this->errors[] = 'Не указан ни период, ни дата осмотра!';
+
+            return;
+        }
+
         /**
          * Генерация номера ПЛ
          */
-        if (empty($form['number_list_road']) && !$form['is_dop']) {
-            $form['number_list_road'] = $car->hash_id . '-' . date('d.m.Y', strtotime($form['date']));
+        if (empty($form['number_list_road']) && !$formIsDop && !empty($carId)) {
+            $form['number_list_road'] = $carId . '-' . date('d.m.Y', $date);
         }
 
-        if ($form['is_dop']) {
+        if ($formIsDop) {
             $form['point_reys_control'] = 'Пройден';
         }
 
@@ -189,12 +176,12 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             $form['realy'] = 'да';
         }
 
-        if ($form['driver_id'] && $form['car_id'] && $form['date'] && $form['type_view']) {
+        if ($driverId && $carId && $date && $form['type_view']) {
             $form['day_hash'] = FormHashGenerator::generate(
                 new TechHashData(
-                    $form['driver_id'],
-                    $form['car_id'],
-                    new DateTimeImmutable($form['date']),
+                    $driverId,
+                    $carId,
+                    new DateTimeImmutable($date),
                     $form['type_view']
                 )
             );

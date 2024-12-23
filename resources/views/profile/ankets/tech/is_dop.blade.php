@@ -45,6 +45,33 @@
         </article>
     </div>
 
+    @if(empty($car_id))
+    <div class="form-group">
+        <label for="car_type_auto" class="form-control-label">Категория Т\С</label>
+        <article>
+            @php
+                $carTypeAutoValues = config('elements.Car.fields.type_auto.values') ?? [];
+                $carTypeAutoValue = $car_type_auto ?? array_values($carTypeAutoValues)[1] ?? '';
+            @endphp
+            <select
+                required
+                @if(!empty($car_type_auto)) disabled @endif
+                value="{{ $carTypeAutoValue }}"
+                name="anketa[0][car_type_auto]"
+                class="filled-select2 filled-select"
+            >
+                @foreach($carTypeAutoValues as $carTypeAuto)
+                    <option
+                        @if($carTypeAutoValue === $carTypeAuto) selected @endif
+                        value="{{ $carTypeAuto }}">
+                        {{ $carTypeAuto }}
+                    </option>
+                @endforeach
+            </select>
+        </article>
+    </div>
+    @endif
+
     <div class="form-group">
         <label class="form-control-label">Дата осмотра ПЛ:</label>
         <article>
