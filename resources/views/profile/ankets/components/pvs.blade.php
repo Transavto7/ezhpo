@@ -20,7 +20,7 @@
 
 <div class="form-group">
     <label class="form-control-label">Пункт выпуска:</label> &nbsp;
-    <select name="pv_id" class="form-control" required>
+    <select @if(in_array($flag_pak ?? '', [\App\Enums\FlagPakEnum::SDPO_R, \App\Enums\FlagPakEnum::SDPO_A])) disabled @endif name="pv_id" class="form-control" required>
         @foreach($points as $point)
             @if(count($point['pvs']) > 0)
                 <optgroup label="{{ $point['name'] }}">

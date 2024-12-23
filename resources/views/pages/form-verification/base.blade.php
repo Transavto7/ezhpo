@@ -118,7 +118,7 @@
                                 </span>
                             </span>
                                     @if(user()->hasRole('driver'))
-                                        <span class="d-none d-sm-inline ml-3">{{ ($driver = \App\Driver::where('hash_id', user()->login)->first()) ? $driver->fio : '' }}<i
+                                        <span class="d-none d-sm-inline ml-3">{{ ($driver = App\Driver::where('hash_id', user()->login)->first()) ? $driver->fio : '' }}<i
                                                 class="fa fa-user ml-1"></i></span>
                                         <span class="d-none d-sm-inline ml-3">{{ user()->login }}</span>
                                     @else
