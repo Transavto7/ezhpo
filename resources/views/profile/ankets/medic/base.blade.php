@@ -1,7 +1,12 @@
+@php
+    /** @var $actions_policy \App\Models\Forms\ActionsPolicy\Contracts\PolicyInterface */
+@endphp
+
 <div class="form-group">
     <label class="form-control-label">ID водителя:</label>
     <article>
         <input value="{{ $driver_id ?? '' }}"
+               @disabled($actions_policy->isAttributeDisabled('driver_id'))
                type="number"
                oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ 'false' }})"
                required min="6"
@@ -19,6 +24,7 @@
                    max="2999-02-20T20:20"
                    type="datetime-local"
                    required
+                   @disabled($actions_policy->isAttributeDisabled('date'))
                    value="{{ $default_current_date ?? '' }}"
                    name="anketa[0][date]"
                    class="form-control inspection-date">
@@ -28,11 +34,19 @@
     <div class="form-group">
         <label class="form-control-label">Тип осмотра:</label>
         <article>
-            <select name="anketa[0][type_view]" required class="form-control type-view">
-                <option value="Предрейсовый/Предсменный" @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>Предрейсовый/Предсменный</option>
-                <option value="Послерейсовый/Послесменный" @if(strcasecmp($type_view ?? '', 'Послерейсовый/Послесменный') == 0) selected @endif>Послерейсовый/Послесменный</option>
+            <select @disabled($actions_policy->isAttributeDisabled('type_view')) name="anketa[0][type_view]" required
+                    class="form-control type-view">
+                <option value="Предрейсовый/Предсменный"
+                        @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>
+                    Предрейсовый/Предсменный
+                </option>
+                <option value="Послерейсовый/Послесменный"
+                        @if(strcasecmp($type_view ?? '', 'Послерейсовый/Послесменный') == 0) selected @endif>
+                    Послерейсовый/Послесменный
+                </option>
             </select>
-            <p class="duplicate-indicator text-danger d-none" style="font-size: 0.7875rem">Осмотр с указанным водителем, датой и типом уже существует</p>
+            <p class="duplicate-indicator text-danger d-none" style="font-size: 0.7875rem">Осмотр с указанным водителем,
+                датой и типом уже существует</p>
         </article>
     </div>
 
@@ -59,8 +73,12 @@
                 class="form-control"
                 required
                 onchange="updateAlcometerResult()">
-            <option @if (($proba_alko ?? 'Отрицательно') === 'Отрицательно') selected @endif value="Отрицательно">Отрицательно</option>
-            <option @if (($proba_alko ?? 'Отрицательно') === 'Положительно') selected @endif value="Положительно">Положительно</option>
+            <option @if (($proba_alko ?? 'Отрицательно') === 'Отрицательно') selected @endif value="Отрицательно">
+                Отрицательно
+            </option>
+            <option @if (($proba_alko ?? 'Отрицательно') === 'Положительно') selected @endif value="Положительно">
+                Положительно
+            </option>
         </select>
     </article>
 </div>

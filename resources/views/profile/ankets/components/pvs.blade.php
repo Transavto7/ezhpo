@@ -1,4 +1,6 @@
 @php
+    /** @var $actions_policy \App\Models\Forms\ActionsPolicy\Contracts\PolicyInterface|null */
+
     $default_pv_id = $default_pv_id ?? null;
     $pv_id = $pv_id ?? null;
     $isSelected = function($child) use ($pv_id, $default_pv_id): bool {
@@ -20,7 +22,7 @@
 
 <div class="form-group">
     <label class="form-control-label">Пункт выпуска:</label> &nbsp;
-    <select name="pv_id" class="form-control" required>
+    <select @disabled(($actions_policy ?? null) && $actions_policy->isAttributeDisabled('point_id')) name="pv_id" class="form-control" required>
         @foreach($points as $point)
             @if(count($point['pvs']) > 0)
                 <optgroup label="{{ $point['name'] }}">

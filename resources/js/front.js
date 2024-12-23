@@ -725,6 +725,26 @@ $(document).ready(function () {
             }
         }
 
+        const setSelectValue = function (select, value, text = null) {
+            if (text === null) {
+                text = value
+            }
+
+            if (select.length < 1) {
+                return
+            }
+
+            const exist = select.children('option').filter((id, element) => element.value === value);
+
+            if (exist.length < 1) {
+                select.append($('<option>', {
+                    value,
+                    text
+                }));
+            }
+
+            select.val(value).trigger("change");
+        }
 
         $.ajax({
             url: `/api/check-prop/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
@@ -733,45 +753,25 @@ $(document).ready(function () {
                 const PROP_HAS_EXISTS = data.data.exists
                 const DATA = data.data.message;
 
-                if ((model === 'Driver' || model === 'Car') && DATA && DATA.company_hash_id) {
+                const carModel = model === 'Car'
+                const driverModel = model === 'Driver'
+                const carTypeAutoValue = DATA?.type_auto
+                if (carModel && carTypeAutoValue) {
                     const form = parent.closest('#ANKETA_FORM');
-                    form.find('input[name="company_id"]').val(DATA.company_hash_id);
-                    const select = form.find('select[name="company_id"]');
-
-                    if (select.length > 0) {
-                        const exist = select.children('option').filter((id, element) => {
-                            return element.value === DATA.company_hash_id;
-                        });
-
-                        if (exist.length < 1) {
-                            select.append($('<option>', {
-                                value: DATA.company_hash_id,
-                                text: DATA.company_name
-                            }));
-                        }
-
-                        select.select2().val(DATA.company_hash_id).trigger("change");
-                    }
+                    setSelectValue(form.find('select.car_type_auto'), carTypeAutoValue)
                 }
 
-                if ((model === 'Driver' || model === 'Car') && DATA && DATA.company_name) {
+                const companyHashIdValue = DATA?.company_hash_id
+                if ((driverModel || carModel) && companyHashIdValue) {
                     const form = parent.closest('#ANKETA_FORM');
-                    const select = form.find('select[name="company_name"]');
+                    form.find('input[name="company_id"]').val(companyHashIdValue);
+                    setSelectValue(form.find('select[name="company_id"]'), companyHashIdValue, DATA?.company_name)
+                }
 
-                    if (select.length > 0) {
-                        const exist = select.children('option').filter((id, element) => {
-                            return element.value === DATA.company_name;
-                        });
-
-                        if (exist.length < 1) {
-                            select.append($('<option>', {
-                                value: DATA.company_name,
-                                text: DATA.company_name
-                            }));
-                        }
-
-                        select.select2().val(DATA.company_name).trigger("change");
-                    }
+                const companyNameValue = DATA?.company_name
+                if ((driverModel || carModel) && companyNameValue) {
+                    const form = parent.closest('#ANKETA_FORM');
+                    setSelectValue(form.find('select[name="company_name"]'), companyNameValue)
                 }
 
                 showAnketsCardDBitemData(model, DATA, data.data.fieldsValues, data.data)
@@ -803,7 +803,7 @@ $(document).ready(function () {
                     checkInputProp('id', 'Company', DATA.company_id, 'name', companyIdInput.parent().parent())
                 }
 
-                if (model === 'Driver' && DATA && DATA.company_hash_id) {
+                if (driverModel && DATA && DATA.company_hash_id) {
                     parent.find('input').attr('company', DATA.company_hash_id);
                     const driverInput = parent.closest('#ANKETA_FORM').find('.car-input');
                     driverInput.each((id, input) => {
@@ -824,7 +824,7 @@ $(document).ready(function () {
                     });
                 }
 
-                if (model === 'Car' && DATA && DATA.company_hash_id) {
+                if (carModel && DATA && DATA.company_hash_id) {
                     const driverInput = parent.closest('#ANKETA_FORM').find('input[name="driver_id"]');
                     parent.find('input').attr('company', DATA.company_hash_id);
 
