@@ -3,6 +3,7 @@
 namespace App\Services\TripTicketExporter\ExcelGenerator;
 
 use App\Services\TripTicketExporter\ViewModels\ExportData;
+use App\Services\TripTicketExporter\ViewModels\FormViewModel;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Sheet;
 
@@ -34,8 +35,9 @@ class TripTicket4sExport implements ExportStrategy
             ->fillCar()
             ->fillDriver()
             ->fillOdometer()
-            ->fillEmployees();
-//            ->fillStamps();
+            ->fillEmployees()
+            ->fillMedicStamp()
+            ->fillTechStamp();
 
         return $this->sheet;
     }
@@ -170,21 +172,41 @@ class TripTicket4sExport implements ExportStrategy
         return $this;
     }
 
-    public function fillStamps(): self
+    public function fillMedicStamp(): self
     {
-        $now = Carbon::now();
+        $medicStamp = config('trip-ticket.stamps.medic');
 
-        $companyStamp = config('trip-ticket.stamps.company');
-        $permitStamp = config('trip-ticket.stamps.permit');
+        $date = $this->getFormDate($this->data->getMedicForm());
 
-        $date = 'Дата: '.$now->day;
-        $date .= ' '.trans('date.months_genitive.'.$now->month);
-        $date .= ' '.$now->year;
-        $date .= '    Время: '.$now->format('H:i');
-
-        $this->sheet->setCellValue('R44', $companyStamp."\n\n".$date);
-        $this->sheet->setCellValue('BY44', $permitStamp."\n\n".$date);
+        $this->sheet->setCellValue('R44', $medicStamp."\n\n".$date);
 
         return $this;
+    }
+
+    public function fillTechStamp(): self
+    {
+        $techStamp = config('trip-ticket.stamps.permit');
+
+        $date = $this->getFormDate($this->data->getTechForm());
+
+        $this->sheet->setCellValue('BY44', $techStamp."\n\n".$date);
+
+        return $this;
+    }
+
+    private function getFormDate(?FormViewModel $form): string
+    {
+        if ($form && $form->getDate()) {
+            $date = $form->getDate();
+
+            $value = 'Дата: '.$date->day;
+            $value .= ' '.trans('date.months_genitive.'.$date->month);
+            $value .= ' '.$date->year;
+            $value .= '    Время: '.$date->format('H:i');
+
+            return $value;
+        }
+
+        return 'Дата: _____ ________ 20__   Время: __:__';
     }
 }

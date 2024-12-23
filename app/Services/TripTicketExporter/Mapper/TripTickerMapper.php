@@ -7,16 +7,14 @@ use App\Enums\LogisticsMethodEnum;
 use App\Enums\TransportationTypeEnum;
 use App\Enums\TripTicketTemplateEnum;
 use App\Models\Forms\Form;
-use App\Models\Forms\MedicForm;
 use App\Models\Forms\TechForm;
 use App\Models\TripTicket;
-use App\Services\TripTicketExporter\ValueObjects\PeriodPl;
 use App\Services\TripTicketExporter\ViewModels\CarViewModel;
 use App\Services\TripTicketExporter\ViewModels\CompanyViewModel;
 use App\Services\TripTicketExporter\ViewModels\DriverViewModel;
 use App\Services\TripTicketExporter\ViewModels\ExportData;
 use App\Services\TripTicketExporter\ViewModels\FormViewModel;
-use App\Services\TripTicketExporter\ViewModels\TripTicketViewModel as TripTicketViewModel;
+use App\Services\TripTicketExporter\ViewModels\TripTicketViewModel;
 use Illuminate\Support\Carbon;
 
 class TripTickerMapper
@@ -85,20 +83,11 @@ class TripTickerMapper
 
     private function getTypedForm(Form $form): ?FormViewModel
     {
-        $typedForm = null;
         $odometer = null;
 
-        if ($form->type_anketa === FormTypeEnum::MEDIC) {
-            $typedForm = MedicForm::find($form->uuid)->first();
-        }
-        else if ($form->type_anketa === FormTypeEnum::TECH) {
+        if ($form->type_anketa === FormTypeEnum::TECH) {
             $typedForm = TechForm::find($form->uuid)->first();
             $odometer = $typedForm->odometer;
-        }
-
-        $periodPl = null;
-        if ($typedForm && $typedForm->period_pl) {
-            $periodPl = PeriodPl::fromString($typedForm->period_pl);
         }
 
         $username = null;
@@ -113,7 +102,6 @@ class TripTickerMapper
 
         return new FormViewModel(
             $date,
-            $periodPl,
             $username,
             $odometer
         );
