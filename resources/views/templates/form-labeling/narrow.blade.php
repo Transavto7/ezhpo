@@ -58,7 +58,7 @@
     <div class="page">
         <div class="wrapper">
             <div class="id">
-                {{ $page['id'] }}2
+                {{ $page['id'] }}
             </div>
             <div class="qr">
                 <img src="{{ $page['qrCode'] }}" width="100%" height="100%" alt="QR Code"/>
