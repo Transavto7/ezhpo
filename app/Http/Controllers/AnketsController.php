@@ -19,9 +19,11 @@ use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueAction;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueHandler;
 use App\Enums\FormTypeEnum;
 use App\Enums\QRCodeLinkParameter;
+use App\Exceptions\ExpiredFormPeriodPlException;
+use App\Models\Forms\ActionsPolicy\Builders\BuildersFactory;
+use App\Models\Forms\ActionsPolicy\Policies\DisabledPolicy;
 use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
-use App\Exceptions\ExpiredFormPeriodPlException;
 use App\Point;
 use App\Traits\UserEdsTrait;
 use App\User;
@@ -123,10 +125,12 @@ class AnketsController extends Controller
             session()->remove('anketa_pv_id');
         }
 
+        $data['actions_policy'] = new DisabledPolicy();
+
         return view('profile.anketa', $data);
     }
 
-    public function Get(Request $request)
+    public function Get(Request $request, BuildersFactory $buildersFactory)
     {
         /** @var Form $form */
         $form = Form::withTrashed()->findOrFail($request->id);
@@ -154,7 +158,9 @@ class AnketsController extends Controller
             $data['not_admitted_reasons'] = NotAdmittedReasons::fromForm($details)->getReasons();
         }
 
-        return view('profile.anketa', $data);
+        $data['actions_policy'] = $buildersFactory->make()->build($form, Auth::user());
+
+        return view('profile.anketa', $data)->with('errors', $request->get('errors', []));
     }
 
     public function Trash(Request $request, TrashFormHandler $handler)

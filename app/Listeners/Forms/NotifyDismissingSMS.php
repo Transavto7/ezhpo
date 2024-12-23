@@ -6,7 +6,6 @@ use App\Company;
 use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
-use App\Models\Forms\MedicForm;
 use App\Services\Notifier\SMSNotifierService;
 use App\Settings;
 
