@@ -2,6 +2,7 @@
     <label class="form-control-label">ID компании:</label>
     <article>
         <input value="{{ $company_id ?? '' }}"
+               @if(!empty($company_id)) disabled @endif
                required
                type="number"
                oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Company', event.target.value, 'name', $(event.target).parent(), {{ !($id ?? false) ? 'true' : 'false' }})"
@@ -17,6 +18,7 @@
     <article>
         <div class="d-flex">
             <input value="{{ $driver_id ?? '' }}"
+                   @if(!empty($driver_id)) disabled @endif
                    type="number"
                    oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent().parent(), {{ !($id ?? false) ? 'true' : 'false' }})"
                    min="6"
@@ -34,6 +36,7 @@
         <article>
             <div class="d-flex">
                 <input value="{{ $car_id ?? '' }}"
+                       @if(!empty($car_id)) disabled @endif
                        type="number"
                        oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent().parent(), {{ !($id ?? false) ? 'true' : 'false' }})"
                        min="6"
@@ -101,9 +104,10 @@
         <label class="form-control-label">Период выдачи ПЛ:</label>
         <article>
             <input type="month"
+                   @if(!empty($period_pl)) disabled @endif
                    @if (!isset($date)) required @endif
                    oninput="changeFormRequire(this, 'pl-date')"
-                   value="{{ isset($period_pl) ? $period_pl : '' }}"
+                   value="{{ $period_pl ?? '' }}"
                    name="anketa[0][period_pl]"
                    class="form-control pl-period">
         </article>
@@ -122,7 +126,7 @@
     <div class="form-group">
         <label class="form-control-label">Тип осмотра:</label>
         <article>
-            <select name="anketa[0][type_view]" class="form-control type-view">
+            <select @if(!empty($type_view)) disabled @endif name="anketa[0][type_view]" class="form-control type-view">
                 <option value="Предрейсовый/Предсменный"
                         @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>
                     Предрейсовый/Предсменный

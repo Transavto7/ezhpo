@@ -17,11 +17,6 @@ use Illuminate\Support\Carbon;
 
 class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
 {
-    protected function validateData()
-    {
-
-    }
-
     protected function fetchExistForms()
     {
         $cars = [];
@@ -79,7 +74,12 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
                 return;
             }
 
-            if (!$driver->company_id) {
+            if ($driver->dismissed === 'Да') {
+                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::DRIVER_BLOCK);
+                return;
+            }
+
+            if (!$driver->company_id || !$driver->company) {
                 $this->errors[] = 'У Водителя не найдена Компания';
                 return;
             }
@@ -89,10 +89,12 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
                 return;
             }
 
-            if ($driver->dismissed === 'Да') {
-                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::DRIVER_BLOCK);
+            if ($driver->company->dismissed === 'Да') {
+                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
                 return;
             }
+
+            //TODO: не нужна ли проверка блокировки временная?
         }
 
         $carId = $form['car_id'] ?? null;
@@ -109,18 +111,23 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
                 return;
             }
 
-            if (!$car->company_id) {
+            if ($car->dismissed === 'Да') {
+                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::CAR_BLOCK);
+                return;
+            }
+
+            if (!$car->company_id || !$car->company) {
                 $this->errors[] = 'У Автомобиля не найдена Компания';
                 return;
             }
 
-            if ($car->company_id !== $companyId) {
+            if ($car->company->hash_id !== $companyId) {
                 $this->errors[] = 'Компания Автомобиля не совпадает с Компанией осмотра.';
                 return;
             }
 
-            if ($car->dismissed === 'Да') {
-                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::CAR_BLOCK);
+            if ($car->company->dismissed === 'Да') {
+                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
                 return;
             }
 
@@ -148,10 +155,26 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             return;
         }
 
-        if ($formIsDop && empty($date) && empty($form['period_pl'])) {
+        $periodPl = $form['period_pl'] ?? null;
+        if ($formIsDop && empty($date) && empty($periodPl)) {
             $this->errors[] = 'Не указан ни период, ни дата осмотра!';
 
             return;
+        }
+
+        if ($formIsDop && $date && $periodPl) {
+            $dateFrom = Carbon::createFromFormat('Y-m', $periodPl)->startOfMonth();
+            $dateTo = Carbon::createFromFormat('Y-m', $periodPl)->endOfMonth();
+            $dateCarbon = Carbon::parse($date);
+            if ($dateCarbon->lessThan($dateFrom->startOfMonth()) || $dateCarbon->greaterThan($dateTo->endOfMonth())) {
+                $this->errors[] = 'Дата осмотра находится вне периода выдачи ПЛ!';
+
+                return;
+            }
+        }
+
+        if ($formIsDop && $date && empty($periodPl)) {
+            $form['period_pl'] = date('Y-m', $date);
         }
 
         /**
@@ -168,7 +191,6 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         /**
          * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
          */
-        $date = $form['date'] ?? null;
         $diffDateCheck = Carbon::now()
             ->addHours($user->timezone ?? 3)
             ->diffInMinutes($date);
@@ -176,7 +198,7 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
             $form['realy'] = 'да';
         }
 
-        if ($driverId && $carId && $date && $form['type_view']) {
+        if ($driverId && $carId && $date) {
             $form['day_hash'] = FormHashGenerator::generate(
                 new TechHashData(
                     $driverId,
