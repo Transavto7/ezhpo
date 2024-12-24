@@ -486,8 +486,8 @@
                                 <button id="selected-items-control-btn-delete" class="btn btn-danger btn-sm"></button>
                             @endif
                             @if($permissionToPrintTripTickets)
-                                <button id="trip-tickets-print-btn" class="btn btn-success btn-sm ml-2">Печать ПЛ
-                                </button>
+{{--                                <button id="trip-tickets-print-btn" class="btn btn-success btn-sm ml-2">Печать ПЛ--}}
+{{--                                </button>--}}
                             @endif
                             <button id="select-all" class="btn btn-success btn-sm ml-2">Выделить все на странице
                             </button>
