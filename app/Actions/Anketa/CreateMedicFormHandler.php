@@ -137,7 +137,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         /**
          * ПРОВЕРЯЕМ статус для поля "Заключение"
          */
-        if (!$this->admit($form, $driver)) {
+        if (!$formIsDop && !$this->admit($form, $driver ?? null)) {
             $form['admitted'] = 'Не допущен';
         }
 
