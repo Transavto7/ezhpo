@@ -126,7 +126,7 @@
                         }
 
                         if ($model === 'Driver') {
-                            $contractForDriverOrCar = \App\Driver::query()
+                            $contractForDriverOrCar = App\Driver::query()
                                 ->with('contracts')
                                 ->find($el->id);
                         }

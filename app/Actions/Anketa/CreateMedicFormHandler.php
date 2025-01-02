@@ -33,37 +33,13 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         $this->existForms = DuplicatesCheckerService::getExistMedicForms($driver);
     }
 
-    protected function validateData()
-    {
-        if ($this->data['is_dop'] ?? 0 === 1) return;
-
-        $driverId = $this->data['driver_id'] ?? null;
-        if (!$driverId) {
-            $this->errors[] = 'Не указан водитель.';
-            return;
-        }
-
-        $driverExist =  Driver::where('hash_id', $driverId)->first();
-        if (!$driverExist) {
-            $this->errors[] = 'Не найден водитель.';
-            return;
-        }
-
-        if ($driverExist->end_of_ban && $this->time < $driverExist->end_of_ban) {
-            $this->errors[] = 'Водитель отстранен до '.Carbon::parse($driverExist->end_of_ban);
-        }
-    }
-
     /**
      * @throws Exception
      */
     protected function createForm(array $form)
     {
-        $driverId = $this->data['driver_id'] ?? 0;
-        $driver = Driver::where('hash_id', $driverId)->first();
-
         $defaultData = [
-            'tonometer' => strval(Tonometer::random($driver)),
+            'tonometer' => strval(Tonometer::random(Driver::where('hash_id', $this->data['driver_id'] ?? 0)->first())),
             't_people' => Temperature::random()->getTemperature(),
             'pulse' => Pulse::random()->getPulse(),
             'date' => date('Y-m-d H:i:s'),
@@ -78,65 +54,62 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         ];
 
         $form = $this->mergeFormData($form, $defaultData);
-        $form['is_dop'] = $form['is_dop'] ?? 0;
+        $formIsDop = $form['is_dop'] ?? 0;
+        $form['is_dop'] = $formIsDop;
 
-        /**
-         * Компания
-         */
-        if (isset($form['company_id'])) {
-            $companyDop = Company::where('hash_id', $form['company_id'])->first();
-
-            if ($companyDop) {
-                $form['company_id'] = $companyDop->hash_id;
-                $form['company_name'] = $companyDop->name;
-            } elseif (! isset($form['driver_id'])) {
-                $this->errors[] = 'Компания не найдена';
-
-                return;
-            }
-        }
-
-        /**
-         * Водитель
-         */
-        if (isset($form['driver_id'])) {
-            $driverDop = Driver::where('hash_id', $form['driver_id'])->first();
-
-            if ($driverDop) {
-                $form['driver_id'] = $driverDop->hash_id;
-                $form['driver_fio'] = $driverDop->fio;
-
-                $driver = $driverDop;
-            }
-        }
-
-        if (!$driver && isset($form['driver_id'])) {
-            $this->errors[] = 'Водитель не найден';
+        if (empty($form['company_id'])) {
+            $this->errors[] = 'Не указана компания.';
             return;
         }
 
-        /**
-         * Проверка водителя по: тесту наркотиков, возрасту
-         */
-        if ($driver) {
+        $companyId = $form['company_id'];
+        $company = Company::where('hash_id', $companyId)->first();
+        if (!$company) {
+            $this->errors[] = 'Компания не найдена.';
+            return;
+        }
+
+        if ($company->dismissed === 'Да') {
+            $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+            return;
+        }
+
+        $driverId = $form['driver_id'] ?? null;
+        if (!$formIsDop && empty($driverId)) {
+            $this->errors[] = 'Не указан Водитель.';
+            return;
+        }
+
+        if (!empty($driverId)) {
+            $driver = Driver::where('hash_id', $driverId)->first();
+
+            if (!$driver) {
+                $this->errors[] = 'Водитель не найден.';
+                return;
+            }
+
             if ($driver->dismissed === 'Да') {
-                $this->errors[] = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
-            }
-
-            if (!$driver->company_id) {
-                $this->errors[] = 'У Водителя не найдена компания';
+                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::DRIVER_BLOCK);
                 return;
             }
 
-            $company = Company::find($driver->company_id);
-
-            if (!$company) {
-                $this->errors[] = 'У Водителя не верно указано ID компании';
+            if (!$driver->company_id || !$driver->company) {
+                $this->errors[] = 'У Водителя не найдена Компания';
                 return;
             }
 
-            if ($company->dismissed === 'Да') {
+            if ($driver->company_id !== $companyId) {
+                $this->errors[] = 'Компания Водителя не совпадает с Компанией осмотра.';
+                return;
+            }
+
+            if ($driver->company->dismissed === 'Да') {
                 $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+                return;
+            }
+
+            if ($driver->end_of_ban && $this->time < $driver->end_of_ban) {
+                $this->errors[] = 'Водитель отстранен до ' . Carbon::parse($driver->end_of_ban);
                 return;
             }
 
@@ -156,6 +129,11 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             );
         }
 
+        $isFormUnique = $this->findDuplicates($form);
+        if (!$isFormUnique) {
+            return;
+        }
+
         /**
          * ПРОВЕРЯЕМ статус для поля "Заключение"
          */
@@ -163,32 +141,6 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             $form['admitted'] = 'Не допущен';
         }
 
-        /**
-         * Проверка на дубликат из ТЗ
-         *
-         * Мы должны дать техническую возможность внесение осмотров любой даты (год назад, месяц назад.
-         * При внесении осмотра, система должна смотреть, есть ли подобный.
-         *
-         * Например, сегодня 13.02.21 в 09.00 до 10.00.
-         */
-        $isFormUnique = $this->findDuplicates($form);
-        if (!$isFormUnique) {
-            return;
-        }
-
-        if ($form['driver_id'] && $form['date'] && $form['type_view']) {
-            $form['day_hash'] = FormHashGenerator::generate(
-                new MedicHashData(
-                    $form['driver_id'],
-                    new DateTimeImmutable($form['date']),
-                    $form['type_view']
-                )
-            );
-        }
-
-        /**
-         * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
-         */
         $date = $form['date'] ?? null;
         $diffDateCheck = Carbon::now()
             ->addHours($user->timezone ?? 3)
@@ -197,21 +149,22 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             $form['realy'] = 'да';
         }
 
-        $formModel = new Form();
-        $formModel->fill($form);
+        if ($driverId && $date && $form['type_view']) {
+            $form['day_hash'] = FormHashGenerator::generate(
+                new MedicHashData(
+                    $driverId,
+                    new DateTimeImmutable($date),
+                    $form['type_view']
+                )
+            );
+        }
+
+        $formModel = new Form($form);
         $formModel->save();
 
-        $formDetailsModel = new MedicForm();
-        $formDetailsModel->fill($form);
+        $formDetailsModel = new MedicForm($form);
         $formDetailsModel->setAttribute('forms_uuid', $formModel->uuid);
         $formDetailsModel->save();
-
-        /**
-         * ОТПРАВКА SMS
-         */
-        if ($form['admitted'] === 'Не допущен') {
-            event(new DriverDismissed($formModel));
-        }
 
         if ($this->needStoreNormalizedPressure) {
             MedicFormNormalizedPressure::store(
@@ -221,6 +174,10 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         }
 
         $this->createdForms->push($formModel);
+
+        if ($form['admitted'] === 'Не допущен') {
+            event(new DriverDismissed($formModel));
+        }
     }
 
     protected function admit(array $form, Driver $driver = null): bool
