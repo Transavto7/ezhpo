@@ -13,97 +13,116 @@ use App\Services\TripTicketExporter\ViewModels\CarViewModel;
 use App\Services\TripTicketExporter\ViewModels\CompanyViewModel;
 use App\Services\TripTicketExporter\ViewModels\DriverViewModel;
 use App\Services\TripTicketExporter\ViewModels\ExportData;
-use App\Services\TripTicketExporter\ViewModels\FormViewModel;
+use App\Services\TripTicketExporter\ViewModels\TechFormViewModel;
+use App\Services\TripTicketExporter\ViewModels\MedicFormViewModel;
 use App\Services\TripTicketExporter\ViewModels\TripTicketViewModel;
 use Illuminate\Support\Carbon;
 
 class TripTickerMapper
 {
-    public function fromEloquent(TripTicket $model): ExportData
+    public function fromEloquent(TripTicket $tripTicket): ExportData
     {
-        $tripTicket = new TripTicketViewModel(
-            $model->ticket_number,
-            Carbon::parse($model->start_date),
-            $model->validity_period,
-            LogisticsMethodEnum::fromString($model->logistics_method),
-            TransportationTypeEnum::fromString($model->transportation_type)
+        $tripTicketViewModel = new TripTicketViewModel(
+            $tripTicket->ticket_number,
+            Carbon::parse($tripTicket->start_date),
+            $tripTicket->validity_period,
+            LogisticsMethodEnum::fromString($tripTicket->logistics_method),
+            TransportationTypeEnum::fromString($tripTicket->transportation_type)
         );
 
-        $company = null;
-        if ($model->company) {
-            $company = new CompanyViewModel($model->company->name, $model->company->where_call);
-        }
-
-        $driver = null;
-        if ($model->driver) {
-            $driverLicenseDate = null;
-            if ($model->driver->driver_license_issued_at) {
-                $driverLicenseDate = Carbon::parse($model->driver->driver_license_issued_at);
-            }
-
-            $driver = new DriverViewModel(
-                $model->driver->hash_id,
-                $model->driver->fio,
-                $model->driver->driver_license,
-                $driverLicenseDate,
-                $model->driver->snils,
-            );
-        }
-
-        $car = null;
-        if ($model->car) {
-            $car = new CarViewModel(
-                $model->car->hash_id,
-                $model->car->gos_number,
-                $model->car->mark_model,
-                $model->car->type_auto,
-            );
-        }
-
-        $medicForm = null;
-        if ($model->medicForm) {
-            $medicForm = $this->getTypedForm($model->medicForm);
-        }
-
-        $techForm = null;
-        if ($model->techForm) {
-            $techForm = $this->getTypedForm($model->techForm);
-        }
+        $companyViewModel = $this->mapCompany($tripTicket);
+        $driverViewModel = $this->mapDriver($tripTicket);
+        $carViewModel = $this->mapCar($tripTicket);
+        $medicFormViewModel = $this->mapMedic($tripTicket);
+        $techFormViewModel = $this->mapTechForm($tripTicket);
 
         return new ExportData(
-            TripTicketTemplateEnum::fromString($model->template_code),
-            $tripTicket,
-            $company,
-            $driver,
-            $car,
-            $medicForm,
-            $techForm
+            TripTicketTemplateEnum::fromString($tripTicket->template_code),
+            $tripTicketViewModel,
+            $companyViewModel,
+            $driverViewModel,
+            $carViewModel,
+            $medicFormViewModel,
+            $techFormViewModel
         );
     }
 
-    private function getTypedForm(Form $form): ?FormViewModel
+    private function mapCompany(TripTicket $tripTicket): ?CompanyViewModel
     {
+        if (!$tripTicket->company) {
+            return null;
+        }
+
+        return new CompanyViewModel($tripTicket->company->name, $tripTicket->company->where_call);
+    }
+
+    private function mapDriver(TripTicket $tripTicket): ?DriverViewModel
+    {
+        if (!$tripTicket->driver) {
+            return null;
+        }
+
+        $driverLicenseDate = null;
+        if ($tripTicket->driver->driver_license_issued_at) {
+            $driverLicenseDate = Carbon::parse($tripTicket->driver->driver_license_issued_at);
+        }
+
+        return new DriverViewModel(
+            $tripTicket->driver->hash_id,
+            $tripTicket->driver->fio,
+            $tripTicket->driver->driver_license,
+            $driverLicenseDate,
+            $tripTicket->driver->snils,
+        );
+    }
+
+    private function mapCar(TripTicket $tripTicket): ?CarViewModel
+    {
+        if (!$tripTicket->car) {
+            return null;
+        }
+
+        return new CarViewModel(
+            $tripTicket->car->hash_id,
+            $tripTicket->car->gos_number,
+            $tripTicket->car->mark_model,
+            $tripTicket->car->type_auto,
+        );
+    }
+
+    private function mapMedic(TripTicket $tripTicket): ?MedicFormViewModel
+    {
+        if (!$tripTicket->medicForm) {
+            return null;
+        }
+
+        $form = $tripTicket->medicForm;
+
+        return new MedicFormViewModel(
+            $form->date ? Carbon::parse($form->date) : null,
+            $form->user ? $form->user->name : null,
+        );
+    }
+
+    private function mapTechForm(TripTicket $tripTicket): ?TechFormViewModel
+    {
+        if (!$tripTicket->techForm) {
+            return null;
+        }
+
+        $form = $tripTicket->techForm;
+
         $odometer = null;
+        $techForm = TechForm::where('forms_uuid', '=', $form->uuid)->first();
 
-        if ($form->type_anketa === FormTypeEnum::TECH) {
-            $typedForm = TechForm::find($form->uuid)->first();
-            $odometer = $typedForm->odometer;
+        if ($techForm) {
+            $odometer = $techForm->odometer;
         }
 
-        $username = null;
-        if ($form->user) {
-            $username = $form->user->name;
-        }
-
-        $date = $form->date;
-        if ($date) {
-            $date = Carbon::parse($date);
-        }
-
-        return new FormViewModel(
-            $date,
-            $username,
-            $odometer
+        return new TechFormViewModel(
+            $form->date ? Carbon::parse($form->date) : null,
+            $form->user ? $form->user->name : null,
+            $odometer,
         );
     }
 }

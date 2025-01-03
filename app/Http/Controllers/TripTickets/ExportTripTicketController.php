@@ -9,7 +9,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final class TripTicketExportController extends Controller
+final class ExportTripTicketController extends Controller
 {
     public function __invoke(Request $request, TripTicketExporter $exporter)
     {
