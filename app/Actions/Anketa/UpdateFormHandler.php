@@ -37,9 +37,10 @@ class UpdateFormHandler
      */
     public function handle(Form $form, array $data, Authenticatable $user)
     {
-        $isPakQueueForm = $form['type_anketa'] === FormTypeEnum::PAK_QUEUE;
-        $isMedicForm = $form['type_anketa'] === FormTypeEnum::MEDIC;
-        $isTechForm = $form['type_anketa'] === FormTypeEnum::TECH;
+        $formType = $form['type_anketa'];
+        $isPakQueueForm = $formType === FormTypeEnum::PAK_QUEUE;
+        $isMedicForm = $formType === FormTypeEnum::MEDIC;
+        $isTechForm = $formType === FormTypeEnum::TECH;
 
         if (isset($data['anketa'])) {
             $this->findDuplicates($form, $data);
@@ -242,30 +243,50 @@ class UpdateFormHandler
             return;
         }
 
-        $mainFormTimestamp = Carbon::parse($data['anketa'][0]['date'])->timestamp;
+        $mainFormDate = $data['anketa'][0]['date'] ?? $form->date ?? null;
+        if (empty($mainFormDate)) {
+            return;
+        }
 
         $formId = $form->id;
         $existForms = $this->getExistForms($form, $data)->reject(function ($existForm) use ($formId) {
             return $formId === $existForm->id;
         });
 
+        $mainFormTimestamp = Carbon::parse($mainFormDate)->timestamp;
         DuplicatesCheckerService::checkExist($existForms, $mainFormTimestamp);
     }
 
     protected function getExistForms(Form $form, array $data): Collection
     {
-        $formNewDate = $data['anketa'][0]['date'];
+        $formNewDate = $data['anketa'][0]['date'] ?? $form->date ?? null;
+        if (empty($formNewDate)) {
+            return collect([]);
+        }
+
         $datesDiapason = [
             Carbon::parse($formNewDate)->subSeconds(Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS),
             Carbon::parse($formNewDate)->addSeconds(Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS)
         ];
 
         if ($form->type_anketa === FormTypeEnum::MEDIC) {
-            return DuplicatesCheckerService::getExistMedicForms($data['driver_id'], $datesDiapason);
+            $driverId = $data['driver_id'] ?? $form->driver_id ?? null;
+
+            if (empty($driverId)) {
+                return collect([]);
+            }
+
+            return DuplicatesCheckerService::getExistMedicForms($driverId, $datesDiapason);
         }
 
         if ($form->type_anketa === FormTypeEnum::TECH) {
-            return DuplicatesCheckerService::getExistTechForms([$data['anketa'][0]['car_id']], $datesDiapason);
+            $carId = $data['anketa'][0]['car_id'] ?? $form->details->car_id ?? null;
+
+            if (empty($carId)) {
+                return collect([]);
+            }
+
+            return DuplicatesCheckerService::getExistTechForms([$carId], $datesDiapason);
         }
 
         return collect([]);

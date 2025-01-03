@@ -49,30 +49,30 @@
     </div>
 
     @if(empty($car_id))
-    <div class="form-group">
-        <label for="car_type_auto" class="form-control-label">Категория Т\С</label>
-        <article>
-            @php
-                $carTypeAutoValues = config('elements.Car.fields.type_auto.values') ?? [];
-                $carTypeAutoValue = $car_type_auto ?? array_values($carTypeAutoValues)[1] ?? '';
-            @endphp
-            <select
-                required
-                @if(!empty($car_type_auto)) disabled @endif
-                value="{{ $carTypeAutoValue }}"
-                name="anketa[0][car_type_auto]"
-                class="filled-select2 filled-select"
-            >
-                @foreach($carTypeAutoValues as $carTypeAuto)
-                    <option
-                        @if($carTypeAutoValue === $carTypeAuto) selected @endif
+        <div class="form-group">
+            <label for="car_type_auto" class="form-control-label">Категория Т\С</label>
+            <article>
+                @php
+                    $carTypeAutoValues = config('elements.Car.fields.type_auto.values') ?? [];
+                    $carTypeAutoValue = $car_type_auto ?? array_values($carTypeAutoValues)[1] ?? '';
+                @endphp
+                <select
+                    required
+                    @if(!empty($car_type_auto)) disabled @endif
+                    value="{{ $carTypeAutoValue }}"
+                    name="anketa[0][car_type_auto]"
+                    class="filled-select2 filled-select"
+                >
+                    @foreach($carTypeAutoValues as $carTypeAuto)
+                        <option
+                            @if($carTypeAutoValue === $carTypeAuto) selected @endif
                         value="{{ $carTypeAuto }}">
-                        {{ $carTypeAuto }}
-                    </option>
-                @endforeach
-            </select>
-        </article>
-    </div>
+                            {{ $carTypeAuto }}
+                        </option>
+                    @endforeach
+                </select>
+            </article>
+        </div>
     @endif
 
     <div class="form-group">
@@ -81,6 +81,7 @@
             <input min="1900-02-20T20:20"
                    max="2999-02-20T20:20"
                    type="datetime-local"
+                   @if(!empty($date) && !empty($result_dop)) disabled @endif
                    @if (!isset($period_pl)) required @endif
                    oninput="changeFormRequire(this, 'pl-period')"
                    @isset ($date) value="{{ $default_current_date ?? '' }}" @endisset
@@ -126,7 +127,9 @@
     <div class="form-group">
         <label class="form-control-label">Тип осмотра:</label>
         <article>
-            <select @if(!empty($type_view)) disabled @endif name="anketa[0][type_view]" class="form-control type-view">
+            <select name="anketa[0][type_view]"
+                    @if(!empty($type_view)) disabled @endif
+                    class="form-control type-view">
                 <option value="Предрейсовый/Предсменный"
                         @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>
                     Предрейсовый/Предсменный
@@ -136,7 +139,8 @@
                     Послерейсовый/Послесменный
                 </option>
             </select>
-            <p class="duplicate-indicator text-danger d-none" style="font-size: 0.7875rem">Осмотр с указанным водителем, датой и типом уже существует</p>
+            <p class="duplicate-indicator text-danger d-none" style="font-size: 0.7875rem">Осмотр с указанным водителем,
+                датой и типом уже существует</p>
         </article>
     </div>
 

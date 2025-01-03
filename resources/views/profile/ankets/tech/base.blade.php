@@ -2,7 +2,10 @@
     <label class="form-control-label">ID водителя:</label>
     <article>
         <div class="d-flex">
-            <input required value="{{ $driver_id ?? '' }}" type="number"
+            <input required
+                   value="{{ $driver_id ?? '' }}"
+                   @if(!empty($driver_id)) disabled @endif
+                   type="number"
                    oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent().parent(), {{ 'false' }})"
                    min="6"
                    name="driver_id"
@@ -20,6 +23,7 @@
             <input min="1900-02-20T20:20"
                    max="2999-02-20T20:20"
                    type="datetime-local"
+                   @if(!empty($date)) disabled @endif
                    value="{{ $default_current_date ?? '' }}"
                    name="anketa[0][date]"
                    class="form-control inspection-date">
@@ -30,7 +34,10 @@
         <label class="form-control-label">ID автомобиля:</label>
         <article>
             <div class="d-flex">
-                <input required value="{{ $car_id ?? '' }}" type="number"
+                <input required
+                       value="{{ $car_id ?? '' }}"
+                       @if(!empty($car_id)) disabled @endif
+                       type="number"
                        oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent().parent(), {{ 'false' }})"
                        min="6"
                        name="anketa[0][car_id]"
@@ -44,7 +51,10 @@
     <div class="form-group">
         <label class="form-control-label">Тип осмотра:</label>
         <article>
-            <select name="anketa[0][type_view]" required class="form-control type-view">
+            <select name="anketa[0][type_view]"
+                    @if(!empty($type_view)) disabled @endif
+                    required
+                    class="form-control type-view">
                 <option value="Предрейсовый/Предсменный"
                         @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>
                     Предрейсовый/Предсменный
@@ -54,7 +64,8 @@
                     Послерейсовый/Послесменный
                 </option>
             </select>
-            <p class="duplicate-indicator text-danger d-none" style="font-size: 0.7875rem">Осмотр с указанным водителем, датой и типом уже существует</p>
+            <p class="duplicate-indicator text-danger d-none" style="font-size: 0.7875rem">Осмотр с указанным водителем,
+                датой и типом уже существует</p>
         </article>
     </div>
 

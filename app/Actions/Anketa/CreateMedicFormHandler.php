@@ -57,21 +57,23 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         $formIsDop = $form['is_dop'] ?? 0;
         $form['is_dop'] = $formIsDop;
 
-        if (empty($form['company_id'])) {
+        $companyId = $form['company_id'] ?? null;
+        if ($formIsDop && empty($companyId)) {
             $this->errors[] = 'Не указана компания.';
             return;
         }
 
-        $companyId = $form['company_id'];
-        $company = Company::where('hash_id', $companyId)->first();
-        if (!$company) {
-            $this->errors[] = 'Компания не найдена.';
-            return;
-        }
+        if (!empty($companyId)) {
+            $company = Company::where('hash_id', $companyId)->first();
+            if (!$company) {
+                $this->errors[] = 'Компания не найдена.';
+                return;
+            }
 
-        if ($company->dismissed === 'Да') {
-            $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
-            return;
+            if ($company->dismissed === 'Да') {
+                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+                return;
+            }
         }
 
         $driverId = $form['driver_id'] ?? null;
@@ -98,9 +100,14 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
                 return;
             }
 
-            if ($driver->company_id !== $companyId) {
+            if (!empty($companyId) && ($driver->company->hash_id !== $companyId)) {
                 $this->errors[] = 'Компания Водителя не совпадает с Компанией осмотра.';
                 return;
+            }
+
+            if (empty($companyId)) {
+                $companyId = $driver->company->hash_id;
+                $form['company_id'] = $companyId;
             }
 
             if ($driver->company->dismissed === 'Да') {
@@ -121,7 +128,6 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             );
 
             $form['driver_group_risk'] = $driver->group_risk;
-            $form['company_id'] = $company->hash_id;
 
             $this->checkRedDates(
                 date('Y-m-d', strtotime($form['date'])),
@@ -134,6 +140,35 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             return;
         }
 
+        $date = $form['date'] ?? null;
+        if (!$formIsDop && empty($date)) {
+            $this->errors[] = 'Не указана дата осмотра!';
+
+            return;
+        }
+
+        $periodPl = $form['period_pl'] ?? null;
+        if ($formIsDop && empty($date) && empty($periodPl)) {
+            $this->errors[] = 'Не указан ни период, ни дата осмотра!';
+
+            return;
+        }
+
+        if ($formIsDop && $date && $periodPl) {
+            $dateFrom = Carbon::createFromFormat('Y-m', $periodPl)->startOfMonth();
+            $dateTo = Carbon::createFromFormat('Y-m', $periodPl)->endOfMonth();
+            $dateCarbon = Carbon::parse($date);
+            if ($dateCarbon->lessThan($dateFrom->startOfMonth()) || $dateCarbon->greaterThan($dateTo->endOfMonth())) {
+                $this->errors[] = 'Дата осмотра находится вне периода выдачи ПЛ!';
+
+                return;
+            }
+        }
+
+        if ($formIsDop && $date && empty($periodPl)) {
+            $form['period_pl'] = date('Y-m', $date);
+        }
+
         /**
          * ПРОВЕРЯЕМ статус для поля "Заключение"
          */
@@ -141,7 +176,9 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             $form['admitted'] = 'Не допущен';
         }
 
-        $date = $form['date'] ?? null;
+        /**
+         * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
+         */
         $diffDateCheck = Carbon::now()
             ->addHours($user->timezone ?? 3)
             ->diffInMinutes($date);
@@ -149,7 +186,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             $form['realy'] = 'да';
         }
 
-        if ($driverId && $date && $form['type_view']) {
+        if ($driverId && $date) {
             $form['day_hash'] = FormHashGenerator::generate(
                 new MedicHashData(
                     $driverId,

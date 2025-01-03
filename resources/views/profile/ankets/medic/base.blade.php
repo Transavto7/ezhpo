@@ -2,6 +2,7 @@
     <label class="form-control-label">ID водителя:</label>
     <article>
         <input value="{{ $driver_id ?? '' }}"
+               @if(!empty($driver_id)) disabled @endif
                type="number"
                oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ 'false' }})"
                required min="6"
@@ -19,6 +20,7 @@
                    max="2999-02-20T20:20"
                    type="datetime-local"
                    required
+                   @if(!empty($date)) disabled @endif
                    value="{{ $default_current_date ?? '' }}"
                    name="anketa[0][date]"
                    class="form-control inspection-date">
@@ -28,7 +30,7 @@
     <div class="form-group">
         <label class="form-control-label">Тип осмотра:</label>
         <article>
-            <select name="anketa[0][type_view]" required class="form-control type-view">
+            <select @if(!empty($type_view)) disabled @endif name="anketa[0][type_view]" required class="form-control type-view">
                 <option value="Предрейсовый/Предсменный" @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>Предрейсовый/Предсменный</option>
                 <option value="Послерейсовый/Послесменный" @if(strcasecmp($type_view ?? '', 'Послерейсовый/Послесменный') == 0) selected @endif>Послерейсовый/Послесменный</option>
             </select>

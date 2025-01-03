@@ -2,6 +2,7 @@
     <label class="form-control-label">ID компании:</label>
     <article>
         <input value="{{ $company_id ?? '' }}"
+               @if(!empty($company_id)) disabled @endif
                required
                type="number"
                oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Company', event.target.value, 'name', $(event.target).parent(), {{ !($id ?? false) ? 'true' : 'false' }})"
@@ -16,6 +17,7 @@
     <label class="form-control-label">ID водителя:</label>
     <article>
         <input value="{{ $driver_id ?? '' }}"
+               @if(!empty($driver_id)) disabled @endif
                type="number"
                oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent(), {{ !($id ?? false) ? 'true' : 'false' }})"
                min="6"
@@ -32,6 +34,7 @@
             <input min="1900-02-20T20:20"
                    max="2999-02-20T20:20"
                    type="datetime-local"
+                   @if(!empty($date) && !empty($result_dop)) disabled @endif
                    @if (!isset($period_pl)) required @endif
                    oninput="changeFormRequire(this, 'pl-period')"
                    @isset ($date) value="{{ $default_current_date ?? '' }}" @endisset
@@ -55,6 +58,7 @@
         <label class="form-control-label">Период выдачи ПЛ:</label>
         <article>
             <input type="month"
+                   @if(!empty($period_pl)) disabled @endif
                    @if (!isset($date)) required @endif
                    oninput="changeFormRequire(this, 'pl-date')"
                    value="{{ isset($period_pl) ? $period_pl : '' }}"
@@ -66,7 +70,7 @@
     <div class="form-group">
         <label class="form-control-label">Тип осмотра:</label>
         <article>
-            <select name="anketa[0][type_view]" class="form-control type-view">
+            <select @if(!empty($type_view)) disabled @endif name="anketa[0][type_view]" class="form-control type-view">
                 <option value="Предрейсовый/Предсменный" @if(strcasecmp($type_view ?? '', 'Предрейсовый/Предсменный') == 0) selected @endif>Предрейсовый/Предсменный</option>
                 <option value="Послерейсовый/Послесменный" @if(strcasecmp($type_view ?? '', 'Послерейсовый/Послесменный') == 0) selected @endif>Послерейсовый/Послесменный</option>
             </select>

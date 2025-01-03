@@ -43,21 +43,23 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         $formIsDop = $form['is_dop'] ?? 0;
         $form['is_dop'] = $formIsDop;
 
-        if (empty($form['company_id'])) {
+        $companyId = $form['company_id'] ?? null;
+        if ($formIsDop && empty($companyId)) {
             $this->errors[] = 'Не указана компания.';
             return;
         }
 
-        $companyId = $form['company_id'];
-        $company = Company::where('hash_id', $companyId)->first();
-        if (!$company) {
-            $this->errors[] = 'Компания не найдена.';
-            return;
-        }
+        if (!empty($companyId)) {
+            $company = Company::where('hash_id', $companyId)->first();
+            if (!$company) {
+                $this->errors[] = 'Компания не найдена.';
+                return;
+            }
 
-        if ($company->dismissed === 'Да') {
-            $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
-            return;
+            if ($company->dismissed === 'Да') {
+                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+                return;
+            }
         }
 
         $driverId = $form['driver_id'] ?? null;
@@ -84,9 +86,14 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
                 return;
             }
 
-            if ($driver->company_id !== $companyId) {
+            if (!empty($companyId) && ($driver->company->hash_id !== $companyId)) {
                 $this->errors[] = 'Компания Водителя не совпадает с Компанией осмотра.';
                 return;
+            }
+
+            if (empty($companyId)) {
+                $companyId = $driver->company->hash_id;
+                $form['company_id'] = $companyId;
             }
 
             if ($driver->company->dismissed === 'Да') {
@@ -121,9 +128,14 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
                 return;
             }
 
-            if ($car->company->hash_id !== $companyId) {
-                $this->errors[] = 'Компания Автомобиля не совпадает с Компанией осмотра.';
+            if (!empty($companyId) && ($car->company->hash_id !== $companyId)) {
+                $this->errors[] = 'Компания Автомобиля не совпадает с Компанией осмотра / Водителя.';
                 return;
+            }
+
+            if (empty($companyId)) {
+                $companyId = $car->company->hash_id;
+                $form['company_id'] = $companyId;
             }
 
             if ($car->company->dismissed === 'Да') {
