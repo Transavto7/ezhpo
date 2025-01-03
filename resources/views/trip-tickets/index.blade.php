@@ -331,9 +331,17 @@
                     .then((response) => {
                         const url = window.URL.createObjectURL(new Blob([response.data]));
                         const link = document.createElement('a');
+                        const disposition = response.headers['content-disposition'];
+                        let filename = disposition
+                            ? disposition.match(/filename\*=(?:UTF-8'')?(.+?)(?:;|$)/i)?.[1]
+                            : null
+
+                        if (filename) {
+                            filename = decodeURIComponent(filename)
+                        }
 
                         link.href = url;
-                        link.setAttribute('download', 'Путевой лист.xlsx');
+                        link.setAttribute('download', filename ?? 'Путевой лист.xlsx');
 
                         document.body.appendChild(link);
                         link.click();

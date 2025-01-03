@@ -6,6 +6,7 @@ use App\Models\TripTicket;
 use App\Services\TripTicketExporter\ExcelGenerator\TripTicketExcelGenerator;
 use App\Services\TripTicketExporter\Mapper\TripTickerMapper;
 use App\ValueObjects\EntityId;
+use DateTimeImmutable;
 use DomainException;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -39,6 +40,8 @@ class TripTicketExporter
 
         $export = new TripTicketExcelGenerator($exportData);
 
-        return Excel::download($export, 'Путевой лист.xlsx');
+        $now = new DateTimeImmutable();
+
+        return Excel::download($export, "Путевой_лист_".$now->format('Y_m_d_H_i_s').".xlsx");
     }
 }

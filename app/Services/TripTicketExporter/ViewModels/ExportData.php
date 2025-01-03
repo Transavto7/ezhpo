@@ -27,11 +27,11 @@ class ExportData
      */
     private $car;
     /**
-     * @var FormViewModel|null
+     * @var MedicFormViewModel|null
      */
     private $medicForm;
     /**
-     * @var FormViewModel|null
+     * @var TechFormViewModel|null
      */
     private $techForm;
 
@@ -41,8 +41,8 @@ class ExportData
      * @param CompanyViewModel|null $company
      * @param DriverViewModel|null $driver
      * @param CarViewModel|null $car
-     * @param FormViewModel|null $medicForm
-     * @param FormViewModel|null $techForm
+     * @param MedicFormViewModel|null $medicForm
+     * @param TechFormViewModel|null $techForm
      */
     public function __construct(
         TripTicketTemplateEnum $templateCode,
@@ -50,8 +50,8 @@ class ExportData
         ?CompanyViewModel      $company,
         ?DriverViewModel       $driver,
         ?CarViewModel          $car,
-        ?FormViewModel         $medicForm,
-        ?FormViewModel         $techForm
+        ?MedicFormViewModel    $medicForm,
+        ?TechFormViewModel $techForm
     )
     {
         $this->templateCode = $templateCode;
@@ -88,12 +88,12 @@ class ExportData
         return $this->car;
     }
 
-    public function getMedicForm(): ?FormViewModel
+    public function getMedicForm(): ?MedicFormViewModel
     {
         return $this->medicForm;
     }
 
-    public function getTechForm(): ?FormViewModel
+    public function getTechForm(): ?TechFormViewModel
     {
         return $this->techForm;
     }

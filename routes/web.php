@@ -166,7 +166,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('{id}/store-medic-form', 'TripTickets\TripTicketStoreMedicFormController')->name('store-medic-form');
             Route::get('{id}/create-tech-form', 'TripTickets\TripTicketCreateTechFormPageController')->name('create-tech-form');
             Route::post('{id}/store-tech-form', 'TripTickets\TripTicketStoreTechFormController')->name('store-tech-form');
-            Route::post('export', 'TripTickets\TripTicketExportController')->name('export');
+            Route::post('export', 'TripTickets\ExportTripTicketController')->name('export');
             Route::get('table-export', 'TripTickets\TripTicketTableExportController')->name('table-export');
         });
     });

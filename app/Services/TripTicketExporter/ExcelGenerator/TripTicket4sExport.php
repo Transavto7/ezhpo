@@ -3,7 +3,7 @@
 namespace App\Services\TripTicketExporter\ExcelGenerator;
 
 use App\Services\TripTicketExporter\ViewModels\ExportData;
-use App\Services\TripTicketExporter\ViewModels\FormViewModel;
+use App\Services\TripTicketExporter\ViewModels\TechFormViewModel;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Sheet;
 
@@ -50,11 +50,11 @@ class TripTicket4sExport implements ExportStrategy
         $car = $this->data->getCar();
 
         if ($driver) {
-            $value = "ID - ".$driver->getId()." Водитель\n";
+            $value = "ID - " . $driver->getId() . " Водитель\n";
         }
 
         if ($car) {
-            $value .= 'ID - '.$car->getId().' Автомобиль';
+            $value .= 'ID - ' . $car->getId() . ' Автомобиль';
         }
 
         $this->sheet->setCellValue('DZ1', $value);
@@ -93,7 +93,7 @@ class TripTicket4sExport implements ExportStrategy
         $value = $company->getName();
 
         if ($company->getWhereCall()) {
-            $value .= ', тел. '.$company->getWhereCall();
+            $value .= ', тел. ' . $company->getWhereCall();
         }
 
         $value .= '.';
@@ -111,7 +111,7 @@ class TripTicket4sExport implements ExportStrategy
             return $this;
         }
 
-        $this->sheet->setCellValue('R8', $car->getTypeAuto().', '.$car->getMarkModel());
+        $this->sheet->setCellValue('R8', $car->getTypeAuto() . ', ' . $car->getMarkModel());
         $this->sheet->setCellValue('AE9', $car->getGosNumber());
 
         return $this;
@@ -174,39 +174,44 @@ class TripTicket4sExport implements ExportStrategy
 
     public function fillMedicStamp(): self
     {
-        $medicStamp = config('trip-ticket.stamps.medic');
+        $medicStamp = '';
 
-        $date = $this->getFormDate($this->data->getMedicForm());
+        if ($this->data->getCompany()) {
+            $medicStamp = $this->data->getCompany()->getName() . "\n";
+        }
+        $medicStamp .= config('trip-ticket.stamps.medic');
 
-        $this->sheet->setCellValue('R44', $medicStamp."\n\n".$date);
+        $medicForm = $this->data->getMedicForm();
+        $date = $this->getFormDate($medicForm ? $medicForm->getDate() : null);
+
+        $this->sheet->setCellValue('R44', $medicStamp . "\n\n" . $date);
 
         return $this;
     }
 
     public function fillTechStamp(): self
     {
-        $techStamp = config('trip-ticket.stamps.permit');
+        $techStamp = config('trip-ticket.stamps.tech');
 
-        $date = $this->getFormDate($this->data->getTechForm());
+        $techForm = $this->data->getTechForm();
+        $date = $this->getFormDate($techForm ? $techForm->getDate() : null);
 
-        $this->sheet->setCellValue('BY44', $techStamp."\n\n".$date);
+        $this->sheet->setCellValue('BY44', $techStamp . "\n\n" . $date);
 
         return $this;
     }
 
-    private function getFormDate(?FormViewModel $form): string
+    private function getFormDate(?Carbon $date): string
     {
-        if ($form && $form->getDate()) {
-            $date = $form->getDate();
-
-            $value = 'Дата: '.$date->day;
-            $value .= ' '.trans('date.months_genitive.'.$date->month);
-            $value .= ' '.$date->year;
-            $value .= '    Время: '.$date->format('H:i');
-
-            return $value;
+        if (!$date) {
+            return 'Дата: _____ ________ 20__   Время: __:__';
         }
 
-        return 'Дата: _____ ________ 20__   Время: __:__';
+        $value = 'Дата: ' . $date->day;
+        $value .= ' ' . trans('date.months_genitive.' . $date->month);
+        $value .= ' ' . $date->year;
+        $value .= '    Время: ' . $date->format('H:i');
+
+        return $value;
     }
 }
