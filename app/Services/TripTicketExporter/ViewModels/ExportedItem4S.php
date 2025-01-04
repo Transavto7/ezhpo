@@ -2,14 +2,8 @@
 
 namespace App\Services\TripTicketExporter\ViewModels;
 
-use App\Enums\TripTicketTemplateEnum;
-
-class ExportData
+final class ExportedItem4S extends ExportedItem
 {
-    /**
-     * @var TripTicketTemplateEnum
-     */
-    private $templateCode;
     /**
      * @var TripTicketViewModel
      */
@@ -36,7 +30,6 @@ class ExportData
     private $techForm;
 
     /**
-     * @param TripTicketTemplateEnum $templateCode
      * @param TripTicketViewModel $tripTicket
      * @param CompanyViewModel|null $company
      * @param DriverViewModel|null $driver
@@ -45,7 +38,6 @@ class ExportData
      * @param TechFormViewModel|null $techForm
      */
     public function __construct(
-        TripTicketTemplateEnum $templateCode,
         TripTicketViewModel    $tripTicket,
         ?CompanyViewModel      $company,
         ?DriverViewModel       $driver,
@@ -54,18 +46,12 @@ class ExportData
         ?TechFormViewModel $techForm
     )
     {
-        $this->templateCode = $templateCode;
         $this->tripTicket = $tripTicket;
         $this->company = $company;
         $this->driver = $driver;
         $this->car = $car;
         $this->medicForm = $medicForm;
         $this->techForm = $techForm;
-    }
-
-    public function getTemplateCode(): TripTicketTemplateEnum
-    {
-        return $this->templateCode;
     }
 
     public function getTripTicket(): TripTicketViewModel

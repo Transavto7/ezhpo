@@ -161,7 +161,8 @@
     <script type="text/javascript">
         const tripTicketsApi = {
             massTrash: '{{ route('trip-tickets.mass-trash') }}',
-            export: '{{ route('trip-tickets.export') }}',
+            print: '{{ route('trip-tickets.print') }}',
+            massPrint: '{{ route('trip-tickets.mass-print') }}',
         }
         const data = {
             items: [],
@@ -316,32 +317,19 @@
                 updateTripTicketsControl()
             })
 
-            $('.export-excel-btn').click((event) => {
-                const btn = $(event.currentTarget)
-                const uuid = btn.attr('data-uuid')
-
+            const downloadExcelFileToPrint = (url, params) => {
                 axios({
                     method: 'post',
-                    url: tripTicketsApi.export,
-                    data: {
-                        id: uuid
-                    },
+                    url: url,
+                    data: params,
                     responseType: 'blob',
                 })
                     .then((response) => {
                         const url = window.URL.createObjectURL(new Blob([response.data]));
                         const link = document.createElement('a');
-                        const disposition = response.headers['content-disposition'];
-                        let filename = disposition
-                            ? disposition.match(/filename\*=(?:UTF-8'')?(.+?)(?:;|$)/i)?.[1]
-                            : null
-
-                        if (filename) {
-                            filename = decodeURIComponent(filename)
-                        }
 
                         link.href = url;
-                        link.setAttribute('download', filename ?? 'Путевой лист.xlsx');
+                        link.setAttribute('download', 'Путевой лист.xlsx');
 
                         document.body.appendChild(link);
                         link.click();
@@ -354,7 +342,7 @@
                             blob.text().then((text) => {
                                 try {
                                     const errorData = JSON.parse(text);
-                                    let message = errorData.message ?? '';
+                                    let message = errorData.error ?? '';
 
                                     swal.fire({
                                         title: 'При формировании файла произошла ошибка',
@@ -376,6 +364,23 @@
                             });
                         }
                     });
+            }
+
+            $('.download-excel-to-print-btn').click((event) => {
+                const btn = $(event.currentTarget)
+                const uuid = btn.attr('data-uuid')
+
+                downloadExcelFileToPrint(tripTicketsApi.print, {
+                    id: uuid
+                })
+            })
+
+            $('#mass-download-excel-to-print-btn').click(function () {
+                const tripTicketsStorage = getTripTicketsStorage()
+
+                downloadExcelFileToPrint(tripTicketsApi.massPrint, {
+                    ids: tripTicketsStorage.items
+                })
             })
 
             $('#hv-alert-error-close').click(function () {
@@ -494,8 +499,7 @@
                                 <button id="selected-items-control-btn-delete" class="btn btn-danger btn-sm"></button>
                             @endif
                             @if($permissionToPrintTripTickets)
-{{--                                <button id="trip-tickets-print-btn" class="btn btn-success btn-sm ml-2">Печать ПЛ--}}
-{{--                                </button>--}}
+                                <button id="mass-download-excel-to-print-btn" class="btn btn-success btn-sm ml-2">Печать ПЛ</button>
                             @endif
                             <button id="select-all" class="btn btn-success btn-sm ml-2">Выделить все на странице
                             </button>
@@ -655,7 +659,7 @@
                                         @endif
 
                                         @if($permissionToExport)
-                                            <a class="dropdown-item export-excel-btn"
+                                            <a class="dropdown-item download-excel-to-print-btn"
                                                data-uuid="{{ $tripTicket->uuid }}" style="cursor: pointer">
                                                 <i class="fa fa-file-excel-o"></i> Печать ПЛ
                                             </a>

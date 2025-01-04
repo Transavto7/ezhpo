@@ -2,7 +2,7 @@
 
 namespace App\Services\TripTicketExporter\ViewModels;
 
-class CompanyViewModel
+final class CompanyViewModel
 {
     /**
      * @var string
