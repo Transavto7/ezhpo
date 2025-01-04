@@ -1,26 +1,28 @@
 <?php
 
-namespace App\Services\TripTicketExporter\Mapper;
+namespace App\Services\TripTicketExporter\Mappers;
 
-use App\Enums\FormTypeEnum;
 use App\Enums\LogisticsMethodEnum;
 use App\Enums\TransportationTypeEnum;
-use App\Enums\TripTicketTemplateEnum;
-use App\Models\Forms\Form;
 use App\Models\Forms\TechForm;
 use App\Models\TripTicket;
 use App\Services\TripTicketExporter\ViewModels\CarViewModel;
 use App\Services\TripTicketExporter\ViewModels\CompanyViewModel;
 use App\Services\TripTicketExporter\ViewModels\DriverViewModel;
-use App\Services\TripTicketExporter\ViewModels\ExportData;
-use App\Services\TripTicketExporter\ViewModels\TechFormViewModel;
+use App\Services\TripTicketExporter\ViewModels\ExportedItem;
+use App\Services\TripTicketExporter\ViewModels\ExportedItem4S;
 use App\Services\TripTicketExporter\ViewModels\MedicFormViewModel;
+use App\Services\TripTicketExporter\ViewModels\TechFormViewModel;
 use App\Services\TripTicketExporter\ViewModels\TripTicketViewModel;
 use Illuminate\Support\Carbon;
 
-class TripTickerMapper
+final class ItemMapper4S implements ItemMapperInterface
 {
-    public function fromEloquent(TripTicket $tripTicket): ExportData
+    /**
+     * @param TripTicket $tripTicket
+     * @return ExportedItem4S
+     */
+    public function fromEloquent(TripTicket $tripTicket): ExportedItem
     {
         $tripTicketViewModel = new TripTicketViewModel(
             $tripTicket->ticket_number,
@@ -36,8 +38,7 @@ class TripTickerMapper
         $medicFormViewModel = $this->mapMedic($tripTicket);
         $techFormViewModel = $this->mapTechForm($tripTicket);
 
-        return new ExportData(
-            TripTicketTemplateEnum::fromString($tripTicket->template_code),
+        return new ExportedItem4S(
             $tripTicketViewModel,
             $companyViewModel,
             $driverViewModel,

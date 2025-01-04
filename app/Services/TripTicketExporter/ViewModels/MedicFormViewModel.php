@@ -4,7 +4,7 @@ namespace App\Services\TripTicketExporter\ViewModels;
 
 use Carbon\Carbon;
 
-class MedicFormViewModel
+final class MedicFormViewModel
 {
     /**
      * @var Carbon|null

@@ -1,32 +1,41 @@
 <?php
 
-namespace App\Services\TripTicketExporter\ExcelGenerator;
+namespace App\Services\TripTicketExporter\SheetWriters;
 
-use App\Services\TripTicketExporter\ViewModels\ExportData;
-use App\Services\TripTicketExporter\ViewModels\TechFormViewModel;
+use App\Services\TripTicketExporter\ViewModels\ExportedItem;
+use App\Services\TripTicketExporter\ViewModels\ExportedItem4S;
 use Carbon\Carbon;
-use Maatwebsite\Excel\Sheet;
+use PhpOffice\PhpSpreadsheet\Exception;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class TripTicket4sExport implements ExportStrategy
+final class SheetWriter4S implements SheetWriterInterface
 {
     /**
-     * @var Sheet
+     * @var Worksheet
      */
     private $sheet;
     /**
-     * @var ExportData
+     * @var ExportedItem4S
      */
     private $data;
 
-    public function getTemplate(): string
+    public function templateSheetName(): string
     {
-        return public_path('templates/trip-tickets/4s.xlsx');
+        return config('trip-ticket.print.4s.template.front.sheet');
     }
 
-    public function fillSheet(Sheet $sheet, ExportData $data): Sheet
+    /**
+     * @param Spreadsheet $spreadsheet
+     * @param ExportedItem4S $item
+     * @param int $number
+     * @return Spreadsheet
+     * @throws Exception
+     */
+    public function createSheet(Spreadsheet $spreadsheet, ExportedItem $item, int $number): Spreadsheet
     {
-        $this->sheet = $sheet;
-        $this->data = $data;
+        $this->sheet = clone $spreadsheet->getSheetByName($this->templateSheetName());
+        $this->data = $item;
 
         $this->fillIds()
             ->fillTripTicketNumber()
@@ -39,7 +48,17 @@ class TripTicket4sExport implements ExportStrategy
             ->fillMedicStamp()
             ->fillTechStamp();
 
-        return $this->sheet;
+        $title = $number.'. '.config('trip-ticket.print.4s.template.front.prefix');
+
+        if ($item->getTripTicket()->getTicketNumber()) {
+            $title .= ' (' . $item->getTripTicket()->getTicketNumber() . ')';
+        }
+
+        $this->sheet->setTitle($title);
+
+        $spreadsheet->addSheet($this->sheet);
+
+        return $spreadsheet;
     }
 
     private function fillIds(): self
@@ -179,7 +198,7 @@ class TripTicket4sExport implements ExportStrategy
         if ($this->data->getCompany()) {
             $medicStamp = $this->data->getCompany()->getName() . "\n";
         }
-        $medicStamp .= config('trip-ticket.stamps.medic');
+        $medicStamp .= config('trip-ticket.print.4s.stamps.medic');
 
         $medicForm = $this->data->getMedicForm();
         $date = $this->getFormDate($medicForm ? $medicForm->getDate() : null);
@@ -189,9 +208,9 @@ class TripTicket4sExport implements ExportStrategy
         return $this;
     }
 
-    public function fillTechStamp(): self
+    private function fillTechStamp(): self
     {
-        $techStamp = config('trip-ticket.stamps.tech');
+        $techStamp = config('trip-ticket.print.4s.stamps.tech');
 
         $techForm = $this->data->getTechForm();
         $date = $this->getFormDate($techForm ? $techForm->getDate() : null);
