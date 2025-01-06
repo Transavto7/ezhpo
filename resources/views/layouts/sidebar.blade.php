@@ -13,7 +13,8 @@
             'journal_pl_read',
             'map_report_read',
             'errors_sdpo_read',
-            'errors_sdpo_create'
+            'errors_sdpo_create',
+            'trip_tickets_read'
         );
 
     $accessToSettings = $user->access(
@@ -110,12 +111,12 @@
             </li>
         @endif
 
-{{--        @if($user->access('trip_ticket_create'))--}}
+        @if($user->access('trip_tickets_create'))
             <li>
                 <a href="{{ route('trip-tickets.create') }}" class="bg-gray"><i
                         class="icon-padnote"></i>Внести путевой лист</a>
             </li>
-{{--        @endif--}}
+        @endif
 
         @if($user->access('journal_briefing_bdd_create'))
             <li>
@@ -168,7 +169,7 @@
                         </li>
                     @endif
 
-                    @if($user->access('journal_pl_read'))
+                    @if($user->access('trip_tickets_read'))
                         <li>
                             <a href="{{ route('trip-tickets.index') }}"><i class="fa fa-book"></i>Реестр путевых листов</a>
                         </li>
