@@ -179,19 +179,21 @@
                                 </article>
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-control-label">ID автомобиля:</label>
-                                <article>
-                                    <div class="d-flex">
-                                        <input value="{{ $car_id ?? '' }}" type="number"
-                                               oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent().parent(), {{ 'false' }})"
-                                               min="6"
-                                               name="car_id"
-                                               class="MASK_ID_ELEM form-control car-input">
-                                    </div>
-                                    <p class="app-checker-prop"></p>
-                                </article>
-                            </div>
+                            @if(! $createByForms)
+                                <div class="form-group">
+                                    <label class="form-control-label">ID автомобиля:</label>
+                                    <article>
+                                        <div class="d-flex">
+                                            <input value="{{ $car_id ?? '' }}" type="number"
+                                                   oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent().parent(), {{ 'false' }})"
+                                                   min="6"
+                                                   name="car_id"
+                                                   class="MASK_ID_ELEM form-control car-input">
+                                        </div>
+                                        <p class="app-checker-prop"></p>
+                                    </article>
+                                </div>
+                            @endif
 
                             <div class="clone" id="first-clone">
                                 <div class="form-group">
