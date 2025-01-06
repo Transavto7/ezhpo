@@ -72,13 +72,20 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
     private function getMedicForms(TripTicketsAction $action, Carbon $date): array
     {
         return $this->getFormBuilder($action, $date)
-            ->select('id')
+            ->select('forms.id')
             ->join(
                 'medic_forms',
                 'medic_forms.forms_uuid',
                 '=',
                 'forms.uuid'
             )
+            ->whereRaw('
+                NOT EXISTS (
+                    SELECT 1 FROM trip_tickets
+                    WHERE forms.id = trip_tickets.medic_form_id
+                    AND trip_tickets.deleted_at is null
+                )
+            ')
             ->where('type_anketa', '=', FormTypeEnum::MEDIC)
             ->where('medic_forms.admitted', '=', 'Допущен')
             ->orderBy('medic_forms.type_view', 'desc')
@@ -90,8 +97,8 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
     {
         return $this->getFormBuilder($action, $date)
             ->select([
-                'id',
-                'car_id',
+                'forms.id',
+                'tech_forms.car_id',
             ])
             ->join(
                 'tech_forms',
@@ -99,8 +106,16 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
                 '=',
                 'forms.uuid'
             )
+            ->whereRaw('
+                NOT EXISTS (
+                    SELECT 1 FROM trip_tickets
+                    WHERE forms.id = trip_tickets.tech_form_id
+                    AND trip_tickets.deleted_at is null
+                )
+            ')
             ->where('type_anketa', '=', FormTypeEnum::TECH)
             ->where('tech_forms.point_reys_control', '=', 'Пройден')
+            ->whereNotNull('tech_forms.car_id')
             ->orderBy('tech_forms.type_view', 'desc')
             ->get()
             ->toArray();
@@ -109,22 +124,24 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
     private function getFormBuilder(TripTicketsAction $action, Carbon $date): Builder
     {
         return DB::table('forms')
-            ->where('company_id', '=', $action->getCompany()->hash_id)
-            ->where('driver_id', '=', $action->getDriver() ? $action->getDriver()->hash_id : null)
+            ->where('forms.company_id', '=', $action->getCompany()->hash_id)
+            ->where('forms.driver_id', '=', $action->getDriver() ? $action->getDriver()->hash_id : null)
             ->where(DB::raw('DATE(date)'), '=', $date)
-            ->whereNull('deleted_id')
-            ->whereNull('deleted_at');
+            ->whereNotNull('forms.driver_id')
+            ->whereNull('forms.deleted_id')
+            ->whereNull('forms.deleted_at');
     }
 
     private function existedTripTicket($medicFormId, $techFormId)
     {
         $tripTicket = DB::table('trip_tickets')
-            ->when($medicFormId, function ($query) use ($medicFormId) {
+            ->when($medicFormId, function (Builder $query) use ($medicFormId) {
                 $query->where('medic_form_id', '=', $medicFormId);
             })
-            ->when($techFormId, function ($query) use ($techFormId) {
+            ->when($techFormId, function (Builder $query) use ($techFormId) {
                 $query->where('tech_form_id', '=', $techFormId);
             })
+            ->whereNull('deleted_at')
             ->first();
 
         return $tripTicket !== null
