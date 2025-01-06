@@ -78,7 +78,7 @@
         let fieldsVisible = @json(config('fields.visible'));
         @endif
 
-        const type = $('.ankets-form').attr('anketa');
+        const type = 'trip_tickets'
 
         function setVisibleInputs() {
             $('.ankets-form input').each(function () {
@@ -392,15 +392,17 @@
 @endsection
 
 @php
-    //todo: permissions for trip tickets
-    $permissionToView = true;
-    $permissionToTrashView = true;
-    $permissionToCreate = true;
-    $permissionToDelete = true;
-    $permissionToUpdate = true;
-    $permissionToExport = true;
-    $permissionToExportPrikaz = true;
-    $permissionToPrintTripTickets = true;
+    $permissionToView = user()->access('trip_tickets_read');
+    $permissionToTrashView = user()->access('trip_tickets_trash');
+    $permissionToCreateMedicForm = user()->access('trip_tickets_create_medic_form');
+    $permissionToCreateTechForm = user()->access('trip_tickets_create_tech_form');
+    $permissionToEditMedicForm = user()->access('medic_update');
+    $permissionToEditTechForm = user()->access('tech_update');
+    $permissionToDelete = user()->access('trip_tickets_delete');
+    $permissionToUpdate = user()->access('trip_tickets_edit');
+    $permissionToExport = user()->access('trip_tickets_export');
+    $permissionToExportPrikaz = user()->access('trip_tickets_export_prikaz');
+    $permissionToPrintTripTickets = user()->access('trip_tickets_print_trip_ticket');
     $notDeletedItems = session('not_deleted_items');
 @endphp
 
@@ -601,6 +603,8 @@
                                         @endisset>
                                         @if(in_array($field->field, ['start_date', 'created_at']) && $tripTicket[$field->field])
                                             {{ date('d.m.Y', strtotime($tripTicket[$field->field])) }}
+                                        @elseif($field->field === 'period_pl' && $tripTicket[$field->field])
+                                            {{ date('m.Y', strtotime($tripTicket[$field->field])) }}
                                         @elseif($field->field === 'driver_fio' && user()->access('drivers_read'))
                                             <a href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'fio' => $tripTicket[$field->field] ]) }}">
                                                 {{ $tripTicket[$field->field] }}
@@ -639,26 +643,26 @@
                                         @if($permissionToUpdate)
                                             <a href="{{ route('trip-tickets.edit', $tripTicket->uuid) }}"
                                                class="dropdown-item"><i class="fa fa-edit"></i> Редактировать ПЛ</a>
-                                            @if($tripTicket['medic_form_id'])
-                                                <a href="{{ route('forms.get', $tripTicket->medic_form_id) }}"
-                                                   class="dropdown-item"><i class="fa fa-edit"></i> Редактировать МО</a>
-                                            @endif
-                                            @if($tripTicket['tech_form_id'])
-                                                <a href="{{ route('forms.get', $tripTicket->tech_form_id) }}"
-                                                   class="dropdown-item"><i class="fa fa-edit"></i> Редактировать ТО</a>
-                                            @endif
+                                        @endif
+                                        @if($permissionToEditMedicForm && $tripTicket['medic_form_id'])
+                                            <a href="{{ route('forms.get', $tripTicket->medic_form_id) }}"
+                                               class="dropdown-item"><i class="fa fa-edit"></i> Редактировать МО</a>
+                                        @endif
+                                        @if($permissionToEditTechForm && $tripTicket['tech_form_id'])
+                                            <a href="{{ route('forms.get', $tripTicket->tech_form_id) }}"
+                                               class="dropdown-item"><i class="fa fa-edit"></i> Редактировать ТО</a>
                                         @endif
 
-                                        @if(! $tripTicket['medic_form_id'])
+                                        @if($permissionToCreateMedicForm && ! $tripTicket['medic_form_id'])
                                             <a href="{{ route('trip-tickets.create-medic-form', ['id' => $tripTicket->uuid]) }}" class="dropdown-item">
                                                 <i class="fa fa-plus"></i> Добавить МО</a>
                                         @endif
-                                        @if(! $tripTicket['tech_form_id'])
+                                        @if($permissionToCreateTechForm && ! $tripTicket['tech_form_id'])
                                             <a href="{{ route('trip-tickets.create-tech-form', ['id' => $tripTicket->uuid]) }}" class="dropdown-item">
                                                 <i class="fa fa-plus"></i> Добавить ТО</a>
                                         @endif
 
-                                        @if($permissionToExport)
+                                        @if($permissionToPrintTripTickets)
                                             <a class="dropdown-item download-excel-to-print-btn"
                                                data-uuid="{{ $tripTicket->uuid }}" style="cursor: pointer">
                                                 <i class="fa fa-file-excel-o"></i> Печать ПЛ

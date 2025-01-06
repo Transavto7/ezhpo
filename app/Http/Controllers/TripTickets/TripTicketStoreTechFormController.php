@@ -25,7 +25,9 @@ class TripTicketStoreTechFormController extends Controller
         $data['type_anketa'] = FormTypeEnum::TECH;
         $data['company_id'] = $tripTicket->company_id;
         $data['driver_id'] = $tripTicket->driver_id ?: $request->input('driver_id');
-        $data['anketa'][0]['car_id'] = $tripTicket->car_id ?: $request->input('car_id');
+        if ($tripTicket->car_id || isset($data['anketa'][0]['car_id'])) {
+            $data['anketa'][0]['car_id'] = $tripTicket->car_id ?: $data['anketa'][0]['car_id'];
+        }
         $data['anketa'][0]['number_list_road'] = $tripTicket->ticket_number;
 
         try {
@@ -44,10 +46,11 @@ class TripTicketStoreTechFormController extends Controller
 
                 $ticketHandler->handle(new UpdateTripTicketFormAction(
                     $tripTicket,
+                    new \DateTimeImmutable($data['anketa'][0]['date']),
                     $data['type_anketa'],
                     $responseData['created'][0],
                     $request->input('driver_id'),
-                    array_key_exists('car_id', $data['anketa'][0]) ? $data['anketa'][0]['car_id'] : null,
+                    $data['anketa'][0]['car_id'] ?? null
                 ));
             }
 

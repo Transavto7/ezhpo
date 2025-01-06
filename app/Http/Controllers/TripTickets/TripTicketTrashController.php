@@ -28,6 +28,7 @@ class TripTicketTrashController extends Controller
             DB::rollBack();
 
             session()->flash('not_deleted_items', [$uuid]);
+            session()->flash('error', $exception->getMessage());
         }
 
         return redirect(url()->previous());

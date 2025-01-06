@@ -54,6 +54,68 @@
 
                 clone.find('.trip-ticket-delete').html('<a href="" onclick="' + randId + '.remove(); return false;" class="text-danger">Удалить</a>')
             })
+
+            $('#trip-ticket-print-btn').click(function () {
+                const spinner = $('.spinner-btn')
+                const created = JSON.parse('@json($created)')
+                const ids = created.map(item => item.uuid)
+
+                spinner.attr('style', '')
+                $(this).attr('style', 'display:none')
+
+                axios({
+                    method: 'post',
+                    url: '{{ route('trip-tickets.mass-print') }}',
+                    data: {
+                        ids: ids,
+                    },
+                    responseType: 'blob',
+                })
+                    .then((response) => {
+                        const url = window.URL.createObjectURL(new Blob([response.data]));
+                        const link = document.createElement('a');
+
+                        link.href = url;
+                        link.setAttribute('download', 'Путевой лист.xlsx');
+
+                        document.body.appendChild(link);
+                        link.click();
+                        link.remove();
+                    })
+                    .catch((error) => {
+                        if (error.response && error.response.data instanceof Blob) {
+                            const blob = error.response.data;
+
+                            blob.text().then((text) => {
+                                try {
+                                    const errorData = JSON.parse(text);
+                                    let message = errorData.error ?? '';
+
+                                    swal.fire({
+                                        title: 'При формировании файла произошла ошибка',
+                                        text: message,
+                                        icon: 'error'
+                                    });
+                                } catch (e) {
+                                    swal.fire({
+                                        title: 'При формировании файла произошла ошибка',
+                                        text: text,
+                                        icon: 'error'
+                                    });
+                                }
+                            });
+                        } else {
+                            swal.fire({
+                                title: 'При формировании файла произошла ошибка',
+                                icon: 'error'
+                            });
+                        }
+                    })
+                    .finally(() => {
+                        spinner.attr('style', 'display:none')
+                        $(this).attr('style', '')
+                    })
+            })
         })
     </script>
 @endsection
@@ -85,39 +147,48 @@
                         @endforeach
 
                         @if(count($created ?? []))
+                            @if(count($created ?? []) <= 15)
+                                <div class="row">
+                                    <div class="col-md-12 d-flex justify-content-center">
+                                        <button type="button" id="trip-ticket-print-btn" class="btn btn-sm btn-success">
+                                            <i class="fa fa-print"></i> Распечатать путевые листы
+                                        </button>
+                                        <button type="button" class="btn btn-success spinner-btn" style="display: none" disabled>
+                                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                                            Загрузка...
+                                        </button>
+                                    </div>
+                                </div>
+                            @endif
                             <div class="row">
                                 @foreach($created ?? [] as $tripTicket)
                                     <div class="col-md-12">
                                         <div class="card p-2 text-xsmall">
                                             <b>Путевой лист успешно создан!</b>
-                                            <br/> Номер путевого листа: {{ $tripTicket->ticket_number }}
+                                            <span>Номер путевого листа: <b>{{ $tripTicket->ticket_number }}</b></span>
 
                                             @if($tripTicket->company && $tripTicket->company->name)
-                                                <br/>
-                                                <b>Компания: {{ $tripTicket->company->name }}</b>
+                                                <span>Компания: <b>{{ $tripTicket->company->name }}</b></span>
                                             @endif
 
                                             @if($tripTicket->driver && $tripTicket->driver->fio)
-                                                <br/>
-                                                <b>Водитель: {{ $tripTicket->driver->fio }}</b>
+                                                <span>Водитель: <b>{{ $tripTicket->driver->fio }}</b></span>
                                             @endif
 
                                             @if($tripTicket->car && $tripTicket->car->gos_number)
-                                                <br/>
-                                                <b>Госномер автомобиля: {{ $tripTicket->car->gos_number }}</b>
+                                                <span>Госномер автомобиля: <b>{{ $tripTicket->car->gos_number }}</b></span>
                                             @endif
 
                                             @if($tripTicket->start_date)
-                                                <div>
-                                                    <i>Дата начала действия:
-                                                        <br/><b>{{ Carbon::parse($tripTicket->start_date)->format('d.m.Y') }}</b></i>
-                                                </div>
+                                                <span><i>Дата начала действия:<b> {{ Carbon::parse($tripTicket->start_date)->format('d.m.Y') }}</b></i></span>
+                                            @endif
+
+                                            @if($tripTicket->start_date === null && $tripTicket->period_pl)
+                                                <span><i>Период выдачи ПЛ:<b> {{ Carbon::parse($tripTicket->period_pl)->format('m.Y') }}</b></i></span>
                                             @endif
 
                                             @if($tripTicket->validity_period)
-                                                <div>
-                                                    <i>Срок действия:<b> {{ $tripTicket->validity_period }}</b></i>
-                                                </div>
+                                                <span><i>Срок действия:<b> {{ $tripTicket->validity_period }}</b></i></span>
                                             @endif
                                         </div>
                                     </div>
@@ -179,19 +250,21 @@
                                 </article>
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-control-label">ID автомобиля:</label>
-                                <article>
-                                    <div class="d-flex">
-                                        <input value="{{ $car_id ?? '' }}" type="number"
-                                               oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent().parent(), {{ 'false' }})"
-                                               min="6"
-                                               name="car_id"
-                                               class="MASK_ID_ELEM form-control car-input">
-                                    </div>
-                                    <p class="app-checker-prop"></p>
-                                </article>
-                            </div>
+                            @if(! $createByForms)
+                                <div class="form-group">
+                                    <label class="form-control-label">ID автомобиля:</label>
+                                    <article>
+                                        <div class="d-flex">
+                                            <input value="{{ $car_id ?? '' }}" type="number"
+                                                   oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent().parent(), {{ 'false' }})"
+                                                   min="6"
+                                                   name="car_id"
+                                                   class="MASK_ID_ELEM form-control car-input">
+                                        </div>
+                                        <p class="app-checker-prop"></p>
+                                    </article>
+                                </div>
+                            @endif
 
                             <div class="clone" id="first-clone">
                                 <div class="form-group">
@@ -205,11 +278,12 @@
                                     <article>
                                         <input min="1970-01-01"
                                                max="2100-01-01"
+                                               oninput="$(this).closest('.clone').find('.period_pl').prop('required', !(this.value.length > 0))"
                                                type="date"
                                                value="{{ $default_current_date ?? '' }}"
-                                               class="form-control"
+                                               class="form-control date_from"
+                                               required
                                                @if($createByForms)
-                                                   required
                                                    name="date_from"
                                                @else
                                                    name="trip_ticket[0][date_from]"
@@ -230,6 +304,16 @@
                                                    name="date_to"
                                                    class="form-control"
                                                    required>
+                                        </article>
+                                    </div>
+                                @else
+                                    <div class="form-group">
+                                        <label class="form-control-label">Период выдачи ПЛ:</label>
+                                        <article>
+                                            <input type="month"
+                                                   oninput="$(this).closest('.clone').find('.date_from').prop('required', !(this.value.length > 0))"
+                                                   name="trip_ticket[0][period_pl]"
+                                                   class="form-control period_pl">
                                         </article>
                                     </div>
                                 @endif

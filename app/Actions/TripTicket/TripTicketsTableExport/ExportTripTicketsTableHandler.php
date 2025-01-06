@@ -33,7 +33,12 @@ class ExportTripTicketsTableHandler implements FromView, WithBatchInserts, WithC
             $tripTicket->logistics_method = $logisticsMethods[$tripTicket->logistics_method];
             $tripTicket->transportation_type = $transportationTypes[$tripTicket->transportation_type];
             $tripTicket->template_code = $templateCodes[$tripTicket->template_code];
-            $tripTicket->start_date = Carbon::parse($tripTicket->start_date)->format('d.m.Y');
+            $tripTicket->start_date = $tripTicket->start_date
+                ? Carbon::parse($tripTicket->start_date)->format('d.m.Y')
+                : null;
+            $tripTicket->period_pl = $tripTicket->period_pl
+                ? Carbon::parse($tripTicket->period_pl)->format('m.Y')
+                : null;
         }
 
         return view('home-export', [

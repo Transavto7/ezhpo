@@ -3,6 +3,7 @@
 namespace App\Actions\TripTicket\TripTicketsQuery;
 
 use App\Models\TripTicket;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
 final class TripTicketsQueryHandler
@@ -20,6 +21,7 @@ final class TripTicketsQueryHandler
             'trip_tickets.uuid',
             'trip_tickets.ticket_number',
             'trip_tickets.start_date',
+            'trip_tickets.period_pl',
             'trip_tickets.validity_period',
             'trip_tickets.medic_form_id',
             'trip_tickets.tech_form_id',
@@ -52,6 +54,13 @@ final class TripTicketsQueryHandler
             )
             ->orderBy($action->getOrderKey(), $action->getOrderBy());
 
+        $dateFrom = isset($action->getFilterParams()['date_from'])
+            ? Carbon::parse($action->getFilterParams()['date_from'])
+            : Carbon::now()->subYears(10);
+        $dateTo = isset($action->getFilterParams()['date_to'])
+            ? Carbon::parse($action->getFilterParams()['date_to'])
+            : Carbon::now()->addYears(10);
+
         if (count($action->getFilterParams()) > 0 && $action->isFilterActivated()) {
             foreach ($action->getFilterParams() as $filterKey => $filterValue) {
                 if ($filterValue === null || in_array($filterKey, ['date_from', 'date_to'])) {
@@ -60,19 +69,20 @@ final class TripTicketsQueryHandler
 
                 $tripTickets->where("trip_tickets.$filterKey", '=', $filterValue);
             }
-
-            if ($action->getFilterParams()['date_from'] || $action->getFilterParams()['date_to']) {
-                $tripTickets = $tripTickets
-                    ->whereBetween('start_date', [$action->getFilterParams()['date_from'], $action->getFilterParams()['date_to']]);
-            }
-        } else {
-            $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
-            $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
-
-            $tripTickets = $tripTickets
-                ->whereBetween('start_date', [$date_from_filter, $date_to_filter]);
         }
 
-        return $tripTickets;
+        return $tripTickets->where(function ($query) use ($dateFrom, $dateTo) {
+            $query->where(function ($subQuery) use ($dateFrom, $dateTo) {
+                $subQuery->whereNotNull('trip_tickets.start_date')
+                    ->whereBetween('trip_tickets.start_date', [$dateFrom, $dateTo]);
+            })->orWhere(function ($subQuery) use ($dateFrom, $dateTo) {
+                $subQuery
+                    ->whereNull('trip_tickets.start_date')
+                    ->whereBetween('trip_tickets.period_pl', [
+                        $dateFrom->format('Y-m'),
+                        $dateTo->format('Y-m')
+                    ]);
+            });
+        });
     }
 }
