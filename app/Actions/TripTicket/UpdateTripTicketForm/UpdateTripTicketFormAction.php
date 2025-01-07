@@ -4,6 +4,7 @@ namespace App\Actions\TripTicket\UpdateTripTicketForm;
 
 use App\Models\Forms\Form;
 use App\Models\TripTicket;
+use DateTimeImmutable;
 
 final class UpdateTripTicketFormAction
 {
@@ -33,15 +34,22 @@ final class UpdateTripTicketFormAction
     private $carId;
 
     /**
+     * @var DateTimeImmutable|null
+     */
+    private $startDate;
+
+    /**
      * @param TripTicket $tripTicket
+     * @param DateTimeImmutable|null $startDate
      * @param string $formType
      * @param Form $form
      * @param string|null $driverId
      * @param string|null $carId
      */
-    public function __construct(TripTicket $tripTicket, string $formType, Form $form, ?string $driverId, ?string $carId = null)
+    public function __construct(TripTicket $tripTicket, ?DateTimeImmutable $startDate, string $formType, Form $form, ?string $driverId, ?string $carId = null)
     {
         $this->tripTicket = $tripTicket;
+        $this->startDate = $startDate;
         $this->formType = $formType;
         $this->form = $form;
         $this->driverId = $driverId;
@@ -56,6 +64,11 @@ final class UpdateTripTicketFormAction
     public function getFormType(): string
     {
         return $this->formType;
+    }
+
+    public function getStartDate(): ?DateTimeImmutable
+    {
+        return $this->startDate;
     }
 
     public function getForm(): Form

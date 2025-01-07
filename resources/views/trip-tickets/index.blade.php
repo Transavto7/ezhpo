@@ -603,6 +603,8 @@
                                         @endisset>
                                         @if(in_array($field->field, ['start_date', 'created_at']) && $tripTicket[$field->field])
                                             {{ date('d.m.Y', strtotime($tripTicket[$field->field])) }}
+                                        @elseif($field->field === 'period_pl' && $tripTicket[$field->field])
+                                            {{ date('m.Y', strtotime($tripTicket[$field->field])) }}
                                         @elseif($field->field === 'driver_fio' && user()->access('drivers_read'))
                                             <a href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'fio' => $tripTicket[$field->field] ]) }}">
                                                 {{ $tripTicket[$field->field] }}

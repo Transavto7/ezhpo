@@ -112,12 +112,28 @@
                             <div class="form-group">
                                 <label class="form-control-label">Дата начала действия:</label>
                                 <article>
-                                    <input min="1970-01-01"
-                                           max="2100-01-01"
-                                           type="date"
+                                    <input type="date"
+                                           @if($tripTicket->period_pl)
+                                               min="{{ Carbon::parse($tripTicket->period_pl)->startOfMonth()->format('Y-m-d') }}"
+                                               max="{{ Carbon::parse($tripTicket->period_pl)->endOfMonth()->format('Y-m-d') }}"
+                                           @else
+                                               min="1970-01-01"
+                                               max="2100-01-01"
+                                           @endif
                                            value="{{ $tripTicket->start_date }}"
                                            name="start_date"
                                            class="form-control">
+                                </article>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-control-label">Период выдачи ПЛ:</label>
+                                <article>
+                                    <input type="month"
+                                           value="{{ $tripTicket->period_pl }}"
+                                           disabled
+                                           name="period_pl"
+                                           class="form-control period_pl">
                                 </article>
                             </div>
 

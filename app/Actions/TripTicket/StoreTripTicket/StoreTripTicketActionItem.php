@@ -14,6 +14,11 @@ final class StoreTripTicketActionItem
     private $startDate;
 
     /**
+     * @var string|null
+     */
+    private $periodPl;
+
+    /**
      * @var integer
      */
     private $validityPeriod;
@@ -40,6 +45,7 @@ final class StoreTripTicketActionItem
 
     /**
      * @param string|null $startDate
+     * @param string|null $periodPl
      * @param int $validityPeriod
      * @param string|null $ticketNumber
      * @param LogisticsMethodEnum $logisticsMethod
@@ -48,6 +54,7 @@ final class StoreTripTicketActionItem
      */
     public function __construct(
         ?string $startDate,
+        ?string $periodPl,
         int $validityPeriod,
         ?string $ticketNumber,
         LogisticsMethodEnum $logisticsMethod,
@@ -55,6 +62,7 @@ final class StoreTripTicketActionItem
         TripTicketTemplateEnum $templateCode
     ) {
         $this->startDate = $startDate;
+        $this->periodPl = $periodPl;
         $this->validityPeriod = $validityPeriod;
         $this->ticketNumber = $ticketNumber;
         $this->logisticsMethod = $logisticsMethod;
@@ -65,6 +73,11 @@ final class StoreTripTicketActionItem
     public function getStartDate(): ?string
     {
         return $this->startDate;
+    }
+
+    public function getPeriodPl(): ?string
+    {
+        return $this->periodPl;
     }
 
     public function getValidityPeriod(): int

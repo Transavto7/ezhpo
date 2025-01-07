@@ -32,6 +32,10 @@ final class UpdateTripTicketFormHandler
             $updates['car_id'] = $action->getCarId();
         }
 
+        if ($action->getStartDate()) {
+            $updates['start_date'] = $action->getStartDate();
+        }
+
         $action->getTripTicket()->update($updates);
 
         return $action->getTripTicket();

@@ -207,11 +207,12 @@
                                     <article>
                                         <input min="1970-01-01"
                                                max="2100-01-01"
+                                               oninput="$(this).closest('.clone').find('.period_pl').prop('required', !(this.value.length > 0))"
                                                type="date"
                                                value="{{ $default_current_date ?? '' }}"
-                                               class="form-control"
+                                               class="form-control date_from"
+                                               required
                                                @if($createByForms)
-                                                   required
                                                    name="date_from"
                                                @else
                                                    name="trip_ticket[0][date_from]"
@@ -232,6 +233,16 @@
                                                    name="date_to"
                                                    class="form-control"
                                                    required>
+                                        </article>
+                                    </div>
+                                @else
+                                    <div class="form-group">
+                                        <label class="form-control-label">Период выдачи ПЛ:</label>
+                                        <article>
+                                            <input type="month"
+                                                   oninput="$(this).closest('.clone').find('.date_from').prop('required', !(this.value.length > 0))"
+                                                   name="trip_ticket[0][period_pl]"
+                                                   class="form-control period_pl">
                                         </article>
                                     </div>
                                 @endif

@@ -23,6 +23,11 @@ final class StoreTripTicketHandler extends TripTicketNumberGenerator
             if ($item->getTicketNumber() && $this->findSimilar($item->getTicketNumber(), $action->getCompanyId())) {
                 throw new Exception("Путевой лист с номером {$item->getTicketNumber()} уже существует");
             }
+
+            if (! $item->getStartDate() && $item->getPeriodPl() && ! $this->checkPeriod($item->getPeriodPl())) {
+                throw new Exception("Неверный формат периода ПЛ {$item->getPeriodPl()}");
+            }
+
             $id = EntityId::next()->getId();
 
             $tripTickets[] = TripTicket::create([
@@ -30,6 +35,7 @@ final class StoreTripTicketHandler extends TripTicketNumberGenerator
                 'ticket_number' => $item->getTicketNumber() ?: $this->getTicketNumber($id),
                 'company_id' => $action->getCompanyId(),
                 'start_date' => $item->getStartDate(),
+                'period_pl' => $item->getStartDate() ? null : $item->getPeriodPl(),
                 'validity_period' => $item->getValidityPeriod(),
                 'driver_id' => $action->getDriverId(),
                 'car_id' => $action->getCarId(),
@@ -52,5 +58,15 @@ final class StoreTripTicketHandler extends TripTicketNumberGenerator
             ->first();
 
         return $similar !== null;
+    }
+
+    private function checkPeriod(string $periodPl): bool
+    {
+        if (preg_match('/^\d{4}-\d{2}$/', $periodPl) !== 1) {
+            return false;
+        }
+
+        $date = Carbon::createFromFormat('Y-m', $periodPl);
+        return $date && $date->format('Y-m') === $periodPl;
     }
 }
