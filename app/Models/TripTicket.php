@@ -22,6 +22,7 @@ class TripTicket extends Model
         'created_at' => 'Дата оформления',
         'company_id' => 'Компания',
         'start_date' => 'Дата начала действия',
+        'period_pl' => 'Период выдачи ПЛ',
         'validity_period' => 'Дней действует',
         'medic_form_id' => 'ID медосмотра',
         'driver_id' => 'ФИО водителя',
@@ -37,6 +38,7 @@ class TripTicket extends Model
         'created_at' => 'Дата оформления',
         'company_name' => 'Компания',
         'start_date' => 'Дата выдачи',
+        'period_pl' => 'Период выдачи ПЛ',
         'validity_period' => 'Дней действует',
         'medic_form_id' => 'ID медосмотра',
         'driver_name' => 'ФИО водителя',
@@ -80,6 +82,7 @@ class TripTicket extends Model
         'transportation_type',
         'template_code',
         'user_id',
+        'period_pl',
     ];
 
     public function driver(): BelongsTo

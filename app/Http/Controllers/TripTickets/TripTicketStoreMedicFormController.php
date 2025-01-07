@@ -42,6 +42,7 @@ class TripTicketStoreMedicFormController extends Controller
 
                 $ticketHandler->handle(new UpdateTripTicketFormAction(
                     $tripTicket,
+                    new \DateTimeImmutable($data['anketa'][0]['date']),
                     $data['type_anketa'],
                     $responseData['created'][0],
                     $request->input('driver_id')
