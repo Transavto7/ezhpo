@@ -5,6 +5,7 @@ namespace App\Models\Forms;
 use App\Company;
 use App\Driver;
 use App\Enums\FormTypeEnum;
+use App\Models\TripTicket;
 use App\Point;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
@@ -108,6 +109,16 @@ class Form extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'company_id', 'hash_id');
+    }
+
+    public function tripTicketMedic(): HasOne
+    {
+        return $this->hasOne(TripTicket::class, 'medic_form_id', 'id');
+    }
+
+    public function tripTicketTech(): HasOne
+    {
+        return $this->hasOne(TripTicket::class, 'tech_form_id', 'id');
     }
 
     public static function pakQueueCount(User $user): int
