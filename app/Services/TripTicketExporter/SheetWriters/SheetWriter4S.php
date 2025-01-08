@@ -91,15 +91,24 @@ final class SheetWriter4S implements SheetWriterInterface
 
     private function fillPeriod(): self
     {
-        $period = $this->data->getTripTicket()->getValidityPeriod();
-        $startDate = $this->data->getTripTicket()->getStartDate();
-        $endDate = $startDate->copy()->addDays($period);
+        if ($this->data->getTripTicket()->getStartDate()) {
+            $period = $this->data->getTripTicket()->getValidityPeriod();
+            $startDate = $this->data->getTripTicket()->getStartDate();
+            $endDate = $startDate->copy()->addDays($period);
 
-        $this->sheet->setCellValue('AV5', $startDate->day);
+            $this->sheet->setCellValue('AV5', $startDate->day);
+            $this->sheet->setCellValue('CT5', $endDate->day);
+        } else {
+            $startDate = $this->data->getTripTicket()->getPeriodPl();
+            $endDate = $startDate;
+
+            $this->sheet->setCellValue('AV5', null);
+            $this->sheet->setCellValue('CT5', null);
+        }
+
         $this->sheet->setCellValue('BF5', trans('date.months_genitive.' . $startDate->month));
         $this->sheet->setCellValue('CB5', $startDate->year);
 
-        $this->sheet->setCellValue('CT5', $endDate->day);
         $this->sheet->setCellValue('DC5', trans('date.months_genitive.' . $endDate->month));
         $this->sheet->setCellValue('DX5', $endDate->year);
 

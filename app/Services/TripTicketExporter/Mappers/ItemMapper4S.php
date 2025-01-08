@@ -26,7 +26,12 @@ final class ItemMapper4S implements ItemMapperInterface
     {
         $tripTicketViewModel = new TripTicketViewModel(
             $tripTicket->ticket_number,
-            Carbon::parse($tripTicket->start_date),
+            $tripTicket->start_date
+                ? Carbon::parse($tripTicket->start_date)
+                : null,
+            $tripTicket->period_pl
+                ? Carbon::parse($tripTicket->period_pl)
+                : null,
             $tripTicket->validity_period,
             LogisticsMethodEnum::fromString($tripTicket->logistics_method),
             TransportationTypeEnum::fromString($tripTicket->transportation_type)

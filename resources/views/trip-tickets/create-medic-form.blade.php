@@ -108,7 +108,7 @@
                                         <input oninput="changeFormRequire(this, 'pl-period')"
                                                required
                                                value="{{ $tripTicket->start_date ? $tripTicket->start_date.'T00:00' : null }}"
-                                               @if($tripTicket->period_pl)
+                                               @if($tripTicket->period_pl && $tripTicket->start_date === null)
                                                    min="{{ Carbon::parse($tripTicket->period_pl)->startOfMonth()->format('Y-m-d\TH:i') }}"
                                                    max="{{ Carbon::parse($tripTicket->period_pl)->endOfMonth()->endOfDay()->format('Y-m-d\TH:i') }}"
                                                @else
