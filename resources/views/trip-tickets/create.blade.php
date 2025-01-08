@@ -109,8 +109,13 @@
 
                                             @if($tripTicket->start_date)
                                                 <div>
-                                                    <i>Дата начала действия:
-                                                        <br/><b>{{ Carbon::parse($tripTicket->start_date)->format('d.m.Y') }}</b></i>
+                                                    <i>Дата начала действия:<b>{{ Carbon::parse($tripTicket->start_date)->format('d.m.Y') }}</b></i>
+                                                </div>
+                                            @endif
+
+                                            @if($tripTicket->period_pl)
+                                                <div>
+                                                    <i>Период выдачи ПЛ:<b>{{ Carbon::parse($tripTicket->period_pl)->format('m.Y') }}</b></i>
                                                 </div>
                                             @endif
 
