@@ -444,6 +444,7 @@ return [
             'created_at' => true,
             'company_name' => true,
             'start_date' => true,
+            'period_pl' => true,
             'validity_period' => true,
             'medic_form_id' => true,
             'driver_name' => true,
