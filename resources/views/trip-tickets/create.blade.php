@@ -54,6 +54,68 @@
 
                 clone.find('.trip-ticket-delete').html('<a href="" onclick="' + randId + '.remove(); return false;" class="text-danger">Удалить</a>')
             })
+
+            $('#trip-ticket-print-btn').click(function () {
+                const spinner = $('.spinner-btn')
+                const created = JSON.parse('@json($created)')
+                const ids = created.map(item => item.uuid)
+
+                spinner.attr('style', '')
+                $(this).attr('style', 'display:none')
+
+                axios({
+                    method: 'post',
+                    url: '{{ route('trip-tickets.mass-print') }}',
+                    data: {
+                        ids: ids,
+                    },
+                    responseType: 'blob',
+                })
+                    .then((response) => {
+                        const url = window.URL.createObjectURL(new Blob([response.data]));
+                        const link = document.createElement('a');
+
+                        link.href = url;
+                        link.setAttribute('download', 'Путевой лист.xlsx');
+
+                        document.body.appendChild(link);
+                        link.click();
+                        link.remove();
+                    })
+                    .catch((error) => {
+                        if (error.response && error.response.data instanceof Blob) {
+                            const blob = error.response.data;
+
+                            blob.text().then((text) => {
+                                try {
+                                    const errorData = JSON.parse(text);
+                                    let message = errorData.error ?? '';
+
+                                    swal.fire({
+                                        title: 'При формировании файла произошла ошибка',
+                                        text: message,
+                                        icon: 'error'
+                                    });
+                                } catch (e) {
+                                    swal.fire({
+                                        title: 'При формировании файла произошла ошибка',
+                                        text: text,
+                                        icon: 'error'
+                                    });
+                                }
+                            });
+                        } else {
+                            swal.fire({
+                                title: 'При формировании файла произошла ошибка',
+                                icon: 'error'
+                            });
+                        }
+                    })
+                    .finally(() => {
+                        spinner.attr('style', 'display:none')
+                        $(this).attr('style', '')
+                    })
+            })
         })
     </script>
 @endsection
@@ -85,44 +147,48 @@
                         @endforeach
 
                         @if(count($created ?? []))
+                            @if(count($created ?? []) <= 15)
+                                <div class="row">
+                                    <div class="col-md-12 d-flex justify-content-center">
+                                        <button type="button" id="trip-ticket-print-btn" class="btn btn-sm btn-success">
+                                            <i class="fa fa-print"></i> Распечатать путевые листы
+                                        </button>
+                                        <button type="button" class="btn btn-success spinner-btn" style="display: none" disabled>
+                                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                                            Загрузка...
+                                        </button>
+                                    </div>
+                                </div>
+                            @endif
                             <div class="row">
                                 @foreach($created ?? [] as $tripTicket)
                                     <div class="col-md-12">
                                         <div class="card p-2 text-xsmall">
                                             <b>Путевой лист успешно создан!</b>
-                                            <br/> Номер путевого листа: {{ $tripTicket->ticket_number }}
+                                            <span>Номер путевого листа: <b>{{ $tripTicket->ticket_number }}</b></span>
 
                                             @if($tripTicket->company && $tripTicket->company->name)
-                                                <br/>
-                                                <b>Компания: {{ $tripTicket->company->name }}</b>
+                                                <span>Компания: <b>{{ $tripTicket->company->name }}</b></span>
                                             @endif
 
                                             @if($tripTicket->driver && $tripTicket->driver->fio)
-                                                <br/>
-                                                <b>Водитель: {{ $tripTicket->driver->fio }}</b>
+                                                <span>Водитель: <b>{{ $tripTicket->driver->fio }}</b></span>
                                             @endif
 
                                             @if($tripTicket->car && $tripTicket->car->gos_number)
-                                                <br/>
-                                                <b>Госномер автомобиля: {{ $tripTicket->car->gos_number }}</b>
+                                                <span>Госномер автомобиля: <b>{{ $tripTicket->car->gos_number }}</b></span>
                                             @endif
 
                                             @if($tripTicket->start_date)
-                                                <div>
-                                                    <i>Дата начала действия:<b>{{ Carbon::parse($tripTicket->start_date)->format('d.m.Y') }}</b></i>
-                                                </div>
+                                                <span><i>Дата начала действия:<b> {{ Carbon::parse($tripTicket->start_date)->format('d.m.Y') }}</b></i></span>
                                             @endif
 
-                                            @if($tripTicket->period_pl)
-                                                <div>
-                                                    <i>Период выдачи ПЛ:<b>{{ Carbon::parse($tripTicket->period_pl)->format('m.Y') }}</b></i>
-                                                </div>
+                                            @if($tripTicket->start_date === null && $tripTicket->period_pl)
+                                                <span><i>Период выдачи ПЛ:<b> {{ Carbon::parse($tripTicket->period_pl)->format('m.Y') }}</b></i></span>
                                             @endif
 
                                             @if($tripTicket->validity_period)
-                                                <div>
-                                                    <i>Срок действия:<b> {{ $tripTicket->validity_period }}</b></i>
-                                                </div>
+                                                <span><i>Срок действия:<b> {{ $tripTicket->validity_period }}</b></i></span>
                                             @endif
                                         </div>
                                     </div>

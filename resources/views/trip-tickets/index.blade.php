@@ -78,7 +78,7 @@
         let fieldsVisible = @json(config('fields.visible'));
         @endif
 
-        const type = $('.ankets-form').attr('anketa');
+        const type = 'trip_tickets'
 
         function setVisibleInputs() {
             $('.ankets-form input').each(function () {

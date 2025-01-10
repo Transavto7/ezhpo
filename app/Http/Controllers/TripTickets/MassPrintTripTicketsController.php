@@ -20,7 +20,7 @@ final class MassPrintTripTicketsController extends Controller
                 return EntityId::fromString($id);
             }, $request->input('ids'));
 
-            if (count($ids) > 15) {
+            if (count($ids) >= 15) {
                 throw new DomainException('Количество ПЛ для печати не должно превышать 15');
             }
 
