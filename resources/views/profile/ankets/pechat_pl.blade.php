@@ -59,6 +59,17 @@
                 </article>
             </div>
 
+            <div class="form-group">
+                <label for="period_pl" class="form-control-label">Период действия ПЛ:</label>
+                <input
+                    class="form-control pl-period"
+                    name="anketa[0][period_pl]"
+                    required
+                    type="month"
+                    value="{{ $period_pl ?? '' }}"
+                />
+            </div>
+
             <div class="anketa-delete"></div>
         </div>
     </div>

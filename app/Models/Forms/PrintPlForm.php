@@ -17,6 +17,7 @@ class PrintPlForm extends Model
         'forms_uuid',
 
         'count_pl',
+        'period_pl',
     ];
 
     public function form(): BelongsTo
