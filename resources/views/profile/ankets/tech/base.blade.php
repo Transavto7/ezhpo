@@ -1,10 +1,14 @@
+@php
+    /** @var $actions_policy \Src\Forms\ActionsPolicy\Contracts\PolicyInterface */
+@endphp
+
 <div class="form-group">
     <label class="form-control-label">ID водителя:</label>
     <article>
         <div class="d-flex">
             <input required
                    value="{{ $driver_id ?? '' }}"
-                   @if(!empty($driver_id)) disabled @endif
+                   @disabled($actions_policy->isAttributeDisabled('driver_id'))
                    type="number"
                    oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent().parent(), {{ 'false' }})"
                    min="6"
@@ -23,7 +27,7 @@
             <input min="1900-02-20T20:20"
                    max="2999-02-20T20:20"
                    type="datetime-local"
-                   @if(!empty($date)) disabled @endif
+                   @disabled($actions_policy->isAttributeDisabled('date'))
                    value="{{ $default_current_date ?? '' }}"
                    name="anketa[0][date]"
                    class="form-control inspection-date">
@@ -36,7 +40,7 @@
             <div class="d-flex">
                 <input required
                        value="{{ $car_id ?? '' }}"
-                       @if(!empty($car_id)) disabled @endif
+                       @disabled($actions_policy->isAttributeDisabled('car_id'))
                        type="number"
                        oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent().parent(), {{ 'false' }})"
                        min="6"
@@ -52,7 +56,7 @@
         <label class="form-control-label">Тип осмотра:</label>
         <article>
             <select name="anketa[0][type_view]"
-                    @if(!empty($type_view)) disabled @endif
+                    @disabled($actions_policy->isAttributeDisabled('type_view'))
                     required
                     class="form-control type-view">
                 <option value="Предрейсовый/Предсменный"

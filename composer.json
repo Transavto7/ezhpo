@@ -21,7 +21,9 @@
         "maatwebsite/excel": "^3.1",
         "ramsey/uuid": "^3.9",
         "sentry/sentry-laravel": "^2.14",
-        "spatie/laravel-permission": "^3.0"
+        "spatie/laravel-permission": "^3.0",
+        "symfony/cache": "^5.4",
+        "unleash/client": "^1.13"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
