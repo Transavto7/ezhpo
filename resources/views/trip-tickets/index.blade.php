@@ -122,7 +122,6 @@
 
             $('.ankets-form input').change(e => {
                 let el = $(e.target)
-                const type = el.parents('.ankets-form').attr('anketa');
                 const id = el.attr('name');
 
                 if (!fieldsVisible[type]) {

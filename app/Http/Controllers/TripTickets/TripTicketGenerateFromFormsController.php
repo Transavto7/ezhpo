@@ -4,7 +4,6 @@ namespace App\Http\Controllers\TripTickets;
 
 use App\Actions\TripTicket\CreateTripTickets\TripTicketsAction;
 use App\Actions\TripTicket\CreateTripTickets\TripTicketsHandler;
-use App\Actions\TripTicket\CreateTripTickets\TripTicketsHandlerV2;
 use App\Company;
 use App\Driver;
 use App\Enums\LogisticsMethodEnum;
@@ -18,7 +17,7 @@ use Throwable;
 
 class TripTicketGenerateFromFormsController extends Controller
 {
-    public function __invoke(Request $request, TripTicketsHandlerV2 $handler)
+    public function __invoke(Request $request, TripTicketsHandler $handler)
     {
         if (! $request->has('date_from') || ! $request->has('date_to')) {
             return back()->with(['error' => 'Не выбран период ПЛ'])->withInput();

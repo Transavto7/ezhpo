@@ -70,7 +70,9 @@ class StoreTripTicketController extends Controller
     {
         return array_map(function (array $item) {
             return new StoreTripTicketActionItem(
-                $item['date_from'],
+                $item['date_from']
+                    ? new \DateTimeImmutable($item['date_from'])
+                    : null,
                 $item['period_pl'],
                 $item['validity_period'] ?: 1,
                 $item['ticket_number'],

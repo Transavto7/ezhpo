@@ -5,11 +5,12 @@ namespace App\Actions\TripTicket\StoreTripTicket;
 use App\Enums\LogisticsMethodEnum;
 use App\Enums\TransportationTypeEnum;
 use App\Enums\TripTicketTemplateEnum;
+use DateTimeImmutable;
 
 final class StoreTripTicketActionItem
 {
     /**
-     * @var string|null
+     * @var DateTimeImmutable|null
      */
     private $startDate;
 
@@ -44,7 +45,7 @@ final class StoreTripTicketActionItem
     private $templateCode;
 
     /**
-     * @param string|null $startDate
+     * @param DateTimeImmutable|null $startDate
      * @param string|null $periodPl
      * @param int $validityPeriod
      * @param string|null $ticketNumber
@@ -53,7 +54,7 @@ final class StoreTripTicketActionItem
      * @param TripTicketTemplateEnum $templateCode
      */
     public function __construct(
-        ?string $startDate,
+        ?DateTimeImmutable $startDate,
         ?string $periodPl,
         int $validityPeriod,
         ?string $ticketNumber,
@@ -70,7 +71,7 @@ final class StoreTripTicketActionItem
         $this->templateCode = $templateCode;
     }
 
-    public function getStartDate(): ?string
+    public function getStartDate(): ?DateTimeImmutable
     {
         return $this->startDate;
     }

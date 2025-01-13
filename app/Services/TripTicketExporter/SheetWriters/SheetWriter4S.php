@@ -4,6 +4,8 @@ namespace App\Services\TripTicketExporter\SheetWriters;
 
 use App\Services\TripTicketExporter\ViewModels\ExportedItem;
 use App\Services\TripTicketExporter\ViewModels\ExportedItem4S;
+use App\Services\TripTicketExporter\ViewModels\MedicFormViewModel;
+use App\Services\TripTicketExporter\ViewModels\TechFormViewModel;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -210,7 +212,8 @@ final class SheetWriter4S implements SheetWriterInterface
         $medicStamp .= config('trip-ticket.print.4s.stamps.medic');
 
         $medicForm = $this->data->getMedicForm();
-        $date = $this->getFormDate($medicForm ? $medicForm->getDate() : null);
+
+        $date = $this->getDateString($medicForm);
 
         $this->sheet->setCellValue('R44', $medicStamp . "\n\n" . $date);
 
@@ -222,24 +225,42 @@ final class SheetWriter4S implements SheetWriterInterface
         $techStamp = config('trip-ticket.print.4s.stamps.tech');
 
         $techForm = $this->data->getTechForm();
-        $date = $this->getFormDate($techForm ? $techForm->getDate() : null);
+
+        $date = $this->getDateString($techForm);
 
         $this->sheet->setCellValue('BY44', $techStamp . "\n\n" . $date);
 
         return $this;
     }
 
-    private function getFormDate(?Carbon $date): string
+    private function getFormDate(?Carbon $date, bool $hasDay = true, bool $hasTime = true): string
     {
         if (!$date) {
             return 'Дата: _____ ________ 20__   Время: __:__';
         }
 
-        $value = 'Дата: ' . $date->day;
+        $value = 'Дата: ' . ($hasDay ? $date->day : '_____');
         $value .= ' ' . trans('date.months_genitive.' . $date->month);
         $value .= ' ' . $date->year;
-        $value .= '    Время: ' . $date->format('H:i');
+        $value .= '    Время: ' . ($hasTime ? $date->format('H:i') : '__:__');
 
         return $value;
+    }
+
+    /**
+     * @param MedicFormViewModel|TechFormViewModel|null $medicForm
+     * @return string
+     */
+    public function getDateString($medicForm): string
+    {
+        if ($medicForm) {
+            $date = $this->getFormDate($medicForm->getDate());
+        } else if ($this->data->getTripTicket()->getStartDate()) {
+            $date = $this->getFormDate($this->data->getTripTicket()->getStartDate(), true, false);
+        } else {
+            $date = $this->getFormDate($this->data->getTripTicket()->getPeriodPl(), false, false);
+        }
+
+        return $date;
     }
 }

@@ -6,6 +6,7 @@ use App\Actions\TripTicket\TripTicketNumberGenerator;
 use App\Models\TripTicket;
 use App\ValueObjects\EntityId;
 use Carbon\Carbon;
+use DB;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,13 +20,23 @@ final class StoreTripTicketHandler extends TripTicketNumberGenerator
         $user = Auth::user();
         $tripTickets = [];
 
+        DB::beginTransaction();
+
         foreach ($action->getItems() as $item) {
             if ($item->getTicketNumber() && $this->findSimilar($item->getTicketNumber(), $action->getCompanyId())) {
+                DB::rollBack();
                 throw new Exception("Путевой лист с номером {$item->getTicketNumber()} уже существует");
             }
 
             if (! $item->getStartDate() && $item->getPeriodPl() && ! $this->checkPeriod($item->getPeriodPl())) {
+                DB::rollBack();
                 throw new Exception("Неверный формат периода ПЛ {$item->getPeriodPl()}");
+            }
+
+            if ($item->getStartDate() && $item->getPeriodPl() && $item->getStartDate()->format('Y-m') !== $item->getPeriodPl()) {
+                DB::rollBack();
+                $period = Carbon::parse($item->getPeriodPl());
+                throw new Exception("Период ПЛ {$period->format('m.Y')} не совпадает с месяцем начала действия {$item->getStartDate()->format('d.m.Y')}");
             }
 
             $id = EntityId::next()->getId();
@@ -35,7 +46,9 @@ final class StoreTripTicketHandler extends TripTicketNumberGenerator
                 'ticket_number' => $item->getTicketNumber() ?: $this->getTicketNumber($id),
                 'company_id' => $action->getCompanyId(),
                 'start_date' => $item->getStartDate(),
-                'period_pl' => $item->getStartDate() ? null : $item->getPeriodPl(),
+                'period_pl' => $item->getStartDate()
+                    ? $item->getStartDate()->format('Y-m')
+                    : $item->getPeriodPl(),
                 'validity_period' => $item->getValidityPeriod(),
                 'driver_id' => $action->getDriverId(),
                 'car_id' => $action->getCarId(),
@@ -45,6 +58,8 @@ final class StoreTripTicketHandler extends TripTicketNumberGenerator
                 'user_id' => $user->id,
             ]);
         }
+
+        DB::commit();
 
         return $tripTickets;
     }

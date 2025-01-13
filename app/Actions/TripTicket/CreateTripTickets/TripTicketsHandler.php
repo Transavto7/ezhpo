@@ -4,12 +4,12 @@ namespace App\Actions\TripTicket\CreateTripTickets;
 
 use App\Actions\TripTicket\TripTicketNumberGenerator;
 use App\Enums\FormTypeEnum;
+use App\Models\Forms\Form;
 use App\Models\TripTicket;
 use App\ValueObjects\EntityId;
 use Carbon\Carbon;
-use DB;
 use Exception;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 final class TripTicketsHandler extends TripTicketNumberGenerator
@@ -19,133 +19,131 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
      */
     public function handle(TripTicketsAction $action): array
     {
-        $user = Auth::user();
         $tripTicketIds = [];
 
-        for ($date = $action->getDateFrom(); $action->getDateFrom() <= $action->getDateTo(); $action->getDateFrom()->addDay()) {
-            $medicForms = $this->getMedicForms($action, $date);
-            $techForms = $this->getTechForms($action, $date);
+        $medicForms = $this->getMedicForms($action);
+        $techForms = $this->getTechForms($action);
 
-            $maxLength = max(count($medicForms), count($techForms));
+        $groupedMedic = $this->groupForms($medicForms);
+        $groupedTech = $this->groupForms($techForms);
 
-            for ($i = 0; $i < $maxLength; $i++) {
-                $medicForm = $medicForms[$i] ?? null;
-                $techForm = $techForms[$i] ?? null;
-                $carId = null;
-                $id = EntityId::next()->getId();
+        foreach ($groupedMedic as $date => $drivers) {
+            foreach ($drivers as $driverId => $medicList) {
+                foreach ($medicList as $medic) {
+                    $tech = $groupedTech
+                        ->get($date, collect())
+                        ->get($driverId, collect())
+                        ->first();
 
-                if ($techForm !== null) {
-                    $carId = $techForm->car_id;
+                    $tripTicketIds[] = $this->createTripTicket($action, $date, $medic, $tech);
+
+                    if ($tech) {
+                        $groupedTech[$date][$driverId] = $groupedTech[$date][$driverId]->filter(
+                            function ($item) use ($tech) {
+                                return $item->id !== $tech->id;
+                            }
+                        );
+                    }
                 }
+            }
+        }
 
-                $tripTicketId = $this->existedTripTicket(
-                    $medicForm ? $medicForm->id : null,
-                    $techForm ? $techForm->id : null);
-
-                if ($tripTicketId !== null) {
-                    continue;
+        foreach ($groupedTech as $date => $drivers) {
+            foreach ($drivers as $techList) {
+                foreach ($techList as $tech) {
+                    $tripTicketIds[] = $this->createTripTicket($action, $date, null, $tech);
                 }
-
-                $tripTicket = TripTicket::create([
-                    'uuid' => $id,
-                    'ticket_number' => $this->getTicketNumber($id),
-                    'company_id' => $action->getCompany()->hash_id,
-                    'start_date' => $date->copy(),
-                    'validity_period' => $action->getValidityPeriod(),
-                    'medic_form_id' => $medicForm ? $medicForm->id : null,
-                    'driver_id' => $action->getDriver() ? $action->getDriver()->hash_id : null,
-                    'tech_form_id' => $techForm ? $techForm->id : null,
-                    'car_id' => $carId,
-                    'logistics_method' => $action->getLogisticsMethod(),
-                    'transportation_type' => $action->getTransportationType(),
-                    'template_code' => $action->getTemplateCode(),
-                    'user_id' => $user->id,
-                ]);
-
-                $tripTicketIds[] = $tripTicket;
             }
         }
 
         return $tripTicketIds;
     }
 
-    private function getMedicForms(TripTicketsAction $action, Carbon $date): array
+    private function groupForms($forms)
     {
-        return $this->getFormBuilder($action, $date)
-            ->select('forms.id')
+        return $forms->reduce(function ($carry, Form $form) {
+            $date = Carbon::parse($form->date)->format('Y-m-d');
+
+            if (! isset($carry[$date])) {
+                $carry[$date] = collect();
+            }
+
+            if (! isset($carry[$date][$form->driver_id])) {
+                $carry[$date][$form->driver_id] = collect();
+            }
+
+            $carry[$date][$form->driver_id][] = $form;
+
+            return $carry;
+        }, collect());
+    }
+
+    private function getMedicForms(TripTicketsAction $action)
+    {
+        return $this->getFormBuilder($action)
             ->join(
                 'medic_forms',
                 'medic_forms.forms_uuid',
                 '=',
                 'forms.uuid'
             )
-            ->whereRaw('
-                NOT EXISTS (
-                    SELECT 1 FROM trip_tickets
-                    WHERE forms.id = trip_tickets.medic_form_id
-                    AND trip_tickets.deleted_at is null
-                )
-            ')
             ->where('type_anketa', '=', FormTypeEnum::MEDIC)
             ->where('medic_forms.admitted', '=', 'Допущен')
-            ->orderBy('medic_forms.type_view', 'desc')
-            ->get()
-            ->toArray();
+            ->whereDoesntHave('tripTicketMedic')
+            ->get();
     }
 
-    private function getTechForms(TripTicketsAction $action, Carbon $date): array
+    private function getTechForms(TripTicketsAction $action)
     {
-        return $this->getFormBuilder($action, $date)
-            ->select([
-                'forms.id',
-                'tech_forms.car_id',
-            ])
+        return $this->getFormBuilder($action)
             ->join(
                 'tech_forms',
                 'tech_forms.forms_uuid',
                 '=',
                 'forms.uuid'
             )
-            ->whereRaw('
-                NOT EXISTS (
-                    SELECT 1 FROM trip_tickets
-                    WHERE forms.id = trip_tickets.tech_form_id
-                    AND trip_tickets.deleted_at is null
-                )
-            ')
             ->where('type_anketa', '=', FormTypeEnum::TECH)
             ->where('tech_forms.point_reys_control', '=', 'Пройден')
             ->whereNotNull('tech_forms.car_id')
-            ->orderBy('tech_forms.type_view', 'desc')
-            ->get()
-            ->toArray();
+            ->whereDoesntHave('tripTicketTech')
+            ->get();
     }
 
-    private function getFormBuilder(TripTicketsAction $action, Carbon $date): Builder
+    private function getFormBuilder(TripTicketsAction $action)
     {
-        return DB::table('forms')
-            ->where('forms.company_id', '=', $action->getCompany()->hash_id)
-            ->where('forms.driver_id', '=', $action->getDriver() ? $action->getDriver()->hash_id : null)
-            ->where(DB::raw('DATE(date)'), '=', $date)
+        return Form::where('forms.company_id', '=', $action->getCompany()->hash_id)
+            ->when($action->getDriver(), function (Builder $query) use ($action) {
+                $query->where('forms.driver_id', '=', $action->getDriver()->hash_id);
+            })
             ->whereNotNull('forms.driver_id')
-            ->whereNull('forms.deleted_id')
-            ->whereNull('forms.deleted_at');
+            ->whereBetween('forms.date', [$action->getDateFrom(), $action->getDateTo()->endOfDay()]);
     }
 
-    private function existedTripTicket($medicFormId, $techFormId)
+    private function createTripTicket(TripTicketsAction $action, string $date, Form $medicForm = null, Form $techForm = null): TripTicket
     {
-        $tripTicket = DB::table('trip_tickets')
-            ->when($medicFormId, function (Builder $query) use ($medicFormId) {
-                $query->where('medic_form_id', '=', $medicFormId);
-            })
-            ->when($techFormId, function (Builder $query) use ($techFormId) {
-                $query->where('tech_form_id', '=', $techFormId);
-            })
-            ->whereNull('deleted_at')
-            ->first();
-
-        return $tripTicket !== null
-            ? $tripTicket->id
+        $carId = $techForm
+            ? $techForm->details->car_id
             : null;
+        $driverId = $medicForm
+            ? $medicForm->driver_id
+            : $techForm->driver_id;
+        $id = EntityId::next()->getId();
+
+        return TripTicket::create([
+            'uuid' => $id,
+            'ticket_number' => $this->getTicketNumber($id),
+            'company_id' => $action->getCompany()->hash_id,
+            'start_date' => $date,
+            'period_pl' => Carbon::parse($date)->format('Y-m'),
+            'validity_period' => $action->getValidityPeriod(),
+            'medic_form_id' => $medicForm ? $medicForm->id : null,
+            'driver_id' => $action->getDriver() ? $action->getDriver()->hash_id : $driverId,
+            'tech_form_id' => $techForm ? $techForm->id : null,
+            'car_id' => $carId,
+            'logistics_method' => $action->getLogisticsMethod(),
+            'transportation_type' => $action->getTransportationType(),
+            'template_code' => $action->getTemplateCode(),
+            'user_id' => Auth::user()->id,
+        ]);
     }
 }
