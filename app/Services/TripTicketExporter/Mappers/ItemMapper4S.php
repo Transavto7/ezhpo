@@ -6,6 +6,7 @@ use App\Enums\LogisticsMethodEnum;
 use App\Enums\TransportationTypeEnum;
 use App\Models\Forms\TechForm;
 use App\Models\TripTicket;
+use App\Req;
 use App\Services\TripTicketExporter\ViewModels\CarViewModel;
 use App\Services\TripTicketExporter\ViewModels\CompanyViewModel;
 use App\Services\TripTicketExporter\ViewModels\DriverViewModel;
@@ -59,7 +60,14 @@ final class ItemMapper4S implements ItemMapperInterface
             return null;
         }
 
-        return new CompanyViewModel($tripTicket->company->name, $tripTicket->company->where_call);
+        $reqName = null;
+        $req = Req::find($tripTicket->company->req_id);
+
+        if ($req) {
+            $reqName = $req->name;
+        }
+
+        return new CompanyViewModel($tripTicket->company->name, $tripTicket->company->where_call, $reqName);
     }
 
     private function mapDriver(TripTicket $tripTicket): ?DriverViewModel

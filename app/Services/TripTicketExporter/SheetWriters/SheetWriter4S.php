@@ -206,8 +206,8 @@ final class SheetWriter4S implements SheetWriterInterface
     {
         $medicStamp = '';
 
-        if ($this->data->getCompany()) {
-            $medicStamp = $this->data->getCompany()->getName() . "\n";
+        if ($this->data->getCompany() && $this->data->getCompany()->getReqName()) {
+            $medicStamp = $this->data->getCompany()->getReqName() . "\n";
         }
         $medicStamp .= config('trip-ticket.print.4s.stamps.medic');
 
@@ -248,13 +248,13 @@ final class SheetWriter4S implements SheetWriterInterface
     }
 
     /**
-     * @param MedicFormViewModel|TechFormViewModel|null $medicForm
+     * @param MedicFormViewModel|TechFormViewModel|null $formViewModel
      * @return string
      */
-    public function getDateString($medicForm): string
+    private function getDateString($formViewModel): string
     {
-        if ($medicForm) {
-            $date = $this->getFormDate($medicForm->getDate());
+        if ($formViewModel) {
+            $date = $this->getFormDate($formViewModel->getDate());
         } else if ($this->data->getTripTicket()->getStartDate()) {
             $date = $this->getFormDate($this->data->getTripTicket()->getStartDate(), true, false);
         } else {
