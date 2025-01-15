@@ -68,13 +68,22 @@ class GetJournalDataHandler implements GetServicesReportForCompanyByPeriodInterf
             ->leftJoin('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
             ->where('forms.company_id', $this->companyHashId)
             ->where(function ($query) use ($dateFrom, $dateTo) {
-                $query->where(function ($subQuery) use ($dateFrom, $dateTo) {
-                    $subQuery->whereNotNull('forms.date')
-                        ->whereBetween('forms.date', [
-                            $dateFrom,
-                            $dateTo,
-                        ]);
-                })
+                $query
+                    ->where(function ($subQuery) use ($dateFrom, $dateTo) {
+                        $subQuery->whereNotNull('print_pl_forms.period_pl')
+                            ->whereBetween('print_pl_forms.period_pl', [
+                                $dateFrom->format('Y-m'),
+                                $dateTo->format('Y-m'),
+                            ]);
+                    })
+                    ->orWhere(function ($subQuery) use ($dateFrom, $dateTo) {
+                        $subQuery->whereNotNull('forms.date')
+                            ->where('type_anketa', '!=', FormTypeEnum::PRINT_PL)
+                            ->whereBetween('forms.date', [
+                                $dateFrom,
+                                $dateTo,
+                            ]);
+                    })
                     ->orWhere(function ($subQuery) use ($dateFrom, $dateTo) {
                         $subQuery->whereNull('forms.date')
                             ->whereBetween('medic_forms.period_pl', [
@@ -218,19 +227,29 @@ class GetJournalDataHandler implements GetServicesReportForCompanyByPeriodInterf
             ->leftJoin('points', 'points.id', '=', 'forms.point_id')
             ->leftJoin('medic_forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
             ->leftJoin('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
+            ->leftJoin('print_pl_forms', 'forms.uuid', '=', 'print_pl_forms.forms_uuid')
             ->where('forms.company_id', $this->companyHashId)
             ->whereBetween('forms.created_at', [
                 $dateFrom,
                 $dateTo
             ])
             ->where(function ($query) use ($dateFrom, $dateTo) {
-                $query->where(function ($subQuery) use ($dateFrom, $dateTo) {
-                    $subQuery->whereNotNull('forms.date')
-                        ->whereNotBetween('forms.date', [
-                            $dateFrom,
-                            $dateTo,
-                        ]);
-                })
+                $query
+                    ->where(function ($subQuery) use ($dateFrom, $dateTo) {
+                        $subQuery->whereNotNull('print_pl_forms.period_pl')
+                            ->whereNotBetween('print_pl_forms.period_pl', [
+                                $dateFrom->format('Y-m'),
+                                $dateTo->format('Y-m'),
+                            ]);
+                    })
+                    ->orWhere(function ($subQuery) use ($dateFrom, $dateTo) {
+                        $subQuery->whereNotNull('forms.date')
+                            ->where('type_anketa', '!=', FormTypeEnum::PRINT_PL)
+                            ->whereNotBetween('forms.date', [
+                                $dateFrom,
+                                $dateTo,
+                            ]);
+                    })
                     ->orWhere(function ($query) use ($dateFrom, $dateTo) {
                         $query->whereNull('forms.date')
                             ->whereNotBetween('medic_forms.period_pl', [
