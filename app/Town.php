@@ -15,6 +15,7 @@ class Town extends Model
         = [
             'id',
             'hash_id',
+            'req_id',
             'name',
             'deleted_id',
             'deleted_at',
@@ -55,5 +56,10 @@ class Town extends Model
             ->toArray();
 
         return implode(', ', $data) ?? '';
+    }
+
+    public function req(): BelongsTo
+    {
+        return $this->belongsTo(Req::class);
     }
 }

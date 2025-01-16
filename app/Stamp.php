@@ -28,4 +28,17 @@ class Stamp extends Model
 
         return parent::delete();
     }
+
+    public function getName($id)
+    {
+        $stamps = Stamp::find($id);
+
+        if ( !$stamps) {
+            $stamps = '';
+        } else {
+            $stamps = $stamps['name'];
+        }
+
+        return $stamps;
+    }
 }

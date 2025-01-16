@@ -21,6 +21,14 @@ return [
                 'type' => 'text',
                 'hideFilter' => 1
             ],
+            'req_id' => [
+                'label' => 'Организация',
+                'type' => 'select',
+                'values' => 'Req',
+                'getField' => 'name',
+                'concatField' => 'hash_id',
+                'getFieldKey' => 'id',
+            ],
         ],
     ],
 
@@ -72,6 +80,14 @@ return [
             'name' => [
                 'label' => 'Название',
                 'type' => 'text'
+            ],
+            'stamp_id' => [
+                'label' => 'Штамп',
+                'type' => 'select',
+                'values' => 'Stamp',
+                'getField' => 'name',
+                'getFieldKey' => 'id',
+                'concatField' => null,
             ],
             'inn' => [
                 'label' => 'ИНН',

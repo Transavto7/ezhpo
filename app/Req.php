@@ -3,15 +3,18 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Req extends Model
 {
-    use \Illuminate\Database\Eloquent\SoftDeletes;
+    use SoftDeletes;
 
     public $fillable
         = [
             'hash_id',
             'name',
+            'stamp_id',
             'inn',
             'bik',
             'kc',
@@ -55,5 +58,10 @@ class Req extends Model
     public static function getAll()
     {
         return self::all();
+    }
+
+    public function stamp(): BelongsTo
+    {
+        return $this->belongsTo(Stamp::class);
     }
 }
