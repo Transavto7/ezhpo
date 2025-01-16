@@ -64,7 +64,7 @@ class GetJournalDataHandler
             ->leftJoin('points', 'points.id', '=', 'forms.point_id')
             ->leftJoin('medic_forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
             ->leftJoin('print_pl_forms', 'forms.uuid', '=', 'print_pl_forms.forms_uuid')
-            ->join('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
+            ->leftJoin('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
             ->where('forms.company_id', $this->companyHashId)
             ->where(function ($query) use ($dateFrom, $dateTo) {
                 $query->where(function ($subQuery) use ($dateFrom, $dateTo) {
@@ -87,9 +87,9 @@ class GetJournalDataHandler
         $result = [];
 
         foreach ($nonTechForms->groupBy('driver_id') as $driverForms) {
-            $driver = $driverForms->first();
-            $driverId = $driver->driver_id;
-            $result[$driverId]['driver_fio'] = $driver->driver_fio;
+            $firstDriverForm = $driverForms->first();
+            $driverId = $firstDriverForm->driver_id;
+            $result[$driverId]['driver_fio'] = $firstDriverForm->driver_fio;
             $result[$driverId]['pv_id'] = implode('; ', array_unique($driverForms->pluck('pv_id')->toArray()));
 
             $driverMedicFormsWithoutNotIdentifiedGroupedByTypeView = $driverForms
@@ -149,7 +149,7 @@ class GetJournalDataHandler
             ->where('type_anketa', FormTypeEnum::TECH)
             ->leftJoin('points', 'points.id', '=', 'forms.point_id')
             ->join('tech_forms', 'tech_forms.forms_uuid', '=', 'forms.uuid')
-            ->join('cars', 'tech_forms.car_id', '=', 'cars.hash_id')
+            ->leftJoin('cars', 'tech_forms.car_id', '=', 'cars.hash_id')
             ->where('forms.company_id', $this->companyHashId)
             ->where(function ($query) use ($dateFrom, $dateTo) {
                 $query->where(function ($subQuery) use ($dateFrom, $dateTo) {
