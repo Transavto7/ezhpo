@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Anketa\ChangeSdpoMedicFormType\ChangeSdpoMedicFormTypeHandler;
 use App\Enums\FormTypeEnum;
 use App\FieldPrompt;
 use App\Models\Forms\Form;
@@ -10,20 +11,47 @@ use App\ValueObjects\NotAdmittedReasons;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class PakController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        if ($request->clear) {
-            Form::query()->pakQueueByUser($request->user())->delete();
-
-            return redirect(route('pak.index'));
-        }
-
         return view('pak.index', [
             'fields' => FieldPrompt::where('type', FormTypeEnum::PAK_QUEUE)->get()
         ]);
+    }
+
+    public function clear(ChangeSdpoMedicFormTypeHandler $handler)
+    {
+        $user = Auth::user();
+
+        $formsIds = Form::query()
+            ->select('forms.id')
+            ->pakQueueByUser($user)
+            ->get()
+            ->pluck('id')
+            ->toArray();
+
+        $errors = [];
+
+        foreach ($formsIds as $formsId) {
+            try {
+                DB::beginTransaction();
+
+                $handler->handle($formsId, $user);
+
+                DB::commit();
+            } catch (Throwable $exception) {
+                $errors[] = "$formsId . {$exception->getMessage()}";
+
+                DB::rollBack();
+            }
+        }
+
+        return redirect(route('pak.index'))->withErrors($errors);
     }
 
     public function list(Request $request): JsonResponse

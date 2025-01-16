@@ -100,6 +100,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('pak')->as('pak.')->group(function () {
             Route::get('/', 'PakController@index')->name('index');
             Route::get('list', 'PakController@list')->name('list');
+            Route::get('clear', 'PakController@clear')->name('clear');
         });
 
         Route::prefix('docs')->as('docs.')->group(function () {
