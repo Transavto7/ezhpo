@@ -80,7 +80,7 @@ class UpdateFormHandler
 
         $carId = $data['car_id'] ?? null;
         if ($carId) {
-            $car = Car::where('hash_id', $driverId)->first();
+            $car = Car::where('hash_id', $carId)->first();
 
             if (empty($car)) {
                 throw new Exception('Автомобиль не найден.');
