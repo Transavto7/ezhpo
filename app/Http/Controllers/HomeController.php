@@ -171,7 +171,6 @@ class HomeController extends Controller
             'town_id' => 'points.pv_id',
             'pv_id' => 'forms.point_id',
             'user_id' => 'forms.user_id',
-            'car_type_auto' => 'cars.type_auto',
             'car_mark_model' => 'cars.mark_model'
         ];
 
@@ -276,6 +275,17 @@ class HomeController extends Controller
                         });
 
                         continue;
+                    }
+
+                    if ($filterKey === 'car_type_auto') {
+                        $forms = $forms->where(function ($query) use ($filterValue) {
+                            foreach ($filterValue as $fvItemValue) {
+                                $query = $query->orWhere('cars.type_auto', $fvItemValue)
+                                    ->orWhere('tech_forms.car_type_auto', $fvItemValue);
+                            }
+
+                            return $query;
+                        });
                     }
 
                     $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
@@ -392,7 +402,7 @@ class HomeController extends Controller
             $forms = $forms
                 ->leftJoin('cars', 'tech_forms.car_id', '=', 'cars.hash_id')
                 ->select(array_merge($defaultFieldsToSelect, [
-                    'cars.type_auto as car_type_auto',
+                    DB::raw("COALESCE(cars.type_auto, tech_forms.car_type_auto) as car_type_auto"),
                     'cars.mark_model as car_mark_model',
                     'cars.gos_number as car_gos_number',
                     'cars.date_prto as date_prto',
