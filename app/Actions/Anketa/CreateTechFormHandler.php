@@ -186,14 +186,14 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         }
 
         if ($formIsDop && $date && empty($periodPl)) {
-            $form['period_pl'] = date('Y-m', $date);
+            $form['period_pl'] = date('Y-m', strtotime($date));
         }
 
         /**
          * Генерация номера ПЛ
          */
-        if (empty($form['number_list_road']) && !$formIsDop && !empty($carId)) {
-            $form['number_list_road'] = $carId . '-' . date('d.m.Y', $date);
+        if (empty($form['number_list_road']) && !$formIsDop && !empty($carId) && $date) {
+            $form['number_list_road'] = $carId . '-' . date('d.m.Y', strtotime($date));
         }
 
         if ($formIsDop) {

@@ -166,7 +166,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         }
 
         if ($formIsDop && $date && empty($periodPl)) {
-            $form['period_pl'] = date('Y-m', $date);
+            $form['period_pl'] = $form['period_pl'] = date('Y-m', strtotime($date));
         }
 
         /**
