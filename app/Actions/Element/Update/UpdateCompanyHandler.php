@@ -7,6 +7,7 @@ use App\Company;
 use App\Enums\OneCSyncStatusEnum;
 use App\Exceptions\EntityAlreadyExistException;
 use App\Exceptions\WrongCompanyReqsException;
+use App\Services\CompanyReqsChecker\CompanyRepository;
 use App\Services\CompanyReqsChecker\CompanyReqsCheckerInterface;
 use App\Services\OneC\CompanySync\CompanySyncServiceInterface;
 use App\ValueObjects\CompanyReqs;
@@ -26,6 +27,11 @@ class UpdateCompanyHandler extends UpdateElementHandler
      */
     private $companySyncService;
 
+    /**
+     * @var CompanyRepository
+     */
+    private $companyRepository;
+
     public function __construct(string $type)
     {
         parent::__construct($type);
@@ -33,6 +39,8 @@ class UpdateCompanyHandler extends UpdateElementHandler
         $this->companySyncService = resolve(CompanySyncServiceInterface::class);
 
         $this->syncFieldsHandler = new SyncFieldsHandler();
+
+        $this->companyRepository = new CompanyRepository();
     }
 
     public function handle($id, array $data)
@@ -79,7 +87,7 @@ class UpdateCompanyHandler extends UpdateElementHandler
             throw new Exception('Попытка смены корректных реквизитов компании!');
         }
 
-        $companyReqs = new CompanyReqs($this->data['inn'] ?? '', $this->data['kpp'] ?? '', $this->data['official_name'] ?? '');
+        $companyReqs = new CompanyReqs($this->data['inn'] ?? '', $this->data['kpp'] ?? '', $this->data['ogrn'] ?? '');
         //TODO: проверять отдельно ЮЛ, СЗ и ФЛ
         if ($companyReqs->isValidFormat()) {
             /** @var CompanyReqsCheckerInterface $companyReqsChecker */
@@ -91,14 +99,7 @@ class UpdateCompanyHandler extends UpdateElementHandler
             }
         }
 
-        $existItem = Company::query()
-            ->where('id', '!=', $id)
-            ->where('inn', $companyReqs->getInn())
-            ->when($companyReqs->isOrganizationInnFormat(), function ($query) use ($companyReqs) {
-                $query->where('kpp', $companyReqs->getKpp());
-            })
-            ->first();
-
+        $existItem = $this->companyRepository->findByReqs($companyReqs, $id);
         if ($existItem) {
             throw new EntityAlreadyExistException('Найден дубликат компании по ИНН (+КПП)');
         }

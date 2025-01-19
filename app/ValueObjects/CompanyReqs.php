@@ -8,51 +8,76 @@ class CompanyReqs
 
     private $kpp;
 
-    private $officialName;
+    private $ogrn;
 
     /**
      * @param string $inn
      * @param string $kpp
-     * @param string $officialName
+     * @param string $ogrn
      */
-    public function __construct(string $inn, string $kpp = '', string $officialName = '')
+    public function __construct(string $inn, string $kpp = '', string $ogrn = '')
     {
         $this->inn = trim($inn);
+        $this->ogrn = trim ($ogrn);
         $this->kpp = trim($kpp);
-        $this->officialName = trim($officialName);
     }
 
     public function isValidFormat(): bool
+    {
+        return $this->isOrganizationFormat() || $this->isPersonalFormat();
+    }
+
+    private function isPersonalInnFormat(): bool
     {
         if (!ctype_digit($this->inn)) {
             return false;
         }
 
-        if (!$this->isPersonalInnFormat() && !$this->isOrganizationInnFormat()) {
-            return false;
-        }
-
-        if ($this->isOrganizationInnFormat()) {
-            if (!ctype_digit($this->kpp)) {
-                return false;
-            }
-
-            if (strlen($this->kpp) !== 9) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public function isPersonalInnFormat(): bool
-    {
         return strlen($this->inn) === 12;
     }
 
-    public function isOrganizationInnFormat(): bool
+    private function isPersonalOgrnFormat(): bool
     {
+        if (strlen($this->ogrn) === 0) {
+            return true;
+        }
+
+        if (!ctype_digit($this->ogrn)) {
+            return false;
+        }
+
+        return strlen($this->ogrn) === 15;
+    }
+
+    private function isOrganizationInnFormat(): bool
+    {
+        if (!ctype_digit($this->inn)) {
+            return false;
+        }
+
         return strlen($this->inn) === 10;
+    }
+
+    private function isOrganizationOgrnFormat(): bool
+    {
+        if (!ctype_digit($this->ogrn)) {
+            return false;
+        }
+
+        return strlen($this->ogrn) === 13;
+    }
+
+    private function isOrganizationKppFormat(): bool
+    {
+        if (!ctype_digit($this->kpp)) {
+            return false;
+        }
+
+        if (strlen($this->kpp) !== 9) {
+            return false;
+        }
+
+        return true;
     }
 
     public function getInn(): string
@@ -65,8 +90,21 @@ class CompanyReqs
         return $this->kpp;
     }
 
-    public function getOfficialName(): string
+    public function getOgrn(): string
     {
-        return $this->officialName;
+        return $this->ogrn;
+    }
+
+    public function isPersonalFormat(): bool
+    {
+        return $this->isPersonalInnFormat()
+            && $this->isPersonalOgrnFormat();
+    }
+
+    public function isOrganizationFormat(): bool
+    {
+        return $this->isOrganizationInnFormat()
+            && $this->isOrganizationOgrnFormat()
+            && $this->isOrganizationKppFormat();
     }
 }

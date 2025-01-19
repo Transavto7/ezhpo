@@ -29,6 +29,8 @@ class Company extends Model
         'where_call_name',
         'inn',
         'kpp',
+        'ogrn',
+        'address',
         'required_type_briefing',
         'has_actived_prev_month',
         'bitrix_link',

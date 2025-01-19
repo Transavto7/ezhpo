@@ -35,6 +35,8 @@ class CompanySyncService extends OneCIntegrationService implements CompanySyncSe
             'name',
             'inn',
             'kpp',
+            'ogrn',
+            'address'
         ]);
 
         $response = $this->client->post($url,  [

@@ -5,6 +5,7 @@ namespace App\Actions\Element;
 use App\Company;
 use App\Exceptions\EntityAlreadyExistException;
 use App\Exceptions\WrongCompanyReqsException;
+use App\Services\CompanyReqsChecker\CompanyRepository;
 use App\Services\CompanyReqsChecker\CompanyReqsCheckerInterface;
 use App\User;
 use App\ValueObjects\CompanyReqs;
@@ -15,10 +16,17 @@ use Illuminate\Support\Facades\Hash;
 class CreateCompanyHandler extends AbstractCreateElementHandler implements CreateElementHandlerInterface
 {
     /**
+     * @var CompanyRepository
+     */
+    private $companyRepository;
+
+    /**
      * @throws Exception
      */
     public function __construct()
     {
+        $this->companyRepository = new CompanyRepository();
+
         parent::__construct('Company');
     }
 
@@ -79,27 +87,20 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
      */
     protected function validateReqs($data): array
     {
-        $companyReqs = new CompanyReqs($data['inn'] ?? '', $data['kpp'] ?? '', $data['official_name']);
+        $companyReqs = new CompanyReqs($data['inn'] ?? '', $data['kpp'] ?? '', $data['ogrn'] ?? '');
         if ($companyReqs->isValidFormat()) {
-            //TODO: проверять отдельно ЮЛ, СЗ и ФЛ
             /** @var CompanyReqsCheckerInterface $companyReqsChecker */
             $companyReqsChecker = resolve(CompanyReqsCheckerInterface::class);
-            if ($companyReqsChecker->check($companyReqs)) {
-                $data['reqs_validated'] = true;
-            } else {
+            if (!$companyReqsChecker->check($companyReqs)) {
                 throw new WrongCompanyReqsException();
             }
+
+            $data['reqs_validated'] = true;
         }
 
-        $existItem = Company::query()
-            ->where('inn', $companyReqs->getInn())
-            ->when($companyReqs->isOrganizationInnFormat(), function ($query) use ($companyReqs) {
-                $query->where('kpp', $companyReqs->getKpp());
-            })
-            ->first();
-
+        $existItem = $this->companyRepository->findByReqs($companyReqs);
         if ($existItem) {
-            throw new EntityAlreadyExistException('Найден дубликат компании по ИНН (+КПП)');
+            throw new EntityAlreadyExistException('Найден дубликат компании по ИНН (+КПП) или ОГРН');
         }
 
         return $data;

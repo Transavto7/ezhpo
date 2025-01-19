@@ -634,6 +634,16 @@ return [
                 'type' => 'text',
                 'noRequired' => 1,
             ],
+            'ogrn' => [
+                'label' => 'ОГРН',
+                'type' => 'text',
+                'noRequired' => 1,
+            ],
+            'address' => [
+                'label' => 'Адрес',
+                'type' => 'text',
+                'noRequired' => 1,
+            ],
             'reqs_validated' => [
                 'label' => 'Корректные реквизиты',
                 'type' => 'select',
