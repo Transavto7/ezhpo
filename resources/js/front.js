@@ -1233,7 +1233,7 @@ $(document).ready(function () {
         triggerField()
     })
 
-    function initCompanyNameSuggestion(companyOfficialNameInput, innInput, kppInput, nameInput) {
+    function initCompanyNameSuggestion(companyOfficialNameInput, innInput, kppInput, nameInput, ogrnInput, addressInput) {
         if (!companyOfficialNameInput) return;
 
         if (!innInput) return;
@@ -1248,11 +1248,13 @@ $(document).ready(function () {
                     return
                 }
 
-                const {name,inn,kpp} = suggestion.data
+                const {name,inn,kpp,ogrn,address} = suggestion.data
 
                 innInput.val(inn)
                 kppInput.val(kpp)
                 nameInput.val(name.short_with_opf)
+                ogrnInput.val(ogrn)
+                addressInput.val(address.unrestricted_value)
             },
             /* Определяет текст, подставляемый в инпут при выборе одной из подсказок */
             formatSelected: function (suggestion) {
@@ -1265,7 +1267,9 @@ $(document).ready(function () {
         $('#elements-modal-add input[data-field="Company_official_name"]'),
         $('#elements-modal-add input[name="inn"]'),
         $('#elements-modal-add input[name="kpp"]'),
-        $('#elements-modal-add input[name="name"]')
+        $('#elements-modal-add input[name="name"]'),
+        $('#elements-modal-add input[name="ogrn"]'),
+        $('#elements-modal-add input[name="address"]'),
     )
 
     $('.header #toggle-btn').each(function () {
@@ -1313,7 +1317,9 @@ $(document).ready(function () {
                     $('#modalEditor textarea[data-field="Company_official_name"]'),
                     $('#modalEditor input[name="inn"]'),
                     $('#modalEditor input[name="kpp"]'),
-                    $('#modalEditor textarea[name="name"]')
+                    $('#modalEditor textarea[name="name"]'),
+                    $('#modalEditor input[name="ogrn"]'),
+                    $('#modalEditor input[name="address"]')
                 )
             })
 

@@ -350,13 +350,15 @@ class IndexController extends Controller
         if (($model === 'Company') && $element->getAttribute('reqs_validated')) {
             $disabledFields[] = 'inn';
             $disabledFields[] = 'kpp';
+            $disabledFields[] = 'ogrn';
 
             $companyReqs = new CompanyReqs(
                 $element->getAttribute('inn'),
-                $element->getAttribute('kpp') ?? ''
+            $element->getAttribute('kpp') ?? '',
+                $element->getAttribute('ogrn') ?? '',
             );
 
-            if ($companyReqs->isOrganizationInnFormat()) {
+            if ($companyReqs->isOrganizationFormat()) {
                 $disabledFields[] = 'official_name';
             }
         }
@@ -372,7 +374,8 @@ class IndexController extends Controller
             'essence',
             'hash_id',
             'id',
-            'reqs_validated'
+            'reqs_validated',
+            'one_c_synced'
         ];
         if (user()->hasRole('client')) {
             $fieldsToSkip[] = 'products_id';

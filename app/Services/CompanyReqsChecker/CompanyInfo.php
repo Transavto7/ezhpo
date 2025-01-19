@@ -2,7 +2,7 @@
 
 namespace App\Services\CompanyReqsChecker;
 
-class DaDataCompany
+class CompanyInfo
 {
     private $officialName;
 
@@ -10,16 +10,24 @@ class DaDataCompany
 
     private $kpp;
 
+    private $ogrn;
+
+    private $address;
+
     /**
      * @param string $officialName
      * @param string $inn
+     * @param string $ogrn
      * @param string|null $kpp
+     * @param string|null $address
      */
-    public function __construct(string $officialName, string $inn, string $kpp = null)
+    public function __construct(string $officialName, string $inn, string $ogrn, string $kpp = null, string $address = null)
     {
         $this->officialName = $officialName;
         $this->inn = $inn;
+        $this->ogrn = $ogrn;
         $this->kpp = $kpp;
+        $this->address = $address;
     }
 
     /**
@@ -44,5 +52,21 @@ class DaDataCompany
     public function getKpp(): ?string
     {
         return $this->kpp;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOgrn(): string
+    {
+        return $this->ogrn;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAddress(): ?string
+    {
+        return $this->address;
     }
 }

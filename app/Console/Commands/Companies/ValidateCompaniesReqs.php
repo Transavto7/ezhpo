@@ -67,6 +67,7 @@ class ValidateCompaniesReqs extends Command
                 'name',
                 'inn',
                 'kpp',
+                'ogrn',
                 'reqs_validated'
             ])
             ->where('reqs_validated', false)
@@ -77,7 +78,7 @@ class ValidateCompaniesReqs extends Command
         foreach ($companies as $company) {
             $inn = $company->getAttribute('inn') ?? '';
             $kpp = $company->getAttribute('kpp') ?? '';
-            $officialName = $company->getAttribute('official_name') ?? '';
+            $ogrn = $company->getAttribute('ogrn') ?? '';
             $innWithKpp = $inn . $kpp;
 
             if (isset($uniqueInn[$innWithKpp])) {
@@ -85,36 +86,43 @@ class ValidateCompaniesReqs extends Command
             }
             $uniqueInn[$innWithKpp] = true;
 
-            $companyReqs = new CompanyReqs($inn, $kpp, $officialName);
+            $companyReqs = new CompanyReqs($inn, $kpp, $ogrn);
 
-            if ($companyReqs->isPersonalInnFormat()) {
-                $company->setAttribute('inn', $companyReqs->getInn());
-                $company->setAttribute('reqs_validated', true);
-                $company->save();
-                continue;
-            }
+            if ($companyReqs->isPersonalFormat()) {
+                $companyInfo = $companyReqsChecker->restoreCompany($companyReqs);
 
-            if ($companyReqs->isOrganizationInnFormat()) {
-                $restoredCompanyReqs = $companyReqsChecker->restoreOrganization($companyReqs);
+                if ($companyInfo !== null) {
+                    $company->setAttribute('ogrn', $companyInfo->getOgrn());
+                    $company->setAttribute('address', $companyInfo->getAddress());
+                }
+            } else if ($companyReqs->isOrganizationFormat()) {
+                $companyInfo = $companyReqsChecker->restoreCompany($companyReqs);
 
-                if ($restoredCompanyReqs === null) {
+                if ($companyInfo === null) {
                     continue;
                 }
 
-                $company->setAttribute('official_name', $restoredCompanyReqs->getOfficialName());
-                $company->setAttribute('kpp', $restoredCompanyReqs->getKpp());
-                $company->setAttribute('inn', $restoredCompanyReqs->getInn());
-                $company->setAttribute('reqs_validated', true);
-                $company->save();
-
-                $this->log(sprintf(
-                    "Восстановление реквизитов %s (%s) ИНН: %s, КПП: %s",
-                    $company->getAttribute('name'),
-                    $company->getAttribute('hash_id'),
-                    $company->getAttribute('inn'),
-                    $company->getAttribute('kpp')
-                ));
+                $company->setAttribute('official_name', $companyInfo->getOfficialName());
+                $company->setAttribute('kpp', $companyInfo->getKpp());
+                $company->setAttribute('ogrn', $companyInfo->getOgrn());
+                $company->setAttribute('address', $companyInfo->getAddress());
+            } else {
+                continue;
             }
+
+            $company->setAttribute('inn', $companyReqs->getInn());
+            $company->setAttribute('reqs_validated', true);
+            $company->save();
+
+            $this->log(sprintf(
+                "Восстановление реквизитов %s (%s) ИНН: %s, КПП: %s, ОГРН: %s, адрес: %s",
+                $company->getAttribute('name'),
+                $company->getAttribute('hash_id'),
+                $company->getAttribute('inn'),
+                $company->getAttribute('kpp'),
+                $company->getAttribute('ogrn'),
+                $company->getAttribute('address')
+            ));
         }
     }
 

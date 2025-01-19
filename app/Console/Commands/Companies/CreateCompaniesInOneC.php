@@ -64,7 +64,9 @@ class CreateCompaniesInOneC extends Command
                 'inn',
                 'kpp',
                 'reqs_validated',
-                'one_c_synced'
+                'one_c_synced',
+                'address',
+                'ogrn'
             ])
             ->where('reqs_validated', true)
             ->where('one_c_synced', OneCSyncStatusEnum::NON_CREATED)
@@ -78,19 +80,23 @@ class CreateCompaniesInOneC extends Command
                 $company->save();
 
                 $this->info(sprintf(
-                    "Создание компании в 1С %s (%s) ИНН: %s, КПП: %s",
-                    $company->getAttribute('name'),
-                    $company->getAttribute('hash_id'),
-                    $company->getAttribute('inn'),
-                    $company->getAttribute('kpp')
-                ));
-            } catch (Throwable $exception) {
-                $message = sprintf(
-                    "Ошибка создания компании в 1С %s (%s) ИНН: %s, КПП: %s. %s",
+                    "Создание компании в 1С %s (%s) ИНН: %s, КПП: %s, ОГРН: %s, адрес: %s",
                     $company->getAttribute('name'),
                     $company->getAttribute('hash_id'),
                     $company->getAttribute('inn'),
                     $company->getAttribute('kpp'),
+                    $company->getAttribute('ogrn'),
+                    $company->getAttribute('address')
+                ));
+            } catch (Throwable $exception) {
+                $message = sprintf(
+                    "Ошибка создания компании в 1С %s (%s) ИНН: %s, КПП: %s, ОГРН: %s, адрес: %s. %s",
+                    $company->getAttribute('name'),
+                    $company->getAttribute('hash_id'),
+                    $company->getAttribute('inn'),
+                    $company->getAttribute('kpp'),
+                    $company->getAttribute('ogrn'),
+                    $company->getAttribute('address'),
                     $exception->getMessage()
                 );
 

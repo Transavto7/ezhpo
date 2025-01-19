@@ -4,11 +4,22 @@ namespace App\Actions\Element\Remove;
 
 use App\Company;
 use App\Exceptions\EntityAlreadyExistException;
+use App\Services\CompanyReqsChecker\CompanyRepository;
 use App\ValueObjects\CompanyReqs;
 use Exception;
 
 class RemoveCompanyHandler implements RemoveElementHandlerInterface
 {
+    /**
+     * @var CompanyRepository
+     */
+    private $companyRepository;
+
+    public function __construct()
+    {
+        $this->companyRepository = new CompanyRepository();
+    }
+
     /**
      * @throws Exception
      */
@@ -77,20 +88,14 @@ class RemoveCompanyHandler implements RemoveElementHandlerInterface
      */
     private function checkDuplicateByReqs(Company $company)
     {
-        $companyReqs = new CompanyReqs(
+        $existItem = $this->companyRepository->findByReqs(new CompanyReqs(
             $company->getAttribute('inn'),
-            $company->getAttribute('kpp')
-        );
-
-        $existItem = Company::query()
-            ->where('inn', $companyReqs->getInn())
-            ->when($companyReqs->isOrganizationInnFormat(), function ($query) use ($companyReqs) {
-                $query->where('kpp', $companyReqs->getKpp());
-            })
-            ->first();
+            $company->getAttribute('kpp'),
+            $company->getAttribute('ogrn')
+        ));
 
         if ($existItem) {
-            throw new EntityAlreadyExistException('Найден дубликат компании по ИНН (+КПП)');
+            throw new EntityAlreadyExistException('Найден дубликат компании по ИНН (+КПП) или ОГРН');
         }
     }
 }

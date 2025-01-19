@@ -37,11 +37,11 @@ class DaDataCompanyReqsChecker implements CompanyReqsCheckerInterface
     {
         $companies = $this->getCompaniesByInn($companyReqs->getInn());
 
-        if ($companyReqs->isPersonalInnFormat()) {
+        if ($companyReqs->isPersonalFormat()) {
             return $this->checkPerson($companyReqs, $companies);
         }
 
-        if ($companyReqs->isOrganizationInnFormat()) {
+        if ($companyReqs->isOrganizationFormat()) {
             return $this->checkOrganization($companyReqs, $companies);
         }
 
@@ -50,7 +50,7 @@ class DaDataCompanyReqsChecker implements CompanyReqsCheckerInterface
 
     /**
      * @param string $inn
-     * @return DaDataCompany[]
+     * @return CompanyInfo[]
      * @throws GuzzleException
      */
     private function getCompaniesByInn(string $inn): array
@@ -59,10 +59,12 @@ class DaDataCompanyReqsChecker implements CompanyReqsCheckerInterface
             usleep(self::PAUSE_BETWEEN_REQUEST_MICROSECONDS);
 
             $result = array_map(function ($result) {
-                return new DaDataCompany(
+                return new CompanyInfo(
                     $result['data']['name']['full_with_opf'],
                     $result['data']['inn'],
-                    $result['data']['kpp'] ?? null
+                    $result['data']['ogrn'],
+                $result['data']['kpp'] ?? null,
+                    $result['data']['address']['unrestricted_value']
                 );
             }, $this->daData->findById("party", $inn, 300));
 
@@ -78,7 +80,7 @@ class DaDataCompanyReqsChecker implements CompanyReqsCheckerInterface
 
     /**
      * @param CompanyReqs $companyReqs
-     * @param DaDataCompany[] $companies
+     * @param CompanyInfo[] $companies
      * @return bool
      */
     private function checkPerson(CompanyReqs $companyReqs, array $companies): bool
@@ -99,7 +101,7 @@ class DaDataCompanyReqsChecker implements CompanyReqsCheckerInterface
 
     /**
      * @param CompanyReqs $companyReqs
-     * @param DaDataCompany[] $companies
+     * @param CompanyInfo[] $companies
      * @return bool
      */
     private function checkOrganization(CompanyReqs $companyReqs, array $companies): bool
@@ -111,7 +113,9 @@ class DaDataCompanyReqsChecker implements CompanyReqsCheckerInterface
         $hasSubCompanyWithoutKpp = false;
 
         foreach ($companies as $company) {
-            Log::info($company->getKpp());
+            if ($company->getOgrn() !== $companyReqs->getOgrn()) {
+                continue;
+            }
 
             if (empty($company->getKpp())) {
                 $hasSubCompanyWithoutKpp = true;
@@ -119,9 +123,11 @@ class DaDataCompanyReqsChecker implements CompanyReqsCheckerInterface
                 continue;
             }
 
-            if ($company->getKpp() === $companyReqs->getKpp()) {
-                return true;
+            if ($company->getKpp() !== $companyReqs->getKpp()) {
+                continue;
             }
+
+            return true;
         }
 
         if ($hasSubCompanyWithoutKpp) {
@@ -135,24 +141,14 @@ class DaDataCompanyReqsChecker implements CompanyReqsCheckerInterface
      * @throws GuzzleException
      * @throws Exception
      */
-    public function restoreOrganization(CompanyReqs $companyReqs): ?CompanyReqs
+    public function restoreCompany(CompanyReqs $companyReqs): ?CompanyInfo
     {
-        if (!$companyReqs->isOrganizationInnFormat()) {
-            throw new Exception('Восстановление КПП для ФЛ!');
-        }
-
         $companies = $this->getCompaniesByInn($companyReqs->getInn());
 
         if (count($companies) !== 1) {
             return null;
         }
 
-        $company = array_values($companies)[0];
-
-        return new CompanyReqs(
-            $companyReqs->getInn(),
-            $company->getKpp(),
-            $company->getOfficialName()
-        );
+        return array_values($companies)[0];
     }
 }

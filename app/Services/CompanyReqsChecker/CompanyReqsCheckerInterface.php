@@ -16,5 +16,5 @@ interface CompanyReqsCheckerInterface
      * @param CompanyReqs $companyReqs
      * @return CompanyReqs|null
      */
-    public function restoreOrganization(CompanyReqs $companyReqs): ?CompanyReqs;
+    public function restoreCompany(CompanyReqs $companyReqs): ?CompanyInfo;
 }
