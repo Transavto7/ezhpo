@@ -26,6 +26,8 @@ final class GetCompaniesItemsController extends Controller
                     'inn',
                     'kpp',
                     'req_id',
+                    'address',
+                    'ogrn'
                 ])
                 ->where('dismissed', '<>', 'Да')
                 ->get();
