@@ -78,6 +78,7 @@ class GetJournalDataHandler implements GetServicesReportForCompanyByPeriodInterf
                     })
                     ->orWhere(function ($subQuery) use ($dateFrom, $dateTo) {
                         $subQuery->whereNotNull('forms.date')
+                            ->where('type_anketa', '!=', FormTypeEnum::PRINT_PL)
                             ->whereBetween('forms.date', [
                                 $dateFrom,
                                 $dateTo,
@@ -243,6 +244,7 @@ class GetJournalDataHandler implements GetServicesReportForCompanyByPeriodInterf
                     })
                     ->orWhere(function ($subQuery) use ($dateFrom, $dateTo) {
                         $subQuery->whereNotNull('forms.date')
+                            ->where('type_anketa', '!=', FormTypeEnum::PRINT_PL)
                             ->whereNotBetween('forms.date', [
                                 $dateFrom,
                                 $dateTo,
