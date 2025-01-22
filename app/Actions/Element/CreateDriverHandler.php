@@ -12,6 +12,7 @@ use App\Models\Contract;
 use App\Services\BriefingService;
 use App\Services\UserService;
 use App\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 
@@ -43,6 +44,16 @@ class CreateDriverHandler extends AbstractCreateElementHandler implements Create
             ->first();
         if ($existItem) {
             throw new EntityAlreadyExistException('Найден дубликат по ФИО Водителя');
+        }
+
+        $birthday = Carbon::parse($data['year_birthday']);
+        if (! $this->validBirthday($birthday)) {
+            throw new Exception("Ошибка! Указанная дата рождения {$birthday->format('d.m.Y')} "
+                .'не попадает в промежуток с '.Carbon::now()->subYears(80)->format('d.m.Y').' по '.Carbon::now()->subYears(16)->format('d.m.Y'));
+        }
+
+        if ($data['phone'] !== null && (! is_numeric($data['phone']) || $data['phone'] < 0 || $data['phone'] > 99999999999)) {
+            throw new Exception('Ошибка! Неправильный формат телефона: '.$data['phone']);
         }
 
         $validator = function (int $hashId) {
@@ -101,5 +112,13 @@ class CreateDriverHandler extends AbstractCreateElementHandler implements Create
         }
 
         return $created;
+    }
+
+    private function validBirthday(Carbon $date): bool
+    {
+        $start = Carbon::now()->subYears(80)->format('Y-m-d');
+        $end = Carbon::now()->subYears(16)->format('Y-m-d');
+
+        return $date->between($start, $end);
     }
 }
