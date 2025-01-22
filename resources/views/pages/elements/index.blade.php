@@ -748,6 +748,20 @@
                         })
                 }
             })
+
+            $('input[name="phone"]').on('keypress', function(event) {
+                if (event.which < 48 || event.which > 57) {
+                    event.preventDefault()
+                }
+            });
+
+            $('input[name="phone"]').on('input', function() {
+                this.value = this.value.replace(/\D/g, '')
+
+                if (this.value.length > 5) {
+                    this.value = this.value.slice(0, 11)
+                }
+            });
         </script>
     @endsection
 @endsection

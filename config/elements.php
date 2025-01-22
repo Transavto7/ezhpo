@@ -262,7 +262,7 @@ return [
             ],
             'phone' => [
                 'label' => 'Телефон',
-                'type' => 'text',
+                'type' => 'number',
                 'noRequired' => 1,
             ],
             'gender' => [
