@@ -4,7 +4,7 @@
             <h5 class="card-header">Выбор информации</h5>
             <div class="card-body">
                 <div class="row">
-                    <div class="form-group col-lg-3">
+                    <div class="form-group col-lg-6">
                         <label class="mb-1" for="company">Компания</label>
                         <multiselect
                             :disabled="client"
@@ -40,6 +40,12 @@
                             Экспортировать
                         </button>
                         <a href="?" class="btn btn-danger">Сбросить</a>
+                    </div>
+                </div>
+
+                <div class="row" v-if="showAlert">
+                    <div class="col-md-12">
+                        <div class="alert alert-danger w-100" role="alert">В данном месяце оказаны услуги за другие периоды</div>
                     </div>
                 </div>
             </div>
@@ -88,6 +94,7 @@ export default {
     data() {
         return {
             loading: false,
+            showAlert: false,
             loadingExport: false,
             company: null,
             client: false,
@@ -128,6 +135,7 @@ export default {
             this.$refs.reportsTechOther.hide();
             this.$refs.reportsMedicOther.hide();
             this.$refs.reportsOther.hide();
+            this.showAlert = false;
         },
         report() {
             this.reset();
@@ -143,6 +151,7 @@ export default {
                 this.$refs.reportsTechOther.visible(data.techs_other);
                 this.$refs.reportsMedicOther.visible(data.medics_other);
                 this.$refs.reportsOther.visible(data.other);
+                this.showAlert = this.isEmpty(data.techs_other) || this.isEmpty(data.medics_other);
             }).finally(() => {
                 this.loading = false;
             });
@@ -178,6 +187,16 @@ export default {
                 this.companies = data;
             });
         },
+        isEmpty(value) {
+            if (value && typeof value === 'object') {
+                if (Array.isArray(value)) {
+                    return value.length > 0;
+                }
+                return Object.keys(value).length > 0;
+            }
+
+            return false;
+        }
     }
 }
 </script>
