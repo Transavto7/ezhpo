@@ -65,7 +65,7 @@
                     @disabled($actions_policy->isAttributeDisabled('car_type_auto'))
                     value="{{ $carTypeAutoValue }}"
                     name="anketa[0][car_type_auto]"
-                    class="filled-select2 filled-select car_type_auto"
+                    class="form-control car_type_auto"
                 >
                     @foreach($carTypeAutoValues as $carTypeAuto)
                         <option
