@@ -4,6 +4,7 @@ namespace App\Http\Controllers\TripTickets;
 
 use App\Actions\TripTicket\TripTicketsQuery\TripTicketsQueryAction;
 use App\Actions\TripTicket\TripTicketsQuery\TripTicketsQueryHandler;
+use App\Enums\FeaturesEnum;
 use App\FieldPrompt;
 use App\Http\Controllers\Controller;
 use App\Models\TripTicket;
@@ -11,11 +12,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Unleash\Client\Unleash;
 
 class TripTicketIndexPageController extends Controller
 {
-    public function __invoke(Request $request, TripTicketsQueryHandler $handler)
+    public function __invoke(Request $request, TripTicketsQueryHandler $handler, Unleash $unleash)
     {
+        if (!$unleash->isEnabled(FeaturesEnum::TRIP_TICKETS_ENABLED)) {
+            return view('common.disabled-feature-page', ['title' => 'Реестр путевых листов']);
+        }
+
         $queryParamsSessionKey = 'trip-tickets.index-page.filters';
         $queryParams = Session::get($queryParamsSessionKey, []);
         if (count($queryParams) !== 0) {
