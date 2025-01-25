@@ -757,7 +757,7 @@ $(document).ready(function () {
                 const driverModel = model === 'Driver'
                 const carTypeAutoValue = DATA?.type_auto
                 if (carModel && carTypeAutoValue) {
-                    const form = parent.closest('#ANKETA_FORM');
+                    const form = parent.closest('.cloning');
                     setSelectValue(form.find('select.car_type_auto'), carTypeAutoValue)
                 }
 
@@ -930,7 +930,8 @@ $(document).ready(function () {
         clone_to.append(clone)
 
         clone.find('input,select').each(function () {
-            this.name = this.name.replace('anketa[' + (count_anketa - 1) + ']', 'anketa[' + count_anketa + ']')
+            this.name = this.name.replace('anketa[' + (count_anketa - 1) + ']', 'anketa[' + count_anketa + ']');
+            $(this).trigger('input');
         })
 
         const datePickerElement = clone.find(".date-range");
@@ -938,13 +939,15 @@ $(document).ready(function () {
             initDatePicker(clone.find(".date-range")[0])
         }
 
-        count_anketa++
+        const deleteBtn = '<a href="" onclick="' + randId + '.remove(); return false;" class="text-danger">Удалить</a>';
 
-        clone.find('.anketa-delete').html('<a href="" onclick="' + randId + '.remove(); return false;" class="text-danger">Удалить</a>')
+        clone.find('.anketa-delete').html(deleteBtn)
 
         if (! clone.find('.duplicate-indicator').hasClass('d-none')) {
-            window.duplicates['anketa[' + (count_anketa - 1) + ']' + '[date]'] = true
+            window.duplicates['anketa[' + count_anketa + ']' + '[date]'] = true
         }
+
+        count_anketa++
     })
 
     // Отправка данных с форма по CTRL + ENTER
