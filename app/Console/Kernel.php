@@ -33,6 +33,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('forms:transfer')->withoutOverlapping()->everyMinute()->between($startLowLoadPeriod, $endLowLoadPeriod);
         $schedule->command('forms:restore-foreign')->withoutOverlapping()->everyMinute()->between($startLowLoadPeriod, $endLowLoadPeriod);
         $schedule->command('forms:fill-day-hash')->withoutOverlapping()->everyMinute()->between($startLowLoadPeriod, $endLowLoadPeriod);
+        $schedule->command('mo-file-links:remove')->withoutOverlapping()->everyMinute()->between($startLowLoadPeriod, $endLowLoadPeriod);
         $schedule->command('companies:inspect')->monthlyOn(1, '6:00');
         $schedule->command("run:briefings")->monthlyOn(10, '10:00');
     }
