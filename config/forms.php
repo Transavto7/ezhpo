@@ -16,4 +16,8 @@ return [
     'labeling' => [
         'template' => env('FORM_LABELING_TEMPLATE', ''),
     ],
+
+    'deleting-mo-files' => filter_var(env('RUN_DELETING_MO_FILES', false), FILTER_VALIDATE_BOOLEAN),
+    'days-before-deleting-mo-files' => env('DAYS_BEFORE_DELETING_MO_FILES', 45),
+    'deleting-mo-files-chunk' => env('DELETING_MO_FILES_CHUNK', 50000),
 ];
