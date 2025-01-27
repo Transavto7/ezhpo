@@ -316,7 +316,7 @@ class CreateFieldPromptsTable extends Migration
         $this->addField('pak_sdpo', 'blocked', 'Заблокирован');
         $this->addField('pak_sdpo', 'roles', 'Роль');
 
-        $this->addField('req', 'hash_id', 'id');
+        $this->addField('req', 'ha sh_id', 'id');
         $this->addField('req', 'name', 'Название');
         $this->addField('req', 'inn', 'ИНН');
         $this->addField('req', 'bik', 'БИК');
