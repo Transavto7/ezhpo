@@ -50,6 +50,16 @@ class UpdateFormHandler
             }
         }
 
+        $pointId = $data['pv_id'] ?? null;
+        if ($pointId) {
+            $point = Point::where('id', $data['pv_id'])->first();
+            if (empty($point)) {
+                throw new Exception('ПВ не найден.');
+            }
+
+            $data['point_id'] = $pointId;
+        }
+
         $driverId = $data['driver_id'] ?? null;
         if ($driverId) {
             $driver = Driver::where('hash_id', $driverId)->first();
@@ -118,7 +128,7 @@ class UpdateFormHandler
             /** @var TechForm|MedicForm $details */
             $details = $form->details;
 
-            $periodPl = $details->period_pl;
+            $periodPl = $data['period_pl'] ?? $details->period_pl;
         }
 
         if ($date && $periodPl) {
