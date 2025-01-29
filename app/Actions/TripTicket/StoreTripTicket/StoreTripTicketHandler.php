@@ -81,7 +81,7 @@ final class StoreTripTicketHandler extends TripTicketNumberGenerator
             return false;
         }
 
-        $date = Carbon::createFromFormat('Y-m', $periodPl);
+        $date = Carbon::createFromFormat('!Y-m', $periodPl);
         return $date && $date->format('Y-m') === $periodPl;
     }
 }

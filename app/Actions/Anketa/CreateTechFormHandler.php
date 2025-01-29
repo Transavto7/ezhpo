@@ -175,8 +175,8 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         }
 
         if ($formIsDop && $date && $periodPl) {
-            $dateFrom = Carbon::createFromFormat('Y-m', $periodPl)->startOfMonth();
-            $dateTo = Carbon::createFromFormat('Y-m', $periodPl)->endOfMonth();
+            $dateFrom = Carbon::createFromFormat('!Y-m', $periodPl)->startOfMonth();
+            $dateTo = Carbon::createFromFormat('!Y-m', $periodPl)->endOfMonth();
             $dateCarbon = Carbon::parse($date);
             if ($dateCarbon->lessThan($dateFrom->startOfMonth()) || $dateCarbon->greaterThan($dateTo->endOfMonth())) {
                 $this->errors[] = 'Дата осмотра находится вне периода выдачи ПЛ!';

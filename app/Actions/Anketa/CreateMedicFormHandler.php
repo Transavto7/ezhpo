@@ -155,10 +155,10 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         }
 
         if ($formIsDop && $date && $periodPl) {
-            $dateFrom = Carbon::createFromFormat('Y-m', $periodPl)->startOfMonth();
-            $dateTo = Carbon::createFromFormat('Y-m', $periodPl)->endOfMonth();
+            $dateFrom = Carbon::createFromFormat('!Y-m', $periodPl)->startOfMonth();
+            $dateTo = Carbon::createFromFormat('!Y-m', $periodPl)->endOfMonth();
             $dateCarbon = Carbon::parse($date);
-            if ($dateCarbon->lessThan($dateFrom->startOfMonth()) || $dateCarbon->greaterThan($dateTo->endOfMonth())) {
+            if ($dateCarbon->lessThan($dateFrom) || $dateCarbon->greaterThan($dateTo)) {
                 $this->errors[] = 'Дата осмотра находится вне периода выдачи ПЛ!';
 
                 return;
@@ -166,7 +166,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         }
 
         if ($formIsDop && $date && empty($periodPl)) {
-            $form['period_pl'] = $form['period_pl'] = date('Y-m', strtotime($date));
+            $form['period_pl'] = date('Y-m', strtotime($date));
         }
 
         /**
