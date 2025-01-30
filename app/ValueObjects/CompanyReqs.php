@@ -11,15 +11,15 @@ class CompanyReqs
     private $ogrn;
 
     /**
-     * @param string $inn
-     * @param string $kpp
-     * @param string $ogrn
+     * @param string|null $inn
+     * @param string|null $kpp
+     * @param string|null $ogrn
      */
-    public function __construct(string $inn, string $kpp = '', string $ogrn = '')
+    public function __construct(string $inn, ?string $kpp, ?string $ogrn)
     {
-        $this->inn = trim($inn);
-        $this->ogrn = trim ($ogrn);
-        $this->kpp = trim($kpp);
+        $this->inn = $inn ? trim($inn) : "";
+        $this->ogrn = $ogrn ? trim ($ogrn) : "";
+        $this->kpp = $kpp ? trim($kpp) : "";
     }
 
     public function isValidFormat(): bool
