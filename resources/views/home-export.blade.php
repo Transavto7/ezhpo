@@ -17,7 +17,7 @@
                     <td>{{ date('d-m-Y', strtotime($item[$key])) }}</td>
                 @elseif($key === 'date' || $key === 'created_at' || $key === 'updated_at')
                     <td>{{$item[$key] ? \Carbon\Carbon::parse($item[$key])->format("d.m.Y H:i:s") : '' }}</td>
-                @elseif($item['type_anketa'] === \App\Enums\FormTypeEnum::MEDIC && $key === 'admitted')
+                @elseif($item['type_anketa'] === \App\Enums\FormTypeEnum::MEDIC && $key === 'admitted' && in_array($item[$key], ['Допущен', 'Не допущен', 'Недопущен']))
                     @if($item['type_view'] === 'Предрейсовый/Предсменный')
                         <td>Прошел предсменный/предрейсовый медицинский осмотр, к исполнению трудовых обязанностей @if($item[$key] !== 'Допущен') НЕ @endif допущен</td>
                     @else
