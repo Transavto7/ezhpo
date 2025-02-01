@@ -121,7 +121,7 @@ Route::middleware(['auth'])->group(function () {
             Route::middleware(StripEmptyParamsFromQueryString::class)->get('{type}', 'IndexController@RenderElements')->name('renderElements');
             Route::get('{type}/{id}', 'IndexController@RemoveElement')->name('removeElement');
             Route::post('{type}', 'IndexController@AddElement')->name('addElement');
-            Route::post('{type}/{id}', 'IndexController@updateElement')->name('updateElement');
+            Route::post('{type}/{id}', 'IndexController@UpdateElement')->name('updateElement');
             Route::get('{type}/sync/{id}', 'IndexController@syncElement')->name('syncElement');
             Route::get('delete-file/{model}/{id}/{field}', 'IndexController@DeleteFileElement')->name('deleteFileElement');
         });
