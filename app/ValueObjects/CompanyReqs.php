@@ -15,7 +15,7 @@ class CompanyReqs
      * @param string|null $kpp
      * @param string|null $ogrn
      */
-    public function __construct(string $inn, ?string $kpp, ?string $ogrn)
+    public function __construct(?string $inn, ?string $kpp, ?string $ogrn)
     {
         $this->inn = $inn ? trim($inn) : "";
         $this->ogrn = $ogrn ? trim ($ogrn) : "";
