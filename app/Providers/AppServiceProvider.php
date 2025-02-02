@@ -7,6 +7,8 @@ use App\Car;
 use App\Company;
 use App\Contractcs\GetServicesReportForCompanyByPeriodInterface;
 use App\Driver;
+use App\Employee;
+use App\Enums\UserEntityType;
 use App\Models\Contract;
 use App\Observers\AnketaObserver;
 use App\Observers\CarObserver;
@@ -24,7 +26,9 @@ use App\Services\OneC\CompanySync\CompanySyncServiceInterface;
 use App\Services\OneC\Reports\GetServicesReportForCompanyByPeriod;
 use App\Services\QRCode\QRCodeGenerator;
 use App\Services\QRCode\QRCodeGeneratorInterface;
+use App\Terminal;
 use App\User;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
@@ -59,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
 
         $this->registerModelObservers();
+        $this->registerMorphRelations();
     }
 
     private function registerModelObservers()
@@ -69,5 +74,15 @@ class AppServiceProvider extends ServiceProvider
         Driver::observe(DriverObserver::class);
         User::observe(UserObserver::class);
         Anketa::observe(AnketaObserver::class);
+    }
+
+    private function registerMorphRelations()
+    {
+        Relation::morphMap([
+            UserEntityType::EMPLOYEE => Employee::class,
+            UserEntityType::TERMINAL => Terminal::class,
+            UserEntityType::DRIVER   => Driver::class,
+            UserEntityType::COMPANY  => Company::class,
+        ]);
     }
 }

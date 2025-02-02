@@ -2,7 +2,9 @@
 
 namespace App;
 
+use App\Enums\UserEntityType;
 use App\Models\Contract;
+use App\Traits\HasUserRelationTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -10,7 +12,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Driver extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasUserRelationTrait;
+
+    const ENTITY_TYPE = UserEntityType::DRIVER;
 
     public $fillable = [
         'hash_id',

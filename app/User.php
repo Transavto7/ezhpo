@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -50,7 +51,9 @@ class User extends Authenticatable
             'validity_eds_end',
             'accepted_agreement',
             'deleted_at',
-            'auto_created'
+            'auto_created',
+            'entity_id',
+            'entity_type',
         ];
 
     protected $hidden = [
@@ -217,5 +220,10 @@ class User extends Authenticatable
         }
 
         return $userName;
+    }
+
+    public function entity(): MorphTo
+    {
+        return $this->morphTo(null, 'entity_type', 'entity_id');
     }
 }
