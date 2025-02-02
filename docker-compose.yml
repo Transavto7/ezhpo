@@ -1,0 +1,25 @@
+services:
+  php-fpm:
+    restart: always
+    build:
+      context: ./
+      dockerfile: ./.docker/php-fpm/Dockerfile
+    volumes:
+      - ${STORAGE_PATH_HOST}:/var/www/html/storage/app
+    ports:
+      - "${WEB_PORT}:9000"
+
+  ### MySQL ################################################
+  mysql:
+    restart: always
+    build:
+      context: ./
+      dockerfile: ./.docker/mysql/Dockerfile
+    environment:
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - TZ=UTC
+    volumes:
+      - ${DATA_PATH_HOST}/mysql:/var/lib/mysql
