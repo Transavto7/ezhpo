@@ -171,7 +171,9 @@ class HomeController extends Controller
             'town_id' => 'points.pv_id',
             'pv_id' => 'forms.point_id',
             'user_id' => 'forms.user_id',
-            'car_mark_model' => 'cars.mark_model'
+            'car_mark_model' => 'cars.mark_model',
+            'driver_id' => 'forms.driver_id',
+            'car_id' => 'tech_forms.car_id'
         ];
 
         if (count($filterParams) > 0 && $filterActivated) {
