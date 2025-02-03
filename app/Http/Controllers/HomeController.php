@@ -407,12 +407,17 @@ class HomeController extends Controller
                     'cars.gos_number as car_gos_number',
                     'cars.date_prto as date_prto',
                 ]));
-        } else if ($validTypeForm === FormTypeEnum::MEDIC) {
+        } else if (($validTypeForm === FormTypeEnum::MEDIC) && ($export || $user->hasRole('client'))) {
             $forms = $forms
                 ->leftJoin('medic_form_normalized_pressures', 'forms.id', '=', 'medic_form_normalized_pressures.form_id')
                 ->select(array_merge($defaultFieldsToSelect, [
                     'drivers.date_prmo as date_prmo',
                     DB::raw("COALESCE(medic_form_normalized_pressures.pressure, medic_forms.tonometer, NULL) as tonometer")
+                ]));
+        } else if ($validTypeForm === FormTypeEnum::MEDIC) {
+            $forms = $forms
+                ->select(array_merge($defaultFieldsToSelect, [
+                    'drivers.date_prmo as date_prmo'
                 ]));
         } else {
             $forms = $forms
