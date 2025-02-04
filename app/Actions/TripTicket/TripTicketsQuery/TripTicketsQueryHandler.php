@@ -29,10 +29,12 @@ final class TripTicketsQueryHandler
             'trip_tickets.transportation_type',
             'trip_tickets.template_code',
             'trip_tickets.created_at',
+            'trip_tickets.deleted_at',
 
             'companies.name as company_name',
             'drivers.fio as driver_name',
             'cars.gos_number as car_number',
+            'users.name as deleted_user_name'
         ])
             ->leftJoin(
                 'companies',
@@ -51,6 +53,12 @@ final class TripTicketsQueryHandler
                 'cars.hash_id',
                 '=',
                 'trip_tickets.car_id',
+            )
+            ->leftJoin(
+                'users',
+                'users.id',
+                '=',
+                'trip_tickets.deleted_id'
             )
             ->orderBy($action->getOrderKey(), $action->getOrderBy());
 
