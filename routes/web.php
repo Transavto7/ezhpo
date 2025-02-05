@@ -169,6 +169,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('print', 'TripTickets\PrintTripTicketController')->name('print');
             Route::post('mass-print', 'TripTickets\MassPrintTripTicketsController')->name('mass-print');
             Route::get('table-export', 'TripTickets\TripTicketTableExportController')->name('table-export');
+            Route::get('select-forms', 'TripTickets\TripTicketSelectFormsController')->name('select-forms');
         });
     });
 
