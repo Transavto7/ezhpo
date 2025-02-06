@@ -146,6 +146,32 @@
                 await saveFieldsVisible(null);
                 $('.toast-reset-checks').toast('show');
             });
+
+            $('.delete').on('click', function (e) {
+                e.preventDefault();
+                const link = $(this).attr('href');
+
+                const action = $(this).data('action');
+
+                if (action === 0) {
+                    window.location.href = link;
+
+                    return;
+                }
+
+                swal.fire({
+                    title: 'Подтверждение',
+                    text: 'Вы уверены, что хотите удалить ПЛ? Связь с МО и ТО будет удалена!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Да',
+                    cancelButtonText: 'Нет'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = link;
+                    }
+                });
+            });
         });
 
         function saveFieldsVisible(params) {
@@ -647,15 +673,15 @@
                                     <div class="dropdown-menu">
                                         @if($permissionToUpdate)
                                             <a href="{{ route('trip-tickets.edit', $tripTicket->uuid) }}"
-                                               class="dropdown-item"><i class="fa fa-edit"></i> Редактировать ПЛ</a>
+                                               class="dropdown-item"><i class="fa fa-edit"></i>ПЛ</a>
                                         @endif
                                         @if($permissionToEditMedicForm && $tripTicket['medic_form_id'])
                                             <a href="{{ route('forms.get', $tripTicket->medic_form_id) }}"
-                                               class="dropdown-item"><i class="fa fa-edit"></i> Редактировать МО</a>
+                                               class="dropdown-item"><i class="fa fa-edit"></i>МО</a>
                                         @endif
                                         @if($permissionToEditTechForm && $tripTicket['tech_form_id'])
                                             <a href="{{ route('forms.get', $tripTicket->tech_form_id) }}"
-                                               class="dropdown-item"><i class="fa fa-edit"></i> Редактировать ТО</a>
+                                               class="dropdown-item"><i class="fa fa-edit"></i>ТО</a>
                                         @endif
 
                                         @if($permissionToCreateMedicForm && ! $tripTicket['medic_form_id'])
@@ -667,6 +693,8 @@
                                                 <i class="fa fa-plus"></i> Добавить ТО</a>
                                         @endif
 
+                                        {{-- TODO: добавить кнопки "связывания" и "отвязывания" осмотров --}}
+
                                         @if($permissionToPrintTripTickets)
                                             <a class="dropdown-item download-excel-to-print-btn"
                                                data-uuid="{{ $tripTicket->uuid }}" style="cursor: pointer">
@@ -677,8 +705,9 @@
                                         @if($permissionToDelete)
                                             <a
                                                 href="{{ route('trip-tickets.trash', ['id' => $tripTicket->uuid, 'action' => request()->get('trash') ? 0 : 1]) }}"
-                                                class="hv-btn-trash dropdown-item"
-                                                data-id="{{ $tripTicket->id }}">
+                                                class="hv-btn-trash dropdown-item delete"
+                                                data-id="{{ $tripTicket->id }}"
+                                                data-action="{{ request()->get('trash') ? 0 : 1 }}">
                                                 @if(request()->get('trash', 0))
                                                     <i class="fa fa-undo"></i> Восстановить
                                                 @else
