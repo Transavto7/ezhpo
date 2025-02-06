@@ -236,9 +236,9 @@ class TerminalController extends Controller
 
     public function update(Request $request)
     {
-        try {
-            DB::beginTransaction();
+        DB::beginTransaction();
 
+        try {
             $terminalStoreHandler = new TerminalStoreHandler();
             $terminalUpdateHandler = new TerminalUpdateHandler();
             $terminalCheckStoreHandler = new TerminalCheckStoreHandler();
@@ -268,7 +268,7 @@ class TerminalController extends Controller
                 ));
             }
 
-            // todo(hv): вынести в action
+            // todo: вынести в action
             TerminalDevice::where('user_id', '=', $userId)->forceDelete();
             foreach ($request->input('devices') as $device) {
                 $terminalDeviceStoreHandler->handle(new TerminalDeviceStoreAction(

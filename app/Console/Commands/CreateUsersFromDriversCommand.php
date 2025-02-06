@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Company;
+use App\Enums\UserEntityType;
 use App\GenerateHashIdTrait;
 use App\User;
 use Illuminate\Console\Command;
@@ -85,6 +86,8 @@ class CreateUsersFromDriversCommand extends Command
 
                 $password = Hash::make($driver->hash_id);
                 $data = [
+                    'entity_id' => $driver->id,
+                    'entity_type' => UserEntityType::driver(),
                     'hash_id' => $userHashId,
                     'login' => $driver->hash_id,
                     'password' => $password,

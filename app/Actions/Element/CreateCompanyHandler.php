@@ -3,6 +3,7 @@
 namespace App\Actions\Element;
 
 use App\Company;
+use App\Enums\UserEntityType;
 use App\Exceptions\EntityAlreadyExistException;
 use App\Exceptions\WrongCompanyReqsException;
 use App\Services\CompanyReqsChecker\CompanyRepository;
@@ -161,6 +162,8 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
         $userLogin = $this->getUserLogin($companyHashId);
 
         $user = User::create([
+            'entity_id' => $created->id,
+            'entity_type' => UserEntityType::company(),
             'hash_id' => $userHashId,
             'email' => $companyHashId . '-' . $userHashId . '@ta-7.ru',
             'api_token' => Hash::make(date('H:i:s') . sha1($companyHashId)),

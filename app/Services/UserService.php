@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Company;
 use App\Driver;
+use App\Enums\UserEntityType;
 use App\Services\HashIdGenerator\DefaultHashIdValidators;
 use App\Services\HashIdGenerator\HashedType;
 use App\Services\HashIdGenerator\HashIdGenerator;
@@ -38,6 +39,8 @@ class UserService
 
         /** @var User $user */
         $user = User::create([
+            'entity_id' => $driver->id,
+            'entity_type' => UserEntityType::driver(),
             'hash_id' => $userHashId,
             'email' => $company->hash_id . '-' . $userHashId . '@ta-7.ru',
             'api_token' => Hash::make(date('H:i:s') . sha1($driverHashId)),
