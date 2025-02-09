@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\TripTickets;
 
 use App\Actions\Anketa\CreateFormHandlerFactory;
-use App\Actions\TripTicket\UpdateTripTicketForm\UpdateTripTicketFormAction;
-use App\Actions\TripTicket\UpdateTripTicketForm\UpdateTripTicketFormHandler;
+use App\Actions\TripTicket\SyncTripTicketWithForm\SyncTripTicketWithFormAction;
+use App\Actions\TripTicket\SyncTripTicketWithForm\SyncTripTicketWithFormHandler;
 use App\Driver;
 use App\Enums\FormTypeEnum;
 use App\Http\Controllers\Controller;
@@ -17,7 +17,7 @@ use Throwable;
 
 class TripTicketStoreFormController extends Controller
 {
-    public function __invoke(string  $id, Request $request, CreateFormHandlerFactory $factory, UpdateTripTicketFormHandler $ticketHandler): RedirectResponse
+    public function __invoke(string $id, Request $request, CreateFormHandlerFactory $factory, SyncTripTicketWithFormHandler $ticketHandler): RedirectResponse
     {
         $tripTicket = TripTicket::where('uuid', '=', $id)->first();
         $data = $request->all();
@@ -44,7 +44,7 @@ class TripTicketStoreFormController extends Controller
 
             $responseData['success'] = "$formTypeLabel для ПЛ № $tripTicket->ticket_number успешно добавлен";
 
-            $ticketHandler->handle(new UpdateTripTicketFormAction(
+            $ticketHandler->handle(new SyncTripTicketWithFormAction(
                 $tripTicket,
                 $responseData['created'][0]
             ));

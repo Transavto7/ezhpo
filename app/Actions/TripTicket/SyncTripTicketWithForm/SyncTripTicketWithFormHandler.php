@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Actions\TripTicket\UpdateTripTicketForm;
+namespace App\Actions\TripTicket\SyncTripTicketWithForm;
 
 use App\Enums\FormTypeEnum;
 use App\Models\TripTicket;
 use Illuminate\Database\Eloquent\Builder;
 
-final class UpdateTripTicketFormHandler
+final class SyncTripTicketWithFormHandler
 {
-    public function handle(UpdateTripTicketFormAction $action): TripTicket
+    public function handle(SyncTripTicketWithFormAction $action): TripTicket
     {
         if ($action->getTripTicket()->{$action->getFormType().'_form_id'} !== null) {
             $type = $action->getFormType() === FormTypeEnum::MEDIC ? 'медицинским' : 'техническим';
@@ -41,7 +41,7 @@ final class UpdateTripTicketFormHandler
         return $action->getTripTicket();
     }
 
-    private function formHasRelation(UpdateTripTicketFormAction $action): bool
+    private function formHasRelation(SyncTripTicketWithFormAction $action): bool
     {
         $tripTicket = TripTicket::query()
             ->when($action->getFormType() === FormTypeEnum::MEDIC, function (Builder $query) use ($action) {
