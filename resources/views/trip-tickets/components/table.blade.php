@@ -108,8 +108,7 @@
                     @endif
 
                     @if($permissionToUpdate)
-                        <a class="dropdown-item form-actions-modal-btn" data-toggle="modal" data-target="#from-actions" style="cursor: pointer"
-                            data-medic="{{ $tripTicket['medic_form_id'] }}" data-tech="{{ $tripTicket['tech_form_id'] }}" data-id="{{ $tripTicket->uuid }}">
+                        <a class="dropdown-item form-actions-modal-btn" data-toggle="modal" data-target="#from-actions" style="cursor: pointer" data-id="{{ $tripTicket->uuid }}">
                             &plusmn; Привязать/отвязать МО и ТО
                         </a>
                     @endif

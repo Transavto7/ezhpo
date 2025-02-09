@@ -67,6 +67,10 @@
         .dropleft .dropdown-toggle::before {
             display: none;
         }
+
+        .form-link {
+            font-size: 13px;
+        }
     </style>
 @endsection
 
@@ -398,38 +402,97 @@
             })
 
             let currentTripTicketId = null
-            const medicSelect = $('#medic_form_id').select2({
-                ajax: {
-                    url: '{{ route('trip-tickets.select-forms') }}',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            term: params.term,
-                            page: params.page || 1,
-                            type: 'medic',
-                            currentTripTicketId,
-                        };
-                    },
-                    processResults: function(data, params) {
-                        params.page = params.page || 1;
+            const medicSelect = setSelect2('#medic_form_id', 'medic')
+            const techSelect = setSelect2('#tech_form_id', 'tech')
 
-                        return {
-                            results: data.items,
-                            pagination: {
-                                more: data.more
-                            }
-                        };
+            function setSelect2(selector, type) {
+                return $(selector).select2({
+                    ajax: {
+                        url: '{{ route('trip-tickets.select-forms') }}',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                term: params.term,
+                                page: params.page || 1,
+                                type: type,
+                                currentTripTicketId,
+                            };
+                        },
+                        processResults: function(data, params) {
+                            params.page = params.page || 1;
+
+                            return {
+                                results: data.items,
+                                pagination: {
+                                    more: data.more
+                                }
+                            };
+                        },
+                        cache: true
                     },
-                    cache: true
-                },
-                placeholder: 'Выберите значение из списка...',
-            });
+                    placeholder: 'Выберите значение из списка...',
+                    allowClear: true,
+                })
+            }
+
+            medicSelect.change(function () {
+                console.log($(this).val())
+                enableLink('.medic-link', $(this).val())
+            })
+
+            techSelect.change(function () {
+                enableLink('.tech-link', $(this).val())
+            })
 
             $('table').on('click', '.form-actions-modal-btn', function () {
                 currentTripTicketId = $(this).data('id')
-                const medicId = $(this).data('medic')
-                const techId = $(this).data('tech')
+
+                axios
+                    .get('{{ route('trip-tickets.get-related-forms') }}', {
+                        params: {
+                            id: currentTripTicketId
+                        }
+                    })
+                    .then(response => {
+                        const {data} = response
+
+                        if (data.medic) {
+                            medicSelect.append(new Option(data.medic.text, data.medic.id, true, true)).trigger('change')
+                            enableLink('.medic-link', data.medic.id)
+                        }
+
+                        if (data.tech) {
+                            techSelect.append(new Option(data.tech.text, data.tech.id, true, true)).trigger('change')
+                            enableLink('.tech-link', data.tech.id)
+                        }
+                    })
+            })
+
+            function enableLink(selector, id) {
+                const link = $(selector)
+                let url = '/forms/'
+
+                if (id === null) {
+                    link.attr('style', 'display: none')
+
+                    return
+                }
+
+                link.attr('href', url + id)
+                link.attr('style', '')
+            }
+
+            $('.table-card').on('click', '.update-forms-actions', function () {
+                axios
+                    .post('{{ route('trip-tickets.update-forms') }}', {
+                        id: currentTripTicketId,
+                        medic: medicSelect.val(),
+                        tech: techSelect.val(),
+                    })
+                    .then(response => {
+                        location.reload()
+                    })
             })
         })
     </script>

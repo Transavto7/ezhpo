@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Actions\TripTicket\UpdateTripTicketForm;
+namespace App\Actions\TripTicket\SyncTripTicketWithForm;
 
 use App\Models\Forms\Form;
 use App\Models\TripTicket;
 use DateTimeImmutable;
 use Exception;
 
-final class UpdateTripTicketFormAction
+final class SyncTripTicketWithFormAction
 {
     /**
      * @var TripTicket
