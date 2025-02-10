@@ -14,22 +14,22 @@ final class UpdateTripTicketFormsAction
     /**
      * @var Form|null
      */
-    private $medicFormId;
+    private $medicForm;
     /**
      * @var Form|null
      */
-    private $techFormId;
+    private $techForm;
 
     /**
      * @param TripTicket $tripTicket
-     * @param Form|null $medicFormId
-     * @param Form|null $techFormId
+     * @param Form|null $medicForm
+     * @param Form|null $techForm
      */
-    public function __construct(TripTicket $tripTicket, ?Form $medicFormId, ?Form $techFormId)
+    public function __construct(TripTicket $tripTicket, ?Form $medicForm, ?Form $techForm)
     {
         $this->tripTicket = $tripTicket;
-        $this->medicFormId = $medicFormId;
-        $this->techFormId = $techFormId;
+        $this->medicForm = $medicForm;
+        $this->techForm = $techForm;
     }
 
     public function getTripTicket(): TripTicket
@@ -37,13 +37,13 @@ final class UpdateTripTicketFormsAction
         return $this->tripTicket;
     }
 
-    public function getTechFormId(): ?Form
+    public function getTechForm(): ?Form
     {
-        return $this->techFormId;
+        return $this->techForm;
     }
 
-    public function getMedicFormId(): ?Form
+    public function getMedicForm(): ?Form
     {
-        return $this->medicFormId;
+        return $this->medicForm;
     }
 }

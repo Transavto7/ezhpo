@@ -12,6 +12,8 @@ class FormLogActionTypesEnum
     const APPROVAL = 'approval';
     const QUEUE_PROCESSING = 'queue_processing';
     const SET_FEEDBACK = 'set_feedback';
+    const ATTACH_TO_TRIP_TICKET = 'attach_to_trip_ticket';
+    const DETACH_FROM_TRIP_TICKET = 'detach_from_trip_ticket';
 
     public static function labels(): array
     {
@@ -21,7 +23,9 @@ class FormLogActionTypesEnum
             self::RESTORING => 'Восстановление',
             self::APPROVAL => 'Утверждение',
             self::QUEUE_PROCESSING => 'Обработка очереди',
-            self::SET_FEEDBACK => 'Оценка осмотра'
+            self::SET_FEEDBACK => 'Оценка осмотра',
+            self::ATTACH_TO_TRIP_TICKET => 'Привязан к путевому листу',
+            self::DETACH_FROM_TRIP_TICKET => 'Отвязан от путевого листа',
         ];
     }
 
@@ -50,7 +54,9 @@ class FormLogActionTypesEnum
             self::RESTORING,
             self::APPROVAL,
             self::QUEUE_PROCESSING,
-            self::SET_FEEDBACK
+            self::SET_FEEDBACK,
+            self::ATTACH_TO_TRIP_TICKET,
+            self::DETACH_FROM_TRIP_TICKET,
         ];
     }
 }
