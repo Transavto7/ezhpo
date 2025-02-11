@@ -118,31 +118,6 @@ class User extends Authenticatable
             778 => 'Терминал',
         ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        if (static::hideDefaultUser()) {
-            static::addGlobalScope('hideDefaultUser', function (Builder $builder) {
-                $builder->where('login', '!=', self::DEFAULT_USER_LOGIN);
-            });
-        }
-    }
-
-    //TODO: перенести в корректный слой позже
-    protected static function hideDefaultUser(): bool
-    {
-        $user = Request::user('web');
-
-        if (!$user) {
-            $user = Request::user('api');
-        }
-
-        if (!$user) return false;
-
-        return $user->login !== self::DEFAULT_USER_LOGIN;
-    }
-
     public function deleted_user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'deleted_id', 'id')
