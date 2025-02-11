@@ -58,6 +58,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('saveUser', 'UserController@saveUser');
     });
 
+    Route::prefix('employees')->as('employees.')->middleware('auth')->group(function () {
+        Route::get('/', 'Employees\IndexEmployeesPageController')->name('index');
+        Route::post('/', 'Employees\CreateEmployeeController')->name('create');
+        Route::get('/table', 'Employees\GetEmployeesTableItemsController')->name('table');
+        Route::get('/{id}', 'Employees\GetEmployeeItemController')->name('item');
+        Route::delete('/{id}', 'Employees\DeleteEmployeeController')->name('delete');
+        Route::put('/{id}', 'Employees\UpdateEmployeeController')->name('update');
+        Route::post('/{id}/restore', 'Employees\RestoreEmployeeController')->name('restore');
+        Route::post('/permissions-by-roles', 'Employees\GetPermissionsByRolesController')->name('permissions-by-roles');
+    });
+
     Route::prefix('terminals')->as('terminals.')->group(function () {
         Route::get('/', 'TerminalController@index')->name('index');
         Route::post('/', 'TerminalController@update')->name('update');

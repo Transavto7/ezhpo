@@ -3,21 +3,21 @@
 namespace App;
 
 use App\Enums\UserEntityType;
-use App\Traits\HasUserRelationTrait;
+use App\Traits\HasUserRelation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class Terminal extends Model
 {
-    use SoftDeletes, HasUserRelationTrait;
+    use SoftDeletes, HasUserRelation;
 
     const ENTITY_TYPE = UserEntityType::TERMINAL;
 
     public $fillable = [
+        'name',
         'blocked',
         'pv_id',
-        'api_token',
-        'timezone',
+        'stamp_id',
         'last_connection_at',
         'auto_created',
         'deleted_at',

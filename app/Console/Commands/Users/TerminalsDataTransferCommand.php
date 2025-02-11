@@ -45,18 +45,18 @@ final class TerminalsDataTransferCommand extends Command
                     return;
                 }
 
-                $item = [
+                $terminal = Terminal::create([
+                    'name' => $user->name,
                     'blocked' => $user->blocked,
                     'pv_id' => $user->pv_id,
+                    'stamp_id' => $user->stamp_id,
                     'last_connection_at' > $user,
-                    'auto_created' => $user->auto_created,
+                    'auto_created' => 1,
                     'deleted_at' => $user->deleted_at,
                     'deleted_id' => $user->deleted_id,
-                ];
+                ]);
 
-                $employee = Terminal::create($item);
-
-                $user->entity_id = $employee->id;
+                $user->entity_id = $terminal->id;
                 $user->entity_type = UserEntityType::TERMINAL;
                 $user->save();
             });

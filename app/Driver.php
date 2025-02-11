@@ -4,7 +4,7 @@ namespace App;
 
 use App\Enums\UserEntityType;
 use App\Models\Contract;
-use App\Traits\HasUserRelationTrait;
+use App\Traits\HasUserRelation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Driver extends Model
 {
-    use SoftDeletes, HasUserRelationTrait;
+    use SoftDeletes, HasUserRelation;
 
     const ENTITY_TYPE = UserEntityType::DRIVER;
 

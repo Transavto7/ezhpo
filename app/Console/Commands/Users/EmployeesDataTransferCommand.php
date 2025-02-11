@@ -48,18 +48,17 @@ final class EmployeesDataTransferCommand extends Command
                     return;
                 }
 
-                $item = [
+                $employee = Employee::create([
+                    'name' => $user->name,
                     'blocked' => $user->blocked,
                     'pv_id' => $user->pv_id,
                     'eds' => $user->eds,
                     'validity_eds_start' => $user->validity_eds_start,
                     'validity_eds_end' => $user->validity_eds_end,
-                    'auto_created' => $user->auto_created,
+                    'auto_created' => 1,
                     'deleted_at' => $user->deleted_at,
                     'deleted_id' => $user->deleted_id,
-                ];
-
-                $employee = Employee::create($item);
+                ]);
 
                 $user->entity_id = $employee->id;
                 $user->entity_type = UserEntityType::EMPLOYEE;

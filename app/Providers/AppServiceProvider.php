@@ -2,6 +2,14 @@
 
 namespace App\Providers;
 
+use App\Actions\User\CreateUser\CreateUserCommand;
+use App\Actions\User\CreateUser\CreateUserHandler;
+use App\Actions\User\DeleteUser\DeleteUserCommand;
+use App\Actions\User\DeleteUser\DeleteUserHandler;
+use App\Actions\User\RestoreUser\RestoreUserCommand;
+use App\Actions\User\RestoreUser\RestoreUserHandler;
+use App\Actions\User\UpdateUser\UpdateUserCommand;
+use App\Actions\User\UpdateUser\UpdateUserHandler;
 use App\Anketa;
 use App\Car;
 use App\Company;
@@ -28,6 +36,7 @@ use App\Services\QRCode\QRCodeGenerator;
 use App\Services\QRCode\QRCodeGeneratorInterface;
 use App\Terminal;
 use App\User;
+use Illuminate\Bus\Dispatcher;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -64,6 +73,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->registerModelObservers();
         $this->registerMorphRelations();
+        $this->registerCommandHandlers();
     }
 
     private function registerModelObservers()
@@ -84,5 +94,19 @@ class AppServiceProvider extends ServiceProvider
             UserEntityType::DRIVER   => Driver::class,
             UserEntityType::COMPANY  => Company::class,
         ]);
+    }
+
+    private function registerCommandHandlers()
+    {
+        $this->app->extend(Dispatcher::class, function (Dispatcher $dispatcher) {
+            $dispatcher->map([
+                CreateUserCommand::class => CreateUserHandler::class,
+                UpdateUserCommand::class => UpdateUserHandler::class,
+                DeleteUserCommand::class => DeleteUserHandler::class,
+                RestoreUserCommand::class => RestoreUserHandler::class,
+            ]);
+
+            return $dispatcher;
+        });
     }
 }

@@ -84,7 +84,7 @@ class UserController extends Controller
             ]);
         }
 
-        $fields = FieldPrompt::where('type', 'users')->get();
+        $fields = FieldPrompt::where('type', 'employees')->get();
 
         $points = Town::query()
             ->with(['pvs'])
