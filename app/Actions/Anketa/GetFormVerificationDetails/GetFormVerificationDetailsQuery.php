@@ -5,6 +5,7 @@ namespace App\Actions\Anketa\GetFormVerificationDetails;
 use App\Enums\FormLabelingType;
 use App\Exceptions\ExpiredFormPeriodPlException;
 use App\Models\Forms\Form;
+use App\Models\TripTicket;
 use App\ViewModels\FormVerificationDetails\FormVerificationDetails;
 use Carbon\Carbon;
 use Http\Client\Common\Exception\HttpClientNotFoundException;
@@ -28,6 +29,7 @@ final class GetFormVerificationDetailsQuery
         $formPeriod = null;
         $driverName = null;
         $carGosNumber = null;
+        $tripTicketId = null;
 
         if ($form->deleted_at !== null) {
             $verified = false;
@@ -64,6 +66,12 @@ final class GetFormVerificationDetailsQuery
             if ($form->details->car && $form->details->car->gos_number) {
                 $carGosNumber = $form->details->car->gos_number;
             }
+
+            $tripTicket = TripTicket::where('medic_form_id', '=', $form->id)->first();
+
+            if ($tripTicket) {
+                $tripTicketId = $tripTicket->uuid;
+            }
         }
 
         return new FormVerificationDetails(
@@ -77,6 +85,7 @@ final class GetFormVerificationDetailsQuery
             $formPeriod,
             $driverName,
             $carGosNumber,
+            $tripTicketId
         );
     }
 }

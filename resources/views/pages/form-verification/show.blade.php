@@ -136,9 +136,9 @@
                                     @endif
                                 </div>
 
-                                @auth
-                                    @if($permissionToDelete)
-                                        <div class="mt-2">
+                                <div class="mt-2">
+                                    @auth
+                                        @if($permissionToDelete)
                                             <a
                                                 id="form-verification-delete-link"
                                                 href="{{ route('forms.trash', ['id' => $details->getFormId(), 'action' => 1]) }}"
@@ -146,9 +146,18 @@
                                                 data-id="{{ $details->getFormId() }}">
                                                 Удалить <i class="fa fa-trash ml-1"></i>
                                             </a>
-                                        </div>
+                                        @endif
+                                    @endauth
+
+                                    @if($details->getTripTicketId())
+                                        <a
+                                            id="attach-trip-ticket-photos"
+                                            href="{{ route('trip-tickets.attach-photos-page', ['id' => $details->getTripTicketId()]) }}"
+                                            class="btn btn-success btn-sm hv-btn-trash ml-2 mr-1">
+                                            Загрузить фото ПЛ <i class="fa fa-photo ml-1"></i>
+                                        </a>
                                     @endif
-                                @endauth
+                                </div>
                             @endif
                         </div>
                     </div>

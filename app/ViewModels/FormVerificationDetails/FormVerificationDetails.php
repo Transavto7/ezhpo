@@ -36,7 +36,7 @@ final class FormVerificationDetails
      */
     private $formDate;
     /**
-     * @var string|null
+     * @var Carbon|null
      */
     private $formPeriod;
     /**
@@ -47,6 +47,10 @@ final class FormVerificationDetails
      * @var string|null
      */
     private $carGosNumber;
+    /**
+     * @var string|null
+     */
+    private $tripTicketId;
 
     /**
      * @param bool $verified
@@ -59,6 +63,7 @@ final class FormVerificationDetails
      * @param Carbon|null $formPeriod
      * @param string|null $driverName
      * @param string|null $carGosNumber
+     * @param string|null $tripTicketId
      */
     public function __construct(
         bool             $verified,
@@ -70,9 +75,9 @@ final class FormVerificationDetails
         ?Carbon          $formDate,
         ?Carbon          $formPeriod,
         ?string          $driverName,
-        ?string          $carGosNumber
-    )
-    {
+        ?string          $carGosNumber,
+        ?string          $tripTicketId
+    ) {
         $this->verified = $verified;
         $this->formUuid = $formUuid;
         $this->formId = $formId;
@@ -83,6 +88,7 @@ final class FormVerificationDetails
         $this->formPeriod = $formPeriod;
         $this->driverName = $driverName;
         $this->carGosNumber = $carGosNumber;
+        $this->tripTicketId = $tripTicketId;
     }
 
     public function isVerified(): bool
@@ -123,6 +129,11 @@ final class FormVerificationDetails
     public function getFormPeriod(): ?Carbon
     {
         return $this->formPeriod;
+    }
+
+    public function getTripTicketId(): ?string
+    {
+        return $this->tripTicketId;
     }
 
     public function getFormattedFormPeriod(): ?string
