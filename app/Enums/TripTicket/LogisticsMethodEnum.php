@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums;
+namespace App\Enums\TripTicket;
 
 class LogisticsMethodEnum
 {
@@ -69,9 +69,9 @@ class LogisticsMethodEnum
     public static function labels(): array
     {
         return [
+            self::LONG_DISTANCE => 'Междугородное',
             self::URBAN => 'Городское',
             self::SUBURBAN => 'Пригородное',
-            self::LONG_DISTANCE => 'Междугородное',
             self::INTERNATIONAL => 'Международное',
         ];
     }

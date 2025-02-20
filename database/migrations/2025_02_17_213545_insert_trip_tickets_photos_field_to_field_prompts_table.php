@@ -13,7 +13,7 @@ class InsertTripTicketsPhotosFieldToFieldPromptsTable extends Migration
      */
     public function up()
     {
-        $period = [
+        $photos = [
             'attributes' => [
                 'type' => TripTicket::SLUG,
                 'field' => 'photos'
@@ -24,7 +24,7 @@ class InsertTripTicketsPhotosFieldToFieldPromptsTable extends Migration
             ]
         ];
 
-        FieldPrompt::query()->updateOrCreate($period['attributes'], $period['values']);
+        FieldPrompt::query()->updateOrCreate($photos['attributes'], $photos['values']);
     }
 
     /**

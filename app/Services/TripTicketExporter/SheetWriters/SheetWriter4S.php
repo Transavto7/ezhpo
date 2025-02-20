@@ -2,16 +2,20 @@
 
 namespace App\Services\TripTicketExporter\SheetWriters;
 
-use App\Enums\LogisticsMethodEnum;
-use App\Enums\TransportationTypeEnum;
+use App\Enums\TripTicket\LogisticsMethodEnum;
+use App\Enums\TripTicket\TransportationTypeEnum;
+use App\Services\QRCode\QRCodeGeneratorInterface;
 use App\Services\TripTicketExporter\ViewModels\ExportedItem;
 use App\Services\TripTicketExporter\ViewModels\ExportedItem4S;
 use App\Services\TripTicketExporter\ViewModels\MedicFormViewModel;
-use App\Services\TripTicketExporter\ViewModels\StampViewModel;
 use App\Services\TripTicketExporter\ViewModels\TechFormViewModel;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 final class SheetWriter4S implements SheetWriterInterface
@@ -24,6 +28,19 @@ final class SheetWriter4S implements SheetWriterInterface
      * @var ExportedItem4S
      */
     private $data;
+
+    /**
+     * @var QRCodeGeneratorInterface
+     */
+    private $qrCodeGenerator;
+
+    /**
+     * @param QRCodeGeneratorInterface $qrCodeGenerator
+     */
+    public function __construct(QRCodeGeneratorInterface $qrCodeGenerator)
+    {
+        $this->qrCodeGenerator = $qrCodeGenerator;
+    }
 
     public function templateSheetName(): string
     {
@@ -40,6 +57,17 @@ final class SheetWriter4S implements SheetWriterInterface
     public function createSheet(Spreadsheet $spreadsheet, ExportedItem $item, int $number): Spreadsheet
     {
         $this->sheet = clone $spreadsheet->getSheetByName($this->templateSheetName());
+
+        $title = $number . '. ' . config('trip-ticket.print.4s.template.front.prefix');
+
+        if ($item->getTripTicket()->getTicketNumber()) {
+            $title .= ' (' . $item->getTripTicket()->getTicketNumber() . ')';
+        }
+
+        $this->sheet->setTitle($title);
+
+        $spreadsheet->addSheet($this->sheet);
+
         $this->data = $item;
 
         $this->fillIds()
@@ -54,16 +82,6 @@ final class SheetWriter4S implements SheetWriterInterface
             ->fillTechStamp()
             ->fillLogisticMethod()
             ->fillTransportationType();
-
-        $title = $number . '. ' . config('trip-ticket.print.4s.template.front.prefix');
-
-        if ($item->getTripTicket()->getTicketNumber()) {
-            $title .= ' (' . $item->getTripTicket()->getTicketNumber() . ')';
-        }
-
-        $this->sheet->setTitle($title);
-
-        $spreadsheet->addSheet($this->sheet);
 
         return $spreadsheet;
     }
@@ -91,7 +109,10 @@ final class SheetWriter4S implements SheetWriterInterface
     private function fillTripTicketNumber(): self
     {
         $number = $this->data->getTripTicket()->getTicketNumber();
-        $this->sheet->setCellValue('CZ3', $number);
+        $externalNumber = $this->data->getTripTicket()->getExternalTicketNumber();
+
+        $this->sheet->setCellValue('CZ3', $externalNumber ?: $number);
+        $this->sheet->setCellValue('CZ4', $number);
 
         return $this;
     }
@@ -101,7 +122,7 @@ final class SheetWriter4S implements SheetWriterInterface
         if ($this->data->getTripTicket()->getStartDate()) {
             $period = $this->data->getTripTicket()->getValidityPeriod();
             $startDate = $this->data->getTripTicket()->getStartDate();
-            $endDate = $startDate->copy()->addDays($period);
+            $endDate = $startDate->copy()->addDays($period - 1);
 
             $this->sheet->setCellValue('AV5', $startDate->day);
             $this->sheet->setCellValue('CT5', $endDate->day);
@@ -114,10 +135,10 @@ final class SheetWriter4S implements SheetWriterInterface
         }
 
         $this->sheet->setCellValue('BF5', trans('date.months_genitive.' . $startDate->month));
-        $this->sheet->setCellValue('CA5', $startDate->year);
+        $this->sheet->setCellValue('BY5', $startDate->year);
 
         $this->sheet->setCellValue('DC5', trans('date.months_genitive.' . $endDate->month));
-        $this->sheet->setCellValue('DW5', $endDate->year);
+        $this->sheet->setCellValue('DU5', $endDate->year);
 
         return $this;
     }
@@ -225,8 +246,11 @@ final class SheetWriter4S implements SheetWriterInterface
             $stamp = $this->data->getMedicForm()->getStamp();
         }
 
-        if (!$stamp) {
-            $stamp = StampViewModel::default();
+        if (! $stamp) {
+            $this->sheet->getStyle('Q43:BA50')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
+            $this->sheet->getStyle('Q43:BA50')->getFill()->setFillType(Fill::FILL_NONE);
+
+            return $this;
         }
 
         $medicStamp = $stamp->getReqName() . "\n";
@@ -239,6 +263,26 @@ final class SheetWriter4S implements SheetWriterInterface
 
         $this->sheet->setCellValue('R44', $medicStamp . "\n\n" . $date);
 
+        $url = route('anketa.verification.page', [
+            'uuid' => $this->data->getMedicForm()->getUuid(),
+        ]);
+
+        $qrCodeFileName = 'qrcodes/medic_' . $this->data->getMedicForm()->getUuid() . '.jpg';
+        $qrCodeFilePath = Storage::disk('public')->path($qrCodeFileName);
+
+        $this->qrCodeGenerator->generate($url, QRCodeGeneratorInterface::VERSION_6, $qrCodeFilePath);
+
+        $drawing = new Drawing();
+        $drawing->setName('Маркировка осмотра');
+        $drawing->setDescription('Маркировка осмотра');
+        $drawing->setPath($qrCodeFilePath);
+        $drawing->setCoordinates('A43');
+        $drawing->setWidth(80);
+        $drawing->setHeight(80);
+        $drawing->setOffsetX(15);
+        $drawing->setOffsetY(5);
+        $drawing->setWorksheet($this->sheet);
+
         return $this;
     }
 
@@ -247,6 +291,13 @@ final class SheetWriter4S implements SheetWriterInterface
         $techStamp = config('trip-ticket.print.4s.stamps.tech');
 
         $techForm = $this->data->getTechForm();
+
+        if (! $techForm) {
+            $this->sheet->getStyle('BX43:DH50')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
+            $this->sheet->getStyle('BX43:DH50')->getFill()->setFillType(Fill::FILL_NONE);
+
+            return $this;
+        }
 
         $date = $this->getDateString($techForm);
 
@@ -257,16 +308,40 @@ final class SheetWriter4S implements SheetWriterInterface
 
     private function fillLogisticMethod(): self
     {
-        $value = LogisticsMethodEnum::getLabel($this->data->getTripTicket()->getLogisticsMethod()->value());
-        $this->sheet->setCellValue('B22', $value);
+        $value = $this->data->getTripTicket()->getLogisticsMethod()->value();
+
+        switch (true) {
+            case $value === LogisticsMethodEnum::URBAN:
+                $this->sheet->setCellValue('A22', '+');
+                break;
+            case $value === LogisticsMethodEnum::SUBURBAN:
+                $this->sheet->setCellValue('A25', '+');
+                break;
+            case $value === LogisticsMethodEnum::LONG_DISTANCE:
+                $this->sheet->setCellValue('A27', '+');
+                break;
+            default:
+        }
 
         return $this;
     }
 
     private function fillTransportationType(): self
     {
-        $value = TransportationTypeEnum::getLabel($this->data->getTripTicket()->getTransportationType()->value());
-        $this->sheet->setCellValue('V22', $value);
+        $value = $this->data->getTripTicket()->getTransportationType()->value();
+
+        switch (true) {
+            case $value === TransportationTypeEnum::SELF_NEEDS:
+                $this->sheet->setCellValue('T22', '+');
+                break;
+            case $value === TransportationTypeEnum::SPECIAL_VEHICLE:
+                $this->sheet->setCellValue('T25', '+');
+                break;
+            case $value === TransportationTypeEnum::CONTRACT:
+                $this->sheet->setCellValue('BJ22', '+');
+                break;
+            default:
+        }
 
         return $this;
     }

@@ -8,10 +8,11 @@ use App\Actions\TripTicket\StoreTripTicket\StoreTripTicketHandler;
 use App\Car;
 use App\Company;
 use App\Driver;
-use App\Enums\LogisticsMethodEnum;
-use App\Enums\TransportationTypeEnum;
-use App\Enums\TripTicketTemplateEnum;
+use App\Enums\TripTicket\LogisticsMethodEnum;
+use App\Enums\TripTicket\TransportationTypeEnum;
+use App\Enums\TripTicket\TripTicketTemplateEnum;
 use App\Http\Controllers\Controller;
+use App\Models\Forms\Form;
 use Http\Discovery\Exception\NotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,11 +24,22 @@ class StoreTripTicketController extends Controller
     {
         $response = [];
         try {
+            $createIsDopMedic = $request->has('create_is_dop_medic');
+            $form = null;
+            if ($request->query('form_id')) {
+                $form = Form::find($request->query('form_id'));
+
+                if ($form && ($form->tripTicketTech || $form->tripTicketMedic)) {
+                    throw new \DomainException("Осмотр $form->id уже связан с путевым листом");
+                }
+            }
+
             $this->validateIds(
                 $request->input('company_id'),
                 $request->input('driver_id'),
                 $request->input('car_id')
             );
+
             $items = $this->getItems($request->input('trip_ticket'));
 
             DB::beginTransaction();
@@ -35,7 +47,9 @@ class StoreTripTicketController extends Controller
                 $request->input('company_id'),
                 $request->input('driver_id'),
                 $request->input('car_id'),
-                $items
+                $items,
+                $createIsDopMedic,
+                $form
             ));
 
             DB::commit();
@@ -45,7 +59,7 @@ class StoreTripTicketController extends Controller
             DB::rollBack();
         }
 
-        return back()->with($response);
+        return redirect(route('trip-tickets.create'))->with($response);
     }
 
     private function validateIds(string $companyId, string $driverId = null, string $carId = null)

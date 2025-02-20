@@ -10,6 +10,7 @@ use App\Enums\FormLogActionTypesEnum;
 use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\Events\Forms\FormAction;
+use App\Events\TripTickets\UpdateRelatedItems;
 use App\Exceptions\InvalidCarTypeAutoForIsDopTechForm;
 use App\MedicFormNormalizedPressure;
 use App\Models\Forms\Form;
@@ -182,6 +183,7 @@ class UpdateFormHandler
             }
         }
 
+        $this->checkRelatedTripTicket($form, $data);
         $form->fill($data);
         $form->details->fill($data);
 
@@ -199,6 +201,8 @@ class UpdateFormHandler
         if ($isMedicForm) {
             $this->normalizeMedicPressure($form);
         }
+
+        event(new UpdateRelatedItems($form));
     }
 
     protected function normalizeMedicPressure(Form $form)
@@ -301,5 +305,40 @@ class UpdateFormHandler
         }
 
         return collect([]);
+    }
+
+    private function checkRelatedTripTicket(Form $form, array $data)
+    {
+        if ($form->type_anketa === FormTypeEnum::TECH) {
+            $tripTicket = $form->tripTicketTech;
+        } else {
+            $tripTicket = $form->tripTicketMedic;
+        }
+
+        if ($tripTicket) {
+            if ($tripTicket->start_date && ! $data['date']) {
+                throw new Exception('Нельзя удалить дату осмотра, который связан с путевым листом');
+            } elseif ($tripTicket->start_date && Carbon::parse($data['date'])->format('Y-m-d') !== $tripTicket->start_date) {
+                throw new Exception('Нельзя изменить дату осмотра, который связан с путевым листом');
+            }
+
+            if (isset($data['period_pl']) && $data['period_pl'] && Carbon::parse($data['period_pl'])->format('Y-m') !== $tripTicket->period_pl) {
+                throw new Exception('Период ПЛ не совпадает с периодом ПЛ осмотра, который связан с путевым листом');
+            }
+
+            if ($tripTicket->driver_id && ! $data['driver_id']) {
+                throw new Exception('Нельзя удалить водителя у осмотра, который связан с путевым листом');
+            } elseif ($tripTicket->driver_id && $data['driver_id'] !== $tripTicket->driver_id) {
+                throw new Exception('Нельзя изменить водителя у осмотра, который связан с путевым листом');
+            }
+
+            if ($form->type_anketa === FormTypeEnum::TECH) {
+                if ($tripTicket->car_id && ! $data['car_id']) {
+                    throw new Exception('Нельзя удалить водителя у осмотра, который связан с путевым листом');
+                } elseif ($tripTicket->car_id && $data['car_id'] !== $tripTicket->car_id) {
+                    throw new Exception('Нельзя изменить водителя у осмотра, который связан с путевым листом');
+                }
+            }
+        }
     }
 }

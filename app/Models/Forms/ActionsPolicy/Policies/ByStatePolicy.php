@@ -3,10 +3,13 @@
 namespace App\Models\Forms\ActionsPolicy\Policies;
 
 use App\Enums\FlagPakEnum;
+use App\Enums\TripTicket\TripTicketStatus;
+use App\Enums\TripTicket\TripTicketType;
 use App\Models\Forms\Form;
 use App\Models\TripTicket;
 use App\User;
 use App\Models\Forms\ActionsPolicy\Contracts\PolicyInterface;
+use Illuminate\Database\Eloquent\Builder;
 
 class ByStatePolicy implements PolicyInterface
 {
@@ -80,8 +83,26 @@ class ByStatePolicy implements PolicyInterface
 
         /** Относится к ПЛ */
         $permanentlyDisabledConditions[] = TripTicket::query()
-            ->where('medic_form_id', $this->form->id)
-            ->orWhere('tech_form_id', $this->form->id)
+            ->where(function (Builder $query) {
+                $query->where('medic_form_id', $this->form->id)
+                    ->orWhere('tech_form_id', $this->form->id);
+            })
+            ->where(function (Builder $query) {
+                $query->where(function (Builder $query) {
+                    $query->where('type', '=', TripTicketType::GENERATED)
+                        ->where('status','!=', TripTicketStatus::CREATED);
+                })->orWhere(function (Builder $query) {
+                    $query->where(function (Builder $query) {
+                        $query->where('type', '=', TripTicketType::IN_ADVANCE)
+                            ->where('status','=', TripTicketStatus::APPROVED);
+                    });
+                })->orWhere(function (Builder $query) {
+                    $query->where(function (Builder $query) {
+                        $query->where('type', '=', TripTicketType::COMMON)
+                            ->where('status','!=', TripTicketStatus::CREATED);
+                    });
+                });
+            })
             ->exists();
 
         /** Относится к СДПО */

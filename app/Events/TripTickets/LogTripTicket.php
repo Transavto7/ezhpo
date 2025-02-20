@@ -2,12 +2,12 @@
 
 namespace App\Events\TripTickets;
 
-use App\Enums\TripTicketActionType;
+use App\Enums\TripTicket\TripTicketActionType;
 use App\Models\TripTicket;
 use App\User;
 use Illuminate\Queue\SerializesModels;
 
-class TripTicketAction
+class LogTripTicket
 {
     use SerializesModels;
 

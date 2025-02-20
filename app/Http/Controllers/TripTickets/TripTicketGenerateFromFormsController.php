@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\TripTickets;
 
-use App\Actions\TripTicket\CreateTripTickets\TripTicketsAction;
-use App\Actions\TripTicket\CreateTripTickets\TripTicketsHandler;
+use App\Actions\TripTicket\GenerateTripTickets\TripTicketsAction;
+use App\Actions\TripTicket\GenerateTripTickets\TripTicketsHandler;
 use App\Company;
 use App\Driver;
-use App\Enums\LogisticsMethodEnum;
-use App\Enums\TransportationTypeEnum;
-use App\Enums\TripTicketTemplateEnum;
+use App\Enums\TripTicket\LogisticsMethodEnum;
+use App\Enums\TripTicket\TransportationTypeEnum;
+use App\Enums\TripTicket\TripTicketTemplateEnum;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

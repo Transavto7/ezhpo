@@ -2,9 +2,9 @@
 
 namespace App\Actions\TripTicket\StoreTripTicket;
 
-use App\Enums\LogisticsMethodEnum;
-use App\Enums\TransportationTypeEnum;
-use App\Enums\TripTicketTemplateEnum;
+use App\Enums\TripTicket\LogisticsMethodEnum;
+use App\Enums\TripTicket\TransportationTypeEnum;
+use App\Enums\TripTicket\TripTicketTemplateEnum;
 use DateTimeImmutable;
 
 final class StoreTripTicketActionItem
@@ -27,7 +27,7 @@ final class StoreTripTicketActionItem
     /**
      * @var string|null
      */
-    private $ticketNumber;
+    private $externalTicketNumber;
 
     /**
      * @var LogisticsMethodEnum
@@ -48,7 +48,7 @@ final class StoreTripTicketActionItem
      * @param DateTimeImmutable|null $startDate
      * @param string|null $periodPl
      * @param int $validityPeriod
-     * @param string|null $ticketNumber
+     * @param string|null $externalTicketNumber
      * @param LogisticsMethodEnum $logisticsMethod
      * @param TransportationTypeEnum $transportationType
      * @param TripTicketTemplateEnum $templateCode
@@ -57,7 +57,7 @@ final class StoreTripTicketActionItem
         ?DateTimeImmutable $startDate,
         ?string $periodPl,
         int $validityPeriod,
-        ?string $ticketNumber,
+        ?string $externalTicketNumber,
         LogisticsMethodEnum $logisticsMethod,
         TransportationTypeEnum $transportationType,
         TripTicketTemplateEnum $templateCode
@@ -65,7 +65,7 @@ final class StoreTripTicketActionItem
         $this->startDate = $startDate;
         $this->periodPl = $periodPl;
         $this->validityPeriod = $validityPeriod;
-        $this->ticketNumber = $ticketNumber;
+        $this->externalTicketNumber = $externalTicketNumber;
         $this->logisticsMethod = $logisticsMethod;
         $this->transportationType = $transportationType;
         $this->templateCode = $templateCode;
@@ -86,9 +86,9 @@ final class StoreTripTicketActionItem
         return $this->validityPeriod;
     }
 
-    public function getTicketNumber(): ?string
+    public function getExternalTicketNumber(): ?string
     {
-        return $this->ticketNumber;
+        return $this->externalTicketNumber;
     }
 
     public function getLogisticsMethod(): LogisticsMethodEnum

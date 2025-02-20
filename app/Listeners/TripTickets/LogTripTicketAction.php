@@ -2,7 +2,8 @@
 
 namespace App\Listeners\TripTickets;
 
-use App\Events\TripTickets\TripTicketAction;
+use App\Enums\TripTicket\TripTicketActionType;
+use App\Events\TripTickets\LogTripTicket;
 use App\Models\TripTicketLog;
 
 class LogTripTicketAction
@@ -20,14 +21,14 @@ class LogTripTicketAction
     /**
      * Handle the event.
      *
-     * @param TripTicketAction $event
+     * @param LogTripTicket $event
      * @return void
      */
-    public function handle(TripTicketAction $event)
+    public function handle(LogTripTicket $event)
     {
         $logData = $this->logModel($event->getTripTicket());
 
-        if (count($logData) === 0) {
+        if (count($logData) === 0 && ! $event->getType()->equal(TripTicketActionType::changeStatus())) {
             return;
         }
 
@@ -39,18 +40,18 @@ class LogTripTicketAction
         ]);
     }
 
-    private function logModel($form): array
+    private function logModel($tripTicket): array
     {
         $logData = [];
 
-        foreach ($form->getDirty() as $attribute => $newValue) {
-            if (empty($newValue) && empty($form->getOriginal($attribute))) {
+        foreach ($tripTicket->getDirty() as $attribute => $newValue) {
+            if (empty($newValue) && empty($tripTicket->getOriginal($attribute))) {
                 continue;
             }
 
             $logData[] = [
                 'name' => $attribute,
-                'oldValue' => $form->getOriginal($attribute),
+                'oldValue' => $tripTicket->getOriginal($attribute),
                 'newValue' => $newValue
             ];
         }

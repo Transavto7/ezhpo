@@ -6,11 +6,12 @@ use App\Actions\TripTicket\UpdateTripTicket\UpdateTripTicketAction;
 use App\Actions\TripTicket\UpdateTripTicket\UpdateTripTicketHandler;
 use App\Car;
 use App\Driver;
-use App\Enums\LogisticsMethodEnum;
-use App\Enums\TransportationTypeEnum;
-use App\Enums\TripTicketTemplateEnum;
+use App\Enums\TripTicket\LogisticsMethodEnum;
+use App\Enums\TripTicket\TransportationTypeEnum;
+use App\Enums\TripTicket\TripTicketTemplateEnum;
 use App\Http\Controllers\Controller;
 use App\Models\TripTicket;
+use App\Services\TripTicket\TripTicketPermissions;
 use Http\Discovery\Exception\NotFoundException;
 use Illuminate\Http\Request;
 use Throwable;
@@ -24,6 +25,11 @@ class UpdateTripTicketController extends Controller
         try {
             $tripTicket = TripTicket::where('uuid', '=', $uuid)->first();
 
+            if (! TripTicketPermissions::canEdit($tripTicket->type, $tripTicket->status)) {
+                $number = $tripTicket->external_number ?: $tripTicket->ticket_number;
+                throw new \Exception("Путевой лист №$number не может быть отредактирован");
+            }
+
             $this->validateIds(
                 $request->input('driver_id'),
                 $request->input('car_id')
@@ -35,13 +41,14 @@ class UpdateTripTicketController extends Controller
                 $request->input('car_id'),
                 $request->input('start_date'),
                 $request->input('validity_period', 1),
+                $request->input('external_number'),
                 LogisticsMethodEnum::fromString($request->input('logistics_method')),
                 TransportationTypeEnum::fromString($request->input('transportation_type')),
                 TripTicketTemplateEnum::fromString($request->input('template_code')),
             ));
 
         } catch (Throwable $exception) {
-            return redirect($referer)->with(['error' => $exception->getMessage()]);
+            return redirect($referer)->with(['errors' => [$exception->getMessage()]]);
         }
 
         return redirect($referer)->with(['success' => "Путевой лист №$tripTicket->ticket_number обновлен"]);

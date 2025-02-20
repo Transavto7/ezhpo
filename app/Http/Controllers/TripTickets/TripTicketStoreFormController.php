@@ -5,8 +5,8 @@ namespace App\Http\Controllers\TripTickets;
 use App\Actions\Anketa\CreateFormHandlerFactory;
 use App\Actions\TripTicket\SyncTripTicketWithForm\SyncTripTicketWithFormAction;
 use App\Actions\TripTicket\SyncTripTicketWithForm\SyncTripTicketWithFormHandler;
-use App\Driver;
 use App\Enums\FormTypeEnum;
+use App\Events\TripTickets\UpdateRelatedItems;
 use App\Http\Controllers\Controller;
 use App\Models\TripTicket;
 use Illuminate\Http\RedirectResponse;
@@ -48,6 +48,8 @@ class TripTicketStoreFormController extends Controller
                 $tripTicket,
                 $responseData['created'][0]
             ));
+
+            event(new UpdateRelatedItems($responseData['created'][0]));
 
             DB::commit();
 

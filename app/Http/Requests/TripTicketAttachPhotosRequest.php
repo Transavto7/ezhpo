@@ -18,4 +18,14 @@ class TripTicketAttachPhotosRequest extends FormRequest
     {
         return true;
     }
+
+    public function messages(): array
+    {
+        return [
+            'file.required' => 'Файл обязателен для загрузки.',
+            'file.file' => 'Загруженный файл недействителен.',
+            'file.mimes' => 'Файл должен быть в формате JPEG, JPG, PNG или PDF.',
+            'file.max' => 'Размер файла не должен превышать 8 МБ.',
+        ];
+    }
 }

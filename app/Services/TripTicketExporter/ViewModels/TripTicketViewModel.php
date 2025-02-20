@@ -2,9 +2,8 @@
 
 namespace App\Services\TripTicketExporter\ViewModels;
 
-use App\Enums\LogisticsMethodEnum;
-use App\Enums\TransportationTypeEnum;
-use App\Enums\TripTicketTemplateEnum;
+use App\Enums\TripTicket\LogisticsMethodEnum;
+use App\Enums\TripTicket\TransportationTypeEnum;
 use Illuminate\Support\Carbon;
 
 final class TripTicketViewModel
@@ -13,6 +12,10 @@ final class TripTicketViewModel
      * @var string|null
      */
     private $ticketNumber;
+    /**
+     * @var string|null
+     */
+    private $externalTicketNumber;
     /**
      * @var Carbon|null
      */
@@ -36,6 +39,7 @@ final class TripTicketViewModel
 
     /**
      * @param string|null $ticketNumber
+     * @param string|null $externalTicketNumber
      * @param Carbon|null $startDate
      * @param Carbon|null $periodPl
      * @param int $validityPeriod
@@ -44,14 +48,15 @@ final class TripTicketViewModel
      */
     public function __construct(
         ?string                $ticketNumber,
+        ?string                $externalTicketNumber,
         ?Carbon                $startDate,
         ?Carbon                $periodPl,
         int                    $validityPeriod,
         LogisticsMethodEnum    $logisticsMethod,
         TransportationTypeEnum $transportationType
-    )
-    {
+    ) {
         $this->ticketNumber = $ticketNumber;
+        $this->externalTicketNumber = $externalTicketNumber;
         $this->startDate = $startDate;
         $this->periodPl = $periodPl;
         $this->validityPeriod = $validityPeriod;
@@ -62,6 +67,11 @@ final class TripTicketViewModel
     public function getTicketNumber(): ?string
     {
         return $this->ticketNumber;
+    }
+
+    public function getExternalTicketNumber(): ?string
+    {
+        return $this->externalTicketNumber;
     }
 
     public function getStartDate(): ?Carbon
