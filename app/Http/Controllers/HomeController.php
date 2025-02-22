@@ -84,7 +84,8 @@ class HomeController extends Controller
             ->leftJoin('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
             ->leftJoin('companies', 'forms.company_id', '=', 'companies.hash_id')
             ->leftJoin('points', 'forms.point_id', '=', 'points.id')
-            ->leftJoin('users', 'forms.user_id', '=', 'users.id');
+            ->leftJoin('users', 'forms.user_id', '=', 'users.id')
+            ->leftJoin('employees as user_employees', 'user_employees.related_user_id', '=', 'forms.user_id');
 
         if ($trash) {
             $forms = $forms->leftJoin('users as delete_users', 'forms.deleted_id', '=', 'delete_users.id');
@@ -120,12 +121,13 @@ class HomeController extends Controller
         /**
          * Фильтрация анкет в ЛКК
          */
-        if ($user->hasRole('client')) {
+        if ($user->isCompany()) {
             $forms = $forms
-                ->where('forms.company_id', $user->company->hash_id)
+                ->where('forms.company_id', $user->relatedCompany->hash_id)
                 ->whereNotNull('forms.date')
                 ->where(function ($query) use ($validTypeForm, $user) {
-                    $query->where('forms.date', '<=', Carbon::now()->addHours($user->timezone ?? 3));
+                    $timezone = 3; // значение по умолчанию, т.к. у компаний нет таймзоны
+                    $query->where('forms.date', '<=', Carbon::now()->addHours($timezone));
 
                     if ($validTypeForm === FormTypeEnum::MEDIC) {
                         $query->orWhere(function ($subQuery) {
@@ -386,17 +388,13 @@ class HomeController extends Controller
             'forms.created_at as created_at',
             'forms.updated_at as updated_at',
             'forms.deleted_at as deleted_at',
-            'users.name as user_name',
             'drivers.fio as driver_fio',
             'drivers.gender as driver_gender',
             'drivers.year_birthday as driver_year_birthday',
             'points.name as pv_id',
-            'companies.name as company_name'
+            'companies.name as company_name',
+            'user_employees.name as user_name',
         ];
-
-        if ($trash) {
-            $defaultFieldsToSelect[] = 'delete_users.name as deleted_user_name';
-        }
 
         /**
          * Обогащение данных
@@ -430,6 +428,11 @@ class HomeController extends Controller
             $forms = $forms
                 ->select($defaultFieldsToSelect);
         }
+
+        if ($trash) {
+            $forms->withDeletedUserName();
+        }
+
         /**
          * Обогащение данных
          */

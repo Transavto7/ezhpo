@@ -59,6 +59,7 @@ class ChangePakQueueHandler
     protected function updateForm(Form $form, ChangePakQueueAction $action)
     {
         $user = $action->getMedic();
+        $employee = $user->relatedEmployee;
 
         $form->type_anketa = FormTypeEnum::MEDIC;
 
@@ -73,10 +74,10 @@ class ChangePakQueueHandler
         }
 
         $form->user_id = $user->id;
-        $details->operator_id = $user->id;
-        $form->user_eds = $user->eds;
-        $form->user_validity_eds_start = $user->validity_eds_start;
-        $form->user_validity_eds_end = $user->validity_eds_end;
+        $details->operator_id = $employee->id;
+        $form->user_eds = $employee->eds;
+        $form->user_validity_eds_start = $employee->validity_eds_start;
+        $form->user_validity_eds_end = $employee->validity_eds_end;
 
         event(new FormAction($user, $form, FormLogActionTypesEnum::QUEUE_PROCESSING));
 

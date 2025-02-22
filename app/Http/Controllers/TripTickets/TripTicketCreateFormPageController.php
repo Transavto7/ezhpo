@@ -33,7 +33,10 @@ class TripTicketCreateFormPageController extends Controller
         date_default_timezone_set('UTC');
         $time = time();
         $user = Auth::user();
-        $timezone = $user->timezone ?: 3;
+
+        $employee = $user->relatedEmployee;
+
+        $timezone = $employee->timezone ?: 3;
         $time += $timezone * 3600;
         $time = date('Y-m-d', $time);
 
@@ -53,11 +56,16 @@ class TripTicketCreateFormPageController extends Controller
             }
         }
 
+        $defaultPvId = null;
+        if ($employee) {
+            $defaultPvId = $employee->pv_id;
+        }
+
         return view($view, [
             'tripTicket' => $tripTicket,
             'title' => "Добавление $formTypeLabels[$type] по данным путевого листа $tripTicket->ticket_number",
             'default_current_date' => $time,
-            'default_pv_id' => $user->pv_id,
+            'default_pv_id' => $defaultPvId,
         ]);
     }
 }

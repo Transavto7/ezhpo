@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Car;
 use App\Company;
 use App\Driver;
+use App\Employee;
+use App\Enums\UserRoleEnum;
 use App\Http\Requests\GetPreviousOdometerRequest;
 use App\Models\Forms\TechForm;
 use App\Services\RedDatesCheckerService;
+use App\Terminal;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -25,6 +28,8 @@ class ApiController extends Controller
             "Instr" => "name",
             'Stamp' => 'name',
             'Req' => 'name',
+            'Terminal' => 'name',
+            'Employee' => 'name',
         ];
 
         $field = 'name';
@@ -59,12 +64,16 @@ class ApiController extends Controller
             $query = $query
                 ->with(['roles'])
                 ->whereHas('roles', function ($subQuery) use ($request) {
-                    $subQuery->whereNotIn('roles.id', [3, 6, 9]);
+                    $subQuery->whereNotIn('roles.id', [
+                        UserRoleEnum::DRIVER,
+                        UserRoleEnum::CLIENT,
+                        UserRoleEnum::TERMINAL,
+                    ]);
                 });
         }
 
-        if ($user->hasRole('client') && ($model === 'Driver' || $model === 'Car')) {
-            $query = $query->where('company_id', $user->company_id);
+        if ($user->isCompany() && ($model === 'Driver' || $model === 'Car')) {
+            $query = $query->where('company_id', $user->relatedCompany->id);
         }
 
         if ($request->get('trashed') === 'true') {
@@ -171,6 +180,14 @@ class ApiController extends Controller
             'User' => [
                 'model' => User::class,
                 'fields' => ['id', 'name']
+            ],
+            'Employee' => [
+                'model' => Employee::class,
+                'fields' => ['hash_id', 'name']
+            ],
+            'Terminal' => [
+                'model' => Terminal::class,
+                'fields' => ['hash_id', 'name']
             ]
         ];
 

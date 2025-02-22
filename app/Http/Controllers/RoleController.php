@@ -24,6 +24,10 @@ class RoleController extends Controller
     {
         if (request()->get('deleted')) {
             $roles = Role::onlyTrashed()->get();
+            $roles = $roles->map(function (Role $role) {
+                $role->deleted_user_name = $role->deleted_user->name;
+                return $role;
+            });
         } else {
             $roles = Role::whereNull('deleted_at')->get();
         }

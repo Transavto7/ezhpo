@@ -13,6 +13,7 @@ use App\Events\Forms\DriverDismissed;
 use App\Services\FormHash\FormHashGenerator;
 use App\Services\FormHash\TechHashData;
 use DateTimeImmutable;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 
 class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -31,7 +32,7 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         $this->existForms = DuplicatesCheckerService::getExistTechForms($cars);
     }
 
-    protected function createForm(array $form)
+    protected function createForm(array $form, Authenticatable $user)
     {
         $defaultData = [
             'date' => date('Y-m-d H:i:s'),
@@ -204,7 +205,7 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
          * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
          */
         $diffDateCheck = Carbon::now()
-            ->addHours($user->timezone ?? 3)
+            ->addHours($user->entity->timezone ?? 3)
             ->diffInMinutes($date);
         if ($date && $diffDateCheck <= 60*12) {
             $form['realy'] = 'да';

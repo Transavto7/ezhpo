@@ -143,8 +143,10 @@ class IndexController extends Controller
 
             unset($data['_token']);
 
-            if ($request->user()->hasRole('client')) {
-                $data['company_id'] = $request->user()->company_id;
+            $user = $request->user();
+
+            if ($user->isCompany()) {
+                $data['company_id'] = $user->relatedCompany->id;
             }
 
             $factory->make($request->type)->handle($data);
@@ -284,8 +286,10 @@ class IndexController extends Controller
 
             unset($data['_token']);
 
-            if ($request->user()->hasRole('client')) {
-                $data['company_id'] = $request->user()->company_id;
+            $user = $request->user();
+
+            if ($user->isCompany()) {
+                $data['company_id'] = $user->relatedCompany->id;
             }
 
             $handler->handle($request->id, $data);
@@ -535,7 +539,7 @@ class IndexController extends Controller
 
         /** @var User $user */
         $user = Auth::user();
-        if ($user->hasRole('client')) {
+        if ($user->isCompany()) {
             $companyIdField = null;
 
             if ($model == 'Company') {
@@ -547,7 +551,7 @@ class IndexController extends Controller
             }
 
             if ($companyIdField) {
-                $query = $query->where($companyIdField, $user->company_id);
+                $query = $query->where($companyIdField, $user->relatedCompany->id);
             }
         }
 
@@ -627,27 +631,5 @@ class IndexController extends Controller
         }
 
         return view('index');
-    }
-
-    public function agreement()
-    {
-        return view('agreement.index');
-    }
-
-    public function acceptAgreement(Request $request): RedirectResponse
-    {
-        try {
-            DB::beginTransaction();
-
-            $request->user()->update([
-                'accepted_agreement' => true
-            ]);
-
-            DB::commit();
-        } catch (Throwable $exception) {
-            DB::rollBack();
-        } finally {
-            return back();
-        }
     }
 }

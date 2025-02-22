@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Src\Employees\Workdays\Commands\StoreWorkdayManually;
 
+use App\Employee;
 use App\Enums\FlagPakEnum;
 use App\Point;
-use App\User;
 use Exception;
 use Src\Employees\Workdays\Eloquent\Workday;
 use Src\Employees\Workdays\SmartEnum\WorkdayEventTypeEnum;
@@ -23,7 +23,7 @@ final class StoreWorkdayHandler
         $workDay->flag_pak = FlagPakEnum::INTERNAL;
         $workDay->admitted = true;
 
-        $employee = User::where('hash_id', $command->getEmployeeId())->first();
+        $employee = Employee::where('hash_id', $command->getEmployeeId())->first();
         if (! $employee) {
             throw new Exception('Сотрудник с указанным ID не найден!', Response::HTTP_NOT_FOUND);
         }

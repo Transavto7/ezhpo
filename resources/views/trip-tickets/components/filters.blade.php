@@ -231,7 +231,7 @@
         @include('templates.elements_field', [
             'v' => [
                 'type' => 'select',
-                'values' => 'User',
+                'values' => 'Employee',
                 'getField' => 'name',
                 'getFieldKey' => 'id',
                 'multiple' => 1,
@@ -239,10 +239,10 @@
                 'trashed' => true
             ],
             'model' => 'trip-tickets',
-            'k' => 'user_id',
+            'k' => 'employee_id',
             'is_required' => '',
-            'default_value' => request()->get('user_id', null) !== [null]
-                ? request()->get('user_id', null)
+            'default_value' => request()->get('employee_id', null) !== [null]
+                ? request()->get('employee_id', null)
                 : null
         ])
       </div>

@@ -68,9 +68,9 @@ SELECT STR_TO_DATE(DATE_FORMAT(w_open.date, '%Y-%m-%d %H'), '%Y-%m-%d %H') as 'd
        IF(p.pv_id is null or p.pv_id = 0, null, p.pv_id)                   as 'town_id',
        h.id                                                                as 'is_holiday'
 FROM workdays w_open
-         INNER JOIN users u on u.id = w_open.employee_id
+         INNER JOIN employees e on e.id = w_open.employee_id
          LEFT JOIN points p on p.id = w_open.point_id
-         INNER JOIN model_has_roles mhr on mhr.model_id = w_open.employee_id and mhr.role_id IN ({$roleIds})
+         INNER JOIN model_has_roles mhr on mhr.model_id = e.related_user_id and mhr.role_id IN ({$roleIds})
          LEFT JOIN workdays w_close on w_open.id = w_close.open_workday_id and w_close.admitted = 1 AND w_close.deleted_at is null
          LEFT JOIN holidays h on h.date = STR_TO_DATE(DATE_FORMAT(w_open.date, '%Y-%m-%d'), '%Y-%m-%d')
 WHERE w_open.admitted = 1

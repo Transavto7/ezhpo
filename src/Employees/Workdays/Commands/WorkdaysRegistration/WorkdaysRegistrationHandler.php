@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Src\Employees\Workdays\Commands\WorkdaysRegistration;
 
+use App\Employee;
 use App\Enums\FlagPakEnum;
 use App\Settings;
-use App\User;
 use App\ValueObjects\ForeignDevice\PressureLimit;
 use App\ValueObjects\ForeignDevice\PulseLimit;
 use Exception;
@@ -33,7 +33,7 @@ final class WorkdaysRegistrationHandler
             throw new Exception('Отсутствуют обязательные параметры', Response::HTTP_BAD_REQUEST);
         }
 
-        $employee = User::where('hash_id', $command->getEmployeeId())->first();
+        $employee = Employee::where('hash_id', $command->getEmployeeId())->first();
         if (! $employee) {
             throw new Exception('Сотрудник с указанным ID не найден!', Response::HTTP_NOT_FOUND);
         }
@@ -75,8 +75,8 @@ final class WorkdaysRegistrationHandler
         $workDay->employee_id = $employee->id;
         $workDay->terminal_id = $command->getTerminal()->id;
 
-        if ($command->getTerminal()->pv) {
-            $workDay->point_id = $command->getTerminal()->pv->id;
+        if ($command->getTerminal()->point) {
+            $workDay->point_id = $command->getTerminal()->point->id;
         }
 
         if ($termometer = $command->getPeopleThermometer()) {

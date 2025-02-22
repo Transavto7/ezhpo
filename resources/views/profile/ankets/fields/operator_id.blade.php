@@ -1,7 +1,7 @@
 @include('templates.elements_field', [
     'v' => [
         'type' => 'select',
-        'values' => 'User',
+        'values' => 'Employee',
         'getField' => 'name',
         'getFieldKey' => 'id',
         'multiple' => 1,

@@ -37,8 +37,16 @@ class CompanyObserver
     {
         $logData = [];
 
+        $skipAttributeChanges = [
+            'related_user_id',
+        ];
+
         foreach ($company->getDirty() as $attribute => $newValue) {
             if (empty($newValue) && empty($company->getOriginal($attribute))) {
+                continue;
+            }
+
+            if (in_array($attribute, $skipAttributeChanges)) {
                 continue;
             }
 

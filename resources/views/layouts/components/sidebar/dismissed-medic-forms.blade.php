@@ -12,7 +12,7 @@
         'date' => now()->subMonth()->startOfMonth()->format('Y-m-d'),
         'TO_date' => now()->subMonth()->endOfMonth()->format('Y-m-d'),
         'admitted' => ['Не допущен', 'Не идентифицирован'],
-        'company_id' => ($user && $user->hasRole('client') && $user->company) ? $user->company->hash_id : null
+        'company_id' => ($user && $user->isCompany() && $user->relatedCompany) ? $user->relatedCompany->hash_id : null
     ]);
 @endphp
 <li>

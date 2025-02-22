@@ -36,8 +36,8 @@ class UserObserver
     public function updating(User $user)
     {
         $skipAttributeChanges = [
-            'last_connection_at',
-            'remember_token'
+            'remember_token',
+            'entity_type',
         ];
 
         $hideAttributeChanges = [

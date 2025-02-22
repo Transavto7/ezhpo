@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\FormLogActionTypesEnum;
 use App\Enums\FormLogModelTypesEnum;
+use App\Enums\UserEntityType;
 use App\FieldPrompt;
 use App\Models\FormEvent;
 use App\User;
@@ -34,10 +35,21 @@ class FormLogController extends Controller
         $users = User::query()
             ->select([
                 'users.id as id',
-                DB::raw("CONCAT('[',users.hash_id,'] ',users.name) as text")
+                DB::raw("CONCAT(
+                    '[', coalesce(employees.hash_id, terminals.hash_id), '] ',
+                    coalesce(employees.name, terminals.name)
+                ) as text"),
             ])
             ->distinct()
             ->leftJoin('form_events', 'form_events.user_id', '=', 'users.id')
+            ->leftJoin('employees', function ($join) {
+                $join->on('employees.related_user_id', '=', 'users.id')
+                    ->where('users.entity_type', '=', UserEntityType::EMPLOYEE);
+            })
+            ->leftJoin('terminals', function ($join) {
+                $join->on('terminals.related_user_id', '=', 'users.id')
+                    ->where('users.entity_type', '=', UserEntityType::TERMINAL);
+            })
             ->whereNotNull('form_events.user_id')
             ->get();
 
@@ -78,7 +90,14 @@ class FormLogController extends Controller
                 'form_events.*',
                 'form_events.event_type as type',
                 'forms.id as form_id',
-                DB::raw("IF(ISNULL(users.hash_id), '-', CONCAT('[', users.hash_id, '] ', users.name)) as user")
+                DB::raw("IF(
+                    ISNULL(users.id), 
+                    '-', 
+                    CONCAT(
+                        '[', coalesce(employees.hash_id, terminals.hash_id), '] ', 
+                        coalesce(employees.name, terminals.name)
+                    )
+                ) as user"),
             ])
             ->dateFrom($request->input('filter.date_start'))
             ->dateTo($request->input('filter.date_end'))
@@ -88,6 +107,14 @@ class FormLogController extends Controller
             ->userIds($request->input('filter.users'))
             ->actionTypes($request->input('filter.actions'))
             ->leftJoin('users', 'form_events.user_id', '=', 'users.id')
+            ->leftJoin('employees', function ($join) {
+                $join->on('employees.related_user_id', '=', 'users.id')
+                    ->where('users.entity_type', '=', UserEntityType::EMPLOYEE);
+            })
+            ->leftJoin('terminals', function ($join) {
+                $join->on('terminals.related_user_id', '=', 'users.id')
+                    ->where('users.entity_type', '=', UserEntityType::TERMINAL);
+            })
             ->leftJoin('forms', 'form_events.form_uuid', '=', 'forms.uuid')
             ->orderBy('created_at', 'desc')
             ->paginate(

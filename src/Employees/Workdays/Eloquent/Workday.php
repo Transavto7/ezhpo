@@ -2,8 +2,9 @@
 
 namespace Src\Employees\Workdays\Eloquent;
 
+use App\Employee;
 use App\Point;
-use App\User;
+use App\Terminal;
 use DateTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -94,12 +95,12 @@ class Workday extends Model
 
     public function employee(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'employee_id', 'id');
+        return $this->belongsTo(Employee::class, 'employee_id', 'id');
     }
 
     public function terminal(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'terminal_id', 'id');
+        return $this->belongsTo(Terminal::class, 'terminal_id', 'id');
     }
 
     public function point(): BelongsTo

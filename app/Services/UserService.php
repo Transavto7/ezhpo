@@ -4,11 +4,13 @@ namespace App\Services;
 
 use App\Company;
 use App\Driver;
-use App\Services\HashIdGenerator\DefaultHashIdValidators;
-use App\Services\HashIdGenerator\HashedType;
-use App\Services\HashIdGenerator\HashIdGenerator;
+use App\Enums\UserEntityType;
+use App\Enums\UserRoleEnum;
 use App\User;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Facades\Hash;
+use Src\Users\Management\Commands\CreateUser\CreateUserCommand;
+use Src\Users\Management\Commands\UpdateUserAccess\UpdateUserAccessCommand;
 
 class UserService
 {
@@ -23,32 +25,33 @@ class UserService
             return false;
         }
 
-        return (bool) $user->blocked;
+        return $user->isBlocked();
     }
 
     public static function createUserFromDriver(Driver $driver, ?Company $company = null): User
     {
-        $userHashId = HashIdGenerator::generateWithType(DefaultHashIdValidators::user(), HashedType::user());
-
         $driverHashId = $driver->hash_id;
 
         if ($company === null) {
             $company = $driver->company;
         }
 
-        /** @var User $user */
-        $user = User::create([
-            'hash_id' => $userHashId,
-            'email' => $company->hash_id . '-' . $userHashId . '@ta-7.ru',
-            'api_token' => Hash::make(date('H:i:s') . sha1($driverHashId)),
-            'login' => $driverHashId,
-            'password' => Hash::make($driverHashId),
-            'name' => $driver->fio,
-            'role' => 3,
-            'company_id' => $company->id
-        ]);
+        $dispatcher = app()->make(Dispatcher::class);
 
-        $user->roles()->attach(3);
+        $user = $dispatcher->dispatch(new CreateUserCommand(
+            UserEntityType::driver(),
+            $driverHashId,
+            $company->hash_id . '-' . $driverHashId . '@ta-7.ru',
+            $driverHashId,
+            Hash::make(date('H:i:s') . sha1($driverHashId)),
+            3
+        ));
+
+        $dispatcher->dispatch(new UpdateUserAccessCommand(
+            $user,
+            [UserRoleEnum::DRIVER],
+            []
+        ));
 
         return $user;
     }

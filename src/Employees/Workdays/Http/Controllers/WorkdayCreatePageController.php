@@ -2,6 +2,7 @@
 
 namespace Src\Employees\Workdays\Http\Controllers;
 
+use App\Employee;
 use App\Enums\FeaturesEnum;
 use App\Http\Controllers\Controller;
 use App\Point;
@@ -19,16 +20,17 @@ final class WorkdayCreatePageController extends Controller
 
         /** @var User $user */
         $user = Auth::user();
+        $employee = $user->relatedEmployee;
 
         date_default_timezone_set('UTC');
         $time = time();
-        $timezone = $user->timezone ?: 3;
+        $timezone = $employee->timezone ?: 3;
         $time += $timezone * 3600;
         $time = date('Y-m-d\TH:i', $time);
 
         // Дефолтные значения
         $data['default_current_date'] = $time;
-        $data['default_pv_id'] = $user->pv_id;
+        $data['default_pv_id'] = $employee->pv_id;
         $data['points'] = Point::getAll();
 
         // Проверяем выставленный ПВ

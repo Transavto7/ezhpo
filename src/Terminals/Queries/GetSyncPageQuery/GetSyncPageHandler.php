@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Src\Terminals\Queries\GetSyncPageQuery;
 
-use App\User;
+use App\Employee;
+use App\Enums\UserRoleEnum;
+use App\Terminal;
 use Carbon\Carbon;
 use Src\Terminals\Eloquent\TerminalSettings;
 use Src\Terminals\Factories\SettingsFactory;
@@ -16,22 +18,17 @@ final class GetSyncPageHandler
         $terminals = [];
         $firstTerminalId = null;
         if ($query->getTerminalIds() !== null) {
-            $terminals = User::query()
+            $terminals = Terminal::query()
                 ->select([
-                    'users.id',
-                    'users.hash_id',
+                    'terminals.id',
+                    'terminals.hash_id',
                     'terminal_checks.serial_number as serial_number',
-                    'users.name'
+                    'terminals.name'
                 ])
-                ->leftJoin('terminal_checks', 'users.id', '=', 'terminal_checks.user_id')
-                ->leftJoin('model_has_roles', function ($join) {
-                    $join->on('users.id', '=', 'model_has_roles.model_id')
-                        ->where('model_has_roles.role_id', '=', 9);
-                })
-                ->whereNotNull('model_has_roles.model_id')
-                ->whereIn('users.id', $query->getTerminalIds())
+                ->leftJoin('terminal_checks', 'terminals.id', '=', 'terminal_checks.terminal_id')
+                ->whereIn('terminals.id', $query->getTerminalIds())
                 ->get()
-                ->map(function ($model) {
+                ->map(function (Terminal $model) {
                     return new TerminalViewModel(
                         $model->id,
                         sprintf(
@@ -46,25 +43,26 @@ final class GetSyncPageHandler
             $firstTerminalId = $query->getTerminalIds()[0];
         }
 
-        $medics = User::query()
+        $medics = Employee::query()
             ->with([
-                'roles',
-                'pv:id,name,pv_id',
-                'pv.town:id,name'
+                'user',
+                'user.roles',
+                'point:id,name,pv_id',
+                'point.town:id,name'
             ])
-            ->whereHas('roles', function ($q) {
-                $q->where('roles.id', 2);
+            ->whereHas('user.roles', function ($q) {
+                $q->where('roles.id', UserRoleEnum::MEDIC);
             })
             ->orderBy('name')
             ->get()
-            ->map(function (User $medic) {
+            ->map(function (Employee $medic) {
                 return new MedicTerminalViewModel(
                     $medic->id,
                     $medic->name,
                     $medic->eds,
                     Carbon::parse($medic->validity_eds_start),
                     $medic->validity_eds_end ? Carbon::parse($medic->validity_eds_end) : null,
-                    $medic->pv->name
+                    $medic->point->name
                 );
             })
             ->toArray();

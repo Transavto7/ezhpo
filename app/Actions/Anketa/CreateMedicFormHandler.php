@@ -20,6 +20,7 @@ use App\ValueObjects\ForeignDevice\Temperature;
 use App\ValueObjects\ForeignDevice\Tonometer;
 use DateTimeImmutable;
 use Exception;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 
 class CreateMedicFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -36,7 +37,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
     /**
      * @throws Exception
      */
-    protected function createForm(array $form)
+    protected function createForm(array $form, Authenticatable $user)
     {
         $defaultData = [
             'tonometer' => strval(Tonometer::randomWithDriver(Driver::where('hash_id', $this->data['driver_id'] ?? 0)->first())),
@@ -180,7 +181,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
          * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
          */
         $diffDateCheck = Carbon::now()
-            ->addHours($user->timezone ?? 3)
+            ->addHours($user->entity->timezone ?? 3)
             ->diffInMinutes($date);
         if ($date && $diffDateCheck <= 60*12) {
             $form['realy'] = 'да';

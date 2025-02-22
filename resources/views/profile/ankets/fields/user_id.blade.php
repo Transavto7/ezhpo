@@ -1,11 +1,12 @@
 @include('templates.elements_field', [
     'v' => [
         'type' => 'select',
-        'values' => 'User',
+        'values' => 'Employee',
         'getField' => 'name',
-        'getFieldKey' => 'id',
+        'getFieldKey' => 'related_user_id',
         'multiple' => 1,
         'concatField' => 'hash_id',
+        'trashed' => true
     ],
     'model' => $type_ankets,
     'k' => $field,

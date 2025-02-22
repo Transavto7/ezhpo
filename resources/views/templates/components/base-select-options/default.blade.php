@@ -1,4 +1,6 @@
 @php
+    /** @var \App\User $user */
+
     $model = app("App\\" . $v['values']);
     $options = $model::query();
     $selectedOptions = $model::query();
@@ -7,9 +9,9 @@
         $options->orderBy($v['orderBy'], $v['order'] ?? 'asc');
     }
 
-    if ($user && $user->hasRole("client") && in_array($v['values'], ['Driver', 'Car'])) {
-        $options->where('company_id', $user->company_id);
-        $selectedOptions->where('company_id', $user->company_id);
+    if ($user && $user->isCompany() && in_array($v['values'], ['Driver', 'Car'])) {
+        $options->where('company_id', $user->relatedCompany->id);
+        $selectedOptions->where('company_id', $user->relatedCompany->id);
     }
 @endphp
 

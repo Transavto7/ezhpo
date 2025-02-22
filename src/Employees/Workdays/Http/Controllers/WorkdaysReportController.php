@@ -46,14 +46,15 @@ class WorkdaysReportController extends Controller
             ->get()
             ->toArray();
 
-        $employeeList = DB::table('users')
+        $employeeList = DB::table('employees')
             ->select([
-                'users.id',
-                'users.name',
+                'employees.id',
+                'employees.name',
             ])
+            ->join('users', 'users.id', '=', 'employees.related_user_id')
             ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
             ->whereIn('model_has_roles.role_id', CalcEmployeeSalaryConstant::ROLE_IDS)
-            ->whereNull('users.deleted_at')
+            ->whereNull('employees.deleted_at')
             ->get()
             ->toArray();
 

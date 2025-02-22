@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Src\Employees\Workdays\Commands\WorkdaysRegistration;
 
-use App\User;
+use App\Terminal;
 use App\ValueObjects\ForeignDevice\Alcometer;
 use App\ValueObjects\ForeignDevice\Pulse;
 use App\ValueObjects\ForeignDevice\Temperature;
@@ -39,21 +39,21 @@ final class WorkdaysRegistrationCommand
     private $video = null;
 
     /**
-     * @return User|null
+     * @return Terminal|null
      */
-    public function getTerminal(): ?User
+    public function getTerminal(): ?Terminal
     {
         return $this->terminal;
     }
 
     /**
-     * @param User|null $terminal
+     * @param Terminal|null $terminal
      * @return self
      * @throws \Exception
      */
     public function setTerminal($terminal): self
     {
-        if ($terminal instanceof User || is_null($terminal)) {
+        if ($terminal instanceof Terminal || is_null($terminal)) {
             $this->terminal = $terminal;
         } else {
             throw new \Exception('Неверный тип терминала');

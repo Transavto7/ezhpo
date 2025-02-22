@@ -11,7 +11,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('show-edit-element-modal/{model}/{id}', 'IndexController@showEditModal')->name('showEditElementModal');
 
     Route::get('/', 'IndexController@index')->name('index');
-    Route::get('/openapi', 'OpenApiUiPageController@index')->name('index');
+    Route::get('/openapi', 'OpenApiUiPageController@index')->name('openapi');
     Route::get('/swagger/{type}', 'OpenApiUiPageController@apiByType')->name('api_by_type');
 
     Route::prefix('contract')->group(function () {
@@ -43,27 +43,26 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/', 'BddController@store')->name('store');
     });
 
-    Route::prefix('profile')->as('profile.')->group(function () {
-        Route::get('delete-avatar', 'ProfileController@deleteAvatar')->name('deleteAvatar');
-        Route::get('/', 'ProfileController@index')->name('index');
-        Route::post('/', 'ProfileController@updateAvatar')->name('updateAvatar');
-    });
-
-    Route::prefix('users')->group(function () {
-        Route::get('/', 'UserController@index')->name('users');
-        Route::post('/', 'UserController@destroy');
-        Route::get('fetchCompanies', 'UserController@fetchCompanies');
-        Route::get('fetchRoleData', 'UserController@fetchRoleData');
-        Route::get('fetchUserData', 'UserController@fetchUserData');
-        Route::post('return_trash', 'UserController@returnTrash');
-        Route::post('saveUser', 'UserController@saveUser');
+    Route::prefix('settings/employees')->as('employees.')->middleware('auth')->group(function () {
+        Route::get('/', 'Employees\IndexEmployeesPageController')->name('index');
+        Route::post('/', 'Employees\CreateEmployeeController')->name('create');
+        Route::get('/table-items', 'Employees\GetEmployeesTableItemsController')->name('table-items');
+        Route::get('/{id}', 'Employees\GetEmployeeItemController')->name('item');
+        Route::delete('/{id}', 'Employees\DeleteEmployeeController')->name('delete');
+        Route::put('/{id}', 'Employees\UpdateEmployeeController')->name('update');
+        Route::post('/{id}/restore', 'Employees\RestoreEmployeeController')->name('restore');
+        Route::post('/permissions-by-roles', 'Employees\GetPermissionsByRolesController')->name('permissions-by-roles');
     });
 
     Route::prefix('terminals')->as('terminals.')->group(function () {
-        Route::get('/', 'TerminalController@index')->name('index');
-        Route::post('/', 'TerminalController@update')->name('update');
-        Route::get('status', 'TerminalController@getConnectionStatus')->name('status');
-        Route::get('to-check', 'TerminalController@terminalsToCheck')->name('to-check');
+        Route::get('/', 'Terminals\IndexTerminalsPageController')->name('index');
+        Route::get('/table-items', 'Terminals\GetTerminalsTableItemsController')->name('table-items');
+        Route::get('to-check', 'Terminals\GetTerminalsToCheckController')->name('to-check');
+        Route::get('/{id}/item', 'Terminals\GetTerminalItemController')->name('item');
+        Route::post('/', 'Terminals\CreateTerminalController')->name('store');
+        Route::put('/{id}', 'Terminals\UpdateTerminalController')->name('update');
+        Route::delete('/{id}', 'Terminals\DeleteTerminalController')->name('delete');
+        Route::post('/status', 'Terminals\GetTerminalsConnectionStatusController')->name('status');
     });
 
     Route::resource('roles', 'RoleController');
@@ -80,11 +79,6 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('stamp')->as('stamp.')->group(function () {
         Route::any('filter', 'StampController@getAll');
         Route::any('find', 'StampController@find');
-    });
-
-    Route::prefix('agreement')->group(function () {
-        Route::get('/', 'IndexController@agreement');
-        Route::post('/', 'IndexController@acceptAgreement');
     });
 
     Route::prefix('trip-tickets')->as('trip-tickets.')->group(function () {

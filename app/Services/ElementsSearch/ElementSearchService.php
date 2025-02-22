@@ -6,12 +6,13 @@ use App\Car;
 use App\Company;
 use App\Driver;
 use App\Dto\ElementDto;
+use App\Employee;
 use App\Enums\LogModelTypesEnum;
 use App\Models\Contract;
 use App\Models\TripTicket;
 use App\Product;
 use App\Stamp;
-use App\User;
+use App\Terminal;
 use Illuminate\Database\Eloquent\Model;
 
 class ElementSearchService implements ElementsSearchServiceInterface
@@ -66,21 +67,27 @@ class ElementSearchService implements ElementsSearchServiceInterface
             ],
             'fields' => []
         ],
-        User::class => [
-            'select' => [
-                'id as hash_id',
-                'id',
-                'name'
-            ],
-            'fields' => [
-                'hash_id',
-            ]
-        ],
         Stamp::class => [
             'select' => [
                 'id as hash_id',
                 'id',
                 'company_name as name'
+            ],
+            'fields' => []
+        ],
+        Terminal::class => [
+            'select' => [
+                'hash_id',
+                'id',
+                'name'
+            ],
+            'fields' => []
+        ],
+        Employee::class => [
+            'select' => [
+                'hash_id',
+                'id',
+                'name'
             ],
             'fields' => []
         ],

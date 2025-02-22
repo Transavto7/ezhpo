@@ -10,7 +10,6 @@ use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Throwable;
 
 abstract class AbstractCreateFormHandler
@@ -51,25 +50,36 @@ abstract class AbstractCreateFormHandler
         $pointId = $data['pv_id'] ?? null;
         $this->data['point_id'] = $pointId;
 
+        /**
+         * @var User $user
+         */
+        $timezone = 3;
+        if ($user->isEmployee()) {
+            $timezone = $user->relatedEmployee->timezone;
+        }
+        if ($user->isTerminal()) {
+            $timezone = $user->relatedTerminal->timezone;
+        }
+
         date_default_timezone_set('UTC');
-        $this->time = date('Y-m-d H:i:s', time() + ($user->timezone ?: 3) * 3600);
+        $this->time = date('Y-m-d H:i:s', time() + ($timezone) * 3600);
 
         $this->validateData();
         if (count($this->errors ?? [])) {
             return [
-                'errors' => $this->errors
+                'errors' => $this->errors,
             ];
         }
 
         $this->fetchExistForms();
 
         foreach ($this->data['anketa'] as $form) {
-            $this->createForm($form);
+            $this->createForm($form, $user);
         }
 
         $responseData = [
             'created' => $this->createdForms->all(),
-            'errors' => array_unique($this->errors)
+            'errors' => array_unique($this->errors),
         ];
 
         if (count($this->redDates ?? []) > 0) {
@@ -88,11 +98,13 @@ abstract class AbstractCreateFormHandler
         $user = $this->user;
 
         /** @var User $user */
+        $entity = $user->entity;
+
         $this->data['user_id'] = $user->id;
-        $this->data['operator_id'] = $user->id;
-        $this->data['user_eds'] = $user->eds;
-        $this->data['user_validity_eds_start'] = $user->validity_eds_start;
-        $this->data['user_validity_eds_end'] = $user->validity_eds_end;
+        $this->data['operator_id'] = $entity->id;
+        $this->data['user_eds'] = $entity ? $entity->eds : null;
+        $this->data['user_validity_eds_start'] = $entity ? $entity->validity_eds_start : null;
+        $this->data['user_validity_eds_end'] = $entity ? $entity->validity_eds_end : null;
     }
 
     protected function init()
@@ -152,7 +164,7 @@ abstract class AbstractCreateFormHandler
         $this->existForms = collect([]);
     }
 
-    protected abstract function createForm(array $form);
+    protected abstract function createForm(array $form, Authenticatable $user);
 
     protected function mergeFormData(array $form, array $defaultData): array
     {

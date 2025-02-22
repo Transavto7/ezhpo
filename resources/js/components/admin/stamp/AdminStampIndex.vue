@@ -172,7 +172,7 @@ export default {
             ],
             columnTrash: [
                 {
-                    key: "deleted_user.name",
+                    key: "deleted_user_name",
                     sortable: true,
                     label: "Имя удалившего"
                 },

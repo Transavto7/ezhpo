@@ -589,10 +589,10 @@ return [
                 'defaultValue' => 'Фактовый',
                 'noRequired' => 1,
             ],
-            'user_id' => [
+            'responsible_id' => [
                 'label' => 'Ответственный',
                 'type' => 'select',
-                'values' => 'User',
+                'values' => 'Employee',
                 'getFieldKey' => 'id',
                 'concatField' => 'hash_id',
                 'noRequired' => 1,
@@ -902,6 +902,7 @@ return [
         ],
     ],
 
+    // todo: изменить пользователя
     'User' => [
         'title' => 'Сотрудники',
         'popupTitle' => 'Сотрудника',
@@ -931,6 +932,66 @@ return [
                 'type' => 'file',
                 'resize' => 1,
                 'noRequired' => 1
+            ],
+            'pv_id' => [
+                'label' => 'ПВ',
+                'type' => 'select',
+                'values' => 'Point',
+                'getFieldKey' => 'id',
+                'concatField' => 'hash_id',
+                'noRequired' => 1
+            ],
+        ]
+    ],
+
+    'Employee' => [
+        'title' => 'Сотрудники',
+        'popupTitle' => 'Сотрудника',
+        'editOnField' => 'name',
+        'model' => 'Employee',
+        'fields' => [
+            'name' => [
+                'label' => 'ФИО',
+                'type' => 'text',
+                'hideFilter' => 1
+            ],
+            'hash_id' => [
+                'label' => 'ID сотрудника',
+                'type' => 'select',
+                'values' => 'Driver',
+                'getField' => 'fio',
+                'concatField' => 'hash_id',
+                'getFieldKey' => 'hash_id'
+            ],
+            'pv_id' => [
+                'label' => 'ПВ',
+                'type' => 'select',
+                'values' => 'Point',
+                'getFieldKey' => 'id',
+                'concatField' => 'hash_id',
+                'noRequired' => 1
+            ],
+        ]
+    ],
+
+    'Terminal' => [
+        'title' => 'Терминалы',
+        'popupTitle' => 'Терминала',
+        'editOnField' => 'name',
+        'model' => 'Terminal',
+        'fields' => [
+            'name' => [
+                'label' => 'AnyDesk',
+                'type' => 'text',
+                'hideFilter' => 1
+            ],
+            'hash_id' => [
+                'label' => 'ID терминала',
+                'type' => 'select',
+                'values' => 'Driver',
+                'getField' => 'fio',
+                'concatField' => 'hash_id',
+                'getFieldKey' => 'hash_id'
             ],
             'pv_id' => [
                 'label' => 'ПВ',

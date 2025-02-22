@@ -826,12 +826,12 @@
                                                 {{ $anketa[$field->field] }}
                                             </a>
                                         @elseif($field->field === 'user_name' && user()->access('employee_read'))
-                                            <a href="{{ route('users', ['name' => $anketa[$field->field] ]) }}">
+                                            <a href="{{ route('employees.index', ['name' => $anketa[$field->field] ]) }}">
                                                 {{ $anketa[$field->field] }}
                                             </a>
                                         @elseif($field->field === 'operator_id' && user()->access('employee_read'))
                                             @if($anketa->operator_id)
-                                                <a href="{{ route('users', ['id' => $anketa[$field->field] ]) }}">
+                                                <a href="{{ route('employees.index', ['employee_id' => [$anketa[$field->field]] ]) }}">
                                                     {{ $anketa->operator ? $anketa->operator->name : 'Отсутствует' }}
                                                 </a>
                                             @else

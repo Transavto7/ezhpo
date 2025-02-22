@@ -2,6 +2,8 @@
 
 namespace Src\Employees\Workdays\Commands\CalcEmployeeSalaries;
 
+use App\Enums\UserRoleEnum;
+
 final class CalcEmployeeSalaryConstant
 {
     public const MONTH_LIST = [
@@ -21,10 +23,10 @@ final class CalcEmployeeSalaryConstant
 
     public const START_YEAR = 2025;
 
-    public const ROLE_IDS = [1, 2];
+    public const ROLE_IDS = [UserRoleEnum::TECH, UserRoleEnum::MEDIC];
 
     /**
      * @const ID ролей в приоритете (если у сотрудника есть обе роли, то в ЗП будет использоваться та, что приоритетнее)
      * */
-    public const PRIORITY_ROLE = [2, 1];
+    public const PRIORITY_ROLE = [UserRoleEnum::MEDIC, UserRoleEnum::TECH];
 }

@@ -8,6 +8,7 @@ use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
 use App\Models\Forms\Form;
 use App\Models\Forms\ReportCartForm;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 
 class CreateReportCardFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -29,7 +30,7 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
         }
     }
 
-    protected function createForm(array $form)
+    protected function createForm(array $form, Authenticatable $user)
     {
         $driverId = $form['driver_id'] ?? ($this->data['driver_id'] ?? 0);
         $driver = Driver::where('hash_id', $driverId)->first();
@@ -111,7 +112,7 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
          */
         $date = $form['date'] ?? null;
         $diffDateCheck = Carbon::now()
-            ->addHours($user->timezone ?? 3)
+            ->addHours($user->entity->timezone ?? 3)
             ->diffInMinutes($date);
 
         if ($date && $diffDateCheck <= 60*12) {

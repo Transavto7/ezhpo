@@ -22,9 +22,10 @@
 @if($v['type'] !== 'select')
     @include('templates.components.linear-elements-field')
 @elseif ($v['type'] === 'select')
-    @if($user && $user->hasRole('driver') && $k === 'company_name')
+    <!-- todo: пользовать-водитель попасть сюда не может, этого условия и блока тут вроде не должно быть -->
+    @if($user && $user->isDriver() && $k === 'company_name')
         @include('templates.components.driver-company-select')
-    @elseif ($user && $user->hasRole('client') && ($k === 'company_id' || $k === 'company_name'))
+    @elseif ($user && $user->isCompany() && ($k === 'company_id' || $k === 'company_name'))
         @include('templates.components.client-company-select')
     @else
         @include('templates.components.base-select')

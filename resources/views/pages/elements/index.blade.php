@@ -103,6 +103,8 @@
             || user()->access('pv_delete') && $model == 'Point'
         ) && !request()->get('deleted');
 
+        $permissionToUserShow = user()->access('users_read') && ($model == 'Driver' || $model == 'Company');
+
         $permissionToEdit = (
             user()->access('drivers_update') && $model == 'Driver'
             || user()->access('cars_update') && $model == 'Car'
@@ -379,6 +381,10 @@
                             <th width="60">#</th>
                         @endif
 
+                        @if($permissionToUserShow)
+                            <th width="60">#</th>
+                        @endif
+
                         @if($permissionToDelete)
                             {{--УДАЛЕНИЕ--}}
                             <th width="60">#</th>
@@ -462,8 +468,8 @@
                                         {{ $el[$field->field] == 1 ? 'Да' : 'Нет' }}
                                     @elseif($field->field === 'one_c_synced' && $model === 'Company')
                                         {{ \App\Enums\OneCSyncStatusEnum::getTitle($el[$field->field]) }}
-                                    @elseif ($field->field === 'user_id')
-                                        {{ app('App\User')->getName($el->user_id, false) }}
+                                    @elseif ($field->field === 'responsible_id')
+                                        {{ app('App\Employee')->getName($el->responsible_id) }}
                                     @elseif ($field->field === 'req_id')
                                         {{ app('App\Req')->getName($el->req_id) }}
                                     @elseif ($field->field === 'town_id')
@@ -592,6 +598,16 @@
                                             class="btn btn-sm btn-secondary">
                                         <i class="fa fa-book"></i>
                                     </button>
+                                </td>
+                            @endif
+
+                            @if($permissionToUserShow)
+                                <td class="td-option">
+                                    @if($el->related_user_id)
+                                        <a target="_blank" href="{{ route('users.management.show-page', $el->related_user_id) }}" class="btn btn-sm btn-secondary">
+                                            <i class="fa fa-user"></i>
+                                        </a>
+                                    @endif
                                 </td>
                             @endif
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\LogActionTypesEnum;
 use App\Enums\LogModelTypesEnum;
+use App\Enums\UserEntityType;
 use App\FieldPrompt;
 use App\Log;
 use App\User;
@@ -34,10 +35,17 @@ class LogController extends Controller
         $users = User::query()
             ->select([
                 'users.id as id',
-                DB::raw("CONCAT('[',users.hash_id,'] ',users.name) as text")
+                DB::raw("CONCAT(
+                    '[', coalesce(employees.hash_id, drivers.hash_id, terminals.hash_id, companies.hash_id), '] ',
+                    coalesce(employees.name, drivers.fio, terminals.name, companies.name)
+                ) as text"),
             ])
             ->distinct()
             ->leftJoin('logs', 'logs.user_id', '=', 'users.id')
+            ->leftJoin('employees', 'employees.related_user_id', '=', 'users.id')
+            ->leftJoin('drivers', 'drivers.related_user_id', '=', 'users.id')
+            ->leftJoin('terminals', 'terminals.related_user_id', '=', 'users.id')
+            ->leftJoin('companies', 'companies.related_user_id', '=', 'users.id')
             ->whereNotNull('logs.user_id')
             ->get();
 
@@ -73,7 +81,14 @@ class LogController extends Controller
         $data = Log::query()
             ->select([
                 'logs.*',
-                DB::raw("IF(ISNULL(users.hash_id), '-', CONCAT('[', users.hash_id, '] ', users.name)) as user")
+                DB::raw("IF(
+                    ISNULL(users.id), 
+                    '-', 
+                    CONCAT(
+                        '[', coalesce(employees.hash_id, drivers.hash_id, terminals.hash_id, companies.hash_id), '] ', 
+                        coalesce(employees.name, drivers.fio, terminals.name, companies.name)
+                    )
+                ) as user"),
             ])
             ->dateFrom($request->input('filter.date_start'))
             ->dateTo($request->input('filter.date_end'))
@@ -83,6 +98,10 @@ class LogController extends Controller
             ->userIds($request->input('filter.users'))
             ->actionTypes($request->input('filter.actions'))
             ->leftJoin('users', 'logs.user_id', '=', 'users.id')
+            ->leftJoin('employees', 'employees.related_user_id', '=', 'users.id')
+            ->leftJoin('drivers', 'drivers.related_user_id', '=', 'users.id')
+            ->leftJoin('terminals', 'terminals.related_user_id', '=', 'users.id')
+            ->leftJoin('companies', 'companies.related_user_id', '=', 'users.id')
             ->orderBy('created_at', 'desc')
             ->paginate(
                 $request->input('limit', 100),
@@ -108,11 +127,22 @@ class LogController extends Controller
         $data = Log::query()
             ->select([
                 'logs.*',
-                DB::raw("IF(ISNULL(users.hash_id), '-', CONCAT('[', users.hash_id, '] ', users.name)) as user")
+                DB::raw("IF(
+                    ISNULL(users.id), 
+                    '-', 
+                    CONCAT(
+                        '[', coalesce(employees.hash_id, drivers.hash_id, terminals.hash_id, companies.hash_id), '] ', 
+                        coalesce(employees.name, drivers.fio, terminals.name, companies.name)
+                    )
+                ) as user"),
             ])
             ->modelTypes([$modelType])
             ->modelId($request->input('id'))
             ->leftJoin('users', 'logs.user_id', '=', 'users.id')
+            ->leftJoin('employees', 'employees.related_user_id', '=', 'users.id')
+            ->leftJoin('drivers', 'drivers.related_user_id', '=', 'users.id')
+            ->leftJoin('terminals', 'terminals.related_user_id', '=', 'users.id')
+            ->leftJoin('companies', 'companies.related_user_id', '=', 'users.id')
             ->get();
 
         return response()->json($data);

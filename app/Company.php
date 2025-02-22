@@ -21,7 +21,7 @@ class Company extends Model
         'note',
         'comment',
         'procedure_pv',
-        'user_id',
+        'responsible_id',
         'req_id',
         'pv_id',
         'town_id',
@@ -43,7 +43,7 @@ class Company extends Model
         'auto_created',
         'deleted_at',
         'reqs_validated',
-        'one_c_synced'
+        'one_c_synced',
     ];
 
     public static function getAll()
@@ -74,7 +74,7 @@ class Company extends Model
 
     public function responsible(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(Employee::class, 'responsible_id', 'id');
     }
 
     public function deleted_user(): BelongsTo

@@ -50,7 +50,20 @@ class FieldPromptController extends Controller
             $prompts->orderBy($request->sortBy, $sort);
         }
 
-        return $prompts->paginate($request->perPage);
+        $paginator = $prompts->paginate($request->perPage);
+
+        if ($request->trash) {
+            $paginator->getCollection()->transform(function (FieldPrompt $stamp) {
+                if ($stamp->deleted_user) {
+                    $stamp->deleted_user_name = $stamp->deleted_user->name;
+                } else {
+                    $stamp->deleted_user_name = null;
+                }
+                return $stamp;
+            });
+        }
+
+        return $paginator;
     }
 
     /**
@@ -77,5 +90,16 @@ class FieldPromptController extends Controller
         } else {
             $field->delete();
         }
+    }
+
+    public function getItemsByType(string $type)
+    {
+        $fields = FieldPrompt::query()
+            ->select([
+                ''
+            ])
+            ->where('type', $type)
+            ->get()
+            ->toArray();
     }
 }

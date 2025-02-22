@@ -94,7 +94,10 @@ class CreateDriverHandler extends AbstractCreateElementHandler implements Create
             event(new ClientAddRecord($user, UserActionTypesEnum::ADD_DRIVER_VIA_FORM));
         }
 
-        UserService::createUserFromDriver($created);
+        $user = UserService::createUserFromDriver($created);
+
+        $created->related_user_id = $user->id;
+        $created->save();
 
         /** @var Contract $contract */
         $contract = Contract::query()

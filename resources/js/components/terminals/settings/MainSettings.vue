@@ -15,9 +15,6 @@ export default {
             medics: window.PAGE_SETUP.medics,
         }
     },
-    mounted() {
-        console.log(this.settings);
-    },
     methods: {
         save() {
             this.pending = true;

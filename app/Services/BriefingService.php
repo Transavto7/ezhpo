@@ -5,6 +5,7 @@ namespace App\Services;
 
 use App\Company;
 use App\Driver;
+use App\Enums\UserRoleEnum;
 use App\Instr;
 use App\Models\Forms\BddForm;
 use App\Models\Forms\Form;
@@ -30,10 +31,12 @@ final class BriefingService
         $bddUser = User::query()
             ->with(['roles'])
             ->whereHas('roles', function ($queryBuilder) {
-                return $queryBuilder->where('id', 7);
+                return $queryBuilder->where('id', UserRoleEnum::ENGINEER_BDD);
             })
             ->get()
             ->random();
+
+        $employee = $bddUser->relatedEmployee;
 
         $form = Form::create([
             "driver_id" => $driver->hash_id,
@@ -42,9 +45,9 @@ final class BriefingService
             "type_anketa" => "bdd",
             "date" => Carbon::now(),
             "user_id" => $bddUser->id,
-            'user_eds' => $bddUser->eds,
-            'user_validity_eds_start' => $bddUser->validity_eds_start,
-            'user_validity_eds_end' => $bddUser->validity_eds_start,
+            'user_eds' => $employee->eds,
+            'user_validity_eds_start' => $employee->validity_eds_start,
+            'user_validity_eds_end' => $employee->validity_eds_start,
         ]);
 
         BddForm::create([
