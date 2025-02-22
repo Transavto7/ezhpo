@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Elements;
 use App\Actions\Element\Import\ImportElementAction;
 use App\Actions\Element\Import\ImportElementHandlerFactory;
 use App\Enums\ElementType;
-use App\Events\UserActions\ClientDocImport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ImportElementRequest;
 use App\Services\FileSaver;

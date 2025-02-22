@@ -5,10 +5,12 @@ namespace App\Enums;
 use App\Car;
 use App\Company;
 use App\Driver;
+use App\Employee;
 use App\Models\Contract;
 use App\Models\TripTicket;
 use App\Product;
 use App\Stamp;
+use App\Terminal;
 use App\User;
 
 class LogModelTypesEnum
@@ -23,7 +25,9 @@ class LogModelTypesEnum
             Product::class => 'product',
             User::class => 'users',
             Stamp::class => 'stamps',
-            TripTicket::class => 'trip_ticket'
+            TripTicket::class => 'trip_ticket',
+            Employee::class => 'employees',
+            Terminal::class => 'terminals',
         ];
     }
 
@@ -37,7 +41,9 @@ class LogModelTypesEnum
             Product::class => 'Услуги',
             User::class => 'Пользователи',
             Stamp::class => 'Штампы',
-            TripTicket::class => 'Путевой лист'
+            TripTicket::class => 'Путевой лист',
+            Employee::class => 'Сотрудники',
+            Terminal::class => 'Терминалы',
         ];
     }
 

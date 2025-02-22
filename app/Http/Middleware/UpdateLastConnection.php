@@ -18,9 +18,10 @@ class UpdateLastConnection
     {
         $user = $request->user('api');
 
-        if ($user) {
-            $user->last_connection_at = Carbon::now();
-            $user->save();
+        if ($user && $user->isTerminal()) {
+            $terminal = $user->relatedTerminal;
+            $terminal->last_connection_at = Carbon::now();
+            $terminal->save();
         }
 
         return $next($request);

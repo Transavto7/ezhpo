@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\OneC;
 
 use App\Actions\Element\CreateCompanyHandler;
 use App\Actions\Element\CreateElementHandlerFactory;
-use App\Actions\User\CreateUserHandler;
 use App\Exceptions\EntityAlreadyExistException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateCompanyRequest;

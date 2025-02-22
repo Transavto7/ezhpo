@@ -20,7 +20,10 @@ final class TripTicketCreatePage extends Controller
         date_default_timezone_set('UTC');
         $time = time();
         $user = Auth::user();
-        $timezone = $user->timezone ?: 3;
+
+        $employee = $user->relatedEmployee;
+
+        $timezone = $employee->timezone ?: 3;
         $time += $timezone * 3600;
         $time = date('Y-m-d', $time);
         $form = null;

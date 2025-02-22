@@ -32,14 +32,15 @@ class WorkdaysIndexController extends Controller
         $workdays = $workdays
             //TODO: нужно ли инфо о терминале?
             ->leftJoin('points', 'workdays.point_id', '=', 'points.id')
-            ->leftJoin('users', 'workdays.employee_id', '=', 'users.id')
+            ->leftJoin('employees', 'workdays.employee_id', '=', 'employees.id')
             ->leftJoin('workdays as closed_workdays', function ($query) {
                 $query->on('workdays.id', '=', 'closed_workdays.open_workday_id')
                     ->orOn('closed_workdays.id', '=', 'workdays.open_workday_id');
             });
 
         if ($trash) {
-            $workdays = $workdays->leftJoin('users as delete_users', 'workdays.deleted_id', '=', 'delete_users.id');
+            $workdays = $workdays
+                ->leftJoin('employees as delete_users', 'workdays.deleted_id', '=', 'delete_users.related_user_id');
         }
 
         /**
@@ -94,11 +95,13 @@ class WorkdaysIndexController extends Controller
                         ->pluck('id')
                         ->toArray();
 
-                    $workdays = $workdays->leftJoin('model_has_roles', function ($query) use ($roleIds) {
-                        $query->on('workdays.employee_id', '=', 'model_has_roles.model_id')
-                            ->where('model_has_roles.role_id', $roleIds);
-                    })
-                    ->whereNotNull('model_has_roles.role_id');
+                    $workdays = $workdays
+                        ->leftJoin('users', 'users.id', '=', 'employees.related_user_id')
+                        ->leftJoin('model_has_roles', function ($query) use ($roleIds) {
+                            $query->on('workdays.employee_id', '=', 'model_has_roles.model_id')
+                                ->where('model_has_roles.role_id', $roleIds);
+                        })
+                        ->whereNotNull('model_has_roles.role_id');
 
                     continue;
                 }
@@ -186,7 +189,7 @@ class WorkdaysIndexController extends Controller
             'workdays.*',
             'workdays.created_at as created_at',
             'workdays.updated_at as updated_at',
-            'users.name as employee_fio',
+            'employees.name as employee_fio',
             'points.name as point_id',
             'closed_workdays.id as closed_workday_id',
         ];

@@ -48,4 +48,20 @@ final class UserEntityType extends Enum
                 throw new \LogicException("Unsupported user entity type value '$value'");
         }
     }
+
+    public function getLabel(): string
+    {
+        switch (true) {
+            case $this->value === self::COMPANY:
+                return 'Компания';
+            case $this->value === self::DRIVER:
+                return 'Водитель';
+            case $this->value === self::TERMINAL:
+                return 'Терминал';
+            case $this->value === self::EMPLOYEE:
+                return 'Сотрудник';
+            default:
+                throw new \LogicException("Unsupported user entity type value '$value'");
+        }
+    }
 }

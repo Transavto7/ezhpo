@@ -34,7 +34,7 @@
                                 @if($errors->getMessages())
                                     @foreach($errors->getMessages() as $err)
                                         @foreach($err as $errItem)
-                                            <span class="alert alert-danger">{{ $errItem }}</span>
+                                            <span class="alert alert-danger d-block">{{ $errItem }}</span>
                                         @endforeach
                                     @endforeach
                                 @endif

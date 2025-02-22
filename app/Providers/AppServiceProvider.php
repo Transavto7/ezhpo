@@ -7,12 +7,15 @@ use App\Car;
 use App\Company;
 use App\Contractcs\GetServicesReportForCompanyByPeriodInterface;
 use App\Driver;
+use App\Employee;
 use App\Models\Contract;
 use App\Observers\AnketaObserver;
 use App\Observers\CarObserver;
 use App\Observers\CompanyObserver;
 use App\Observers\ContractObserver;
 use App\Observers\DriverObserver;
+use App\Observers\EmployeeObserver;
+use App\Observers\TerminalObserver;
 use App\Observers\UserObserver;
 use App\Services\CompanyReqsChecker\CompanyReqsCheckerInterface;
 use App\Services\CompanyReqsChecker\DaDataCompanyReqsChecker;
@@ -26,6 +29,7 @@ use App\Services\OneC\CompanySync\CompanySyncServiceInterface;
 use App\Services\OneC\Reports\GetServicesReportForCompanyByPeriod;
 use App\Services\QRCode\QRCodeGenerator;
 use App\Services\QRCode\QRCodeGeneratorInterface;
+use App\Terminal;
 use App\User;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -72,5 +76,7 @@ class AppServiceProvider extends ServiceProvider
         Driver::observe(DriverObserver::class);
         User::observe(UserObserver::class);
         Anketa::observe(AnketaObserver::class);
+        Employee::observe(EmployeeObserver::class);
+        Terminal::observe(TerminalObserver::class);
     }
 }

@@ -7,11 +7,12 @@ use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Models\Forms\Form;
 use App\Models\Forms\PrintPlForm;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 
 class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
 {
-    protected function createForm(array $form)
+    protected function createForm(array $form, Authenticatable $user)
     {
         $driverId = $form['driver_id'] ?? ($this->data['driver_id'] ?? 0);
         $driver = Driver::where('hash_id', $driverId)->first();
@@ -87,7 +88,7 @@ class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements Crea
          */
         $date = $form['date'] ?? null;
         $diffDateCheck = Carbon::now()
-            ->addHours($user->timezone ?? 3)
+            ->addHours($user->entity->timezone ?? 3)
             ->diffInMinutes($date);
         if ($date && $diffDateCheck <= 60*12) {
             $form['realy'] = 'да';

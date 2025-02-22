@@ -10,8 +10,8 @@
             :default_company="{{ json_encode($company) }}"
         @endif
 
-        @if (user()->hasRole('client'))
-            :client_company="{{ json_encode(auth()->user()->company->only('hash_id', 'name', 'inn')) }}"
+        @if (user()->isCompany())
+            :client_company="{{ json_encode(auth()->user()->relatedCompany->only('hash_id', 'name', 'inn')) }}"
        @endif
         :permissions='@json([
             'create' => user()->access('report_service_company_read'),

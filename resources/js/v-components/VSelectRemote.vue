@@ -170,4 +170,6 @@ export default defineComponent({
     </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style lang="scss">
+@import "../../sass/libs/vue-select";
+</style>

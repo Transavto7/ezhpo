@@ -44,13 +44,26 @@ final class Employee extends Model
         return $this->belongsTo(User::class, 'deleted_id', 'id');
     }
 
-    public function pv(): BelongsTo
+    public function point(): BelongsTo
     {
-        return $this->belongsTo(Point::class, 'pv_id')->withDefault();
+        return $this->belongsTo(Point::class, 'pv_id', 'id')->withDefault();
     }
 
     public function points(): BelongsToMany
     {
         return $this->belongsToMany(Point::class, 'points_to_employees', 'employee_id', 'point_id');
+    }
+
+    public function getName($id)
+    {
+        $employee = self::find($id);
+
+        if (! $employee) {
+            $employee = '';
+        } else {
+            $employee = $employee->name;
+        }
+
+        return $employee;
     }
 }

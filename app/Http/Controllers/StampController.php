@@ -47,7 +47,20 @@ class StampController extends Controller
             $stamps->orderBy($request->sortBy, $sort);
         }
 
-        return $stamps->paginate(15);
+        $paginator = $stamps->paginate(15);
+
+        if ($request->trash) {
+            $paginator->getCollection()->transform(function (Stamp $stamp) {
+                if ($stamp->deleted_user) {
+                    $stamp->deleted_user_name = $stamp->deleted_user->name;
+                } else {
+                    $stamp->deleted_user_name = null;
+                }
+                return $stamp;
+            });
+        }
+
+        return $paginator;
     }
 
     /**

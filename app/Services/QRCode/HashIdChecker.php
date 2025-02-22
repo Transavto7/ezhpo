@@ -60,7 +60,7 @@ class HashIdChecker
      */
     private function checkUser()
     {
-        if ($this->user->blocked) {
+        if ($this->user->isBlocked()) {
             throw new Exception('Этот терминал заблокирован!', 400);
         }
     }
@@ -78,7 +78,12 @@ class HashIdChecker
         date_default_timezone_set('UTC');
         $time = time();
         $apiClient = $this->user;
-        $timezone = $apiClient->timezone ?: 3;
+
+        $timezone = 3;
+        if ($apiClient->timezone) {
+            $timezone = $apiClient->timezone;
+        }
+
         $time += $timezone * 3600;
         $time = date('Y-m-d H:i:s', $time);
 

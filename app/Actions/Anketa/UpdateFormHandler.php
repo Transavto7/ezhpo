@@ -143,7 +143,7 @@ class UpdateFormHandler
         }
 
         if ($date) {
-            $timezone = $user->timezone ?? 3;
+            $timezone = $user->entity->timezone ?? 3;
             $diffDateCheck = Carbon::parse($form['created_at'])
                 ->addHours($timezone)
                 ->diffInMinutes($date);
@@ -228,11 +228,13 @@ class UpdateFormHandler
         }
 
         /** @var User $user */
+        $entity = $user->entity;
+
         $form->user_id = $user->id;
-        $form->details->operator_id = $user->id;
-        $form->user_eds = $user->eds;
-        $form->user_validity_eds_start = $user->validity_eds_start;
-        $form->user_validity_eds_end = $user->validity_eds_end;
+        $form->details->operator_id = $entity->id;
+        $form->user_eds = $entity ? $entity->eds : null;
+        $form->user_validity_eds_start = $entity ? $entity->validity_eds_start : null;
+        $form->user_validity_eds_end = $entity ? $entity->validity_eds_end : null;
 
         $form->save();
         $form->details->save();

@@ -333,7 +333,7 @@ export default {
 
         if (this.deleted) {
             this.columns.push({
-                key: 'deleted_user.name',
+                key: 'deleted_user_name',
                 label: 'Имя удалившего',
             }, {
                 key: 'deleted_at',

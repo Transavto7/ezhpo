@@ -87,7 +87,7 @@ class TripTicket extends Model
         'logistics_method',
         'transportation_type',
         'template_code',
-        'user_id',
+        'employee_id',
         'period_pl',
         'photos',
         'status',

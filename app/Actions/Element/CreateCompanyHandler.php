@@ -3,6 +3,8 @@
 namespace App\Actions\Element;
 
 use App\Company;
+use App\Enums\UserEntityType;
+use App\Enums\UserRoleEnum;
 use App\Exceptions\EntityAlreadyExistException;
 use App\Exceptions\WrongCompanyReqsException;
 use App\Services\CompanyReqsChecker\CompanyRepository;
@@ -11,10 +13,17 @@ use App\User;
 use App\ValueObjects\CompanyReqs;
 use App\ValueObjects\Phone;
 use Exception;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Facades\Hash;
+use Src\Users\Management\Commands\CreateUser\CreateUserCommand;
+use Src\Users\Management\Commands\UpdateUserAccess\UpdateUserAccessCommand;
 
 class CreateCompanyHandler extends AbstractCreateElementHandler implements CreateElementHandlerInterface
 {
+    /**
+     * @var Dispatcher
+     */
+    private $dispatcher;
     /**
      * @var CompanyRepository
      */
@@ -26,6 +35,7 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
     public function __construct()
     {
         $this->companyRepository = new CompanyRepository();
+        $this->dispatcher = app()->make(Dispatcher::class);
 
         parent::__construct('Company');
     }
@@ -57,9 +67,13 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
             config('app.hash_generator.company.tries')
         );
 
+        /** @var Company $created */
         $created = $this->createElement($data);
 
-        $this->createUser($created);
+        $userId = $this->createUser($created);
+
+        $created->related_user_id = $userId;
+        $created->save();
 
         return $created;
     }
@@ -142,35 +156,24 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
      */
     protected function createUser(Company $created)
     {
-        $validator = function (int $hashId) {
-            if (User::withTrashed()->where('hash_id', $hashId)->first()) {
-                return false;
-            }
-
-            return true;
-        };
-
-        $userHashId = $this->generateHashId(
-            $validator,
-            config('app.hash_generator.user.min'),
-            config('app.hash_generator.user.max'),
-            config('app.hash_generator.user.tries')
-        );
-
         $companyHashId = $created->hash_id;
         $userLogin = $this->getUserLogin($companyHashId);
 
-        $user = User::create([
-            'hash_id' => $userHashId,
-            'email' => $companyHashId . '-' . $userHashId . '@ta-7.ru',
-            'api_token' => Hash::make(date('H:i:s') . sha1($companyHashId)),
-            'login' => $userLogin,
-            'password' => Hash::make($userLogin),
-            'name' => $created->name,
-            'role' => 12,
-            'company_id' => $created->id
-        ]);
+        $user = $this->dispatcher->dispatch(new CreateUserCommand(
+            UserEntityType::company(),
+            $userLogin,
+            $companyHashId . '@ta-7.ru',
+            $userLogin,
+            Hash::make(date('H:i:s') . sha1($companyHashId)),
+            12,
+        ));
 
-        $user->roles()->attach(6);
+        $this->dispatcher->dispatch(new UpdateUserAccessCommand(
+            $user,
+            [UserRoleEnum::CLIENT],
+            []
+        ));
+
+        return $user->id;
     }
 }

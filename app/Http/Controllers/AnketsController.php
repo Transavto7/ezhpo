@@ -51,14 +51,14 @@ class AnketsController extends Controller
         $user = Auth::user();
 
         $type = $request->get('type');
-        if (!$type) {
+        if (! $type) {
             if ($user->hasRole('manager') || $user->hasRole('engineer_bdd')) {
                 return redirect()->route('renderElements', 'Company');
             }
             if ($user->hasRole('operator_sdpo')) {
                 return redirect()->route('home', ['type_ankets' => FormTypeEnum::PAK_QUEUE]);
             }
-            if ($user->hasRole('client')) {
+            if ($user->isCompany()) {
                 return redirect()->route('home', ['type_ankets' => FormTypeEnum::MEDIC]);
             }
             if ($user->hasRole('tech')) {
@@ -67,7 +67,7 @@ class AnketsController extends Controller
             if ($user->hasRole('medic')) {
                 $type = FormTypeEnum::TECH;
             }
-            if (!$type) {
+            if (! $type) {
                 return redirect()->route('index');
             }
         }
@@ -109,15 +109,25 @@ class AnketsController extends Controller
         // Конвертация текущего времени Юзера
         date_default_timezone_set('UTC');
         $time = time();
-        $timezone = $user->timezone ?: 3;
+
+        $timezone = 3;
+        if ($user->isTerminal()) {
+            $timezone = $user->relatedTerminal->timezone;
+        }
+        if ($user->isEmployee()) {
+            $timezone = $user->relatedEmployee->timezone;
+        }
+
         $time += $timezone * 3600;
         $time = date('Y-m-d\TH:i', $time);
 
         // Дефолтные значения
+        $pv = $user->entity->point;
+
         $data['default_current_date'] = $time;
         $data['points'] = Point::getAll();
         $data['type_anketa'] = $type;
-        $data['default_pv_id'] = $user->pv_id;
+        $data['default_pv_id'] = $pv ? $pv->id : null;
         $data['car_id'] = $request->input(QRCodeLinkParameter::CAR_ID);
         $data['driver_id'] = $request->input(QRCodeLinkParameter::DRIVER_ID);
 
@@ -462,18 +472,8 @@ class AnketsController extends Controller
 
     public function verificationPage(string $uuid, GetFormVerificationDetailsQuery $query)
     {
-        $user = Auth::user();
-
-        $userId = null;
-        if ($user) {
-            $userId = $user->id;
-        }
-
         try {
-            $details = $query->get(new GetFormVerificationDetailsParams(
-                $uuid,
-                $userId
-            ));
+            $details = $query->get(new GetFormVerificationDetailsParams($uuid));
 
             return view('pages.form-verification.show', [
                 'details' => $details,

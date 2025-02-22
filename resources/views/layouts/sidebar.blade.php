@@ -2,7 +2,7 @@
     use App\Enums\FormTypeEnum;
     use Illuminate\Support\Facades\Cache;
     use App\Models\Forms\Form;
-    use App\Services\Terminals\TerminalsToCheckService;
+    use App\Actions\Terminals\GetTerminalsToCheck\GetTerminalsToCheckQuery;
 
     /** @var \App\User $user */
     $user = \Illuminate\Support\Facades\Auth::user();
@@ -37,7 +37,8 @@
             'pak_sdpo_update',
             'requisites_read',
             'requisites_create',
-            'releases_read'
+            'releases_read',
+            'users_read',
         );
 
     $accessToElements = $user->access(
@@ -312,7 +313,7 @@
                     @endif
 
                     @if($user->access('employee_read', 'employee_create'))
-                        <li><a href="{{ route('users') }}">Сотрудники</a></li>
+                        <li><a href="{{ route('employees.index') }}">Сотрудники</a></li>
                     @endif
 
                     @if($user->access('group_read', 'group_create'))
@@ -321,11 +322,11 @@
 
                     @if($user->access('pak_sdpo_read', 'pak_sdpo_create'))
                         @php
-                            $service = new TerminalsToCheckService();
-                            $needToCheck = $service->getIds();
+                            $query = new GetTerminalsToCheckQuery();
+                            $terminalsToCheckViewModel = $query->get();
 
-                            $lessMonthCount = count($needToCheck['less_month']);
-                            $expiredCount = count($needToCheck['expired']);
+                            $lessMonthCount = count($terminalsToCheckViewModel->getLessMonth());
+                            $expiredCount = count($terminalsToCheckViewModel->getExpired());
                         @endphp
                         <li>
                             <a href="{{ route('terminals.index') }}">
@@ -341,6 +342,10 @@
                             </a>
                         </li>
                     @endif
+
+                     @if($user->access('users_read'))
+                         <li><a href="{{ route('users.management.list-page') }}">Пользователи</a></li>
+                     @endif
 
                     @if($user->access('stamp_read'))
                         <li><a href="{{ route('stamp.index') }}">Штампы</a></li>

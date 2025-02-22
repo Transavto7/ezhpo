@@ -4,7 +4,7 @@
         : explode(',', $default_value);
     $key = $v['getFieldKey'] ?? 'id';
     $value = $v['getField'] ?? 'name';
-    $company = $user->company
+    $company = $user->relatedDriver->company
 @endphp
 <select
     disabled

@@ -37,8 +37,16 @@ class DriverObserver
     {
         $logData = [];
 
+        $skipAttributeChanges = [
+            'related_user_id',
+        ];
+
         foreach ($driver->getDirty() as $attribute => $newValue) {
             if (empty($newValue) && empty($driver->getOriginal($attribute))) {
+                continue;
+            }
+
+            if (in_array($attribute, $skipAttributeChanges)) {
                 continue;
             }
 

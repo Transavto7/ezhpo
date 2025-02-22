@@ -414,7 +414,7 @@
                                         @elseif(($field->field === 'video') && $workday[$field->field])
                                             @include('Workdays::components.columns.video', compact($workday, $field))
                                         @elseif($field->field === 'employee_id' && user()->access('employee_read'))
-                                            <a href="{{ route('users', ['id' => $workday[$field->field] ]) }}">
+                                            <a href="{{ route('employees.index', ['employee_id' => [$workday[$field->field]] ]) }}">
                                                 {{ $workday['employee_fio'] }}
                                             </a>
                                         @elseif($field->field === 'type_anketa')

@@ -144,7 +144,7 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
             'logistics_method' => $action->getLogisticsMethod(),
             'transportation_type' => $action->getTransportationType(),
             'template_code' => $action->getTemplateCode(),
-            'user_id' => Auth::user()->id,
+            'employee_id' => Auth::user()->relatedEmployee->id,
             'status' => TripTicketStatus::CREATED,
             'type' => TripTicketType::GENERATED,
         ]);

@@ -5,14 +5,17 @@ namespace App\Models\Forms;
 use App\Company;
 use App\Driver;
 use App\Enums\FormTypeEnum;
+use App\Enums\UserEntityType;
 use App\Models\TripTicket;
 use App\Point;
 use App\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 
 class Form extends Model
@@ -136,12 +139,21 @@ class Form extends Model
         if ($user->access('approval_queue_view_all')) {
 
         } else if ($user->hasRole('head_operator_sdpo')) {
-            $query->join('points_to_users', function ($join) use ($user) {
-                $join->on('forms.point_id', '=', 'points_to_users.point_id')
-                    ->where('points_to_users.user_id', '=', $user->id);
+            $employee = $user->relatedEmployee;
+
+            $query->join('points_to_employees', function ($join) use ($employee) {
+                $join->on('forms.point_id', '=', 'points_to_employees.point_id')
+                    ->where('points_to_employees.employee_id', '=', $employee->id);
             });
         } else {
             $query->where('forms.user_id', $user->id);
         }
+    }
+
+    public function scopeWithDeletedUserName(Builder $query)
+    {
+        $query
+            ->leftJoin('employees', 'employees.related_user_id', '=', 'forms.deleted_id')
+            ->addSelect('employees.name as deleted_user_name');
     }
 }

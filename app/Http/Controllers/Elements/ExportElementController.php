@@ -22,7 +22,7 @@ final class ExportElementController extends Controller
 
         event(new ClientDocExport($authUser, $type));
 
-        $userCompanyId = $authUser->hasRole('client')
+        $userCompanyId = $authUser->isCompany()
             ? User::getUserCompanyId('id', true)
             : (int)$request->input('company_id', -1);
 

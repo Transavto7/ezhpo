@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\SdpoCrashTypesEnum;
+use App\Enums\UserEntityType;
 use App\Point;
 use App\SdpoCrashLog;
 use App\User;
@@ -46,9 +47,13 @@ class SdpoCrashLogController extends Controller
         $terminals = User::query()
             ->select([
                 'users.id as id',
-                DB::raw("CONCAT('[',users.hash_id,'] ',users.name) as text")
+                DB::raw("CONCAT('[',terminals.hash_id,'] ',terminals.name) as text")
             ])
             ->leftJoin('sdpo_crash_logs', 'sdpo_crash_logs.terminal_id', '=', 'users.id')
+            ->leftJoin('terminals', function ($join) {
+                $join->on('terminals.related_user_id', '=', 'users.id')
+                    ->where('users.entity_type', '=', UserEntityType::TERMINAL);
+            })
             ->whereNotNull('sdpo_crash_logs.terminal_id')
             ->get()
             ->toArray();
@@ -64,7 +69,7 @@ class SdpoCrashLogController extends Controller
         $data = SdpoCrashLog::query()
             ->select([
                 'sdpo_crash_logs.*',
-                DB::raw("CONCAT('[', users.hash_id, '] ', users.name) as terminal"),
+                DB::raw("CONCAT('[', terminals.hash_id, '] ', terminals.name) as terminal"),
                 DB::raw("CONCAT('[',towns.name,'] ',points.name) as point")
             ])
             ->createdAtFrom($request->input('filter.created_at_start'))
@@ -77,6 +82,10 @@ class SdpoCrashLogController extends Controller
             ->versions($request->input('filter.versions'))
             ->terminals($request->input('filter.terminals'))
             ->leftJoin('users', 'sdpo_crash_logs.terminal_id', '=', 'users.id')
+            ->leftJoin('terminals', function ($join) {
+                $join->on('terminals.related_user_id', '=', 'users.id')
+                    ->where('users.entity_type', '=', UserEntityType::TERMINAL);
+            })
             ->leftJoin('points', 'sdpo_crash_logs.point_id', '=', 'points.id')
             ->leftJoin('towns', 'points.pv_id', '=', 'towns.id')
             ->orderBy('sdpo_crash_logs.happened_at', 'desc')

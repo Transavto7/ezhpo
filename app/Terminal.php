@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Src\Terminals\Eloquent\TerminalSettings;
 
 final class Terminal extends Model
 {
@@ -40,10 +41,14 @@ final class Terminal extends Model
         return $this->belongsTo(User::class, 'related_user_id', 'id');
     }
 
-    public function pv(): BelongsTo
+    public function whoDeleted(): BelongsTo
     {
-        return $this->belongsTo(Point::class, 'pv_id')
-            ->withDefault();
+        return $this->belongsTo(User::class, 'deleted_id', 'id');
+    }
+
+    public function point(): BelongsTo
+    {
+        return $this->belongsTo(Point::class, 'pv_id')->withDefault();
     }
 
     public function stamp(): BelongsTo
@@ -64,5 +69,27 @@ final class Terminal extends Model
     public function terminalCheck(): HasOne
     {
         return $this->hasOne(TerminalCheck::class, 'terminal_id');
+    }
+
+    public function terminalSettings(): HasOne
+    {
+        return $this->hasOne(TerminalSettings::class, 'terminal_id');
+    }
+
+    public function getStamp(): ?Stamp
+    {
+        /** @var Stamp|null $stamp */
+        $stamp = $this->stamp;
+        if ($stamp) {
+            return $stamp;
+        }
+
+        /** @var Point|null $point */
+        $point = $this->point;
+        if ($point) {
+            return $point->getStamp();
+        }
+
+        return null;
     }
 }

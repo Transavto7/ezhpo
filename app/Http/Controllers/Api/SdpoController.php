@@ -9,9 +9,12 @@ use App\Actions\Forms\StoreFormEvent\StoreFormEventCommand;
 use App\Actions\Forms\StoreFormEvent\StoreFormEventHandler;
 use App\Car;
 use App\Driver;
+use App\Employee;
 use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FlagPakEnum;
 use App\Enums\FormTypeEnum;
+use App\Enums\UserEntityType;
+use App\Enums\UserRoleEnum;
 use App\Events\Forms\DriverDismissed;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSdpoCrashRequest;
@@ -27,10 +30,10 @@ use App\Settings;
 use App\Stamp;
 use App\Traits\UserEdsTrait;
 use App\User;
-use App\ValueObjects\FormFeedback;
-use App\ValueObjects\Phone;
 use App\ValueObjects\ForeignDevice\PressureLimit;
 use App\ValueObjects\ForeignDevice\Tonometer;
+use App\ValueObjects\FormFeedback;
+use App\ValueObjects\Phone;
 use DateTimeImmutable;
 use DomainException;
 use Exception;
@@ -46,7 +49,6 @@ use Src\Terminals\Factories\SettingsFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
-use function Clue\StreamFilter\fun;
 
 class SdpoController extends Controller
 {
@@ -57,12 +59,12 @@ class SdpoController extends Controller
         /** @var User $user */
         $user = $request->user('api');
 
-        if ($user->blocked) {
+        if ($user->isBlocked()) {
             return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK)], 400);
         }
 
         $driver = Driver::where('hash_id', $id)->first();
-        if (!$driver) {
+        if (! $driver) {
             return response()->json(['message' => 'Водитель с указанным ID не найден!'], 400);
         }
 
@@ -77,23 +79,26 @@ class SdpoController extends Controller
                 'medic_forms.admitted',
                 'forms.date as created_at',
                 'forms.user_eds',
-                'users.name as user_name',
+                DB::raw('coalesce(user_employees.name, user_drivers.fio, user_terminals.name, user_companies.name) as user_name'),
                 'medic_forms.type_view',
                 'forms.user_validity_eds_start',
                 'forms.user_validity_eds_end',
                 DB::raw("COALESCE(terminal_stamps.company_name, point_stamps.company_name, town_stamps.company_name, '$defaultCompanyName') as stamp_head"),
-                DB::raw("COALESCE(terminal_stamps.licence, point_stamps.licence, town_stamps.licence, '$defaultLicense') as stamp_licence")
+                DB::raw("COALESCE(terminal_stamps.licence, point_stamps.licence, town_stamps.licence, '$defaultLicense') as stamp_licence"),
             ])
             ->join('medic_forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
             ->join('drivers', 'forms.driver_id', '=', 'drivers.hash_id')
             ->join('companies', 'forms.company_id', '=', 'companies.hash_id')
-            ->join('users as terminals', 'medic_forms.terminal_id', '=', 'terminals.id')
-            ->join('users', 'forms.user_id', '=', 'users.id')
+            ->join('terminals', 'medic_forms.terminal_id', '=', 'terminals.id')
             ->leftJoin('stamps as terminal_stamps', 'terminals.stamp_id', '=', 'terminal_stamps.id')
             ->leftJoin('points', 'forms.point_id', '=', 'points.id')
             ->leftJoin('stamps as point_stamps', 'points.stamp_id', '=', 'point_stamps.id')
             ->leftJoin('towns', 'points.pv_id', '=', 'towns.id')
             ->leftJoin('stamps as town_stamps', 'towns.stamp_id', '=', 'town_stamps.id')
+            ->leftJoin('employees as user_employees', 'user_employees.related_user_id', '=', 'forms.user_id')
+            ->leftJoin('drivers as user_drivers', 'user_drivers.related_user_id', '=', 'forms.user_id')
+            ->leftJoin('terminals as user_terminals', 'user_terminals.related_user_id', '=', 'forms.user_id')
+            ->leftJoin('companies as user_companies', 'user_companies.related_user_id', '=', 'forms.user_id')
             ->where('forms.driver_id', $id)
             ->where('medic_forms.admitted', 'Допущен')
             ->where('medic_forms.flag_pak', '!=', FlagPakEnum::INTERNAL)
@@ -128,32 +133,49 @@ class SdpoController extends Controller
             /** @var User $user */
             $user = $request->user('api');
             $apiClient = $user;
-            if ($user->blocked) {
+            if ($user->isBlocked()) {
                 throw new Exception(BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK), 400);
             }
 
+            $terminal = $user->relatedTerminal;
+
+            /**
+             * @var ?Employee $employee
+             */
+            $employee = null;
+
             if ($request->user_id) {
-                $user = User::find($request->user_id);
+                $employee = Employee::find($request->user_id);
+
+                // todo: позже убрать эту проверку
+                if (! $employee) {
+                    $user = User::find($request->user_id);
+                    $employee = $user->relatedEmployee;
+                }
             }
 
-            if (!$user) {
+            if (! $user) {
                 throw new Exception('Пользователь с таким ID не найден!', 400);
             }
 
+            $medicEds = $employee ? $employee->eds : null;
+            $medicValidityEdsStart = $employee ? $employee->validity_eds_start : null;
+            $medicValidityEdsEnd = $employee ? $employee->validity_eds_end : null;
+
             /** @var Driver $driver */
             $driver = Driver::where('hash_id', $request->driver_id)->first();
-            if (!$driver) {
+            if (! $driver) {
                 throw new Exception('Указанный водитель не найден!', 400);
             }
 
             date_default_timezone_set('UTC');
             $time = time();
-            $timezone = $apiClient->timezone ?: 3;
+            $timezone = $apiClient->relatedTerminal->timezone ?: 3;
             $time += $timezone * 3600;
             $time = date('Y-m-d H:i:s', $time);
 
             if ($driver->end_of_ban && (Carbon::parse($time) < Carbon::parse($driver->end_of_ban))) {
-                $message = sprintf("Указанный водитель отстранен до %s!", Carbon::parse($driver->end_of_ban));
+                $message = sprintf('Указанный водитель отстранен до %s!', Carbon::parse($driver->end_of_ban));
                 throw new Exception($message, 400);
             }
 
@@ -174,18 +196,18 @@ class SdpoController extends Controller
 
             //TODO: добавить валидацию
             $tonometer = $request->tonometer;
-            if (!$tonometer) {
+            if (! $tonometer) {
                 $tonometer = strval(Tonometer::randomWithDriver($driver));
             }
 
             $medic = [];
             $medic['type_anketa'] = $request->type_anketa ?? FormTypeEnum::MEDIC;
-            $medic['user_id'] = $user->id;
-            $medic['user_validity_eds_start'] = $user->validity_eds_start;
-            $medic['user_validity_eds_end'] = $user->validity_eds_end;
-            $medic['user_eds'] = $user->eds;
+            $medic['user_id'] = $employee ? $employee->related_user_id : null;
+            $medic['user_validity_eds_start'] = $medicValidityEdsStart;
+            $medic['user_validity_eds_end'] = $medicValidityEdsEnd;
+            $medic['user_eds'] = $medicEds;
             $medic['pulse'] = $request->pulse ?? mt_rand(60, 80);
-            $medic['point_id'] = $apiClient->pv->id;
+            $medic['point_id'] = $terminal->point->id;
             $medic['tonometer'] = $tonometer;
             $medic['driver_id'] = $driver->hash_id;
             $medic['company_id'] = $company->hash_id;
@@ -193,8 +215,8 @@ class SdpoController extends Controller
             $medic['t_people'] = $request->t_people ?? 36.6;
             $medic['type_view'] = $request->type_view ?? 'Предрейсовый/Предсменный';
             $medic['flag_pak'] = $request->type_anketa === FormTypeEnum::PAK_QUEUE ? FlagPakEnum::SDPO_R : FlagPakEnum::SDPO_A;
-            $medic['terminal_id'] = $apiClient->id;
-            $medic['realy'] = "да";
+            $medic['terminal_id'] = $terminal->id;
+            $medic['realy'] = 'да';
             $medic['proba_alko'] = $request->proba_alko ?? 'Отрицательно';
 
             if ($driver->year_birthday !== '' && $driver->year_birthday !== '0000-00-00') {
@@ -219,7 +241,7 @@ class SdpoController extends Controller
             $notAdmittedReasons = [];
 
             if ($request->filled('alcometer_result')) {
-                $medic['alcometer_result'] = doubleval($request->input('alcometer_result'));
+                $medic['alcometer_result'] = floatval($request->input('alcometer_result'));
             }
 
             if (($medic['alcometer_result'] ?? 0) == 1) {
@@ -271,7 +293,7 @@ class SdpoController extends Controller
                 $medic['med_view'] = 'Отстранение';
             }
 
-            if (doubleval($medic['t_people']) >= 37) {
+            if (floatval($medic['t_people']) >= 37) {
                 $notAdmittedReasons[] = ['Высокая температура'];
                 $admitted = 'Не допущен';
                 $medic['med_view'] = 'Отстранение';
@@ -285,7 +307,7 @@ class SdpoController extends Controller
 
             $pressure = Tonometer::fromString($tonometer);
             $pressureLimits = PressureLimit::create($driver);
-            if (!$pressure->isAdmitted($pressureLimits)) {
+            if (! $pressure->isAdmitted($pressureLimits)) {
                 $notAdmittedReasons[] = ['Высокое давление'];
                 $admitted = 'Не допущен';
                 $medic['med_view'] = 'Отстранение';
@@ -333,7 +355,7 @@ class SdpoController extends Controller
             $stampViewModel = StampViewModel::fromStampOrDefault($formDetailsModel->getStamp());
             $form = array_merge($form, $stampViewModel->toArray());
 
-            $validity = UserEdsTrait::getValidityString($user->validity_eds_start, $user->validity_eds_end);
+            $validity = UserEdsTrait::getValidityString($medicValidityEdsStart, $medicValidityEdsEnd);
             if ($validity) {
                 $form['validity'] = $validity;
             }
@@ -353,7 +375,7 @@ class SdpoController extends Controller
                     [
                         'id' => $form->id,
                         'request' => $request->all(),
-                        'ip' => $request->getClientIp() ?? null
+                        'ip' => $request->getClientIp() ?? null,
                     ]
                 ));
             }
@@ -373,7 +395,7 @@ class SdpoController extends Controller
             }
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], $code);
         }
     }
@@ -393,16 +415,18 @@ class SdpoController extends Controller
     public function getPoint(Request $request)
     {
         $user = $request->user('api');
+        $terminal = $user->relatedTerminal;
 
-        return response()->json($user->pv->name);
+        return response()->json($terminal->point->name);
     }
 
     public function getStamp(Request $request): JsonResponse
     {
         /** @var User $user */
         $user = $request->user('api');
+        $terminal = $user->relatedTerminal;
 
-        $stampViewModel = StampViewModel::fromStampOrDefault($user->getStamp());
+        $stampViewModel = StampViewModel::fromStampOrDefault($terminal->getStamp());
 
         return response()->json($stampViewModel->toArray());
     }
@@ -410,8 +434,9 @@ class SdpoController extends Controller
     public function getTerminalVerification(Request $request)
     {
         $user = $request->user('api');
+        $terminal = $user->relatedTerminal;
 
-        if (!$user->terminalCheck) {
+        if (! $terminal->terminalCheck) {
             return response()->json([
                 'serial_number' => null,
                 'date_check' => null,
@@ -420,9 +445,9 @@ class SdpoController extends Controller
         }
 
         return response()->json([
-            'serial_number' => $user->terminalCheck->serial_number,
-            'date_check' => $user->terminalCheck->date_check->format('Y-m-d'),
-            'stamp' => StampViewModel::fromStampOrDefault($user->getStamp())->toArray(),
+            'serial_number' => $terminal->terminalCheck->serial_number,
+            'date_check' => $terminal->terminalCheck->date_check->format('Y-m-d'),
+            'stamp' => StampViewModel::fromStampOrDefault($terminal->getStamp())->toArray(),
         ]);
     }
 
@@ -431,14 +456,14 @@ class SdpoController extends Controller
      */
     public function getMedics(): JsonResponse
     {
-        $users = User::query()
+        $medics = Employee::query()
             ->with([
-                'roles',
-                'pv:id,name,pv_id',
-                'pv.town:id,name'
+                'user.roles',
+                'point:id,name,pv_id',
+                'point.town:id,name',
             ])
-            ->whereHas('roles', function ($q) {
-                $q->where('roles.id', 2);
+            ->whereHas('user.roles', function ($q) {
+                $q->where('roles.id', UserRoleEnum::MEDIC);
             })
             ->select([
                 'id',
@@ -446,15 +471,15 @@ class SdpoController extends Controller
                 'eds',
                 'pv_id',
                 'validity_eds_start',
-                'validity_eds_end'
+                'validity_eds_end',
             ])
             ->get()
             ->groupBy([
-                'pv.town.name',
-                'pv.name'
+                'point.town.name',
+                'point.name',
             ]);
 
-        return response()->json($users);
+        return response()->json($medics);
     }
 
     public function getStamps(): JsonResponse
@@ -463,7 +488,7 @@ class SdpoController extends Controller
             ->select([
                 'id',
                 'company_name as stamp_head',
-                'licence as stamp_licence'
+                'licence as stamp_licence',
             ])
             ->get()
             ->groupBy('id');
@@ -486,13 +511,13 @@ class SdpoController extends Controller
         $settings->getMain()->setSetting('terminal_is_blocked', $user->blocked == 1);
         $settings->getMain()->setSetting('support_phone', Settings::setting('sdpo_support_phone'));
 
-        $medic = User::query()
+        $medic = Employee::query()
             ->select([
                 'id',
                 'name',
                 'eds',
                 'validity_eds_start',
-                'validity_eds_end'
+                'validity_eds_end',
             ])
             ->where('id', '=', $settings->getMain()->getSetting('selected_medic'))
             ->first();
@@ -508,8 +533,9 @@ class SdpoController extends Controller
     public function getDriver(Request $request, $id): JsonResponse
     {
         $apiClient = $request->user('api');
+        $terminal = $apiClient->relatedTerminal;
 
-        if ($apiClient->blocked) {
+        if ($apiClient->isBlocked()) {
             return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK)], 400);
         }
 
@@ -523,23 +549,23 @@ class SdpoController extends Controller
                 'end_of_ban',
                 'photo',
                 'phone',
-                'only_offline_medic_inspections'
+                'only_offline_medic_inspections',
             ])
             ->first();
 
-        if (!$driver) {
+        if (! $driver) {
             return response()->json(['message' => 'Водитель с указанным ID не найден!'], 400);
         }
 
         date_default_timezone_set('UTC');
         $time = time();
-        $timezone = $apiClient->timezone ?? Auth::user()->timezone;
+        $timezone = $terminal->timezone;
         $time += $timezone * 3600;
         $time = date('Y-m-d H:i:s', $time);
 
         if ($driver->end_of_ban && (Carbon::parse($time) < Carbon::parse($driver->end_of_ban))) {
             return response()->json(
-                ['message' => 'Указанный водитель отстранен до ' . Carbon::parse($driver->end_of_ban) . "!"],
+                ['message' => 'Указанный водитель отстранен до '.Carbon::parse($driver->end_of_ban).'!'],
                 400
             );
         }
@@ -566,7 +592,7 @@ class SdpoController extends Controller
     {
         $apiClient = $request->user('api');
 
-        if ($apiClient->blocked) {
+        if ($apiClient->isBlocked()) {
             return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK)], 400);
         }
 
@@ -580,7 +606,7 @@ class SdpoController extends Controller
             ])
             ->first();
 
-        if (!$car) {
+        if (! $car) {
             return response()->json(['message' => 'Авто с указанным ID не найдено!'], 400);
         }
 
@@ -599,7 +625,7 @@ class SdpoController extends Controller
     {
         $apiClient = $request->user('api');
 
-        if ($apiClient->blocked) {
+        if ($apiClient->isBlocked()) {
             return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK)], 400);
         }
 
@@ -609,7 +635,7 @@ class SdpoController extends Controller
             ->where('hash_id', $id)
             ->first();
 
-        if (!$driver) {
+        if (! $driver) {
             return response()->json(['message' => 'Водитель с указанным ID не найден!'], 400);
         }
 
@@ -626,7 +652,7 @@ class SdpoController extends Controller
         }
 
         $phone = new Phone($request->input('phone'));
-        if (!$phone->isValid()) {
+        if (! $phone->isValid()) {
             return response()->json(['message' => 'Некорректный номер телефона!', 422]);
         }
 
@@ -634,7 +660,7 @@ class SdpoController extends Controller
         $driver->save();
 
         return response()->json([
-            'message' => 'Номер телефона водителя успешно обновлен!'
+            'message' => 'Номер телефона водителя успешно обновлен!',
         ]);
     }
 
@@ -719,45 +745,45 @@ class SdpoController extends Controller
             ->get()
             ->map(function (Driver $item) {
                 return [
-                    "hash_id" => $item->hash_id,
-                    "fio" => $item->fio,
-                    "dismissed" => convertStringToBoolean(getValueByPriority(
+                    'hash_id' => $item->hash_id,
+                    'fio' => $item->fio,
+                    'dismissed' => convertStringToBoolean(getValueByPriority(
                         $item->dismissed,
                         $item->company_dismissed
                     )),
-                    "end_of_ban" => $item->end_of_ban,
-                    "pressure_systolic" => getValueByPriority(
+                    'end_of_ban' => $item->end_of_ban,
+                    'pressure_systolic' => getValueByPriority(
                         $item->pressure_systolic,
                         $item->company_pressure_systolic,
                         $item->settings_pressure_systolic,
                         $item->default_pressure_systolic,
                     ) ?? 0,
-                    "pressure_diastolic" => getValueByPriority(
+                    'pressure_diastolic' => getValueByPriority(
                         $item->pressure_diastolic,
                         $item->company_pressure_diastolic,
                         $item->settings_pressure_diastolic,
                         $item->default_pressure_diastolic,
                     ) ?? 0,
-                    "time_of_pressure_ban" => getValueByPriority(
+                    'time_of_pressure_ban' => getValueByPriority(
                         $item->time_of_pressure_ban,
                         $item->company_time_of_pressure_ban,
                         $item->settings_time_of_pressure_ban,
                         $item->default_time_of_pressure_ban,
                     ) ?? 0,
-                    "time_of_alcohol_ban" => getValueByPriority(
+                    'time_of_alcohol_ban' => getValueByPriority(
                         $item->time_of_alcohol_ban,
                         $item->company_time_of_alcohol_ban,
                         $item->settings_time_of_alcohol_ban,
                         $item->default_time_of_alcohol_ban,
                     ) ?? 0,
-                    "pulse_lower" => getValueByPriority(
+                    'pulse_lower' => getValueByPriority(
                         $item->settings_pulse_lower,
                         $item->default_pulse_lower
                     ) ?? 0,
-                    "pulse_upper" => getValueByPriority(
+                    'pulse_upper' => getValueByPriority(
                         $item->settings_pulse_upper,
                         $item->default_pulse_upper
-                    ) ?? 0
+                    ) ?? 0,
                 ];
             });
 
@@ -770,7 +796,7 @@ class SdpoController extends Controller
     public function getInspection($id): JsonResponse
     {
         $inspection = Form::find($id);
-        if (!$inspection) {
+        if (! $inspection) {
             return response()->json(['Осмотр с указанным ID не найден'], Response::HTTP_NOT_FOUND);
         }
 
@@ -826,21 +852,21 @@ class SdpoController extends Controller
     */
     public function setDriverPhoto(Request $request, $id)
     {
-        if (!$request->photo) {
+        if (! $request->photo) {
             return;
         }
 
         $driver = Driver::where('hash_id', $id)->first();
-        if (!$driver) {
+        if (! $driver) {
             return;
         }
 
         $image = base64_decode($request->photo);
-        $path = "elements/driver_photo_" . $id . ".png";
+        $path = 'elements/driver_photo_'.$id.'.png';
         Storage::disk('public')->put($path, $image);
 
         $driver->update([
-            'photo' => $path
+            'photo' => $path,
         ]);
     }
 
@@ -849,7 +875,7 @@ class SdpoController extends Controller
         /** @var User $user */
         $user = $request->user('api');
 
-        if ($user->blocked) {
+        if ($user->isBlocked()) {
             return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK)], 400);
         }
 
@@ -860,20 +886,20 @@ class SdpoController extends Controller
                 $request->all() +
                 [
                     'terminal_id' => $user->getAttribute('id'),
-                    'point_id' => $user->getAttribute('pv_id')
+                    'point_id' => $user->getAttribute('pv_id'),
                 ]
             );
 
             DB::commit();
 
             return response()->json([
-                'message' => 'Ошибка успешно передана на сервер!'
+                'message' => 'Ошибка успешно передана на сервер!',
             ]);
         } catch (Throwable $exception) {
             DB::rollBack();
 
             return response()->json([
-                'message' => "Ошибка не была передана на сервер! " . $exception->getMessage()
+                'message' => 'Ошибка не была передана на сервер! '.$exception->getMessage(),
             ]);
         }
     }
@@ -882,12 +908,11 @@ class SdpoController extends Controller
         StoreSdpoFormFeedbackRequest $request,
         string $id,
         StoreFormEventHandler $handler
-    )
-    {
+    ) {
         /** @var User $user */
         $user = $request->user('api');
 
-        if ($user->blocked) {
+        if ($user->isBlocked()) {
             return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK)], Response::HTTP_BAD_REQUEST);
         }
 
@@ -913,13 +938,13 @@ class SdpoController extends Controller
             DB::rollBack();
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ])->setStatusCode(Response::HTTP_NOT_FOUND);
         } catch (Exception $exception) {
             DB::rollBack();
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ])->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -930,11 +955,11 @@ class SdpoController extends Controller
             return $handler->handle(new ExportFormsLabelingPdfCommand([$id]));
         } catch (DomainException $exception) {
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
         } catch (Throwable $exception) {
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -942,6 +967,7 @@ class SdpoController extends Controller
     public function getRandomWish()
     {
         $wishMessages = config('wishes.messages');
+
         return response()
             ->json(['wish_message' => $wishMessages[array_rand($wishMessages)]]);
     }

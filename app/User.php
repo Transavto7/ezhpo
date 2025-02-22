@@ -5,7 +5,6 @@ namespace App;
 use App\Enums\FormTypeEnum;
 use App\Enums\UserEntityType;
 use App\Models\Forms\Form;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,7 +16,6 @@ use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property string $name
- * @property Collection $companies
  */
 class User extends Authenticatable
 {
@@ -26,50 +24,38 @@ class User extends Authenticatable
     const DEFAULT_USER_LOGIN = 'it@nozdratenko.ru';
 
     public $fillable = [
-            'hash_id',
-            'entity_type',
-            'req_id',
-            'photo',
-            'name',
-            'email',
-            'password',
-            'eds',
-            'pv_id',
-            'timezone',
-            'role',
-            'blocked',
-            'pv_id_default',
-            'api_token',
-            'login',
-            'user_post',
-            'company_id',
-            'deleted_id',
-            'last_connection_at',
-            'stamp_id',
-            'validity_eds_start',
-            'validity_eds_end',
-            'accepted_agreement',
-            'deleted_at',
-            'auto_created'
-        ];
+        'entity_type',
+        'photo',
+        'email',
+        'password',
+        'role',
+        'blocked',
+        'api_token',
+        'login',
+        'deleted_id',
+        'last_connection_at',
+        'accepted_agreement',
+        'deleted_at',
+        'auto_created',
+    ];
 
     protected $hidden = [
-            'password',
-        ];
+        'password',
+    ];
 
     protected $casts = [
-            'email_verified_at' => 'datetime',
-            'last_connection_at' => 'datetime',
-        ];
+        'email_verified_at' => 'datetime',
+        'last_connection_at' => 'datetime',
+    ];
 
     public static $defaultUserJournalByRole = [
-            '1' => FormTypeEnum::TECH,
-            '4' => FormTypeEnum::PAK_QUEUE
-        ];
+        '1' => FormTypeEnum::TECH,
+        '4' => FormTypeEnum::PAK_QUEUE,
+    ];
 
     public function deleted_user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'deleted_id', 'id')
+        return $this->belongsTo(self::class, 'deleted_id', 'id')
             ->withDefault();
     }
 
@@ -99,38 +85,6 @@ class User extends Authenticatable
             ->withDefault();
     }
 
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class, 'company_id', 'id')
-            ->withDefault();
-    }
-
-    public function companies(): HasMany
-    {
-        return $this->hasMany(Company::class);
-    }
-
-    public function pv(): BelongsTo
-    {
-        return $this->belongsTo(Point::class, 'pv_id')
-            ->withDefault();
-    }
-
-    public function points(): BelongsToMany
-    {
-        return $this->belongsToMany(Point::class, 'points_to_users', 'user_id', 'point_id');
-    }
-
-    public function terminalDevices(): HasMany
-    {
-        return $this->hasMany(TerminalDevice::class, 'user_id');
-    }
-
-    public function terminalCheck(): HasOne
-    {
-        return $this->hasOne(TerminalCheck::class, 'user_id');
-    }
-
     public function access(...$permissionName): bool
     {
         return $this->getAllPermissions()
@@ -138,99 +92,131 @@ class User extends Authenticatable
             ->isNotEmpty();
     }
 
+    /**
+     * // todo: убрать это у пользователя
+     */
     public static function getUserCompanyId($field = 'id', $withUserCompanyId = false): int
     {
         /** @var User $authUser */
         $authUser = auth()->user();
-        $point = $authUser->pv_id;
+
+        $company = $authUser->relatedCompany;
+
+        if (! $company) {
+            return -1;
+        }
+
+        $point = $company->pv_id;
         $point = Point::find($point);
 
         if ($point) {
             $company = $point->company_id ? Company::find($point->company_id) : 0;
 
             if ($company) {
-               return $company->$field;
+                return $company->$field;
             }
-
         }
 
-	    if ($withUserCompanyId && $authUser->company_id !== null) {
-            $company = Company::find($authUser->company_id);
-
-            if (! $company) {
-                return -1;
-            }
-
+        if ($withUserCompanyId) {
             return $company->$field;
         }
 
         return -1;
     }
 
-    public function stamp(): BelongsTo
+    public function entity(): HasOne
     {
-        return $this->belongsTo(Stamp::class, 'stamp_id', 'id');
-    }
+        $entityType = $this->getAttribute('entity_type');
 
-    /**
-     * Получение имени юзера
-     *
-     * @param int $id
-     * @param bool $authId
-     * @return string
-     */
-    public function getName($id = -1, $authId = true)
-    {
-        $id = $id ?: ($authId ? auth()->user()->id : -1);
-
-        $userName = User::find($id);
-
-        if ($userName) {
-            $userName = $userName->name;
-        } else {
-            $userName = '';
+        if (! $entityType) {
+            return $this->hasOne(Employee::class, 'related_user_id', 'id')->whereNull('id');
         }
 
-        return $userName;
-    }
-
-    public function getStamp(): ?Stamp
-    {
-        /** @var Stamp|null $stamp */
-        $stamp = $this->stamp;
-        if ($stamp) {
-            return $stamp;
+        switch ($entityType) {
+            case UserEntityType::EMPLOYEE:
+                return $this->hasOne(Employee::class, 'related_user_id', 'id')->withTrashed();
+            case UserEntityType::TERMINAL:
+                return $this->hasOne(Terminal::class, 'related_user_id', 'id')->withTrashed();
+            case UserEntityType::COMPANY:
+                return $this->hasOne(Company::class, 'related_user_id', 'id')->withTrashed();
+            case UserEntityType::DRIVER:
+                return $this->hasOne(Driver::class, 'related_user_id', 'id')->withTrashed();
         }
 
-        // todo: у User не будет pv
-        /** @var Point|null $point */
-        $point = $this->pv;
-        if ($point) {
-            return $point->getStamp();
+        return $this->hasOne(Employee::class, 'related_user_id', 'id')->whereNull('id');
+    }
+
+    public function relatedEmployee(): HasOne
+    {
+        return $this->hasOne(Employee::class, 'related_user_id', 'id')->withTrashed();
+    }
+
+    public function relatedTerminal(): HasOne
+    {
+        return $this->hasOne(Terminal::class, 'related_user_id', 'id')->withTrashed();
+    }
+
+    public function relatedCompany(): HasOne
+    {
+        return $this->hasOne(Company::class, 'related_user_id', 'id')->withTrashed();
+    }
+
+    public function relatedDriver(): HasOne
+    {
+        return $this->hasOne(Driver::class, 'related_user_id', 'id')->withTrashed();
+    }
+
+    public function isEmployee(): bool
+    {
+        return $this->entity_type === UserEntityType::EMPLOYEE;
+    }
+
+    public function isTerminal(): bool
+    {
+        return $this->entity_type === UserEntityType::TERMINAL;
+    }
+
+    public function isCompany(): bool
+    {
+        return $this->entity_type === UserEntityType::COMPANY;
+    }
+
+    public function isDriver(): bool
+    {
+        return $this->entity_type === UserEntityType::DRIVER;
+    }
+
+    public function getNameAttribute(): ?string
+    {
+        if ($this->isDriver()) {
+            $relatedEntity = $this->relatedDriver;
+
+            return $relatedEntity !== null ? $relatedEntity->fio : null;
+        }
+
+        if ($this->isCompany()) {
+            $relatedEntity = $this->relatedCompany;
+
+            return $relatedEntity !== null ? $relatedEntity->name : null;
+        }
+
+        if ($this->isTerminal()) {
+            $relatedEntity = $this->relatedTerminal;
+
+            return $relatedEntity !== null ? $relatedEntity->name : null;
+        }
+
+        if ($this->isEmployee()) {
+            $relatedEntity = $this->relatedEmployee;
+
+            return $relatedEntity !== null ? $relatedEntity->name : null;
         }
 
         return null;
     }
 
-    public function entity()
+    public function isBlocked(): bool
     {
-        switch ($this->entity_type) {
-            case UserEntityType::EMPLOYEE:
-                $relation = $this->hasOne(Employee::class, 'related_user_id', 'id');
-                break;
-            case UserEntityType::TERMINAL:
-                $relation = $this->hasOne(Terminal::class, 'related_user_id', 'id');
-                break;
-            case UserEntityType::COMPANY:
-                $relation = $this->hasOne(Company::class, 'related_user_id', 'id');
-                break;
-            case UserEntityType::DRIVER:
-                $relation = $this->hasOne(Driver::class, 'related_user_id', 'id');
-                break;
-            default:
-                $relation = null;
-        }
-
-        return $relation;
+        return $this->blocked === 1;
     }
 }

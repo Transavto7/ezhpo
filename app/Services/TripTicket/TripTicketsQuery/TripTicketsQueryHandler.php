@@ -40,8 +40,8 @@ final class TripTicketsQueryHandler
             'companies.name as company_name',
             'drivers.fio as driver_name',
             'cars.gos_number as car_number',
-            'users.name as user_name',
-            'deleted_users.name as deleted_user_name'
+            'employees.name as user_name',
+            'deleted_employees.name as deleted_user_name',
         ])
             ->leftJoin(
                 'companies',
@@ -62,22 +62,22 @@ final class TripTicketsQueryHandler
                 'trip_tickets.car_id',
             )
             ->leftJoin(
-                'users as deleted_users',
-                'deleted_users.id',
+                'employees as deleted_employees',
+                'deleted_employees.related_user_id',
                 '=',
                 'trip_tickets.deleted_id'
             )
             ->leftJoin(
-                'users',
-                'users.id',
+                'employees',
+                'employees.id',
                 '=',
-                'trip_tickets.user_id'
+                'trip_tickets.employee_id'
             )
             ->orderBy($action->getOrderKey(), $action->getOrderBy());
 
         $user = \Auth::user();
-        if ($user->hasRole('client')) {
-            $tripTickets->where('trip_tickets.company_id', $user->company->hash_id);
+        if ($user->isCompany()) {
+            $tripTickets->where('trip_tickets.company_id', $user->relatedCompany->hash_id);
         }
 
         $dateFrom = isset($action->getFilterParams()['date_from'])

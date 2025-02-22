@@ -801,7 +801,7 @@ $(document).ready(function () {
             select.val(value).trigger("change");
         }
 
-        const userModel = model === 'User'
+        const userModel = model === 'Employee'
         let dateFormQueryParam = '';
         if (!userModel) {
             dateFormQueryParam = `?dateAnketa=${$('[name="anketa[0][date]"]').val()}`

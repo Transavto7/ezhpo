@@ -13,7 +13,7 @@
         <article>
             <input value="{{ old('employee_id') }}"
                    type="number"
-                   oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'User', event.target.value, 'name', $(event.target).parent(), {{ 'false' }})"
+                   oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Employee', event.target.value, 'name', $(event.target).parent(), {{ 'false' }})"
                    required min="6"
                    name="employee_id"
                    class="MASK_ID_ELEM form-control">

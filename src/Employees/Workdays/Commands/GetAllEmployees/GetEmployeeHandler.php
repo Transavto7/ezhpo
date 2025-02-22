@@ -46,17 +46,18 @@ final class GetEmployeeHandler
             }
         }
 
-        $employeeList = DB::table('users')
+        $employeeList = DB::table('employees')
             ->select([
-                'users.hash_id',
-                'users.name',
+                'employees.hash_id',
+                'employees.name',
             ])
+            ->leftJoin('users', 'users.id', '=', 'employees.related_user_id')
             ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
             ->whereIn('model_has_roles.role_id', CalcEmployeeSalaryConstant::ROLE_IDS)
-            ->whereNull('users.deleted_at');
+            ->whereNull('employees.deleted_at');
 
         if ($filterHashId = $getEmployeeCommand->getFilterHashId()) {
-            $employeeList = $employeeList->where('users.hash_id', '=', $filterHashId);
+            $employeeList = $employeeList->where('employees.hash_id', '=', $filterHashId);
         }
 
         $employeeList = $employeeList
@@ -89,8 +90,8 @@ final class GetEmployeeHandler
 
             // Проверка на дубликат в этот же день
             $existingWorkday = Workday::query()
-                ->leftJoin('users', 'users.id', '=', 'workdays.employee_id')
-                ->where('users.hash_id', $filterHashId)
+                ->leftJoin('employees', 'employees.id', '=', 'workdays.employee_id')
+                ->where('employees.hash_id', $filterHashId)
                 ->whereDate('date', now()->format('Y-m-d'))
                 ->orderBy('workdays.created_at', 'desc')
                 ->where('admitted', 1)

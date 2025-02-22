@@ -111,7 +111,7 @@
                             @endphp
 
                             <li class="nav-item">
-                                <a class="nav-link flex-center" href="{{ route('profile.index') }}">
+                                <a class="nav-link flex-center" href="{{ route('users.profile.index') }}">
                             <span class="client">
                                 <span class="client-avatar">
                                     <img src="{{ $user_avatar }}" width="50" alt="avatar">

@@ -75,7 +75,7 @@ class TripTicketIndexPageController extends Controller
         return view('trip-tickets.index', [
             'filters' => $filters,
             'exclude' => [],
-            'name' => $user->name,
+            'name' => $user->relatedEmployee->name,
             'tripTickets' => $tripTickets,
             'filter_activated' => $filterActivated,
             'fieldPrompts' => $fieldPrompts,

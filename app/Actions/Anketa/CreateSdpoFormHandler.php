@@ -12,6 +12,7 @@ use App\MedicFormNormalizedPressure;
 use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
 use App\Models\Forms\ReportCartForm;
+use App\Terminal;
 use App\User;
 use App\ValueObjects\ForeignDevice\Pulse;
 use App\ValueObjects\ForeignDevice\Temperature;
@@ -32,7 +33,7 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
 
         /** @var User $apiClient */
         $apiClient = $user;
-        if ($apiClient->blocked) {
+        if ($apiClient->isBlocked()) {
             throw new Exception('Этот терминал заблокирован!');
         }
 
@@ -46,18 +47,20 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
             throw new Exception('Пользователь с таким ID не найден!');
         }
 
+        $terminal = $apiClient->relatedTerminal;
+
         $this->user = $user;
         $this->addUserInfo();
 
-        $this->data['pv_id'] = $apiClient->pv->name;
-        $this->data['point_id'] = $apiClient->pv->id;
-        $this->data['terminal_id'] = $apiClient->id;
+        $this->data['pv_id'] = $terminal->point->name;
+        $this->data['point_id'] = $terminal->point->id;
+        $this->data['terminal_id'] = $terminal->id;
 
         date_default_timezone_set('UTC');
-        $this->time = date('Y-m-d H:i:s', time() + ($user->timezone ?: 3) * 3600);
+        $this->time = date('Y-m-d H:i:s', time() + ($user->entity->timezone ?: 3) * 3600);
 
         foreach ($this->data['anketa'] as $form) {
-            $this->createForm($form);
+            $this->createForm($form, $apiClient);
         }
 
         return [
@@ -68,7 +71,7 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
         ];
     }
 
-    protected function createForm(array $form)
+    protected function createForm(array $form, Authenticatable $user)
     {
         $driverId = $this->data['driver_id'] ?? 0;
         $driver = Driver::where('hash_id', $driverId)->first();

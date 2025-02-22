@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\UserService;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-use App\Services\UserService;
 use Illuminate\Support\Facades\Lang;
 
 class LoginController extends Controller
@@ -47,6 +47,16 @@ class LoginController extends Controller
             $this->sendLockoutResponse($request);
         }
 
+        if ($this->isBlocked($request)) {
+            $this->incrementLoginAttempts($request);
+
+            return redirect()->back()
+                ->withInput($request->only($this->username(), 'remember'))
+                ->withErrors([
+                    $this->username() => Lang::get('auth.blocked'),
+                ]);
+        }
+
         if ($this->attemptLogin($request)) {
             return $this->sendLoginResponse($request);
         }
@@ -64,24 +74,11 @@ class LoginController extends Controller
      */
     public function attemptLogin(Request $request)
     {
-        if ($this->isBlocked($request)) {
-            $this->incrementLoginAttempts($request);
-            return $this->sendFailedLoginResponse($request);
-        }
-
         return $this->parentAttempt($request);
     }
 
     protected function sendFailedLoginResponse(Request $request)
     {
-        if($this->isBlocked($request)){
-            return redirect()->back()
-            ->withInput($request->only($this->username(), 'remember'))
-            ->withErrors([
-                $this->username() => Lang::get('auth.blocked'),
-            ]);
-        }
-
         return redirect()->back()
             ->withInput($request->only($this->username(), 'remember'))
             ->withErrors([

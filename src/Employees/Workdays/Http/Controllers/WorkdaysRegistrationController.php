@@ -27,14 +27,14 @@ final class WorkdaysRegistrationController
         try {
             DB::beginTransaction();
 
-            /** @var User $terminal */
-            $terminal = $request->user('api');
-            if ($terminal->blocked) {
+            /** @var User $apiClient */
+            $apiClient = $request->user('api');
+            if ($apiClient->isBlocked()) {
                 throw new Exception(BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK), 400);
             }
 
             $command = (new WorkdaysRegistrationCommand())
-                ->setTerminal($terminal)
+                ->setTerminal($apiClient->relatedTerminal)
                 ->setDate($request->date)
                 ->setEmployeeId($request->employee_id)
                 ->setProbaAlko($request->proba_alko)

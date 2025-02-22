@@ -8,6 +8,7 @@ use App\Enums\BlockActionReasonsEnum;
 use App\Models\Forms\BddForm;
 use App\Models\Forms\Form;
 use App\Point;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 
 class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -27,7 +28,7 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
         }
     }
 
-    protected function createForm(array $form)
+    protected function createForm(array $form, Authenticatable $user)
     {
         $driverId = $form['driver_id'] ?? ($this->data['driver_id'] ?? 0);
         $driver = Driver::where('hash_id', $driverId)->first();
@@ -121,7 +122,7 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
          */
         $date = $form['date'] ?? null;
         $diffDateCheck = Carbon::now()
-            ->addHours($user->timezone ?? 3)
+            ->addHours($user->entity->timezone ?? 3)
             ->diffInMinutes($date);
 
         if ($date && $diffDateCheck <= 60*12) {

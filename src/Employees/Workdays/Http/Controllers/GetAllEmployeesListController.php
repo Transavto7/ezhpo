@@ -21,7 +21,7 @@ final class GetAllEmployeesListController
         try {
             /** @var User $user */
             $user = $request->user('api');
-            if ($user->blocked) {
+            if ($user->isBlocked()) {
                 throw new Exception(BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK), 400);
             }
 

@@ -2,10 +2,12 @@
 
 namespace App\Models\Forms;
 
+use App\Employee;
 use App\Enums\FlagPakEnum;
 use App\Enums\FormTypeEnum;
 use App\Point;
 use App\Stamp;
+use App\Terminal;
 use App\User;
 use App\ValueObjects\NotAdmittedReasons;
 use App\ValueObjects\ForeignDevice\PressureLimit;
@@ -69,12 +71,12 @@ class MedicForm extends Model
 
     public function terminal(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'terminal_id', 'id');
+        return $this->belongsTo(Terminal::class, 'terminal_id', 'id');
     }
 
     public function operator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'operator_id', 'id');
+        return $this->belongsTo(Employee::class, 'operator_id', 'id');
     }
 
     public function getNotAdmittedReasonsAttribute(): array
@@ -129,9 +131,11 @@ class MedicForm extends Model
         if ($user->access('approval_queue_view_all')) {
 
         } else if ($user->hasRole('head_operator_sdpo')) {
-            $query->join('points_to_users', function ($join) use ($user) {
-                $join->on('forms.point_id', '=', 'points_to_users.point_id')
-                    ->where('points_to_users.user_id', '=', $user->id);
+            $employee = $user->relatedEmployee;
+
+            $query->join('points_to_employees', function ($join) use ($employee) {
+                $join->on('forms.point_id', '=', 'points_to_employees.point_id')
+                    ->where('points_to_employees.employee_id', '=', $employee->id);
             });
         } else {
             $query->where('forms.user_id', $user->id);
@@ -143,7 +147,7 @@ class MedicForm extends Model
         if ($this->getAttribute('flag_pak') !== FlagPakEnum::INTERNAL) {
             $terminal = $this->terminal;
 
-            /** @var User $terminal */
+            /** @var Terminal $terminal */
             if ($terminal) {
                 $terminalStamp = $terminal->getStamp();
 
