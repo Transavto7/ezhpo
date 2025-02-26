@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers\TripTickets;
 
-use App\Actions\TripTicket\TripTicketsQuery\TripTicketsQueryAction;
-use App\Actions\TripTicket\TripTicketsQuery\TripTicketsQueryHandler;
 use App\Actions\TripTicket\TripTicketsTableExport\ExportTripTicketsTableHandler;
 use App\Http\Controllers\Controller;
 use App\Models\TripTicket;
+use App\Services\TripTicket\TripTicketsQuery\TripTicketsQueryAction;
+use App\Services\TripTicket\TripTicketsQuery\TripTicketsQueryHandler;
 use Auth;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Symfony\Component\HttpFoundation\Response;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\Response;
 
 final class TripTicketTableExportController extends Controller
 {

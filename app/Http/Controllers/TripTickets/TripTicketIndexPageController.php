@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\TripTickets;
 
-use App\Actions\TripTicket\TripTicketsQuery\TripTicketsQueryAction;
-use App\Actions\TripTicket\TripTicketsQuery\TripTicketsQueryHandler;
 use App\Enums\FeaturesEnum;
 use App\FieldPrompt;
 use App\Http\Controllers\Controller;
 use App\Models\TripTicket;
+use App\Services\TripTicket\TripTicketsQuery\TripTicketsQueryAction;
+use App\Services\TripTicket\TripTicketsQuery\TripTicketsQueryHandler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;

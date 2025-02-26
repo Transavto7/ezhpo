@@ -2,13 +2,16 @@
 
 namespace App\Services\TripTicketExporter;
 
+use App\Enums\TripTicketActionType;
 use App\Enums\TripTicketStatus;
 use App\Enums\TripTicketTemplateEnum;
 use App\Events\TripTickets\ChangeTripTicketStatus;
+use App\Events\TripTickets\LogTripTicket;
 use App\Models\TripTicket;
 use App\Services\TripTicketExporter\Mappers\ItemMapperStrategy;
 use App\Services\TripTicketExporter\SheetWriters\SheetWriterStrategy;
 use App\ValueObjects\EntityId;
+use Auth;
 use DomainException;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
@@ -131,6 +134,12 @@ final class ExcelGenerator
 
         foreach ($tripTickets as $tripTicket) {
             event(new ChangeTripTicketStatus($tripTicket, TripTicketStatus::printed()));
+
+            if ($tripTicket->getOriginal('status') !== TripTicketStatus::PRINTED) {
+                event(new LogTripTicket(Auth::user(), $tripTicket, TripTicketActionType::changeStatus()));
+            }
+
+            $tripTicket->save();
         }
 
         return new Xlsx($spreadsheet);

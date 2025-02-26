@@ -6,6 +6,7 @@ final class TripTicketStatus
 {
     const CREATED = 'created';
     const ACTIVATED = 'activated';
+    const DEACTIVATED = 'deactivated';
     const APPROVED = 'approved';
     const PRINTED = 'printed';
 
@@ -37,6 +38,11 @@ final class TripTicketStatus
         return new self(self::ACTIVATED);
     }
 
+    public static function deactivated(): self
+    {
+        return new self(self::DEACTIVATED);
+    }
+
     public static function approved(): self
     {
         return new self(self::APPROVED);
@@ -54,6 +60,8 @@ final class TripTicketStatus
                 return self::created();
             case self::ACTIVATED:
                 return self::activated();
+            case self::DEACTIVATED:
+                return self::deactivated();
             case self::APPROVED:
                 return self::approved();
             case self::PRINTED:
@@ -68,6 +76,7 @@ final class TripTicketStatus
         return [
             self::CREATED => 'Создан',
             self::ACTIVATED => 'Активирован',
+            self::DEACTIVATED => 'Активация отменена',
             self::APPROVED => 'Утвержден',
             self::PRINTED => 'Напечатан',
         ];

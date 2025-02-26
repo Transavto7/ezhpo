@@ -90,38 +90,46 @@
                 </a>
                 <div class="dropdown-menu">
                     @if($permissionToUpdate)
+                        @if($tripTicket->status === \App\Enums\TripTicketStatus::ACTIVATED)
+                            <a class="dropdown-item change-status" href="#" data-status="{{ \App\Enums\TripTicketStatus::DEACTIVATED }}"
+                               data-uuid="{{ $tripTicket->uuid }}"><i class="fa fa-times"></i> Отменить утверждение</a>
+                        @else
+                            <a class="dropdown-item change-status" href="#" data-status="{{ \App\Enums\TripTicketStatus::ACTIVATED }}"
+                               data-uuid="{{ $tripTicket->uuid }}"><i class="fa fa-check"></i> Утвердить</a>
+                        @endif
+                    @endif
+                    @if($permissionToUpdate && $tripTicket->status !== \App\Enums\TripTicketStatus::ACTIVATED)
                         <a href="{{ route('trip-tickets.edit', $tripTicket->uuid) }}"
                            class="dropdown-item"><i class="fa fa-edit"></i> Редактировать ПЛ</a>
                     @endif
-                    @if($permissionToEditMedicForm && $tripTicket['medic_form_id'])
+                    @if($permissionToEditMedicForm && $tripTicket['medic_form_id'] && $tripTicket->status !== \App\Enums\TripTicketStatus::ACTIVATED)
                         <a href="{{ route('forms.get', $tripTicket->medic_form_id) }}"
                            class="dropdown-item"><i class="fa fa-edit"></i> Редактировать МО</a>
                     @endif
-                    @if($permissionToEditTechForm && $tripTicket['tech_form_id'])
+                    @if($permissionToEditTechForm && $tripTicket['tech_form_id'] && $tripTicket->status !== \App\Enums\TripTicketStatus::ACTIVATED)
                         <a href="{{ route('forms.get', $tripTicket->tech_form_id) }}"
                            class="dropdown-item"><i class="fa fa-edit"></i> Редактировать ТО</a>
                     @endif
-
-                    @if($permissionToCreateMedicForm && ! $tripTicket['medic_form_id'])
+                    @if($permissionToCreateMedicForm && ! $tripTicket['medic_form_id'] && $tripTicket->status !== \App\Enums\TripTicketStatus::ACTIVATED)
                         <a href="{{ route('trip-tickets.create-form', ['id' => $tripTicket->uuid, 'type' => \App\Enums\FormTypeEnum::MEDIC]) }}" class="dropdown-item">
                             <i class="fa fa-plus"></i> Добавить МО</a>
                     @endif
-                    @if($permissionToCreateTechForm && ! $tripTicket['tech_form_id'])
+                    @if($permissionToCreateTechForm && ! $tripTicket['tech_form_id'] && $tripTicket->status !== \App\Enums\TripTicketStatus::ACTIVATED)
                         <a href="{{ route('trip-tickets.create-form', ['id' => $tripTicket->uuid, 'type' => \App\Enums\FormTypeEnum::TECH]) }}" class="dropdown-item">
                             <i class="fa fa-plus"></i> Добавить ТО</a>
                     @endif
-                    @if($permissionToUpdate)
+                    @if($permissionToUpdate && $tripTicket->status !== \App\Enums\TripTicketStatus::ACTIVATED)
                         <a class="dropdown-item form-actions-modal-btn" data-toggle="modal" data-target="#from-actions" style="cursor: pointer" data-id="{{ $tripTicket->uuid }}">
                             &plusmn; Привязать/отвязать МО и ТО
                         </a>
                     @endif
-                    @if($permissionToPrintTripTickets)
+                    @if($permissionToPrintTripTickets && $tripTicket->status === \App\Enums\TripTicketStatus::ACTIVATED)
                         <a class="dropdown-item download-excel-to-print-btn"
                            data-uuid="{{ $tripTicket->uuid }}" style="cursor: pointer">
                             <i class="fa fa-file-excel-o"></i> Печать ПЛ
                         </a>
                     @endif
-                    @if($permissionToDelete)
+                    @if($permissionToDelete && $tripTicket->status !== \App\Enums\TripTicketStatus::ACTIVATED)
                         <a
                             href="{{ route('trip-tickets.trash', ['id' => $tripTicket->uuid, 'action' => request()->get('trash') ? 0 : 1]) }}"
                             class="hv-btn-trash dropdown-item delete"

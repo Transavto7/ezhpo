@@ -39,18 +39,18 @@ class LogTripTicketAction
         ]);
     }
 
-    private function logModel($form): array
+    private function logModel($tripTicket): array
     {
         $logData = [];
 
-        foreach ($form->getDirty() as $attribute => $newValue) {
-            if (empty($newValue) && empty($form->getOriginal($attribute))) {
+        foreach ($tripTicket->getDirty() as $attribute => $newValue) {
+            if (empty($newValue) && empty($tripTicket->getOriginal($attribute))) {
                 continue;
             }
 
             $logData[] = [
                 'name' => $attribute,
-                'oldValue' => $form->getOriginal($attribute),
+                'oldValue' => $tripTicket->getOriginal($attribute),
                 'newValue' => $newValue
             ];
         }
