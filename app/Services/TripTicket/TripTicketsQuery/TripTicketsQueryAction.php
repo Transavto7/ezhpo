@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\TripTicket\TripTicketsQuery;
+namespace App\Services\TripTicket\TripTicketsQuery;
 
 final class TripTicketsQueryAction
 {

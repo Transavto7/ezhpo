@@ -554,11 +554,22 @@
 
                             wrapper.append(html)
                         })
-
-
                     })
             })
 
+            $('table').on('click', '.change-status', function () {
+                const status = $(this).data('status')
+                const id = $(this).data('uuid')
+
+                axios
+                    .post('{{ route('trip-tickets.change-status') }}', {
+                        status,
+                        id,
+                    })
+                    .then(response => {
+                        location.reload()
+                    })
+            })
         })
     </script>
 @endsection

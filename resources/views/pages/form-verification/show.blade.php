@@ -22,7 +22,7 @@
 @push('custom_styles')
     <style>
         .page-content {
-            height: calc(100vh - 50px);
+            padding-top: 75px;
         }
 
         .status-icon {
@@ -191,8 +191,7 @@
         </div>
     </main>
 
-
-    <div id="history-widget" class="justify-content-center d-none">
+    <div id="history-widget" class="justify-content-center d-none p-2">
         <a class="text-info" data-toggle="collapse" href="#collapseVerificationHistory" role="button"
            aria-expanded="false" aria-controls="collapseVerificationHistory">
             История проверок осмотра

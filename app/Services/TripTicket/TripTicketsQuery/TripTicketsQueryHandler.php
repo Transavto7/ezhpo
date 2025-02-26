@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\TripTicket\TripTicketsQuery;
+namespace App\Services\TripTicket\TripTicketsQuery;
 
 use App\Models\TripTicket;
 use Carbon\Carbon;
@@ -29,6 +29,7 @@ final class TripTicketsQueryHandler
             'trip_tickets.transportation_type',
             'trip_tickets.template_code',
             'trip_tickets.photos',
+            'trip_tickets.status',
             'trip_tickets.created_at',
             'trip_tickets.deleted_at',
 

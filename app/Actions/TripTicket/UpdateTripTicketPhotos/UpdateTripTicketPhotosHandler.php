@@ -2,8 +2,11 @@
 
 namespace App\Actions\TripTicket\UpdateTripTicketPhotos;
 
+use App\Enums\TripTicketActionType;
 use App\Enums\TripTicketStatus;
 use App\Events\TripTickets\ChangeTripTicketStatus;
+use App\Events\TripTickets\LogTripTicket;
+use Auth;
 use Illuminate\Http\UploadedFile;
 use Ramsey\Uuid\Uuid;
 use Storage;
@@ -15,11 +18,16 @@ final class UpdateTripTicketPhotosHandler
         $files = $this->storeFiles($action->getPhotos());
 
         $action->getTripTicket()
-            ->update([
+            ->fill([
                 'photos' => array_merge($files, $action->getTripTicket()->photos ?: [])
             ]);
 
-        event(new ChangeTripTicketStatus($action->getTripTicket(), TripTicketStatus::activated()));
+        if ($action->getTripTicket()->status !== TripTicketStatus::ACTIVATED) {
+            event(new ChangeTripTicketStatus($action->getTripTicket(), TripTicketStatus::activated()));
+            event(new LogTripTicket(Auth::user(), $action->getTripTicket(), TripTicketActionType::changeStatus()));
+        }
+
+        $action->getTripTicket()->save();
     }
 
     private function removeFiles(array $files)

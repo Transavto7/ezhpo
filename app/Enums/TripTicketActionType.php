@@ -8,6 +8,9 @@ final class TripTicketActionType
     const DETACH_MEDIC_FORM = 'detach_medic_form';
     const ATTACH_TECH_FORM = 'attach_tech_form';
     const DETACH_TECH_FORM = 'detach_tech_form';
+    const CHANGE_STATUS = 'change_status';
+    const ACTIVATE = 'activate';
+    const DEACTIVATE = 'deactivate';
 
     /** @var string */
     private $value;
@@ -47,6 +50,21 @@ final class TripTicketActionType
         return new self(self::DETACH_TECH_FORM);
     }
 
+    public static function changeStatus(): self
+    {
+        return new self(self::CHANGE_STATUS);
+    }
+
+    public static function activate(): self
+    {
+        return new self(self::ACTIVATE);
+    }
+
+    public static function deactivate(): self
+    {
+        return new self(self::DEACTIVATE);
+    }
+
     public static function fromString(string $value): self
     {
         switch ($value) {
@@ -58,6 +76,12 @@ final class TripTicketActionType
                 return self::attachTechForm();
             case self::DETACH_TECH_FORM:
                 return self::detachTechForm();
+            case self::CHANGE_STATUS:
+                return self::changeStatus();
+            case self::ACTIVATE:
+                return self::activate();
+            case self::DEACTIVATE:
+                return self::deactivate();
             default:
                 throw new \DomainException('Unknown trip ticket action type: ' . $value);
         }
@@ -70,6 +94,9 @@ final class TripTicketActionType
             self::DETACH_MEDIC_FORM => 'Отвязка медосмотра от путевого листа',
             self::ATTACH_TECH_FORM => 'Привязка техосмотра к путевому листу',
             self::DETACH_TECH_FORM => 'Отвязка техосмотра от путевого листа',
+            self::CHANGE_STATUS => 'Изменение статуса путевого листа',
+            self::ACTIVATE => 'Утверждение путевого листа',
+            self::DEACTIVATE => 'Отмена утверждения путевого листа',
         ];
     }
 
