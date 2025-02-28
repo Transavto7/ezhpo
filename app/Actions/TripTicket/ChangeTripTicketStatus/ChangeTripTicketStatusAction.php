@@ -2,7 +2,7 @@
 
 namespace App\Actions\TripTicket\ChangeTripTicketStatus;
 
-use App\Enums\TripTicketStatus;
+use App\Enums\TripTicket\TripTicketStatus;
 use App\Models\TripTicket;
 
 final class ChangeTripTicketStatusAction

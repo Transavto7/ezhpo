@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Enums;
+namespace App\Enums\TripTicket;
 
 final class TripTicketStatus
 {
     const CREATED = 'created';
     const ACTIVATED = 'activated';
-    const DEACTIVATED = 'deactivated';
     const APPROVED = 'approved';
+    const APPROVAL_CANCELLED = 'approval_cancelled';
     const PRINTED = 'printed';
 
     /** @var string */
@@ -38,9 +38,9 @@ final class TripTicketStatus
         return new self(self::ACTIVATED);
     }
 
-    public static function deactivated(): self
+    public static function approval_cancelled(): self
     {
-        return new self(self::DEACTIVATED);
+        return new self(self::APPROVAL_CANCELLED);
     }
 
     public static function approved(): self
@@ -60,8 +60,8 @@ final class TripTicketStatus
                 return self::created();
             case self::ACTIVATED:
                 return self::activated();
-            case self::DEACTIVATED:
-                return self::deactivated();
+            case self::APPROVAL_CANCELLED:
+                return self::approval_cancelled();
             case self::APPROVED:
                 return self::approved();
             case self::PRINTED:
@@ -76,8 +76,8 @@ final class TripTicketStatus
         return [
             self::CREATED => 'Создан',
             self::ACTIVATED => 'Активирован',
-            self::DEACTIVATED => 'Активация отменена',
             self::APPROVED => 'Утвержден',
+            self::APPROVAL_CANCELLED => 'Утверждение отменено',
             self::PRINTED => 'Напечатан',
         ];
     }

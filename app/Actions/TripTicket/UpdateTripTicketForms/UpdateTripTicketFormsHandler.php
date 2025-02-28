@@ -3,8 +3,7 @@
 namespace App\Actions\TripTicket\UpdateTripTicketForms;
 
 use App\Enums\FormLogActionTypesEnum;
-use App\Enums\TripTicketActionType;
-use App\Events\Forms\FormAction;
+use App\Enums\TripTicket\TripTicketActionType;
 use App\Events\Forms\FormDetachedFromTripTicket;
 use App\Events\TripTickets\LogTripTicket;
 use App\Models\Forms\Form;

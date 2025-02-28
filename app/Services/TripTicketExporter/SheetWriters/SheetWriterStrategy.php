@@ -2,7 +2,7 @@
 
 namespace App\Services\TripTicketExporter\SheetWriters;
 
-use App\Enums\TripTicketTemplateEnum;
+use App\Enums\TripTicket\TripTicketTemplateEnum;
 use App\Services\TripTicketExporter\ViewModels\ExportedItem;
 use DomainException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;

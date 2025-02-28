@@ -24,7 +24,7 @@ class ChangeTripTicketStatusAction
      */
     public function handle(ChangeTripTicketStatus $event)
     {
-        $event->getTripTicket()->fill([
+        $event->getTripTicket()->update([
             'status' => $event->getStatus()->value(),
         ]);
     }

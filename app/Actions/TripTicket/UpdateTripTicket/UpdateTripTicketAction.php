@@ -3,8 +3,8 @@
 namespace App\Actions\TripTicket\UpdateTripTicket;
 
 use App\Enums\LogisticsMethodEnum;
-use App\Enums\TransportationTypeEnum;
-use App\Enums\TripTicketTemplateEnum;
+use App\Enums\TripTicket\TransportationTypeEnum;
+use App\Enums\TripTicket\TripTicketTemplateEnum;
 use App\Models\TripTicket;
 
 final class UpdateTripTicketAction

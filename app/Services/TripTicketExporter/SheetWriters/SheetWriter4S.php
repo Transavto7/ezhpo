@@ -3,7 +3,7 @@
 namespace App\Services\TripTicketExporter\SheetWriters;
 
 use App\Enums\LogisticsMethodEnum;
-use App\Enums\TransportationTypeEnum;
+use App\Enums\TripTicket\TransportationTypeEnum;
 use App\Services\TripTicketExporter\ViewModels\ExportedItem;
 use App\Services\TripTicketExporter\ViewModels\ExportedItem4S;
 use App\Services\TripTicketExporter\ViewModels\MedicFormViewModel;

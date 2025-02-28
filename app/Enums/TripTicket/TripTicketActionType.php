@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums;
+namespace App\Enums\TripTicket;
 
 final class TripTicketActionType
 {
@@ -9,8 +9,8 @@ final class TripTicketActionType
     const ATTACH_TECH_FORM = 'attach_tech_form';
     const DETACH_TECH_FORM = 'detach_tech_form';
     const CHANGE_STATUS = 'change_status';
-    const ACTIVATE = 'activate';
-    const DEACTIVATE = 'deactivate';
+    const APPROVAL = 'approval';
+    const CANCEL_OF_APPROVAL = 'cancel_of_approval';
 
     /** @var string */
     private $value;
@@ -30,6 +30,18 @@ final class TripTicketActionType
         return $this->value;
     }
 
+    /**
+     * @param static|string $value
+     * @return bool
+     */
+    public function equal($value): bool
+    {
+        if ($value instanceof static) {
+            return $this->equal($value->value());
+        }
+
+        return $value === $this->value;
+    }
     public static function attachMedicForm(): self
     {
         return new self(self::ATTACH_MEDIC_FORM);
@@ -55,14 +67,14 @@ final class TripTicketActionType
         return new self(self::CHANGE_STATUS);
     }
 
-    public static function activate(): self
+    public static function approval(): self
     {
-        return new self(self::ACTIVATE);
+        return new self(self::APPROVAL);
     }
 
-    public static function deactivate(): self
+    public static function cancelOfApproval(): self
     {
-        return new self(self::DEACTIVATE);
+        return new self(self::CANCEL_OF_APPROVAL);
     }
 
     public static function fromString(string $value): self
@@ -78,10 +90,10 @@ final class TripTicketActionType
                 return self::detachTechForm();
             case self::CHANGE_STATUS:
                 return self::changeStatus();
-            case self::ACTIVATE:
-                return self::activate();
-            case self::DEACTIVATE:
-                return self::deactivate();
+            case self::APPROVAL:
+                return self::approval();
+            case self::CANCEL_OF_APPROVAL:
+                return self::cancelOfApproval();
             default:
                 throw new \DomainException('Unknown trip ticket action type: ' . $value);
         }
@@ -95,8 +107,8 @@ final class TripTicketActionType
             self::ATTACH_TECH_FORM => 'Привязка техосмотра к путевому листу',
             self::DETACH_TECH_FORM => 'Отвязка техосмотра от путевого листа',
             self::CHANGE_STATUS => 'Изменение статуса путевого листа',
-            self::ACTIVATE => 'Утверждение путевого листа',
-            self::DEACTIVATE => 'Отмена утверждения путевого листа',
+            self::APPROVAL => 'Утверждение путевого листа',
+            self::CANCEL_OF_APPROVAL => 'Отмена утверждения путевого листа',
         ];
     }
 

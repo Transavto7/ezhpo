@@ -2,9 +2,8 @@
 
 namespace App\Actions\TripTicket\UpdateTripTicketPhotos;
 
-use App\Enums\TripTicketActionType;
-use App\Enums\TripTicketStatus;
-use App\Events\TripTickets\ChangeTripTicketStatus;
+use App\Enums\TripTicket\TripTicketActionType;
+use App\Enums\TripTicket\TripTicketStatus;
 use App\Events\TripTickets\LogTripTicket;
 use Auth;
 use Illuminate\Http\UploadedFile;
@@ -19,13 +18,11 @@ final class UpdateTripTicketPhotosHandler
 
         $action->getTripTicket()
             ->fill([
-                'photos' => array_merge($files, $action->getTripTicket()->photos ?: [])
+                'photos' => array_merge($files, $action->getTripTicket()->photos ?: []),
+                'status' => TripTicketStatus::ACTIVATED
             ]);
 
-        if ($action->getTripTicket()->status !== TripTicketStatus::ACTIVATED) {
-            event(new ChangeTripTicketStatus($action->getTripTicket(), TripTicketStatus::activated()));
-            event(new LogTripTicket(Auth::user(), $action->getTripTicket(), TripTicketActionType::changeStatus()));
-        }
+        event(new LogTripTicket(Auth::user(), $action->getTripTicket(), TripTicketActionType::changeStatus()));
 
         $action->getTripTicket()->save();
     }

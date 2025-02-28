@@ -2,6 +2,7 @@
 
 namespace App\Listeners\TripTickets;
 
+use App\Enums\TripTicket\TripTicketActionType;
 use App\Events\TripTickets\LogTripTicket;
 use App\Models\TripTicketLog;
 
@@ -27,7 +28,7 @@ class LogTripTicketAction
     {
         $logData = $this->logModel($event->getTripTicket());
 
-        if (count($logData) === 0) {
+        if (count($logData) === 0 && ! $event->getType()->equal(TripTicketActionType::changeStatus())) {
             return;
         }
 

@@ -2,9 +2,9 @@
 
 namespace App\Services\TripTicketExporter;
 
-use App\Enums\TripTicketActionType;
-use App\Enums\TripTicketStatus;
-use App\Enums\TripTicketTemplateEnum;
+use App\Enums\TripTicket\TripTicketActionType;
+use App\Enums\TripTicket\TripTicketStatus;
+use App\Enums\TripTicket\TripTicketTemplateEnum;
 use App\Events\TripTickets\ChangeTripTicketStatus;
 use App\Events\TripTickets\LogTripTicket;
 use App\Models\TripTicket;
@@ -138,8 +138,6 @@ final class ExcelGenerator
             if ($tripTicket->getOriginal('status') !== TripTicketStatus::PRINTED) {
                 event(new LogTripTicket(Auth::user(), $tripTicket, TripTicketActionType::changeStatus()));
             }
-
-            $tripTicket->save();
         }
 
         return new Xlsx($spreadsheet);

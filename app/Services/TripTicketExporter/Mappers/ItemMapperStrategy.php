@@ -2,7 +2,7 @@
 
 namespace App\Services\TripTicketExporter\Mappers;
 
-use App\Enums\TripTicketTemplateEnum;
+use App\Enums\TripTicket\TripTicketTemplateEnum;
 use App\Models\TripTicket;
 use App\Services\TripTicketExporter\ViewModels\ExportedItem;
 use DomainException;
