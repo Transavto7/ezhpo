@@ -4,12 +4,12 @@ namespace App\Http\Controllers\TripTickets;
 
 use App\Actions\TripTicket\ChangeTripTicketStatus\ChangeTripTicketStatusAction;
 use App\Actions\TripTicket\ChangeTripTicketStatus\ChangeTripTicketStatusHandler;
-use App\Enums\TripTicketStatus;
+use App\Enums\TripTicket\TripTicketStatus;
 use App\Http\Controllers\Controller;
 use App\Models\TripTicket;
 use Illuminate\Http\Request;
 
-class ChangeTripTicketStatusController extends Controller
+class ActivateTripTicketController extends Controller
 {
     public function __invoke(Request $request, ChangeTripTicketStatusHandler $handler)
     {

@@ -3,8 +3,8 @@
 namespace App\Actions\TripTicket\StoreTripTicket;
 
 use App\Enums\LogisticsMethodEnum;
-use App\Enums\TransportationTypeEnum;
-use App\Enums\TripTicketTemplateEnum;
+use App\Enums\TripTicket\TransportationTypeEnum;
+use App\Enums\TripTicket\TripTicketTemplateEnum;
 use DateTimeImmutable;
 
 final class StoreTripTicketActionItem

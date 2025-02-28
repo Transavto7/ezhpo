@@ -30,6 +30,7 @@ final class TripTicketsQueryHandler
             'trip_tickets.template_code',
             'trip_tickets.photos',
             'trip_tickets.status',
+            'trip_tickets.type',
             'trip_tickets.created_at',
             'trip_tickets.deleted_at',
 

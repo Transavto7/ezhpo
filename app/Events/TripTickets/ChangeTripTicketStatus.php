@@ -2,7 +2,7 @@
 
 namespace App\Events\TripTickets;
 
-use App\Enums\TripTicketStatus;
+use App\Enums\TripTicket\TripTicketStatus;
 use App\Models\TripTicket;
 use Illuminate\Queue\SerializesModels;
 
