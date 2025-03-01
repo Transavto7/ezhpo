@@ -53,30 +53,24 @@ jobs:
           - 09vk
           - alekseeva
           - alkomed
-          - aplus
-          - a-rosa
+          - alt-era
           - atp
           - avtodoctor69
-          - avtomedik
           - avto-med
-          - cert
+          - babichev
           - chinara
           - demo
           - dopusk
-          - leskraft
-          - medi-t
           - meduslugi
           - medzenklinik
-          - mkyyzch
           - mt
           - oreltaxi
           - pomosh
           - p-osmotr
-          - profmed
           - puti-nn
-          - smirnova
           - soyuzmed
           - tomilko
+          - trans-kontinent
           - tverkooptrans
     steps:
     - name: Update domains
