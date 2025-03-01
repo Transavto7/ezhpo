@@ -1,6 +1,7 @@
 @php
     $uniqueInputId = sha1(time() + rand(999, 99999));
     $disabled = $disabled ?? false;
+    $readonly = $readonly ?? false;
     if (($k ?? null) === 'date_of_employment') {
         $default_value = $default_value ?? null;
         if ($default_value == 'current_date') {
@@ -19,6 +20,7 @@
         id="croppie-input{{ $uniqueInputId }}"
     @endif
     @if($disabled) disabled @endif
+    @if($readonly) readonly @endif
     value="{{ $default_value }}"
     type="{{ $v['type'] }}" {{ $is_required }}
     name="{{ $k }}"

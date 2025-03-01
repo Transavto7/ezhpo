@@ -6,7 +6,7 @@ use App\Car;
 use App\Company;
 use App\Driver;
 use App\Models\Contract;
-use App\Models\Service;
+use App\Models\TripTicket;
 use App\Product;
 use App\Stamp;
 use App\User;
@@ -20,10 +20,10 @@ class LogModelTypesEnum
             Company::class => 'company',
             Car::class => 'car',
             Contract::class => 'contracts',
-            Service::class => 'product',
             Product::class => 'product',
             User::class => 'users',
-            Stamp::class => 'stamps'
+            Stamp::class => 'stamps',
+            TripTicket::class => 'trip_ticket'
         ];
     }
 
@@ -34,10 +34,10 @@ class LogModelTypesEnum
             Company::class => 'Компании',
             Car::class => 'ТС',
             Contract::class => 'Договора',
-            Service::class => 'Услуги',
             Product::class => 'Услуги',
             User::class => 'Пользователи',
-            Stamp::class => 'Штампы'
+            Stamp::class => 'Штампы',
+            TripTicket::class => 'Путевой лист'
         ];
     }
 

@@ -1,13 +1,10 @@
 <?php
 
-use App\Anketa;
-use App\Http\Controllers\Api\SdpoController;
-use App\Http\Controllers\ReportContractRefactoringController;
+use App\Enums\FormTypeEnum;
+use App\Models\Forms\Form;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Route;
-
 use App\User;
 use App\Point;
 
@@ -24,16 +21,6 @@ use App\Point;
 
 Route::get('/companies/find', 'ApiController@companiesList');
 Route::get('/find/{model}', 'ApiController@modelList');
-
-Route::prefix('reports')->group(function () {
-    Route::prefix('contract')->group(function () {
-        Route::get('/journal', 'ReportControllerContract@getJournalData')->name('api.reports.journal');
-        Route::get('/journal/export', 'ReportController@exportJournalData');
-        Route::get('/journal_v2', [ReportContractRefactoringController::class, 'getReport']);
-        Route::get('/export/journal_v2', [ReportContractRefactoringController::class, 'export']);
-    });
-    Route::get('getContractsForCompany', 'ReportControllerContract@getContractsForCompany');
-});
 
 Route::middleware('auth:api')->group(function () {
     Route::get('getField/{model}/{field}/{default_value?}', 'IndexController@GetFieldHTML');
@@ -54,7 +41,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/get-user-from-token', function (Request $request) {
         $user = $request->user();
 
-        if($user->hasRole('terminal')) {
+        if ($user->hasRole('terminal')) {
             if (isset($request->token)) {
                 $user = User::where('api_token', $request->token)->first();
             }
@@ -66,7 +53,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/get-user/{user_id}', function (Request $request) {
         $user = $request->user();
 
-        if($user->hasRole('terminal')) {
+        if ($user->hasRole('terminal')) {
             $user_id = $request->user_id;
             $user = User::find($user_id);
 
@@ -74,19 +61,24 @@ Route::middleware('auth:api')->group(function () {
         }
     });
 
-    Route::post('/anketa', 'AnketsController@ApiAddForm')->name('api.addform');
+    /**
+     * Роуты для старых версий СДПО
+     * @deprecated
+     */
+    Route::prefix('anketa')->group(function () {
+        Route::post('/', 'AnketsController@ApiAddForm');
+        Route::get('/{id}', function ($id) {
+            $form = Form::find($id);
 
-    Route::get('/anketa/{id}', function ($id) {
-        $anketa = Anketa::find($id);
-
-        if ($anketa && $anketa->type_anketa == 'pak_queue') {
-            if (Carbon::now()->getTimestamp() - Carbon::parse($anketa->created_at)->getTimestamp() > 12) {
-                $anketa->type_anketa = 'medic';
-                $anketa->save();
+            if ($form && $form->type_anketa == FormTypeEnum::PAK_QUEUE) {
+                if (Carbon::now()->getTimestamp() - Carbon::parse($form->created_at)->getTimestamp() > 12) {
+                    $form->type_anketa = FormTypeEnum::MEDIC;
+                    $form->save();
+                }
             }
-        }
 
-        return response()->json($anketa);
+            return response()->json($form);
+        });
     });
 
     Route::prefix('reports')->group(function () {
@@ -99,7 +91,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('pvs/{id?}', function () {
         $id = isset(request()->id) ? request()->id : null;
 
-        if($id) {
+        if ($id) {
             $points = Point::find($id);
         } else {
             $points = Point::all();
@@ -116,6 +108,14 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/update-doc/{type}', 'DocsController@update')->name('docs.update');
 
     Route::post('/fields/visible', 'ApiController@saveFieldsVisible');
+
+    Route::prefix('1c/v1')->as('1c.v1.')->group(function () {
+        Route::get('/companies', 'Api\OneC\GetCompaniesItemsController');
+        Route::get('/requisites', 'Api\OneC\GetRequisitesItemsController');
+        Route::post('/companies', 'Api\OneC\CreateCompanyController');
+        Route::post('/reports', 'Api\OneC\CreateReportJobController');
+        Route::get('/reports/{id}', 'Api\OneC\GetReportController');
+    });
 });
 
 Route::middleware(['auth:api', 'update-last-connection'])->prefix('sdpo')->name('sdpo')->group(function () {
@@ -125,6 +125,7 @@ Route::middleware(['auth:api', 'update-last-connection'])->prefix('sdpo')->name(
         Route::post('/', 'Api\SdpoController@createAnketa');
         Route::post('/{id}', 'Api\SdpoController@changeType');
         Route::get('/{id}', 'Api\SdpoController@getInspection');
+        Route::post('/labeling-qr/{id}', 'Api\SdpoController@getAnketLabelingQr');
     });
 
     Route::get('/drivers', 'Api\SdpoController@getDrivers');
@@ -139,6 +140,11 @@ Route::middleware(['auth:api', 'update-last-connection'])->prefix('sdpo')->name(
         Route::get('/{id}', 'Api\SdpoController@getCar');
     });
 
+    Route::prefix('/forms')->group(function () {
+        Route::get('/duplicates', 'Api\Forms\CheckInspectionDuplicatesController');
+        Route::post('/{id}/feedback', 'Api\SdpoController@storeFormFeedback');
+    });
+
     Route::get('/pv', 'Api\SdpoController@getPoint');
     Route::get('/stamp', 'Api\SdpoController@getStamp');
     Route::get('/stamps', 'Api\SdpoController@getStamps');
@@ -146,6 +152,7 @@ Route::middleware(['auth:api', 'update-last-connection'])->prefix('sdpo')->name(
     Route::get('/medics', 'Api\SdpoController@getMedics');
 
     Route::post('/crash', 'Api\SdpoController@storeCrash');
+    Route::get('wish-message', 'Api\SdpoController@getRandomWish');
 });
 
 Route::get('/sdpo/check', 'Api\SdpoController@checkConnection');

@@ -3,8 +3,6 @@
 namespace App\Exports;
 
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
-use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;

@@ -2,17 +2,16 @@
 
 namespace App\Actions\Anketa;
 
-use App\Anketa;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
-use App\Enums\FormTypeEnum;
+use App\Models\Forms\BddForm;
+use App\Models\Forms\Form;
+use App\Point;
 use Illuminate\Support\Carbon;
 
 class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
 {
-    const FORM_TYPE = FormTypeEnum::BDD;
-
     protected function validateData()
     {
         $driverId = $this->data['driver_id'] ?? null;
@@ -35,12 +34,27 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
 
         $defaultData = [
             'date' => date('Y-m-d H:i:s'),
-            'admitted' => 'Допущен',
             'realy' => 'нет',
             'created_at' => $this->time
         ];
 
         $form = $this->mergeFormData($form, $defaultData);
+
+        if (isset($form['point_id'])) {
+            if ($form['point_id'] == 0) {
+                $form['point_id'] = null;
+            } else {
+                $point = Point::find($form['point_id']);
+
+                if (!$point) {
+                    $errMsg = 'ПВ не найден';
+
+                    $this->errors[] = $errMsg;
+
+                    return;
+                }
+            }
+        }
 
         /**
          * Водитель
@@ -50,7 +64,6 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
 
             if ($driverDop) {
                 $form['driver_id'] = $driverDop->hash_id;
-                $form['driver_fio'] = $driverDop->fio;
 
                 $driver = $driverDop;
             }
@@ -61,61 +74,47 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
 
             $this->errors[] = $errMsg;
 
-            $this->saveSdpoFormWithError($form, $errMsg);
-
             return;
         }
 
         /**
          * Проверка водителя по: тесту наркотиков, возрасту
          */
-        if ($driver) {
-            if($driver->dismissed === 'Да') {
-                $this->errors[] = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
-            }
-
-            if (!$driver->company_id) {
-                $message = 'У Водителя не найдена компания';
-
-                $this->errors[] = $message;
-
-                $this->saveSdpoFormWithError($form, $message);
-
-                return;
-            }
-
-            $company = Company::find($driver->company_id);
-
-            if (!$company) {
-                $message = 'У Водителя не верно указано ID компании';
-
-                $this->errors[] = $message;
-
-                $this->saveSdpoFormWithError($form, $message);
-
-                return;
-            }
-
-            if ($company->dismissed === 'Да') {
-                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
-
-                return;
-            }
-
-            if ($driver->year_birthday && $driver->year_birthday !== '0000-00-00') {
-                $form['driver_year_birthday'] = $driver->year_birthday;
-            }
-
-            $form['driver_gender'] = $driver->gender ?? '';
-            $form['driver_fio'] = $driver->fio;
-            $form['driver_group_risk'] = $driver->group_risk;
-
-            $form['company_id'] = $company->hash_id;
-            $form['company_name'] = $company->name;
-
-            $driver->date_bdd = $form['date'];
-            $driver->save();
+        if($driver->dismissed === 'Да') {
+            $this->errors[] = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
         }
+
+        if (!$driver->company_id) {
+            $this->errors[] = 'У Водителя не найдена компания';
+
+            return;
+        }
+
+        $company = Company::find($driver->company_id);
+
+        if (!$company) {
+            $this->errors[] = 'У Водителя не верно указано ID компании';
+
+            return;
+        }
+
+        if ($company->dismissed === 'Да') {
+            $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+
+            return;
+        }
+
+        if ($form['point_id']) {
+            $point = Point::find($form['point_id']);
+            if (!$point) {
+
+            }
+        }
+
+        $form['company_id'] = $company->hash_id;
+
+        $driver->date_bdd = $form['date'];
+        $driver->save();
 
         /**
          * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
@@ -129,9 +128,13 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
             $form['realy'] = 'да';
         }
 
-        $formModel = new Anketa($form);
-
+        $formModel = new Form($form);
         $formModel->save();
+
+        $formDetailsModel = new BddForm($form);
+        $formDetailsModel->setAttribute('forms_uuid', $formModel->uuid);
+        $formDetailsModel->save();
+
         $this->createdForms->push($formModel);
     }
 }

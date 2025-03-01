@@ -15,8 +15,10 @@ class Point extends Model
             'hash_id',
             'name',
             'pv_id',
+            'stamp_id',
             'company_id',
-            'deleted_id',
+            'deleted_at',
+            'auto_created'
         ];
 
     public static function getPointText($id = 0)
@@ -63,4 +65,25 @@ class Point extends Model
             ->toArray();
     }
 
+    public function stamp(): BelongsTo
+    {
+        return $this->belongsTo(Stamp::class);
+    }
+
+    public function getStamp(): ?Stamp
+    {
+        /** @var Stamp $stamp */
+        $stamp = $this->stamp;
+        if ($stamp) {
+            return $stamp;
+        }
+
+        /** @var Town|null $town */
+        $town = $this->town;
+        if ($town) {
+            return $town->getStamp();
+        }
+
+        return null;
+    }
 }

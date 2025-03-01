@@ -14,7 +14,7 @@ class AddFieldsPlToAnketas extends Migration
     public function up()
     {
         Schema::table('anketas', function (Blueprint $table) {
-            $table->integer('is_dop')->nullable(); // Режим ввода ПЛ
+            $table->integer('is_dop')->nullable(); // Неполный осмотр
             $table->text('result_dop')->nullable(); // Результат режиме ввода ПЛ
         });
     }

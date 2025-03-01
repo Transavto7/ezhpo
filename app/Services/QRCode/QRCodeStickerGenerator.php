@@ -4,8 +4,6 @@ namespace App\Services\QRCode;
 
 use App\Enums\QRCodeLinkParameter;
 use Barryvdh\DomPDF\Facade as PDF;
-use chillerlan\QRCode\QRCode;
-use chillerlan\QRCode\QROptions;
 use Illuminate\Contracts\Container\BindingResolutionException;
 
 class QRCodeStickerGenerator
@@ -16,13 +14,19 @@ class QRCodeStickerGenerator
      * @var QRCodeLinkGenerator
      */
     protected $linkGenerator;
+    /**
+     * @var QRCodeGeneratorInterface
+     */
+    private $qrCodeGenerator;
 
     /**
      * @param QRCodeLinkGenerator $linkGenerator
+     * @throws BindingResolutionException
      */
     public function __construct(QRCodeLinkGenerator $linkGenerator)
     {
         $this->linkGenerator = $linkGenerator;
+        $this->qrCodeGenerator = app()->make(QRCodeGeneratorInterface::class);
     }
 
     /**
@@ -32,8 +36,11 @@ class QRCodeStickerGenerator
     {
         $customPaper = array(0,0,282.00,222.00);
 
+        $link = $this->linkGenerator->generate();
+        $qrCode = $this->qrCodeGenerator->generate($link);
+
         $pdf = Pdf::loadView('templates.qr-code', [
-                'qrCode' => $this->getCRCode(),
+                'qrCode' => $qrCode,
                 'id' => $this->linkGenerator->getId(),
                 'type' => $this->linkGenerator->getParameter()->value() === QRCodeLinkParameter::CAR_ID
                     ? self::CAR
@@ -46,16 +53,6 @@ class QRCodeStickerGenerator
         $response->header('Content-Type', 'application/pdf');
 
         return $response;
-    }
-
-    public function getCRCode()
-    {
-        $options = new QROptions;
-        $options->version = 4;
-        $options->quietzoneSize = 0;
-        $options->scale = 8;
-
-        return (new QRCode($options))->render($this->linkGenerator->generate());
     }
 
     public function getUrl()
@@ -77,9 +74,12 @@ class QRCodeStickerGenerator
 
     public function getView()
     {
+        $link = $this->linkGenerator->generate();
+        $qrCode = $this->qrCodeGenerator->generate($link);
+
         return view('templates.qr-code',
             [
-                'qrCode' => $this->getCRCode(),
+                'qrCode' => $qrCode,
                 'id' => $this->linkGenerator->getId(),
                 'type' => $this->linkGenerator->getParameter()->value() === QRCodeLinkParameter::CAR_ID
                     ? self::CAR

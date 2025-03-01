@@ -15,8 +15,11 @@ class Town extends Model
         = [
             'id',
             'hash_id',
+            'stamp_id',
             'name',
             'deleted_id',
+            'deleted_at',
+            'auto_created'
         ];
 
     public function pvs(): HasMany
@@ -53,5 +56,15 @@ class Town extends Model
             ->toArray();
 
         return implode(', ', $data) ?? '';
+    }
+
+    public function stamp(): BelongsTo
+    {
+        return $this->belongsTo(Stamp::class);
+    }
+
+    public function getStamp(): ?Stamp
+    {
+        return $this->stamp;
     }
 }

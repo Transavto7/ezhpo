@@ -48,6 +48,10 @@
             <div class="row">
                 <div class="col-12">
                     <h1>
+                        <a href="{{url()->previous()}}">
+                            Назад
+                        </a>
+                        <span class="text-muted">|</span>
                         <a href="/">
                             На главную
                         </a>

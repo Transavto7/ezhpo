@@ -9,6 +9,7 @@ require('chosen-js')
 require('croppie')
 require('suggestions-jquery')
 require('./common/camera')
+require('./common/findDuplicates')
 
 $.fn.select2.amd.require(['select2/selection/search'], function (Search) {
     Search.prototype.searchRemoveChoice = function (decorated, item) {
@@ -458,7 +459,11 @@ $(document).ready(function () {
     }
 
     const showInputFormCardDBItem = async (fieldName, fieldValue, fvItem, model, isBlocked) => {
-        let field = '', clearInputBtn = '', fId = uidv4(), inputClass = `${model}_input`;
+        let field = '',
+            clearInputBtn = '',
+            fId = uidv4(),
+            inputClass = `${model}_input`,
+            required = Number(fvItem['noRequired'] ?? 0) !== 1 ? 'required' : '';
 
         if (fvItem['type'] === 'select') {
             await API_CONTROLLER.getFieldHTML({
@@ -469,19 +474,28 @@ $(document).ready(function () {
                 field = response.data
             })
         } else if (['note', 'comment', 'name'].includes(fieldName)) {
-            field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${fieldName}">${(fieldValue ?? '').trim()}</textarea>`
+            field = `<textarea id="${fId}" ${isBlocked} data-model="${model}" class="ANKETAS_TEXTAREA form-control" name="${fieldName}" ${required}>${(fieldValue ?? '').trim()}</textarea>`
         } else if (fieldName === 'photo' && fieldValue) {
             field = `<img alt="photo" src="/storage/${fieldValue}" width="100%"/>`
         } else {
-            field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${fieldValue ?? ''}' name="${fieldName}" />`
+            field = `<input id="${fId}" ${isBlocked} data-model="${model}" class="form-control" type="${fvItem['type']}" value='${fieldValue ?? ''}' name="${fieldName}" ${required}/>`
         }
 
         if (isBlocked === '' && fieldName !== 'photo') {
             clearInputBtn = `<a href="" style="font-size: 10px; color: #c2c2c2;" onclick="$('#${fId}').val('').trigger('change'); return false;"><i class="fa fa-trash"></i> Очистить</a>`
         }
 
+        let labelStyle = ''
+        const importantValueLabelStyle = "color: red; font-weight: bold;";
+        if (fieldName === 'dismissed' && fieldValue.toUpperCase() === 'ДА') {
+            labelStyle = importantValueLabelStyle
+        }
+        if (fieldName === 'group_risk' && (fieldValue ?? '').trim() !== '') {
+            labelStyle = importantValueLabelStyle
+        }
+
         return `
-            <p style="${fieldName === 'dismissed' ? fieldValue.toUpperCase() === 'ДА' ? 'color: red; font-weight: bold;' : '' : ''}"
+            <p style="${labelStyle}"
             data-field-card="${model}_${fieldName}"
             class="text-small m-0">
             ${fvItem.label}:
@@ -711,6 +725,26 @@ $(document).ready(function () {
             }
         }
 
+        const setSelectValue = function (select, value, text = null) {
+            if (text === null) {
+                text = value
+            }
+
+            if (select.length < 1) {
+                return
+            }
+
+            const exist = select.children('option').filter((id, element) => element.value === value);
+
+            if (exist.length < 1) {
+                select.append($('<option>', {
+                    value,
+                    text
+                }));
+            }
+
+            select.val(value).trigger("change");
+        }
 
         $.ajax({
             url: `/api/check-prop/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
@@ -719,45 +753,25 @@ $(document).ready(function () {
                 const PROP_HAS_EXISTS = data.data.exists
                 const DATA = data.data.message;
 
-                if ((model === 'Driver' || model === 'Car') && DATA.company_hash_id) {
-                    const form = parent.closest('#ANKETA_FORM');
-                    form.find('input[name="company_id"]').val(DATA.company_hash_id);
-                    const select = form.find('select[name="company_id"]');
-
-                    if (select.length > 0) {
-                        const exist = select.children('option').filter((id, element) => {
-                            return element.value === DATA.company_hash_id;
-                        });
-
-                        if (exist.length < 1) {
-                            select.append($('<option>', {
-                                value: DATA.company_hash_id,
-                                text: DATA.company_name
-                            }));
-                        }
-
-                        select.select2().val(DATA.company_hash_id).trigger("change");
-                    }
+                const carModel = model === 'Car'
+                const driverModel = model === 'Driver'
+                const carTypeAutoValue = DATA?.type_auto
+                if (carModel && carTypeAutoValue) {
+                    const form = parent.closest('.cloning');
+                    setSelectValue(form.find('select.car_type_auto'), carTypeAutoValue)
                 }
 
-                if ((model === 'Driver' || model === 'Car') && DATA.company_name) {
+                const companyHashIdValue = DATA?.company_hash_id
+                if ((driverModel || carModel) && companyHashIdValue) {
                     const form = parent.closest('#ANKETA_FORM');
-                    const select = form.find('select[name="company_name"]');
+                    form.find('input[name="company_id"]').val(companyHashIdValue);
+                    setSelectValue(form.find('select[name="company_id"]'), companyHashIdValue, DATA?.company_name)
+                }
 
-                    if (select.length > 0) {
-                        const exist = select.children('option').filter((id, element) => {
-                            return element.value === DATA.company_name;
-                        });
-
-                        if (exist.length < 1) {
-                            select.append($('<option>', {
-                                value: DATA.company_name,
-                                text: DATA.company_name
-                            }));
-                        }
-
-                        select.select2().val(DATA.company_name).trigger("change");
-                    }
+                const companyNameValue = DATA?.company_name
+                if ((driverModel || carModel) && companyNameValue) {
+                    const form = parent.closest('#ANKETA_FORM');
+                    setSelectValue(form.find('select[name="company_name"]'), companyNameValue)
                 }
 
                 showAnketsCardDBitemData(model, DATA, data.data.fieldsValues, data.data)
@@ -789,7 +803,7 @@ $(document).ready(function () {
                     checkInputProp('id', 'Company', DATA.company_id, 'name', companyIdInput.parent().parent())
                 }
 
-                if (model === 'Driver' && DATA.company_hash_id) {
+                if (driverModel && DATA && DATA.company_hash_id) {
                     parent.find('input').attr('company', DATA.company_hash_id);
                     const driverInput = parent.closest('#ANKETA_FORM').find('.car-input');
                     driverInput.each((id, input) => {
@@ -810,7 +824,7 @@ $(document).ready(function () {
                     });
                 }
 
-                if (model === 'Car' && DATA.company_hash_id) {
+                if (carModel && DATA && DATA.company_hash_id) {
                     const driverInput = parent.closest('#ANKETA_FORM').find('input[name="driver_id"]');
                     parent.find('input').attr('company', DATA.company_hash_id);
 
@@ -834,7 +848,7 @@ $(document).ready(function () {
         })
     }
 
-    // Открытие/закртие элементов
+    // Открытие/закрытие элементов
     $('[data-toggle-show]').click(function (e) {
         e.preventDefault()
 
@@ -916,7 +930,8 @@ $(document).ready(function () {
         clone_to.append(clone)
 
         clone.find('input,select').each(function () {
-            this.name = this.name.replace('anketa[' + (count_anketa - 1) + ']', 'anketa[' + count_anketa + ']')
+            this.name = this.name.replace('anketa[' + (count_anketa - 1) + ']', 'anketa[' + count_anketa + ']');
+            $(this).trigger('input');
         })
 
         const datePickerElement = clone.find(".date-range");
@@ -924,9 +939,15 @@ $(document).ready(function () {
             initDatePicker(clone.find(".date-range")[0])
         }
 
-        count_anketa++
+        const deleteBtn = '<a href="" onclick="' + randId + '.remove(); return false;" class="text-danger">Удалить</a>';
 
-        clone.find('.anketa-delete').html('<a href="" onclick="' + randId + '.remove(); return false;" class="text-danger">Удалить</a>')
+        clone.find('.anketa-delete').html(deleteBtn)
+
+        if (! clone.find('.duplicate-indicator').hasClass('d-none')) {
+            window.duplicates['anketa[' + count_anketa + ']' + '[date]'] = true
+        }
+
+        count_anketa++
     })
 
     // Отправка данных с форма по CTRL + ENTER
@@ -1093,6 +1114,12 @@ $(document).ready(function () {
                 title: successTitle,
                 icon: 'info'
             });
+        }).catch(error => {
+            swal.fire({
+                title: "Ошибка!",
+                text: "Обратитесь к администратору!",
+                icon: 'error'
+            });
         })
 
         document.querySelector('#page-preloader').classList.add('hide');
@@ -1209,31 +1236,44 @@ $(document).ready(function () {
         triggerField()
     })
 
-    function initCompanyNameSuggestion(companyNameInput, innInput) {
-        if (!companyNameInput) return;
+    function initCompanyNameSuggestion(companyOfficialNameInput, innInput, kppInput, nameInput, ogrnInput, addressInput) {
+        if (!companyOfficialNameInput) return;
 
         if (!innInput) return;
 
-        companyNameInput.suggestions({
-            //TODO: вынести в енв
-            token: "4de76a04c285fbbad3b2dc7bcaa3ad39233d4300",
+        companyOfficialNameInput.suggestions({
+            token: window.DADATA_TOKEN,
             type: "PARTY",
+            count: 20,
             /* Вызывается, когда пользователь выбирает одну из подсказок */
             onSelect: function (suggestion) {
                 if (!suggestion.data) {
                     return
                 }
 
-                console.log('test', suggestion)
-
-                const {inn} = suggestion.data
+                const {name,inn,kpp,ogrn,address} = suggestion.data
 
                 innInput.val(inn)
+                kppInput.val(kpp)
+                nameInput.val(name.short_with_opf)
+                ogrnInput.val(ogrn)
+                addressInput.val(address.unrestricted_value)
+            },
+            /* Определяет текст, подставляемый в инпут при выборе одной из подсказок */
+            formatSelected: function (suggestion) {
+                return suggestion?.data?.name?.full_with_opf
             }
         });
     }
 
-    initCompanyNameSuggestion($('*[data-field="Company_name"]'), $('#elements-modal-add input[name="inn"]'))
+    initCompanyNameSuggestion(
+        $('#elements-modal-add input[data-field="Company_official_name"]'),
+        $('#elements-modal-add input[name="inn"]'),
+        $('#elements-modal-add input[name="kpp"]'),
+        $('#elements-modal-add input[name="name"]'),
+        $('#elements-modal-add input[name="ogrn"]'),
+        $('#elements-modal-add input[name="address"]'),
+    )
 
     $('.header #toggle-btn').each(function () {
         let localStatusSidebar = () => {
@@ -1276,7 +1316,14 @@ $(document).ready(function () {
             .then(({data}) => {
                 modalContent.text('').append(data);
                 LIBS.initAll()
-                initCompanyNameSuggestion($('#modalEditor *[data-field="Company_name"]'), $('#modalEditor input[name="inn"]'))
+                initCompanyNameSuggestion(
+                    $('#modalEditor textarea[data-field="Company_official_name"]'),
+                    $('#modalEditor input[name="inn"]'),
+                    $('#modalEditor input[name="kpp"]'),
+                    $('#modalEditor textarea[name="name"]'),
+                    $('#modalEditor input[name="ogrn"]'),
+                    $('#modalEditor input[name="address"]')
+                )
             })
 
     })
@@ -1355,6 +1402,14 @@ $(document).ready(function () {
             })
         });
     })
+
+    $('#CARD_DRIVER').on('input', 'input[name="phone"]', function() {
+        const input = $('#CARD_DRIVER input[name="phone"]')
+        input.val(input.val().replace(/[^+\-\d\s]/g, ''))
+        if (input.val().length > 5) {
+            input.val(input.val().slice(0, 18))
+        }
+    });
 });
 
 window.initDatePicker = initDatePicker

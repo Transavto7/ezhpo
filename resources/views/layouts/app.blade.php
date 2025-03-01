@@ -25,31 +25,19 @@
     @include('layouts.analytics.yandex-metric')
 
     <script>
+        window.API_TOKEN = '';
+        window.DADATA_TOKEN = '';
+
+        @auth
+            window.API_TOKEN = '{{ Auth::user()->api_token }}';
+            window.DADATA_TOKEN = '{{ config('services.dadata.token') }}';
+        @endauth
+
         window.PAGE_SETUP = {
             baseUrl: '{{ config('app.url') }}'
         }
         window.DOC_FIELDS = @json(config('docs.fields'));
-    </script>
 
-    @auth
-        <script type="text/javascript">
-            window.API_TOKEN = '{{ Auth::user()->api_token }}';
-            window.userRole = function () {
-                return {{ auth()->user()->role }}
-            };
-        </script>
-    @endauth
-
-    @guest
-        <script type="text/javascript">
-            window.API_TOKEN = '';
-            window.userRole = function () {
-                return 0;
-            };
-        </script>
-    @endguest
-
-    <script type="text/javascript">
         window.addEventListener("load", function (event) {
             const preloader = document.querySelector('#page-preloader');
             preloader.classList.add('hide');
@@ -143,6 +131,27 @@
     <form id="agreement-form" action="/agreement" method="POST" style="display: none;">
         @csrf
     </form>
+@endif
+
+@if(user() && user()->hasRole('client') && config('payment-qr-code.payment_qr_code_enable'))
+    <div id="paymentQrCodeModal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: fit-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body d-flex justify-content-center align-items-center">
+                    <img
+                        src="{{ asset(config('payment-qr-code.payment_qr_code_image')) }}"
+                        alt="Не найдено изображение с QR-кодом для оплаты"
+                        style="max-width: calc(100vw - 45px)"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
 @endif
 
 @stack('setup-scripts')

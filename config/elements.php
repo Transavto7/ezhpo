@@ -3,7 +3,6 @@
 return [
     'Town' => [
         'title' => 'Города',
-        'role' => 777,
         'popupTitle' => 'города',
         'editOnField' => 'name',
         'model' => 'Town',
@@ -20,14 +19,21 @@ return [
             'name' => [
                 'label' => 'Город',
                 'type' => 'text',
-                'hideFilter' => true
+                'hideFilter' => 1
+            ],
+            'stamp_id' => [
+                'label' => 'Штамп',
+                'type' => 'select',
+                'values' => 'Stamp',
+                'getField' => 'name',
+                'getFieldKey' => 'id',
+                'concatField' => null,
             ],
         ],
     ],
 
     'Point' => [
         'title' => 'Пункты выпуска',
-        'role' => 777,
         'popupTitle' => 'Пункта выпуска',
         'editOnField' => 'name',
         'model' => 'Point',
@@ -43,7 +49,7 @@ return [
             'name' => [
                 'label' => 'Пункт выпуска',
                 'type' => 'text',
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'pv_id' => [
                 'label' => 'Город',
@@ -62,12 +68,19 @@ return [
                 'concatField' => 'hash_id',
                 'noRequired' => 1,
             ],
+            'stamp_id' => [
+                'label' => 'Штамп',
+                'type' => 'select',
+                'values' => 'Stamp',
+                'getField' => 'name',
+                'getFieldKey' => 'id',
+                'concatField' => null,
+            ],
         ],
     ],
 
     'Req' => [
         'title' => 'Реквизиты нашей компании',
-        'role' => 777,
         'popupTitle' => 'Реквизитов',
         'editOnField' => 'name',
         'model' => 'Req',
@@ -121,9 +134,8 @@ return [
 
     'DDates' => [
         'title' => 'Даты контроля',
-        'role' => 777,
         'popupTitle' => 'Даты контроля',
-        'editOnField' => 'item_model',
+        'editOnField' => 'field',
         'model' => 'DDates',
         'fields' => [
             'item_model' => [
@@ -144,7 +156,7 @@ return [
                     'date_prto' => 'Дата ПРТО (автомобиль)',
                     'date_report_driver' => 'Дата снятия отчета с карты водителя (водитель)',
                     'date_techview' => 'Дата техосмотра (автомобиль)',
-                    'time_skzi' => 'Срок действия СКЗИ (автомобиль)',
+                    'time_skzi' => 'Срок действия СКЗИ\настройки тахографа ЕСТР (автомобиль)',
                     'time_card_driver' => 'Срок действия карты водителя (водитель)',
                     'date_osago' => 'Дата осаго (автомобиль)',
                     'date_driver_license' => 'Срок действия водительского удостоверения (водитель)',
@@ -169,7 +181,6 @@ return [
 
     'Settings' => [
         'title' => 'Настройки системы',
-        'role' => 777,
         'popupTitle' => 'Настройки системы',
         'max' => 1,
         'editOnField' => 'id',
@@ -210,7 +221,6 @@ return [
 
     'Driver' => [
         'title' => 'Водители',
-        'role' => 0,
         'popupTitle' => 'Водителя',
         'otherRoles' => [
             'medic',
@@ -242,8 +252,7 @@ return [
             ],
             'year_birthday' => [
                 'label' => 'Дата рождения',
-                'type' => 'date',
-                'noRequired' => 1
+                'type' => 'date'
             ],
             'photo' => [
                 'label' => 'Фото',
@@ -318,14 +327,14 @@ return [
                 'type' => 'text',
                 'noRequired' => 1
             ],
-            'snils' => [
-                'label' => 'СНИЛС',
-                'type' => 'text',
-                'noRequired' => 1
-            ],
             'date_driver_license' => [
                 'label' => 'Срок действия водительского удостоверения',
                 'type' => 'date',
+                'noRequired' => 1
+            ],
+            'snils' => [
+                'label' => 'СНИЛС',
+                'type' => 'text',
                 'noRequired' => 1
             ],
             'date_narcotic_test' => [
@@ -373,7 +382,7 @@ return [
                 ],
                 'defaultValue' => 'products_id',
                 'multiple' => 1,
-                'hidden' => 1,
+                'hideFilter' => 1,
             ],
             'pressure_systolic' => [
                 'label' => 'Порог верхнего давления',
@@ -399,7 +408,6 @@ return [
 
     'Car' => [
         'title' => 'Автомобили',
-        'role' => 0,
         'popupTitle' => 'Автомобиля',
         'otherRoles' => [
             'medic',
@@ -448,6 +456,11 @@ return [
                 ],
                 'defaultValue' => 'Не установлено',
             ],
+            'official_type_auto' => [
+                'label' => 'Тип Т\С',
+                'type' => 'text',
+                'noRequired' => 1
+            ],
             'trailer' => [
                 'label' => 'Прицеп',
                 'type' => 'select',
@@ -490,7 +503,7 @@ return [
                 'noRequired' => 1
             ],
             'time_skzi' => [
-                'label' => 'Срок действия СКЗИ',
+                'label' => 'Срок действия СКЗИ\настройки тахографа ЕСТР',
                 'type' => 'date',
                 'noRequired' => 1
             ],
@@ -524,7 +537,7 @@ return [
                 ],
                 'defaultValue' => 'products_id',
                 'multiple' => 1,
-                'hidden' => 1,
+                'hideFilter' => 1,
             ],
         ],
     ],
@@ -532,7 +545,6 @@ return [
     'Company' => [
         'title' => 'Компании',
         'popupTitle' => 'Компании',
-        'role' => 0,
         'editOnField' => 'name',
         'model' => 'Company',
         'fields' => [
@@ -545,10 +557,14 @@ return [
                 'concatField' => 'hash_id',
                 'getFieldKey' => 'hash_id'
             ],
+            'official_name' => [
+                'label' => 'Официальное название компании',
+                'type' => 'text',
+            ],
             'name' => [
                 'label' => 'Название компании',
                 'type' => 'text',
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'note' => [
                 'label' => 'Договоренности с клиентом',
@@ -634,6 +650,38 @@ return [
                 'label' => 'ИНН',
                 'type' => 'text'
             ],
+            'kpp' => [
+                'label' => 'КПП',
+                'type' => 'text',
+                'noRequired' => 1,
+            ],
+            'ogrn' => [
+                'label' => 'ОГРН',
+                'type' => 'text',
+                'noRequired' => 1,
+            ],
+            'address' => [
+                'label' => 'Адрес',
+                'type' => 'text',
+                'noRequired' => 1,
+            ],
+            'reqs_validated' => [
+                'label' => 'Корректные реквизиты',
+                'type' => 'select',
+                'values' => [
+                    0 => 'Нет',
+                    1 => 'Да',
+                ],
+            ],
+            'one_c_synced' => [
+                'label' => 'Синхронизация 1С',
+                'type' => 'select',
+                'values' => [
+                    \App\Enums\OneCSyncStatusEnum::NON_CREATED => 'Нет',
+                    \App\Enums\OneCSyncStatusEnum::NEED_UPDATE => 'Нужно обновление в 1С',
+                    \App\Enums\OneCSyncStatusEnum::SYNCED => 'Да',
+                ],
+            ],
             'dismissed' => [
                 'label' => 'Временная блокировка',
                 'type' => 'select',
@@ -682,7 +730,6 @@ return [
 
     'Product' => [
         'title' => 'Услуги',
-        'role' => 0,
         'popupTitle' => 'Услуги',
         'editOnField' => 'name',
         'model' => 'Product',
@@ -698,7 +745,7 @@ return [
             'name' => [
                 'label' => 'Название',
                 'type' => 'text',
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'type_product' => [
                 'label' => 'Тип',
@@ -754,7 +801,6 @@ return [
 
     'Discount' => [
         'title' => 'Скидки',
-        'role' => 0,
         'popupTitle' => 'Скидка',
         'editOnField' => 'products_id',
         'model' => 'Discount',
@@ -787,72 +833,8 @@ return [
         ],
     ],
 
-    'Service' => [
-        'title' => 'Услуги новые',
-        'role' => 0,
-        'popupTitle' => 'Услуги',
-        'editOnField' => 'name',
-        'model' => 'Service',
-        'fields' => [
-            'name' => [
-                'label' => 'Название',
-                'type' => 'text'
-            ],
-            'type_product' => [
-                'label' => 'Тип',
-                'type' => 'select',
-                'values' => [
-                    'Абонентская оплата' => 'Абонентская оплата',
-                    'Разовые осмотры' => 'Разовые осмотры',
-                    'Абонентская плата без реестров' => 'Абонентская плата без реестров',
-                ],
-                'defaultValue' => 'Абонентская оплата',
-            ],
-            'unit' => [
-                'label' => 'Ед.изм.',
-                'type' => 'text'
-            ],
-            'price_unit' => [
-                'label' => 'Стоимость за единицу',
-                'type' => 'number'
-            ],
-            'type_anketa' => [
-                'label' => 'Реестр',
-                'type' => 'select',
-                'values' => [
-                    'bdd' => 'БДД',
-                    'medic' => 'Медицинский',
-                    'tech' => 'Технический',
-                    'pechat_pl' => 'Печать ПЛ',
-                    'report_cart' => 'Отчеты с карт',
-                ],
-                'defaultValue' => 'Не установлено',
-            ],
-            'type_view' => [
-                'label' => 'Тип осмотра',
-                'type' => 'select',
-                'values' => [
-                    'Предрейсовый/Предсменный' => 'Предрейсовый/Предсменный',
-                    'Послерейсовый/Послесменный' => 'Послерейсовый/Послесменный',
-                    'БДД' => 'БДД',
-                    'Отчёты с карт' => 'Отчёты с карт',
-                    'Учет ПЛ' => 'Учет ПЛ',
-                    'Печать ПЛ' => 'Печать ПЛ',
-                ],
-                'defaultValue' => 'Не установлено',
-                'multiple' => 1,
-            ],
-            'essence' => [
-                'label' => 'Сущности',
-                'type' => 'text',
-                'noRequired' => 1
-            ],
-        ],
-    ],
-
     'Instr' => [
         'title' => 'Виды инструктажей',
-        'role' => 0,
         'popupTitle' => 'Инструктажа',
         'editOnField' => 'name',
         'model' => 'Instr',
@@ -861,7 +843,7 @@ return [
                 'label' => 'Фото',
                 'type' => 'file',
                 'noRequired' => 1,
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'hash_id' => [
                 'label' => 'Инструктаж',
@@ -874,7 +856,7 @@ return [
             'name' => [
                 'label' => 'Название',
                 'type' => 'text',
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'descr' => [
                 'label' => 'Описание',
@@ -909,7 +891,7 @@ return [
                 'label' => 'Сортировка',
                 'type' => 'number',
                 'noRequired' => 1,
-                'hideFilter' => true
+                'hideFilter' => 1
             ],
             'signature' => [
                 'label' => 'ЭЛ подпись водителя',

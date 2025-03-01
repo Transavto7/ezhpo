@@ -2,21 +2,20 @@
 
 namespace App\Services;
 
-use App\Anketa;
 use App\Company;
 use App\Driver;
-use App\Http\Controllers\ProfileController;
+use App\Models\Forms\Form;
 use App\Point;
+use App\User;
 
 class DocDataService
 {
-    public function get(Anketa $form): array
+    public function get(Form $form): array
     {
         $data = [
             'anketa_id' => $form->id,
-            'driver_fio' => '',
-            'driver_yb' => '',
             'driver_pv' => '',
+            'company_name' => '',
             'user_name' => '',
             'user_fio' => '',
             'user_company' => '',
@@ -30,28 +29,30 @@ class DocDataService
             'point' => ''
         ];
 
-        foreach ($form->fillable as $field) {
-            $data[$field] = $form[$field];
-        }
+        $details = $form->details;
 
-        $driver = Driver::where('hash_id', $form->driver_id)->first();
+        $data = array_merge($data, $form->toArray(), $details->toArray());
+
+        $driver = Driver::withTrashed()->where('hash_id', $form->driver_id)->first();
         $data['driver'] = $driver;
+        $data['driver_year_birthday'] = $driver->year_birthday;
+        $data['driver_fio'] = $driver->fio;
 
-        if ($form->test_narko === 'Положительно') {
+        if ($details->test_narko === 'Положительно') {
             $data['drugs'] = true;
         }
 
-        if ($form->proba_alko === 'Положительно') {
+        if ($details->proba_alko === 'Положительно') {
             $data['alko'] = true;
         }
 
         $data['alcometer_result'] = $data['alcometer_result'] ?? 0;
 
-        if ($form->med_view === 'Отстранение') {
+        if ($details->med_view === 'Отстранение') {
             $data['status'] = 'Есть жалобы';
         }
 
-        $data['user_post'] = ProfileController::getUserRole(true, $form->user_id);
+        $data['user_post'] = $this->getUserRole($form->user_id);
 
         if ($data['alko']) {
             $recommendations = 'Пройдите медицинское освидетельствование на состояние алкогольного опьянения';
@@ -61,10 +62,12 @@ class DocDataService
         $data['recommendations'] = $recommendations;
 
         if ($form->company_id) {
-            $company = Company::where('hash_id', $form->company_id)->first();
+            $company = Company::withTrashed()->where('hash_id', $form->company_id)->first();
 
-            if($company) {
+            if ($company) {
                 $point = Point::find($company->pv_id);
+
+                $data['company_name'] = $company->name;
 
                 if ($point) {
                     $data['driver_pv'] = $point->name;
@@ -72,12 +75,20 @@ class DocDataService
             }
         }
 
-        if ($form->pv_id) {
-            $point = Point::where('name', $form->pv_id)->with('town')->first();
+        if ($form->point_id) {
+            $point = Point::withTrashed()->with('town')->find($form->point_id);
 
             if ($point) {
                 $data['town'] = $point->town->name;
                 $data['point'] = $point->name;
+            }
+        }
+
+        if ($form->user_id) {
+            $user = User::withTrashed()->find($form->user_id);
+
+            if ($user) {
+                $data['user_name'] = $user->name;
             }
         }
 
@@ -89,6 +100,53 @@ class DocDataService
         $data = $this->getClosing($data);
 
         return $this->getComment($data);
+    }
+
+    protected function getUserRole($userId): string
+    {
+        if (empty($userId)) {
+            return '';
+        }
+
+        $user = User::find($userId);
+
+        if (empty($user)) {
+            return '';
+        }
+
+        switch ($user->role) {
+            case 12:
+                $role = 'Клиент';
+                break;
+            case 4:
+                $role = 'Оператор СДПО';
+                break;
+            case 1:
+                $role = 'Контролёр ТС';
+                break;
+            case 2:
+                $role = 'Медицинский сотрудник';
+                break;
+            case 3:
+                $role = 'Водитель';
+                break;
+            case 11:
+                $role = 'Менеджер';
+                break;
+            case 13:
+                $role = 'Инженер БДД';
+                break;
+            case 777:
+                $role = 'Администратор';
+                break;
+            case 778:
+                $role = 'Терминал';
+                break;
+            default:
+                $role = '';
+        }
+
+        return $role;
     }
 
     protected function getClosing(array $data): array

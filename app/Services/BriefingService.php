@@ -3,16 +3,17 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Anketa;
 use App\Company;
 use App\Driver;
 use App\Instr;
+use App\Models\Forms\BddForm;
+use App\Models\Forms\Form;
 use App\User;
 use Carbon\Carbon;
 
 final class BriefingService
 {
-    public static function createFirstBriefingForDriver(Driver $driver, ?Company $company = null): Anketa
+    public static function createFirstBriefingForDriver(Driver $driver, ?Company $company = null): Form
     {
         if ($company === null) {
             $company = $driver->company;
@@ -34,36 +35,25 @@ final class BriefingService
             ->get()
             ->random();
 
-        /** @var Anketa $anketa */
-        $anketa = Anketa::query()->create([
+        $form = Form::create([
+            "driver_id" => $driver->hash_id,
+            'point_id' => $point->id,
+            "company_id" => $company->hash_id,
             "type_anketa" => "bdd",
-            "complaint" => "Нет",
-            "type_briefing" => 'Вводный',
-            "signature" => "Подписано простой электронной подписью (ПЭП)",
-            "condition_visible_sliz" => "Без особенностей",
-            "condition_koj_pokr" => "Без особенностей",
             "date" => Carbon::now(),
-            "type_view" => "Предрейсовый",
-
             "user_id" => $bddUser->id,
-            "user_name" => $bddUser->name,
             'user_eds' => $bddUser->eds,
             'user_validity_eds_start' => $bddUser->validity_eds_start,
             'user_validity_eds_end' => $bddUser->validity_eds_start,
+        ]);
 
-            "driver_id" => $driver->hash_id,
-            "driver_fio" => $driver->fio,
-            "driver_gender" => $driver->gender,
-            "driver_year_birthday" => $driver->year_birthday,
-
-            'pv_id' => $point->name ?? null,
-            'point_id' => $point->id ?? null,
-
-            "company_id" => $company->hash_id,
-            "company_name" => $company->name,
+        BddForm::create([
+            'forms_uuid' => $form->uuid,
+            "type_briefing" => 'Вводный',
+            "signature" => "Подписано простой электронной подписью (ПЭП)",
             "briefing_name" => $briefing->name ?? '',
         ]);
 
-        return $anketa;
+        return $form;
     }
 }

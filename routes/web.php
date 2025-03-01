@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\ReportContractRefactoringController;
 use App\Http\Middleware\CheckDriver;
+use App\Http\Middleware\StripEmptyParamsFromQueryString;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -11,14 +11,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('show-edit-element-modal/{model}/{id}', 'IndexController@showEditModal')->name('showEditElementModal');
 
     Route::get('/', 'IndexController@index')->name('index');
-
-    Route::prefix('v-search')->group(function () {
-        Route::get('companies', '\App\Helpers\VSelect@companies');
-        Route::get('cars', '\App\Helpers\VSelect@cars');
-        Route::get('drivers', '\App\Helpers\VSelect@drivers');
-        Route::get('services', '\App\Helpers\VSelect@services');
-        Route::get('our_companies', '\App\Helpers\VSelect@our_companies');
-    });
+    Route::get('/openapi', 'OpenApiUiPageController@index')->name('index');
 
     Route::prefix('contract')->group(function () {
         Route::get('/', 'ContractController@view');
@@ -31,6 +24,14 @@ Route::middleware(['auth'])->group(function () {
         Route::post('getCarsByCompany/{id}', 'ContractController@getCarsByCompany');
         Route::post('getDriversByCompany/{id}', 'ContractController@getDriversByCompany');
         Route::post('getAvailableForCompany', 'ContractController@getAvailableForCompany');
+
+        Route::prefix('select')->group(function () {
+            Route::get('companies', 'ContractSelectsController@companies');
+            Route::get('cars', 'ContractSelectsController@cars');
+            Route::get('drivers', 'ContractSelectsController@drivers');
+            Route::get('products', 'ContractSelectsController@products');
+            Route::get('our_companies', 'ContractSelectsController@ourCompanies');
+        });
     });
 
     Route::get('add-client', 'IndexController@RenderAddClient')->name('pages.add_client');
@@ -41,10 +42,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/', 'BddController@store')->name('store');
     });
 
-    Route::prefix('profile')->group(function () {
-        Route::get('delete-avatar', 'ProfileController@DeleteAvatar')->name('deleteAvatar');
-        Route::get('/', 'ProfileController@RenderIndex')->name('profile');
-        Route::post('/', 'ProfileController@UpdateData')->name('updateProfile');
+    Route::prefix('profile')->as('profile.')->group(function () {
+        Route::get('delete-avatar', 'ProfileController@deleteAvatar')->name('deleteAvatar');
+        Route::get('/', 'ProfileController@index')->name('index');
+        Route::post('/', 'ProfileController@updateAvatar')->name('updateAvatar');
     });
 
     Route::prefix('users')->group(function () {
@@ -54,7 +55,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('fetchRoleData', 'UserController@fetchRoleData');
         Route::get('fetchUserData', 'UserController@fetchUserData');
         Route::post('return_trash', 'UserController@returnTrash');
-        Route::get('saveUser', 'UserController@saveUser');
+        Route::post('saveUser', 'UserController@saveUser');
     });
 
     Route::prefix('terminals')->as('terminals.')->group(function () {
@@ -69,12 +70,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('return_trash', 'RoleController@returnTrash');
     });
 
-    Route::resource('field/prompt', 'FieldPromptController');
+    Route::resource('field/prompt', 'FieldPromptController')->except(['edit', 'show', 'store', 'create']);
     Route::prefix('field/prompt')->as('prompt.')->group(function () {
         Route::any('filter', 'FieldPromptController@getAll');
     });
 
-    Route::resource('stamp', 'StampController')->except(['show']);
+    Route::resource('stamp', 'StampController')->except(['show', 'create', 'edit']);
     Route::prefix('stamp')->as('stamp.')->group(function () {
         Route::any('filter', 'StampController@getAll');
         Route::any('find', 'StampController@find');
@@ -93,12 +94,13 @@ Route::middleware(['auth'])->group(function () {
             Route::get('filters', 'HomeController@getFilters');
             Route::get('{type_ankets?}/filters', 'HomeController@getFilters')->name('home.filters');
             Route::get('pak_queue', 'PakController@index');
-            Route::get('{type_ankets?}', 'HomeController@index')->name('home');
+            Route::middleware(StripEmptyParamsFromQueryString::class)->get('{type_ankets?}', 'HomeController@index')->name('home');
         });
 
         Route::prefix('pak')->as('pak.')->group(function () {
             Route::get('/', 'PakController@index')->name('index');
             Route::get('list', 'PakController@list')->name('list');
+            Route::get('clear', 'PakController@clear')->name('clear');
         });
 
         Route::prefix('docs')->as('docs.')->group(function () {
@@ -116,10 +118,10 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/export/{type}', 'Elements\ExportElementController')->name('exportElement');
             Route::post('/import', 'Elements\ImportElementController')->name('importElement');
             Route::post('/search', 'Elements\SearchElementsController')->name('searchElement');
-            Route::get('{type}', 'IndexController@RenderElements')->name('renderElements');
+            Route::middleware(StripEmptyParamsFromQueryString::class)->get('{type}', 'IndexController@RenderElements')->name('renderElements');
             Route::get('{type}/{id}', 'IndexController@RemoveElement')->name('removeElement');
             Route::post('{type}', 'IndexController@AddElement')->name('addElement');
-            Route::post('{type}/{id}', 'IndexController@updateElement')->name('updateElement');
+            Route::post('{type}/{id}', 'IndexController@UpdateElement')->name('updateElement');
             Route::get('{type}/sync/{id}', 'IndexController@syncElement')->name('syncElement');
             Route::get('delete-file/{model}/{id}/{field}', 'IndexController@DeleteFileElement')->name('deleteFileElement');
         });
@@ -131,6 +133,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('forms')->as('forms.')->group(function () {
             Route::get('/', 'AnketsController@index')->name('index');
             Route::post('/', 'AnketsController@AddForm')->name('store');
+            Route::post('/change-multiple-result-dop', 'AnketsController@ChangeMultipleResultDop')->name('changeMultipleResultDop');
             Route::get('{id}/print', 'AnketsController@Print')->name('print');
             Route::delete('{id}', 'AnketsController@Delete')->name('delete');
             Route::post('{id}', 'AnketsController@Update')->name('update');
@@ -140,16 +143,32 @@ Route::middleware(['auth'])->group(function () {
         });
 
         Route::prefix('report')->as('report.')->group(function () {
-            Route::get('getContractsForCompany_v2', [ReportContractRefactoringController::class, 'getContractsForCompany']);
-            Route::get('journal', 'ReportController@ShowJournal')->name('journal');
-            Route::get('journal_new',[ReportContractRefactoringController::class, 'index'])->name('company_service');
-            Route::get('{type_report}', 'ReportController@GetReport')->name('get');
+            Route::get('journal', 'ReportController@index')->name('journal');
+            Route::get('{type_report}', 'ReportController@getReport')->name('get');
             Route::get('/dynamic/{journal}', 'ReportController@getDynamic')->name('dynamic');
         });
 
         Route::post('save-fields-home/{type_ankets}', 'HomeController@SaveCheckedFieldsFilter')->name('home.save-fields');
         Route::get('anketa-trash/{id}/{action}', 'AnketsController@Trash')->name('forms.trash');
         Route::get('anketa-mass-trash', 'AnketsController@MassTrash')->name('forms.mass-trash');
+
+        Route::post('ankets-export-pdf-labeling', 'AnketsController@exportPdfLabeling')->name('ankets.export-pdf-labeling');
+
+        Route::prefix('trip-tickets')->as('trip-tickets.')->group(function () {
+            Route::get('/', 'TripTickets\TripTicketIndexPageController')->name('index');
+            Route::post('generate', 'TripTickets\TripTicketGenerateFromFormsController')->name('generate');
+            Route::get('create', 'TripTickets\TripTicketCreatePage')->name('create');
+            Route::post('store', 'TripTickets\StoreTripTicketController')->name('store');
+            Route::get('{id}/edit', 'TripTickets\TripTicketEditPageController')->name('edit');
+            Route::post('{id}/update', 'TripTickets\UpdateTripTicketController')->name('update');
+            Route::get('trash', 'TripTickets\TripTicketTrashController')->name('trash');
+            Route::get('mass-trash', 'TripTickets\TripTicketMassTrashController')->name('mass-trash');
+            Route::get('{id}/{type}', 'TripTickets\TripTicketCreateFormPageController')->name('create-form');
+            Route::post('{id}/store-form', 'TripTickets\TripTicketStoreFormController')->name('store-form');
+            Route::post('print', 'TripTickets\PrintTripTicketController')->name('print');
+            Route::post('mass-print', 'TripTickets\MassPrintTripTicketsController')->name('mass-print');
+            Route::get('table-export', 'TripTickets\TripTicketTableExportController')->name('table-export');
+        });
     });
 
     /**
@@ -168,12 +187,22 @@ Route::middleware(['auth'])->group(function () {
             Route::post('list-model-map', 'LogController@listByModelMaps')->name('list-model-map');
         });
 
+        Route::prefix('form-logs')->as('form-logs.')->group(function () {
+            Route::get('/', 'FormLogController@index')->name('index');
+            Route::post('list', 'FormLogController@list')->name('list');
+            Route::post('list-model', 'FormLogController@listByModel')->name('list-model');
+            Route::post('list-model-map', 'FormLogController@listByModelMaps')->name('list-model-map');
+        });
+
         Route::prefix('sdpo-crash-logs')->as('sdpo_crash_logs.')->group(function () {
             Route::get('/', 'SdpoCrashLogController@index')->name('index');
             Route::post('list', 'SdpoCrashLogController@list')->name('list');
         });
     });
 });
+
+Route::get('/anketa-verification/{uuid}', 'AnketsController@verificationPage')->name('anketa.verification.page');
+Route::get('/anketa-verification/{uuid}/history', 'AnketsController@verificationHistory')->name('anketa.verification.history');
 
 Auth::routes();
 

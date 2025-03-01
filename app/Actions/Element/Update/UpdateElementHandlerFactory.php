@@ -22,8 +22,6 @@ class UpdateElementHandlerFactory
                 return new UpdateInstrHandler($type);
             case 'Product':
                 return new UpdateProductHandler($type);
-            case 'Service':
-                return new UpdateServiceHandler($type);
             default:
                 return new UpdateElementHandler($type);
         }

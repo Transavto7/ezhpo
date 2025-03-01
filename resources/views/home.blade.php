@@ -71,7 +71,8 @@
         };
 
         @if (user()->fields_visible)
-        let fieldsVisible = {!! user()->fields_visible !!};;
+        let fieldsVisible = {!! user()->fields_visible !!};
+        ;
         @else
         let fieldsVisible = @json(config('fields.visible'));
         @endif
@@ -101,7 +102,7 @@
                     const anketsTable = $(`.ankets-table thead th[data-field-key="${id}"], .ankets-table tbody tr td[data-field-key="${id}"]`)
                     const displayProp = !prop_checked ? 'none' : 'table-cell'
 
-                    anketsTable.attr('hidden', !prop_checked).css({'display': displayProp })
+                    anketsTable.attr('hidden', !prop_checked).css({'display': displayProp})
 
                     return
                 }
@@ -145,7 +146,7 @@
         });
 
         function saveFieldsVisible(params) {
-            return axios.post('/api/fields/visible', { params }, {
+            return axios.post('/api/fields/visible', {params}, {
                 headers: {
                     Authorization: 'Bearer ' + API_TOKEN
                 },
@@ -156,7 +157,8 @@
     <script type="text/javascript">
         const SELECTED_ANKETS_ITEM = 'selectedAnkets'
         const anketsApi = {
-            massTrash: '{{ route('forms.mass-trash') }}'
+            massTrash: '{{ route('forms.mass-trash') }}',
+            massApprove: '{{ route('forms.changeMultipleResultDop') }}',
         }
         const data = {
             items: [],
@@ -210,14 +212,17 @@
         function updateAnketsControl() {
             const control = $('#selected-ankets-control')
             const controlBtnDelete = $('#selected-ankets-control-btn-delete')
+            const approveBtn = $('#approve-selected')
 
             const anketsStorage = getAnketsStorage()
 
             if (anketsStorage.total) {
                 const records = pronunciationWithNumber(anketsStorage.total, 'анкету', 'анкеты', 'анкет')
                 const label = "Удалить " + anketsStorage.total + " " + records
+                const approveLabel = "<i class=\"fa fa-check\"></i> Утвердить " + anketsStorage.total + " " + records
 
                 controlBtnDelete.html(label)
+                approveBtn.html(approveLabel)
                 control.addClass('d-flex')
                 control.removeClass('d-none')
             } else {
@@ -264,8 +269,7 @@
 
                 if (checked) {
                     pushAnketaToStorage(id)
-                }
-                else {
+                } else {
                     removeAnketaFromStorage(id)
                 }
 
@@ -284,7 +288,7 @@
                 axios
                     .get(anketsApi.massTrash, {
                         params: {
-                            action: '{{ isset($_GET['trash']) ? 0 : 1 }}',
+                            action: '{{ request()->get('trash') ? 0 : 1 }}',
                             ids: anketsStorage.items
                         }
                     })
@@ -292,7 +296,37 @@
                         clearAnketsStorage()
                         window.location.reload()
                     })
-                    .catch(() => {})
+                    .catch(() => {
+                    })
+            })
+
+            $('#approve-selected').click(function (e) {
+                const anketsStorage = getAnketsStorage()
+
+                axios
+                    .create({
+                        headers: {
+                            Authorization: 'Bearer ' + API_TOKEN
+                        }
+                    })
+                    .post(anketsApi.massApprove, {
+                        ids: anketsStorage.items,
+                    })
+                    .then((response) => {
+                        clearAnketsStorage()
+                        window.location.reload()
+                    })
+                    .catch(error => {
+                        console.log(error.response.data)
+                    })
+            })
+
+            $('#select-all').click(function () {
+                $('.ankets-table input[type="checkbox"]').each(function () {
+                    if (!$(this).prop('checked')) {
+                        $(this).click();
+                    }
+                });
             })
 
             $('.hv-btn-trash').click(function (e) {
@@ -301,6 +335,44 @@
 
                 removeAnketaFromStorage(id)
                 updateAnketsControl()
+            })
+
+            $('#ankets-labeling-print-btn').click(function () {
+                const anketsStorage = getAnketsStorage()
+
+                axios({
+                    method: 'post',
+                    url: '{{ route('ankets.export-pdf-labeling') }}',
+                    data: {
+                        anket_ids: anketsStorage.items,
+                    },
+                    responseType: 'blob',
+                })
+                    .then((response) => {
+                        const url = window.URL.createObjectURL(new Blob([response.data]))
+                        const link = document.createElement('a')
+
+                        link.href = url
+                        link.setAttribute('download', 'Маркировка осмотров.pdf')
+
+                        document.body.appendChild(link)
+
+                        link.click()
+                        link.remove()
+                    })
+                    .catch((error) => {
+                        const status = error.response.status;
+                        let message = 'При формировании файла произошла ошибка';
+
+                        if (status === 422) {
+                            message = 'Превышено максимально допустимое количество осмотров для печати'
+                        }
+
+                        swal.fire({
+                            title: message,
+                            icon: 'error'
+                        });
+                    })
             })
 
             $('#hv-alert-error-close').click(function () {
@@ -312,6 +384,8 @@
 @endsection
 
 @php
+    use App\Enums\FormTypeEnum;use App\Models\TripTicket;
+
     function checkChangeResult($anketa) {
         if (!$anketa->is_dop) {
             return false;
@@ -325,13 +399,13 @@
             return false;
         }
 
-        if ($anketa->type_anketa === 'medic') {
+        if ($anketa->type_anketa === FormTypeEnum::MEDIC) {
             if (!$anketa->driver_id || !$anketa->driver_fio) {
                 return false;
             }
         }
 
-        if ($anketa->type_anketa === 'tech') {
+        if ($anketa->type_anketa === FormTypeEnum::TECH) {
             if (!$anketa->car_id || !$anketa->car_gos_number) {
                 return false;
             }
@@ -341,63 +415,83 @@
     }
 
     $permissionToView = (
-        user()->access('medic_read') && $type_ankets == 'medic'
-        || user()->access('tech_read') && $type_ankets == 'tech'
-        || user()->access('journal_briefing_bdd_read') && $type_ankets == 'bdd'
-        || user()->access('journal_pl_read') && $type_ankets == 'pechat_pl'
-        || user()->access('map_report_read') && $type_ankets == 'report_cart'
-        || user()->access('errors_sdpo_read') && $type_ankets == 'pak'
-        || user()->access('approval_queue_view') && $type_ankets == 'pak_queue'
+        user()->access('medic_read') && $type_ankets == FormTypeEnum::MEDIC
+        || user()->access('tech_read') && $type_ankets == FormTypeEnum::TECH
+        || user()->access('journal_briefing_bdd_read') && $type_ankets == FormTypeEnum::BDD
+        || user()->access('journal_pl_read') && $type_ankets == FormTypeEnum::PRINT_PL
+        || user()->access('map_report_read') && $type_ankets == FormTypeEnum::REPORT_CARD
+        || user()->access('errors_sdpo_read') && $type_ankets == FormTypeEnum::PAK
+        || user()->access('approval_queue_view') && $type_ankets == FormTypeEnum::PAK_QUEUE
+        || $type_ankets == TripTicket::SLUG
     );
 
     $permissionToTrashView = (
-        user()->access('medic_trash') && $type_ankets == 'medic'
-        || user()->access('tech_trash') && $type_ankets == 'tech'
-        || user()->access('journal_briefing_bdd_trash') && $type_ankets == 'bdd'
-        || user()->access('journal_pl_trash') && $type_ankets == 'pechat_pl'
-        || user()->access('map_report_trash') && $type_ankets == 'report_cart'
-        || user()->access('errors_sdpo_trash') && $type_ankets == 'pak'
+        user()->access('medic_trash') && $type_ankets == FormTypeEnum::MEDIC
+        || user()->access('tech_trash') && $type_ankets == FormTypeEnum::TECH
+        || user()->access('journal_briefing_bdd_trash') && $type_ankets == FormTypeEnum::BDD
+        || user()->access('journal_pl_trash') && $type_ankets == FormTypeEnum::PRINT_PL
+        || user()->access('map_report_trash') && $type_ankets == FormTypeEnum::REPORT_CARD
+        || user()->access('errors_sdpo_trash') && $type_ankets == FormTypeEnum::PAK
+        || $type_ankets == TripTicket::SLUG
+    );
+
+    $duplicateView = (
+        $type_ankets === FormTypeEnum::MEDIC && user()->hasRole('medic')
+        || $type_ankets === FormTypeEnum::TECH && user()->hasRole('tech')
+        || user()->hasRole('admin') && in_array($type_ankets, [FormTypeEnum::MEDIC, FormTypeEnum::TECH])
     );
 
     $permissionToDelete = (
-        $type_ankets == 'medic' && user()->access('medic_delete')
-        || $type_ankets == 'tech' && user()->access('tech_delete')
-        || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_delete')
-        || user()->access('journal_pl_delete') && $type_ankets == 'pechat_pl'
-        || user()->access('map_report_delete') && $type_ankets == 'report_cart'
-        || user()->access('errors_sdpo_delete') && $type_ankets == 'pak'
+        $type_ankets == FormTypeEnum::MEDIC && user()->access('medic_delete')
+        || $type_ankets == FormTypeEnum::TECH && user()->access('tech_delete')
+        || $type_ankets == FormTypeEnum::BDD && user()->access('journal_briefing_bdd_delete')
+        || user()->access('journal_pl_delete') && $type_ankets == FormTypeEnum::PRINT_PL
+        || user()->access('map_report_delete') && $type_ankets == FormTypeEnum::REPORT_CARD
+        || user()->access('errors_sdpo_delete') && $type_ankets == FormTypeEnum::PAK
+        || $type_ankets == TripTicket::SLUG
     );
 
     $permissionToUpdate = (
-        $type_ankets == 'medic' && user()->access('medic_update')
-        || $type_ankets == 'tech' && user()->access('tech_update')
-        || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_update')
-        || user()->access('journal_pl_update') && $type_ankets == 'pechat_pl'
-        || user()->access('map_report_update') && $type_ankets == 'report_cart'
-        || user()->access('errors_sdpo_update') && $type_ankets == 'pak'
+        $type_ankets == FormTypeEnum::MEDIC && user()->access('medic_update')
+        || $type_ankets == FormTypeEnum::TECH && user()->access('tech_update')
+        || $type_ankets == FormTypeEnum::BDD && user()->access('journal_briefing_bdd_update')
+        || user()->access('journal_pl_update') && $type_ankets == FormTypeEnum::PRINT_PL
+        || user()->access('map_report_update') && $type_ankets == FormTypeEnum::REPORT_CARD
+        || user()->access('errors_sdpo_update') && $type_ankets == FormTypeEnum::PAK
+        || $type_ankets == TripTicket::SLUG
+
     );
 
-    $permissionToExport = !user()->hasRole('client') && (
-        $type_ankets == 'tech' && user()->access('tech_export')
-        || $type_ankets == 'medic' && user()->access('medic_export')
-        || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_export')
-        || $type_ankets == 'pechat_pl' && user()->access('journal_pl_export')
-        || $type_ankets == 'report_cart' && user()->access('map_report_export')
+    $permissionToExport = (
+        $type_ankets == FormTypeEnum::TECH && user()->access('tech_export')
+        || $type_ankets == FormTypeEnum::MEDIC && user()->access('medic_export')
+        || $type_ankets == FormTypeEnum::BDD && user()->access('journal_briefing_bdd_export')
+        || $type_ankets == FormTypeEnum::PRINT_PL && user()->access('journal_pl_export')
+        || $type_ankets == FormTypeEnum::REPORT_CARD && user()->access('map_report_export')
+        || $type_ankets == TripTicket::SLUG
     );
 
-    $permissionToExportPrikaz = !user()->hasRole('client') && (
-        $type_ankets == 'tech' && user()->access('tech_export_prikaz')
-        || $type_ankets == 'medic' && user()->access('medic_export_prikaz')
-        || $type_ankets == 'bdd' && user()->access('journal_briefing_bdd_export_prikaz')
-        || $type_ankets == 'pechat_pl' && user()->access('journal_pl_export_prikaz')
-        || $type_ankets == 'report_cart' && user()->access('map_report_export_prikaz')
+    $permissionToExportPrikaz = (
+        $type_ankets == FormTypeEnum::TECH && user()->access('tech_export_prikaz')
+        || $type_ankets == FormTypeEnum::MEDIC && user()->access('medic_export_prikaz')
+        || $type_ankets == FormTypeEnum::BDD && user()->access('journal_briefing_bdd_export_prikaz')
+        || $type_ankets == FormTypeEnum::PRINT_PL && user()->access('journal_pl_export_prikaz')
+        || $type_ankets == FormTypeEnum::REPORT_CARD && user()->access('map_report_export_prikaz')
+        || $type_ankets == TripTicket::SLUG
+
     );
 
-    $permissionToExportPrikazPL = !user()->hasRole('client') && (
-        $type_ankets == 'tech' && user()->access('tech_export_prikaz_pl')
+    $permissionToExportPrikazPL = (
+        $type_ankets == FormTypeEnum::TECH && user()->access('tech_export_prikaz_pl')
+    );
+
+    $permissionToPrintAnketLabeling = (
+        user()->access('medic_read') && $type_ankets == 'medic'
+        || user()->access('tech_read') && $type_ankets == 'tech'
     );
 
     $notDeletedItems = session('not_deleted_ankets');
+    $approveErrors = session('mass_approve_errors');
 @endphp
 
 @section('content')
@@ -405,41 +499,62 @@
         <div class="card">
             <div class="card-body">
                 <div>
-                    @if($type_ankets !== 'pak_queue')
+                    @if($type_ankets !== FormTypeEnum::PAK_QUEUE)
                         <div class="col-md-12">
                             <div class="row bg-light p-2">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     @if (!user()->hasRole('client'))
-                                        <button type="button" data-toggle-show="#ankets-filters" class="btn btn-sm btn-info"><i class="fa fa-cog"></i> <span class="toggle-title">Настроить</span> колонки</button>
+                                        <button type="button" data-toggle-show="#ankets-filters"
+                                                class="btn btn-sm btn-info"><i class="fa fa-cog"></i> <span
+                                                class="toggle-title">Настроить</span> колонки
+                                        </button>
                                     @endif
 
                                     @if($permissionToTrashView)
-                                        @isset($_GET['trash'])
+                                        @if(request()->get('trash', 0))
                                             <a href="{{ route('home', $type_ankets) }}" class="btn btn-sm btn-warning">Назад</a>
                                         @else
-                                            <a href="?trash=1" class="btn btn-sm btn-warning">Корзина <i class="fa fa-trash"></i></a>
+                                            <a href="?trash=1" class="btn btn-sm btn-warning">Корзина <i
+                                                    class="fa fa-trash"></i></a>
                                         @endisset
                                     @endif
+                                    @if($duplicateView)
+                                        @if(request()->filled('duplicates'))
+                                            <a href="{{ route('home', $type_ankets) }}"
+                                               class="btn btn-sm btn-secondary">Назад</a>
+                                        @else
+                                            <a href="?duplicates=true" class="btn btn-sm btn-secondary">Показать
+                                                дубликаты <i class="fa fa-clone"></i></a>
+                                        @endif
+                                    @endif
                                 </div>
-                                @if($type_ankets === 'tech')
-                                    <div class="col-md-8 text-right">
+                                @if($type_ankets === FormTypeEnum::TECH)
+                                    <div class="col-md-6 text-right">
                                         @if($permissionToExport)
-                                            <a href="?export=1&{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
+                                            <a href="?export=1&{{ $queryString }}" class="btn btn-sm btn-default">Экспорт
+                                                таблицы <i class="fa fa-download"></i></a>
                                         @endif
                                         @if($permissionToExportPrikaz)
-                                            <a href="?export=1&{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ТО <i class="fa fa-download"></i></a>
+                                            <a href="?export=1&{{ $queryString }}&exportPrikaz=1"
+                                               class="btn btn-sm btn-default">Экспорт таблицы по приказу ТО <i
+                                                    class="fa fa-download"></i></a>
                                         @endif
                                         @if($permissionToExportPrikazPL)
-                                            <a href="?export=1&{{ $queryString }}&exportPrikazPL=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу ПЛ <i class="fa fa-download"></i></a>
+                                            <a href="?export=1&{{ $queryString }}&exportPrikazPL=1"
+                                               class="btn btn-sm btn-default">Экспорт таблицы по приказу ПЛ <i
+                                                    class="fa fa-download"></i></a>
                                         @endif
                                     </div>
                                 @else
-                                    <div class="col-md-8 text-right">
+                                    <div class="col-md-6 text-right">
                                         @if($permissionToExport)
-                                            <a href="?export=1&{{ $queryString }}" class="btn btn-sm btn-default">Экспорт таблицы <i class="fa fa-download"></i></a>
+                                            <a href="?export=1&{{ $queryString }}" class="btn btn-sm btn-default">Экспорт
+                                                таблицы <i class="fa fa-download"></i></a>
                                         @endif
                                         @if($permissionToExportPrikaz)
-                                            <a href="?export=1&{{ $queryString }}&exportPrikaz=1" class="btn btn-sm btn-default">Экспорт таблицы по приказу <i class="fa fa-download"></i></a>
+                                            <a href="?export=1&{{ $queryString }}&exportPrikaz=1"
+                                               class="btn btn-sm btn-default">Экспорт таблицы по приказу <i
+                                                    class="fa fa-download"></i></a>
                                         @endif
                                     </div>
                                 @endif
@@ -451,12 +566,14 @@
                                                 <label>
                                                     <input
                                                         checked
-                                                        type="checkbox" name="{{ $field->field }}" data-value="{{ $key+1 }}" />
+                                                        type="checkbox" name="{{ $field->field }}"
+                                                        data-value="{{ $key+1 }}"/>
                                                     {{ $field->name }} &nbsp;
                                                 </label>
                                             @endforeach
                                         </form>
-                                        <button class="btn btn-success btn-sm mt-3" id="saveFieldsBtn">Сохранить</button>
+                                        <button class="btn btn-success btn-sm mt-3" id="saveFieldsBtn">Сохранить
+                                        </button>
                                         <button class="btn btn-danger btn-sm mt-3" id="resetFieldsBtn">Сбросить</button>
                                         <div class="toast mt-2 toast-save-checks position-absolute">
                                             <div class="toast-body bg-success text-white">
@@ -505,33 +622,70 @@
                                 </li>
                             </ul>
 
-                            <form onsubmit="document.querySelector('#page-preloader').classList.remove('hide')" action="" method="GET" class="tab-content ankets-form-filter mb-3 pt-3" id="filter-groupsContent">
+                            <form onsubmit="document.querySelector('#page-preloader').classList.remove('hide')"
+                                  action="" method="GET" class="tab-content ankets-form-filter mb-3 pt-3"
+                                  id="filter-groupsContent">
                                 <div class="text-center">
-                                    <img src="{{ asset('images/loader.gif') }}" width="30" class="mb-4" />
+                                    <img src="{{ asset('images/loader.gif') }}" width="30" class="mb-4"/>
                                 </div>
                             </form>
                         @endif
                     @elseif(user()->access('approval_queue_clear'))
-                        <a href="?clear=1&type_anketa={{ $type_ankets }}" class="btn btn-warning mb-2">Очистить очередь</a>
+                        <a href="?clear=1&type_anketa={{ $type_ankets }}" class="btn btn-warning mb-2">Очистить
+                            очередь</a>
                     @endif
 
                     @if(session()->has('error'))
                         <div class="alert alert-danger" role="alert">{{ session()->get('error') }}</div>
                     @endif
 
-                    @if(count($ankets) > 0 && $permissionToView && $permissionToDelete)
+                    @if(count($ankets) > 0 && $permissionToView)
                         <div id="selected-ankets-control" class="d-none align-items-center mt-4 mb-2">
-                            <button id="selected-ankets-control-btn-delete" class="btn btn-danger btn-sm"></button>
-                            <button id="selected-ankets-control-btn-unset" class="btn btn-success btn-sm ml-2">Снять выделение</button>
+                            @if($permissionToDelete)
+                                <button id="selected-ankets-control-btn-delete"
+                                        class="btn btn-danger btn-sm mr-2"></button>
+                            @endif
+                            <button id="approve-selected" class="btn btn-success btn-sm"></button>
+                            <button id="select-all" class="btn btn-success btn-sm ml-2">Выделить все на странице
+                            </button>
+                            <button id="selected-ankets-control-btn-unset" class="btn btn-success btn-sm ml-2">Снять
+                                выделение
+                            </button>
+
+                            @if($permissionToPrintAnketLabeling)
+                                <button id="ankets-labeling-print-btn" class="btn btn-success btn-sm ml-2">Печать
+                                    маркировки
+                                </button>
+                            @endif
                         </div>
                     @endif
 
                     @if($notDeletedItems)
-                        <div id="hv-alert-error" class="alert alert-danger hv-mass-deletion-alert-error d-flex justify-content-between align-items-center">
+                        <div id="hv-alert-error"
+                             class="alert alert-danger hv-mass-deletion-alert-error d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center" style="gap: 10px;">
                                 <div>Не удалось удалить анкеты с ID:</div>
                                 <div class="d-flex align-items-center flex-wrap" style="gap: 5px;">
                                     @foreach($notDeletedItems as $item)
+                                        <code>{{ $item }}</code>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div>
+                                <div id="hv-alert-error-close">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($approveErrors)
+                        <div id="hv-alert-error"
+                             class="alert alert-danger hv-mass-deletion-alert-error d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center" style="gap: 10px;">
+                                <div>Во время утверждения возникли ошибки:</div>
+                                <div class="d-flex align-items-center flex-wrap" style="gap: 5px;">
+                                    @foreach($approveErrors as $item)
                                         <code>{{ $item }}</code>
                                     @endforeach
                                 </div>
@@ -561,9 +715,7 @@
                         class="ankets-table table table-striped table-sm">
                         <thead>
                         <tr>
-                            @if($permissionToDelete)
-                                <th>#</th>
-                            @endif
+                            <th>#</th>
 
                             @if($type_ankets === 'pak_queue')
                                 <th class="not-export">Таймер</th>
@@ -597,7 +749,7 @@
                             @endif
 
                             <th class="not-export">
-                                @if($permissionToUpdate && ($type_ankets === 'medic'))
+                                @if($permissionToUpdate && ($type_ankets === FormTypeEnum::MEDIC))
                                     <a class="not-export"
                                        href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey=result_dop&{{ $queryString }}">
                                         <i class="fa fa-sort"></i>
@@ -610,16 +762,14 @@
                         <tbody>
                         @foreach($ankets as $anketaKey => $anketa)
                             <tr data-field="{{ $anketaKey }}">
-                                @if($permissionToDelete)
-                                    <td>
-                                        <input
-                                            type="checkbox"
-                                            data-id="{{ $anketa->id }}"
-                                            class="hv-checkbox-mass-deletion">
-                                    </td>
-                                @endif
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        data-id="{{ $anketa->id }}"
+                                        class="hv-checkbox-mass-deletion">
+                                </td>
 
-                                @if($type_ankets === 'pak_queue')
+                                @if($type_ankets === FormTypeEnum::PAK_QUEUE)
                                     <td class="not-export">
                                         <div
                                             class="App-Timer"
@@ -634,7 +784,7 @@
                                             class="not-export"
                                         @endisset>
                                         @if(($field->field === 'date' || strpos($field->field, '_at') > 0) && $anketa[$field->field])
-                                            @if ($field->field === 'date' && $type_ankets === 'bdd')
+                                            @if ($field->field === 'date' && $type_ankets === FormTypeEnum::BDD)
                                                 {{ date('d-m-Y', strtotime($anketa[$field->field])) }}
                                             @else
                                                 {{ date('d-m-Y H:i:s', strtotime($anketa[$field->field])) }}
@@ -667,7 +817,8 @@
                                                         ({{ count($videos) }})
                                                     </a>
                                                 @else
-                                                    <a data-type="iframe" href="{{ $vV }}" data-fancybox="video_{{ $anketa->id }}"></a>
+                                                    <a data-type="iframe" href="{{ $vV }}"
+                                                       data-fancybox="video_{{ $anketa->id }}"></a>
                                                 @endif
                                             @endforeach
                                         @elseif($field->field === 'company_name' && user()->access('company_read'))
@@ -715,7 +866,7 @@
 
                                             {{ $anketa[$field->field] }}
 
-                                            @if($type_ankets === 'medic' && $field->field === 'admitted' && $anketa[$field->field] === 'Не допущен' && user()->access('medic_closing_view'))
+                                            @if($type_ankets === FormTypeEnum::MEDIC && $field->field === 'admitted' && $anketa[$field->field] === 'Не допущен' && user()->access('medic_closing_view'))
                                                 @if(user()->access('medic_closing_edit'))
                                                     <div class="row d-flex"
                                                          style="gap: 3px">
@@ -750,42 +901,45 @@
 
                                 @if($permissionToDelete && request()->get('trash'))
                                     <td class="td-option">
-                                        {{ ($anketa->deleted_user->name) }}
+                                        {{ ($anketa->deleted_user_name) }}
                                     </td>
                                     <td class="td-option">
                                         {{ ($anketa->deleted_at) }}
                                     </td>
                                 @endif
 
-                                <td class="td-option not-export d-flex">
-                                    @if($type_ankets === 'pak_queue')
-                                        <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-sm btn-info mr-1"><i class="fa fa-search mr-1"></i></a>
-                                        <a href="{{ route('forms.changePakQueue', ['admitted' => 'Допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-success mr-1"><i class="fa fa-check"></i></a>
-                                        <a href="{{ route('forms.changePakQueue', ['admitted' => 'Не идентифицирован', 'id' => $anketa->id]) }}" class="btn btn-sm btn-secondary mr-1"><i class="fa fa-question"></i></a>
-                                        <a href="{{ route('forms.changePakQueue', ['admitted' => 'Не допущен', 'id' => $anketa->id]) }}" class="btn btn-sm btn-danger mr-1"><i class="fa fa-close"></i></a>
+                                <td class="td-option not-export d-flex justify-content-end">
+                                    @if($type_ankets === FormTypeEnum::PAK_QUEUE)
+                                        <a href="{{ route('forms.get', $anketa->id) }}"
+                                           class="btn btn-sm btn-info mr-1"><i class="fa fa-search mr-1"></i></a>
+                                        <a href="{{ route('forms.changePakQueue', ['admitted' => 'Допущен', 'id' => $anketa->id]) }}"
+                                           class="btn btn-sm btn-success mr-1"><i class="fa fa-check"></i></a>
+                                        <a href="{{ route('forms.changePakQueue', ['admitted' => 'Не идентифицирован', 'id' => $anketa->id]) }}"
+                                           class="btn btn-sm btn-secondary mr-1"><i class="fa fa-question"></i></a>
+                                        <a href="{{ route('forms.changePakQueue', ['admitted' => 'Не допущен', 'id' => $anketa->id]) }}"
+                                           class="btn btn-sm btn-danger mr-1"><i class="fa fa-close"></i></a>
+                                    @endif
+
+                                    @if($anketa->is_dop && ! checkChangeResult($anketa))
+                                        <button class="btn btn-sm btn-outline-success mr-1"
+                                                title="{{ $anketa->result_dop }}"
+                                                style="cursor: default" disabled>
+                                            <i class="fa fa-check"></i>
+                                        </button>
                                     @endif
 
                                     @if($permissionToUpdate)
-                                        <a href="{{ route('forms.get', $anketa->id) }}" class="btn btn-info btn-sm mr-1"><i class="fa fa-edit"></i></a>
-                                        @if($anketa->is_dop && !$anketa->result_dop)
-                                            @if (checkChangeResult($anketa))
-                                                <a
-                                                    href="{{ route('forms.changeResultDop', ['result_dop' => 'Утвержден', 'id' => $anketa->id]) }}"
-                                                    class="btn btn-sm btn-success mr-1">
-                                                    <i class="fa fa-check"></i>
-                                                </a>
-                                            @else
-                                                <button
-                                                    disabled
-                                                    class="btn btn-sm btn-success mr-1">
-                                                    <i class="fa fa-check"></i>
-                                                </button>
-                                            @endif
+                                        @if($anketa->is_dop && !$anketa->result_dop && checkChangeResult($anketa))
+                                            <a href="{{ route('forms.changeResultDop', ['result_dop' => 'Утвержден', 'id' => $anketa->id]) }}"
+                                               class="btn btn-sm btn-success mr-1">
+                                                <i class="fa fa-check"></i>
+                                            </a>
                                         @endif
-                                        {{ $anketa->result_dop }}
+                                        <a href="{{ route('forms.get', $anketa->id) }}"
+                                           class="btn btn-info btn-sm mr-1"><i class="fa fa-edit"></i></a>
                                     @endif
 
-                                    @if($type_ankets === 'medic' && mb_strtolower($anketa->admitted ?? '') === 'допущен')
+                                    @if($type_ankets === FormTypeEnum::MEDIC && mb_strtolower($anketa->admitted ?? '') === 'допущен')
                                         <a
                                             href="{{ route('forms.print', ['id' => $anketa->id]) }}"
                                             target="_blank"
@@ -794,17 +948,8 @@
                                         </a>
                                     @endif
 
-                                    @if($type_ankets !== 'pak_queue' && $permissionToDelete)
-                                        <a
-                                            href="{{ route('forms.trash', ['id' => $anketa->id, 'action' => isset($_GET['trash']) ? 0 : 1]) }}"
-                                            class="btn btn-warning btn-sm hv-btn-trash mr-1"
-                                            data-id="{{ $anketa->id }}">
-                                            @isset($_GET['trash'])
-                                                <i class="fa fa-undo"></i>
-                                            @else
-                                                <i class="fa fa-trash"></i>
-                                            @endisset
-                                        </a>
+                                    @if(($type_ankets !== FormTypeEnum::PAK_QUEUE) && $permissionToDelete)
+                                        @include('pages.home.components.buttons.delete-form-btn', compact('anketa'))
                                     @endif
                                 </td>
                             </tr>

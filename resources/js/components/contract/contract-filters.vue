@@ -240,11 +240,11 @@ export default {
         }
     },
     mounted() {
-        axios.get(`/v-search/companies`).then(({data}) => this.companies = data)
+        axios.get(`/contract/select/companies`).then(({data}) => this.companies = data)
             .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
-        axios.get(`/v-search/our_companies`).then(({data}) => this.our_companies = data)
+        axios.get(`/contract/select/our_companies`).then(({data}) => this.our_companies = data)
             .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
-        axios.get(`/v-search/services`)
+        axios.get(`/contract/select/products`)
             .then(({data}) => this.services = data)
             .catch(() => Swal2.fire('Ошибка!', '', 'warning'));
     },
@@ -278,7 +278,7 @@ export default {
         searchCompanies(value, loading) {
             loading(true);
             axios
-                .get(`/v-search/companies`, {
+                .get(`/contract/select/companies`, {
                     params: {
                         query: value,
                     },
@@ -305,7 +305,7 @@ export default {
         searchOurCompanies(value, loading) {
             loading(true);
 
-            axios.get(`/v-search/our_companies`, {
+            axios.get(`/contract/select/our_companies`, {
                 params: {
                     query: value,
                 },
@@ -332,7 +332,7 @@ export default {
         searchServices(value, loading) {
             loading(true);
 
-            axios.get(`/v-search/services`, {
+            axios.get(`/contract/select/products`, {
                 params: {
                     query: value,
                 },

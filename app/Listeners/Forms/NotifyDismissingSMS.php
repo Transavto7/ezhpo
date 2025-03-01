@@ -4,6 +4,7 @@ namespace App\Listeners\Forms;
 
 use App\Company;
 use App\Driver;
+use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\Services\Notifier\SMSNotifierService;
 use App\Settings;
@@ -49,7 +50,23 @@ class NotifyDismissingSMS
         }
 
         $phoneToCall = Settings::setting('sms_text_phone');
-        $message = Settings::setting('sms_text_driver') . " $driver->fio . $phoneToCall";
+        if ($form->type_anketa === FormTypeEnum::MEDIC) {
+            $message = Settings::setting('sms_text_driver') . " $driver->fio. $phoneToCall";
+        } else if ($form->type_anketa === FormTypeEnum::TECH) {
+            $details = $form->details;
+            if ($details === null) {
+                return;
+            }
+
+            $car = $details->car;
+            if ($car === null) {
+                return;
+            }
+
+            $message = Settings::setting('sms_text_car') . " $car->gos_number. $phoneToCall";
+        } else {
+            return;
+        }
 
         (new SMSNotifierService())->notify($whereCall, $message);
     }

@@ -191,7 +191,7 @@ class UpdateElementHandler implements UpdateElementHandlerInterface
     protected function syncCompanyFields()
     {
         $companyId = $this->element->company_id ?? 0;
-        $company = Company::find($companyId);
+        $company = Company::withTrashed()->find($companyId);
         if (!$company) {
             throw new Exception('Компания не найдена');
         }

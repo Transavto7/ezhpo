@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\FieldPrompt;
-use App\Req;
 use App\Stamp;
 use Illuminate\Http\Request;
 
@@ -23,7 +22,8 @@ class StampController extends Controller
     /*
      * Axios get all rows in table
      */
-    public function getAll(Request $request) {
+    public function getAll(Request $request)
+    {
         $stamps = Stamp::query();
 
         if ($request->trash) {
@@ -51,35 +51,11 @@ class StampController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
         Stamp::create($request->only('name', 'company_name', 'licence'));
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Stamp $stamp)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Stamp $stamp)
-    {
-        //
     }
 
     /**
@@ -96,6 +72,17 @@ class StampController extends Controller
     }
 
     /**
+     * List stamp by find string
+     */
+    public function find(Request $request)
+    {
+        $query = $request->search ?? '';
+
+        return Stamp::query()->where('name', 'like', '%' . $query . '%')
+            ->limit(100)->get();
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(int $id)
@@ -106,15 +93,5 @@ class StampController extends Controller
         } else {
             $stamp->delete();
         }
-    }
-
-    /**
-     * List stamp by find string
-     */
-    public function find(Request $request) {
-        $query = $request->search ?? '';
-
-        return Stamp::query()->where('name', 'like', '%' . $query . '%')
-            ->limit(100)->get();
     }
 }

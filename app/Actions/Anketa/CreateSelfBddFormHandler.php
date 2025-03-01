@@ -18,7 +18,6 @@ class CreateSelfBddFormHandler extends CreateBddFormHandler
             ->random();
 
         $this->data['user_id'] = $bddUser->id;
-        $this->data['user_name'] = $bddUser->name;
         $this->data['user_eds'] = $bddUser->eds;
         $this->data['user_validity_eds_start'] = $bddUser->validity_eds_start;
         $this->data['user_validity_eds_end'] = $bddUser->validity_eds_end;

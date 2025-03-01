@@ -2,18 +2,24 @@
 
 namespace App\Actions\Anketa;
 
-use App\Anketa;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
+use App\Enums\FlagPakEnum;
 use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
+use App\Models\Forms\Form;
+use App\Models\Forms\MedicForm;
+use App\Services\DuplicatesCheckerService;
+use App\Services\FormHash\FormHashGenerator;
+use App\Services\FormHash\MedicHashData;
 use App\ValueObjects\PressureLimits;
 use App\ValueObjects\Pulse;
 use App\ValueObjects\PulseLimits;
 use App\ValueObjects\Temperature;
 use App\ValueObjects\Tonometer;
-use Illuminate\Database\Eloquent\Builder;
+use DateTimeImmutable;
+use Exception;
 use Illuminate\Support\Carbon;
 
 class CreateMedicFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -24,107 +30,96 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
     {
         $driver = $this->data['driver_id'] ?? 0;
 
-        $this->existForms = Anketa::query()
-            ->select([
-                'id',
-                'date'
-            ])
-            ->where('driver_id', $driver)
-            ->where('type_anketa', 'medic')
-            ->where('in_cart', 0)
-            ->whereNotNull('date')
-            ->where(function (Builder $query) {
-                $query
-                    ->where('is_dop', '<>', 1)
-                    ->orWhereNotNull('result_dop');
-            })
-            ->orderBy('date', 'desc')
-            ->get();
+        $this->existForms = DuplicatesCheckerService::getExistMedicForms($driver);
     }
 
-    protected function validateData()
-    {
-        if ($this->data['is_dop'] ?? 0 === 1) return;
-
-        $driverId = $this->data['driver_id'] ?? null;
-        if (!$driverId) {
-            $this->errors[] = 'Не указан водитель.';
-            return;
-        }
-
-        $driverExist =  Driver::where('hash_id', $driverId)->first();
-        if (!$driverExist) {
-            $this->errors[] = 'Не найден водитель.';
-            return;
-        }
-
-        if ($driverExist->end_of_ban && $this->time < $driverExist->end_of_ban) {
-            $this->errors[] = 'Водитель отстранен до '.Carbon::parse($driverExist->end_of_ban);
-        }
-    }
-
+    /**
+     * @throws Exception
+     */
     protected function createForm(array $form)
     {
-        $driverId = $this->data['driver_id'] ?? 0;
-        $driver = Driver::where('hash_id', $driverId)->first();
-
         $defaultData = [
-            'tonometer' => strval(Tonometer::random($driver)),
+            'tonometer' => strval(Tonometer::random(Driver::where('hash_id', $this->data['driver_id'] ?? 0)->first())),
             't_people' => Temperature::random()->getTemperature(),
             'pulse' => Pulse::random()->getPulse(),
             'date' => date('Y-m-d H:i:s'),
             'test_narko' => 'Отрицательно',
             'proba_alko' => 'Отрицательно',
+            'alcometer_result' => '0',
             'med_view' => 'В норме',
             'admitted' => 'Допущен',
             'realy' => 'нет',
-            'created_at' => $this->time
+            'created_at' => $this->time,
+            'flag_pak' => FlagPakEnum::INTERNAL,
         ];
 
         $form = $this->mergeFormData($form, $defaultData);
-        $form['is_dop'] = $form['is_dop'] ?? 0;
+        $formIsDop = $form['is_dop'] ?? 0;
+        $form['is_dop'] = $formIsDop;
 
-        $company = null;
-        /**
-         * Компания
-         */
-        if (isset($form['company_id'])) {
-            $companyDop = Company::where('hash_id', $form['company_id'])->first();
-
-            if ($companyDop) {
-                $form['company_id'] = $companyDop->hash_id;
-                $form['company_name'] = $companyDop->name;
-            }
-        }
-
-        /**
-         * Водитель
-         */
-        if (isset($form['driver_id'])) {
-            $driverDop = Driver::where('hash_id', $form['driver_id'])->first();
-
-            if ($driverDop) {
-                $form['driver_id'] = $driverDop->hash_id;
-                $form['driver_fio'] = $driverDop->fio;
-
-                $driver = $driverDop;
-            }
-        }
-
-        if (!$driver && isset($form['driver_id'])) {
-            $errMsg = 'Водитель не найден';
-
-            $this->errors[] = $errMsg;
-
-            $this->saveSdpoFormWithError($form, $errMsg);
-
+        $companyId = $form['company_id'] ?? null;
+        if ($formIsDop && empty($companyId)) {
+            $this->errors[] = 'Не указана компания.';
             return;
         }
 
-        /**
-         * Проверка водителя по: тесту наркотиков, возрасту
-         */
-        if ($driver) {
+        if (!empty($companyId)) {
+            $company = Company::where('hash_id', $companyId)->first();
+            if (!$company) {
+                $this->errors[] = 'Компания не найдена.';
+                return;
+            }
+
+            if ($company->dismissed === 'Да') {
+                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+                return;
+            }
+        }
+
+        $driverId = $form['driver_id'] ?? null;
+        if (!$formIsDop && empty($driverId)) {
+            $this->errors[] = 'Не указан Водитель.';
+            return;
+        }
+
+        if (!empty($driverId)) {
+            $driver = Driver::where('hash_id', $driverId)->first();
+
+            if (!$driver) {
+                $this->errors[] = 'Водитель не найден.';
+                return;
+            }
+
+            if ($driver->dismissed === 'Да') {
+                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::DRIVER_BLOCK);
+                return;
+            }
+
+            if (!$driver->company_id || !$driver->company) {
+                $this->errors[] = 'У Водителя не найдена Компания';
+                return;
+            }
+
+            if (!empty($companyId) && ($driver->company->hash_id !== $companyId)) {
+                $this->errors[] = 'Компания Водителя не совпадает с Компанией осмотра.';
+                return;
+            }
+
+            if (empty($companyId)) {
+                $companyId = $driver->company->hash_id;
+                $form['company_id'] = $companyId;
+            }
+
+            if ($driver->company->dismissed === 'Да') {
+                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+                return;
+            }
+
+            if ($driver->end_of_ban && $this->time < $driver->end_of_ban) {
+                $this->errors[] = 'Водитель отстранен до ' . Carbon::parse($driver->end_of_ban);
+                return;
+            }
+
             /** @var Driver $driver */
             $driver->checkGroupRisk(
                 $form['tonometer'],
@@ -132,48 +127,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
                 $form['proba_alko']
             );
 
-            if ($driver->dismissed === 'Да') {
-                $this->errors[] = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
-            }
-
-            if (!$driver->company_id) {
-                $message = 'У Водителя не найдена компания';
-
-                $this->errors[] = $message;
-
-                $this->saveSdpoFormWithError($form, $message);
-
-                return;
-            }
-
-            $company = Company::find($driver->company_id);
-
-            if (!$company) {
-                $message = 'У Водителя не верно указано ID компании';
-
-                $this->errors[] = $message;
-
-                $this->saveSdpoFormWithError($form, $message);
-
-                return;
-            }
-
-            if ($company->dismissed === 'Да') {
-                $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
-
-                return;
-            }
-
-            if ($driver->year_birthday && $driver->year_birthday !== '0000-00-00') {
-                $form['driver_year_birthday'] = $driver->year_birthday;
-            }
-
-            $form['driver_gender'] = $driver->gender ?? '';
-            $form['driver_fio'] = $driver->fio;
             $form['driver_group_risk'] = $driver->group_risk;
-
-            $form['company_id'] = $company->hash_id;
-            $form['company_name'] = $company->name;
 
             $this->checkRedDates(
                 date('Y-m-d', strtotime($form['date'])),
@@ -181,30 +135,50 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             );
         }
 
-        /**
-         * ПРОВЕРЯЕМ статус для поля "Заключение"
-         */
-        if (!$this->admit($form, $driver)) {
-            $form['admitted'] = 'Не допущен';
-        }
-
-        /**
-         * Проверка на дубликат из ТЗ
-         *
-         * Мы должны дать техническую возможность внесение осмотров любой даты (год назад, месяц назад.
-         * При внесении осмотра, система должна смотреть, есть ли подобный.
-         *
-         * Например, сегодня 13.02.21 в 09.00 до 10.00.
-         */
         $isFormUnique = $this->findDuplicates($form);
         if (!$isFormUnique) {
             return;
         }
 
+        $date = $form['date'] ?? null;
+        if (!$formIsDop && empty($date)) {
+            $this->errors[] = 'Не указана дата осмотра!';
+
+            return;
+        }
+
+        $periodPl = $form['period_pl'] ?? null;
+        if ($formIsDop && empty($date) && empty($periodPl)) {
+            $this->errors[] = 'Не указан ни период, ни дата осмотра!';
+
+            return;
+        }
+
+        if ($formIsDop && $date && $periodPl) {
+            $dateFrom = Carbon::createFromFormat('!Y-m', $periodPl)->startOfMonth();
+            $dateTo = Carbon::createFromFormat('!Y-m', $periodPl)->endOfMonth();
+            $dateCarbon = Carbon::parse($date);
+            if ($dateCarbon->lessThan($dateFrom) || $dateCarbon->greaterThan($dateTo)) {
+                $this->errors[] = 'Дата осмотра находится вне периода выдачи ПЛ!';
+
+                return;
+            }
+        }
+
+        if ($formIsDop && $date && empty($periodPl)) {
+            $form['period_pl'] = date('Y-m', strtotime($date));
+        }
+
+        /**
+         * ПРОВЕРЯЕМ статус для поля "Заключение"
+         */
+        if (!$formIsDop && !$this->admit($form, $driver ?? null)) {
+            $form['admitted'] = 'Не допущен';
+        }
+
         /**
          * Diff Date (ОСМОТР РЕАЛЬНЫЙ ИЛИ НЕТ)
          */
-        $date = $form['date'] ?? null;
         $diffDateCheck = Carbon::now()
             ->addHours($user->timezone ?? 3)
             ->diffInMinutes($date);
@@ -212,25 +186,35 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
             $form['realy'] = 'да';
         }
 
-        $formModel = new Anketa($form);
+        if ($driverId && $date) {
+            $form['day_hash'] = FormHashGenerator::generate(
+                new MedicHashData(
+                    $driverId,
+                    new DateTimeImmutable($date),
+                    $form['type_view']
+                )
+            );
+        }
 
+        $formModel = new Form($form);
         $formModel->save();
 
-        /**
-         * ОТПРАВКА SMS
-         */
-        if ($form['admitted'] === 'Не допущен') {
-            event(new DriverDismissed($formModel));
-        }
+        $formDetailsModel = new MedicForm($form);
+        $formDetailsModel->setAttribute('forms_uuid', $formModel->uuid);
+        $formDetailsModel->save();
 
         if ($this->needStoreNormalizedPressure) {
             MedicFormNormalizedPressure::store(
                 $formModel->id,
-                Tonometer::fromString($formModel->tonometer)->getNormalized()
+                Tonometer::fromString($formDetailsModel->tonometer)->getNormalized()
             );
         }
 
         $this->createdForms->push($formModel);
+
+        if ($form['admitted'] === 'Не допущен') {
+            event(new DriverDismissed($formModel));
+        }
     }
 
     protected function admit(array $form, Driver $driver = null): bool

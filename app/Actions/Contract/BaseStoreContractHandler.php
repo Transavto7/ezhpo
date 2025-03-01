@@ -7,7 +7,7 @@ use App\Driver;
 use App\Events\Relations\Attached;
 use App\Events\Relations\Detached;
 use App\Models\Contract;
-use App\Models\Service;
+use App\Product;
 use Carbon\Carbon;
 use Exception;
 use Ramsey\Uuid\Uuid;
@@ -60,8 +60,8 @@ class BaseStoreContractHandler
         $syncEventUuid = Uuid::uuid4();
 
         $changes = $contract->services()->sync($servicesToSync);
-        event(new Attached($contract, $changes['attached'], Service::class, $syncEventUuid));
-        event(new Detached($contract, $changes['detached'], Service::class, $syncEventUuid));
+        event(new Attached($contract, $changes['attached'], Product::class, $syncEventUuid));
+        event(new Detached($contract, $changes['detached'], Product::class, $syncEventUuid));
 
         $changes = $contract->cars()->sync($data['cars'] ?? []);
         event(new Attached($contract, $changes['attached'], Car::class, $syncEventUuid));

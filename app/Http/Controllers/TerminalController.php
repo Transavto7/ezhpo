@@ -10,9 +10,9 @@ use App\Actions\Terminal\Store\TerminalDeviceStoreHandler;
 use App\Actions\Terminal\Store\TerminalStoreHandler;
 use App\Actions\Terminal\Update\TerminalCheckUpdateHandler;
 use App\Actions\Terminal\Update\TerminalUpdateHandler;
-use App\Anketa;
 use App\Enums\DeviceEnum;
 use App\FieldPrompt;
+use App\Models\Forms\Form;
 use App\Role;
 use App\Services\Terminals\TerminalsToCheckService;
 use App\TerminalCheck;
@@ -91,13 +91,14 @@ class TerminalController extends Controller
 
             $terminals = $paginate->getCollection();
 
-            $forms = Anketa::query()
+            $forms = Form::query()
                 ->select([
-                    'created_at',
-                    'terminal_id'
+                    'forms.created_at',
+                    'medic_forms.terminal_id'
                 ])
-                ->whereIn('terminal_id', $terminals->pluck('id'))
-                ->where('created_at', '>=', Carbon::now()->subMonth()->startOfMonth())
+                ->leftJoin('medic_forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
+                ->whereIn('medic_forms.terminal_id', $terminals->pluck('id'))
+                ->where('forms.created_at', '>=', Carbon::now()->subMonth()->startOfMonth())
                 ->get();
 
             $startOfMonth = Carbon::now()->startOfMonth();

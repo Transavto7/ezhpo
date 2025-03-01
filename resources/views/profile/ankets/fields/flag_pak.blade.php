@@ -1,10 +1,11 @@
+@php use \App\Enums\FlagPakEnum; @endphp
 @include('templates.elements_field', [
     'v' => [
         'type' => 'select',
         'values' => [
-            'internal' => 'Очный',
-            'СДПО А' => 'СДПО А',
-            'СДПО Р' => 'СДПО Р'
+            FlagPakEnum::INTERNAL => FlagPakEnum::INTERNAL,
+            FlagPakEnum::SDPO_A => FlagPakEnum::SDPO_A,
+            FlagPakEnum::SDPO_R => FlagPakEnum::SDPO_R,
         ],
         'multiple' => 1
     ],

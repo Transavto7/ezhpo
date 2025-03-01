@@ -11,12 +11,13 @@ return [
             'date' => 'Дата и время осмотра',
             'period_pl' => 'Период выдачи ПЛ',
             'driver_fio' => 'ФИО работника',
+            'date_prmo' => 'Дата ПРМО',
             'realy' => 'Осмотр реальный?',
             'driver_group_risk' => 'Группа риска',
             'type_view' => 'Тип осмотра',
             'proba_alko' => 'Признаки опьянения',
             'driver_gender' => 'Пол',
-            'Пол' => 'Дата рождения',
+            'driver_year_birthday' => 'Дата рождения',
             'complaint' => 'Жалобы',
             'condition_visible_sliz' => 'condition_visible_sliz',
             'condition_koj_pokr' => 'Состояние кожных покровов',
@@ -36,7 +37,7 @@ return [
             'med_view' => 'Мед показания',
             'pv_id' => 'Пункт выпуска',
             'flag_pak' => 'Флаг СДПО',
-            'is_dop' => 'Режим ввода ПЛ'
+            'is_dop' => 'Неполный осмотр'
         ],
 
         'tech' => [
@@ -61,7 +62,7 @@ return [
             'user_name' => 'ФИО ответственного',
             'user_eds' => 'Подпись лица, проводившего контроль',
             'pv_id' => 'Пункт выпуска',
-            'is_dop' => 'Режим ввода ПЛ',
+            'is_dop' => 'Неполный осмотр',
         ],
 
         'pak_queue' => [
@@ -123,6 +124,7 @@ return [
             'signature' => 'ЭЛ подпись водителя',
             'created_at' => 'Дата/Время создания записи',
         ],
+
         'bdd' => [
             'company_name' => 'Компания',
             'company_id' => 'ID Компании',
@@ -180,7 +182,7 @@ return [
             'procedure_pv' => 'Порядок выпуска',
             'date_prto' => 'Дата ПРТО',
             'date_techview' => 'Дата техосмотра',
-            'time_skzi' => 'Срок действия СКЗИ',
+            'time_skzi' => 'Срок действия СКЗИ\настройки тахографа ЕСТР',
             'date_osago' => 'Дата ОСАГО',
             'town_id' => 'Город',
             'dismissed' => 'Уволен',
@@ -203,6 +205,9 @@ return [
             'where_call' => 'Кому отправлять СМС при отстранении',
             'where_call_name' => 'Кому звонить при отстранении (имя, должность)',
             'inn' => 'ИНН',
+            'kpp' => 'КПП',
+            'ogrn' => 'ОГРН',
+            'address' => 'Адрес',
             'procedure_pv' => 'Порядок выпуска',
             'has_actived_prev_month' => 'Были ли активны в прошлом месяце',
             'bitrix_link' => 'Ссылка на компанию в Bitrix24',
@@ -222,6 +227,7 @@ return [
             'type_view' => 'Тип осмотра',
             'essence' => 'Сущности',
         ],
+
         'discount' => [
             'hash_id' => 'ID',
             'products_id' => 'Услуга',
@@ -229,6 +235,7 @@ return [
             'porog' => 'Пороговое значение',
             'discount' => 'Скидка (%)',
         ],
+
         'instr' => [
             'hash_id' => 'ID',
             'photos' => 'Фото',
@@ -240,16 +247,19 @@ return [
             'is_default' => 'Базовый',
             'sort' => 'Сортировка',
         ],
+
         'point' => [
             'hash_id' => 'ID',
             'name' => 'Пункт выпуска',
             'pv_id' => 'Город',
             'company_id' => 'Компания',
         ],
+
         'town' => [
             'hash_id' => 'ID',
             'name' => 'Город',
         ],
+
         'users' => [
             'hash_id' => 'ID',
             'photo' => 'Фото',
@@ -261,6 +271,7 @@ return [
             'blocked' => 'Заблокирован',
             'roles' => 'Роль',
         ],
+
         'terminals' => [
             'status' => 'on/off',
             'hash_id' => 'ID',
@@ -275,16 +286,19 @@ return [
             'last_month_amount' => 'Количество осмотров за предыдущий месяц',
             'month_amount' => 'Количество осмотров за текущий месяц',
         ],
+
         'roles' => [
             'id' => 'ID',
             'guard_name' => 'Название',
         ],
+
         'ddates' => [
             'hash_id' => 'ID',
             'field' => 'Поле даты проверки',
             'days' => 'Кол-во дней',
             'action' => 'Действие',
         ],
+
         'pak_sdpo' => [
             'hash_id' => 'ID',
             'api_token' => 'Токен',
@@ -296,6 +310,7 @@ return [
             'blocked' => 'Заблокирован',
             'roles' => 'Роль',
         ],
+
         'req' => [
             'hash_id' => 'id',
             'name' => 'Название',
@@ -308,11 +323,13 @@ return [
             'director_fio' => 'ФИО Руководителя',
             'seal' => 'Печать',
         ],
+
         'field_prompts' => [
             'type' => 'Журнал',
             'name' => 'Поле',
             'content' => 'Подсказка',
         ],
+
         'pechat_pl' => [
             'id' => 'ID записи',
             'company_name' => 'Компания',
@@ -324,6 +341,7 @@ return [
             'user_eds' => 'ЭЦП сотрудника',
             'pv_id' => 'Пункт выпуска',
         ],
+
         'contracts' => [
             'id' => 'ID',
             'name' => 'Название',
@@ -422,7 +440,22 @@ return [
             'type_view' => true,
             'comments' => true,
             'flag_pak' => true,
-        ]
+        ],
+        'trip_tickets' => [
+            'ticket_number' => true,
+            'created_at' => true,
+            'company_name' => true,
+            'start_date' => true,
+            'period_pl' => true,
+            'validity_period' => true,
+            'medic_form_id' => true,
+            'driver_name' => true,
+            'tech_form_id' => true,
+            'car_number' => true,
+            'logistics_method' => true,
+            'transportation_type' => true,
+            'template_code' => true,
+        ],
     ],
 
     'client_exclude' => [
@@ -433,10 +466,9 @@ return [
             'created_at',
             'flag_pak',
             'is_dop',
-            't_people',
-            'tonometer',
             'pulse',
-            'period_pl'
+            'period_pl',
+            'date_prmo',
         ],
         'tech' => [
             'company_id',
@@ -451,6 +483,9 @@ return [
             'company_id',
             'company_name',
             'created_at',
-        ]
+        ],
+        'trip_tickets' => [
+
+        ],
     ]
 ];

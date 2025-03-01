@@ -6,7 +6,6 @@ use App\Models\Contract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Car extends Model
@@ -19,6 +18,7 @@ class Car extends Model
             'gos_number',
             'mark_model',
             'type_auto',
+            'official_type_auto',
             'products_id',
             'trailer',
             'company_id',
@@ -32,16 +32,10 @@ class Car extends Model
             'town_id',
             'dismissed',
             'autosync_fields',
-            'contract_id',
             'deleted_id',
+            'auto_created',
+            'deleted_at'
         ];
-
-    public function inspections_tech(): HasMany
-    {
-        return $this
-            ->hasMany(Anketa::class, 'car_id', 'hash_id')
-            ->where('type_anketa', 'tech');
-    }
 
     public function deleted_user(): BelongsTo
     {

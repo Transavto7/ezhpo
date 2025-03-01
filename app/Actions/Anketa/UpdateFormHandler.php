@@ -4,32 +4,44 @@ namespace App\Actions\Anketa;
 
 use App\Anketa;
 use App\Car;
-use App\Company;
 use App\Driver;
+use App\Enums\BlockActionReasonsEnum;
+use App\Enums\FormLogActionTypesEnum;
 use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
+use App\Events\Forms\FormAction;
+use App\Exceptions\InvalidCarTypeAutoForIsDopTechForm;
 use App\MedicFormNormalizedPressure;
+use App\Models\Forms\Form;
+use App\Models\Forms\MedicForm;
+use App\Models\Forms\TechForm;
 use App\Point;
+use App\Services\DuplicatesCheckerService;
+use App\Services\FormHash\FormHashGenerator;
+use App\Services\FormHash\MedicHashData;
+use App\Services\FormHash\TechHashData;
 use App\Settings;
 use App\User;
 use App\ValueObjects\PressureLimits;
 use App\ValueObjects\Tonometer;
+use DateTimeImmutable;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class UpdateFormHandler
 {
-    public function handle(Anketa $form, array $data, Authenticatable $user)
+    /**
+     * @throws InvalidCarTypeAutoForIsDopTechForm
+     * @throws Exception
+     */
+    public function handle(Form $form, array $data, Authenticatable $user)
     {
-        $isPakQueueForm = $form['type_anketa'] === FormTypeEnum::PAK_QUEUE;
-        $isMedicForm = $form['type_anketa'] === FormTypeEnum::MEDIC;
-
-        $point = Point::where('id', $data['pv_id'])->first();
-        $data['pv_id'] = $point->name;
-        $data['point_id'] = $point->id;
+        $formType = $form['type_anketa'];
+        $isPakQueueForm = $formType === FormTypeEnum::PAK_QUEUE;
+        $isMedicForm = $formType === FormTypeEnum::MEDIC;
+        $isTechForm = $formType === FormTypeEnum::TECH;
 
         if (isset($data['anketa'])) {
             $this->findDuplicates($form, $data);
@@ -39,55 +51,145 @@ class UpdateFormHandler
             }
         }
 
-        unset($data['REFERER']);
-        unset($data['anketa']);
-        unset($data['_token']);
+        $pointId = $data['pv_id'] ?? null;
+        if ($pointId) {
+            $point = Point::where('id', $data['pv_id'])->first();
+            if (empty($point)) {
+                throw new Exception('ПВ не найден.');
+            }
 
-        foreach($data as $key => $value) {
-            $form[$key] = $value;
+            $data['point_id'] = $pointId;
         }
 
-        $companyId = null;
-        $form['company_id'] = '';
-        $form['company_name'] = '';
-
         $driverId = $data['driver_id'] ?? null;
-        $driver = Driver::where('hash_id', $driverId)->first();
-        if ($driver) {
-            $form['driver_fio'] = $driver->fio;
-            $form['driver_group_risk'] = $driver->group_risk;
-            $form['driver_gender'] = $driver->gender;
-            $form['driver_year_birthday'] = $driver->year_birthday;
-            $companyId = $driver->company_id;
+        if ($driverId) {
+            $driver = Driver::where('hash_id', $driverId)->first();
+            if (empty($driver)) {
+                throw new Exception('Водитель не найден.');
+            }
+
+            if ($driver->dismissed === 'Да') {
+                throw new Exception(BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::DRIVER_BLOCK));
+            }
+
+            if (!$driver->company_id || !$driver->company) {
+                throw new Exception('У Водителя не найдена Компания');
+            }
+
+            if ($driver->company->hash_id !== $form->company_id) {
+                throw new Exception('Компания Водителя не совпадает с Компанией осмотра.');
+            }
+
+            if ($driver->company->dismissed === 'Да') {
+                throw new Exception(BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK));
+            }
+
+            //TODO: не нужна ли проверка блокировки временная?
+
+            $data['driver_group_risk'] = $driver->group_risk;
         }
 
         $carId = $data['car_id'] ?? null;
-        $car = Car::where('hash_id', $carId)->first();
-        if ($car) {
-            $form['car_mark_model'] = $car->mark_model;
-            $form['car_gos_number'] = $car->gos_number;
-            $companyId = $car->company_id;
+        if ($carId) {
+            $car = Car::where('hash_id', $carId)->first();
+
+            if (empty($car)) {
+                throw new Exception('Автомобиль не найден.');
+            }
+
+            if ($car->dismissed === 'Да') {
+                throw new Exception(BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::CAR_BLOCK));
+            }
+
+            if (!$car->company_id || !$car->company) {
+                throw new Exception('У Автомобиля не найдена Компания');
+            }
+
+            if ($car->company->hash_id !== $form->company_id) {
+                throw new Exception('Компания Автомобиля не совпадает с Компанией осмотра.');
+            }
+
+            if ($car->company->dismissed === 'Да') {
+                throw new Exception(BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK));
+            }
+
+            if ($isTechForm) {
+                /** @var TechForm $details */
+                $details = $form->details;
+
+                if ($details->is_dop && $details->car_type_auto && ($details->car_type_auto !== $car->type_auto)) {
+                    throw new InvalidCarTypeAutoForIsDopTechForm();
+                }
+            }
         }
 
-        $company = Company::where('id', $companyId)->first();
-        if ($company) {
-            $form['company_id'] = $company->hash_id;
-            $form['company_name'] = $company->name;
+        $date = $data['date'] ?? null;
+        $periodPl = null;
+        if ($isMedicForm || $isTechForm) {
+            /** @var TechForm|MedicForm $details */
+            $details = $form->details;
+
+            $periodPl = $data['period_pl'] ?? $details->period_pl;
         }
 
-        $timezone      = $user->timezone ?? 3;
-        $diffDateCheck = Carbon::parse($form['created_at'])
-            ->addHours($timezone)
-            ->diffInMinutes($data['date'] ?? null);
-
-        $form['realy'] = 'нет';
-        if ($diffDateCheck <= 60 * 12 && $form['date'] ?? null) {
-            $form['realy'] = 'да';
+        if ($date && $periodPl) {
+            $dateFrom = Carbon::createFromFormat('!Y-m', $periodPl)->startOfMonth();
+            $dateTo = Carbon::createFromFormat('!Y-m', $periodPl)->endOfMonth();
+            $dateCarbon = Carbon::parse($date);
+            if ($dateCarbon->lessThan($dateFrom->startOfMonth()) || $dateCarbon->greaterThan($dateTo->endOfMonth())) {
+                throw new Exception('Дата осмотра находится вне периода выдачи ПЛ!');
+            }
         }
+
+        if ($date) {
+            $timezone = $user->timezone ?? 3;
+            $diffDateCheck = Carbon::parse($form['created_at'])
+                ->addHours($timezone)
+                ->diffInMinutes($date);
+
+            $data['realy'] = $diffDateCheck <= 60 * 12 ? 'да' : 'нет';
+        }
+
+        //TODO: перерасчет хэша вынести в ивент
+        $dateForHash = $date ?? $form->date ?? null;
+        if ($dateForHash && ($driverId || $carId || $date)) {
+            if ($isMedicForm) {
+                $driverIdForHash = $driverId ?? $form->driver_id;
+                if ($driverIdForHash) {
+                    $hashData = new MedicHashData(
+                        $driverIdForHash,
+                        new DateTimeImmutable($dateForHash),
+                        $form->details->type_view
+                    );
+
+                    $data['day_hash'] = FormHashGenerator::generate($hashData);
+                }
+            }
+
+            if ($isTechForm) {
+                $carIdForHash = $carId ?? $form->details->car_id;
+                $driverIdForHash = $driverId ?? $form->driver_id;
+                if ($carIdForHash && $driverIdForHash) {
+                    $hashData = new TechHashData(
+                        $driverIdForHash,
+                        $carIdForHash,
+                        new DateTimeImmutable($dateForHash),
+                        $form->details->type_view
+                    );
+
+                    $data['day_hash'] = FormHashGenerator::generate($hashData);
+                }
+            }
+        }
+
+        $form->fill($data);
+        $form->details->fill($data);
+
+        /** @var User $user */
+        event(new FormAction($user, $form, FormLogActionTypesEnum::UPDATING));
 
         $form->save();
-
-        $this->updateConnectedForm($form);
+        $form->details->save();
 
         if ($isPakQueueForm) {
             $this->updatePakQueueForm($form, $user);
@@ -99,10 +201,10 @@ class UpdateFormHandler
         }
     }
 
-    protected function normalizeMedicPressure(Anketa $form)
+    protected function normalizeMedicPressure(Form $form)
     {
         $driver = Driver::where('hash_id', $form->driver_id)->first();
-        $pressure = Tonometer::fromString($form->tonometer);
+        $pressure = Tonometer::fromString($form->details->tonometer);
         $pressureLimits = PressureLimits::create($driver);
 
         if ($pressure->needNormalize($pressureLimits)) {
@@ -115,26 +217,26 @@ class UpdateFormHandler
         }
     }
 
-    protected function updatePakQueueForm(Anketa $form, Authenticatable $user)
+    protected function updatePakQueueForm(Form $form, Authenticatable $user)
     {
-        if ($form->admitted === 'Не идентифицирован') {
-            $form->comments = Settings::setting('not_identify_text') ?? 'Водитель не идентифицирован';
+        if ($form->details->admitted === 'Не идентифицирован') {
+            $form->details->comments = Settings::setting('not_identify_text') ?? 'Водитель не идентифицирован';
         }
 
         /** @var User $user */
         $form->user_id = $user->id;
-        $form->user_name = $user->name;
-        $form->operator_id = $user->id;
+        $form->details->operator_id = $user->id;
         $form->user_eds = $user->eds;
         $form->user_validity_eds_start = $user->validity_eds_start;
         $form->user_validity_eds_end = $user->validity_eds_end;
 
         $form->save();
+        $form->details->save();
     }
 
-    protected function notifyCancel(Anketa $form)
+    protected function notifyCancel(Form $form)
     {
-        if ($form->admitted !== 'Не допущен') {
+        if ($form->details->admitted !== 'Не допущен') {
             return;
         }
 
@@ -144,105 +246,60 @@ class UpdateFormHandler
     /**
      * @throws Exception
      */
-    protected function findDuplicates(Anketa $form, array $data)
+    protected function findDuplicates(Form $form, array $data)
     {
-        if ($form->is_dop && ($form->result_dop == null)) {
+        $details = $form->details;
+
+        if ($details->is_dop && ($details->result_dop == null)) {
             return;
         }
 
-        $mainFormTimestamp = Carbon::parse($data['anketa'][0]['date'])->timestamp;
-
-        foreach($this->getExistForms($form, $data) as $existForm) {
-            if ($existForm->id === $form->id) {
-                continue;
-            }
-
-            if ($this->isDuplicate($mainFormTimestamp, $existForm->date)) {
-                throw new Exception("Найден дубликат осмотра (ID: $existForm->id, Дата: $existForm->date)");
-            }
+        $mainFormDate = $data['anketa'][0]['date'] ?? $form->date ?? null;
+        if (empty($mainFormDate)) {
+            return;
         }
+
+        $formId = $form->id;
+        $existForms = $this->getExistForms($form, $data)->reject(function ($existForm) use ($formId) {
+            return $formId === $existForm->id;
+        });
+
+        $mainFormTimestamp = Carbon::parse($mainFormDate)->timestamp;
+        DuplicatesCheckerService::checkExist($existForms, $mainFormTimestamp);
     }
 
-    protected function getExistForms(Anketa $form, array $data): Collection
+    protected function getExistForms(Form $form, array $data): Collection
     {
-        $formNewDate = $data['anketa'][0]['date'];
+        $formNewDate = $data['anketa'][0]['date'] ?? $form->date ?? null;
+        if (empty($formNewDate)) {
+            return collect([]);
+        }
+
         $datesDiapason = [
             Carbon::parse($formNewDate)->subSeconds(Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS),
             Carbon::parse($formNewDate)->addSeconds(Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS)
         ];
 
-        $query = Anketa::query()
-            ->select([
-                'id',
-                'date'
-            ])
-            ->where('type_anketa', $form->type_anketa)
-            ->where('id', '<>', $form->id)
-            ->where(function (Builder $query) {
-                $query
-                    ->where('is_dop', '<>', 1)
-                    ->orWhereNotNull('result_dop');
-            })
-            ->whereBetween('date', $datesDiapason)
-            ->whereNotNull('date')
-            ->where('in_cart', 0)
-            ->orderBy('date', 'desc');
-
         if ($form->type_anketa === FormTypeEnum::MEDIC) {
-            return $query
-                //TODO: разобраться позднее, почему есть разница в том, где лежат данные
-                ->where('driver_id', $data['driver_id'])
-                ->where('type_view', $data['anketa'][0]['type_view'])
-                ->get();
+            $driverId = $data['driver_id'] ?? $form->driver_id ?? null;
+
+            if (empty($driverId)) {
+                return collect([]);
+            }
+
+            return DuplicatesCheckerService::getExistMedicForms($driverId, $datesDiapason);
         }
 
         if ($form->type_anketa === FormTypeEnum::TECH) {
-            return $query
-                ->where('car_id', $data['anketa'][0]['car_id'])
-                ->where('type_view', $data['anketa'][0]['type_view'] ?? '')
-                ->get();
+            $carId = $data['anketa'][0]['car_id'] ?? $form->details->car_id ?? null;
+
+            if (empty($carId)) {
+                return collect([]);
+            }
+
+            return DuplicatesCheckerService::getExistTechForms([$carId], $datesDiapason);
         }
 
         return collect([]);
-    }
-
-    //TODO: вынести в трейт или хэлпер
-    protected function isDuplicate($first, $second): bool
-    {
-        $diffInMinutes = abs($first - Carbon::parse($second)->timestamp);
-
-        return ($diffInMinutes < Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS) && ($diffInMinutes >= 0);
-    }
-
-    protected function updateConnectedForm(Anketa $form)
-    {
-        if (!$form->connected_hash) {
-            return;
-        }
-
-        $formCopy = Anketa::where('connected_hash', $form->connected_hash)
-            ->where('type_anketa', '!=', $form->type_anketa)
-            ->first();
-
-        if (!$formCopy) {
-            return;
-        }
-
-        $protectedAttributes = [
-            'type_anketa',
-            'id',
-            'created_at',
-            'updated_at'
-        ];
-
-        foreach ($form->fillable as $key) {
-            if (in_array($key, $protectedAttributes)) {
-                continue;
-            }
-
-            $formCopy->$key = $form[$key];
-        }
-
-        $formCopy->save();
     }
 }

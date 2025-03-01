@@ -111,7 +111,7 @@
                                 <td class="text-center">
                                     {{ getTotalAll(item.reports, 'Послерейсовый', 'Послесменный') }}
 
-                                    <div class="font-weight-bold" v-if="getSumAll(reports, 'Послерейсовый', 'Послесменный') != null">
+                                    <div class="font-weight-bold" v-if="getSumAll(item.reports, 'Послерейсовый', 'Послесменный') != null">
                                         {{ getSumAll(item.reports, 'Послерейсовый', 'Послесменный') }}₽
                                     </div>
                                 </td>

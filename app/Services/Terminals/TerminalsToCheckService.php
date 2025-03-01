@@ -15,41 +15,48 @@ final class TerminalsToCheckService
      */
     public function getIds(): array
     {
-        $terminalChecks = TerminalCheck::all();
+        $terminalChecks = TerminalCheck::query()
+            ->select([
+                'terminal_checks.date_end_check',
+                'users.hash_id as user_hash_id'
+            ])
+            ->leftJoin('users', 'terminal_checks.user_id', '=', 'users.id')
+            ->get();
+
+        $now = Carbon::now();
 
         $lessMonth = $terminalChecks
-            ->filter(function (TerminalCheck $terminalCheck) {
-                if (!$terminalCheck->user) {
+            ->filter(function (TerminalCheck $terminalCheck) use ($now) {
+                if (!$terminalCheck->user_hash_id) {
                     return false;
                 }
 
-                if (Carbon::now()->isSameDay($terminalCheck->date_end_check)) {
+                if ($now->isSameDay($terminalCheck->date_end_check)) {
                     return true;
                 }
 
-                return Carbon::now()->lessThanOrEqualTo($terminalCheck->date_end_check) &&
-                    Carbon::now()->diffInDays($terminalCheck->date_end_check) <= 30 &&
-                    $terminalCheck->user;
+                return $now->lessThanOrEqualTo($terminalCheck->date_end_check) &&
+                    $now->diffInDays($terminalCheck->date_end_check) <= 30;
             })
             ->map(function (TerminalCheck $terminalCheck) {
-                return $terminalCheck->user->hash_id;
+                return $terminalCheck->user_hash_id;
             })
             ->values();
 
         $expired = $terminalChecks
-            ->filter(function (TerminalCheck $terminalCheck) {
-                if (!$terminalCheck->user) {
+            ->filter(function (TerminalCheck $terminalCheck) use ($now) {
+                if (!$terminalCheck->user_hash_id) {
                     return false;
                 }
 
-                if (Carbon::now()->isSameDay($terminalCheck->date_end_check)) {
+                if ($now->isSameDay($terminalCheck->date_end_check)) {
                     return false;
                 }
 
-                return Carbon::now()->greaterThan($terminalCheck->date_end_check);
+                return $now->greaterThan($terminalCheck->date_end_check);
             })
             ->map(function (TerminalCheck $terminalCheck) {
-                return $terminalCheck->user->hash_id;
+                return $terminalCheck->user_hash_id;
             })
             ->values();
 

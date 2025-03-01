@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Element\CreateElementHandlerFactory;
+use App\Actions\Element\Remove\RemoveElementHandlerFactory;
 use App\Actions\Element\SyncFieldsHandler;
 use App\Actions\Element\Update\UpdateElementHandlerFactory;
 use App\Car;
@@ -12,9 +13,10 @@ use App\Enums\LogActionTypesEnum;
 use App\FieldPrompt;
 use App\Point;
 use App\User;
+use App\ValueObjects\CompanyReqs;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -23,7 +25,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class IndexController extends Controller
@@ -33,23 +34,6 @@ class IndexController extends Controller
     public function __construct()
     {
         $this->elements = config('elements');
-    }
-
-    public function deprecated(Request $request): JsonResponse
-    {
-        Log::channel('deprecated-api')->info(json_encode(
-            [
-                'request' => $request->all(),
-                'headers' => $request->headers->all(),
-                'user' => Auth::user(),
-                'ip' => $request->getClientIp() ?? null,
-            ]
-        ));
-
-        return response()->json(
-            ['message' => 'Метод не поддерживается, воспользуйтесь консольной командой'],
-            Response::HTTP_METHOD_NOT_ALLOWED
-        );
     }
 
     public function showVideo(Request $request): View
@@ -74,10 +58,12 @@ class IndexController extends Controller
                 return 'Поле не найдено';
             }
 
+            $noRequired = filter_var($field['noRequired'] ?? 0, FILTER_VALIDATE_BOOLEAN);
+
             return view('templates.elements_field', [
                 'k' => $fieldKey,
                 'v' => $field,
-                'is_required' => '',
+                'is_required' => $noRequired ? '' : 'required',
                 'model' => $model,
                 'default_value' => $request->default_value ?? 'Не установлено',
             ]);
@@ -175,29 +161,14 @@ class IndexController extends Controller
         }
     }
 
-    public function RemoveElement(Request $request): RedirectResponse
+    public function RemoveElement(Request $request, RemoveElementHandlerFactory $factory): RedirectResponse
     {
         try {
-            $model = $request->type;
-            $id = $request->id;
-
-            $modelClass = app("App\\$model");
-            if (!$modelClass) {
-                throw new Exception("Модель $model не найдена");
-            }
-
-            $existModel = $modelClass::withTrashed()->find($id);
-            if (!$existModel) {
-                throw new Exception("Модель $model с ID $id не найдена");
-            }
+            $handler = $factory->make($request->type);
 
             DB::beginTransaction();
 
-            if ($request->get('undo')) {
-                $existModel->restore();
-            } else {
-                $existModel->delete();
-            }
+            $handler->handle($request->id, !$request->undo);
 
             DB::commit();
 
@@ -345,10 +316,12 @@ class IndexController extends Controller
             $query = $query->with(['contracts.services']);
         }
 
+        $element = $query->find($id);
+
         $page = $this->elements[$model];
         $page['model'] = $model;
         $page['id'] = $id;
-        $page['el'] = $query->find($id);
+        $page['el'] = $element;
 
         $disabledFields = [];
         if (($model === 'Company') && (user()->hasRole('client') || !user()->access('company_update_pressure_fields'))) {
@@ -372,12 +345,37 @@ class IndexController extends Controller
             $disabledFields[] = 'pressure_systolic';
             $disabledFields[] = 'pressure_diastolic';
         }
+
+        /** @var Model|null $element */
+        if (($model === 'Company') && $element->getAttribute('reqs_validated')) {
+            $disabledFields[] = 'inn';
+            $disabledFields[] = 'kpp';
+            $disabledFields[] = 'ogrn';
+
+            $companyReqs = new CompanyReqs(
+                $element->getAttribute('inn'),
+            $element->getAttribute('kpp') ?? '',
+                $element->getAttribute('ogrn') ?? '',
+            );
+
+            if ($companyReqs->isOrganizationFormat()) {
+                $disabledFields[] = 'official_name';
+            }
+        }
+
+        /** @var Model|null $element */
+        if (($model === 'Company') && !user()->access('companies_access_field_note')) {
+            $disabledFields[] = 'note';
+        }
+
         $page['disabledFields'] = $disabledFields;
 
         $fieldsToSkip = [
             'essence',
             'hash_id',
-            'id'
+            'id',
+            'reqs_validated',
+            'one_c_synced'
         ];
         if (user()->hasRole('client')) {
             $fieldsToSkip[] = 'products_id';
@@ -597,10 +595,14 @@ class IndexController extends Controller
         $data['otherRoles'][] = 'manager';
         $data['otherRoles'][] = 'admin';
         $data['queryString'] = Arr::query(array_filter($request->except([$oKey, $oBy])));
-        $data['fieldPrompts'] = FieldPrompt::where('type', strtolower($model))->get();
+        $data['fieldPrompts'] = FieldPrompt::query()
+            ->where('type', strtolower($model))
+            ->orderBy('sort')
+            ->orderBy('id')
+            ->get();
         $data['isAdminOrClient'] = $isAdminOrClient;
 
-        return view('elements', $data);
+        return view('pages.elements.index', $data);
     }
 
     /**

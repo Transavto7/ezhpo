@@ -15,6 +15,8 @@ class Company extends Model
     public $fillable = [
         'hash_id',
         'name',
+        'official_name',
+        'dismissed',
         'note',
         'comment',
         'procedure_pv',
@@ -26,15 +28,21 @@ class Company extends Model
         'where_call',
         'where_call_name',
         'inn',
+        'kpp',
+        'ogrn',
+        'address',
         'required_type_briefing',
-        'dismissed',
         'has_actived_prev_month',
         'bitrix_link',
         'document_bdd',
         'deleted_id',
         'pressure_systolic',
         'pressure_diastolic',
-        'link_waybill'
+        'link_waybill',
+        'auto_created',
+        'deleted_at',
+        'reqs_validated',
+        'one_c_synced'
     ];
 
     public static function getAll()
@@ -76,36 +84,6 @@ class Company extends Model
             'company_id',
             'id'
         );
-    }
-
-    public function inspections_tech(): HasMany
-    {
-        return $this->hasMany(Anketa::class, 'company_id', 'id')
-            ->where('type_anketa', 'tech');
-    }
-
-    public function inspections_medic(): HasMany
-    {
-        return $this->hasMany(Anketa::class, 'company_id', 'id')
-            ->where('type_anketa', 'medic');
-    }
-
-    public function inspections_pechat_pl(): HasMany
-    {
-        return $this->hasMany(Anketa::class, 'company_id', 'id')
-            ->where('type_anketa', 'pechat_pl');
-    }
-
-    public function inspections_bdd(): HasMany
-    {
-        return $this->hasMany(Anketa::class, 'company_id', 'id')
-            ->where('type_anketa', 'bdd');
-    }
-
-    public function inspections_report_cart(): HasMany
-    {
-        return $this->hasMany(Anketa::class, 'company_id', 'id')
-            ->where('type_anketa', 'report_cart');
     }
 
     public function cars(): HasMany
