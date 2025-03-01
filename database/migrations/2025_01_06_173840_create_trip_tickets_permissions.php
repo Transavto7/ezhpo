@@ -48,6 +48,8 @@ class CreateTripTicketsPermissions extends Migration
      */
     public function up()
     {
+        return;
+
         DB::beginTransaction();
 
         try {
@@ -181,6 +183,8 @@ class CreateTripTicketsPermissions extends Migration
      */
     public function down()
     {
+        return;
+
         DB::beginTransaction();
 
         try {
