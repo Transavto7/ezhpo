@@ -79,6 +79,10 @@
             max-height: 90%;
             object-fit: contain;
         }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
     </style>
 @endsection
 
@@ -381,6 +385,8 @@
                         document.body.appendChild(link);
                         link.click();
                         link.remove();
+
+                        location.reload()
                     })
                     .catch((error) => {
                         if (error.response && error.response.data instanceof Blob) {

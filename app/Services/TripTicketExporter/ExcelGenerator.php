@@ -5,6 +5,7 @@ namespace App\Services\TripTicketExporter;
 use App\Enums\TripTicket\TripTicketActionType;
 use App\Enums\TripTicket\TripTicketStatus;
 use App\Enums\TripTicket\TripTicketTemplateEnum;
+use App\Enums\TripTicket\TripTicketType;
 use App\Events\TripTickets\ChangeTripTicketStatus;
 use App\Events\TripTickets\LogTripTicket;
 use App\Models\TripTicket;
@@ -133,6 +134,10 @@ final class ExcelGenerator
         }
 
         foreach ($tripTickets as $tripTicket) {
+            if ($tripTicket->type === TripTicketType::IN_ADVANCE && $tripTicket->status === TripTicketStatus::APPROVED) {
+                continue;
+            }
+
             event(new ChangeTripTicketStatus($tripTicket, TripTicketStatus::printed()));
 
             if ($tripTicket->getOriginal('status') !== TripTicketStatus::PRINTED) {

@@ -47,9 +47,11 @@ final class TripTicketPermissions
 
     public static function canEdit(string $type, string $status): bool
     {
+        $allowedStatuses = [TripTicketStatus::CREATED, TripTicketStatus::ACTIVATED];
+
         switch (true) {
             case $type === TripTicketType::GENERATED && $status === TripTicketStatus::CREATED:
-            case $type === TripTicketType::IN_ADVANCE && $status !== TripTicketStatus::APPROVED:
+            case $type === TripTicketType::IN_ADVANCE && in_array($status, $allowedStatuses):
             case $type === TripTicketType::COMMON && $status === TripTicketStatus::CREATED:
                 return true;
             default:
@@ -59,7 +61,7 @@ final class TripTicketPermissions
 
     public static function canDelete(string $type, string $status): bool
     {
-        $allowedStatuses = [TripTicketStatus::CREATED, TripTicketStatus::PRINTED];
+        $allowedStatuses = [TripTicketStatus::CREATED, TripTicketStatus::ACTIVATED, TripTicketStatus::PRINTED];
 
         switch (true) {
             case $type === TripTicketType::GENERATED && $status !== TripTicketStatus::APPROVED:
