@@ -217,9 +217,13 @@
                   <input onchange="this.parentNode.click()" type="checkbox"
                          @if($createByForms) checked @endif id="create_by_forms">
                 </a>
-                <label class="form-control-label mb-0 ml-2" for="create_by_forms">Создать на основе
-                  МО/ТО</label>
+                <label class="form-control-label mb-0 ml-2" for="create_by_forms">Создать на основе МО/ТО</label>
                 <input type="hidden" name="createByForms" value="{{ $createByForms ?? 0 }}">
+              </div>
+
+              <div class="form-group d-flex">
+                <input type="checkbox" id="create_is_dop_medic" name="create_is_dop_medic">
+                <label class="form-control-label mb-0 ml-2" for="create_is_dop_medic">Создать неполный МО</label>
               </div>
 
               <div class="form-group">

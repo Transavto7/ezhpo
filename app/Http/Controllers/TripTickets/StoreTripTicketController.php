@@ -23,11 +23,14 @@ class StoreTripTicketController extends Controller
     {
         $response = [];
         try {
+            $createIsDopMedic = $request->has('create_is_dop_medic');
+
             $this->validateIds(
                 $request->input('company_id'),
                 $request->input('driver_id'),
                 $request->input('car_id')
             );
+
             $items = $this->getItems($request->input('trip_ticket'));
 
             DB::beginTransaction();
@@ -35,7 +38,8 @@ class StoreTripTicketController extends Controller
                 $request->input('company_id'),
                 $request->input('driver_id'),
                 $request->input('car_id'),
-                $items
+                $items,
+                $createIsDopMedic
             ));
 
             DB::commit();
