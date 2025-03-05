@@ -1,4 +1,4 @@
-<table id="trip-tickets-table" class="trip-tickets-table table table-striped table-sm" style="min-height: 170px">
+<table id="trip-tickets-table" class="trip-tickets-table table table-striped table-sm" style="min-height: 215px">
     <thead>
     <tr>
         <th>#</th>
@@ -92,11 +92,11 @@
                 <div class="dropdown-menu">
                     @if($permissionToUpdate)
                         @if(\App\Services\TripTicket\TripTicketPermissions::canApprove($tripTicket->type, $tripTicket->status))
-                            <a class="dropdown-item change-status" href="#"
+                            <a class="dropdown-item change-status cursor-pointer"
                                data-status="{{ \App\Enums\TripTicket\TripTicketStatus::APPROVED }}"
                                data-uuid="{{ $tripTicket->uuid }}"><i class="fa fa-check"></i> Утвердить</a>
                         @elseif(\App\Services\TripTicket\TripTicketPermissions::canCancelApprove($tripTicket->type, $tripTicket->status))
-                            <a class="dropdown-item change-status" href="#"
+                            <a class="dropdown-item change-status cursor-pointer"
                                data-status="{{ \App\Enums\TripTicket\TripTicketStatus::APPROVAL_CANCELLED }}"
                                data-uuid="{{ $tripTicket->uuid }}"><i class="fa fa-times"></i> Отменить утверждение</a>
                         @endif
@@ -124,14 +124,13 @@
                             <i class="fa fa-plus"></i> Добавить ТО</a>
                     @endif
                     @if($permissionToUpdate && \App\Services\TripTicket\TripTicketPermissions::canEdit($tripTicket->type, $tripTicket->status))
-                        <a class="dropdown-item form-actions-modal-btn" data-toggle="modal" data-target="#from-actions"
-                           style="cursor: pointer" data-id="{{ $tripTicket->uuid }}">
+                        <a class="dropdown-item form-actions-modal-btn cursor-pointer" data-toggle="modal"
+                           data-target="#from-actions" data-id="{{ $tripTicket->uuid }}">
                             &plusmn; Привязать/отвязать МО и ТО
                         </a>
                     @endif
                     @if($permissionToPrintTripTickets && \App\Services\TripTicket\TripTicketPermissions::canPrint($tripTicket->type, $tripTicket->status))
-                        <a class="dropdown-item download-excel-to-print-btn"
-                           data-uuid="{{ $tripTicket->uuid }}" style="cursor: pointer">
+                        <a class="dropdown-item download-excel-to-print-btn cursor-pointer" data-uuid="{{ $tripTicket->uuid }}">
                             <i class="fa fa-file-excel-o"></i> Печать ПЛ
                         </a>
                     @endif
