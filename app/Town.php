@@ -11,8 +11,7 @@ class Town extends Model
 {
     use SoftDeletes;
 
-    public $fillable
-        = [
+    public $fillable = [
             'id',
             'hash_id',
             'stamp_id',

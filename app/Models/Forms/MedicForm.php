@@ -8,11 +8,11 @@ use App\Point;
 use App\Stamp;
 use App\User;
 use App\ValueObjects\NotAdmittedReasons;
-use App\ValueObjects\PressureLimits;
-use App\ValueObjects\Pulse;
-use App\ValueObjects\PulseLimits;
-use App\ValueObjects\Temperature;
-use App\ValueObjects\Tonometer;
+use App\ValueObjects\ForeignDevice\PressureLimit;
+use App\ValueObjects\ForeignDevice\Pulse;
+use App\ValueObjects\ForeignDevice\PulseLimit;
+use App\ValueObjects\ForeignDevice\Temperature;
+use App\ValueObjects\ForeignDevice\Tonometer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -104,13 +104,13 @@ class MedicForm extends Model
         }
 
         $pressure = Tonometer::fromString($this->attributes['tonometer']);
-        $pressureLimits = PressureLimits::create($driver);
+        $pressureLimits = PressureLimit::create($driver);
         if (!$pressure->isAdmitted($pressureLimits)) {
             $result[] = 'давление';
         }
 
         $pulse = new Pulse(intval($this->attributes['pulse']));
-        $pulseLimits = PulseLimits::create($driver);
+        $pulseLimits = PulseLimit::create($driver);
         if (!$pulse->isAdmitted($pulseLimits)) {
             $result[] = 'повышенный пульс';
         }

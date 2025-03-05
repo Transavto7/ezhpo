@@ -179,8 +179,7 @@ return [
         App\Providers\UnleashServiceProvider::class,
         App\Providers\FormsServiceProvider::class,
         Src\Terminals\TerminalsProvider::class,
-
-
+        Src\Employees\EmployeesProvider::class,
 
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
