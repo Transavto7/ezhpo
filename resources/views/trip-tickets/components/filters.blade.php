@@ -9,6 +9,76 @@
   <input type="hidden" name="take" value="{{ request()->get('take', '') }}">
 
   <div class="row">
+      <div class="col-md-3">
+          <div class="form-group">
+              <label>Номер ПЛ</label>
+              <input class="form-control" type="text" value="{{ request()->get('ticket_number', null) }}"
+                     name="ticket_number"/>
+          </div>
+      </div>
+      <div class="col-md-3">
+          <div class="form-group">
+              <label>Фото загружено?</label>
+              @include('templates.elements_field', [
+                  'v' => [
+                      'type' => 'select',
+                      'values' => [
+                          'true' => 'Да',
+                          'false' => 'Нет'
+                      ]
+                  ],
+                  'model' => 'trip-tickets',
+                  'k' => 'has_photos',
+                  'is_required' => '',
+                  'default_value' => request()->get('has_photos', null) !== [null]
+                    ? request()->get('has_photos', null)
+                    : null
+              ])
+
+          </div>
+      </div>
+      <div class="col-md-3">
+          <div class="form-group">
+              <label>Тип осмотра</label>
+              @include('templates.elements_field', [
+                  'v' => [
+                      'type' => 'select',
+                      'values' => \App\Enums\TripTicket\TripTicketType::labels(),
+                  ],
+                  'model' => 'trip-tickets',
+                  'k' => 'type',
+                  'is_required' => '',
+                  'default_value' => request()->get('type', null) !== [null]
+                      ? request()->get('type', null)
+                      : null
+              ])
+
+          </div>
+      </div>
+      <div class="col-md-3">
+          <div class="form-group">
+              <label>Осмотр утвержден?</label>
+              @include('templates.elements_field', [
+                  'v' => [
+                      'type' => 'select',
+                      'values' => [
+                          'true' => 'Да',
+                          'false' => 'Нет'
+                      ]
+                  ],
+                  'model' => 'trip-tickets',
+                  'k' => 'is_approved',
+                  'is_required' => '',
+                  'default_value' => request()->get('is_approved', null) !== [null]
+                    ? request()->get('is_approved', null)
+                    : null
+              ])
+
+          </div>
+      </div>
+  </div>
+
+  <div class="row">
     <div class="col-md-3">
       <div class="form-group">
         <label>Компания</label>

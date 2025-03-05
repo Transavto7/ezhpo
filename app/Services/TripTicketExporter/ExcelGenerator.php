@@ -134,7 +134,7 @@ final class ExcelGenerator
         }
 
         foreach ($tripTickets as $tripTicket) {
-            if ($tripTicket->type === TripTicketType::IN_ADVANCE && $tripTicket->status === TripTicketStatus::APPROVED) {
+            if ($tripTicket->type === TripTicketType::IN_ADVANCE && in_array($tripTicket->status, [TripTicketStatus::ACTIVATED, TripTicketStatus::APPROVED])) {
                 continue;
             }
 
