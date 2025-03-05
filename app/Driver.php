@@ -153,7 +153,7 @@ class Driver extends Model
             return $setting;
         }
 
-        return 150;
+        return Settings::DEFAULT_PRESSURE_SYSTOLIC;
     }
 
     public function getPressureDiastolic()
@@ -172,7 +172,7 @@ class Driver extends Model
             return $setting;
         }
 
-        return 100;
+        return Settings::DEFAULT_PRESSURE_DIASTOLIC;
     }
 
     public function getPulseLower()
@@ -182,7 +182,7 @@ class Driver extends Model
             return $setting;
         }
 
-        return PHP_INT_MIN;
+        return Settings::DEFAULT_PULSE_LOWER;
     }
 
     public function getPulseUpper()
@@ -192,7 +192,7 @@ class Driver extends Model
             return $setting;
         }
 
-        return PHP_INT_MAX;
+        return Settings::DEFAULT_PULSE_UPPER;
     }
 
     public function getTimeOfAlcoholBan()

@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Settings extends Model
 {
+    public const DEFAULT_PRESSURE_SYSTOLIC = 150;
+    public const DEFAULT_PRESSURE_DIASTOLIC = 100;
+    public const DEFAULT_PULSE_LOWER = PHP_INT_MIN;
+    public const DEFAULT_PULSE_UPPER = PHP_INT_MAX;
+
     public $fillable
         = [
             'deleted_at',
