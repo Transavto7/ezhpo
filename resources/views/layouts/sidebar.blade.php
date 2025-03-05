@@ -288,6 +288,8 @@
             </li>
         @endif
 
+        @include('Workdays::sidebar')
+
         @if($accessToSettings)
             <li>
                 <a href="#" data-btn-collapse="#spis-pol" role="button"><i class="fa fa-cog"></i> Настройки</a>

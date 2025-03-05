@@ -746,8 +746,14 @@ $(document).ready(function () {
             select.val(value).trigger("change");
         }
 
+        const userModel = model === 'User'
+        let dateFormQueryParam = '';
+        if (!userModel) {
+            dateFormQueryParam = `?dateAnketa=${$('[name="anketa[0][date]"]').val()}`
+        }
+
         $.ajax({
-            url: `/api/check-prop/${prop}/${model}/${val}?dateAnketa=${$('[name="anketa[0][date]"]').val()}`,
+            url: `/api/check-prop/${prop}/${model}/${val}${dateFormQueryParam}`,
             headers: {'Authorization': 'Bearer ' + API_TOKEN},
             success: (data) => {
                 const PROP_HAS_EXISTS = data.data.exists

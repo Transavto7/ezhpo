@@ -13,9 +13,9 @@ use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
 use App\Models\Forms\ReportCartForm;
 use App\User;
-use App\ValueObjects\Pulse;
-use App\ValueObjects\Temperature;
-use App\ValueObjects\Tonometer;
+use App\ValueObjects\ForeignDevice\Pulse;
+use App\ValueObjects\ForeignDevice\Temperature;
+use App\ValueObjects\ForeignDevice\Tonometer;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 
@@ -74,7 +74,7 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
         $driver = Driver::where('hash_id', $driverId)->first();
 
         $defaultDatas = [
-            'tonometer' => strval(Tonometer::random($driver)),
+            'tonometer' => strval(Tonometer::randomWithDriver($driver)),
             't_people' => Temperature::random()->getTemperature(),
             'pulse' => Pulse::random()->getPulse(),
             'date' => date('Y-m-d H:i:s'),
