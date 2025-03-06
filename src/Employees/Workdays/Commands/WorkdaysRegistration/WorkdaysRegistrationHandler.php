@@ -11,6 +11,7 @@ use DateTime;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Src\Employees\Workdays\Eloquent\Workday;
+use Src\Employees\Workdays\WorkflowOperations\EmployerWorkdayAdmitting;
 use Symfony\Component\HttpFoundation\Response;
 
 final class WorkdaysRegistrationHandler
@@ -99,7 +100,7 @@ final class WorkdaysRegistrationHandler
         $workDay->is_manual = false;
         $workDay->is_real = $command->getDate()->format('d.m.Y') === date('d.m.Y');
 
-        $workDay->calculateIsAllowedWork();
+        $workDay->is_allowed_work = EmployerWorkdayAdmitting::fromWorkday($workDay)->isAllowedWork();
 
         $workDay->save();
 

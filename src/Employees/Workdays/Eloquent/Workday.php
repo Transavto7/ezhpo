@@ -82,14 +82,4 @@ class Workday extends Model
     {
         return $this->belongsTo(User::class, 'employee_id', 'id');
     }
-
-    public function calculateIsAllowedWork()
-    {
-        $this->is_allowed_work =
-            (is_null($this->t_people_test_status) || $this->t_people_test_status) &&
-            (is_null($this->pressure_test_status) || $this->pressure_test_status) &&
-            (is_null($this->pulse_test_status) || $this->pulse_test_status) &&
-            (is_null($this->alcometer_test_status) || $this->alcometer_test_status) &&
-            (is_null($this->narko_test_status) || $this->narko_test_status);
-    }
 }
