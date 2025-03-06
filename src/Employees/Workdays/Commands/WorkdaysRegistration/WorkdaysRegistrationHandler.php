@@ -45,6 +45,7 @@ final class WorkdaysRegistrationHandler
         if ($command->getTypeAnketa()->isClose()) {
             $openWorkday = Workday::where('employee_id', $employee->id)
                 ->whereDate('date', $command->getDate()->format('Y-m-d'))
+                ->where('is_allowed_work', 1)
                 ->first();
             if (!$openWorkday) {
                 throw new Exception('Сотрудник не имеет открытой смены для закрытия!', Response::HTTP_BAD_REQUEST);
@@ -85,7 +86,7 @@ final class WorkdaysRegistrationHandler
             $workDay->alcometer_result = $alcometer->getValue();
             $workDay->alcometer_mode = $alcometer->getMode();
             $workDay->alcometer_test_status = $alcometer->isAdmitted();
-        } elseif ($probaAlco = $command->getProbaAlko()) {
+        } elseif (!is_null($probaAlco = $command->getProbaAlko())) {
             $workDay->alcometer_test_status = $probaAlco;
         }
 
