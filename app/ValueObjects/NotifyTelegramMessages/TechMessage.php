@@ -1,6 +1,6 @@
 <?php
 
-namespace App\ValueObjects\NotifyTelegramMessages;
+namespace App\ValueObjects\ForeignDevice\NotifyTelegramMessages;
 
 use DateTimeImmutable;
 

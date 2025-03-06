@@ -27,10 +27,10 @@ use App\Settings;
 use App\Stamp;
 use App\Traits\UserEdsTrait;
 use App\User;
-use App\ValueObjects\FormFeedback;
-use App\ValueObjects\Phone;
-use App\ValueObjects\PressureLimits;
-use App\ValueObjects\Tonometer;
+use App\ValueObjects\ForeignDevice\FormFeedback;
+use App\ValueObjects\ForeignDevice\Phone;
+use App\ValueObjects\ForeignDevice\PressureLimit;
+use App\ValueObjects\ForeignDevice\Tonometer;
 use DateTimeImmutable;
 use DomainException;
 use Exception;
@@ -172,7 +172,7 @@ class SdpoController extends Controller
             //TODO: добавить валидацию
             $tonometer = $request->tonometer;
             if (!$tonometer) {
-                $tonometer = strval(Tonometer::random($driver));
+                $tonometer = strval(Tonometer::randomWithDriver($driver));
             }
 
             $medic = [];
@@ -281,7 +281,7 @@ class SdpoController extends Controller
             }
 
             $pressure = Tonometer::fromString($tonometer);
-            $pressureLimits = PressureLimits::create($driver);
+            $pressureLimits = PressureLimit::create($driver);
             if (!$pressure->isAdmitted($pressureLimits)) {
                 $notAdmittedReasons[] = ['Высокое давление'];
                 $admitted = 'Не допущен';

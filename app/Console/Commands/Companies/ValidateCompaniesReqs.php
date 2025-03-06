@@ -4,7 +4,7 @@ namespace App\Console\Commands\Companies;
 
 use App\Company;
 use App\Services\CompanyReqsChecker\CompanyReqsCheckerInterface;
-use App\ValueObjects\CompanyReqs;
+use App\ValueObjects\ForeignDevice\CompanyReqs;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Element\Import\Drivers\ImportObjects;
 
-use App\ValueObjects\Gender;
+use App\ValueObjects\ForeignDevice\Gender;
 use Carbon\Carbon;
 
 final class ImportedDriver

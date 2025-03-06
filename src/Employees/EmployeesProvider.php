@@ -9,9 +9,13 @@ use Src\Employees\Workdays\WorkdaysProvider;
 
 final class EmployeesProvider extends ServiceProvider
 {
-    public function boot(): void
+    public function register()
     {
         $this->app->register(WorkdaysProvider::class);
+    }
+
+    public function boot(): void
+    {
         $this->loadRoutesFrom(__DIR__ . '/Http/routes.php');
     }
 }

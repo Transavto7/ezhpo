@@ -4,7 +4,7 @@ namespace App\Actions\TripTicket\StoreTripTicket;
 
 use App\Actions\TripTicket\TripTicketNumberGenerator;
 use App\Models\TripTicket;
-use App\ValueObjects\EntityId;
+use App\ValueObjects\ForeignDevice\EntityId;
 use Carbon\Carbon;
 use DB;
 use Exception;

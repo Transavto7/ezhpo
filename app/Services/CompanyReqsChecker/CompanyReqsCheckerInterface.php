@@ -2,7 +2,7 @@
 
 namespace App\Services\CompanyReqsChecker;
 
-use App\ValueObjects\CompanyReqs;
+use App\ValueObjects\ForeignDevice\CompanyReqs;
 
 interface CompanyReqsCheckerInterface
 {

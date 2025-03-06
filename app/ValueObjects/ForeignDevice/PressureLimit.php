@@ -1,10 +1,10 @@
 <?php
 
-namespace App\ValueObjects;
+namespace App\ValueObjects\ForeignDevice;
 
 use App\Driver;
 
-class PressureLimits
+class PressureLimit implements ForeignDeviceLimitInterface
 {
     /**
      * @var float
@@ -16,7 +16,7 @@ class PressureLimits
      */
     private $maxDiastolic;
 
-    private function __construct(float $maxSystolic, float $maxDiastolic)
+    public function __construct(float $maxSystolic, float $maxDiastolic)
     {
         $this->maxSystolic = $maxSystolic;
         $this->maxDiastolic = $maxDiastolic;

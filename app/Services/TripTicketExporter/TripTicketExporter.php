@@ -2,7 +2,7 @@
 
 namespace App\Services\TripTicketExporter;
 
-use App\ValueObjects\EntityId;
+use App\ValueObjects\ForeignDevice\EntityId;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 

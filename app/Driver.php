@@ -203,7 +203,7 @@ class Driver extends Model
             return $setting;
         }
 
-        return 0;
+        return Settings::DEFAULT_TIME_OF_ALCOHOL_BAN;
     }
 
     public function getTimeOfPressureBan()
@@ -214,6 +214,6 @@ class Driver extends Model
             return $setting;
         }
 
-        return 0;
+        return Settings::DEFAULT_TIME_OF_PRESSURE_BAN;
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Services\CompanyReqsChecker;
 
 use App\Company;
-use App\ValueObjects\CompanyReqs;
+use App\ValueObjects\ForeignDevice\CompanyReqs;
 
 class CompanyRepository
 {

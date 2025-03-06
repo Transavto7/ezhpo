@@ -4,18 +4,18 @@ declare(strict_types=1);
 namespace Src\Employees\Http\Controllers;
 
 use App\Enums\BlockActionReasonsEnum;
-use App\User;
 use Exception;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\User;
+use Illuminate\Http\JsonResponse;
 use Src\Employees\Commands\GetAllEmployees\GetEmployeeCommand;
 use Src\Employees\Commands\GetAllEmployees\GetEmployeeHandler;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
-final class GetAllEmployeesListController
+final class GetEmployeeController
 {
-    public function __invoke(Request $request, GetEmployeeHandler $handler): JsonResponse
+    public function __invoke(int $hash_id, GetEmployeeHandler $handler, Request $request): JsonResponse
     {
         try {
             /** @var User $user */
@@ -24,7 +24,9 @@ final class GetAllEmployeesListController
                 throw new Exception(BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK), 400);
             }
 
-            return response()->json($handler->handle(new GetEmployeeCommand()));
+            $response = $handler->handle((new GetEmployeeCommand())->setFilterHashId($hash_id));
+
+            return response()->json($response[0]);
         } catch (Throwable $exception) {
             $code = $exception->getCode();
             if ($code < 400 || $code >= 600) {

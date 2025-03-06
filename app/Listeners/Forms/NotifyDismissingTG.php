@@ -8,9 +8,9 @@ use App\Events\Forms\DriverDismissed;
 use App\Models\Forms\MedicForm;
 use App\Models\Forms\TechForm;
 use App\Services\Notifier\TelegramNotifierService;
-use App\ValueObjects\NotifyTelegramMessages\MedicMessage;
-use App\ValueObjects\NotifyTelegramMessages\MessageInterface;
-use App\ValueObjects\NotifyTelegramMessages\TechMessage;
+use App\ValueObjects\ForeignDevice\NotifyTelegramMessages\MedicMessage;
+use App\ValueObjects\ForeignDevice\NotifyTelegramMessages\MessageInterface;
+use App\ValueObjects\ForeignDevice\NotifyTelegramMessages\TechMessage;
 use Illuminate\Support\Carbon;
 
 class NotifyDismissingTG

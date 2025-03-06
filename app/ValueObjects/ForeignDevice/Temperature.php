@@ -1,8 +1,8 @@
 <?php
 
-namespace App\ValueObjects;
+namespace App\ValueObjects\ForeignDevice;
 
-class Temperature
+class Temperature implements ForeignDeviceInterface
 {
     /**
      * @var float
@@ -19,7 +19,7 @@ class Temperature
         return new self(mt_rand(359, 367)/10);
     }
 
-    public function isAdmitted(): bool
+    public function isAdmitted(?ForeignDeviceLimitInterface $deviceLimits = null): bool
     {
         if ($this->temperature >= 37) {
             return false;

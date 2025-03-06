@@ -1,10 +1,10 @@
 <?php
 
-namespace App\ValueObjects;
+namespace App\ValueObjects\ForeignDevice;
 
 use App\Driver;
 
-class Tonometer
+class Tonometer implements ForeignDeviceInterface
 {
     public const MAX_LEGAL_SYSTOLIC = 139;
     public const MIN_LEGAL_SYSTOLIC = 100;
@@ -37,19 +37,26 @@ class Tonometer
         return $this->systolic . '/' . $this->diastolic;
     }
 
-    public static function random(Driver $driver = null): self
+    public static function random(): self
     {
+        return new self(self::getNormalizedSystolic(), self::getNormalizedDiastolic());
+    }
+
+    public static function randomWithDriver(Driver $driver = null): self
+    {
+        if (!$driver) {
+            return self::random();
+        }
+
         $systolic = self::getNormalizedSystolic();
         $diastolic = self::getNormalizedDiastolic();
 
-        if ($driver) {
-            if ($systolic >= intval($driver->getPressureSystolic())) {
-                $systolic = intval($driver->getPressureSystolic()) - rand(1, 10);
-            }
+        if ($systolic >= intval($driver->getPressureSystolic())) {
+            $systolic = intval($driver->getPressureSystolic()) - rand(1, 10);
+        }
 
-            if ($diastolic >= intval($driver->getPressureDiastolic())) {
-                $diastolic = intval($driver->getPressureDiastolic()) - rand(1, 10);
-            }
+        if ($diastolic >= intval($driver->getPressureDiastolic())) {
+            $diastolic = intval($driver->getPressureDiastolic()) - rand(1, 10);
         }
 
         return new self($systolic, $diastolic);
@@ -59,6 +66,10 @@ class Tonometer
     {
         $values = explode('/', $tonometer);
 
+        if (empty($values) || count($values) !== 2) {
+            throw new \Exception('Неверный формат тонометра');
+        }
+
         return new self($values[0], $values[1]);
     }
 
@@ -67,8 +78,12 @@ class Tonometer
         return new self($systolic, $diastolic);
     }
 
-    public function isAdmitted(PressureLimits $pressureLimits): bool
+    public function isAdmitted(?ForeignDeviceLimitInterface $pressureLimits): bool
     {
+        if (!($pressureLimits instanceof PressureLimit)) {
+            throw new \Exception('Неверный тип данных для pressureLimits');
+        }
+
         if ($this->systolic > $pressureLimits->getMaxSystolic()) {
             return false;
         }
@@ -80,7 +95,7 @@ class Tonometer
         return true;
     }
 
-    public function needNormalize(PressureLimits $pressureLimits): bool
+    public function needNormalize(PressureLimit $pressureLimits): bool
     {
         if (!$this->isAdmitted($pressureLimits)) {
             return false;
@@ -120,5 +135,15 @@ class Tonometer
     public static function getNormalizedSystolic(): int
     {
         return rand(self::MIN_LEGAL_SYSTOLIC, self::MAX_LEGAL_SYSTOLIC);
+    }
+
+    public function getSystolic(): int
+    {
+        return $this->systolic;
+    }
+
+    public function getDiastolic(): int
+    {
+        return $this->diastolic;
     }
 }
