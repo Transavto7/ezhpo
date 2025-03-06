@@ -3,7 +3,7 @@
 namespace App\Console\Commands\Companies;
 
 use App\Company;
-use App\ValueObjects\ForeignDevice\Phone;
+use App\ValueObjects\Phone;
 use Illuminate\Console\Command;
 
 class ValidateCompaniesPhoneNumberCommand extends Command

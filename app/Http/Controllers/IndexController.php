@@ -13,7 +13,7 @@ use App\Enums\LogActionTypesEnum;
 use App\FieldPrompt;
 use App\Point;
 use App\User;
-use App\ValueObjects\ForeignDevice\CompanyReqs;
+use App\ValueObjects\CompanyReqs;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Model;

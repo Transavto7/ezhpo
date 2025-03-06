@@ -6,7 +6,7 @@ use App\Actions\TripTicket\TripTicketNumberGenerator;
 use App\Enums\FormTypeEnum;
 use App\Models\Forms\Form;
 use App\Models\TripTicket;
-use App\ValueObjects\ForeignDevice\EntityId;
+use App\ValueObjects\EntityId;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;

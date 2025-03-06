@@ -7,7 +7,7 @@ use App\Enums\FormTypeEnum;
 use App\FieldPrompt;
 use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
-use App\ValueObjects\ForeignDevice\NotAdmittedReasons;
+use App\ValueObjects\NotAdmittedReasons;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;

@@ -10,8 +10,8 @@ use App\Exceptions\WrongCompanyReqsException;
 use App\Services\CompanyReqsChecker\CompanyRepository;
 use App\Services\CompanyReqsChecker\CompanyReqsCheckerInterface;
 use App\Services\OneC\CompanySync\CompanySyncServiceInterface;
-use App\ValueObjects\ForeignDevice\CompanyReqs;
-use App\ValueObjects\ForeignDevice\Phone;
+use App\ValueObjects\CompanyReqs;
+use App\ValueObjects\Phone;
 use Exception;
 use Throwable;
 

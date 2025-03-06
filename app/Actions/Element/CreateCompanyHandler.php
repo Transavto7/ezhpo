@@ -8,8 +8,8 @@ use App\Exceptions\WrongCompanyReqsException;
 use App\Services\CompanyReqsChecker\CompanyRepository;
 use App\Services\CompanyReqsChecker\CompanyReqsCheckerInterface;
 use App\User;
-use App\ValueObjects\ForeignDevice\CompanyReqs;
-use App\ValueObjects\ForeignDevice\Phone;
+use App\ValueObjects\CompanyReqs;
+use App\ValueObjects\Phone;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 

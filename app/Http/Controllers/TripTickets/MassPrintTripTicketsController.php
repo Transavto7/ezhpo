@@ -4,7 +4,7 @@ namespace App\Http\Controllers\TripTickets;
 
 use App\Http\Controllers\Controller;
 use App\Services\TripTicketExporter\TripTicketExporter;
-use App\ValueObjects\ForeignDevice\EntityId;
+use App\ValueObjects\EntityId;
 use DomainException;
 use Exception;
 use Illuminate\Http\Request;

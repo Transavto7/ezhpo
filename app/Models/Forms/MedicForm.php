@@ -7,7 +7,7 @@ use App\Enums\FormTypeEnum;
 use App\Point;
 use App\Stamp;
 use App\User;
-use App\ValueObjects\ForeignDevice\NotAdmittedReasons;
+use App\ValueObjects\NotAdmittedReasons;
 use App\ValueObjects\ForeignDevice\PressureLimit;
 use App\ValueObjects\ForeignDevice\Pulse;
 use App\ValueObjects\ForeignDevice\PulseLimit;

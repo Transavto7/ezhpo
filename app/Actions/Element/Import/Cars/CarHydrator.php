@@ -8,7 +8,7 @@ use App\Actions\Element\Import\Core\ElementHydrator;
 use App\Actions\Element\Import\Drivers\ImportObjects\ImportedDriver;
 use App\Services\Import\DateParser;
 use App\Services\Import\StringSanitizer;
-use App\ValueObjects\ForeignDevice\Gender;
+use App\ValueObjects\Gender;
 use Carbon\Carbon;
 
 final class CarHydrator extends ElementHydrator

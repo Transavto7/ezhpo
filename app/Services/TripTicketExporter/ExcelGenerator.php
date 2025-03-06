@@ -6,7 +6,7 @@ use App\Enums\TripTicketTemplateEnum;
 use App\Models\TripTicket;
 use App\Services\TripTicketExporter\Mappers\ItemMapperStrategy;
 use App\Services\TripTicketExporter\SheetWriters\SheetWriterStrategy;
-use App\ValueObjects\ForeignDevice\EntityId;
+use App\ValueObjects\EntityId;
 use DomainException;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;

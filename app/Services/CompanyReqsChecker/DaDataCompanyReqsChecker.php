@@ -2,7 +2,7 @@
 
 namespace App\Services\CompanyReqsChecker;
 
-use App\ValueObjects\ForeignDevice\CompanyReqs;
+use App\ValueObjects\CompanyReqs;
 use Dadata\DadataClient;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;

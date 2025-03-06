@@ -3,7 +3,7 @@
 namespace App\Services\Notifier;
 
 use App\Settings;
-use App\ValueObjects\ForeignDevice\Phone;
+use App\ValueObjects\Phone;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Throwable;

@@ -5,7 +5,7 @@ namespace App\Actions\Element\Remove;
 use App\Company;
 use App\Exceptions\EntityAlreadyExistException;
 use App\Services\CompanyReqsChecker\CompanyRepository;
-use App\ValueObjects\ForeignDevice\CompanyReqs;
+use App\ValueObjects\CompanyReqs;
 use Exception;
 
 class RemoveCompanyHandler implements RemoveElementHandlerInterface
