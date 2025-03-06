@@ -15,7 +15,7 @@ class InsertTestData extends Migration
     public function up()
     {
         Schema::table('workdays', function (Blueprint $table) {
-            DB::statement("INSERT INTO `default`.workdays (id, uuid, date, employee_id, terminal_id, t_people, t_people_test_status,
+            DB::statement("INSERT INTO workdays (id, uuid, date, employee_id, terminal_id, t_people, t_people_test_status,
                                 pressure_systolic, pressure_diastolic, pressure_test_status, type_anketa, pulse,
                                 pulse_test_status, alcometer_result, alcometer_mode, alcometer_test_status,
                                 narko_test_status, photo, video, admitted, is_real, created_at, updated_at, flag_pak)

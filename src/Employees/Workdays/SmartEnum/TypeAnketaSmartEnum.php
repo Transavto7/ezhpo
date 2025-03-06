@@ -26,8 +26,10 @@ final class TypeAnketaSmartEnum extends SmartEnum
         }
         if (is_string($value)) {
             switch ($value) {
+                case 'open':
                 case 'Открыта':
                     return parent::setValue(self::OPEN);
+                case 'close':
                 case 'Закрыта':
                     return parent::setValue(self::CLOSE);
             }
