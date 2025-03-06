@@ -8,8 +8,8 @@ class Settings extends Model
 {
     public const DEFAULT_PRESSURE_SYSTOLIC = 150;
     public const DEFAULT_PRESSURE_DIASTOLIC = 100;
-    public const DEFAULT_PULSE_LOWER = PHP_INT_MIN;
-    public const DEFAULT_PULSE_UPPER = PHP_INT_MAX;
+    public const DEFAULT_PULSE_LOWER = 0;
+    public const DEFAULT_PULSE_UPPER = 1000;
     public const DEFAULT_TIME_OF_ALCOHOL_BAN = 0;
     public const DEFAULT_TIME_OF_PRESSURE_BAN = 0;
 
