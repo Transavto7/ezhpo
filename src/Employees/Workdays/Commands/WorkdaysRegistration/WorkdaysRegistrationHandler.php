@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Src\Employees\Workdays\Commands\WorkdaysRegistration;
 
+use App\Enums\FlagPakEnum;
 use App\Settings;
 use App\User;
 use App\ValueObjects\ForeignDevice\PressureLimit;
@@ -46,7 +47,7 @@ final class WorkdaysRegistrationHandler
         if ($command->getTypeAnketa()->isClose()) {
             $openWorkday = Workday::where('employee_id', $employee->id)
                 ->whereDate('date', $command->getDate()->format('Y-m-d'))
-                ->where('is_allowed_work', 1)
+                ->where('admitted', 1)
                 ->first();
             if (!$openWorkday) {
                 throw new Exception('Сотрудник не имеет открытой смены для закрытия!', Response::HTTP_BAD_REQUEST);
@@ -97,10 +98,10 @@ final class WorkdaysRegistrationHandler
 
         $workDay->photo = $command->getPhoto();
         $workDay->video = $command->getVideo();
-        $workDay->is_manual = false;
+        $workDay->flag_pak = FlagPakEnum::SDPO_A;
         $workDay->is_real = $command->getDate()->format('d.m.Y') === date('d.m.Y');
 
-        $workDay->is_allowed_work = EmployerWorkdayAdmitting::fromWorkday($workDay)->isAllowedWork();
+        $workDay->admitted = EmployerWorkdayAdmitting::fromWorkday($workDay)->isAllowedWork();
 
         $workDay->save();
 

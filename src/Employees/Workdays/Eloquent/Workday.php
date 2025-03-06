@@ -28,9 +28,9 @@ use Ramsey\Uuid\Uuid;
  * @property bool|null $narko_test_status Тест на наркотики (1 - Пройден, 0 - Нет)
  * @property string|null $photo Фото (ссылка)
  * @property string|null $video Видео (ссылка)
- * @property bool $is_allowed_work Есть ли допуск?
- * @property bool $is_manual Вручную ли добавили?
- * @property bool $is_real Был добавлен в день смены
+ * @property bool $admitted Есть ли допуск?
+ * @property bool $flag_pak Вручную или через терминал: 'Очный' - вручную, 'СДПО А' - через терминал
+ * @property bool $is_real Был добавлен в день смены?
  * @property DateTime $created_at
  * @property DateTime $updated_at
  */
@@ -57,8 +57,8 @@ class Workday extends Model
         'narko_test_status',
         'photo',
         'video',
-        'is_allowed_work',
-        'is_manual',
+        'admitted',
+        'flag_pak',
         'is_real',
         'created_at',
         'updated_at'
