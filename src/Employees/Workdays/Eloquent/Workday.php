@@ -2,6 +2,7 @@
 
 namespace Src\Employees\Workdays\Eloquent;
 
+use App\Point;
 use App\User;
 use DateTime;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,7 @@ use Ramsey\Uuid\Uuid;
  * @property DateTime $date Время открытия/закрытия смены
  * @property int $employee_id ID сотрудника (users)
  * @property int $terminal_id ID терминала (users)
+ * @property int $pv_id - ID ПВ
  * @property int|null $t_people Температура сотрудника
  * @property int|null $t_people_test_status Статус теста на температуру (1 - пройден, 0 - нет))
  * @property int|null $pressure_systolic Систолическое давление
@@ -43,6 +45,7 @@ class Workday extends Model
         'date',
         'employee_id',
         'terminal_id',
+        'pv_id',
         't_people',
         't_people_test_status',
         'pressure_systolic',
@@ -81,5 +84,10 @@ class Workday extends Model
     public function getTerminal(): BelongsTo
     {
         return $this->belongsTo(User::class, 'employee_id', 'id');
+    }
+
+    public function getPoint(): BelongsTo
+    {
+        return $this->belongsTo(Point::class, 'pv_id', 'id');
     }
 }
