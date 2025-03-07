@@ -1,10 +1,10 @@
 <?php
 
-namespace App\ValueObjects;
+namespace App\ValueObjects\ForeignDevice;
 
 use App\Driver;
 
-class PulseLimits
+class PulseLimit implements ForeignDeviceLimitInterface
 {
     /**
      * @var int

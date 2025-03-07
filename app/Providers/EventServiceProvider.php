@@ -79,6 +79,9 @@ class EventServiceProvider extends ServiceProvider
         TripTicketAction::class => [
             LogTripTicketAction::class,
         ],
+        FormDetachedFromTripTicket::class => [
+            LogFormDetachFromTripTicket::class
+        ]
     ];
 
     /**

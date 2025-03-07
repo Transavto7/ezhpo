@@ -178,6 +178,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\UnleashServiceProvider::class,
         App\Providers\FormsServiceProvider::class,
+        Src\Employees\EmployeesProvider::class,
         Src\Terminals\TerminalsProvider::class,
 
 

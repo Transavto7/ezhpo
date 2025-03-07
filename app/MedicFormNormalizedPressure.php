@@ -2,7 +2,7 @@
 
 namespace App;
 
-use App\ValueObjects\Tonometer;
+use App\ValueObjects\ForeignDevice\Tonometer;
 use Illuminate\Database\Eloquent\Model;
 
 class MedicFormNormalizedPressure extends Model

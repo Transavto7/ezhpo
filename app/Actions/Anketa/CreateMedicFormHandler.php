@@ -13,11 +13,11 @@ use App\Models\Forms\MedicForm;
 use App\Services\DuplicatesCheckerService;
 use App\Services\FormHash\FormHashGenerator;
 use App\Services\FormHash\MedicHashData;
-use App\ValueObjects\PressureLimits;
-use App\ValueObjects\Pulse;
-use App\ValueObjects\PulseLimits;
-use App\ValueObjects\Temperature;
-use App\ValueObjects\Tonometer;
+use App\ValueObjects\ForeignDevice\PressureLimit;
+use App\ValueObjects\ForeignDevice\Pulse;
+use App\ValueObjects\ForeignDevice\PulseLimit;
+use App\ValueObjects\ForeignDevice\Temperature;
+use App\ValueObjects\ForeignDevice\Tonometer;
 use DateTimeImmutable;
 use Exception;
 use Illuminate\Support\Carbon;
@@ -39,7 +39,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
     protected function createForm(array $form)
     {
         $defaultData = [
-            'tonometer' => strval(Tonometer::random(Driver::where('hash_id', $this->data['driver_id'] ?? 0)->first())),
+            'tonometer' => strval(Tonometer::randomWithDriver(Driver::where('hash_id', $this->data['driver_id'] ?? 0)->first())),
             't_people' => Temperature::random()->getTemperature(),
             'pulse' => Pulse::random()->getPulse(),
             'date' => date('Y-m-d H:i:s'),
@@ -241,7 +241,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         }
 
         $pressure = Tonometer::fromString($form['tonometer']);
-        $pressureLimits = PressureLimits::create($driver);
+        $pressureLimits = PressureLimit::create($driver);
         if (!$pressure->isAdmitted($pressureLimits)) {
             $admitted = false;
             $driver->end_of_ban = Carbon::parse($this->time)->addMinutes($driver->getTimeOfPressureBan());
@@ -250,7 +250,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         $this->needStoreNormalizedPressure = $pressure->needNormalize($pressureLimits);
 
         $pulse = new Pulse(intval($form['pulse']));
-        $pulseLimits = PulseLimits::create($driver);
+        $pulseLimits = PulseLimit::create($driver);
         if (!$pulse->isAdmitted($pulseLimits)) {
             $admitted = false;
         }

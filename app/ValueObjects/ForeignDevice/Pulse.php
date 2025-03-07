@@ -1,8 +1,8 @@
 <?php
 
-namespace App\ValueObjects;
+namespace App\ValueObjects\ForeignDevice;
 
-class Pulse
+class Pulse implements ForeignDeviceInterface
 {
     private $pulse;
 
@@ -19,8 +19,12 @@ class Pulse
         return new self(mt_rand(60,80));
     }
 
-    public function isAdmitted(PulseLimits $pulseLimits): bool
+    public function isAdmitted(?ForeignDeviceLimitInterface $pulseLimits): bool
     {
+        if (!($pulseLimits instanceof PulseLimit)) {
+            throw new \Exception('Неверный тип данных для pulseLimits');
+        }
+
         if ($this->pulse >= $pulseLimits->getMaxPulse()) {
             return false;
         }
