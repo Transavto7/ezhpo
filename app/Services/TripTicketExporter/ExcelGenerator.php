@@ -2,11 +2,17 @@
 
 namespace App\Services\TripTicketExporter;
 
-use App\Enums\TripTicketTemplateEnum;
+use App\Enums\TripTicket\TripTicketActionType;
+use App\Enums\TripTicket\TripTicketStatus;
+use App\Enums\TripTicket\TripTicketTemplateEnum;
+use App\Enums\TripTicket\TripTicketType;
+use App\Events\TripTickets\ChangeTripTicketStatus;
+use App\Events\TripTickets\LogTripTicket;
 use App\Models\TripTicket;
 use App\Services\TripTicketExporter\Mappers\ItemMapperStrategy;
 use App\Services\TripTicketExporter\SheetWriters\SheetWriterStrategy;
 use App\ValueObjects\EntityId;
+use Auth;
 use DomainException;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
@@ -125,6 +131,18 @@ final class ExcelGenerator
         foreach ($this->templateSheetNames() as $sheetName) {
             $sheet = $spreadsheet->getSheetByName($sheetName);
             $spreadsheet->removeSheetByIndex($spreadsheet->getIndex($sheet));
+        }
+
+        foreach ($tripTickets as $tripTicket) {
+            if ($tripTicket->type === TripTicketType::IN_ADVANCE && in_array($tripTicket->status, [TripTicketStatus::ACTIVATED, TripTicketStatus::APPROVED])) {
+                continue;
+            }
+
+            event(new ChangeTripTicketStatus($tripTicket, TripTicketStatus::printed()));
+
+            if ($tripTicket->getOriginal('status') !== TripTicketStatus::PRINTED) {
+                event(new LogTripTicket(Auth::user(), $tripTicket, TripTicketActionType::changeStatus()));
+            }
         }
 
         return new Xlsx($spreadsheet);

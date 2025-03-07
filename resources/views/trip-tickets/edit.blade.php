@@ -63,12 +63,12 @@
                                 <label class="form-control-label">ID компании:</label>
                                 <article>
                                     <input value="{{ $tripTicket->company_id }}"
-                                        type="number"
-                                        oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Company', event.target.value, 'name', $(event.target).parent(), {{ !($id ?? false) ? 'true' : 'false' }})"
-                                        min="5"
-                                        name="company_id"
-                                        class="MASK_ID_ELEM form-control"
-                                        disabled>
+                                           type="number"
+                                           oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Company', event.target.value, 'name', $(event.target).parent(), {{ !($id ?? false) ? 'true' : 'false' }})"
+                                           min="5"
+                                           name="company_id"
+                                           class="MASK_ID_ELEM form-control"
+                                           disabled>
                                     <p class="app-checker-prop"></p>
                                 </article>
                             </div>
@@ -78,14 +78,14 @@
                                 <article>
                                     <div class="d-flex">
                                         <input type="number"
-                                            @if($tripTicket->driver_id !== null)
-                                                value="{{ $tripTicket->driver_id }}"
-                                                disabled
-                                            @endif
-                                            oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent().parent(), {{ 'false' }})"
-                                            min="6"
-                                            name="driver_id"
-                                            class="MASK_ID_ELEM form-control">
+                                               @if($tripTicket->driver_id !== null)
+                                                   value="{{ $tripTicket->driver_id }}"
+                                               disabled
+                                               @endif
+                                               oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent().parent(), {{ 'false' }})"
+                                               min="6"
+                                               name="driver_id"
+                                               class="MASK_ID_ELEM form-control">
                                     </div>
                                     <p class="app-checker-prop"></p>
                                 </article>
@@ -98,7 +98,7 @@
                                         <input type="number"
                                                @if($tripTicket->car_id !== null)
                                                    value="{{ $tripTicket->car_id }}"
-                                                   disabled
+                                               disabled
                                                @endif
                                                oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent().parent(), {{ 'false' }})"
                                                min="6"
@@ -115,10 +115,10 @@
                                     <input type="date"
                                            @if($tripTicket->period_pl)
                                                min="{{ Carbon::parse($tripTicket->period_pl)->startOfMonth()->format('Y-m-d') }}"
-                                               max="{{ Carbon::parse($tripTicket->period_pl)->endOfMonth()->format('Y-m-d') }}"
+                                           max="{{ Carbon::parse($tripTicket->period_pl)->endOfMonth()->format('Y-m-d') }}"
                                            @else
                                                min="1970-01-01"
-                                               max="2100-01-01"
+                                           max="2100-01-01"
                                            @endif
                                            value="{{ $tripTicket->start_date }}"
                                            name="start_date"
@@ -169,7 +169,7 @@
                                 <label class="form-control-label">Вид перевозки:</label>
                                 <article>
                                     <select name="transportation_type" required class="form-control type-view">
-                                        @foreach(\App\Enums\TransportationTypeEnum::labels() as $key => $label)
+                                        @foreach(\App\Enums\TripTicket\TransportationTypeEnum::labels() as $key => $label)
                                             <option value="{{ $key }}"
                                             @if($tripTicket->transportation_type === $key)
                                                 {{'selected'}}
@@ -184,7 +184,7 @@
                                 <label class="form-control-label">Код бумажного шаблона:</label>
                                 <article>
                                     <select name="template_code" required class="form-control type-view">
-                                        @foreach(\App\Enums\TripTicketTemplateEnum::labels() as $key => $label)
+                                        @foreach(\App\Enums\TripTicket\TripTicketTemplateEnum::labels() as $key => $label)
                                             <option value="{{ $key }}"
                                             @if($tripTicket->template_code === $key)
                                                 {{'selected'}}

@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Actions\TripTicket\TripTicketsQuery;
+namespace App\Services\TripTicket\TripTicketsQuery;
 
+use App\Enums\TripTicket\TripTicketStatus;
+use App\Enums\TripTicket\TripTicketType;
 use App\Models\TripTicket;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -29,6 +31,8 @@ final class TripTicketsQueryHandler
             'trip_tickets.transportation_type',
             'trip_tickets.template_code',
             'trip_tickets.photos',
+            'trip_tickets.status',
+            'trip_tickets.type',
             'trip_tickets.created_at',
             'trip_tickets.deleted_at',
 
@@ -73,6 +77,56 @@ final class TripTicketsQueryHandler
         if (count($action->getFilterParams()) > 0 && $action->isFilterActivated()) {
             foreach ($action->getFilterParams() as $filterKey => $filterValue) {
                 if ($filterValue === null || in_array($filterKey, ['date_from', 'date_to'])) {
+                    continue;
+                }
+
+                if ($filterKey === 'has_photos') {
+                    if (filter_var($filterValue, FILTER_VALIDATE_BOOLEAN)) {
+                        $tripTickets->whereNotNull('trip_tickets.photos');
+                    } else {
+                        $tripTickets->whereNull('trip_tickets.photos');
+                    }
+
+                    continue;
+                }
+
+                if ($filterKey === 'is_approved') {
+                    if (filter_var($filterValue, FILTER_VALIDATE_BOOLEAN)) {
+                        $tripTickets->where(function (Builder $query) {
+                            $query->where(function (Builder $query) {
+                                $query->where('type', '=', TripTicketType::GENERATED)
+                                    ->where('status','!=', TripTicketStatus::CREATED);
+                            })->orWhere(function (Builder $query) {
+                                $query->where(function (Builder $query) {
+                                    $query->where('type', '=', TripTicketType::IN_ADVANCE)
+                                        ->where('status','=', TripTicketStatus::APPROVED);
+                                });
+                            })->orWhere(function (Builder $query) {
+                                $query->where(function (Builder $query) {
+                                    $query->where('type', '=', TripTicketType::COMMON)
+                                        ->where('status','!=', TripTicketStatus::CREATED);
+                                });
+                            });
+                        });
+                    } else {
+                        $tripTickets->where(function (Builder $query) {
+                            $query->where(function (Builder $query) {
+                                $query->where('type', '=', TripTicketType::GENERATED)
+                                    ->where('status','=', TripTicketStatus::CREATED);
+                            })->orWhere(function (Builder $query) {
+                                $query->where(function (Builder $query) {
+                                    $query->where('type', '=', TripTicketType::IN_ADVANCE)
+                                        ->where('status','!=', TripTicketStatus::APPROVED);
+                                });
+                            })->orWhere(function (Builder $query) {
+                                $query->where(function (Builder $query) {
+                                    $query->where('type', '=', TripTicketType::COMMON)
+                                        ->where('status','=', TripTicketStatus::CREATED);
+                                });
+                            });
+                        });
+                    }
+
                     continue;
                 }
 

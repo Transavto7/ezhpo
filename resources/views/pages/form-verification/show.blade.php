@@ -22,7 +22,7 @@
 @push('custom_styles')
     <style>
         .page-content {
-            height: calc(100vh - 50px);
+            padding-top: 75px;
         }
 
         .status-icon {
@@ -76,6 +76,15 @@
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-md-12">
                     <div class="flex justify-content-center align-items-center">
+                        @if($errors->any())
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         <div>
                             @if($details->isVerified())
                                 <div>
@@ -144,19 +153,35 @@
                                                 href="{{ route('forms.trash', ['id' => $details->getFormId(), 'action' => 1]) }}"
                                                 class="btn btn-warning btn-sm hv-btn-trash mr-1"
                                                 data-id="{{ $details->getFormId() }}">
-                                                Удалить <i class="fa fa-trash ml-1"></i>
+                                                Удалить осмотр <i class="fa fa-trash ml-1"></i>
                                             </a>
                                         @endif
                                     @endauth
+                                    @guest
+                                        @if($details->getTripTicketDetails())
+                                            <a class="btn btn-success btn-sm ml-2" type="button" href="{{ route('trip-tickets.attach-photos-page', ['id' => $details->getTripTicketDetails()->getTripTicket()->uuid]) }}">
+                                                Загрузить фото ПЛ <i class="fa fa-photo ml-1"></i>
+                                            </a>
+                                        @endif
+                                    @endguest
+                                    @auth
+                                        @if($details->getTripTicketDetails())
+                                            <div class="mt-2" id="attach-photos">
+                                                <form method="POST"
+                                                      action="{{ route('trip-tickets.attach-photos', ['id' => $details->getTripTicketDetails()->getTripTicket()->uuid]) }}"
+                                                      class="form-horizontal"
+                                                      onsubmit="document.querySelector('#page-preloader').classList.remove('hide')"
+                                                      enctype="multipart/form-data">
+                                                    @csrf
 
-                                    @if($details->getTripTicketId())
-                                        <a
-                                            id="attach-trip-ticket-photos"
-                                            href="{{ route('trip-tickets.attach-photos-page', ['id' => $details->getTripTicketId()]) }}"
-                                            class="btn btn-success btn-sm hv-btn-trash ml-2 mr-1">
-                                            Загрузить фото ПЛ <i class="fa fa-photo ml-1"></i>
-                                        </a>
-                                    @endif
+                                                    <attach-photos-index
+                                                        :id="'{{ $details->getTripTicketDetails()->getTripTicket()->uuid }}'"
+                                                        :items="JSON.parse('{{ json_encode($details->getTripTicketDetails()->getPhotos()) }}')"
+                                                    ></attach-photos-index>
+                                                </form>
+                                            </div>
+                                        @endif
+                                    @endauth
                                 </div>
                             @endif
                         </div>
@@ -166,8 +191,7 @@
         </div>
     </main>
 
-
-    <div id="history-widget" class="justify-content-center d-none">
+    <div id="history-widget" class="justify-content-center d-none p-2">
         <a class="text-info" data-toggle="collapse" href="#collapseVerificationHistory" role="button"
            aria-expanded="false" aria-controls="collapseVerificationHistory">
             История проверок осмотра

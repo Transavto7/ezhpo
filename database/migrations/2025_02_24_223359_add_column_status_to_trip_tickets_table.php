@@ -1,0 +1,33 @@
+<?php
+
+use App\Enums\TripTicket\TripTicketStatus;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class AddColumnStatusToTripTicketsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table('trip_tickets', function (Blueprint $table) {
+            $table->string('status')->default(TripTicketStatus::CREATED);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('trip_tickets', function (Blueprint $table) {
+            $table->dropColumn('status');
+        });
+    }
+}

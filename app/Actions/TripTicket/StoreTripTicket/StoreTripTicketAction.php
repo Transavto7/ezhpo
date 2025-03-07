@@ -25,17 +25,29 @@ final class StoreTripTicketAction
     private $items;
 
     /**
+     * @var bool
+     */
+    private $createIsDopMedic;
+
+    /**
      * @param string $companyId
      * @param string|null $driverId
      * @param string|null $carId
      * @param StoreTripTicketActionItem[] $items
+     * @param bool $createIsDopMedic
      */
-    public function __construct(string $companyId, ?string $driverId, ?string $carId, array $items)
-    {
+    public function __construct(
+        string  $companyId,
+        ?string $driverId,
+        ?string $carId,
+        array   $items,
+        bool    $createIsDopMedic
+    ) {
         $this->companyId = $companyId;
         $this->driverId = $driverId;
         $this->carId = $carId;
         $this->items = $items;
+        $this->createIsDopMedic = $createIsDopMedic;
     }
 
     public function getCompanyId(): string
@@ -56,5 +68,10 @@ final class StoreTripTicketAction
     public function getItems(): array
     {
         return $this->items;
+    }
+
+    public function isCreateIsDopMedic(): bool
+    {
+        return $this->createIsDopMedic;
     }
 }

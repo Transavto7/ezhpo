@@ -79,6 +79,10 @@
             max-height: 90%;
             object-fit: contain;
         }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
     </style>
 @endsection
 
@@ -381,6 +385,8 @@
                         document.body.appendChild(link);
                         link.click();
                         link.remove();
+
+                        location.reload()
                     })
                     .catch((error) => {
                         if (error.response && error.response.data instanceof Blob) {
@@ -554,11 +560,22 @@
 
                             wrapper.append(html)
                         })
-
-
                     })
             })
 
+            $('table').on('click', '.change-status', function () {
+                const status = $(this).data('status')
+                const id = $(this).data('uuid')
+
+                axios
+                    .post('{{ route('trip-tickets.change-status') }}', {
+                        status,
+                        id,
+                    })
+                    .then(response => {
+                        location.reload()
+                    })
+            })
         })
     </script>
 @endsection

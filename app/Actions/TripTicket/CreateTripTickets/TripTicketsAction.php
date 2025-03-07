@@ -5,8 +5,8 @@ namespace App\Actions\TripTicket\CreateTripTickets;
 use App\Company;
 use App\Driver;
 use App\Enums\LogisticsMethodEnum;
-use App\Enums\TransportationTypeEnum;
-use App\Enums\TripTicketTemplateEnum;
+use App\Enums\TripTicket\TransportationTypeEnum;
+use App\Enums\TripTicket\TripTicketTemplateEnum;
 use Carbon\Carbon;
 
 final class TripTicketsAction

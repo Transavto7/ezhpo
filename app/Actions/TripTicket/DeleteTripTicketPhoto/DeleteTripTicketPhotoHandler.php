@@ -2,6 +2,11 @@
 
 namespace App\Actions\TripTicket\DeleteTripTicketPhoto;
 
+use App\Enums\TripTicket\TripTicketActionType;
+use App\Enums\TripTicket\TripTicketStatus;
+use App\Events\TripTickets\ChangeTripTicketStatus;
+use App\Events\TripTickets\LogTripTicket;
+use Auth;
 use Illuminate\Support\Facades\Storage;
 
 final class DeleteTripTicketPhotoHandler
@@ -15,8 +20,13 @@ final class DeleteTripTicketPhotoHandler
 
         $action->getTripTicket()
             ->update([
-                'photos' => $files ?? null,
+                'photos' => count($files) ? $files : null,
             ]);
+
+        if (count($files) === 0) {
+            event(new ChangeTripTicketStatus($action->getTripTicket(), TripTicketStatus::created()));
+            event(new LogTripTicket(Auth::user(), $action->getTripTicket(), TripTicketActionType::changeStatus()));
+        }
     }
 
     private function removeFile(string $path)
@@ -32,6 +42,6 @@ final class DeleteTripTicketPhotoHandler
             }
 
             return $carry;
-        });
+        }, []);
     }
 }

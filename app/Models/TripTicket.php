@@ -88,6 +88,8 @@ class TripTicket extends Model
         'user_id',
         'period_pl',
         'photos',
+        'status',
+        'type',
     ];
 
     public function driver(): BelongsTo

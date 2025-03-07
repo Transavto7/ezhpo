@@ -3,10 +3,9 @@
 namespace App\Actions\TripTicket\UpdateTripTicketForms;
 
 use App\Enums\FormLogActionTypesEnum;
-use App\Enums\TripTicketActionType;
-use App\Events\Forms\FormAction;
+use App\Enums\TripTicket\TripTicketActionType;
 use App\Events\Forms\FormDetachedFromTripTicket;
-use App\Events\TripTickets\TripTicketAction;
+use App\Events\TripTickets\LogTripTicket;
 use App\Models\Forms\Form;
 use App\Models\TripTicket;
 use Auth;
@@ -40,12 +39,12 @@ final class UpdateTripTicketFormsHandler
         ]);
 
         if ($oldMedicForm && $action->getMedicForm() === null) {
-            event(new TripTicketAction($user, $tripTicket, TripTicketActionType::detachMedicForm()));
+            event(new LogTripTicket($user, $tripTicket, TripTicketActionType::detachMedicForm()));
             event(new FormDetachedFromTripTicket($user, Form::findOrFail($oldMedicForm), $tripTicket, FormLogActionTypesEnum::DETACH_FROM_TRIP_TICKET));
         }
 
         if ($action->getMedicForm() !== null && $action->getMedicForm()->id !== $oldMedicForm) {
-            event(new TripTicketAction($user, $tripTicket, TripTicketActionType::attachMedicForm()));
+            event(new LogTripTicket($user, $tripTicket, TripTicketActionType::attachMedicForm()));
             if ($oldMedicForm !== null) {
                 event(new FormDetachedFromTripTicket($user, Form::findOrFail($oldMedicForm), $tripTicket, FormLogActionTypesEnum::DETACH_FROM_TRIP_TICKET));
             }
@@ -74,12 +73,12 @@ final class UpdateTripTicketFormsHandler
         ]);
 
         if ($oldTechForm && $action->getTechForm() === null) {
-            event(new TripTicketAction($user, $tripTicket, TripTicketActionType::detachTechForm()));
+            event(new LogTripTicket($user, $tripTicket, TripTicketActionType::detachTechForm()));
             event(new FormDetachedFromTripTicket($user, Form::findOrFail($oldTechForm), $tripTicket, FormLogActionTypesEnum::DETACH_FROM_TRIP_TICKET));
         }
 
         if ($action->getTechForm() !== null && $action->getTechForm()->id !== $oldTechForm) {
-            event(new TripTicketAction($user, $tripTicket, TripTicketActionType::attachTechForm()));
+            event(new LogTripTicket($user, $tripTicket, TripTicketActionType::attachTechForm()));
             if ($oldTechForm !== null) {
                 event(new FormDetachedFromTripTicket($user, Form::findOrFail($oldTechForm), $tripTicket, FormLogActionTypesEnum::DETACH_FROM_TRIP_TICKET));
             }
