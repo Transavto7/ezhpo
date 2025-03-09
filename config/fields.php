@@ -455,6 +455,9 @@ return [
             'logistics_method' => true,
             'transportation_type' => true,
             'template_code' => true,
+            'photos' => true,
+            'type' => true,
+            'status' => true,
         ],
         'workdays' => [
             'date' => true,
@@ -502,7 +505,9 @@ return [
             'created_at',
         ],
         'trip_tickets' => [
-
+            'photos',
+            'type',
+            'status',
         ],
     ]
 ];
