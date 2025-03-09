@@ -113,9 +113,10 @@ export default {
             type="file"
             class="custom-file-input"
             id="photo"
-            accept="image/jpeg, image/jpg, image/png, application/pdf"
+            accept=".jpeg,.jpg,.png,.pdf"
             name="photos[]"
             multiple
+            required
             @change="changePhoto"
         >
         <label class="custom-file-label mr-0" for="photo">Выберите изображение:</label>
