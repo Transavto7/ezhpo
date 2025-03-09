@@ -5,6 +5,8 @@ namespace Src\Employees\Commands\GetAllEmployees;
 
 use App\Settings;
 use Illuminate\Support\Facades\DB;
+use Src\Employees\Workdays\Eloquent\Workday;
+use Src\Employees\Workdays\SmartEnum\TypeAnketaSmartEnum;
 use Symfony\Component\HttpFoundation\Response;
 
 final class GetEmployeeHandler
@@ -43,7 +45,7 @@ final class GetEmployeeHandler
                 'users.hash_id',
                 'users.name'
             ])
-            ->join('model_has_roles', 'model_has_roles.model_id', '=','users.id')
+            ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
             ->whereIn('model_has_roles.role_id', [1, 2])
             ->whereNull('users.deleted_at');
 
@@ -74,10 +76,34 @@ final class GetEmployeeHandler
         // Валидация ответа только если ищем одного сотрудника, с фильтром
         if ($filterHashId) {
             if (empty($result)) {
-                throw new \Exception('Сотрудник с указанным ID не найден!', Response::HTTP_NOT_FOUND);
+                throw new \Exception('Сотрудник с указанным ID не найден!', Response::HTTP_BAD_REQUEST);
             } elseif ($result[0]['dismissed']) {
                 throw new \Exception('Сотрудник с указанным ID уволен!', Response::HTTP_SEE_OTHER);
             }
+
+            // Проверка на дубликат в этот же день
+            $existingWorkday = Workday::query()
+                ->leftJoin('users', 'users.id', '=', 'workdays.employee_id')
+                ->where('users.hash_id', $filterHashId)
+                ->whereDate('date', now()->format('Y-m-d'))
+                ->orderBy('workdays.created_at', 'desc')
+                ->first();
+            if ($existingWorkday) {
+                if ($existingWorkday->type_anketa === TypeAnketaSmartEnum::CLOSE) {
+                    throw new \Exception('Сотрудник уже имеет запись в этот день', Response::HTTP_BAD_REQUEST);
+                }
+
+                if ($existingWorkday->type_anketa === TypeAnketaSmartEnum::OPEN) {
+                    $result[0]['inspection_types'] = [
+                        TypeAnketaSmartEnum::create(TypeAnketaSmartEnum::CLOSE)->getSpdoValue(),
+                    ];
+                }
+            } else {
+                $result[0]['inspection_types'] = [
+                    TypeAnketaSmartEnum::create(TypeAnketaSmartEnum::OPEN)->getSpdoValue()
+                ];
+            }
+
         }
 
 

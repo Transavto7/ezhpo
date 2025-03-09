@@ -55,6 +55,7 @@ final class WorkdaysRegistrationHandler
         $workDay->date = $command->getDate();
         $workDay->employee_id = $employee->id;
         $workDay->terminal_id = $command->getTerminal()->id;
+        $workDay->pv_id = $command->getTerminal()->pv_id;
 
         if ($termometer = $command->getPeopleThermometer()) {
             $workDay->t_people = $termometer->getTemperature();
