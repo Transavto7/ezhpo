@@ -38,6 +38,7 @@ use Ramsey\Uuid\Uuid;
  */
 class Workday extends Model
 {
+    protected $table = 'workdays';
 
     public $fillable = [
         'id',

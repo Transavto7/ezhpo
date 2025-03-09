@@ -37,4 +37,14 @@ final class TypeAnketaSmartEnum extends SmartEnum
 
         return $this;
     }
+
+    public function getSpdoValue()
+    {
+        switch ($this->value) {
+            case self::OPEN:
+                return 'open';
+            case self::CLOSE:
+                return 'close';
+        }
+    }
 }
