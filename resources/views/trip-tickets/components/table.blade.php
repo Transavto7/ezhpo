@@ -69,6 +69,10 @@
                            style="cursor: pointer" data-id="{{ $tripTicket->uuid }}">
                             <i class="fa fa-camera"></i>
                         </a>
+                    @elseif($field->field === 'status')
+                        {{ \App\Enums\TripTicket\TripTicketStatus::getLabel($tripTicket[$field->field]) }}
+                    @elseif($field->field === 'type')
+                        {{ \App\Enums\TripTicket\TripTicketType::getLabel($tripTicket[$field->field]) }}
                     @else
                         {{ $tripTicket[$field->field] }}
                     @endif
@@ -129,7 +133,7 @@
                             &plusmn; Привязать/отвязать МО и ТО
                         </a>
                     @endif
-                    @if($permissionToPrintTripTickets && \App\Services\TripTicket\TripTicketPermissions::canPrint($tripTicket->type, $tripTicket->status))
+                    @if($permissionToPrintTripTickets && \App\Services\TripTicket\TripTicketPermissions::canPrint($tripTicket->type, $tripTicket->status, $tripTicket->medic_form_id))
                         <a class="dropdown-item download-excel-to-print-btn cursor-pointer" data-uuid="{{ $tripTicket->uuid }}">
                             <i class="fa fa-file-excel-o"></i> Печать ПЛ
                         </a>
