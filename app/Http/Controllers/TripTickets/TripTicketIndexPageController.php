@@ -79,7 +79,7 @@ class TripTicketIndexPageController extends Controller
             'take' => $take,
             'orderBy' => $orderBy,
             'orderKey' => $orderKey,
-            'queryString' => Arr::query($queryParams)
+            'queryString' => Arr::query($request->except(['orderKey', 'orderBy']))
         ]);
     }
 }

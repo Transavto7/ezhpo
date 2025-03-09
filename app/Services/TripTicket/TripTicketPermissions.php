@@ -7,13 +7,13 @@ use App\Enums\TripTicket\TripTicketType;
 
 final class TripTicketPermissions
 {
-    public static function canPrint(string $type, string $status): bool
+    public static function canPrint(string $type, string $status, string $medicFormId = null): bool
     {
         $allowedStatuses = [TripTicketStatus::APPROVED, TripTicketStatus::ACTIVATED, TripTicketStatus::PRINTED];
 
         switch (true) {
             case $type === TripTicketType::GENERATED && in_array($status, $allowedStatuses):
-            case $type === TripTicketType::IN_ADVANCE:
+            case $type === TripTicketType::IN_ADVANCE && $medicFormId !== null:
             case $type === TripTicketType::COMMON && in_array($status, $allowedStatuses):
                 return true;
             default:
@@ -67,6 +67,18 @@ final class TripTicketPermissions
             case $type === TripTicketType::GENERATED && $status !== TripTicketStatus::APPROVED:
             case $type === TripTicketType::IN_ADVANCE && in_array($status, $allowedStatuses):
             case $type === TripTicketType::COMMON && $status === TripTicketStatus::CREATED:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public static function canAddPhoto(string $type, string $status): bool
+    {
+        $allowedStatuses = [TripTicketStatus::ACTIVATED, TripTicketStatus::PRINTED];
+
+        switch (true) {
+            case $type === TripTicketType::IN_ADVANCE && in_array($status, $allowedStatuses):
                 return true;
             default:
                 return false;
