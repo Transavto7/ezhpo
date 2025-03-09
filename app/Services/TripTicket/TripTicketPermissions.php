@@ -72,4 +72,16 @@ final class TripTicketPermissions
                 return false;
         }
     }
+
+    public static function canAddPhoto(string $type, string $status): bool
+    {
+        $allowedStatuses = [TripTicketStatus::ACTIVATED, TripTicketStatus::PRINTED];
+
+        switch (true) {
+            case $type === TripTicketType::IN_ADVANCE && in_array($status, $allowedStatuses):
+                return true;
+            default:
+                return false;
+        }
+    }
 }
