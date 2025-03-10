@@ -26,7 +26,6 @@ components:
           example: 1000
         end_of_ban:
           type: string
-          format: date-time
           example: "2024-01-02 09:14:09"
         time_of_alcohol_ban:
           type: integer
@@ -49,119 +48,77 @@ components:
         hash_id:
           type: string
           example: "459997"
-    Inspection:
+    WorkdayRegistration:
       type: object
       properties:
-        date:
-          type: string
-          format: date-time
-          example: "2025-03-03 22:38:05"
-        driver_id:
-          type: string
-          example: "123456"
-        people_status:
-          type: string
-          example: "Да"
-        driver_fio:
-          type: string
-          example: "Иванов Иван Иванович"
-        day_hash:
-          type: string
-          example: "38d2e9e98af301cc26a5ea0fb7545baf"
-        user_name:
-          type: string
-          example: "Иванова Ирина Ивановна"
-        created_at:
-          type: string
-          format: date-time
-          example: "2025-03-03 22:38:05"
-        wish_message:
-          type: string
-          example: "Легкого рабочего дня!"
-        type_anketa:
-          type: string
-          example: "medic"
-        proba_alko:
-          type: string
-          example: "Отрицательно"
-        uuid:
-          type: string
-          example: "1cef4b84-333a-466c-b23e-717e11c41a79"
-        timeout:
-          type: string
-          example: "90"
-        updated_at:
-          type: string
-          format: date-time
-          example: "2025-03-03 19:38:05"
-        sleep_status:
-          type: string
-          example: "Да"
         id:
           type: integer
-          example: 10833065
+        uuid:
+          type: string
+        date:
+          type: string
+          example: "2025-03-03 22:38:05"
+        employee_id:
+          type: string
         terminal_id:
           type: integer
-          example: 123311
+        pv_id:
+          type: integer
         t_people:
           type: number
-          example: 36.6
-        forms_uuid:
-          type: string
-          example: "0"
-        admitted:
-          type: string
-          example: "Допущен"
-        user_eds:
-          type: string
-          example: "01BB 1181 3G21 8S31 1119 213W 381B 011F"
-        point_id:
+        t_people_test_status:
           type: integer
-          example: 51
-        company_id:
-          type: string
-          example: "412109849"
-        tonometer:
-          type: string
-          example: "134/72"
-        user_validity_eds_end:
-          type: string
-          format: date-time
-          example: "2025-10-01"
-        stamp_licence:
-          type: string
-          example: "Бессрочная лицензия от 09.12.2020 №Л123-123-137643/13113"
-        realy:
-          type: string
-          example: "да"
-        flag_pak:
-          type: string
-          example: "СДПО А"
-        med_view:
-          type: string
-          example: "В норме"
-        user_id:
+        pressure_systolic:
           type: integer
-          example: 66567
+        pressure_diastolic:
+          type: integer
+        pressure_test_status:
+          type: integer
+        type_anketa:
+          type: integer
         pulse:
           type: integer
-          example: 68
-        user_validity_eds_start:
+        pulse_test_status:
+          type: integer
+        alcometer_result:
           type: string
-          format: date-time
-          example: "2024-10-08"
-        validity:
+        alcometer_mode:
           type: string
-          example: "Срок действия с 08.10.2024 по 01.10.2025"
-        type_view:
+        alcometer_test_status:
+          type: integer
+        narko_test_status:
+          type: integer
+        photo:
           type: string
-          example: "Предрейсовый/Предсменный"
-        stamp_head:
+        video:
           type: string
-          example: "ООО \"Трансавто-7\""
+        admitted:
+          type: string
+        flag_pak:
+          type: string
+        is_real:
+          type: boolean
+        created_at:
+          type: string
+          example: "2025-03-03 22:38:05"
+        updated_at:
+          type: string
+          example: "2025-03-03 22:38:05"
   responses:
     InternalServerError:
       description: Внутренняя ошибка сервера
+    BadRequest:
+      description: Ошибка запроса
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                enum:
+                  - "Терминал временно заблокирован. Проверьте оплату услуг!"
+                  - "Сотрудник уже имеет запись в этот день"
     NotFound:
       description: Сотрудник не найден
     SeeOther:
@@ -176,16 +133,6 @@ components:
                 enum:
                   - "Сотрудник с указанным ID уволен!"
                   - "Компания временно заблокирована. Необходимо связаться с руководителем!"
-    BadRequest:
-      description: Ошибка запроса
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
-                example: "Терминал временно заблокирован. Проверьте оплату услуг!"
 paths:
   /api/sdpo/employees:
     get:
@@ -201,7 +148,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Employee"
+                type: array
+                items:
+                  $ref: "#/components/schemas/Employee"
         "500":
           $ref: "#/components/responses/InternalServerError"
   /api/sdpo/employees/{hash_id}:
@@ -224,21 +173,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Employee"
+                allOf:
+                  - $ref: "#/components/schemas/Employee"
+                  - type: object
+                    properties:
+                      inspection_types:
+                        type: array
+                        items:
+                          type: string
+                          enum: ["open", "close"]
         "303":
           $ref: "#/components/responses/SeeOther"
         "400":
           $ref: "#/components/responses/BadRequest"
-        "404":
-          $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /api/sdpo/employees/inspection:
+  /api/sdpo/employees/workdays/registration:
     post:
-      summary: Сохранение осмотра сотрудника
-      description: Обработка и сохранение осмотра сотрудника.
+      summary: Регистрация рабочего дня сотрудника
+      description: Создаёт запись о рабочем дне сотрудника.
       tags:
-        - Employee
+        - Workday
       security:
         - BearerAuth: []
       requestBody:
@@ -246,9 +201,38 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Inspection"
+              type: object
+              properties:
+                date:
+                  type: string
+                  example: "2025-03-03 22:38:05"
+                employee_id:
+                  type: string
+                proba_alko:
+                  type: string
+                t_people:
+                  type: number
+                tonometer:
+                  type: string
+                type_anketa:
+                  type: string
+                  enum: ["open", "close"]
+                pulse:
+                  type: integer
+                alcometer_result:
+                  type: string
+                alcometer_mode:
+                  type: string
+                test_narko:
+                  type: string
       responses:
-        "204":
-          description: Данные успешно сохранены
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkdayRegistration"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalServerError"
