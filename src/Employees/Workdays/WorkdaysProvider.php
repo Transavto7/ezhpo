@@ -11,5 +11,6 @@ final class WorkdaysProvider extends ServiceProvider
     {
         $this->loadRoutesFrom(__DIR__ . '/Http/routes.php');
         $this->loadMigrationsFrom(__DIR__.'/Migrations');
+        $this->loadViewsFrom(__DIR__.'/Http/Views', 'Workdays');
     }
 }

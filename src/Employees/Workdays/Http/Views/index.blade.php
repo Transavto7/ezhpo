@@ -55,11 +55,7 @@
 
 @section('custom-scripts')
     <script type="text/javascript">
-        @if (user()->fields_visible)
-            let fieldsVisible = {!! user()->fields_visible !!};
-        @else
-            let fieldsVisible = @json(config('fields.visible'));
-        @endif
+        let fieldsVisible = {{ user()->fields_visible ?? config('fields.visible') }}
 
         //TODO: как используется?
         function setVisibleInputs() {
@@ -82,7 +78,7 @@
                     const id = el.attr('name');
                     const prop_checked = el.prop('checked');
 
-                    const anketsTable = $(`.ankets-table thead th[data-field-key="${id}"], .ankets-table tbody tr td[data-field-key="${id}"]`)
+                    const anketsTable = $(`.workdays-table thead th[data-field-key="${id}"], .workdays-table tbody tr td[data-field-key="${id}"]`)
                     const displayProp = !prop_checked ? 'none' : 'table-cell'
 
                     anketsTable.attr('hidden', !prop_checked).css({'display': displayProp})
@@ -305,7 +301,7 @@
             })
 
             $('#select-all').click(function () {
-                $('.ankets-table input[type="checkbox"]').each(function () {
+                $('.workdays-table input[type="checkbox"]').each(function () {
                     if (!$(this).prop('checked')) {
                         $(this).click();
                     }
@@ -444,7 +440,7 @@
                         <div class="alert alert-danger" role="alert">{{ session()->get('error') }}</div>
                     @endif
 
-                    @if(count($ankets) > 0 && $permissionToView)
+                    @if(count($workdyays) > 0 && $permissionToView)
                         <div id="selected-ankets-control" class="d-none align-items-center mt-4 mb-2">
                             @if($permissionToDelete)
                                 <button id="selected-ankets-control-btn-delete"
@@ -480,8 +476,8 @@
 
                     <hr>
 
-                    @if(count($ankets) > 0)
-                        {{ $ankets->appends($_GET)->render() }}
+                    @if(count($workdyays) > 0)
+                        {{ $workdyays->appends($_GET)->render() }}
                     @endif
                 </div>
             </div>
@@ -489,10 +485,10 @@
 
         <div class="card table-card">
             <div class="card-body">
-                @if((count($ankets) > 0) && $permissionToView)
+                @if((count($workdyays) > 0) && $permissionToView)
                     <table
-                        id="ankets-table"
-                        class="ankets-table table table-striped table-sm">
+                        id="workdays-table"
+                        class="workdays-table table table-striped table-sm">
                         <thead>
                         <tr>
                             <th>#</th>
@@ -519,84 +515,71 @@
                             @endforeach
 
                             @if(request()->get('trash'))
-                                <th width="60">Удаливший</th>
-                                <th width="60">Время удаления</th>
+                                <th>Удаливший</th>
+                                <th>Время удаления</th>
                             @endif
 
                             <th class="not-export">
-                                <a class="not-export"
-                                   href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&{{ $queryString }}">
-                                    <i class="fa fa-sort"></i>
-                                </a>
                                 #
                             </th>
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($ankets as $anketaKey => $anketa)
-                            <tr data-field="{{ $anketaKey }}">
+                        @foreach($workdyays as $workdayKey => $workday)
+                            <tr data-field="{{ $workdayKey }}">
                                 <td>
                                     <input
                                         type="checkbox"
-                                        data-id="{{ $anketa->id }}"
+                                        data-id="{{ $workday->id }}"
                                         class="hv-checkbox-mass-deletion">
                                 </td>
 
-                                @if($type_ankets === FormTypeEnum::PAK_QUEUE)
-                                    <td class="not-export">
-                                        <div
-                                            class="App-Timer"
-                                            data-date="{{ $anketa->created_at }}">
-                                        </div>
-                                    </td>
-                                @endif
-
                                 @foreach($fieldPrompts as $field)
                                     <td data-field-key="{{ $field->field }}">
-                                        @if(($field->field === 'date' || strpos($field->field, '_at') > 0) && $anketa[$field->field])
+                                        @if(($field->field === 'date' || strpos($field->field, '_at') > 0) && $workday[$field->field])
                                             @if ($field->field === 'date' && $type_ankets === FormTypeEnum::BDD)
-                                                {{ date('d-m-Y', strtotime($anketa[$field->field])) }}
+                                                {{ date('d-m-Y', strtotime($workday[$field->field])) }}
                                             @else
-                                                {{ date('d-m-Y H:i:s', strtotime($anketa[$field->field])) }}
+                                                {{ date('d-m-Y H:i:s', strtotime($workday[$field->field])) }}
                                             @endif
-                                        @elseif(($field->field === 'photos') && $anketa[$field->field])
-                                            @php $photos = explode(',', $anketa[$field->field]) @endphp
+                                        @elseif(($field->field === 'photos') && $workday[$field->field])
+                                            @php $photos = explode(',', $workday[$field->field]) @endphp
                                             @foreach($photos as $phI => $ph)
                                                 @php $isUri = strpos($ph, 'sdpo.ta-7'); @endphp
 
                                                 @if($phI == 0)
                                                     <a href="{{ $isUri ? $ph : Storage::url($ph) }}"
-                                                       data-fancybox="gallery_{{ $anketa->id }}">
+                                                       data-fancybox="gallery_{{ $workday->id }}">
                                                         <i class="fa fa-camera"></i>({{ count($photos) }})
                                                     </a>
                                                 @else
                                                     <a href="{{ $isUri ? $ph : Storage::url($ph) }}"
-                                                       data-fancybox="gallery_{{ $anketa->id }}">
+                                                       data-fancybox="gallery_{{ $workday->id }}">
                                                     </a>
                                                 @endif
                                             @endforeach
-                                        @elseif(($field->field === 'videos') && $anketa[$field->field])
-                                            @php $videos = explode(',', $anketa[$field->field]) @endphp
+                                        @elseif(($field->field === 'videos') && $workday[$field->field])
+                                            @php $videos = explode(',', $workday[$field->field]) @endphp
                                             @foreach($videos as $vK => $vV)
                                                 @if($vK == 0)
                                                     <a
                                                         data-type="iframe"
                                                         href="{{ route('showVideo', ['url' => $vV]) }}"
-                                                        data-fancybox="video_{{ $anketa->id }}">
+                                                        data-fancybox="video_{{ $workday->id }}">
                                                         <i class="fa fa-video-camera"></i>
                                                         ({{ count($videos) }})
                                                     </a>
                                                 @else
                                                     <a data-type="iframe" href="{{ $vV }}"
-                                                       data-fancybox="video_{{ $anketa->id }}"></a>
+                                                       data-fancybox="video_{{ $workday->id }}"></a>
                                                 @endif
                                             @endforeach
                                         @elseif($field->field === 'employee_fio' && user()->access('employee_read'))
-                                            <a href="{{ route('users', ['name' => $anketa[$field->field] ]) }}">
-                                                {{ $anketa[$field->field] }}
+                                            <a href="{{ route('users', ['name' => $workday[$field->field] ]) }}">
+                                                {{ $workday[$field->field] }}
                                             </a>
                                         @else
-                                            {{ $anketa[$field->field] }}
+                                            {{ $workday[$field->field] }}
                                         @endif
                                     </td>
                                 @endforeach
@@ -604,19 +587,14 @@
 
                                 @if($permissionToDelete && request()->get('trash'))
                                     <td class="td-option">
-                                        {{ ($anketa->deleted_user_name) }}
+                                        {{ ($workday->deleted_user_name) }}
                                     </td>
                                     <td class="td-option">
-                                        {{ ($anketa->deleted_at) }}
+                                        {{ ($workday->deleted_at) }}
                                     </td>
                                 @endif
 
                                 <td class="td-option not-export d-flex justify-content-end">
-                                    @if($permissionToUpdate)
-                                        <a href="{{ route('forms.get', $anketa->id) }}"
-                                           class="btn btn-info btn-sm mr-1"><i class="fa fa-edit"></i></a>
-                                    @endif
-
                                     @if($permissionToDelete)
                                         @include('pages.home.components.buttons.delete-form-btn', compact('anketa'))
                                     @endif
@@ -632,12 +610,8 @@
         <div class="card">
             <div class="card-body">
                 @if($permissionToView)
-                    <p class="text-success">Найдено записей: <b>{{ $anketasCountResult }}</b></p>
+                    <p class="text-success">Найдено записей: <b>{{ $count }}</b></p>
                 @endif
-
-                <div id="COUNTS_ANKETAS">
-
-                </div>
             </div>
         </div>
     </div>

@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Employees\WorkdaysJournal\Http\Controllers;
+namespace Src\Employees\Workdays\Http\Controllers;
 
 use App\FieldPrompt;
 use App\Http\Controllers\Controller;
@@ -10,25 +10,25 @@ use Illuminate\Support\Arr;
 use Illuminate\View\View;
 use Src\Employees\Workdays\Eloquent\Workday;
 
-class ListController extends Controller
+class WorkdaysJournalController extends Controller
 {
     public function __invoke(Request $request): View
     {
         $trash = filter_var($request->get('trash', 0), FILTER_VALIDATE_BOOLEAN);
 
         if ($trash) {
-            $forms = Workday::onlyTrashed();
+            $workdays = Workday::onlyTrashed();
         } else {
-            $forms = Workday::query();
+            $workdays = Workday::query();
         }
 
-        $forms = $forms
+        $workdays = $workdays
             //TODO: нужно ли инфо о терминале?
             ->leftJoin('points', 'workdays.pv_id', '=', 'points.id')
             ->leftJoin('users', 'workdays.employee_id', '=', 'users.id');
 
         if ($trash) {
-            $forms = $forms->leftJoin('users as delete_users', 'workdays.deleted_id', '=', 'delete_users.id');
+            $workdays = $workdays->leftJoin('users as delete_users', 'workdays.deleted_id', '=', 'delete_users.id');
         }
 
         /**
@@ -72,12 +72,12 @@ class ListController extends Controller
                 }
 
                 if ($filterKey === 'created_at') {
-                    $forms = $forms->where('workdays.created_at', '>=', Carbon::parse($filterValue)->startOfDay());
+                    $workdays = $workdays->where('workdays.created_at', '>=', Carbon::parse($filterValue)->startOfDay());
                     continue;
                 }
 
                 if ($filterKey === 'TO_created_at') {
-                    $forms = $forms->where('workdays.created_at', '<=', Carbon::parse($filterValue)->endOfDay());
+                    $workdays = $workdays->where('workdays.created_at', '<=', Carbon::parse($filterValue)->endOfDay());
                     continue;
                 }
 
@@ -87,7 +87,7 @@ class ListController extends Controller
                     }, $filterValue);
 
                     if ($filterKey === 'flag_pak') {
-                        $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
+                        $workdays = $workdays->where(function ($query) use ($filterValue, $filterKey) {
                             foreach ($filterValue as $flagPakValue) {
                                 if ($flagPakValue === 'internal') {
                                     $query = $query->orWhereNull('workdays.flag_pak');
@@ -101,7 +101,7 @@ class ListController extends Controller
                         continue;
                     }
 
-                    $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
+                    $workdays = $workdays->where(function ($query) use ($filterValue, $filterKey) {
                         foreach ($filterValue as $fvItemValue) {
                             $query = $query->orWhere($filterKey, $fvItemValue);
                         }
@@ -112,18 +112,18 @@ class ListController extends Controller
                     $filterValue = trim(str_replace('\\', '\\\\', $filterValue));
 
                     if ($filterKey === 'flag_pak' && $filterValue === 'internal') {
-                        $forms = $forms->whereNull('workdays.flag_pak');
+                        $workdays = $workdays->whereNull('workdays.flag_pak');
                         continue;
                     }
 
                     $strictFilter = strpos($filterKey, '_id') || $filterKey === 'workdays.id';
 
                     if ($strictFilter) {
-                        $forms = $forms->where($filterKey, $filterValue);
+                        $workdays = $workdays->where($filterKey, $filterValue);
                         continue;
                     }
 
-                    $forms = $forms->where($filterKey, 'LIKE', '%' . $filterValue . '%');
+                    $workdays = $workdays->where($filterKey, 'LIKE', '%' . $filterValue . '%');
                 }
             }
 
@@ -135,7 +135,7 @@ class ListController extends Controller
                     ? Carbon::parse($filterParams['TO_date'])->endOfDay()
                     : Carbon::now()->addYears(10);
 
-                $forms = $forms
+                $workdays = $workdays
                     ->whereBetween('workdays.date', [$dateFrom, $dateTo]);
             }
         }
@@ -153,7 +153,7 @@ class ListController extends Controller
             $defaultFieldsToSelect[] = 'delete_users.name as deleted_user_name';
         }
 
-        $forms = $forms->select($defaultFieldsToSelect);
+        $workdays = $workdays->select($defaultFieldsToSelect);
 
         /**
          * Выбор полей
@@ -165,8 +165,7 @@ class ListController extends Controller
             'type_view'              => 'Тип осмотра',
             'proba_alko'             => 'Признаки опьянения',
             'test_narko'             => 'Тест на наркотики',
-            'employee_year_birthday' => 'Дата рождения',
-            'admitted'               => 'Заключение о результатах осмотра',
+            'admitted'               => 'Допуск к работе',
             'created_at'             => 'Дата создания',
             'pv_id'                  => 'Пункт выпуска',
             'town_id'                => 'Город',
@@ -185,12 +184,12 @@ class ListController extends Controller
         $take = $request->get('take') ?? 100;
 
         if ($filterActivated) {
-            $forms = $forms->orderBy($orderKey, $orderBy);
+            $workdays = $workdays->orderBy($orderKey, $orderBy);
 
-            $forms = $forms->paginate($take);
-            $formsCountResult = $forms->total();
+            $workdays = $workdays->paginate($take);
+            $formsCountResult = $workdays->total();
         } else {
-            $forms = [];
+            $workdays = [];
             $formsCountResult = 0;
         }
         /**
@@ -205,8 +204,8 @@ class ListController extends Controller
             ->orderBy('id')
             ->get();
 
-        return view('WorkdaysJournal::index', [
-            'workdays' => $forms,
+        return view('Workdays::index', [
+            'workdays' => $workdays,
             'filter_activated' => $filterActivated,
             'fields' => $formsFields,
             'fieldsKeys' => $fieldsKeys,
