@@ -1,0 +1,254 @@
+openapi: 3.0.3
+info:
+  title: СДПО API
+  description: API для взаимодействия с СДПО
+  version: 0.0.1
+servers:
+  - url: https://test.ta-7.ru
+    description: Тестовый сервер
+  - url: http://ezhpo.localhost
+    description: Сервер для разработки
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Employee:
+      type: object
+      properties:
+        pressure_systolic:
+          type: integer
+          example: 160
+        pulse_upper:
+          type: integer
+          example: 1000
+        end_of_ban:
+          type: string
+          format: date-time
+          example: "2024-01-02 09:14:09"
+        time_of_alcohol_ban:
+          type: integer
+          example: 120
+        pulse_lower:
+          type: integer
+          example: 0
+        dismissed:
+          type: boolean
+          example: false
+        time_of_pressure_ban:
+          type: integer
+          example: 0
+        fio:
+          type: string
+          example: "Иванов Иван Иванович"
+        pressure_diastolic:
+          type: integer
+          example: 100
+        hash_id:
+          type: string
+          example: "459997"
+    Inspection:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+          example: "2025-03-03 22:38:05"
+        driver_id:
+          type: string
+          example: "123456"
+        people_status:
+          type: string
+          example: "Да"
+        driver_fio:
+          type: string
+          example: "Иванов Иван Иванович"
+        day_hash:
+          type: string
+          example: "38d2e9e98af301cc26a5ea0fb7545baf"
+        user_name:
+          type: string
+          example: "Иванова Ирина Ивановна"
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-03-03 22:38:05"
+        wish_message:
+          type: string
+          example: "Легкого рабочего дня!"
+        type_anketa:
+          type: string
+          example: "medic"
+        proba_alko:
+          type: string
+          example: "Отрицательно"
+        uuid:
+          type: string
+          example: "1cef4b84-333a-466c-b23e-717e11c41a79"
+        timeout:
+          type: string
+          example: "90"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-03-03 19:38:05"
+        sleep_status:
+          type: string
+          example: "Да"
+        id:
+          type: integer
+          example: 10833065
+        terminal_id:
+          type: integer
+          example: 123311
+        t_people:
+          type: number
+          example: 36.6
+        forms_uuid:
+          type: string
+          example: "0"
+        admitted:
+          type: string
+          example: "Допущен"
+        user_eds:
+          type: string
+          example: "01BB 1181 3G21 8S31 1119 213W 381B 011F"
+        point_id:
+          type: integer
+          example: 51
+        company_id:
+          type: string
+          example: "412109849"
+        tonometer:
+          type: string
+          example: "134/72"
+        user_validity_eds_end:
+          type: string
+          format: date-time
+          example: "2025-10-01"
+        stamp_licence:
+          type: string
+          example: "Бессрочная лицензия от 09.12.2020 №Л123-123-137643/13113"
+        realy:
+          type: string
+          example: "да"
+        flag_pak:
+          type: string
+          example: "СДПО А"
+        med_view:
+          type: string
+          example: "В норме"
+        user_id:
+          type: integer
+          example: 66567
+        pulse:
+          type: integer
+          example: 68
+        user_validity_eds_start:
+          type: string
+          format: date-time
+          example: "2024-10-08"
+        validity:
+          type: string
+          example: "Срок действия с 08.10.2024 по 01.10.2025"
+        type_view:
+          type: string
+          example: "Предрейсовый/Предсменный"
+        stamp_head:
+          type: string
+          example: "ООО \"Трансавто-7\""
+  responses:
+    InternalServerError:
+      description: Внутренняя ошибка сервера
+    NotFound:
+      description: Сотрудник не найден
+    SeeOther:
+      description: Сотрудник или компания временно заблокированы
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                enum:
+                  - "Сотрудник с указанным ID уволен!"
+                  - "Компания временно заблокирована. Необходимо связаться с руководителем!"
+    BadRequest:
+      description: Ошибка запроса
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Терминал временно заблокирован. Проверьте оплату услуг!"
+paths:
+  /api/sdpo/employees:
+    get:
+      summary: Получение списка сотрудников
+      description: Возвращает информацию о сотрудниках.
+      tags:
+        - Employee
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employee"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/sdpo/employees/{hash_id}:
+    get:
+      summary: Получение информации о конкретном сотруднике
+      description: Возвращает информацию о сотруднике по его hash_id.
+      tags:
+        - Employee
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: hash_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employee"
+        "303":
+          $ref: "#/components/responses/SeeOther"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/sdpo/employees/inspection:
+    post:
+      summary: Сохранение осмотра сотрудника
+      description: Обработка и сохранение осмотра сотрудника.
+      tags:
+        - Employee
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Inspection"
+      responses:
+        "204":
+          description: Данные успешно сохранены
+        "500":
+          $ref: "#/components/responses/InternalServerError"
