@@ -4,12 +4,14 @@ declare(strict_types=1);
 namespace Src\Employees\Workdays\Commands\WorkdaysRegistration;
 
 use App\Enums\FlagPakEnum;
+use App\Point;
 use App\Settings;
 use App\User;
 use App\ValueObjects\ForeignDevice\PressureLimit;
 use App\ValueObjects\ForeignDevice\PulseLimit;
 use Exception;
 use Src\Employees\Workdays\Eloquent\Workday;
+use Src\Employees\Workdays\SmartEnum\TypeAnketaSmartEnum;
 use Src\Employees\Workdays\WorkflowOperations\EmployerWorkdayAdmitting;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -41,21 +43,42 @@ final class WorkdaysRegistrationHandler
             throw new Exception('Сотрудник уже имеет запись в этот день', Response::HTTP_BAD_REQUEST);
         }
 
+        $workDay->date = $command->getDate();
+        $workDay->timezone = $command->getTerminal()->timezone ?: 3;
+
         // Нельзя закрыть неоткрытую смену
         if ($command->getTypeAnketa()->isClose()) {
+            /** @var Workday $openWorkday */
             $openWorkday = Workday::where('employee_id', $employee->id)
                 ->whereDate('date', $command->getDate()->format('Y-m-d'))
+                ->where('type_anketa', TypeAnketaSmartEnum::OPEN)
                 ->where('admitted', 1)
                 ->first();
             if (!$openWorkday) {
                 throw new Exception('Сотрудник не имеет открытой смены для закрытия!', Response::HTTP_BAD_REQUEST);
             }
+
+            $workDay->open_workday_id = $openWorkday->id;
+
+            // При закрытии, должна быть та же временная зона, что и при открытии!
+            $diffTimezone = $workDay->timezone - $openWorkday->timezone;
+            if ($diffTimezone !== 0) {
+                // Приводим время в тот же часовой пояс, что и у смены открытия
+                $workDay->date->setTimezone($diffTimezone > 0 ? "+$diffTimezone" : "$diffTimezone");
+            }
         }
 
-        $workDay->date = $command->getDate();
         $workDay->employee_id = $employee->id;
         $workDay->terminal_id = $command->getTerminal()->id;
-        $workDay->pv_id = $command->getTerminal()->pv_id;
+
+        if ($command->getTerminal()->pv_id) {
+            /** @var Point $point */
+            $point = Point::where('pv_id', $command->getTerminal()->pv_id)
+                ->first();
+            if ($point) {
+                $workDay->point_id = $point->id;
+            }
+        }
 
         if ($termometer = $command->getPeopleThermometer()) {
             $workDay->t_people = $termometer->getTemperature();
@@ -98,7 +121,10 @@ final class WorkdaysRegistrationHandler
         $workDay->photo = $command->getPhoto();
         $workDay->video = $command->getVideo();
         $workDay->flag_pak = FlagPakEnum::SDPO_A;
-        $workDay->is_real = $command->getDate()->format('d.m.Y') === date('d.m.Y');
+
+        $nowDatetimeWithTerminalTimezone = new \DateTime('now', new \DateTimeZone($workDay->timezone > 0 ? "+{$workDay->timezone}" : "{$workDay->timezone}"));
+
+        $workDay->is_real = $command->getDate()->format('d.m.Y') === $nowDatetimeWithTerminalTimezone->format('d.m.Y');
 
         $workDay->admitted = EmployerWorkdayAdmitting::fromWorkday($workDay)->isAllowedWork();
 

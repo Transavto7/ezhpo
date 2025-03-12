@@ -42,6 +42,7 @@ final class WorkdaysRegistrationCommand
     /**
      * @param User|null $terminal
      * @return self
+     * @throws \Exception
      */
     public function setTerminal($terminal): self
     {

@@ -13,9 +13,11 @@ use Ramsey\Uuid\Uuid;
  * @property int $id
  * @property string $uuid
  * @property DateTime $date Время открытия/закрытия смены
+ * @property int $timezone Смещение временной зоны относительно UTC (по умолчанию Москва, это +3)
+ * @property int|null $open_workday_id ID открытия смены, если это запись закрытия
  * @property int $employee_id ID сотрудника (users)
  * @property int $terminal_id ID терминала (users)
- * @property int $pv_id - ID ПВ
+ * @property int $point_id - ID point
  * @property int|null $t_people Температура сотрудника
  * @property int|null $t_people_test_status Статус теста на температуру (1 - пройден, 0 - нет))
  * @property int|null $pressure_systolic Систолическое давление
@@ -44,9 +46,11 @@ class Workday extends Model
         'id',
         'uuid',
         'date',
+        'timezone',
         'employee_id',
         'terminal_id',
-        'pv_id',
+        'open_workday_id',
+        'point_id',
         't_people',
         't_people_test_status',
         'pressure_systolic',
@@ -77,18 +81,23 @@ class Workday extends Model
         });
     }
 
-    public function getEmployee(): BelongsTo
+    public function employee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'employee_id', 'id');
     }
 
-    public function getTerminal(): BelongsTo
+    public function terminal(): BelongsTo
     {
         return $this->belongsTo(User::class, 'employee_id', 'id');
     }
 
-    public function getPoint(): BelongsTo
+    public function point(): BelongsTo
     {
-        return $this->belongsTo(Point::class, 'pv_id', 'id');
+        return $this->belongsTo(Point::class, 'point_id', 'id');
+    }
+
+    public function openWorkday(): BelongsTo
+    {
+        return $this->belongsTo(Workday::class, 'open_workday_id', 'id');
     }
 }
