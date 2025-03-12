@@ -55,10 +55,10 @@
                            value="{{ $tripTicket->start_date ? $tripTicket->start_date.'T00:00' : null }}"
                            @if($tripTicket->period_pl && $tripTicket->start_date === null)
                                min="{{ Carbon::parse($tripTicket->period_pl)->startOfMonth()->format('Y-m-d\TH:i') }}"
-                           max="{{ Carbon::parse($tripTicket->period_pl)->endOfMonth()->endOfDay()->format('Y-m-d\TH:i') }}"
+                               max="{{ Carbon::parse($tripTicket->period_pl)->endOfMonth()->endOfDay()->format('Y-m-d\TH:i') }}"
                            @else
                                min="{{ $tripTicket->start_date ?: '1970-01-01' }}T00:00"
-                           max="{{ $tripTicket->start_date ?: '2100-01-01' }}T23:59"
+                               max="{{ $tripTicket->start_date ?: '2100-01-01' }}T23:59"
                            @endif
                            type="datetime-local"
                            name="anketa[0][date]"
@@ -73,7 +73,8 @@
                         <option value="Предрейсовый/Предсменный" selected>
                             Предрейсовый/Предсменный
                         </option>
-                        <option value="Послерейсовый/Послесменный">Послерейсовый/Послесменный
+                        <option value="Послерейсовый/Послесменный">
+                            Послерейсовый/Послесменный
                         </option>
                     </select>
                     <p class="duplicate-indicator text-danger d-none"

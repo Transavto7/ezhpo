@@ -221,10 +221,12 @@
                 <input type="hidden" name="createByForms" value="{{ $createByForms ?? 0 }}">
               </div>
 
-              <div class="form-group d-flex">
-                <input type="checkbox" id="create_is_dop_medic" name="create_is_dop_medic">
-                <label class="form-control-label mb-0 ml-2" for="create_is_dop_medic">Создать неполный МО</label>
-              </div>
+              @if(Auth::user()->access('medic_create'))
+                <div class="form-group d-flex">
+                  <input type="checkbox" id="create_is_dop_medic" name="create_is_dop_medic">
+                  <label class="form-control-label mb-0 ml-2" for="create_is_dop_medic">Создать неполный МО</label>
+                </div>
+              @endif
 
               <div class="form-group">
                 <label class="form-control-label">ID компании:</label>

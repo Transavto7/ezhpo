@@ -69,7 +69,7 @@ final class StoreTripTicketHandler extends TripTicketNumberGenerator
                     'driver_id' => $action->getDriverId(),
                     'anketa' => [
                         0 => [
-                            'date' => $item->getStartDate()->format('Y-m-d'),
+                            'date' => $item->getStartDate() ? $item->getStartDate()->format('Y-m-d') : null,
                             'dates' => null,
                             'period_pl' => $periodPl,
                             'type_view' => 'Предрейсовый/Предсменный',

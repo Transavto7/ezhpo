@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\TripTicket\CreateTripTickets;
+namespace App\Actions\TripTicket\GenerateTripTickets;
 
 use App\Actions\TripTicket\TripTicketNumberGenerator;
 use App\Enums\FormTypeEnum;

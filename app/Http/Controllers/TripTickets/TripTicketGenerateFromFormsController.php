@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\TripTickets;
 
-use App\Actions\TripTicket\CreateTripTickets\TripTicketsAction;
-use App\Actions\TripTicket\CreateTripTickets\TripTicketsHandler;
+use App\Actions\TripTicket\GenerateTripTickets\TripTicketsAction;
+use App\Actions\TripTicket\GenerateTripTickets\TripTicketsHandler;
 use App\Company;
 use App\Driver;
 use App\Enums\LogisticsMethodEnum;
