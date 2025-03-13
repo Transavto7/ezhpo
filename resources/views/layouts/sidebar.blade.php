@@ -298,12 +298,17 @@
                 @endif
                 @if($user->access('employees_workdays_read'))
                     <li>
-                        <a href="{{ route('employees.workdays.journal') }}">Журнал смен</a>
+                        <a href="{{ route('employees.workdays.index') }}">Журнал смен</a>
                     </li>
                 @endif
                 @if($user->access('employees_workdays_report'))
                     <li>
                         <a href="{{ route('employees.workdays.report') }}">Расчет ЗП</a>
+                    </li>
+                @endif
+                @if($user->access('employees_workdays_holidays'))
+                    <li>
+                        <a href="#">Нерабочие дни</a>
                     </li>
                 @endif
             </ul>

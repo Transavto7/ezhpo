@@ -367,6 +367,8 @@
     $permissionToTrashView = user()->access('workdays_trash');
     $permissionToDelete = user()->access('workdays_trash');
     $permissionToUpdate = user()->access('workdays_update');
+
+    $notDeletedItems = session('not_deleted_workdays');
 @endphp
 
 @section('content')
@@ -397,7 +399,7 @@
                             </div>
 
                             <div class="toggle-hidden p-3" id="ankets-filters">
-                                <form class="ankets-form" anketa="{{ $type_ankets }}">
+                                <form class="ankets-form" anketa="workdays">
                                     @foreach($fieldPrompts as $key => $field)
                                         <label>
                                             <input
@@ -440,7 +442,7 @@
                         <div class="alert alert-danger" role="alert">{{ session()->get('error') }}</div>
                     @endif
 
-                    @if(count($workdyays) > 0 && $permissionToView)
+                    @if(count($workdays) > 0 && $permissionToView)
                         <div id="selected-ankets-control" class="d-none align-items-center mt-4 mb-2">
                             @if($permissionToDelete)
                                 <button id="selected-ankets-control-btn-delete"
@@ -476,8 +478,8 @@
 
                     <hr>
 
-                    @if(count($workdyays) > 0)
-                        {{ $workdyays->appends($_GET)->render() }}
+                    @if(count($workdays) > 0)
+                        {{ $workdays->appends($_GET)->render() }}
                     @endif
                 </div>
             </div>
@@ -485,7 +487,7 @@
 
         <div class="card table-card">
             <div class="card-body">
-                @if((count($workdyays) > 0) && $permissionToView)
+                @if((count($workdays) > 0) && $permissionToView)
                     <table
                         id="workdays-table"
                         class="workdays-table table table-striped table-sm">
@@ -525,7 +527,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($workdyays as $workdayKey => $workday)
+                        @foreach($workdays as $workdayKey => $workday)
                             <tr data-field="{{ $workdayKey }}">
                                 <td>
                                     <input

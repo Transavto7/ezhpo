@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Src\Employees\Workdays\Commands\WorkdaysRegistration;
 
 use App\Enums\FlagPakEnum;
-use App\Point;
 use App\Settings;
 use App\User;
 use App\ValueObjects\ForeignDevice\PressureLimit;
@@ -17,6 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class WorkdaysRegistrationHandler
 {
+    /**
+     * @throws Exception
+     */
     public function handle(WorkdaysRegistrationCommand $command): Workday
     {
         $workDay = new Workday();
@@ -38,6 +40,7 @@ final class WorkdaysRegistrationHandler
         $existingWorkday = Workday::where('employee_id', $employee->id)
             ->whereDate('date', $command->getDate()->format('Y-m-d'))
             ->where('type_anketa', $command->getTypeAnketa()->getValue())
+            ->where('admitted', 1)
             ->first();
         if ($existingWorkday) {
             throw new Exception('Сотрудник уже имеет запись в этот день', Response::HTTP_BAD_REQUEST);
@@ -71,13 +74,8 @@ final class WorkdaysRegistrationHandler
         $workDay->employee_id = $employee->id;
         $workDay->terminal_id = $command->getTerminal()->id;
 
-        if ($command->getTerminal()->pv_id) {
-            /** @var Point $point */
-            $point = Point::where('pv_id', $command->getTerminal()->pv_id)
-                ->first();
-            if ($point) {
-                $workDay->point_id = $point->id;
-            }
+        if ($command->getTerminal()->pv) {
+            $workDay->point_id = $command->getTerminal()->pv->id;
         }
 
         if ($termometer = $command->getPeopleThermometer()) {

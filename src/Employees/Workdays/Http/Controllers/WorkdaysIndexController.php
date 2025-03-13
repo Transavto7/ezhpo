@@ -10,7 +10,7 @@ use Illuminate\Support\Arr;
 use Illuminate\View\View;
 use Src\Employees\Workdays\Eloquent\Workday;
 
-class WorkdaysJournalController extends Controller
+class WorkdaysIndexController extends Controller
 {
     public function __invoke(Request $request): View
     {
