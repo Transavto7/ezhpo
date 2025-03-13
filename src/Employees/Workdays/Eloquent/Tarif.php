@@ -25,7 +25,7 @@ use Ramsey\Uuid\Uuid;
  */
 class Tarif extends Model
 {
-    protected $table = 'workdays';
+    protected $table = 'tarifs';
 
     public $fillable = [
         'id',

@@ -19,7 +19,7 @@ use Ramsey\Uuid\Uuid;
  */
 class Holiday extends Model
 {
-    protected $table = 'workdays';
+    protected $table = 'holidays';
 
     public $fillable = [
         'id',
