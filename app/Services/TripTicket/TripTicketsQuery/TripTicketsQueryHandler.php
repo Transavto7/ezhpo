@@ -67,6 +67,11 @@ final class TripTicketsQueryHandler
             )
             ->orderBy($action->getOrderKey(), $action->getOrderBy());
 
+        $user = \Auth::user();
+        if ($user->hasRole('client')) {
+            $tripTickets->where('trip_tickets.company_id', $user->company->hash_id);
+        }
+
         $dateFrom = isset($action->getFilterParams()['date_from'])
             ? Carbon::parse($action->getFilterParams()['date_from'])
             : Carbon::now()->subYears(10);
