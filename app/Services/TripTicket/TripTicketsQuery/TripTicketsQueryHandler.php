@@ -91,41 +91,24 @@ final class TripTicketsQueryHandler
                 }
 
                 if ($filterKey === 'is_approved') {
-                    if (filter_var($filterValue, FILTER_VALIDATE_BOOLEAN)) {
-                        $tripTickets->where(function (Builder $query) {
-                            $query->where(function (Builder $query) {
-                                $query->where('type', '=', TripTicketType::GENERATED)
-                                    ->where('status','!=', TripTicketStatus::CREATED);
-                            })->orWhere(function (Builder $query) {
-                                $query->where(function (Builder $query) {
-                                    $query->where('type', '=', TripTicketType::IN_ADVANCE)
-                                        ->where('status','=', TripTicketStatus::APPROVED);
-                                });
-                            })->orWhere(function (Builder $query) {
-                                $query->where(function (Builder $query) {
-                                    $query->where('type', '=', TripTicketType::COMMON)
-                                        ->where('status','!=', TripTicketStatus::CREATED);
-                                });
+                    $isApproved = filter_var($filterValue, FILTER_VALIDATE_BOOLEAN);
+
+                    $tripTickets->where(function (Builder $query) use ($isApproved) {
+                        $query->where(function (Builder $query) use ($isApproved) {
+                            $query->where('type', '=', TripTicketType::GENERATED)
+                                ->where('status',$isApproved ? '!=' : '=', TripTicketStatus::CREATED);
+                        })->orWhere(function (Builder $query) use ($isApproved) {
+                            $query->where(function (Builder $query) use ($isApproved) {
+                                $query->where('type', '=', TripTicketType::IN_ADVANCE)
+                                    ->where('status',$isApproved ? '=' : '!=', TripTicketStatus::APPROVED);
+                            });
+                        })->orWhere(function (Builder $query) use ($isApproved) {
+                            $query->where(function (Builder $query) use ($isApproved) {
+                                $query->where('type', '=', TripTicketType::COMMON)
+                                    ->where('status',$isApproved ? '!=' : '=', TripTicketStatus::CREATED);
                             });
                         });
-                    } else {
-                        $tripTickets->where(function (Builder $query) {
-                            $query->where(function (Builder $query) {
-                                $query->where('type', '=', TripTicketType::GENERATED)
-                                    ->where('status','=', TripTicketStatus::CREATED);
-                            })->orWhere(function (Builder $query) {
-                                $query->where(function (Builder $query) {
-                                    $query->where('type', '=', TripTicketType::IN_ADVANCE)
-                                        ->where('status','!=', TripTicketStatus::APPROVED);
-                                });
-                            })->orWhere(function (Builder $query) {
-                                $query->where(function (Builder $query) {
-                                    $query->where('type', '=', TripTicketType::COMMON)
-                                        ->where('status','=', TripTicketStatus::CREATED);
-                                });
-                            });
-                        });
-                    }
+                    });
 
                     continue;
                 }

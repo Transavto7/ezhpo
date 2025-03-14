@@ -9,6 +9,7 @@ use App\Events\Relations\Attached;
 use App\Events\Relations\Detached;
 use App\Events\TripTickets\LogTripTicket;
 use App\Events\TripTickets\ChangeTripTicketStatus;
+use App\Events\TripTickets\UpdateRelatedItems;
 use App\Events\UserActions\ClientActionLogRequest;
 use App\Events\UserActions\ClientAddRecord;
 use App\Events\UserActions\ClientDocExport;
@@ -23,6 +24,7 @@ use App\Listeners\LogAttachedEvent;
 use App\Listeners\LogDetachedEvent;
 use App\Listeners\TripTickets\ChangeTripTicketStatusAction;
 use App\Listeners\TripTickets\LogTripTicketAction;
+use App\Listeners\TripTickets\UpdateRelatedItemsAction;
 use App\Listeners\UserActions\LogClientLoginEvent;
 use App\Listeners\UserActions\LogUserActionEvent;
 use Illuminate\Auth\Events\Login;
@@ -83,6 +85,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         ChangeTripTicketStatus::class => [
             ChangeTripTicketStatusAction::class,
+        ],
+        UpdateRelatedItems::class => [
+            UpdateRelatedItemsAction::class,
         ],
     ];
 

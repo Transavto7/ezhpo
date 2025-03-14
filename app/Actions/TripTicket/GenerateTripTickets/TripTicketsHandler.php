@@ -106,7 +106,6 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
             )
             ->where('type_anketa', '=', FormTypeEnum::TECH)
             ->where('tech_forms.point_reys_control', '=', 'Пройден')
-            ->whereNotNull('tech_forms.car_id')
             ->whereDoesntHave('tripTicketTech')
             ->get();
     }
