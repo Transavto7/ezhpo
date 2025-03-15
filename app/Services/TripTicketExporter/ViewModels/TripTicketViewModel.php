@@ -2,9 +2,8 @@
 
 namespace App\Services\TripTicketExporter\ViewModels;
 
-use App\Enums\LogisticsMethodEnum;
+use App\Enums\TripTicket\LogisticsMethodEnum;
 use App\Enums\TripTicket\TransportationTypeEnum;
-use App\Enums\TripTicket\TripTicketTemplateEnum;
 use Illuminate\Support\Carbon;
 
 final class TripTicketViewModel

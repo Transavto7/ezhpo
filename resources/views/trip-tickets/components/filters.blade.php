@@ -9,73 +9,73 @@
   <input type="hidden" name="take" value="{{ request()->get('take', '') }}">
 
   <div class="row">
-      <div class="col-md-3">
-          <div class="form-group">
-              <label>Номер ПЛ</label>
-              <input class="form-control" type="text" value="{{ request()->get('ticket_number', null) }}"
-                     name="ticket_number"/>
-          </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <label>Номер ПЛ</label>
+        <input class="form-control" type="text" value="{{ request()->get('ticket_number', null) }}"
+               name="ticket_number"/>
       </div>
-      <div class="col-md-3">
-          <div class="form-group">
-              <label>Фото загружено?</label>
-              @include('templates.elements_field', [
-                  'v' => [
-                      'type' => 'select',
-                      'values' => [
-                          'true' => 'Да',
-                          'false' => 'Нет'
-                      ]
-                  ],
-                  'model' => 'trip-tickets',
-                  'k' => 'has_photos',
-                  'is_required' => '',
-                  'default_value' => request()->get('has_photos', null) !== [null]
-                    ? request()->get('has_photos', null)
-                    : null
-              ])
+    </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <label>Фото загружено?</label>
+        @include('templates.elements_field', [
+            'v' => [
+                'type' => 'select',
+                'values' => [
+                    'true' => 'Да',
+                    'false' => 'Нет'
+                ]
+            ],
+            'model' => 'trip-tickets',
+            'k' => 'has_photos',
+            'is_required' => '',
+            'default_value' => request()->get('has_photos', null) !== [null]
+              ? request()->get('has_photos', null)
+              : null
+        ])
 
-          </div>
       </div>
-      <div class="col-md-3">
-          <div class="form-group">
-              <label>Тип осмотра</label>
-              @include('templates.elements_field', [
-                  'v' => [
-                      'type' => 'select',
-                      'values' => \App\Enums\TripTicket\TripTicketType::labels(),
-                  ],
-                  'model' => 'trip-tickets',
-                  'k' => 'type',
-                  'is_required' => '',
-                  'default_value' => request()->get('type', null) !== [null]
-                      ? request()->get('type', null)
-                      : null
-              ])
+    </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <label>Тип осмотра</label>
+        @include('templates.elements_field', [
+            'v' => [
+                'type' => 'select',
+                'values' => \App\Enums\TripTicket\TripTicketType::labels(),
+            ],
+            'model' => 'trip-tickets',
+            'k' => 'type',
+            'is_required' => '',
+            'default_value' => request()->get('type', null) !== [null]
+                ? request()->get('type', null)
+                : null
+        ])
 
-          </div>
       </div>
-      <div class="col-md-3">
-          <div class="form-group">
-              <label>Осмотр утвержден?</label>
-              @include('templates.elements_field', [
-                  'v' => [
-                      'type' => 'select',
-                      'values' => [
-                          'true' => 'Да',
-                          'false' => 'Нет'
-                      ]
-                  ],
-                  'model' => 'trip-tickets',
-                  'k' => 'is_approved',
-                  'is_required' => '',
-                  'default_value' => request()->get('is_approved', null) !== [null]
-                    ? request()->get('is_approved', null)
-                    : null
-              ])
+    </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <label>Осмотр утвержден?</label>
+        @include('templates.elements_field', [
+            'v' => [
+                'type' => 'select',
+                'values' => [
+                    'true' => 'Да',
+                    'false' => 'Нет'
+                ]
+            ],
+            'model' => 'trip-tickets',
+            'k' => 'is_approved',
+            'is_required' => '',
+            'default_value' => request()->get('is_approved', null) !== [null]
+              ? request()->get('is_approved', null)
+              : null
+        ])
 
-          </div>
       </div>
+    </div>
   </div>
 
   <div class="row">
@@ -156,7 +156,7 @@
         @include('templates.elements_field', [
             'v' => [
                 'type' => 'select',
-                'values' => App\Enums\LogisticsMethodEnum::labels(),
+                'values' => \App\Enums\TripTicket\LogisticsMethodEnum::labels(),
             ],
             'model' => 'trip-tickets',
             'k' => 'logistics_method',
@@ -200,6 +200,51 @@
         <label>Срок действия, дней</label>
         <input class="form-control" type="number" value="{{ request()->get('validity_period', null) }}"
                name="validity_period" min="1"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+      <div class="form-group">
+        <label>Дата выдачи от</label>
+        <input type="date" value="{{ request()->filled('filter')
+                            ? request()->get('created_date_from', null)
+                            : null }}"
+               name="created_date_from"
+               class="form-control"/>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <label>Дата выдачи до</label>
+        <input type="date"
+               value="{{ request()->filled('filter')
+                            ? request()->get('created_date_to', null)
+                            : null }}" name="created_date_to"
+               class="form-control"/>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <label>ФИО ответственного</label>
+        @include('templates.elements_field', [
+            'v' => [
+                'type' => 'select',
+                'values' => 'User',
+                'getField' => 'name',
+                'getFieldKey' => 'id',
+                'multiple' => 1,
+                'concatField' => 'hash_id',
+                'trashed' => true
+            ],
+            'model' => 'trip-tickets',
+            'k' => 'user_id',
+            'is_required' => '',
+            'default_value' => request()->get('user_id', null) !== [null]
+                ? request()->get('user_id', null)
+                : null
+        ])
       </div>
     </div>
   </div>

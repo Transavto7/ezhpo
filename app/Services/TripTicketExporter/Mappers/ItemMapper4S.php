@@ -2,7 +2,7 @@
 
 namespace App\Services\TripTicketExporter\Mappers;
 
-use App\Enums\LogisticsMethodEnum;
+use App\Enums\TripTicket\LogisticsMethodEnum;
 use App\Enums\TripTicket\TransportationTypeEnum;
 use App\Models\Forms\MedicForm;
 use App\Models\Forms\TechForm;
@@ -72,7 +72,7 @@ final class ItemMapper4S implements ItemMapperInterface
         $company = $tripTicket->company;
 
         return new CompanyViewModel(
-            $company->name,
+            $company->official_name,
             $company->where_call,
             $reqName,
             $company->address,

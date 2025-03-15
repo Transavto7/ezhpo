@@ -8,7 +8,7 @@ use App\Actions\TripTicket\StoreTripTicket\StoreTripTicketHandler;
 use App\Car;
 use App\Company;
 use App\Driver;
-use App\Enums\LogisticsMethodEnum;
+use App\Enums\TripTicket\LogisticsMethodEnum;
 use App\Enums\TripTicket\TransportationTypeEnum;
 use App\Enums\TripTicket\TripTicketTemplateEnum;
 use App\Http\Controllers\Controller;

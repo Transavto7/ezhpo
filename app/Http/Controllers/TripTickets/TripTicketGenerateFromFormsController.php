@@ -6,7 +6,7 @@ use App\Actions\TripTicket\GenerateTripTickets\TripTicketsAction;
 use App\Actions\TripTicket\GenerateTripTickets\TripTicketsHandler;
 use App\Company;
 use App\Driver;
-use App\Enums\LogisticsMethodEnum;
+use App\Enums\TripTicket\LogisticsMethodEnum;
 use App\Enums\TripTicket\TransportationTypeEnum;
 use App\Enums\TripTicket\TripTicketTemplateEnum;
 use App\Http\Controllers\Controller;

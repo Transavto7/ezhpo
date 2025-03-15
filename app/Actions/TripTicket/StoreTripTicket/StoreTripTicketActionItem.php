@@ -2,7 +2,7 @@
 
 namespace App\Actions\TripTicket\StoreTripTicket;
 
-use App\Enums\LogisticsMethodEnum;
+use App\Enums\TripTicket\LogisticsMethodEnum;
 use App\Enums\TripTicket\TransportationTypeEnum;
 use App\Enums\TripTicket\TripTicketTemplateEnum;
 use DateTimeImmutable;

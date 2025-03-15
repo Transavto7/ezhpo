@@ -2,7 +2,7 @@
 
 namespace App\Services\TripTicketExporter\SheetWriters;
 
-use App\Enums\LogisticsMethodEnum;
+use App\Enums\TripTicket\LogisticsMethodEnum;
 use App\Enums\TripTicket\TransportationTypeEnum;
 use App\Services\TripTicketExporter\ViewModels\ExportedItem;
 use App\Services\TripTicketExporter\ViewModels\ExportedItem4S;
@@ -101,7 +101,7 @@ final class SheetWriter4S implements SheetWriterInterface
         if ($this->data->getTripTicket()->getStartDate()) {
             $period = $this->data->getTripTicket()->getValidityPeriod();
             $startDate = $this->data->getTripTicket()->getStartDate();
-            $endDate = $startDate->copy()->addDays($period);
+            $endDate = $startDate->copy()->addDays($period - 1);
 
             $this->sheet->setCellValue('AV5', $startDate->day);
             $this->sheet->setCellValue('CT5', $endDate->day);
@@ -114,10 +114,10 @@ final class SheetWriter4S implements SheetWriterInterface
         }
 
         $this->sheet->setCellValue('BF5', trans('date.months_genitive.' . $startDate->month));
-        $this->sheet->setCellValue('CA5', $startDate->year);
+        $this->sheet->setCellValue('CB5', $startDate->year);
 
         $this->sheet->setCellValue('DC5', trans('date.months_genitive.' . $endDate->month));
-        $this->sheet->setCellValue('DW5', $endDate->year);
+        $this->sheet->setCellValue('DX5', $endDate->year);
 
         return $this;
     }
@@ -225,8 +225,8 @@ final class SheetWriter4S implements SheetWriterInterface
             $stamp = $this->data->getMedicForm()->getStamp();
         }
 
-        if (!$stamp) {
-            $stamp = StampViewModel::default();
+        if (! $stamp) {
+            return $this;
         }
 
         $medicStamp = $stamp->getReqName() . "\n";
@@ -247,6 +247,10 @@ final class SheetWriter4S implements SheetWriterInterface
         $techStamp = config('trip-ticket.print.4s.stamps.tech');
 
         $techForm = $this->data->getTechForm();
+
+        if (! $techForm) {
+            return $this;
+        }
 
         $date = $this->getDateString($techForm);
 

@@ -4,7 +4,7 @@ namespace App\Actions\TripTicket\GenerateTripTickets;
 
 use App\Company;
 use App\Driver;
-use App\Enums\LogisticsMethodEnum;
+use App\Enums\TripTicket\LogisticsMethodEnum;
 use App\Enums\TripTicket\TransportationTypeEnum;
 use App\Enums\TripTicket\TripTicketTemplateEnum;
 use Carbon\Carbon;

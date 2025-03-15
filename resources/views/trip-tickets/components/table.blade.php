@@ -59,7 +59,7 @@
                             {{ $tripTicket[$field->field] }}
                         </a>
                     @elseif($field->field === 'logistics_method')
-                        {{ \App\Enums\LogisticsMethodEnum::getLabel($tripTicket[$field->field]) }}
+                        {{ \App\Enums\TripTicket\LogisticsMethodEnum::getLabel($tripTicket[$field->field]) }}
                     @elseif($field->field === 'transportation_type')
                         {{ \App\Enums\TripTicket\TransportationTypeEnum::getLabel($tripTicket[$field->field]) }}
                     @elseif($field->field === 'template_code')
@@ -134,7 +134,8 @@
                         </a>
                     @endif
                     @if($permissionToPrintTripTickets && \App\Services\TripTicket\TripTicketPermissions::canPrint($tripTicket->type, $tripTicket->status, $tripTicket->medic_form_id))
-                        <a class="dropdown-item download-excel-to-print-btn cursor-pointer" data-uuid="{{ $tripTicket->uuid }}">
+                        <a class="dropdown-item download-excel-to-print-btn cursor-pointer"
+                           data-uuid="{{ $tripTicket->uuid }}">
                             <i class="fa fa-file-excel-o"></i> Печать ПЛ
                         </a>
                     @endif

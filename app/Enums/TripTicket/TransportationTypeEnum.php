@@ -87,12 +87,12 @@ class TransportationTypeEnum
     public static function labels(): array
     {
         return [
+            self::CARGO => 'Перевозка грузов',
             self::REGULAR => 'Регулярная перевозка пассажиров и багажа',
             self::ORDER => 'Перевозка пассажиров и багажа по заказу',
             self::TAXI => 'Перевозка пассажиров и багажа легковым такси',
-            self::CARGO => 'Перевозка грузов',
-            self::SELF_NEEDS => 'Перевозка для собственных нужд',
             self::CHILD_TRANSPORTATION => 'Организованная перевозка группы детей',
+            self::SELF_NEEDS => 'Перевозка для собственных нужд',
         ];
     }
 

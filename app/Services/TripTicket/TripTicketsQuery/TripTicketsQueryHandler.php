@@ -39,6 +39,7 @@ final class TripTicketsQueryHandler
             'companies.name as company_name',
             'drivers.fio as driver_name',
             'cars.gos_number as car_number',
+            'users.name as user_name',
             'deleted_users.name as deleted_user_name'
         ])
             ->leftJoin(
@@ -65,6 +66,12 @@ final class TripTicketsQueryHandler
                 '=',
                 'trip_tickets.deleted_id'
             )
+            ->leftJoin(
+                'users',
+                'users.id',
+                '=',
+                'trip_tickets.user_id'
+            )
             ->orderBy($action->getOrderKey(), $action->getOrderBy());
 
         $user = \Auth::user();
@@ -79,9 +86,16 @@ final class TripTicketsQueryHandler
             ? Carbon::parse($action->getFilterParams()['date_to'])
             : Carbon::now()->addYears(10);
 
+        $createdDateFrom = isset($action->getFilterParams()['created_date_from'])
+            ? Carbon::parse($action->getFilterParams()['created_date_from'])
+            : null;
+        $createdDateTo = isset($action->getFilterParams()['created_date_to'])
+            ? Carbon::parse($action->getFilterParams()['created_date_to'])
+            : null;
+
         if (count($action->getFilterParams()) > 0 && $action->isFilterActivated()) {
             foreach ($action->getFilterParams() as $filterKey => $filterValue) {
-                if ($filterValue === null || in_array($filterKey, ['date_from', 'date_to'])) {
+                if ($filterValue === null || in_array($filterKey, ['date_from', 'date_to', 'created_date_from', 'created_date_to'])) {
                     continue;
                 }
 
@@ -101,16 +115,16 @@ final class TripTicketsQueryHandler
                     $tripTickets->where(function (Builder $query) use ($isApproved) {
                         $query->where(function (Builder $query) use ($isApproved) {
                             $query->where('type', '=', TripTicketType::GENERATED)
-                                ->where('status',$isApproved ? '!=' : '=', TripTicketStatus::CREATED);
+                                ->where('status', $isApproved ? '!=' : '=', TripTicketStatus::CREATED);
                         })->orWhere(function (Builder $query) use ($isApproved) {
                             $query->where(function (Builder $query) use ($isApproved) {
                                 $query->where('type', '=', TripTicketType::IN_ADVANCE)
-                                    ->where('status',$isApproved ? '=' : '!=', TripTicketStatus::APPROVED);
+                                    ->where('status', $isApproved ? '=' : '!=', TripTicketStatus::APPROVED);
                             });
                         })->orWhere(function (Builder $query) use ($isApproved) {
                             $query->where(function (Builder $query) use ($isApproved) {
                                 $query->where('type', '=', TripTicketType::COMMON)
-                                    ->where('status',$isApproved ? '!=' : '=', TripTicketStatus::CREATED);
+                                    ->where('status', $isApproved ? '!=' : '=', TripTicketStatus::CREATED);
                             });
                         });
                     });
@@ -126,14 +140,21 @@ final class TripTicketsQueryHandler
             $query->where(function ($subQuery) use ($dateFrom, $dateTo) {
                 $subQuery->whereNotNull('trip_tickets.start_date')
                     ->whereBetween('trip_tickets.start_date', [$dateFrom, $dateTo]);
-            })->orWhere(function ($subQuery) use ($dateFrom, $dateTo) {
-                $subQuery
-                    ->whereNull('trip_tickets.start_date')
-                    ->whereBetween('trip_tickets.period_pl', [
-                        $dateFrom->format('Y-m'),
-                        $dateTo->format('Y-m')
-                    ]);
+            })
+                ->orWhere(function ($subQuery) use ($dateFrom, $dateTo) {
+                    $subQuery
+                        ->whereNull('trip_tickets.start_date')
+                        ->whereBetween('trip_tickets.period_pl', [
+                            $dateFrom->format('Y-m'),
+                            $dateTo->format('Y-m')
+                        ]);
+                });
+            })
+            ->when($createdDateFrom, function ($query) use ($createdDateFrom) {
+                $query->where('trip_tickets.created_at', '>=', $createdDateFrom->startOfDay());
+            })
+            ->when($createdDateTo, function ($query) use ($createdDateTo) {
+                $query->where('trip_tickets.created_at', '<=', $createdDateTo->endOfDay());
             });
-        });
     }
 }

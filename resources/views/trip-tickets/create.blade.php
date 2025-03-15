@@ -11,112 +11,122 @@
 
 @section('custom-scripts')
   <script type="text/javascript">
-      if (screen.width <= 700) {
-          ANKETA_FORM_VIEW.insertBefore(ANKETA_FORM_ROOT, ANKETA_FORM_VIEW_FIRST)
-      }
+    if (screen.width <= 700) {
+      ANKETA_FORM_VIEW.insertBefore(ANKETA_FORM_ROOT, ANKETA_FORM_VIEW_FIRST)
+    }
 
-      $(document).ready(function () {
-          const datesSelector = $("input[name='additional_dates']")
-          initDatePicker(datesSelector)
+    $(document).ready(function () {
+      const datesSelector = $("input[name='additional_dates']")
+      initDatePicker(datesSelector)
 
-          let ctr = 1;
+      let ctr = 1;
 
-          $('#trip-ticket-clone-btn').click(e => {
-              const CLONE_ID = 'clone'
+      $('#trip-ticket-clone-btn').click(e => {
+        const CLONE_ID = 'clone'
 
-              if (ctr + 1 === 32) {
-                  swal.fire({
-                      title: 'Нельзя добавлять более 31 путевого листа',
-                      icon: 'warning'
-                  });
+        if (ctr + 1 === 32) {
+          swal.fire({
+            title: 'Нельзя добавлять более 31 путевого листа',
+            icon: 'warning'
+          });
 
-                  return
-              }
+          return
+        }
 
-              let firstClone = $(`#first-${CLONE_ID}`)
-              let cloneTo = $('#clone-stack')
-              let clone = firstClone.clone()
-              let randId = 'trip_ticket_' + ctr
+        let firstClone = $(`#first-${CLONE_ID}`)
+        let cloneTo = $('#clone-stack')
+        let clone = firstClone.clone()
+        let randId = 'trip_ticket_' + ctr
+        let logisticsMethod = firstClone.find('.logistics_method').val()
+        let transportationType = firstClone.find('.transportation_type').val()
+        let templateCode = firstClone.find('.template_code').val()
 
-              if (cloneTo.find('.cloning-clone').length) {
-                  clone = cloneTo.find('.cloning-clone').last().clone()
-              }
+        if (cloneTo.find('.cloning-clone').length) {
+          clone = cloneTo.find('.cloning-clone').last().clone()
+          logisticsMethod = cloneTo.find('.logistics_method').val()
+          transportationType = cloneTo.find('.transportation_type').val()
+          templateCode = cloneTo.find('.template_code').val()
+        }
 
-              clone.removeAttr('id').addClass('cloning-clone')
-              clone.attr('id', randId)
-              cloneTo.append(clone)
+        clone.find('.logistics_method').val(logisticsMethod)
+        clone.find('.transportation_type').val(transportationType)
+        clone.find('.template_code').val(templateCode)
 
-              clone.find('input,select').each(function () {
-                  this.name = this.name.replace('trip_ticket[' + (ctr - 1) + ']', 'trip_ticket[' + ctr + ']')
-              })
+        clone.removeAttr('id').addClass('cloning-clone')
+        clone.attr('id', randId)
+        cloneTo.append(clone)
 
-              ctr++
+        clone.find('input,select').each(function () {
+          this.name = this.name.replace('trip_ticket[' + (ctr - 1) + ']', 'trip_ticket[' + ctr + ']')
+        })
 
-              clone.find('.trip-ticket-delete').html('<a href="" onclick="' + randId + '.remove(); return false;" class="text-danger">Удалить</a>')
+        ctr++
+
+        clone.find('.trip-ticket-delete').html('<a href="" onclick="' + randId + '.remove(); return false;" class="text-danger">Удалить</a>')
+      })
+
+      $('#trip-ticket-print-btn').click(function () {
+        const spinner = $('.spinner-btn')
+        const created = JSON.parse('@json($created)')
+        const ids = created.map(item => item.uuid)
+
+        spinner.attr('style', '')
+        $(this).attr('style', 'display:none')
+
+        axios({
+          method: 'post',
+          url: '{{ route('trip-tickets.mass-print') }}',
+          data: {
+            ids: ids,
+          },
+          responseType: 'blob',
+        })
+          .then((response) => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+
+            link.href = url;
+            link.setAttribute('download', 'Путевой лист.xlsx');
+
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
           })
+          .catch((error) => {
+            if (error.response && error.response.data instanceof Blob) {
+              const blob = error.response.data;
 
-          $('#trip-ticket-print-btn').click(function () {
-              const spinner = $('.spinner-btn')
-              const created = JSON.parse('@json($created)')
-              const ids = created.map(item => item.uuid)
+              blob.text().then((text) => {
+                try {
+                  const errorData = JSON.parse(text);
+                  let message = errorData.error ?? '';
 
-              spinner.attr('style', '')
-              $(this).attr('style', 'display:none')
-
-              axios({
-                  method: 'post',
-                  url: '{{ route('trip-tickets.mass-print') }}',
-                  data: {
-                      ids: ids,
-                  },
-                  responseType: 'blob',
-              })
-                  .then((response) => {
-                      const url = window.URL.createObjectURL(new Blob([response.data]));
-                      const link = document.createElement('a');
-
-                      link.href = url;
-                      link.setAttribute('download', 'Путевой лист.xlsx');
-
-                      document.body.appendChild(link);
-                      link.click();
-                      link.remove();
-                  })
-                  .catch((error) => {
-                      if (error.response && error.response.data instanceof Blob) {
-                          const blob = error.response.data;
-
-                          blob.text().then((text) => {
-                              try {
-                                  const errorData = JSON.parse(text);
-                                  let message = errorData.error ?? '';
-
-                                  swal.fire({
-                                      title: 'При формировании файла произошла ошибка',
-                                      text: message,
-                                      icon: 'error'
-                                  });
-                              } catch (e) {
-                                  swal.fire({
-                                      title: 'При формировании файла произошла ошибка',
-                                      text: text,
-                                      icon: 'error'
-                                  });
-                              }
-                          });
-                      } else {
-                          swal.fire({
-                              title: 'При формировании файла произошла ошибка',
-                              icon: 'error'
-                          });
-                      }
-                  })
-                  .finally(() => {
-                      spinner.attr('style', 'display:none')
-                      $(this).attr('style', '')
-                  })
+                  swal.fire({
+                    title: 'При формировании файла произошла ошибка',
+                    text: message,
+                    icon: 'error'
+                  });
+                } catch (e) {
+                  swal.fire({
+                    title: 'При формировании файла произошла ошибка',
+                    text: text,
+                    icon: 'error'
+                  });
+                }
+              });
+            } else {
+              swal.fire({
+                title: 'При формировании файла произошла ошибка',
+                icon: 'error'
+              });
+            }
+          })
+          .finally(() => {
+            spinner.attr('style', 'display:none')
+            $(this).attr('style', '')
           })
       })
+    })
   </script>
 @endsection
 
@@ -293,7 +303,7 @@
                              name="date_from"
                            @else
                              name="trip_ticket[0][date_from]"
-                        @endif
+                           @endif
                     >
                   </article>
                 </div>
@@ -342,8 +352,8 @@
                 <div class="form-group">
                   <label class="form-control-label">Вид сообщения:</label>
                   <article>
-                    <select name="trip_ticket[0][logistics_method]" required class="form-control type-view">
-                      @foreach(\App\Enums\LogisticsMethodEnum::labels() as $key => $label)
+                    <select name="trip_ticket[0][logistics_method]" required class="form-control type-view logistics_method">
+                      @foreach(\App\Enums\TripTicket\LogisticsMethodEnum::labels() as $key => $label)
                         <option value="{{ $key }}">{{ $label }}</option>
                       @endforeach
                     </select>
@@ -353,7 +363,7 @@
                 <div class="form-group">
                   <label class="form-control-label">Вид перевозки:</label>
                   <article>
-                    <select name="trip_ticket[0][transportation_type]" required class="form-control type-view">
+                    <select name="trip_ticket[0][transportation_type]" required class="form-control type-view transportation_type">
                       @foreach(\App\Enums\TripTicket\TransportationTypeEnum::labels() as $key => $label)
                         <option value="{{ $key }}">{{ $label }}</option>
                       @endforeach
@@ -364,7 +374,7 @@
                 <div class="form-group">
                   <label class="form-control-label">Код бумажного шаблона:</label>
                   <article>
-                    <select name="trip_ticket[0][template_code]" required class="form-control type-view">
+                    <select name="trip_ticket[0][template_code]" required class="form-control type-view template_code">
                       @foreach(\App\Enums\TripTicket\TripTicketTemplateEnum::labels() as $key => $label)
                         <option value="{{ $key }}">{{ $label }}</option>
                       @endforeach

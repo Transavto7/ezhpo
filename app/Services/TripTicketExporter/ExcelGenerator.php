@@ -110,7 +110,11 @@ final class ExcelGenerator
 
         $this->validateTemplate($spreadsheet);
 
-        $tripTickets = TripTicket::query()->whereIn('uuid', $ids)->get();
+        $tripTickets = TripTicket::query()
+            ->whereIn('uuid', $ids)
+            ->orderBy('start_date')
+            ->orderBy('period_pl')
+            ->get();
 
         foreach ($tripTickets as $index => $tripTicket) {
             $mapper = new ItemMapperStrategy($tripTicket);

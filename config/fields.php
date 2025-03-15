@@ -458,6 +458,7 @@ return [
             'photos' => true,
             'type' => true,
             'status' => true,
+            'user_name' => true,
         ],
         'workdays' => [
             'date' => true,
@@ -508,6 +509,7 @@ return [
             'photos',
             'type',
             'status',
+            'user_name',
         ],
     ]
 ];
