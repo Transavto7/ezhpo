@@ -8,6 +8,7 @@ use App\Driver;
 use App\Http\Requests\GetPreviousOdometerRequest;
 use App\Models\Forms\TechForm;
 use App\Services\RedDatesCheckerService;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -166,6 +167,10 @@ class ApiController extends Controller
             'Company' => [
                 'model' => Company::class,
                 'fields' => ['id', 'name', 'inn', 'payment_form']
+            ],
+            'User' => [
+                'model' => User::class,
+                'fields' => ['id', 'name']
             ]
         ];
 

@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Src\Employees\Workdays\Commands\CalcEmployeeSalaries\CalcEmployeeSalariesCommand;
 use Src\Employees\Workdays\Commands\CalcEmployeeSalaries\CalcEmployeeSalariesHandler;
-use Src\Employees\Workdays\SmartEnum\TypeAnketaSmartEnum;
+use Src\Employees\Workdays\SmartEnum\WorkdayEventTypeEnum;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 

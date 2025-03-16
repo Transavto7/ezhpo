@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Закрытие смены')
+@section('title', 'Добавление записи рабочей смены')
 @section('sidebar', 1)
 
 @section('custom-scripts')
@@ -20,7 +20,7 @@
                 <div class="card-body">
                     <p><b>Карточка сотрудника</b></p>
 
-                    <div id="CARD_EMPLOYEE">
+                    <div id="CARD_USER">
                         Не найдено
                     </div>
                 </div>
@@ -30,7 +30,7 @@
         <div class="col-lg-3" id="WORKDAY_FORM_ROOT">
             <div class="card">
                 <div class="card-body">
-                    <p><b>Закрытие смены</b></p>
+                    <p><b>Рабочая смена</b></p>
 
                     <article class="workday workday-fields">
                         @foreach($errors ?? [] as $error)

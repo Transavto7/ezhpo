@@ -6,7 +6,7 @@ namespace Src\Employees\Commands\GetAllEmployees;
 use App\Settings;
 use Illuminate\Support\Facades\DB;
 use Src\Employees\Workdays\Eloquent\Workday;
-use Src\Employees\Workdays\SmartEnum\TypeAnketaSmartEnum;
+use Src\Employees\Workdays\SmartEnum\WorkdayEventTypeEnum;
 use Symfony\Component\HttpFoundation\Response;
 
 final class GetEmployeeHandler
@@ -89,18 +89,18 @@ final class GetEmployeeHandler
                 ->orderBy('workdays.created_at', 'desc')
                 ->first();
             if ($existingWorkday) {
-                if ($existingWorkday->type_anketa === TypeAnketaSmartEnum::CLOSE) {
+                if ($existingWorkday->type_anketa === WorkdayEventTypeEnum::CLOSE) {
                     throw new \Exception('Сотрудник уже имеет запись в этот день', Response::HTTP_BAD_REQUEST);
                 }
 
-                if ($existingWorkday->type_anketa === TypeAnketaSmartEnum::OPEN) {
+                if ($existingWorkday->type_anketa === WorkdayEventTypeEnum::OPEN) {
                     $result[0]['inspection_types'] = [
-                        TypeAnketaSmartEnum::create(TypeAnketaSmartEnum::CLOSE)->getSpdoValue(),
+                        WorkdayEventTypeEnum::create(WorkdayEventTypeEnum::CLOSE)->getSpdoValue(),
                     ];
                 }
             } else {
                 $result[0]['inspection_types'] = [
-                    TypeAnketaSmartEnum::create(TypeAnketaSmartEnum::OPEN)->getSpdoValue()
+                    WorkdayEventTypeEnum::create(WorkdayEventTypeEnum::OPEN)->getSpdoValue()
                 ];
             }
 

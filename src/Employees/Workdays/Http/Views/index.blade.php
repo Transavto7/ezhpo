@@ -55,19 +55,19 @@
 
 @section('custom-scripts')
     <script type="text/javascript">
-        let fieldsVisible = {{ user()->fields_visible ?? config('fields.visible') }}
+        let fieldsVisible = {};
 
         //TODO: как используется?
         function setVisibleInputs() {
-            $('.ankets-form input').each(function () {
-                const name = $(this).attr('name');
-                let checked = false;
-                if (fieldsVisible[type] && fieldsVisible[type][name]) {
-                    checked = true;
-                }
-                $(this).prop("checked", checked);
-                $(this).trigger('change');
-            });
+            // $('.ankets-form input').each(function () {
+            //     const name = $(this).attr('name');
+            //     let checked = false;
+            //     if (fieldsVisible[type] && fieldsVisible[type][name]) {
+            //         checked = true;
+            //     }
+            //     $(this).prop("checked", checked);
+            //     $(this).trigger('change');
+            // });
         }
 
         $(document).ready(function () {
@@ -363,10 +363,9 @@
 @endsection
 
 @php
-    $permissionToView = user()->access('workdays_read');
-    $permissionToTrashView = user()->access('workdays_trash');
-    $permissionToDelete = user()->access('workdays_trash');
-    $permissionToUpdate = user()->access('workdays_update');
+    $permissionToView = user()->access('employees_workdays_read');
+    $permissionToTrashView = $permissionToDelete = user()->access('employees_workdays_trash');
+    $permissionToUpdate = user()->access('employees_workdays_update');
 
     $notDeletedItems = session('not_deleted_workdays');
 @endphp
@@ -379,12 +378,10 @@
                     <div class="col-md-12">
                         <div class="row bg-light p-2">
                             <div class="col-md-6">
-                                @if (!user()->hasRole('client'))
-                                    <button type="button" data-toggle-show="#ankets-filters"
-                                            class="btn btn-sm btn-info"><i class="fa fa-cog"></i> <span
-                                            class="toggle-title">Настроить</span> колонки
-                                    </button>
-                                @endif
+                                <button type="button" data-toggle-show="#ankets-filters"
+                                        class="btn btn-sm btn-info"><i class="fa fa-cog"></i> <span
+                                        class="toggle-title">Настроить</span> колонки
+                                </button>
 
                                 @if($permissionToTrashView)
                                     @if(request()->get('trash', 0))

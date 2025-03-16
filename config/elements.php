@@ -230,6 +230,7 @@ return [
         'editOnField' => 'fio',
         'model' => 'Driver',
         'fields' => [
+
             'company_id' => [
                 'label' => 'Компания',
                 'type' => 'select',
@@ -900,4 +901,45 @@ return [
             ],
         ],
     ],
+
+    'User' => [
+        'title' => 'Сотрудники',
+        'popupTitle' => 'Сотрудника',
+        'editOnField' => 'name',
+        'model' => 'User',
+        'fields' => [
+            'name' => [
+                'label' => 'ФИО',
+                'type' => 'text',
+                'hideFilter' => 1
+            ],
+            'email' => [
+                'label' => 'ФИО',
+                'type' => 'text',
+                'hideFilter' => 1
+            ],
+            'hash_id' => [
+                'label' => 'ID водителя',
+                'type' => 'select',
+                'values' => 'Driver',
+                'getField' => 'fio',
+                'concatField' => 'hash_id',
+                'getFieldKey' => 'hash_id'
+            ],
+            'photo' => [
+                'label' => 'Фото',
+                'type' => 'file',
+                'resize' => 1,
+                'noRequired' => 1
+            ],
+            'pv_id' => [
+                'label' => 'ПВ',
+                'type' => 'select',
+                'values' => 'Point',
+                'getFieldKey' => 'id',
+                'concatField' => 'hash_id',
+                'noRequired' => 1
+            ],
+        ]
+    ]
 ];

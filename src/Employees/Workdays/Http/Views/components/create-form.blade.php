@@ -37,15 +37,15 @@
     <div class="form-group">
         <label class="form-control-label">Тип осмотра:</label>
         <article>
-            <select name="type_view"
-                    disabled
-                    class="form-control type-view">
-                <option value="Послерейсовый/Послесменный" selected>
-                    Послерейсовый/Послесменный
+            <select name="type_anketa"
+                    class="form-control">
+                <option value="open" selected>
+                    Открытие
+                </option>
+                <option value="close">
+                    Закрытие
                 </option>
             </select>
-            <p class="duplicate-indicator text-danger d-none" style="font-size: 0.7875rem">Смена с указанным сотрудником,
-                датой и типом уже существует</p>
         </article>
     </div>
 
@@ -78,7 +78,7 @@
     <div class="form-group">
         <label class="form-control-label">Тест на наркотики:</label>
         <article>
-            <select name="test_narko" required class="form-control">
+            <select name="test_narko" class="form-control">
                 <option selected value="Не проводился">
                     Не проводился
                 </option>

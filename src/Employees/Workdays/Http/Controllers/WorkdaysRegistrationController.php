@@ -14,7 +14,7 @@ use App\User;
 use Illuminate\Http\JsonResponse;
 use Src\Employees\Workdays\Commands\WorkdaysRegistration\WorkdaysRegistrationCommand;
 use Src\Employees\Workdays\Commands\WorkdaysRegistration\WorkdaysRegistrationHandler;
-use Src\Employees\Workdays\SmartEnum\TypeAnketaSmartEnum;
+use Src\Employees\Workdays\SmartEnum\WorkdayEventTypeEnum;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -34,7 +34,7 @@ final class WorkdaysRegistrationController
                 ->setDate($request->date)
                 ->setEmployeeId($request->employee_id)
                 ->setProbaAlko($request->proba_alko)
-                ->setTypeAnketa(TypeAnketaSmartEnum::create($request->type_anketa))
+                ->setTypeAnketa(WorkdayEventTypeEnum::create($request->type_anketa))
                 ->setTestNarko($request->test_narko)
                 ->setPhoto($request->photo)
                 ->setVideo($request->video);

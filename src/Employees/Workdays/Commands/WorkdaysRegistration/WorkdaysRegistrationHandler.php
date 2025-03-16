@@ -10,7 +10,7 @@ use App\ValueObjects\ForeignDevice\PressureLimit;
 use App\ValueObjects\ForeignDevice\PulseLimit;
 use Exception;
 use Src\Employees\Workdays\Eloquent\Workday;
-use Src\Employees\Workdays\SmartEnum\TypeAnketaSmartEnum;
+use Src\Employees\Workdays\SmartEnum\WorkdayEventTypeEnum;
 use Src\Employees\Workdays\WorkflowOperations\EmployerWorkdayAdmitting;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -54,7 +54,7 @@ final class WorkdaysRegistrationHandler
             /** @var Workday $openWorkday */
             $openWorkday = Workday::where('employee_id', $employee->id)
                 ->whereDate('date', $command->getDate()->format('Y-m-d'))
-                ->where('type_anketa', TypeAnketaSmartEnum::OPEN)
+                ->where('type_anketa', WorkdayEventTypeEnum::OPEN)
                 ->where('admitted', 1)
                 ->first();
             if (!$openWorkday) {

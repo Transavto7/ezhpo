@@ -4,7 +4,7 @@ namespace Src\Employees\Workdays\SmartEnum;
 
 use Src\Helper\Pattern\SmartEnum;
 
-final class TypeAnketaSmartEnum extends SmartEnum
+final class WorkdayEventTypeEnum extends SmartEnum
 {
     public const OPEN = 1;
     public const CLOSE = 2;

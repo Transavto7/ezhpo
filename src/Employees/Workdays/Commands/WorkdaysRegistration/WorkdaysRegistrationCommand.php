@@ -9,7 +9,7 @@ use App\ValueObjects\ForeignDevice\Pulse;
 use App\ValueObjects\ForeignDevice\Temperature;
 use App\ValueObjects\ForeignDevice\Tonometer;
 use DateTime;
-use Src\Employees\Workdays\SmartEnum\TypeAnketaSmartEnum;
+use Src\Employees\Workdays\SmartEnum\WorkdayEventTypeEnum;
 
 final class WorkdaysRegistrationCommand
 {
@@ -28,7 +28,7 @@ final class WorkdaysRegistrationCommand
 
     public function __construct()
     {
-        $this->typeAnketa = TypeAnketaSmartEnum::create();
+        $this->typeAnketa = WorkdayEventTypeEnum::create();
     }
 
     /**
@@ -165,18 +165,18 @@ final class WorkdaysRegistrationCommand
     }
 
     /**
-     * @return TypeAnketaSmartEnum
+     * @return WorkdayEventTypeEnum
      */
-    public function getTypeAnketa(): TypeAnketaSmartEnum
+    public function getTypeAnketa(): WorkdayEventTypeEnum
     {
         return $this->typeAnketa;
     }
 
     /**
-     * @param TypeAnketaSmartEnum $typeAnketa
+     * @param WorkdayEventTypeEnum $typeAnketa
      * @return WorkdaysRegistrationCommand
      */
-    public function setTypeAnketa(TypeAnketaSmartEnum $typeAnketa): self
+    public function setTypeAnketa(WorkdayEventTypeEnum $typeAnketa): self
     {
         $this->typeAnketa = $typeAnketa;
 
