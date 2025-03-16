@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\TripTickets;
 
 use App\Http\Controllers\Controller;
+use App\Models\TripTicket;
+use App\Services\TripTicket\TripTicketPermissions;
 use App\Services\TripTicketExporter\TripTicketExporter;
 use App\ValueObjects\EntityId;
 use Exception;
@@ -15,7 +17,12 @@ final class PrintTripTicketController extends Controller
     public function __invoke(Request $request, TripTicketExporter $exporter)
     {
         try {
-            $id = EntityId::fromString($request->input('id'));
+            $tripTicket = TripTicket::where('uuid', '=', $request->input('id'))->firstOrFail();
+            $id = EntityId::fromString($tripTicket->uuid);
+
+            if (! TripTicketPermissions::canPrint($tripTicket->type, $tripTicket->status, $tripTicket->medic_form_id)) {
+                throw new Exception("Путевой лист № $tripTicket->ticket_number не может быть напечатан");
+            }
 
             $writer = $exporter->export($id);
 

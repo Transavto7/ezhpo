@@ -116,16 +116,19 @@ final class ExcelGenerator
             ->orderBy('period_pl')
             ->get();
 
+        $usedTemplates = [];
         foreach ($tripTickets as $index => $tripTicket) {
             $mapper = new ItemMapperStrategy($tripTicket);
             $writer = new SheetWriterStrategy(TripTicketTemplateEnum::fromString($tripTicket->template_code));
 
             $item = $mapper->map();
             $spreadsheet = $writer->createSheets($spreadsheet, $item, $index + 1);
+
+            $usedTemplates[] = $tripTicket->template_code;
         }
 
         // copy reverse sheets
-        foreach ($this->reverseSheetNames() as $sheetName => $sheetPrefix) {
+        foreach ($this->reverseSheetNames($usedTemplates) as $sheetName => $sheetPrefix) {
             $sheet = clone $spreadsheet->getSheetByName($sheetName);
             $sheet->setTitle($sheetPrefix);
             $spreadsheet->addSheet($sheet);
@@ -166,11 +169,13 @@ final class ExcelGenerator
         }
     }
 
-    private function reverseSheetNames(): array
+    private function reverseSheetNames(array $usedTemplates): array
     {
-        return [
-            config('trip-ticket.print.4s.template.reverse.sheet') => config('trip-ticket.print.4s.template.reverse.prefix')
-        ];
+        return array_reduce(array_unique($usedTemplates), function (array $carry, string $template) {
+            $carry[config("trip-ticket.print.$template.template.reverse.sheet")] = config("trip-ticket.print.$template.template.reverse.prefix");
+
+            return $carry;
+        }, []);
     }
 
     private function templateSheetNames(): array
@@ -178,6 +183,8 @@ final class ExcelGenerator
         return [
             config('trip-ticket.print.4s.template.front.sheet'),
             config('trip-ticket.print.4s.template.reverse.sheet'),
+            config('trip-ticket.print.3.template.front.sheet'),
+            config('trip-ticket.print.3.template.reverse.sheet'),
         ];
     }
 }

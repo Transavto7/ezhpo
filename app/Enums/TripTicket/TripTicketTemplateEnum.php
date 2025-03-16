@@ -6,6 +6,8 @@ class TripTicketTemplateEnum
 {
     const S4 = '4s';
 
+    const _3 = '3';
+
     /** @var string */
     private $value;
 
@@ -29,6 +31,8 @@ class TripTicketTemplateEnum
         switch ($value) {
             case self::S4:
                 return self::s4();
+            case self::_3:
+                return self::_3();
             default:
                 throw new \DomainException('Unknown trip ticket template type: ' . $value);
         }
@@ -39,10 +43,16 @@ class TripTicketTemplateEnum
         return new self(self::S4);
     }
 
+    public static function _3(): self
+    {
+        return new self(self::_3);
+    }
+
     public static function labels(): array
     {
         return [
             self::S4 => '4-С',
+            self::_3 => '3',
         ];
     }
 

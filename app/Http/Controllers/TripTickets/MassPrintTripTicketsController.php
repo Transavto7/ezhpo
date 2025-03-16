@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\TripTickets;
 
 use App\Http\Controllers\Controller;
+use App\Models\TripTicket;
+use App\Services\TripTicket\TripTicketPermissions;
 use App\Services\TripTicketExporter\TripTicketExporter;
 use App\ValueObjects\EntityId;
 use DomainException;
@@ -22,6 +24,14 @@ final class MassPrintTripTicketsController extends Controller
 
             if (count($ids) >= 15) {
                 throw new DomainException('Количество ПЛ для печати не должно превышать 15');
+            }
+
+            $tripTickets = TripTicket::whereIn('uuid', $ids)->get();
+
+            foreach ($tripTickets as $tripTicket) {
+                if (! TripTicketPermissions::canPrint($tripTicket->type, $tripTicket->status, $tripTicket->medic_form_id)) {
+                    throw new Exception("Путевой лист № $tripTicket->ticket_number не может быть напечатан");
+                }
             }
 
             $writer = $exporter->massExport($ids);

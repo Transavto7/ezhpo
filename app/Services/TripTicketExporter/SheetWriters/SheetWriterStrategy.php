@@ -17,9 +17,14 @@ final class SheetWriterStrategy
 
     public function __construct(TripTicketTemplateEnum $templateCode)
     {
+        $qrCodeGenerator = new QRCodeImageGenerator();
+
         switch (true) {
             case $templateCode->value() === TripTicketTemplateEnum::S4:
-                $this->sheetWriter = new SheetWriter4S(new QRCodeImageGenerator());
+                $this->sheetWriter = new SheetWriter4S($qrCodeGenerator);
+                break;
+            case $templateCode->value() === TripTicketTemplateEnum::_3:
+                $this->sheetWriter = new SheetWriter3($qrCodeGenerator);
                 break;
             default:
                 throw new DomainException('Unsupported trip ticket template code' . $templateCode->value());
