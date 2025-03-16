@@ -16,6 +16,10 @@ class TransportationTypeEnum
 
     const CHILD_TRANSPORTATION = 'child_transportation';
 
+    const SPECIAL_VEHICLE = 'special_vehicle';
+
+    const CONTRACT = 'contract';
+
     /** @var string */
     private $value;
 
@@ -64,6 +68,16 @@ class TransportationTypeEnum
         return new self(self::CHILD_TRANSPORTATION);
     }
 
+    public static function specialVehicle(): self
+    {
+        return new self(self::SPECIAL_VEHICLE);
+    }
+
+    public static function contract(): self
+    {
+        return new self(self::CONTRACT);
+    }
+
     public static function fromString(string $value): self
     {
         switch ($value) {
@@ -79,6 +93,10 @@ class TransportationTypeEnum
                 return self::selfNeeds();
             case self::CHILD_TRANSPORTATION:
                 return self::childTransportation();
+            case self::SPECIAL_VEHICLE:
+                return self::specialVehicle();
+            case self::CONTRACT:
+                return self::contract();
             default:
                 throw new \DomainException('Unknown transportation type: ' . $value);
         }
@@ -93,6 +111,9 @@ class TransportationTypeEnum
             self::TAXI => 'Перевозка пассажиров и багажа легковым такси',
             self::CHILD_TRANSPORTATION => 'Организованная перевозка группы детей',
             self::SELF_NEEDS => 'Перевозка для собственных нужд',
+            self::SPECIAL_VEHICLE => 'Передвижение и работа специальных транспортных средств',
+            self::CONTRACT => 'Перевозка грузов на основании договора перевозки грузов или договора фрахтования
+            (в т.ч. по договору аренды ТС с экипажем)',
         ];
     }
 

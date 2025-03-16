@@ -304,16 +304,40 @@ final class SheetWriter4S implements SheetWriterInterface
 
     private function fillLogisticMethod(): self
     {
-        $value = LogisticsMethodEnum::getLabel($this->data->getTripTicket()->getLogisticsMethod()->value());
-        $this->sheet->setCellValue('B22', $value);
+        $value = $this->data->getTripTicket()->getLogisticsMethod()->value();
+
+        switch (true) {
+            case $value === LogisticsMethodEnum::URBAN:
+                $this->sheet->setCellValue('A22', '+');
+                break;
+            case $value === LogisticsMethodEnum::SUBURBAN:
+                $this->sheet->setCellValue('A25', '+');
+                break;
+            case $value === LogisticsMethodEnum::LONG_DISTANCE:
+                $this->sheet->setCellValue('A27', '+');
+                break;
+            default:
+        }
 
         return $this;
     }
 
     private function fillTransportationType(): self
     {
-        $value = TransportationTypeEnum::getLabel($this->data->getTripTicket()->getTransportationType()->value());
-        $this->sheet->setCellValue('V22', $value);
+        $value = $this->data->getTripTicket()->getTransportationType()->value();
+
+        switch (true) {
+            case $value === TransportationTypeEnum::SELF_NEEDS:
+                $this->sheet->setCellValue('T22', '+');
+                break;
+            case $value === TransportationTypeEnum::SPECIAL_VEHICLE:
+                $this->sheet->setCellValue('U25', '+');
+                break;
+            case $value === TransportationTypeEnum::CONTRACT:
+                $this->sheet->setCellValue('BJ22', '+');
+                break;
+            default:
+        }
 
         return $this;
     }
