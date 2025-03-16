@@ -13,7 +13,8 @@ interface QRCodeGeneratorInterface
     /**
      * @param string $data
      * @param int $version
+     * @param string|null $filePath
      * @return mixed
      */
-    public function generate(string $data, int $version);
+    public function generate(string $data, int $version, string $filePath = null);
 }

@@ -4,14 +4,18 @@ namespace App\Services\TripTicketExporter\SheetWriters;
 
 use App\Enums\TripTicket\LogisticsMethodEnum;
 use App\Enums\TripTicket\TransportationTypeEnum;
+use App\Services\QRCode\QRCodeGeneratorInterface;
 use App\Services\TripTicketExporter\ViewModels\ExportedItem;
 use App\Services\TripTicketExporter\ViewModels\ExportedItem4S;
 use App\Services\TripTicketExporter\ViewModels\MedicFormViewModel;
-use App\Services\TripTicketExporter\ViewModels\StampViewModel;
 use App\Services\TripTicketExporter\ViewModels\TechFormViewModel;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 final class SheetWriter4S implements SheetWriterInterface
@@ -24,6 +28,19 @@ final class SheetWriter4S implements SheetWriterInterface
      * @var ExportedItem4S
      */
     private $data;
+
+    /**
+     * @var QRCodeGeneratorInterface
+     */
+    private $qrCodeGenerator;
+
+    /**
+     * @param QRCodeGeneratorInterface $qrCodeGenerator
+     */
+    public function __construct(QRCodeGeneratorInterface $qrCodeGenerator)
+    {
+        $this->qrCodeGenerator = $qrCodeGenerator;
+    }
 
     public function templateSheetName(): string
     {
@@ -40,6 +57,17 @@ final class SheetWriter4S implements SheetWriterInterface
     public function createSheet(Spreadsheet $spreadsheet, ExportedItem $item, int $number): Spreadsheet
     {
         $this->sheet = clone $spreadsheet->getSheetByName($this->templateSheetName());
+
+        $title = $number . '. ' . config('trip-ticket.print.4s.template.front.prefix');
+
+        if ($item->getTripTicket()->getTicketNumber()) {
+            $title .= ' (' . $item->getTripTicket()->getTicketNumber() . ')';
+        }
+
+        $this->sheet->setTitle($title);
+
+        $spreadsheet->addSheet($this->sheet);
+
         $this->data = $item;
 
         $this->fillIds()
@@ -54,16 +82,6 @@ final class SheetWriter4S implements SheetWriterInterface
             ->fillTechStamp()
             ->fillLogisticMethod()
             ->fillTransportationType();
-
-        $title = $number . '. ' . config('trip-ticket.print.4s.template.front.prefix');
-
-        if ($item->getTripTicket()->getTicketNumber()) {
-            $title .= ' (' . $item->getTripTicket()->getTicketNumber() . ')';
-        }
-
-        $this->sheet->setTitle($title);
-
-        $spreadsheet->addSheet($this->sheet);
 
         return $spreadsheet;
     }
@@ -226,6 +244,9 @@ final class SheetWriter4S implements SheetWriterInterface
         }
 
         if (! $stamp) {
+            $this->sheet->getStyle('Q43:BA50')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
+            $this->sheet->getStyle('Q43:BA50')->getFill()->setFillType(Fill::FILL_NONE);
+
             return $this;
         }
 
@@ -239,6 +260,25 @@ final class SheetWriter4S implements SheetWriterInterface
 
         $this->sheet->setCellValue('R44', $medicStamp . "\n\n" . $date);
 
+        $url = route('anketa.verification.page', [
+            'uuid' => $this->data->getMedicForm()->getUuid(),
+        ]);
+
+        $qrCodeFileName = 'qrcodes/medic_' . $this->data->getMedicForm()->getUuid() . '.jpg';
+        $qrCodeFilePath = Storage::disk('public')->path($qrCodeFileName);
+
+        $this->qrCodeGenerator->generate($url, QRCodeGeneratorInterface::VERSION_6, $qrCodeFilePath);
+
+        $drawing = new Drawing();
+        $drawing->setName('Маркировка осмотра');
+        $drawing->setDescription('Маркировка осмотра');
+        $drawing->setPath($qrCodeFilePath);
+        $drawing->setCoordinates('A43');
+        $drawing->setWidth(92);
+        $drawing->setHeight(92);
+        $drawing->setOffsetX(10);
+        $drawing->setWorksheet($this->sheet);
+
         return $this;
     }
 
@@ -249,6 +289,9 @@ final class SheetWriter4S implements SheetWriterInterface
         $techForm = $this->data->getTechForm();
 
         if (! $techForm) {
+            $this->sheet->getStyle('BX43:DH50')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
+            $this->sheet->getStyle('BX43:DH50')->getFill()->setFillType(Fill::FILL_NONE);
+
             return $this;
         }
 

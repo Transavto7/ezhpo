@@ -127,6 +127,7 @@ final class ItemMapper4S implements ItemMapperInterface
         $stamp = $details->getStamp();
 
         return new MedicFormViewModel(
+            $form->uuid,
             $form->date ? Carbon::parse($form->date) : null,
             $form->user ? $form->user->name : null,
             $stamp ? StampViewModel::fromStampOrDefault($stamp) : null

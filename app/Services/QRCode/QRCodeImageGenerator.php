@@ -5,7 +5,7 @@ namespace App\Services\QRCode;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 
-final class QRCodeGenerator implements QRCodeGeneratorInterface
+final class QRCodeImageGenerator implements QRCodeGeneratorInterface
 {
     /**
      * @inheritDoc
@@ -16,9 +16,10 @@ final class QRCodeGenerator implements QRCodeGeneratorInterface
         $options->version = $version;
         $options->quietzoneSize = 0;
         $options->scale = 8;
+        $options->outputType = QRCode::OUTPUT_IMAGE_JPG;
 
         $qrCode = new QRCode($options);
 
-        return $qrCode->render($data);
+        return $qrCode->render($data, $filePath);
     }
 }
