@@ -11,13 +11,22 @@ class SmartEnum
         $this->setValue($value);
     }
 
-    public static function create($value = null) {
+    public static function create($value = null)
+    {
         return new static($value);
     }
 
     public function isDefined()
     {
         return !is_null($this->value);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
     }
 
     /**
@@ -29,13 +38,5 @@ class SmartEnum
         $this->value = $value;
 
         return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getValue()
-    {
-        return $this->value;
     }
 }

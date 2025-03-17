@@ -88,7 +88,7 @@ class Workday extends Model
 
     public function terminal(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'employee_id', 'id');
+        return $this->belongsTo(User::class, 'terminal_id', 'id');
     }
 
     public function point(): BelongsTo

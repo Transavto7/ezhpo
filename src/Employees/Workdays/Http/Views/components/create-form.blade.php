@@ -11,7 +11,7 @@
     <div class="form-group">
         <label class="form-control-label">ID сотрудника:</label>
         <article>
-            <input value=""
+            <input value="{{ old('employee_id') }}"
                    type="number"
                    oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'User', event.target.value, 'name', $(event.target).parent(), {{ 'false' }})"
                    required min="6"
@@ -28,7 +28,7 @@
                    max="2999-02-20T20:20"
                    type="datetime-local"
                    required
-                   value="{{ $default_current_date ?? '' }}"
+                   value="{{ old('employee_id', $default_current_date ?? '') }}"
                    name="date"
                    class="form-control inspection-date">
         </article>
@@ -39,10 +39,10 @@
         <article>
             <select name="type_anketa"
                     class="form-control">
-                <option value="open" selected>
+                <option value="{{ \Src\Employees\Workdays\SmartEnum\WorkdayEventTypeEnum::OPEN }}" selected>
                     Открытие
                 </option>
-                <option value="close">
+                <option value="{{ \Src\Employees\Workdays\SmartEnum\WorkdayEventTypeEnum::CLOSE }}">
                     Закрытие
                 </option>
             </select>

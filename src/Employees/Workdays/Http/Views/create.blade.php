@@ -11,9 +11,11 @@
     </script>
 @endsection
 
-@section('content')
-    @include('profile.ankets.components.fast-scroll')
+@php
+    $created = \Illuminate\Support\Facades\Session::get('created', []);
+@endphp
 
+@section('content')
     <div class="row" id="WORKDAY_FORM_VIEW">
         <div class="col-lg-3" id="WORKDAY_FORM_VIEW_FIRST">
             <div class="card">
@@ -37,9 +39,9 @@
                             <div class="alert alert-danger" role="alert">{{ $error }}</div>
                         @endforeach
 
-                        @if(count($created ?? []))
+                        @if(count($created))
                             <div class="row">
-                                @foreach($created ?? [] as $workday)
+                                @foreach($created as $workday)
                                     @include('Workdays::components.created', ['workday' => $workday])
                                 @endforeach
                             </div>

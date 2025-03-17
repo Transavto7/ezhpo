@@ -14,22 +14,12 @@ class WorkdaysIndexController extends Controller
 {
     public function __invoke(Request $request): View
     {
-        $trash = filter_var($request->get('trash', 0), FILTER_VALIDATE_BOOLEAN);
-
-        if ($trash) {
-            $workdays = Workday::onlyTrashed();
-        } else {
-            $workdays = Workday::query();
-        }
+        $workdays = Workday::query();
 
         $workdays = $workdays
             //TODO: нужно ли инфо о терминале?
-            ->leftJoin('points', 'workdays.pv_id', '=', 'points.id')
+            ->leftJoin('points', 'workdays.point_id', '=', 'points.id')
             ->leftJoin('users', 'workdays.employee_id', '=', 'users.id');
-
-        if ($trash) {
-            $workdays = $workdays->leftJoin('users as delete_users', 'workdays.deleted_id', '=', 'delete_users.id');
-        }
 
         /**
          * Фильтрация анкет
@@ -69,6 +59,11 @@ class WorkdaysIndexController extends Controller
                     if (count($filterValue) === 1) {
                         $filterValue = $filterValue[0];
                     }
+                }
+
+                if ($filterKey === 'roles') {
+                    //TODO: реализовать фильтр по ролям
+                    continue;
                 }
 
                 if ($filterKey === 'created_at') {
@@ -144,14 +139,9 @@ class WorkdaysIndexController extends Controller
             'workdays.*',
             'workdays.created_at as created_at',
             'workdays.updated_at as updated_at',
-            'workdays.deleted_at as deleted_at',
             'users.name as employee_fio',
-            'points.name as pv_id',
+            'points.name as point_id',
         ];
-
-        if ($trash) {
-            $defaultFieldsToSelect[] = 'delete_users.name as deleted_user_name';
-        }
 
         $workdays = $workdays->select($defaultFieldsToSelect);
 
@@ -167,7 +157,7 @@ class WorkdaysIndexController extends Controller
             'test_narko'             => 'Тест на наркотики',
             'admitted'               => 'Допуск к работе',
             'created_at'             => 'Дата создания',
-            'pv_id'                  => 'Пункт выпуска',
+            'point_id'                  => 'Пункт выпуска',
             'town_id'                => 'Город',
             'flag_pak'               => 'Вид осмотра',
             'deleted_at'             => 'Время удаления'
@@ -183,7 +173,8 @@ class WorkdaysIndexController extends Controller
         $orderBy = $request->get('orderBy', 'DESC');
         $take = $request->get('take') ?? 100;
 
-        if ($filterActivated) {
+        //TODO: убрать автофильтр после тестирования
+        if ($filterActivated || true) {
             $workdays = $workdays->orderBy($orderKey, $orderBy);
 
             $workdays = $workdays->paginate($take);

@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+use App\Http\Middleware\StripEmptyParamsFromQueryString;
 use Illuminate\Support\Facades\Route;
 use Src\Employees\Workdays\Http\Controllers\CalcEmployeeSalariesController;
 use Src\Employees\Workdays\Http\Controllers\StoreWorkdayController;
@@ -14,7 +15,7 @@ Route::middleware(['auth:api', 'update-last-connection'])->prefix('/api/sdpo/emp
 });
 
 Route::middleware(['web', 'auth'])->prefix('employees/workdays')->name('employees.workdays.')->group(function () {
-    Route::get('/', WorkdaysIndexController::class)->name('index');
+    Route::middleware(StripEmptyParamsFromQueryString::class)->get('/', WorkdaysIndexController::class)->name('index');
     Route::get('/report', WorkdaysReportController::class)->name('report');
     Route::get('/create', WorkdayCreatePageController::class)->name('create-page');
     Route::post('/', StoreWorkdayController::class)->name('store');

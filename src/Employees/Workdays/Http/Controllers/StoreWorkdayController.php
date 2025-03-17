@@ -19,7 +19,6 @@ final class StoreWorkdayController extends Controller
         $responseData = [];
 
         try {
-            // TODO: добавить время действия
             session(['anketa_pv_id' => [
                 'value' => $request->get('pv_id', 0),
                 'expired' => date('d.m')
