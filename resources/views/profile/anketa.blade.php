@@ -183,6 +183,12 @@
                                                 </p>
                                             @endforeach
 
+                                            @if(in_array($type_anketa, [\App\Enums\FormTypeEnum::MEDIC, \App\Enums\FormTypeEnum::TECH]))
+                                                <a class="btn btn-sm btn-success" target="_blank"
+                                                   href="{{ route('trip-tickets.create', ['form_id' => $form->id]) }}">
+                                                  Добавить ПЛ
+                                                </a>
+                                            @endif
                                         </div>
                                     </div>
                                 @endforeach

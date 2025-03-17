@@ -21,7 +21,7 @@ class UpdateRelatedItemsAction
         $updatedItem = $event->getUpdatedItem();
 
         if ($updatedItem instanceof TripTicket) {
-            $date = $updatedItem->start_date;
+            $date = $updatedItem->start_date ? $updatedItem->start_date->format('Y-m-d') : null;
             $period = $updatedItem->period_pl;
             $driverId = $updatedItem->driver_id;
             $carId = $updatedItem->car_id;

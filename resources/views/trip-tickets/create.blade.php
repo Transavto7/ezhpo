@@ -7,6 +7,9 @@
   use Carbon\Carbon;
   $created = \Illuminate\Support\Facades\Session::get('created', []);
   $createByForms = $createByForms ?? request()->get('createByForms', '0') === '1';
+  if ($form) {
+    $createByForms = false;
+  }
 @endphp
 
 @section('custom-scripts')
@@ -193,6 +196,14 @@
                         <span><i>Дата начала действия:<b> {{ Carbon::parse($tripTicket->start_date)->format('d.m.Y') }}</b></i></span>
                       @endif
 
+                      @if($tripTicket->medic_form_id)
+                        <span><i>ID медосмотра:<b> {{ $tripTicket->medic_form_id }}</b></i></span>
+                      @endif
+
+                      @if($tripTicket->tech_form_id)
+                        <span><i>ID техосмотра:<b> {{ $tripTicket->tech_form_id }}</b></i></span>
+                      @endif
+
                       @if($tripTicket->start_date === null && $tripTicket->period_pl)
                         <span><i>Период выдачи ПЛ:<b> {{ Carbon::parse($tripTicket->period_pl)->format('m.Y') }}</b></i></span>
                       @endif
@@ -215,34 +226,43 @@
             <form method="POST"
                   action="{{ $createByForms
                                   ? route('trip-tickets.generate')
-                                  : route('trip-tickets.store') }}"
+                                  : route('trip-tickets.store', ['form_id' => $form ? $form->id : null]) }}"
                   class="form-horizontal"
                   onsubmit="document.querySelector('#page-preloader').classList.remove('hide')"
                   enctype="multipart/form-data" id="ANKETA_FORM">
               @csrf
 
-              <div class="form-group d-flex">
-                <a class="text-small"
-                   href="{{ route('trip-tickets.create', ['createByForms' => ! $createByForms]) }}">
-                  <input onchange="this.parentNode.click()" type="checkbox"
-                         @if($createByForms) checked @endif id="create_by_forms">
-                </a>
-                <label class="form-control-label mb-0 ml-2" for="create_by_forms">Создать на основе МО/ТО</label>
-                <input type="hidden" name="createByForms" value="{{ $createByForms ?? 0 }}">
-              </div>
-
-              @if(Auth::user()->access('medic_create'))
+              @if($form === null)
                 <div class="form-group d-flex">
-                  <input type="checkbox" id="create_is_dop_medic" name="create_is_dop_medic">
-                  <label class="form-control-label mb-0 ml-2" for="create_is_dop_medic">Создать неполный МО</label>
+                  <a class="text-small"
+                     href="{{ route('trip-tickets.create', ['createByForms' => ! $createByForms]) }}">
+                    <input onchange="this.parentNode.click()" type="checkbox"
+                           @if($createByForms) checked @endif id="create_by_forms">
+                  </a>
+                  <label class="form-control-label mb-0 ml-2" for="create_by_forms">Создать на основе МО/ТО</label>
+                  <input type="hidden" name="createByForms" value="{{ $createByForms ?? 0 }}">
+                </div>
+
+                @if(Auth::user()->access('medic_create'))
+                  <div class="form-group d-flex">
+                    <input type="checkbox" id="create_is_dop_medic" name="create_is_dop_medic">
+                    <label class="form-control-label mb-0 ml-2" for="create_is_dop_medic">Создать неполный МО</label>
+                  </div>
+                @endif
+              @endif
+
+              @if($form)
+                <div class="form-group">
+                  <span class="form-control-label">ID осмотра: <b>{{ $form->id }}</b></span>
                 </div>
               @endif
 
               <div class="form-group">
                 <label class="form-control-label">ID компании:</label>
                 <article>
-                  <input value="{{ $company_id ?? '' }}"
+                  <input value="{{ $form ? $form->company_id : ($company_id ?? '') }}"
                          required
+                         @if($form) readonly @endif
                          type="number"
                          oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Company', event.target.value, 'name', $(event.target).parent(), {{ !($id ?? false) ? 'true' : 'false' }})"
                          min="5"
@@ -256,8 +276,9 @@
                 <label class="form-control-label">ID водителя:</label>
                 <article>
                   <div class="d-flex">
-                    <input value="{{ $driver_id ?? '' }}" type="number"
+                    <input value="{{ $form ? $form->driver_id : ($driver_id ?? '') }}" type="number"
                            oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Driver', event.target.value, 'fio', $(event.target).parent().parent(), {{ 'false' }})"
+                           @if($form && $form->driver_id) readonly @endif
                            min="6"
                            name="driver_id"
                            class="MASK_ID_ELEM form-control">
@@ -271,8 +292,9 @@
                   <label class="form-control-label">ID автомобиля:</label>
                   <article>
                     <div class="d-flex">
-                      <input value="{{ $car_id ?? '' }}" type="number"
+                      <input value="{{ ($form && $form->type_anketa === \App\Enums\FormTypeEnum::TECH) ? $form->details->car_id : ($car_id ?? '') }}" type="number"
                              oninput="if(this.value.length >= 0) checkInputProp('hash_id', 'Car', event.target.value, 'gos_number', $(event.target).parent().parent(), {{ 'false' }})"
+                             @if($form && $form->details->car_id) readonly @endif
                              min="6"
                              name="car_id"
                              class="MASK_ID_ELEM form-control car-input">
@@ -296,7 +318,8 @@
                            max="2100-01-01"
                            oninput="$(this).closest('.clone').find('.period_pl').prop('required', !(this.value.length > 0))"
                            type="date"
-                           value="{{ $default_current_date ?? '' }}"
+                           value="{{ ($form && $form->date) ? Carbon::parse($form->date)->format('Y-m-d') : ($default_current_date ?? '') }}"
+                           @if($form && $form->date) readonly @endif
                            class="form-control date_from"
                            required
                            @if($createByForms)
@@ -328,6 +351,8 @@
                     <article>
                       <input type="month"
                              oninput="$(this).closest('.clone').find('.date_from').prop('required', !(this.value.length > 0))"
+                             value="{{ $form ? $form->details->period_pl : '' }}"
+                             @if($form && $form->details->period_pl) readonly @endif
                              name="trip_ticket[0][period_pl]"
                              class="form-control period_pl">
                     </article>
@@ -385,7 +410,7 @@
                 <div class="trip-ticket-delete"></div>
               </div>
 
-              @if(! $createByForms)
+              @if(! $createByForms && $form === null)
                 <div id="clone-stack"></div>
 
                 <button type="button" id="trip-ticket-clone-btn" class="anketa__addnew">

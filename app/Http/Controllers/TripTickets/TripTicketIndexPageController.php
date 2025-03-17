@@ -48,22 +48,27 @@ class TripTicketIndexPageController extends Controller
             'page',
         ]);
 
-        $tripTickets = $handler->handle(new TripTicketsQueryAction(
-            $trash,
-            $orderKey,
-            $orderBy,
-            $filterActivated,
-            $filterParams
-        ));
+        if ($filterActivated) {
+            $tripTickets = $handler->handle(new TripTicketsQueryAction(
+                $trash,
+                $orderKey,
+                $orderBy,
+                $filterActivated,
+                $filterParams
+            ));
+
+            $tripTickets = $tripTickets->paginate($take);
+            $countResult = $tripTickets->total();
+        } else {
+            $tripTickets = [];
+            $countResult = 0;
+        }
 
         $fieldPrompts = FieldPrompt::query()
             ->where('type', $type)
             ->orderBy('sort')
             ->orderBy('id')
             ->get();
-
-        $tripTickets = $tripTickets->paginate($take);
-        $countResult = $tripTickets->total();
 
         $filters = TripTicket::FILTERS;
 
