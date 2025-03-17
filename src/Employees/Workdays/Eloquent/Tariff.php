@@ -5,36 +5,34 @@ namespace Src\Employees\Workdays\Eloquent;
 use App\Point;
 use App\Role;
 use App\Town;
-use App\User;
 use DateTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Ramsey\Uuid\Uuid;
 
 /**
  * @property int $id
  * @property string $name Название тарифа
- * @property DateTime $date Дата и время вплоть до часа (Год, месяц, день, часы, минуты и секунды всегда 00)
+ * @property DateTime $date_from Дата и время начала действия тарифа
+ * @property DateTime $date_to Дата и время завершения действия тарифа
  * @property int|null $town_id ID города
- * @property int|null $point_id ID пв
+ * @property int|null $point_id ID point
  * @property int $role_id ID роли, для которой действует тариф
- * @property int $price_hour Стоимость одного часа
  * @property int $price_cfg Коэффициент выходного (прибавляется к стоимости часа, если это выходной день)
  * @property DateTime $created_at
  * @property DateTime $updated_at
  */
-class Tarif extends Model
+class Tariff extends Model
 {
-    protected $table = 'tarifs';
+    protected $table = 'tariffs';
 
     public $fillable = [
         'id',
         'name',
-        'date',
+        'date_from',
+        'date_to',
         'town_id',
         'point_id',
         'role_id',
-        'price_hour',
         'price_cfg',
         'created_at',
         'updated_at',
