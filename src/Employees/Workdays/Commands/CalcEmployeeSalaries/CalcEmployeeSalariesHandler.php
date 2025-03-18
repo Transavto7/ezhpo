@@ -59,7 +59,7 @@ SELECT STR_TO_DATE(DATE_FORMAT(w_open.date, '%Y-%m-%d %H'), '%Y-%m-%d %H') as 'd
        w_open.employee_id,
        mhr.role_id,
        p.id                                                                as 'point_id',
-       p.pv_id                                                             as 'town_id',
+       IF(p.pv_id is null or p.pv_id = 0, null, p.pv_id)                   as 'town_id',
        h.id                                                                as 'is_holiday',
        u.name                                                              as 'employee_name'
 FROM workdays w_open

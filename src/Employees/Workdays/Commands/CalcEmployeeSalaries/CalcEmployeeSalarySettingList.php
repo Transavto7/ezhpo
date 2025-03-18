@@ -21,13 +21,6 @@ class CalcEmployeeSalarySettingList
 
     public function addRow(?int $townId, ?int $pointId, int $roleId, int $priceCfg, string $dateFrom, string $dateTo, int $hour, int $price)
     {
-        if (is_null($townId)) {
-            $townId = 0;
-        }
-        if (is_null($pointId)) {
-            $pointId = 0;
-        }
-
         $dateFrom = new DateTime($dateFrom);
         $dateTo = new DateTime($dateTo);
 
@@ -47,13 +40,6 @@ class CalcEmployeeSalarySettingList
 
     public function getPrice(?int $townId, ?int $pointId, int $roleId, DateTime $dateTime): CalcEmployeeSalaryPrice
     {
-        if (is_null($townId)) {
-            $townId = 0;
-        }
-        if (is_null($pointId)) {
-            $pointId = 0;
-        }
-
         if ($price = $this->mapForHours[$townId][$pointId][$roleId][(int)$dateTime->format('Ymd')][(int)$dateTime->format('H')] ?? null) {
             return $price;
         }
@@ -62,8 +48,8 @@ class CalcEmployeeSalarySettingList
             sprintf('Для указанной даты и времени не задан тариф (Дата: %s`, Время: %s, townId: %s, pointId: %s, roleId: %s)',
                 $dateTime->format('Y-m-d'),
                 $dateTime->format('H'),
-                $townId,
-                $pointId,
+                is_null($townId) ? -1 : $townId,
+                is_null($pointId) ? -1: $pointId,
                 $roleId
             )
         );
