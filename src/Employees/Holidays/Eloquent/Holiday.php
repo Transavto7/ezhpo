@@ -1,15 +1,9 @@
 <?php
 
-namespace Src\Employees\Workdays\Eloquent;
+namespace Src\Employees\Holidays\Eloquent;
 
-use App\Point;
-use App\Role;
-use App\Town;
-use App\User;
 use DateTime;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Ramsey\Uuid\Uuid;
 
 /**
  * @property int $id

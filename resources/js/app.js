@@ -1,3 +1,5 @@
+import moment from "moment";
+
 require('./bootstrap');
 require('./front')
 
@@ -18,7 +20,7 @@ Vue.use(vSelect)
 Vue.use(Toast, {
     position: POSITION.BOTTOM_RIGHT
 });
-
+moment.locale('ru');
 Vue.component('multiselect', Multiselect)
 const files = require.context('./', true, /\.vue$/i);
 files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));

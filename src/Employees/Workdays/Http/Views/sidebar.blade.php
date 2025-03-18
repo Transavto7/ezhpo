@@ -18,7 +18,7 @@
         @endif
         @if(user()->access('employees_workdays_holidays'))
             <li>
-                <a href="#">Нерабочие дни</a>
+                <a href="{{ route('employees.holidays.index') }}">Нерабочие дни</a>
             </li>
         @endif
     </ul>
