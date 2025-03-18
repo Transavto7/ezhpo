@@ -34,6 +34,8 @@ ORDER BY t.date_from");
 
         $settingList = new CalcEmployeeSalarySettingList();
 
+        CalcEmployeeSalary::setCalcEmployeeSalarySettingList($settingList);
+
         foreach ($tariffList as $row) {
             $settingList->addRow(
                 $row->town_id,
@@ -73,25 +75,43 @@ WHERE w_open.admitted = 1
   AND w_open.date >= '{$dateFromString}'
   AND w_open.date <= '{$dateToString}'");
 
-        $result = [];
+        $employees = [];
+        $errors = [];
 
         foreach ($workdayRows as $row) {
-            if (empty($result[$row->employee_id])) {
-                $result[$row->employee_id] = (new CalcEmployeeSalariesResponse($row->employee_id))
+            if (empty($employees[$row->employee_id])) {
+                $employees[$row->employee_id] = (new CalcEmployeeSalary($row->employee_id))
                     ->setEmployeeName($row->employee_name);
             }
-            $result[$row->employee_id]->addWorkday(
-                $row->datetime_round_open,
-                $row->datetime_round_close,
-                $row->datetime_open,
-                $row->datetime_close,
-                $row->role_id,
-                $row->point_id,
-                $row->town_id,
-                $row->is_holiday
-            );
+            try {
+                $employees[$row->employee_id]->addWorkday(
+                    $row->datetime_round_open,
+                    $row->datetime_round_close,
+                    $row->datetime_open,
+                    $row->datetime_close,
+                    $row->role_id,
+                    $row->point_id,
+                    $row->town_id,
+                    (bool)$row->is_holiday
+                );
+            } catch (\Exception $e) {
+                if (empty($errors[$row->employee_id])) {
+                    $errors[$row->employee_id] = [];
+                }
+                $errors[$row->employee_id][] = [
+                    'employeeId' => $row->employee_id,
+                    'errorMessage' => $e->getMessage()
+                ];
+            }
         }
 
-        return array_values($result);
+        foreach ($errors as $employeeId => $error) {
+            unset($employees[$employeeId]);
+        }
+
+        return [
+            'employees' => array_values($employees),
+            'errors' => array_values($errors)
+        ];
     }
 }

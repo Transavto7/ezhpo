@@ -22,8 +22,3 @@ Route::middleware(['web', 'auth'])->prefix('employees/workdays')->name('employee
 
     Route::get('/salaries/calc', CalcEmployeeSalariesController::class);
 });
-
-//TODO: удалить позже
-Route::prefix('/employees/workdays')->group(function () {
-    Route::get('/salaries/calc', CalcEmployeeSalariesController::class);
-});

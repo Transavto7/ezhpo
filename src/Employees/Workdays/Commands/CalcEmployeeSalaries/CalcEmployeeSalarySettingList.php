@@ -2,6 +2,7 @@
 
 namespace Src\Employees\Workdays\Commands\CalcEmployeeSalaries;
 
+use Complex\Exception;
 use DateInterval;
 use DateTime;
 
@@ -9,11 +10,13 @@ class CalcEmployeeSalarySettingList
 {
     public $mapForHours;
     private $intervalOneDay;
+    private $intervalOneHour;
 
     public function __construct()
     {
         $this->mapForHours = [];
         $this->intervalOneDay = new DateInterval('P1D');
+        $this->intervalOneHour = new DateInterval('PT1H');
     }
 
     public function addRow(?int $townId, ?int $pointId, int $roleId, int $priceCfg, string $dateFrom, string $dateTo, int $hour, int $price)
@@ -40,5 +43,39 @@ class CalcEmployeeSalarySettingList
         for (; $dateFrom->diff($dateTo)->days > 0; $dateFrom->add($this->intervalOneDay)) {
             $this->mapForHours[$townId][$pointId][$roleId][(int)$dateFrom->format('Ymd')][$hour] = $price;
         }
+    }
+
+    public function getPrice(?int $townId, ?int $pointId, int $roleId, DateTime $dateTime): CalcEmployeeSalaryPrice
+    {
+        if (is_null($townId)) {
+            $townId = 0;
+        }
+        if (is_null($pointId)) {
+            $pointId = 0;
+        }
+
+        if ($price = $this->mapForHours[$townId][$pointId][$roleId][(int)$dateTime->format('Ymd')][(int)$dateTime->format('H')] ?? null) {
+            return $price;
+        }
+
+        throw new Exception(
+            sprintf('Для указанной даты и времени не задан тариф (Дата: %s`, Время: %s, townId: %s, pointId: %s, roleId: %s)',
+                $dateTime->format('Y-m-d'),
+                $dateTime->format('H'),
+                $townId,
+                $pointId,
+                $roleId
+            )
+        );
+    }
+
+    public function getIntervalOneDay(): DateInterval
+    {
+        return $this->intervalOneDay;
+    }
+
+    public function getIntervalOneHour(): DateInterval
+    {
+        return $this->intervalOneHour;
     }
 }
