@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Журнал рабочих смен сотрудников')
+@section('title', 'Нерабочие дни сотрудников')
 @section('sidebar', 1)
 
 @push('setup-scripts')
