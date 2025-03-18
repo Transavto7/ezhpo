@@ -44,6 +44,19 @@ class CalcEmployeeSalarySettingList
             return $price;
         }
 
+        // Ничего не найдено, но задан и поинт и город, пытаемся найти ТОЛЬКО по городу или ТОЛЬКО по поинту
+        if ($townId && $pointId) {
+            try {
+                return $this->getPrice(null, $pointId, $roleId, $dateTime);
+            } catch (\Exception $e) {
+            }
+
+            try {
+                return $this->getPrice($townId, null, $roleId, $dateTime);
+            } catch (\Exception $e) {
+            }
+        }
+
         throw new Exception(
             sprintf('Для указанной даты и времени не задан тариф (Дата: %s`, Время: %s, townId: %s, pointId: %s, roleId: %s)',
                 $dateTime->format('Y-m-d'),
