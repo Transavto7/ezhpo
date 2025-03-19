@@ -66,7 +66,7 @@ FROM workdays w_open
          INNER JOIN users u on u.id = w_open.employee_id
          LEFT JOIN points p on p.pv_id = u.pv_id
          INNER JOIN model_has_roles mhr on mhr.model_id = w_open.employee_id and mhr.role_id in (1, 2)
-         INNER JOIN workdays w_close
+         LEFT JOIN workdays w_close
                     on w_open.employee_id = w_close.employee_id and w_open.id = w_close.open_workday_id and
                        w_close.admitted = 1
          LEFT JOIN holidays h on h.date = STR_TO_DATE(DATE_FORMAT(w_open.date, '%Y-%m-%d'), '%Y-%m-%d')
@@ -76,9 +76,50 @@ WHERE w_open.admitted = 1
   AND w_open.date <= '{$dateToString}'");
 
         $employees = [];
-        $errors = [];
+        $errorReport = [
+            'workdayErrors' => [],
+            'pointList' => [],
+            'townList' => [],
+            'roleList' => []
+        ];
+
+        $registerError = static function (string $message, $row) use (&$errorReport) {
+            if (empty($errorReport['workdayErrors'][$row->employee_id])) {
+                $errorReport['workdayErrors'][$row->employee_id] = [];
+            }
+
+            $errorReport['workdayErrors'][$row->employee_id][] = [
+                'employeeId' => $row->employee_id,
+                'errorMessage' => $message,
+                'dateTimeOpen' => $row->datetime_open,
+                'dateTimeClose' => $row->datetime_close,
+                'townId' => $row->town_id,
+                'pointId' => $row->point_id,
+                'roleId' => $row->role_id
+            ];
+            if ($row->point_id && empty($errorReport['pointList'][$row->point_id])) {
+                $errorReport['pointList'][$row->point_id] = [
+                    'name' => ''
+                ];
+            }
+            if ($row->town_id && empty($errorReport['townList'][$row->town_id])) {
+                $errorReport['townList'][$row->town_id] = [
+                    'name' => ''
+                ];
+            }
+            if (empty($errorReport['roleList'][$row->role_id])) {
+                $errorReport['roleList'][$row->role_id] = [
+                    'name' => ''
+                ];
+            }
+        };
 
         foreach ($workdayRows as $row) {
+            if (is_null($row->datetime_close)) {
+                $registerError('Нет записи о закрытии смены', $row);
+                continue;
+            }
+
             if (empty($employees[$row->employee_id])) {
                 $employees[$row->employee_id] = (new CalcEmployeeSalary($row->employee_id))
                     ->setEmployeeName($row->employee_name);
@@ -95,23 +136,39 @@ WHERE w_open.admitted = 1
                     (bool)$row->is_holiday
                 );
             } catch (\Exception $e) {
-                if (empty($errors[$row->employee_id])) {
-                    $errors[$row->employee_id] = [];
-                }
-                $errors[$row->employee_id][] = [
-                    'employeeId' => $row->employee_id,
-                    'errorMessage' => $e->getMessage()
-                ];
+                $registerError($e->getMessage(), $row);
             }
         }
 
-        foreach ($errors as $employeeId => $error) {
+        foreach ($errorReport['workdayErrors'] as $employeeId => $error) {
             unset($employees[$employeeId]);
+        }
+
+        if (!empty($errorReport['pointList'])) {
+            $rows = DB::select('SELECT id, name FROM points WHERE id in (:ids)', ['ids' => join(',', array_keys($errorReport['pointList']))]);
+            foreach ($rows as $row) {
+                $errorReport['pointList'][$row->id]['name'] = $row->name;
+            }
+        }
+        if (!empty($errorReport['roleList'])) {
+            $rows = DB::select('SELECT id, name, guard_name FROM roles WHERE id in (:ids)', ['ids' => join(',', array_keys($errorReport['roleList']))]);
+            foreach ($rows as $row) {
+                $errorReport['roleList'][$row->id] = [
+                    'name' => $row->name,
+                    'guardName' => $row->guard_name
+                ];
+            }
+        }
+        if (!empty($errorReport['townList'])) {
+            $rows = DB::select('SELECT id, name FROM towns WHERE id in (:ids)', ['ids' => join(',', array_keys($errorReport['townList']))]);
+            foreach ($rows as $row) {
+                $errorReport['townList'][$row->id]['name'] = $row->name;
+            }
         }
 
         return [
             'employees' => array_values($employees),
-            'errors' => array_values($errors)
+            'errorReport' => $errorReport
         ];
     }
 }

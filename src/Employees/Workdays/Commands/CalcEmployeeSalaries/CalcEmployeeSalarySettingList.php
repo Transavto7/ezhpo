@@ -48,24 +48,16 @@ class CalcEmployeeSalarySettingList
         if ($townId && $pointId) {
             try {
                 return $this->getPrice(null, $pointId, $roleId, $dateTime);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
             }
 
             try {
                 return $this->getPrice($townId, null, $roleId, $dateTime);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
             }
         }
 
-        throw new Exception(
-            sprintf('Для указанной даты и времени не задан тариф (Дата: %s`, Время: %s, townId: %s, pointId: %s, roleId: %s)',
-                $dateTime->format('Y-m-d'),
-                $dateTime->format('H'),
-                is_null($townId) ? -1 : $townId,
-                is_null($pointId) ? -1: $pointId,
-                $roleId
-            )
-        );
+        throw new Exception('Для указанной даты и времени не задан тариф');
     }
 
     public function getIntervalOneDay(): DateInterval
