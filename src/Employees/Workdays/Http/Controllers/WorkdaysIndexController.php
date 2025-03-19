@@ -76,10 +76,26 @@ class WorkdaysIndexController extends Controller
                     continue;
                 }
 
+                //TODO: дублирование как и в анкетах, подумать как переделать
                 if (is_array($filterValue)) {
                     $filterValue = array_map(function ($fvItemValue) {
                         return trim(str_replace('\\', '\\\\', $fvItemValue));
                     }, $filterValue);
+
+                    if ($filterKey === 'is_closed') {
+                        $workdays = $workdays->where(function ($query) use ($filterValue, $filterKey) {
+                            foreach ($filterValue as $isClosedValue) {
+                                if ($isClosedValue === '0') {
+                                    $query = $query->orWhereNull('workdays.open_workday_id');
+                                } else {
+                                    $query = $query->orWhereNotNull('workdays.open_workday_id');
+                                }
+                            }
+
+                            return $query;
+                        });
+                        continue;
+                    }
 
                     if ($filterKey === 'flag_pak') {
                         $workdays = $workdays->where(function ($query) use ($filterValue, $filterKey) {
@@ -108,6 +124,15 @@ class WorkdaysIndexController extends Controller
 
                     if ($filterKey === 'flag_pak' && $filterValue === 'internal') {
                         $workdays = $workdays->whereNull('workdays.flag_pak');
+                        continue;
+                    }
+
+                    if ($filterKey === 'is_closed') {
+                        if ($filterValue === '0') {
+                            $workdays = $workdays->whereNull('workdays.open_workday_id');
+                        } else {
+                            $workdays = $workdays->whereNotNull('workdays.open_workday_id');
+                        }
                         continue;
                     }
 
@@ -173,8 +198,7 @@ class WorkdaysIndexController extends Controller
         $orderBy = $request->get('orderBy', 'DESC');
         $take = $request->get('take') ?? 100;
 
-        //TODO: убрать автофильтр после тестирования
-        if ($filterActivated || true) {
+        if ($filterActivated) {
             $workdays = $workdays->orderBy($orderKey, $orderBy);
 
             $workdays = $workdays->paginate($take);

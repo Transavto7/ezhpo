@@ -42,6 +42,9 @@
         <div class="col-md-3">
             @include('Workdays::components.filters.type-anketa')
         </div>
+        <div class="col-md-3">
+            @include('Workdays::components.filters.is-closed')
+        </div>
     </div>
 
     <button type="submit" class="btn btn-info">Поиск</button>

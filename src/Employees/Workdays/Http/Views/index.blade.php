@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Журнал рабочих смен сотрудников')
+@section('title', 'Журнал записей о рабочих сменах сотрудников')
 @section('sidebar', 1)
 
 @section('custom-styles')
@@ -55,19 +55,27 @@
 
 @section('custom-scripts')
     <script type="text/javascript">
-        let fieldsVisible = {};
+        @if (user()->fields_visible)
+        let fieldsVisible = {!! user()->fields_visible !!};
+        @else
+        let fieldsVisible = @json(config('fields.visible'));
+        @endif
 
-        //TODO: как используется?
+        console.log(fieldsVisible)
+
+        const type = 'workdays'
+
         function setVisibleInputs() {
-            // $('.ankets-form input').each(function () {
-            //     const name = $(this).attr('name');
-            //     let checked = false;
-            //     if (fieldsVisible[type] && fieldsVisible[type][name]) {
-            //         checked = true;
-            //     }
-            //     $(this).prop("checked", checked);
-            //     $(this).trigger('change');
-            // });
+            $('.workdays-form input').each(function () {
+                const name = $(this).attr('name');
+                console.log(name)
+                let checked = false;
+                if (fieldsVisible[type] && fieldsVisible[type][name]) {
+                    checked = true;
+                }
+                $(this).prop("checked", checked);
+                $(this).trigger('change');
+            });
         }
 
         $(document).ready(function () {
@@ -78,15 +86,15 @@
                     const id = el.attr('name');
                     const prop_checked = el.prop('checked');
 
-                    const anketsTable = $(`.workdays-table thead th[data-field-key="${id}"], .workdays-table tbody tr td[data-field-key="${id}"]`)
+                    const workdaysTable = $(`.workdays-table thead th[data-field-key="${id}"], .workdays-table tbody tr td[data-field-key="${id}"]`)
                     const displayProp = !prop_checked ? 'none' : 'table-cell'
 
-                    anketsTable.attr('hidden', !prop_checked).css({'display': displayProp})
+                    workdaysTable.attr('hidden', !prop_checked).css({'display': displayProp})
 
                     return
                 }
 
-                $('.ankets-form input').each(function () {
+                $('.workdays-form input').each(function () {
                     if (this.name !== '_token') {
                         showTableData($(this))
                     }
@@ -95,9 +103,8 @@
 
             showTableData()
 
-            $('.ankets-form input').change(e => {
+            $('.workdays-form input').change(e => {
                 let el = $(e.target)
-                const type = el.parents('.ankets-form').attr('anketa');
                 const id = el.attr('name');
 
                 if (!fieldsVisible[type]) {
@@ -134,26 +141,25 @@
     </script>
 
     <script type="text/javascript">
-        const SELECTED_ANKETS_ITEM = 'selectedAnkets'
-        const anketsApi = {
-            massTrash: '{{ route('forms.mass-trash') }}',
-            massApprove: '{{ route('forms.changeMultipleResultDop') }}',
+        const SELECTED_WORKDAYS_ITEM = 'selectedWorkdays'
+        const workdaysApi = {
+            massTrash: '{{ route('employees.workdays.mass-trash') }}',
         }
         const data = {
             items: [],
             total: 0
         }
 
-        function updateAnketsCheckbox() {
-            const anketsStorage = getAnketsStorage()
+        function updateWorkdaysCheckbox() {
+            const workdaysStorage = getWorkdaysStorage()
 
             $('.hv-checkbox-mass-deletion').prop('checked', false)
-            anketsStorage.items.forEach(function (item) {
+            workdaysStorage.items.forEach(function (item) {
                 $(`.hv-checkbox-mass-deletion[data-id="${item}"]`).prop('checked', true)
             })
         }
 
-        function getAnketsStorage() {
+        function getWorkdaysStorage() {
             if (data === null) {
                 return {
                     items: [],
@@ -164,7 +170,7 @@
             return data
         }
 
-        function setAnketsStorage(value) {
+        function setWorkdaysStorage(value) {
             data.items = value.items
             data.total = value.total
         }
@@ -188,20 +194,17 @@
             return eleven
         }
 
-        function updateAnketsControl() {
-            const control = $('#selected-ankets-control')
-            const controlBtnDelete = $('#selected-ankets-control-btn-delete')
-            const approveBtn = $('#approve-selected')
+        function updateWorkdaysControl() {
+            const control = $('#selected-workdays-control')
+            const controlBtnDelete = $('#selected-workdays-control-btn-delete')
 
-            const anketsStorage = getAnketsStorage()
+            const workdaysStorage = getWorkdaysStorage()
 
-            if (anketsStorage.total) {
-                const records = pronunciationWithNumber(anketsStorage.total, 'анкету', 'анкеты', 'анкет')
-                const label = "Удалить " + anketsStorage.total + " " + records
-                const approveLabel = "<i class=\"fa fa-check\"></i> Утвердить " + anketsStorage.total + " " + records
+            if (workdaysStorage.total) {
+                const records = pronunciationWithNumber(workdaysStorage.total, 'смену', 'смены', 'смен')
+                const label = "Удалить " + workdaysStorage.total + " " + records
 
                 controlBtnDelete.html(label)
-                approveBtn.html(approveLabel)
                 control.addClass('d-flex')
                 control.removeClass('d-none')
             } else {
@@ -210,93 +213,72 @@
             }
         }
 
-        function clearAnketsStorage() {
+        function clearWorkdaysStorage() {
             data.items = []
             data.total = 0
         }
 
-        function pushAnketaToStorage(id) {
-            const anketsStorage = getAnketsStorage()
+        function pushWorkdayToStorage(id) {
+            const workdaysStorage = getWorkdaysStorage()
 
-            if (anketsStorage.items.filter(item => item === id).length) {
+            if (workdaysStorage.items.filter(item => item === id).length) {
                 return
             }
 
-            anketsStorage.total++
-            anketsStorage.items.push(id)
+            workdaysStorage.total++
+            workdaysStorage.items.push(id)
 
-            setAnketsStorage(anketsStorage)
+            setWorkdaysStorage(workdaysStorage)
         }
 
-        function removeAnketaFromStorage(id) {
-            const anketsStorage = getAnketsStorage()
+        function removeWorkdayFromStorage(id) {
+            const workdaysStorage = getWorkdaysStorage()
 
-            anketsStorage.items = anketsStorage.items.filter(item => item !== id)
-            anketsStorage.total = anketsStorage.items.length
+            workdaysStorage.items = workdaysStorage.items.filter(item => item !== id)
+            workdaysStorage.total = workdaysStorage.items.length
 
-            setAnketsStorage(anketsStorage)
+            setWorkdaysStorage(workdaysStorage)
         }
 
         $(document).ready(function () {
-            clearAnketsStorage()
-            updateAnketsControl()
-            updateAnketsCheckbox()
+            clearWorkdaysStorage()
+            updateWorkdaysControl()
+            updateWorkdaysCheckbox()
 
             $('.hv-checkbox-mass-deletion').click(function () {
                 const id = $(this).attr('data-id')
                 const checked = $(this).is(':checked')
 
                 if (checked) {
-                    pushAnketaToStorage(id)
+                    pushWorkdayToStorage(id)
                 } else {
-                    removeAnketaFromStorage(id)
+                    removeWorkdayFromStorage(id)
                 }
 
-                updateAnketsControl()
+                updateWorkdaysControl()
             })
 
-            $('#selected-ankets-control-btn-unset').click(function () {
-                clearAnketsStorage()
-                updateAnketsControl()
-                updateAnketsCheckbox()
+            $('#selected-workdays-control-btn-unset').click(function () {
+                clearWorkdaysStorage()
+                updateWorkdaysControl()
+                updateWorkdaysCheckbox()
             })
 
-            $('#selected-ankets-control-btn-delete').click(function () {
-                const anketsStorage = getAnketsStorage()
+            $('#selected-workdays-control-btn-delete').click(function () {
+                const workdaysStorage = getWorkdaysStorage()
 
                 axios
-                    .get(anketsApi.massTrash, {
+                    .get(workdaysApi.massTrash, {
                         params: {
                             action: '{{ request()->get('trash') ? 0 : 1 }}',
-                            ids: anketsStorage.items
+                            ids: workdaysStorage.items
                         }
                     })
                     .then(() => {
-                        clearAnketsStorage()
+                        clearWorkdaysStorage()
                         window.location.reload()
                     })
                     .catch(() => {
-                    })
-            })
-
-            $('#approve-selected').click(function (e) {
-                const anketsStorage = getAnketsStorage()
-
-                axios
-                    .create({
-                        headers: {
-                            Authorization: 'Bearer ' + API_TOKEN
-                        }
-                    })
-                    .post(anketsApi.massApprove, {
-                        ids: anketsStorage.items,
-                    })
-                    .then((response) => {
-                        clearAnketsStorage()
-                        window.location.reload()
-                    })
-                    .catch(error => {
-                        console.log(error.response.data)
                     })
             })
 
@@ -312,46 +294,8 @@
                 e.stopPropagation()
                 const id = $(this).attr('data-id')
 
-                removeAnketaFromStorage(id)
-                updateAnketsControl()
-            })
-
-            $('#ankets-labeling-print-btn').click(function () {
-                const anketsStorage = getAnketsStorage()
-
-                axios({
-                    method: 'post',
-                    url: '{{ route('ankets.export-pdf-labeling') }}',
-                    data: {
-                        anket_ids: anketsStorage.items,
-                    },
-                    responseType: 'blob',
-                })
-                    .then((response) => {
-                        const url = window.URL.createObjectURL(new Blob([response.data]))
-                        const link = document.createElement('a')
-
-                        link.href = url
-                        link.setAttribute('download', 'Маркировка осмотров.pdf')
-
-                        document.body.appendChild(link)
-
-                        link.click()
-                        link.remove()
-                    })
-                    .catch((error) => {
-                        const status = error.response.status;
-                        let message = 'При формировании файла произошла ошибка';
-
-                        if (status === 422) {
-                            message = 'Превышено максимально допустимое количество осмотров для печати'
-                        }
-
-                        swal.fire({
-                            title: message,
-                            icon: 'error'
-                        });
-                    })
+                removeWorkdayFromStorage(id)
+                updateWorkdaysControl()
             })
 
             $('#hv-alert-error-close').click(function () {
@@ -375,7 +319,7 @@
         <div class="card">
             <div class="card-body">
                 <div>
-                    @include('Workdays::components.visible-columns')
+                    @include('Workdays::components.table-actions')
 
                     @if($permissionToView)
                         @include('Workdays::components.filters')
@@ -386,15 +330,14 @@
                     @endif
 
                     @if(count($workdays) > 0 && $permissionToView)
-                        <div id="selected-ankets-control" class="d-none align-items-center mt-4 mb-2">
+                        <div id="selected-workdays-control" class="d-none align-items-center mt-4 mb-2">
                             @if($permissionToDelete)
-                                <button id="selected-ankets-control-btn-delete"
+                                <button id="selected-workdays-control-btn-delete"
                                         class="btn btn-danger btn-sm mr-2"></button>
                             @endif
-                            <button id="approve-selected" class="btn btn-success btn-sm"></button>
                             <button id="select-all" class="btn btn-success btn-sm ml-2">Выделить все на странице
                             </button>
-                            <button id="selected-ankets-control-btn-unset" class="btn btn-success btn-sm ml-2">Снять
+                            <button id="selected-workdays-control-btn-unset" class="btn btn-success btn-sm ml-2">Снять
                                 выделение
                             </button>
                         </div>
@@ -421,6 +364,7 @@
 
                     <hr>
 
+                    {{-- TODO: что это и зачем --}}
                     @if(count($workdays) > 0)
                         {{ $workdays->appends($_GET)->render() }}
                     @endif
@@ -435,39 +379,21 @@
                         id="workdays-table"
                         class="workdays-table table table-striped table-sm">
                         <thead>
-                        <tr>
-                            <th>#</th>
-                            @foreach($fieldPrompts as $field)
-                                <th
-                                    data-field-key="{{ $field->field }}"
-                                    @isset($blockedToExportFields[$field->field])
-                                        class="not-export"
-                                    @endisset>
-                                <span class="user-select-none"
-                                      @if ($field->content)
-                                          data-toggle="tooltip"
-                                      data-html="true"
-                                      data-trigger="click hover"
-                                      title="{{ $field->content }}"
-                                      @endif>
-                                    {{ $field->name }}
-                                </span>
-                                    <a class="not-export"
-                                       href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field }}&{{ $queryString }}">
-                                        <i class="fa fa-sort"></i>
-                                    </a>
+                            <tr>
+                                <th>#</th>
+                                @foreach($fieldPrompts as $field)
+                                    @include('Workdays::components.columns.column-header')
+                                @endforeach
+
+                                @if($permissionToDelete && request()->get('trash'))
+                                    <th>Удаливший</th>
+                                    <th>Время удаления</th>
+                                @endif
+
+                                <th class="not-export">
+                                    #
                                 </th>
-                            @endforeach
-
-                            @if(request()->get('trash'))
-                                <th>Удаливший</th>
-                                <th>Время удаления</th>
-                            @endif
-
-                            <th class="not-export">
-                                #
-                            </th>
-                        </tr>
+                            </tr>
                         </thead>
                         <tbody>
                         @foreach($workdays as $workdayKey => $workday)
@@ -484,37 +410,9 @@
                                         @if(($field->field === 'date' || strpos($field->field, '_at') > 0) && $workday[$field->field])
                                             {{ date('d-m-Y H:i:s', strtotime($workday[$field->field])) }}
                                         @elseif(($field->field === 'photos') && $workday[$field->field])
-                                            @php $photos = explode(',', $workday[$field->field]) @endphp
-                                            @foreach($photos as $phI => $ph)
-                                                @php $isUri = strpos($ph, 'sdpo.ta-7'); @endphp
-
-                                                @if($phI == 0)
-                                                    <a href="{{ $isUri ? $ph : Storage::url($ph) }}"
-                                                       data-fancybox="gallery_{{ $workday->id }}">
-                                                        <i class="fa fa-camera"></i>({{ count($photos) }})
-                                                    </a>
-                                                @else
-                                                    <a href="{{ $isUri ? $ph : Storage::url($ph) }}"
-                                                       data-fancybox="gallery_{{ $workday->id }}">
-                                                    </a>
-                                                @endif
-                                            @endforeach
+                                            @include('Workdays::components.columns.photo', compact($workday, $field))
                                         @elseif(($field->field === 'videos') && $workday[$field->field])
-                                            @php $videos = explode(',', $workday[$field->field]) @endphp
-                                            @foreach($videos as $vK => $vV)
-                                                @if($vK == 0)
-                                                    <a
-                                                        data-type="iframe"
-                                                        href="{{ route('showVideo', ['url' => $vV]) }}"
-                                                        data-fancybox="video_{{ $workday->id }}">
-                                                        <i class="fa fa-video-camera"></i>
-                                                        ({{ count($videos) }})
-                                                    </a>
-                                                @else
-                                                    <a data-type="iframe" href="{{ $vV }}"
-                                                       data-fancybox="video_{{ $workday->id }}"></a>
-                                                @endif
-                                            @endforeach
+                                            @include('Workdays::components.columns.video', compact($workday, $field))
                                         @elseif($field->field === 'employee_id' && user()->access('employee_read'))
                                             <a href="{{ route('users', ['id' => $workday[$field->field] ]) }}">
                                                 {{ $workday['employee_fio'] }}
@@ -531,7 +429,6 @@
                                     </td>
                                 @endforeach
 
-
                                 @if($permissionToDelete && request()->get('trash'))
                                     <td class="td-option">
                                         {{ ($workday->deleted_user_name) }}
@@ -543,7 +440,7 @@
 
                                 <td class="td-option not-export d-flex justify-content-end">
                                     @if($permissionToDelete)
-                                        @include('pages.home.components.buttons.delete-form-btn', compact('anketa'))
+                                        @include('Workdays::components.buttons.delete-workday-btn', compact($workday))
                                     @endif
                                 </td>
                             </tr>
@@ -557,6 +454,8 @@
         <div class="card">
             <div class="card-body">
                 @if($permissionToView)
+                    @include('templates.take_form')
+
                     <p class="text-success">Найдено записей: <b>{{ $count }}</b></p>
                 @endif
             </div>

@@ -56,13 +56,6 @@
             'contract_read',
             'contract_create'
         );
-
-    $accessToWorkdays = $user->access(
-        'employees_workdays_read',
-        'employees_workdays_create',
-        'employees_workdays_report',
-        'employees_workdays_holidays'
-    )
 @endphp
 
     <!-- Side Navbar -->
@@ -295,9 +288,7 @@
             </li>
         @endif
 
-        @if($accessToWorkdays)
-            @include('Workdays::sidebar')
-        @endif
+        @include('Workdays::sidebar')
 
         @if($accessToSettings)
             <li>
