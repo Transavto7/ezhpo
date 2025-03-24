@@ -26,26 +26,37 @@ class TripTicketSelectFormsController extends Controller
 
         $query = Form::select([
                 'forms.id',
-                DB::raw("CONCAT('[', forms.id, '] ',DATE_FORMAT(forms.date, '%d.%m.%Y'), ' - ', type_view, ' - ', drivers.fio) AS text")
+                DB::raw("CONCAT(
+                    '[', forms.id, '] ',
+                    CASE
+                        WHEN forms.date IS NULL
+                        THEN CONCAT(period_pl, ' - ')
+                        ELSE CONCAT(DATE_FORMAT(forms.date, '%d.%m.%Y'), ' - ')
+                    END,
+                    type_view, ' - ', drivers.fio
+                ) AS text")
             ])
             ->whereRaw("not exists (
                 select * from trip_tickets
-                where forms.id = trip_tickets.tech_form_id
+                where (forms.id = trip_tickets.tech_form_id or forms.id = trip_tickets.medic_form_id)
                 and trip_tickets.deleted_at is null"
                 .($tripTicket->medic_form_id ? " and trip_tickets.medic_form_id != $tripTicket->medic_form_id " : ' ')
                 .($tripTicket->tech_form_id ? " and trip_tickets.tech_form_id != $tripTicket->tech_form_id " : ' ')
                 .")"
             )
-            ->when($type === FormTypeEnum::MEDIC, function (Builder $query) {
+            ->when($type === FormTypeEnum::MEDIC, function (Builder $query) use ($tripTicket) {
                 $query->leftJoin('medic_forms',
                     'forms.uuid',
                     '=',
                     'medic_forms.forms_uuid')
-                    ->where(function (Builder $query) {
+                    ->where(function (Builder $query) use ($tripTicket) {
                         $query->where('medic_forms.is_dop', '=', 0)
                             ->orWhere(function (Builder $query) {
                                 $query->where('medic_forms.is_dop', '=', 1)
                                     ->whereNotNull('medic_forms.result_dop');
+                            })
+                            ->when($tripTicket->medic_form_id, function (Builder $query) use ($tripTicket) {
+                                $query->orWhere('forms.id', '=', $tripTicket->medic_form_id);
                             });
                     });
             })
@@ -57,11 +68,14 @@ class TripTicketSelectFormsController extends Controller
                     ->when($tripTicket->car_id, function (Builder $subquery) use ($tripTicket) {
                         $subquery->where('car_id', '=', $tripTicket->car_id);
                     })
-                    ->where(function (Builder $query) {
+                    ->where(function (Builder $query) use ($tripTicket) {
                         $query->where('tech_forms.is_dop', '=', 0)
-                            ->orWhere(function (Builder $query) {
+                            ->orWhere(function (Builder $query) use ($tripTicket) {
                                 $query->where('tech_forms.is_dop', '=', 1)
                                     ->whereNotNull('tech_forms.result_dop');
+                            })
+                            ->when($tripTicket->tech_form_id, function (Builder $query) use ($tripTicket) {
+                                $query->orWhere('forms.id', '=', $tripTicket->tech_form_id);
                             });
                     });
             })

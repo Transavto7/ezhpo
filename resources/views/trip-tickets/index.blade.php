@@ -375,7 +375,7 @@
                             const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
                             const matches = filenameRegex.exec(contentDisposition);
                             if (matches != null && matches[1]) {
-                                filename = matches[1].replace(/['"]/g, ''); // Remove quotes
+                                filename = matches[1].replace(/['"]/g, '');
                             }
                         }
 
@@ -473,6 +473,7 @@
                     },
                     placeholder: 'Выберите значение из списка...',
                     allowClear: true,
+                    dropdownParent: $('#from-actions')
                 })
             }
 
@@ -583,8 +584,8 @@
 @php
     $permissionToView = user()->access('trip_tickets_read');
     $permissionToTrashView = user()->access('trip_tickets_trash');
-    $permissionToCreateMedicForm = user()->access('trip_tickets_create_medic_form');
-    $permissionToCreateTechForm = user()->access('trip_tickets_create_tech_form');
+    $permissionToCreateMedicForm = user()->access('trip_tickets_create_medic_form') || $user->access('medic_create');
+    $permissionToCreateTechForm = user()->access('trip_tickets_create_tech_form') || $user->access('tech_create');
     $permissionToEditMedicForm = user()->access('medic_update');
     $permissionToEditTechForm = user()->access('tech_update');
     $permissionToDelete = user()->access('trip_tickets_delete');

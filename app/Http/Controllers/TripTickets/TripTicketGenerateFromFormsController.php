@@ -10,6 +10,7 @@ use App\Enums\TripTicket\LogisticsMethodEnum;
 use App\Enums\TripTicket\TransportationTypeEnum;
 use App\Enums\TripTicket\TripTicketTemplateEnum;
 use App\Http\Controllers\Controller;
+use App\Services\TripTicket\TripTicketPermissions;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -72,6 +73,16 @@ class TripTicketGenerateFromFormsController extends Controller
 
         if (array_key_exists('created', $response) && count($response['created']) === 0) {
             $response['errors'] = ['По заданным параметрам осмотры не найдены или они уже используются в других путевых листах'];
+        }
+
+        $response['can_print'] = false;
+
+        if (isset($response['created'])) {
+            foreach ($response['created'] as $tripTicket) {
+                if (TripTicketPermissions::canPrint($tripTicket->type, $tripTicket->status, $tripTicket->medic_form_id)) {
+                    $response['can_print'] = true;
+                }
+            }
         }
 
         return back()->with($response);

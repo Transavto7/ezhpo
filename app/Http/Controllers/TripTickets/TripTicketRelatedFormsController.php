@@ -36,7 +36,15 @@ class TripTicketRelatedFormsController extends Controller
     {
         return Form::select([
                 'forms.id',
-                DB::raw("CONCAT('[', forms.id, '] ',DATE_FORMAT(forms.date, '%d.%m.%Y'), ' - ', type_view, ' - ', drivers.fio) AS text")
+                DB::raw("CONCAT(
+                    '[', forms.id, '] ',
+                    CASE
+                        WHEN forms.date IS NULL
+                        THEN CONCAT(period_pl, ' - ')
+                        ELSE CONCAT(DATE_FORMAT(forms.date, '%d.%m.%Y'), ' - ')
+                    END,
+                    type_view, ' - ', drivers.fio
+                ) AS text")
             ])
             ->when($type === FormTypeEnum::MEDIC, function (Builder $query) {
                 $query->leftJoin('medic_forms',

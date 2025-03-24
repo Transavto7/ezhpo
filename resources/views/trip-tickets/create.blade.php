@@ -6,6 +6,7 @@
 @php
   use Carbon\Carbon;
   $created = \Illuminate\Support\Facades\Session::get('created', []);
+  $canPrint = \Illuminate\Support\Facades\Session::get('can_print', false);
   $createByForms = $createByForms ?? request()->get('createByForms', '0') === '1';
   if ($form) {
     $createByForms = false;
@@ -88,8 +89,18 @@
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
 
+            let filename = 'Путевой лист.xlsx';
+            const contentDisposition = response.headers['content-disposition'];
+            if (contentDisposition && contentDisposition.includes('filename=')) {
+              const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+              const matches = filenameRegex.exec(contentDisposition);
+              if (matches != null && matches[1]) {
+                filename = matches[1].replace(/['"]/g, '');
+              }
+            }
+
             link.href = url;
-            link.setAttribute('download', 'Путевой лист.xlsx');
+            link.setAttribute('download', filename);
 
             document.body.appendChild(link);
             link.click();
@@ -176,7 +187,7 @@
             @endforeach
 
             @if(count($created ?? []))
-              @if(count($created ?? []) <= 15)
+              @if(count($created ?? []) <= 15 && $canPrint)
                 <div class="row">
                   <div class="col-md-12 d-flex justify-content-center">
                     <button type="button" id="trip-ticket-print-btn" class="btn btn-sm btn-success">
@@ -338,10 +349,10 @@
                            max="2100-01-01"
                            oninput="$(this).closest('.clone').find('.period_pl').prop('required', !(this.value.length > 0))"
                            type="date"
-                           value="{{ ($form && $form->date) ? Carbon::parse($form->date)->format('Y-m-d') : ($default_current_date ?? '') }}"
-                           @if($form && $form->date) readonly @endif
+                           value="{{ ($form && $form->date) ? Carbon::parse($form->date)->format('Y-m-d') : ($form ? '' : $default_current_date) }}"
+                           @if($form && $form->date) readonly required @endif
                            class="form-control date_from"
-                           required
+                           @if(! $form) required @endif
                            @if($createByForms)
                              name="date_from"
                            @else
@@ -353,8 +364,7 @@
 
                 @if($createByForms)
                   <div class="form-group">
-                    <label class="form-control-label">Дата последнего осмотра (не более 31 дня от
-                      первого):</label>
+                    <label class="form-control-label">Дата последнего осмотра (не более 31 дня от первого):</label>
                     <article>
                       <input min="1970-01-01"
                              max="2100-01-01"
@@ -373,6 +383,7 @@
                              oninput="$(this).closest('.clone').find('.date_from').prop('required', !(this.value.length > 0))"
                              value="{{ $form ? $form->details->period_pl : '' }}"
                              @if($form && $form->details->period_pl) readonly @endif
+                             @if($form && ! $form->date) required @endif
                              name="trip_ticket[0][period_pl]"
                              class="form-control period_pl">
                     </article>

@@ -13,6 +13,7 @@ use App\Enums\TripTicket\TransportationTypeEnum;
 use App\Enums\TripTicket\TripTicketTemplateEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Forms\Form;
+use App\Services\TripTicket\TripTicketPermissions;
 use Http\Discovery\Exception\NotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -57,6 +58,16 @@ class StoreTripTicketController extends Controller
             $response['errors'] = [$exception->getMessage()];
 
             DB::rollBack();
+        }
+
+        $response['can_print'] = false;
+
+        if (isset($response['created'])) {
+            foreach ($response['created'] as $tripTicket) {
+                if (TripTicketPermissions::canPrint($tripTicket->type, $tripTicket->status, $tripTicket->medic_form_id)) {
+                    $response['can_print'] = true;
+                }
+            }
         }
 
         return redirect(route('trip-tickets.create'))->with($response);
