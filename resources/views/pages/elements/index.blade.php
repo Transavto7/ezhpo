@@ -363,6 +363,10 @@
                             </th>
                         @endforeach
 
+                        @if(($model === 'Company') && $permissionToEdit)
+                            <th width="60">#</th>
+                        @endif
+
                         @if($permissionToLogsView)
                             {{--Логи--}}
                             <th width="60">#</th>
@@ -552,6 +556,15 @@
                                     @endif
                                 </td>
                             @endforeach
+
+                            @if(($model === 'Company') && $permissionToEdit)
+                                <td class="td-option">
+                                    <a href="{{ route('companies.sync-da-data', ['id' => $el->id ]) }}"
+                                       class="ACTION_SYNC_COMPANY btn btn-sm btn-success">
+                                        <i class="fa fa-arrow-circle-down"></i>
+                                    </a>
+                                </td>
+                            @endif
 
                             @if($permissionToLogsView)
                                 {{--ЛОГИ--}}

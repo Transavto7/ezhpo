@@ -178,7 +178,12 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\UnleashServiceProvider::class,
         App\Providers\FormsServiceProvider::class,
+
+        /*
+         * Modules
+         */
         Src\Terminals\TerminalsProvider::class,
+        Src\Companies\CompaniesProvider::class,
         Src\Employees\EmployeesProvider::class,
 
         Maatwebsite\Excel\ExcelServiceProvider::class,
