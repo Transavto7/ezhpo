@@ -557,7 +557,7 @@
                                 </td>
                             @endforeach
 
-                            @if(($model === 'Company') && $permissionToEdit)
+                            @if(($model === 'Company') && $permissionToEdit && !request()->get('deleted'))
                                 <td class="td-option">
                                     <a href="{{ route('companies.sync-da-data', ['id' => $el->id ]) }}"
                                        class="ACTION_SYNC_COMPANY btn btn-sm btn-success">
@@ -760,6 +760,34 @@
                             $('.generate-metric').attr('style', '')
                         })
                 }
+            })
+
+            $(document).on( "click", '.ACTION_SYNC_COMPANY', function (event) {
+                event.preventDefault();
+
+                $(this).toggleClass('disabled');
+
+                const href = $(this).attr('href');
+
+                axios
+                    .post(href)
+                    .then(response => {
+                        swal.fire({
+                            title: 'Успешная синхронизация!',
+                            text: response.data.message,
+                            icon: 'success'
+                        });
+                    })
+                    .catch(error => {
+                        swal.fire({
+                            title: 'Ошибка синхронизации!',
+                            text: error.response.data.error,
+                            icon: 'error'
+                        });
+                    })
+                    .finally(() => {
+                        $(this).toggleClass('disabled');
+                    })
             })
 
             $(document).ready(function() {
