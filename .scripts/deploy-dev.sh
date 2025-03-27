@@ -26,6 +26,9 @@ git checkout --force ./
 # Загрузить последнюю версию приложения
 git pull origin dev
 
+# Закэшировать конфиг
+$PHP_VERSION artisan config:cache
+
 # Установить зависимости Composer
 $PHP_VERSION composer.phar install --no-interaction --optimize-autoloader
 
@@ -67,7 +70,10 @@ fi
 $PHP_VERSION artisan config:cache
 
 # Обновить права на файлы и директории
-chown -R $(id -u):$(id -g) ./
+FOLDER_OWNER=$(stat -c '%U:%G' .)
+
+# Обновить права на файлы и директории
+chown -R "$FOLDER_OWNER" ./
 chmod 777 -R storage
 
 # Выход из режима обслуживания
