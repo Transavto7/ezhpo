@@ -15,14 +15,14 @@ final class ListTariffController
     public function __invoke(Request $request, GetTariffsTableItemsHandler $handler): JsonResponse
     {
         $sortOrder = null;
-        if ($request->input('sort_desc') !== null) {
-            $sortOrder = filter_var($request->input('sort_desc'), FILTER_VALIDATE_BOOLEAN) ? 'desc' : 'asc';
+        if ($request->input('sortDesc') !== null) {
+            $sortOrder = filter_var($request->input('sortDesc'), FILTER_VALIDATE_BOOLEAN) ? 'desc' : 'asc';
         }
 
         $tableItems = $handler->handle(new GetTariffsTableItemsQuery(
             (int) $request->input('page'),
-            (int) $request->input('per_page'),
-            $request->input('sort_by'),
+            (int) $request->input('perPage'),
+            $request->input('sortBy'),
             $sortOrder,
             new TariffsTableFilters(
                 $request->input('filters.search'),
