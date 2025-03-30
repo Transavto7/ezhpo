@@ -15,7 +15,8 @@ class RemoveOldLinksToFilesMOCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'mo-file-links:remove';
+    protected $signature = 'mo-file-links:remove
+                            {--force : Запуск команды игнорируя конфиг}';
 
     /**
      * The console command description.
@@ -38,7 +39,7 @@ class RemoveOldLinksToFilesMOCommand extends Command
     {
         $runCommand = config('forms.deleting-mo-files');
 
-        if (! $runCommand) {
+        if (! $runCommand && ! $this->option('force')) {
             return;
         }
 
