@@ -3,6 +3,7 @@
 use App\Role;
 use App\User;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Contracts\Permission as PermissionContract;
 
 class CreateTripTicketsPermissions extends Migration
@@ -48,8 +49,6 @@ class CreateTripTicketsPermissions extends Migration
      */
     public function up()
     {
-        return;
-
         DB::beginTransaction();
 
         try {
@@ -58,82 +57,46 @@ class CreateTripTicketsPermissions extends Migration
                 ->where('name', 'admin')
                 ->first();
 
-            if (empty($admin)) {
-                throw new Exception('Default admin role does not exists!');
-            }
-
             /** @var Role $tech */
             $tech = Role::query()
                 ->where('name', 'tech')
                 ->first();
-
-            if (empty($tech)) {
-                throw new Exception('Role tech does not exists!');
-            }
 
             /** @var Role $medic */
             $medic = Role::query()
                 ->where('name', 'medic')
                 ->first();
 
-            if (empty($medic)) {
-                throw new Exception('Role medic does not exists!');
-            }
-
             /** @var Role $manager */
             $manager = Role::query()
                 ->where('name', 'manager')
                 ->first();
-
-            if (empty($manager)) {
-                throw new Exception('Role manager does not exists!');
-            }
 
             /** @var Role $engineerBdd */
             $engineerBdd = Role::query()
                 ->where('name', 'engineer_bdd')
                 ->first();
 
-            if (empty($engineerBdd)) {
-                throw new Exception('Role engineer_bdd does not exists!');
-            }
-
             /** @var Role $branchHead */
             $branchHead = Role::query()
                 ->where('name', 'role_223581000')
                 ->first();
-
-            if (empty($branchHead)) {
-                throw new Exception('Role role_223581000 does not exists!');
-            }
 
             /** @var Role $commercialHead */
             $commercialHead = Role::query()
                 ->where('name', 'role_262761000')
                 ->first();
 
-            if (empty($commercialHead)) {
-                throw new Exception('Role role_262761000 does not exists!');
-            }
-
             /** @var Role $client */
             $client = Role::query()
                 ->where('name', 'client')
                 ->first();
-
-            if (empty($client)) {
-                throw new Exception('Role client does not exists!');
-            }
 
             /** @var User $user */
             $user = User::query()
                 ->withoutGlobalScopes()
                 ->where('login', User::DEFAULT_USER_LOGIN)
                 ->first();
-
-            if (empty($user)) {
-                throw new Exception('Default admin user does not exists!');
-            }
 
             $permissionClass = app(PermissionContract::class);
 
@@ -142,31 +105,31 @@ class CreateTripTicketsPermissions extends Migration
 
                 $permissionId = $permission->id;
 
-                $admin->permissions()->syncWithoutDetaching([$permissionId]);
-                $user->permissions()->syncWithoutDetaching([$permissionId]);
+                $admin && $admin->permissions()->syncWithoutDetaching([$permissionId]);
+                $user && $user->permissions()->syncWithoutDetaching([$permissionId]);
 
                 if (in_array($slug, self::MEDIC_TECH_PERMISSIONS)) {
-                    $medic->permissions()->syncWithoutDetaching([$permissionId]);
-                    $tech->permissions()->syncWithoutDetaching([$permissionId]);
+                    $medic && $medic->permissions()->syncWithoutDetaching([$permissionId]);
+                    $tech && $tech->permissions()->syncWithoutDetaching([$permissionId]);
                 }
 
                 if ($slug === 'trip_tickets_create_medic_form') {
-                    $medic->permissions()->syncWithoutDetaching([$permissionId]);
+                    $medic && $medic->permissions()->syncWithoutDetaching([$permissionId]);
                 }
 
                 if ($slug === 'trip_tickets_create_tech_form') {
-                    $tech->permissions()->syncWithoutDetaching([$permissionId]);
+                    $tech && $tech->permissions()->syncWithoutDetaching([$permissionId]);
                 }
 
                 if (in_array($slug, self::MANAGER_ENGINEER_BRANCH_HEAD_PERMISSIONS)) {
-                    $manager->permissions()->syncWithoutDetaching([$permissionId]);
-                    $engineerBdd->permissions()->syncWithoutDetaching([$permissionId]);
-                    $branchHead->permissions()->syncWithoutDetaching([$permissionId]);
+                    $manager && $manager->permissions()->syncWithoutDetaching([$permissionId]);
+                    $engineerBdd && $engineerBdd->permissions()->syncWithoutDetaching([$permissionId]);
+                    $branchHead && $branchHead->permissions()->syncWithoutDetaching([$permissionId]);
                 }
 
                 if (in_array($slug, self::CLIENT_COMMERCIAL_HEAD_PERMISSIONS)) {
-                    $client->permissions()->syncWithoutDetaching([$permissionId]);
-                    $commercialHead->permissions()->syncWithoutDetaching([$permissionId]);
+                    $client && $client->permissions()->syncWithoutDetaching([$permissionId]);
+                    $commercialHead && $commercialHead->permissions()->syncWithoutDetaching([$permissionId]);
                 }
             }
 
@@ -183,8 +146,6 @@ class CreateTripTicketsPermissions extends Migration
      */
     public function down()
     {
-        return;
-
         DB::beginTransaction();
 
         try {
