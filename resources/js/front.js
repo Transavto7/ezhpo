@@ -570,6 +570,22 @@ $(document).ready(function () {
 
                 itemForm += showContractsFormCardDBItem(contracts)
             }
+
+            if (fieldName === 'official_name' && model === 'Company') {
+                itemForm += `
+                    <p class="text-small m-0">Проверка оплаты счетов:</p>
+                    <div class="input-group mb-3">
+                        <input type="text"
+                               readonly
+                               disabled
+                               class="form-control check-for-debts-result">
+                        <div class="input-group-append">
+                            <button class="form-control d-flex btn btn-outline-success check-for-debts" type="button" data-company-id="${data.id}">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>`;
+            }
         }
 
         if (formIsFull) {
@@ -620,6 +636,45 @@ $(document).ready(function () {
             }
         }
     }
+
+    $('#CARD_COMPANY').on('click', '.check-for-debts', function () {
+        const companyId = $(this).data('company-id')
+        const $input = $(this).closest('.input-group').find('.check-for-debts-result')
+
+        if (! companyId) {
+            return;
+        }
+
+        axios
+            .create({
+                headers: {
+                    Authorization: 'Bearer ' + API_TOKEN
+                }
+            })
+            .post(`/companies/${companyId}/check-for-debts`)
+            .then(response => {
+                const {status} = response.data
+
+                if (status.has_debt) {
+                    $input.addClass('is-invalid')
+                    $input.removeClass('is-valid')
+                } else {
+                    $input.removeClass('is-invalid')
+                    $input.addClass('is-valid')
+                }
+
+                $input.attr('title', status.title)
+                $input.val(status.title)
+            })
+            .catch(jqXHR => {
+                console.log(jqXHR.response)
+                if (jqXHR.status === 422) {
+                    $input.val(Object.values(jqXHR.responseJSON.errors)[0][0])
+                } else {
+                    $input.val('Ошибка получения данных!')
+                }
+            })
+    })
 
     window.changeFormRequire = (element, className) => {
         $(element).closest('.cloning').find(`.${className}`).prop('required', !(element.value.length > 0));
