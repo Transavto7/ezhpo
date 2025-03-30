@@ -1,5 +1,6 @@
 import moment from "moment";
 
+
 require('./bootstrap');
 require('./front')
 

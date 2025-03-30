@@ -8,4 +8,5 @@ final class DateFormats
     const USER_SHOW_DATE = 'd.m.Y';
     const USER_SHOW_DATETIME = 'd.m.Y H:i:s';
     const SYSTEM_DATE = 'Y-m-d';
+    const SYSTEM_DATETIME = 'Y-m-d H:i:s';
 }

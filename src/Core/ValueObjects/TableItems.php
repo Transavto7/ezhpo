@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Src\Core\ValueObjects;
@@ -12,6 +13,7 @@ final class TableItems implements Arrayable, JsonSerializable
      * @var array
      */
     private $items;
+
     /**
      * @var int
      */
