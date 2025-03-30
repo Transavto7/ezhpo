@@ -117,7 +117,7 @@ class FormHashFilling extends Command
     {
         $data = DB::table('tech_forms')
             ->select([
-                'forms.id',
+                'forms.uuid',
                 'forms.driver_id',
                 'tech_forms.car_id',
                 'forms.date',
