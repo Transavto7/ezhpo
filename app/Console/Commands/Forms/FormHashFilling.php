@@ -67,7 +67,7 @@ class FormHashFilling extends Command
             ->select([
                 'forms.uuid',
                 'forms.driver_id',
-                'dorms.date',
+                'forms.date',
                 'medic_forms.type_view',
             ])
             ->join('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
@@ -120,7 +120,7 @@ class FormHashFilling extends Command
                 'forms.id',
                 'forms.driver_id',
                 'tech_forms.car_id',
-                'dorms.date',
+                'forms.date',
                 'tech_forms.type_view',
             ])
             ->join('forms', 'forms.uuid', '=', 'tech_forms.forms_uuid')
