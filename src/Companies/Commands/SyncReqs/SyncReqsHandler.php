@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Companies\Actions\SyncReqs;
+namespace Src\Companies\Commands\SyncReqs;
 
 use App\Company;
 use App\Enums\OneCSyncStatusEnum;
