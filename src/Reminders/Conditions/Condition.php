@@ -1,0 +1,31 @@
+<?php
+declare(strict_types=1);
+
+namespace Src\Reminders\Conditions;
+
+use Illuminate\Database\Query\Builder;
+use JsonSerializable;
+use Src\Core\ValueObjects\ClassifierViewModel;
+use Src\Reminders\ViewModels\SelectViewModel;
+
+interface Condition
+{
+    public function run(Builder $query): Builder;
+
+    public function makeViewModel(array $rawReminder): ?ClassifierViewModel;
+
+    public function addJoin(Builder $query): Builder;
+
+    public function getSelectFields(): array;
+
+    public function getName(): string;
+
+    public static function create(): self;
+
+    public function setValue($value): void;
+
+    /**
+     * @return int|string|null
+     */
+    public function getValue();
+}

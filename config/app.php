@@ -185,6 +185,7 @@ return [
         Src\Terminals\TerminalsProvider::class,
         Src\Companies\CompaniesProvider::class,
         Src\Employees\EmployeesProvider::class,
+        Src\Reminders\RemindersProvider::class,
 
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
@@ -258,32 +259,32 @@ return [
         'user' => [
             'min' => 0,
             'max' => 999999,
-            'tries' => 10
+            'tries' => 10,
         ],
         'car' => [
             'min' => 500000,
             'max' => 999999,
-            'tries' => 10
+            'tries' => 10,
         ],
         'driver' => [
             'min' => 100000,
             'max' => 499999,
-            'tries' => 10
+            'tries' => 10,
         ],
         'company' => [
             'min' => 100000,
             'max' => 999999,
-            'tries' => 10
+            'tries' => 10,
         ],
         'product' => [
             'min' => 100000,
             'max' => 499999,
-            'tries' => 10
+            'tries' => 10,
         ],
         'default' => [
             'min' => 0,
             'max' => 999999,
-            'tries' => 10
+            'tries' => 10,
         ],
     ],
 ];
