@@ -4,28 +4,32 @@ declare(strict_types=1);
 
 namespace Src\Core\ValueObjects;
 
+use FontLib\Table\Type\name;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 
 final class ClassifierViewModel implements Arrayable, JsonSerializable
 {
-    /** @var int */
+    /** @var int|string */
     private $id;
 
     /** @var string */
     private $name;
 
     /**
-     * @param int $id
+     * @param int|string $id
      * @param string $name
      */
-    public function __construct(int $id, string $name)
+    public function __construct($id, string $name)
     {
         $this->id = $id;
         $this->name = $name;
     }
 
-    public function getId(): int
+    /**
+     * @return int|string
+     */
+    public function getId()
     {
         return $this->id;
     }
@@ -35,6 +39,9 @@ final class ClassifierViewModel implements Arrayable, JsonSerializable
         return $this->name;
     }
 
+    /**
+     * @return array{id: int|string, name:string}
+     */
     public function toArray(): array
     {
         return [
