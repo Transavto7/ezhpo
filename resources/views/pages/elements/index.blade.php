@@ -163,6 +163,8 @@
 
         $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
         $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
+
+        $oneCIntegrationEnabled = \App\Services\OneC\OneCIntegrationService::configFilled();
     @endphp
     {{--NAVBAR--}}
     @if(!(count($elements) > $max) || !$max)
@@ -363,7 +365,11 @@
                             </th>
                         @endforeach
 
-                        @if(($model === 'Company') && $permissionToEdit)
+                        @if($model === 'Company' && $oneCIntegrationEnabled)
+                            <th width="60">#</th>
+                        @endif
+
+                        @if($model === 'Company' && $permissionToEdit)
                             <th width="60">#</th>
                         @endif
 
@@ -557,9 +563,18 @@
                                 </td>
                             @endforeach
 
-                            @if(($model === 'Company') && $permissionToEdit && !request()->get('deleted'))
+                            @if($model === 'Company' && $oneCIntegrationEnabled && ! request()->get('deleted'))
                                 <td class="td-option">
-                                    <a href="{{ route('companies.sync-da-data', ['id' => $el->id ]) }}"
+                                    <a href="{{ route('companies.get-debt', ['id' => $el->id]) }}" title="Обновление статуса задолженности из 1С"
+                                       class="ACTION_GET_COMPANY_DEBTS btn btn-sm btn-success">
+                                        <i class="fa fa-ruble"></i>
+                                    </a>
+                                </td>
+                            @endif
+
+                            @if($model === 'Company' && $permissionToEdit && ! request()->get('deleted'))
+                                <td class="td-option">
+                                    <a href="{{ route('companies.sync-da-data', ['id' => $el->id]) }}" title="Обновление данных из сервиса DaData"
                                        class="ACTION_SYNC_COMPANY btn btn-sm btn-success">
                                         <i class="fa fa-arrow-circle-down"></i>
                                     </a>
@@ -776,6 +791,52 @@
                             title: 'Успешная синхронизация!',
                             text: response.data.message,
                             icon: 'success'
+                        });
+                    })
+                    .catch(error => {
+                        swal.fire({
+                            title: 'Ошибка синхронизации!',
+                            text: error.response.data.error,
+                            icon: 'error'
+                        });
+                    })
+                    .finally(() => {
+                        $(this).toggleClass('disabled');
+                    })
+            })
+
+            $(document).on( "click", '.ACTION_GET_COMPANY_DEBTS', function (event) {
+                event.preventDefault();
+
+                $(this).toggleClass('disabled');
+
+                const href = $(this).attr('href');
+
+                axios
+                    .get(href)
+                    .then(response => {
+                        const data = response.data.debt
+
+                        if (data) {
+                            let message = data.has_debt ? `<p>Есть задолженность.</p>` : `<p>Задолженность отсутствует.</p>`
+
+                            data.debt_structure.forEach(item => {
+                                message += `<br> <span>${item.title}. Задолженность: ${item.debt}</span>`
+                            })
+
+                            swal.fire({
+                                title: 'Статус задолженности обновлен!',
+                                html: message,
+                                icon: data.has_debt ? 'error' : 'success',
+                            });
+
+                            return
+                        }
+
+                        swal.fire({
+                            title: 'Ошибка синхронизации!',
+                            text: 'Данные по компании не найдены в 1С',
+                            icon: 'error'
                         });
                     })
                     .catch(error => {

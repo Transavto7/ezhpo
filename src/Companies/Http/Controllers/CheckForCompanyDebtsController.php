@@ -2,8 +2,8 @@
 
 namespace Src\Companies\Http\Controllers;
 
-use App\Company;
 use App\Http\Controllers\Controller;
+use App\Services\CompanyReqsChecker\CompanyRepository;
 use Illuminate\Http\JsonResponse;
 use Src\Companies\Commands\CheckForCompanyDebts\CheckForCompanyDebtsCommand;
 use Src\Companies\Commands\CheckForCompanyDebts\CheckForCompanyDebtsHandler;
@@ -12,12 +12,10 @@ use Throwable;
 
 class CheckForCompanyDebtsController extends Controller
 {
-    public function __invoke(string $id, CheckForCompanyDebtsHandler $handler): JsonResponse
+    public function __invoke(string $id, CheckForCompanyDebtsHandler $handler, CompanyRepository $repository): JsonResponse
     {
         try {
-            $company = Company::findOrFail($id);
-
-            $debtStatus = $handler->handle(new CheckForCompanyDebtsCommand($company));
+            $debtStatus = $handler->handle(new CheckForCompanyDebtsCommand($repository->findById($id)));
 
             return response()->json(['status' => $debtStatus->toArray()]);
         } catch (Throwable $exception) {
