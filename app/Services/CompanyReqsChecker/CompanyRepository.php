@@ -25,4 +25,9 @@ class CompanyRepository
 
         return $company;
     }
+
+    public function findById(string $id): Company
+    {
+        return Company::findOrFail($id);
+    }
 }

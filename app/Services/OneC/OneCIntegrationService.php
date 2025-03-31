@@ -65,6 +65,19 @@ abstract class OneCIntegrationService implements OneCIntegrationServiceInterface
         throw new OneCIntegrationException($exceptionMessage);
     }
 
+    public static function configFilled(): bool
+    {
+        $url = config('services.one-c.url');
+        $login = config('services.one-c.login');
+        $password = config('services.one-c.password');
+
+        if (!$url || !$login || !$password) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function healthCheck(): bool
     {
         //TODO: реализовать healthcheck
