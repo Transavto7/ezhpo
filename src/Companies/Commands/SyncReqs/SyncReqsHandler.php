@@ -65,7 +65,7 @@ class SyncReqsHandler
 
             $company->setAttribute('ogrn', $companyInfo->getOgrn());
             $company->setAttribute('address', $companyInfo->getAddress());
-        } else if ($companyReqs->isOrganizationToRestore()) {
+        } elseif ($companyReqs->isOrganizationToRestore()) {
             $companyInfo = $this->checker->restoreCompany($companyReqs);
 
             if ($companyInfo === null) {
@@ -105,7 +105,6 @@ class SyncReqsHandler
 
             $company->setAttribute('one_c_synced', OneCSyncStatusEnum::SYNCED);
         } catch (Throwable $exception) {
-
         }
     }
 

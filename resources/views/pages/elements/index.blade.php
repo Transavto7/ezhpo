@@ -164,7 +164,8 @@
         $date_from_filter = now()->subMonth()->startOfMonth()->format('Y-m-d');
         $date_to_filter = now()->subMonth()->endOfMonth()->format('Y-m-d');
 
-        $oneCIntegrationEnabled = \App\Services\OneC\OneCIntegrationService::configFilled();
+        //TODO: заменить на интерфейс
+        $oneCIntegrationEnabled = \App\Services\OneC\OneCIntegrationService::integrationEnabled();
     @endphp
     {{--NAVBAR--}}
     @if(!(count($elements) > $max) || !$max)
@@ -335,7 +336,7 @@
                     <thead>
                     <tr>
                         @foreach ($fieldPrompts as $field)
-                            @if(($field->field == 'products_id' || $field->field == 'services') && user()->hasRole('client'))
+                            @if(($field->field === 'products_id' || $field->field === 'services') && user()->hasRole('client'))
                                 @continue
                             @elseif($field->field === 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
                                 @continue

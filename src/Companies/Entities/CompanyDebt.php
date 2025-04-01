@@ -10,7 +10,7 @@ final class CompanyDebt
     private $relevantOn;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $hasDebt;
 

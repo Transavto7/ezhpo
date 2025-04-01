@@ -12,7 +12,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Symfony\Component\HttpFoundation\Response;
 
-class CompanySyncService extends OneCIntegrationService implements CompanySyncServiceInterface
+final class CompanySyncService extends OneCIntegrationService implements CompanySyncServiceInterface
 {
     /**
      * @throws WrongCompanyReqsException
@@ -22,9 +22,11 @@ class CompanySyncService extends OneCIntegrationService implements CompanySyncSe
      */
     public function create(Company $company)
     {
-        if (!$this->clientInit) throw new OneCIntegrationEmptyConfigException();
+        if (! $this->clientInit) {
+            throw new OneCIntegrationEmptyConfigException();
+        }
 
-        if (!$company->getAttribute('reqs_validated')) {
+        if (! $company->getAttribute('reqs_validated')) {
             throw new WrongCompanyReqsException();
         }
 
@@ -36,11 +38,11 @@ class CompanySyncService extends OneCIntegrationService implements CompanySyncSe
             'inn',
             'kpp',
             'ogrn',
-            'address'
+            'address',
         ]);
 
-        $response = $this->client->post($url,  [
-            RequestOptions::JSON => $body
+        $response = $this->client->post($url, [
+            RequestOptions::JSON => $body,
         ]);
 
         if ($response->getStatusCode() !== Response::HTTP_OK) {
@@ -56,9 +58,11 @@ class CompanySyncService extends OneCIntegrationService implements CompanySyncSe
      */
     public function update(Company $company)
     {
-        if (!$this->clientInit) throw new OneCIntegrationEmptyConfigException();
+        if (! $this->clientInit) {
+            throw new OneCIntegrationEmptyConfigException();
+        }
 
-        if (!$company->getAttribute('reqs_validated')) {
+        if (! $company->getAttribute('reqs_validated')) {
             throw new WrongCompanyReqsException();
         }
 
@@ -68,8 +72,8 @@ class CompanySyncService extends OneCIntegrationService implements CompanySyncSe
             'name',
         ]);
 
-        $response = $this->client->patch($url,  [
-            RequestOptions::JSON => $body
+        $response = $this->client->patch($url, [
+            RequestOptions::JSON => $body,
         ]);
 
         if ($response->getStatusCode() !== Response::HTTP_OK) {

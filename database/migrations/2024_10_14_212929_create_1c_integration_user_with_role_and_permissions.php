@@ -129,6 +129,7 @@ class Create1cIntegrationUserWithRoleAndPermissions extends Migration
      */
     private function createUser(int $role)
     {
+        /** @var User $user */
         $user = User::query()
             ->withoutGlobalScopes()
             ->where('login', self::INTEGRATION_1C_USER_LOGIN)

@@ -19,6 +19,8 @@ use App\Services\CompanyReqsChecker\DaDataCompanyReqsChecker;
 use App\Services\ElementsSearch\ElementSearchService;
 use App\Services\ElementsSearch\ElementsSearchServiceInterface;
 use App\Services\HashIdGenerator\HashIdGeneratorService;
+use App\Services\OneC\CompanyDebt\CompanyDebtService;
+use App\Services\OneC\CompanyDebt\CompanyDebtServiceInterface;
 use App\Services\OneC\CompanySync\CompanySyncService;
 use App\Services\OneC\CompanySync\CompanySyncServiceInterface;
 use App\Services\OneC\Reports\GetServicesReportForCompanyByPeriod;
@@ -32,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public $bindings = [
         CompanySyncServiceInterface::class => CompanySyncService::class,
+        CompanyDebtServiceInterface::class => CompanyDebtService::class,
         CompanyReqsCheckerInterface::class => DaDataCompanyReqsChecker::class,
         ElementsSearchServiceInterface::class => ElementSearchService::class,
         QRCodeGeneratorInterface::class => QRCodeGenerator::class,

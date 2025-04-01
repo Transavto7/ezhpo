@@ -4,7 +4,7 @@ namespace Src\Companies\Repositories\CompanyDebtsRepository;
 
 use App\Company;
 use DateTimeImmutable;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Src\Companies\Entities\CompanyDebt;
 
 final class CompanyDebtsRepository
@@ -28,11 +28,7 @@ final class CompanyDebtsRepository
     public function syncDebtStatus(Company $company, bool $hasDebt)
     {
         if ($hasDebt) {
-            DB::table('company_debts')
-                ->updateOrInsert(
-                    ['hash_id' => $company->hash_id],
-                    ['relevant_on' => new DateTimeImmutable()]
-                );
+            $this->storeDebt($company, new DateTimeImmutable());
 
             return;
         }
@@ -40,5 +36,19 @@ final class CompanyDebtsRepository
         DB::table('company_debts')
             ->where('hash_id', '=', $company->hash_id)
             ->delete();
+    }
+
+    public function storeDebt(Company $company, DateTimeImmutable $relevantOn)
+    {
+        DB::table('company_debts')
+            ->updateOrInsert(
+                ['hash_id' => $company->hash_id],
+                ['relevant_on' => $relevantOn]
+            );
+    }
+
+    public function resetAllStatuses()
+    {
+        DB::table('company_debts')->truncate();
     }
 }

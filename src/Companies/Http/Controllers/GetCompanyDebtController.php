@@ -17,7 +17,7 @@ class GetCompanyDebtController extends Controller
         try {
             $companyDebt = $handler->handle(new GetCompanyDebtCommand($repository->findById($id)));
 
-            return response()->json(['debt' => $companyDebt ? $companyDebt->toArray() : null]);
+            return response()->json(['debt' => $companyDebt->toArray()]);
         } catch (Throwable $exception) {
             return response()->json(['error' => $exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

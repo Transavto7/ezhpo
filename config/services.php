@@ -39,6 +39,7 @@ return [
     ],
 
     'one-c' => [
+        'enabled' => env('ONE_C_INTEGRATION_ENABLED'),
         'url' => env('ONE_C_URL'),
         'login' => env('ONE_C_LOGIN'),
         'password' => env('ONE_C_PASSWORD')
