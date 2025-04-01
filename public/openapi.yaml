@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: ЭЖПО API
   description: API для взаимодействия с ЭЖПО
-  version: 0.0.2
+  version: 0.0.3
 servers:
   - url: https://test.ta-7.ru
     description: Тестовый сервер
@@ -46,6 +46,36 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         "409":
           $ref: '#/components/responses/CreateCompany409'
+        "422":
+          $ref: '#/components/responses/ValidationError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /api/1c/v1/companies/{id}/debt:
+    post:
+      operationId: UpdateCompanyDebt
+      tags:
+        - Компании
+      summary: Обновление статуса задолженности компании
+      description: Метод установки или снятия задолженности у компании
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: HASH ID компании
+          example: '412109849'
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateCompanyDebtRequest'
+      responses:
+        "200":
+          $ref: '#/components/responses/UpdateCompanyDebt200'
+        "401":
+          $ref: '#/components/responses/UnauthenticatedError'
+        "403":
+          $ref: '#/components/responses/ForbiddenError'
+        "404":
+          $ref: '#/components/responses/UpdateCompanyDebt404'
         "422":
           $ref: '#/components/responses/ValidationError'
         "500":
@@ -228,6 +258,17 @@ components:
               company_id:
                 type: string
                 example: '000000'
+    UpdateCompanyDebtRequest:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - is_debt
+            properties:
+              is_debt:
+                type: boolean
+                example: true
   responses:
     # common
     UnauthenticatedError:
@@ -425,3 +466,30 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Requisite'
+    # update company debt
+    UpdateCompanyDebt200:
+      description: Успешное обновление информации о задолженности
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+            properties:
+              message:
+                type: string
+                description: Сообщение об успешном обновлении статуса
+                example: "Статус задолженности компании успешно обновлен!"
+    UpdateCompanyDebt404:
+      description: Компания не найдена
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+            properties:
+              message:
+                type: string
+                description: Сообщение об ошибке
+                example: "Компания с таким HASH ID не существует!"

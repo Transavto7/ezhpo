@@ -2,16 +2,16 @@
 
 namespace Src\Companies\Commands\GetCompanyDebt;
 
+use App\Services\OneC\CompanyDebt\CompanyDebtServiceInterface;
 use Src\Companies\Entities\CompanyOneCDebt;
 use Src\Companies\Repositories\CompanyDebtsRepository\CompanyDebtsRepository;
-use Src\Companies\Repositories\GetCompanyDebtOneCRepository\GetCompanyDebtOneCRepository;
 
 final class GetCompanyDebtHandler
 {
     /**
-     * @var GetCompanyDebtOneCRepository
+     * @var CompanyDebtServiceInterface
      */
-    private $debtRepository;
+    private $companyDebtService;
 
     /**
      * @var CompanyDebtsRepository
@@ -19,20 +19,18 @@ final class GetCompanyDebtHandler
     private $companyRepository;
 
     public function __construct(
-        GetCompanyDebtOneCRepository $debtRepository,
+        CompanyDebtServiceInterface $companyDebtService,
         CompanyDebtsRepository $companyRepository
     ) {
-        $this->debtRepository = $debtRepository;
+        $this->companyDebtService = $companyDebtService;
         $this->companyRepository = $companyRepository;
     }
 
     public function handle(GetCompanyDebtCommand $command): ?CompanyOneCDebt
     {
-        $debt = $this->debtRepository->get($command->getCompany());
+        $debt = $this->companyDebtService->get($command->getCompany());
 
-        if ($debt) {
-            $this->companyRepository->syncDebtStatus($command->getCompany(), $debt->isHasDebt());
-        }
+        $this->companyRepository->syncDebtStatus($command->getCompany(), $debt->hasDebt());
 
         return $debt;
     }

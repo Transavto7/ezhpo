@@ -26,18 +26,14 @@ abstract class OneCIntegrationService implements OneCIntegrationServiceInterface
 
     public function __construct()
     {
-        $url = config('services.one-c.url');
-        $login = config('services.one-c.login');
-        $password = config('services.one-c.password');
-
-        if (!$url || !$login || !$password) {
+        if (! self::integrationEnabled()) {
             return;
         }
 
-        $this->baseUrl = rtrim($url, '/');
+        $this->baseUrl = rtrim(config('services.one-c.url'), '/');
 
         $this->client = new Client([
-            'auth' => [$login, $password]
+            'auth' => [config('services.one-c.login'), config('services.one-c.password')],
         ]);
 
         $this->clientInit = true;
@@ -47,7 +43,7 @@ abstract class OneCIntegrationService implements OneCIntegrationServiceInterface
     {
         $url = ltrim(trim($url), '/');
 
-        return $this->baseUrl . '/' . $url;
+        return $this->baseUrl.'/'.$url;
     }
 
     /**
@@ -60,18 +56,24 @@ abstract class OneCIntegrationService implements OneCIntegrationServiceInterface
 
         Log::channel('one-c-api')->error(json_encode($responseBody));
 
-        $exceptionMessage = $statusCode . " : " . $responseBody['message'] ?? 'Ошибка интеграции';
+        $exceptionMessage = $statusCode.' : '.$responseBody['message'] ?? 'Ошибка интеграции';
 
         throw new OneCIntegrationException($exceptionMessage);
     }
 
-    public static function configFilled(): bool
+    public static function integrationEnabled(): bool
+    {
+        return filter_var(config('services.one-c.enabled', false), FILTER_VALIDATE_BOOLEAN)
+            && self::configFilled();
+    }
+
+    protected static function configFilled(): bool
     {
         $url = config('services.one-c.url');
         $login = config('services.one-c.login');
         $password = config('services.one-c.password');
 
-        if (!$url || !$login || !$password) {
+        if (! $url || ! $login || ! $password) {
             return false;
         }
 
@@ -80,7 +82,12 @@ abstract class OneCIntegrationService implements OneCIntegrationServiceInterface
 
     public function healthCheck(): bool
     {
+        if (! $this->clientInit) {
+            return false;
+        }
+
         //TODO: реализовать healthcheck
+
         return true;
     }
 }

@@ -12,28 +12,45 @@ final class CompanyOneCDebt
     /**
      * @var DebtStructure[]
      */
-    private $debtStructure;
+    private $debtStructures;
 
     /**
      * @var string
      */
     private $message;
 
-    public function __construct(bool $hasDebt, array $debtStructure, string $message)
+    /**
+     * @var string
+     */
+    private $hashId;
+
+    /**
+     * @param string $hashId
+     * @param bool $hasDebt
+     * @param DebtStructure[] $debtStructures
+     * @param string $message
+     */
+    public function __construct(string $hashId, bool $hasDebt, array $debtStructures, string $message)
     {
+        $this->hashId = $hashId;
         $this->hasDebt = $hasDebt;
-        $this->debtStructure = $debtStructure;
+        $this->debtStructures = $debtStructures;
         $this->message = $message;
     }
 
-    public function isHasDebt(): bool
+    public function getHashId(): string
+    {
+        return $this->hashId;
+    }
+
+    public function hasDebt(): bool
     {
         return $this->hasDebt;
     }
 
-    public function getDebtStructure(): array
+    public function getDebtStructures(): array
     {
-        return $this->debtStructure;
+        return $this->debtStructures;
     }
 
     public function getMessage(): string
@@ -43,14 +60,14 @@ final class CompanyOneCDebt
 
     public function toArray(): array
     {
-        $debtStructure = array_reduce($this->getDebtStructure(), function ($carry, $item) {
+        $debtStructure = array_reduce($this->getDebtStructures(), function ($carry, $item) {
             $carry[] = $item->toArray();
 
             return $carry;
         }, []);
 
         return [
-            'has_debt' => $this->isHasDebt(),
+            'has_debt' => $this->hasDebt(),
             'debt_structure' => $debtStructure,
             'message' => $this->getMessage(),
         ];
