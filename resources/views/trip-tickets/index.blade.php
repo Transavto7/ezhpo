@@ -204,6 +204,7 @@
             massTrash: '{{ route('trip-tickets.mass-trash') }}',
             print: '{{ route('trip-tickets.print') }}',
             massPrint: '{{ route('trip-tickets.mass-print') }}',
+            massApprove: '{{ route('trip-tickets.mass-approve') }}',
         }
         const data = {
             items: [],
@@ -257,14 +258,17 @@
         function updateTripTicketsControl() {
             const control = $('#selected-items-control')
             const controlBtnDelete = $('#selected-items-control-btn-delete')
+            const controlBtnApprove = $('#mass-approve-btn')
 
             const tripTicketsStorage = getTripTicketsStorage()
 
             if (tripTicketsStorage.total) {
                 const records = pronunciationWithNumber(tripTicketsStorage.total, 'путевой лист', 'путевых листа', 'путевых листов')
                 const label = "Удалить " + tripTicketsStorage.total + " " + records
+                const approveLabel = "Утвердить " + tripTicketsStorage.total + " " + records
 
                 controlBtnDelete.html(label)
+                controlBtnApprove.html(approveLabel)
                 control.addClass('d-flex')
                 control.removeClass('d-none')
             } else {
@@ -342,6 +346,21 @@
                     })
             })
 
+            $('#mass-approve-btn').click(function () {
+                const tripTicketsStorage = getTripTicketsStorage()
+
+                axios
+                    .post(tripTicketsApi.massApprove, {
+                        ids: tripTicketsStorage.items
+                    })
+                    .then(() => {
+                        clearTripTicketsStorage()
+                        window.location.reload()
+                    })
+                    .catch(() => {
+                    })
+            })
+
             $('#select-all').click(function () {
                 $('.trip-tickets-table input[type="checkbox"]').each(function () {
                     if (!$(this).prop('checked')) {
@@ -358,7 +377,9 @@
                 updateTripTicketsControl()
             })
 
-            const downloadExcelFileToPrint = (url, params) => {
+            const downloadExcelFileToPrint = (url, params, btn) => {
+                btn.attr('disabled', true)
+
                 axios({
                     method: 'post',
                     url: url,
@@ -416,7 +437,10 @@
                                 icon: 'error'
                             });
                         }
-                    });
+                    })
+                    .finally(() => {
+                      btn.attr('disabled', false)
+                    })
             }
 
             $('.download-excel-to-print-btn').click((event) => {
@@ -425,15 +449,16 @@
 
                 downloadExcelFileToPrint(tripTicketsApi.print, {
                     id: uuid
-                })
+                }, btn)
             })
 
             $('#mass-download-excel-to-print-btn').click(function () {
+                const btn = $(this)
                 const tripTicketsStorage = getTripTicketsStorage()
 
                 downloadExcelFileToPrint(tripTicketsApi.massPrint, {
                     ids: tripTicketsStorage.items
-                })
+                }, btn)
             })
 
             $('#hv-alert-error-close').click(function () {
@@ -554,14 +579,43 @@
                         data.photos.forEach(photo => {
                             const html = `
                                 <div class="row">
-                                    <div class="col-md-12 d-flex flex-column align-items-center">
-                                        <p><a href="${photo.url}" target="_blank"><img class="photo" src="${photo.url}" alt="${photo.original_name}"></a>
+                                    <div class="col-md-12 d-flex flex-row justify-content-between align-items-center">
+                                        <a href="${photo.url}" target="_blank"><img class="photo" src="${photo.url}" alt="${photo.original_name}"></a>
+                                        <button class="btn btn-outline-danger delete-photo" data-id="${currentTripTicketId}" data-path="${photo.path}" title="Удалить фото"><i class="fa fa-times"></i></button>
                                     </div>
                                 </div>`
 
                             wrapper.append(html)
                         })
                     })
+            })
+
+            $('#photos-view').on('click', '.delete-photo', function () {
+              const path = $(this).data('path')
+              const id = $(this).data('id')
+              const url = '/trip-tickets/'+id+'/delete-photo'
+              const photoDiv = $(this).closest('.row')
+
+              axios
+                .post(url, {
+                  path
+                })
+                .then(() => {
+                  const modal = photoDiv.parent()
+                  photoDiv.remove()
+
+                  if (modal.children().length === 0) {
+                    window.location.reload()
+                  }
+                })
+                .catch(error => {
+                  console.log(error.response.data)
+                  swal.fire({
+                    title: 'Ошибка',
+                    text: 'Ошибка удаления файла',
+                    icon: 'error'
+                  })
+                })
             })
 
             $('table').on('click', '.change-status', function () {
@@ -594,6 +648,7 @@
     $permissionToExportPrikaz = user()->access('trip_tickets_export_prikaz');
     $permissionToPrintTripTickets = user()->access('trip_tickets_print_trip_ticket');
     $notDeletedItems = session('not_deleted_items');
+    $notApprovedItems = session('not_approved_items');
 @endphp
 
 @section('content')
@@ -690,6 +745,9 @@
                             @if($permissionToDelete)
                                 <button id="selected-items-control-btn-delete" class="btn btn-danger btn-sm"></button>
                             @endif
+                            @if($permissionToUpdate)
+                                <button id="mass-approve-btn" class="btn btn-success btn-sm ml-2"></button>
+                            @endif
                             @if($permissionToPrintTripTickets)
                                 <button id="mass-download-excel-to-print-btn" class="btn btn-success btn-sm ml-2">Печать ПЛ</button>
                             @endif
@@ -708,6 +766,25 @@
                                 <div>Не удалось удалить ПЛ с ID:</div>
                                 <div class="d-flex align-items-center flex-wrap" style="gap: 5px;">
                                     @foreach($notDeletedItems as $item)
+                                        <code>{{ $item }}</code>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div>
+                                <div id="hv-alert-error-close">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($notApprovedItems)
+                        <div id="hv-alert-error"
+                             class="alert alert-danger hv-mass-deletion-alert-error d-flex justify-content-between align-items-center pl-3 pr-3">
+                            <div class="d-flex align-items-center" style="gap: 10px;">
+                                <div>Не удалось утвердить ПЛ с №:</div>
+                                <div class="d-flex align-items-center flex-wrap" style="gap: 5px;">
+                                    @foreach($notApprovedItems as $item)
                                         <code>{{ $item }}</code>
                                     @endforeach
                                 </div>

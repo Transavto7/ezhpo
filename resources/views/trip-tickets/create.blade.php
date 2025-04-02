@@ -187,7 +187,7 @@
             @endforeach
 
             @if(count($created ?? []))
-              @if(count($created ?? []) <= 15 && $canPrint)
+              @if(count($created ?? []) <= 31 && $canPrint)
                 <div class="row">
                   <div class="col-md-12 d-flex justify-content-center">
                     <button type="button" id="trip-ticket-print-btn" class="btn btn-sm btn-success">

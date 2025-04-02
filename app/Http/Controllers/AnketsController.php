@@ -309,11 +309,10 @@ class AnketsController extends Controller
         $form = Form::withTrashed()->findOrFail($id);
 
         try {
-
             $handler->handle($form, $request->all(), Auth::user());
 
             $referer = $request->input('REFERER');
-            if ($referer) {
+            if ($referer && ! str_contains($referer, route('forms.get', ['id' => $id]))) {
                 $response = redirect($referer);
             } else {
                 $response = redirect(route('forms.get', [

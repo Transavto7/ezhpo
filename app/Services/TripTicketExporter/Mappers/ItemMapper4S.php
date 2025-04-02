@@ -130,6 +130,7 @@ final class ItemMapper4S implements ItemMapperInterface
         return new MedicFormViewModel(
             $form->uuid,
             $form->date ? Carbon::parse($form->date) : null,
+            $details->period_pl ? Carbon::parse($details->period_pl) : null,
             $form->user ? $form->user->name : null,
             $stamp ? StampViewModel::fromStampOrDefault($stamp) : null
         );
@@ -144,14 +145,17 @@ final class ItemMapper4S implements ItemMapperInterface
         $form = $tripTicket->techForm;
 
         $odometer = null;
+        $periodPl = null;
         $techForm = TechForm::where('forms_uuid', '=', $form->uuid)->first();
 
         if ($techForm) {
             $odometer = $techForm->odometer;
+            $periodPl = $techForm->period_pl;
         }
 
         return new TechFormViewModel(
             $form->date ? Carbon::parse($form->date) : null,
+            $periodPl ? Carbon::parse($periodPl) : null,
             $form->user ? $form->user->name : null,
             $odometer,
         );

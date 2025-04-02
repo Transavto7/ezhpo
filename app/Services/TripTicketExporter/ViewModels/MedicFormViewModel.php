@@ -15,6 +15,10 @@ final class MedicFormViewModel
      */
     private $date;
     /**
+     * @var Carbon|null
+     */
+    private $periodPl;
+    /**
      * @var string|null
      */
     private $username;
@@ -26,11 +30,13 @@ final class MedicFormViewModel
     public function __construct(
         string    $uuid,
         ?Carbon   $date,
+        ?Carbon   $periodPl,
         ?string   $username,
         ?StampViewModel   $stamp
     ) {
         $this->uuid = $uuid;
         $this->date = $date;
+        $this->periodPl = $periodPl;
         $this->username = $username;
         $this->stamp = $stamp ?? StampViewModel::default();
     }
@@ -43,6 +49,11 @@ final class MedicFormViewModel
     public function getDate(): ?Carbon
     {
         return $this->date;
+    }
+
+    public function getPeriodPl(): ?Carbon
+    {
+        return $this->periodPl;
     }
 
     public function getUsername(): ?string

@@ -24,7 +24,7 @@ final class DeleteTripTicketPhotoHandler
             ]);
 
         if (count($files) === 0) {
-            event(new ChangeTripTicketStatus($action->getTripTicket(), TripTicketStatus::created()));
+            event(new ChangeTripTicketStatus($action->getTripTicket(), TripTicketStatus::printed()));
             event(new LogTripTicket(Auth::user(), $action->getTripTicket(), TripTicketActionType::changeStatus()));
         }
     }

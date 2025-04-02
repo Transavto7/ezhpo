@@ -158,14 +158,14 @@
                                         @endif
                                     @endauth
                                     @guest
-                                        @if($details->getTripTicketDetails() && \App\Services\TripTicket\TripTicketPermissions::canAddPhoto($details->getTripTicketDetails()->getTripTicket()->type, $details->getTripTicketDetails()->getTripTicket()->status))
+                                        @if($details->getTripTicketDetails())
                                             <a class="btn btn-success btn-sm ml-2" type="button" href="{{ route('trip-tickets.attach-photos-page', ['id' => $details->getTripTicketDetails()->getTripTicket()->uuid]) }}">
                                                 Загрузить фото ПЛ <i class="fa fa-photo ml-1"></i>
                                             </a>
                                         @endif
                                     @endguest
                                     @auth
-                                        @if($details->getTripTicketDetails() && \App\Services\TripTicket\TripTicketPermissions::canAddPhoto($details->getTripTicketDetails()->getTripTicket()->type, $details->getTripTicketDetails()->getTripTicket()->status))
+                                        @if($details->getTripTicketDetails())
                                             <div class="mt-2" id="attach-photos">
                                                 <form method="POST"
                                                       action="{{ route('trip-tickets.attach-photos', ['id' => $details->getTripTicketDetails()->getTripTicket()->uuid]) }}"

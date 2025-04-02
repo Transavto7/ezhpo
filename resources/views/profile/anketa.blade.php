@@ -134,6 +134,9 @@
                         @foreach($errors ?? [] as $error)
                             <div class="alert alert-danger" role="alert">{{ $error }}</div>
                         @endforeach
+                        @if(request()->has('msg'))
+                            <div class="alert alert-success" role="alert">{{ request()->get('msg') }}</div>
+                        @endif
 
                         @if(count($created ?? []))
                             <div class="row">

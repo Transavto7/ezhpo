@@ -361,17 +361,17 @@ final class SheetWriter4S implements SheetWriterInterface
     }
 
     /**
-     * @param MedicFormViewModel|TechFormViewModel|null $formViewModel
+     * @param MedicFormViewModel|TechFormViewModel $formViewModel
      * @return string
      */
     private function getDateString($formViewModel): string
     {
-        if ($formViewModel) {
+        if ($formViewModel->getDate()) {
             $date = $this->getFormDate($formViewModel->getDate());
-        } else if ($this->data->getTripTicket()->getStartDate()) {
-            $date = $this->getFormDate($this->data->getTripTicket()->getStartDate(), true, false);
+        } else if ($formViewModel->getPeriodPl()) {
+            $date = $this->getFormDate($formViewModel->getPeriodPl(), false, false);
         } else {
-            $date = $this->getFormDate($this->data->getTripTicket()->getPeriodPl(), false, false);
+            $date = $this->getFormDate(null);
         }
 
         return $date;

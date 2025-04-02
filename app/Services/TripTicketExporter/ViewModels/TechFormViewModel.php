@@ -11,6 +11,10 @@ final class TechFormViewModel
      */
     private $date;
     /**
+     * @var Carbon|null
+     */
+    private $periodPl;
+    /**
      * @var string|null
      */
     private $username;
@@ -19,17 +23,14 @@ final class TechFormViewModel
      */
     private $odometer;
 
-    /**
-     * @param Carbon|null $date
-     * @param string|null $username
-     * @param int|null $odometer
-     */
     public function __construct(
-        ?Carbon   $date,
-        ?string   $username,
-        ?int      $odometer = null
+        ?Carbon $date,
+        ?Carbon $periodPl,
+        ?string $username,
+        ?int    $odometer = null
     ) {
         $this->date = $date;
+        $this->periodPl = $periodPl;
         $this->username = $username;
         $this->odometer = $odometer;
     }
@@ -37,6 +38,11 @@ final class TechFormViewModel
     public function getDate(): ?Carbon
     {
         return $this->date;
+    }
+
+    public function getPeriodPl(): ?Carbon
+    {
+        return $this->periodPl;
     }
 
     public function getUsername(): ?string

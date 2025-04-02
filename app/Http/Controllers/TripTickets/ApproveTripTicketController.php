@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\TripTicket;
 use Illuminate\Http\Request;
 
-class ActivateTripTicketController extends Controller
+class ApproveTripTicketController extends Controller
 {
     public function __invoke(Request $request, ChangeTripTicketStatusHandler $handler)
     {
