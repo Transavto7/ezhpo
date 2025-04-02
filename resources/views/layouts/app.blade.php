@@ -70,6 +70,8 @@
 <div id="app" class="page @yield('class-page')">
     @include('layouts.header')
 
+    <notification-modal-widget></notification-modal-widget>
+
     <main
         class="page-content d-flex align-items-stretch @if (user() && (user()->hasRole('driver') || user()->hasRole('client'))) blue @endif">
 
