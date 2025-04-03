@@ -6,6 +6,7 @@ import {useRemindersTable} from "./useRemindersTable";
 import RemindersFilter from "./RemindersFilter.vue";
 import RemindersTable from "./RemindersTable.vue";
 import RemindersTablePagination from "./RemindersTablePagination.vue";
+import { ACTIONS, CONDITIONS, SUBJECT_TYPES } from "../../../common/reminderContextEnums";
 
 const { table, params, fetchTablePending, fetchRemindersTable, resetFilter, filter, performDeleteReminder } = useRemindersTable()
 
@@ -17,6 +18,17 @@ const handleFilterApply = async () => {
 const handleFilterReset = async () => {
     resetFilter()
     await fetchRemindersTable()
+}
+
+const handleSend = async () => {
+    window.dispatchEvent(new CustomEvent('showModalNotificationWindow', {
+        detail: {
+            context:{
+                [CONDITIONS.SUBJECT_TYPE]: SUBJECT_TYPES.CAR
+            },
+            action: ACTIONS.CREATE_INSPECTION
+        },
+    }));
 }
 
 const handleDelete = async (id) => {
@@ -63,6 +75,7 @@ watch([
                 <div class="mt-2 d-flex">
                     <b-btn class="btn btn-sm btn-success" :disabled="fetchTablePending" @click="handleFilterApply">Поиск</b-btn>
                     <b-btn class="btn btn-sm btn-danger ml-2" :disabled="fetchTablePending" @click="handleFilterReset">Сбросить</b-btn>
+                    <b-btn class="btn btn-sm btn-danger ml-2" @click="handleSend">Эвент</b-btn>
                 </div>
             </div>
         </div>

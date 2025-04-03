@@ -6,7 +6,6 @@ namespace Src\Reminders\Conditions\BaseConditions;
 
 use Illuminate\Database\Query\Builder;
 use Src\Reminders\Conditions\Condition;
-use Src\Reminders\ViewModels\SelectViewModel;
 
 abstract class StringCondition implements Condition
 {
@@ -33,7 +32,8 @@ abstract class StringCondition implements Condition
         return $query->where(function (Builder $query) {
             return $query
                 ->whereRaw('JSON_EXTRACT(context, "$.'.$this->conditionName.'") = ?', [$this->value])
-                ->orWhereRaw('JSON_EXTRACT(context, "$.'.$this->conditionName.'") is null');
+                ->orWhereRaw('JSON_EXTRACT(context, "$.'.$this->conditionName.'") is null')
+                ->orWhereRaw("JSON_EXTRACT(context, \"$.role\") = CAST('null' AS JSON)");
         });
     }
 

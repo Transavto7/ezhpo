@@ -17,12 +17,12 @@ final class AvailableConditions
 {
     /** @var class-string<Condition>[] */
     public const AVAILABLE_CONDITIONS = [
-        UserCondition::class,
-        CityCondition::class,
-        CompanyCondition::class,
-        PointCondition::class,
-        RoleCondition::class,
-        SubjectCondition::class,
-        SubjectTypeCondition::class,
+        'user' => UserCondition::class,
+        'city' => CityCondition::class,
+        'company' => CompanyCondition::class,
+        'point' => PointCondition::class,
+        'role' => RoleCondition::class,
+        'subject' => SubjectCondition::class,
+        'subject_type' => SubjectTypeCondition::class,
     ];
 }

@@ -10,15 +10,15 @@ use Src\Core\Emuns\Enum;
 final class ReminderSubjectType extends Enum
 {
     const DRIVER = 'driver';
-    const COMPANY = 'company';
+    const CAR = 'car';
 
     public static function from(string $value): self
     {
         switch ($value) {
             case self::DRIVER:
                 return self::driver();
-            case self::COMPANY:
-                return self::company();
+            case self::CAR:
+                return self::car();
             default:
                 throw new LogicException('Invalid value');
         }
@@ -29,8 +29,8 @@ final class ReminderSubjectType extends Enum
         return new self(self::DRIVER);
     }
 
-    public static function company(): self
+    public static function car(): self
     {
-        return new self(self::COMPANY);
+        return new self(self::CAR);
     }
 }
