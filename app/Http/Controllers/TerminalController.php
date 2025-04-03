@@ -12,7 +12,7 @@ use App\Actions\Terminal\Update\TerminalCheckUpdateHandler;
 use App\Actions\Terminal\Update\TerminalUpdateHandler;
 use App\Enums\DeviceEnum;
 use App\FieldPrompt;
-use App\Models\Forms\Form;
+use App\Models\Forms\MedicForm;
 use App\Role;
 use App\Services\Terminals\TerminalsToCheckService;
 use App\TerminalCheck;
@@ -102,27 +102,36 @@ class TerminalController extends Controller
 
             $terminals = $paginate->getCollection();
 
-            $forms = Form::query()
+            $lastMonthAmount = MedicForm::query()
                 ->select([
-                    'forms.created_at',
+                    DB::raw('count(forms.id) as count'),
                     'medic_forms.terminal_id'
                 ])
-                ->leftJoin('medic_forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
-                ->whereIn('medic_forms.terminal_id', $terminals->pluck('id'))
-                ->where('forms.created_at', '>=', Carbon::now()->subMonth()->startOfMonth());
+                ->leftJoin('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
+                ->where('forms.created_at', '>=', Carbon::now()->subMonth()->startOfMonth())
+                ->where('forms.created_at', '<=', Carbon::now()->startOfMonth())
+                ->whereNotNull('medic_forms.terminal_id')
+                ->groupBy(['medic_forms.terminal_id'])
+                ->get()
+                ->pluck('count', 'terminal_id')
+                ->toArray();
 
-            $startOfMonth = Carbon::now()->startOfMonth();
+            $monthAmount = MedicForm::query()
+                ->select([
+                    DB::raw('count(forms.id) as count'),
+                    'medic_forms.terminal_id'
+                ])
+                ->leftJoin('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
+                ->where('forms.created_at', '>', Carbon::now()->startOfMonth())
+                ->whereNotNull('medic_forms.terminal_id')
+                ->groupBy(['medic_forms.terminal_id'])
+                ->get()
+                ->pluck('count', 'terminal_id')
+                ->toArray();
 
             foreach ($terminals as $terminal) {
-                $terminal->month_amount = $forms
-                    ->where('terminal_id', $terminal->id)
-                    ->where('created_at', '>=', $startOfMonth)
-                    ->count();
-
-                $terminal->last_month_amount = $forms
-                    ->where('terminal_id', $terminal->id)
-                    ->where('created_at', '<', $startOfMonth)
-                    ->count();
+                $terminal->month_amount = $monthAmount[$terminal->id] ?? 0;
+                $terminal->last_month_amount = $lastMonthAmount[$terminal->id] ?? 0;
             }
 
             return response([
