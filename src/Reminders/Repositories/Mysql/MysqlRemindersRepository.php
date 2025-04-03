@@ -10,12 +10,15 @@ use Src\Core\ValueObjects\Uuid;
 use Src\Reminders\ConditionBuilder\AvailableConditions;
 use Src\Reminders\Conditions\Condition;
 use Src\Reminders\Entities\Reminder;
+use Src\Reminders\Enums\ReminderAction;
 use Src\Reminders\Normalizers\ReminderDatabaseNormalizer;
 use Src\Reminders\Queries\GetReminderById\GetReminderRepositoryInterface;
 use Src\Reminders\Queries\GetReminderById\ReminderViewModel;
+use Src\Reminders\Queries\GetRemindersByContext\GetReminderByContextRepository;
+use Src\Reminders\Queries\GetRemindersByContext\ReminderByContextViewModel;
 use Src\Reminders\Repositories\RemindersRepository;
 
-final class MysqlRemindersRepository implements RemindersRepository, GetReminderRepositoryInterface
+final class MysqlRemindersRepository implements RemindersRepository, GetReminderRepositoryInterface, GetReminderByContextRepository
 {
     /** @var ReminderDatabaseNormalizer */
     private $normalizer;
@@ -91,5 +94,33 @@ final class MysqlRemindersRepository implements RemindersRepository, GetReminder
             $rawReminder->status,
             $rawReminder->type,
         );
+    }
+
+    /**
+     * @param ReminderAction $action
+     * @param Condition[] $context
+     * @return ReminderByContextViewModel[]
+     */
+    public function getReminderByContext(ReminderAction $action, array $context): array
+    {
+        $builder = DB::table('reminders')
+            ->select(['reminders.id', 'reminders.title', 'reminders.content'])
+            ->where('action', '=', $action->value())
+            ->orderBy('reminders.created_at', 'desc');
+
+        foreach ($context as $condition) {
+            $builder = $condition->run($builder);
+        }
+
+        /** @var object{id: string, title: string, content: string}[] $rawReminders */
+        $rawReminders = $builder->get()->toArray();
+
+        return array_map(function (object $reminder) {
+            return new ReminderByContextViewModel(
+                Uuid::fromString($reminder->id),
+                $reminder->title,
+                $reminder->content,
+            );
+        }, $rawReminders);
     }
 }

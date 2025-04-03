@@ -15,7 +15,7 @@ final class SubjectsFilter extends ArrayFilter
     {
         $query->where(function (Builder $query) {
             $query->whereIn('subject_drivers.id', $this->value)
-                ->orWhereIn('subject_companies.id', $this->value);
+                ->orWhereIn('subject_cars.id', $this->value);
         });
     }
 }

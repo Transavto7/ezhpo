@@ -1,32 +1,15 @@
 <script setup>
 
-import {ref} from "vue";
+import {computed, onMounted, onUnmounted, ref} from "vue";
 import {fetchModalData, sendActionComplete, sendActionOk} from "./api";
-import { onMounted, onUnmounted } from 'vue';
 
 const globalNotificationModal = ref(null);
-const id = ref(null);
-const title = ref(null);
-const body = ref(null);
-const isSendAction = ref(false)
-
-const showModal = () => {
-    globalNotificationModal.value.show();
-    isSendAction.value = false
-}
-
-const hideModal = () => {
-    globalNotificationModal.value.hide();
-    isSendAction.value = true
-}
+const reminders = ref([]);
 
 // Обработчик глобального события
 const handleGlobalEvent = (event) => {
-    fetchModalData(event.detail).then(response => {
-        id.value = response.id
-        title.value = response.name ?? null
-        body.value = response.content
-        showModal()
+    fetchModalData(event.detail).then(({data}) => {
+        reminders.value = data;
     })
 };
 
@@ -40,44 +23,48 @@ onUnmounted(() => {
     window.removeEventListener('showModalNotificationWindow', handleGlobalEvent);
 });
 
-/*
-// Отправка события в модальное окно
-window.dispatchEvent(new CustomEvent('showModalNotificationWindow', {
-    detail: { ... Тут какой-то JSON ... }
-}));
-*/
-
-const actionOk = () => {
-    const isSendActionValue = isSendAction.value
-    hideModal()
-    if (!isSendActionValue) {
-        sendActionOk(id.value)
+const actionOk = (bvModalEvent) => {
+    bvModalEvent.preventDefault()
+    if (currentReminder.value.id) {
+        sendActionOk(currentReminder.value.id)
+        removeReminder()
     }
 }
 
-const actionComplete = () => {
-    const isSendActionValue = isSendAction.value
-    hideModal()
-    if (!isSendActionValue) {
-        sendActionComplete(id.value)
-    }
+const actionComplete = (bvModalEvent) => {
+    bvModalEvent.preventDefault()
+    sendActionComplete(currentReminder.value.id)
+    removeReminder()
 }
 
+const removeReminder = () => {
+    reminders.value.splice(0, 1);
+}
+
+const hasReminders = computed(() => {
+    return reminders.value.length > 0
+})
+
+const currentReminder = computed(() => {
+    return reminders.value[0] ?? {}
+})
 </script>
 
 <template>
-    <b-modal ref="globalNotificationModal" @hidden="actionOk" @cancel="actionOk" @ok="actionComplete">
-        <template #modal-title v-if="title !== null">
-            {{title}}
+    <b-modal ref="globalNotificationModal" v-model="hasReminders" @hidden="actionOk" @cancel="actionOk"
+             @ok="actionComplete">
+        <template #modal-title v-if="currentReminder.name !== null">
+            {{ currentReminder.name }}
         </template>
 
         <template>
-            <div class="d-block" v-html="body"></div>
+            <div class="d-block" v-html="currentReminder.content">
+            </div>
         </template>
 
         <template #modal-footer="{ok, cancel}">
-            <b-button class="mt-3" @click="cancel()" variant="info">Ок</b-button>
-            <b-button class="mt-3" @click="ok()" variant="success">Выполнено</b-button>
+            <b-button class="mt-3" @click="cancel(currentReminder.id)" variant="info">Ок</b-button>
+            <b-button class="mt-3" @click="ok(currentReminder.id)" variant="success">Выполнено</b-button>
         </template>
     </b-modal>
 </template>

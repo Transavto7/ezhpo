@@ -25,7 +25,7 @@ interface Condition
     public function setValue($value): void;
 
     /**
-     * @return int|string|null
+     * @return int|string|array<int, string|int>|null
      */
     public function getValue();
 }

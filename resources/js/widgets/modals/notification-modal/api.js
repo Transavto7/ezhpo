@@ -1,13 +1,5 @@
 export const fetchModalData = (data) => {
-    console.log('Запросил данные для JSON: ', data)
-
-    return new Promise((resolve) => {
-        resolve({
-            id: 123,
-            name: 'Важное уведомление!',
-            content: '<span>Текст уведомления <b>с HTML</b></span>'
-        });
-    })
+    return axios.post(`/reminders/by-context`, data);
 }
 
 export const sendActionOk = (id) => {

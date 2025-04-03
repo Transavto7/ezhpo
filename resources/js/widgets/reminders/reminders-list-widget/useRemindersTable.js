@@ -55,7 +55,7 @@ export const useRemindersTable = () => {
                     users: filter.users?.map((item) => item.id),
                     roles: filter.roles?.map((item) => item.id),
                     companies: filter.companies?.map((item) => item.id),
-                    subject_type: filter.subject_type,
+                    subject_type: filter.subject_type?.id,
                     subjects: filter.subjects?.map((item) => item.id),
                 },
             })

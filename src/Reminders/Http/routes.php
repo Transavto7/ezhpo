@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Src\Reminders\Http\Controllers\CreateReminderController;
 use Src\Reminders\Http\Controllers\CreateReminderPageController;
 use Src\Reminders\Http\Controllers\DeleteReminderController;
+use Src\Reminders\Http\Controllers\GetRemindersByContextController;
 use Src\Reminders\Http\Controllers\ListRemindersController;
 use Src\Reminders\Http\Controllers\ListRemindersPageController;
 use Src\Reminders\Http\Controllers\Selects\SelectActionsController;
@@ -25,6 +26,9 @@ Route::middleware(['web', 'auth'])->prefix('reminders')->name('reminders.')->gro
     Route::get('/create', CreateReminderPageController::class)->name('create-page');
     Route::post('/create', CreateReminderController::class)->name('create');
     Route::post('/delete', DeleteReminderController::class)->name('delete');
+
+    Route::post('/by-context', GetRemindersByContextController::class)->name('by-context');
+
     Route::get('/{id}', UpdateReminderPageController::class)->name('update-page');
     Route::post('/{id}', UpdateReminderController::class)->name('update');
 

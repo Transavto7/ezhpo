@@ -19,7 +19,7 @@ final class SelectSubjectsController
     public function __invoke(Request $request, SubjectBuilderFactory $factory): JsonResponse
     {
         $builder = $factory->createBuilder(
-            ReminderSubjectType::from($request->get('subject_type')),
+            ReminderSubjectType::from($request->input('subject_type')),
         );
 
         $subjects = DB::table(DB::raw("({$builder->toSql()}) as main"))
