@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Src\Core\ValueObjects;
 
+use JsonSerializable;
 use Ramsey\Uuid\Uuid as BaseUuid;
 use Ramsey\Uuid\UuidInterface;
 
-class Uuid
+class Uuid implements JsonSerializable
 {
     /**
      * @var UuidInterface
@@ -64,5 +65,10 @@ class Uuid
     public function __toString(): string
     {
         return $this->id->toString();
+    }
+
+    public function jsonSerialize(): string
+    {
+        return $this->value();
     }
 }

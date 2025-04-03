@@ -19,10 +19,10 @@ final class SubjectCondition extends IntCondition
         $context = json_decode($rawReminder['context'], true);
 
         if (isset($context['subject_type'])) {
-            if ($context['subject_type'] === ReminderSubjectType::COMPANY && isset($rawReminder['subject_company_id'])) {
+            if ($context['subject_type'] === ReminderSubjectType::CAR && isset($rawReminder['subject_car_id'])) {
                 return new ClassifierViewModel(
-                    $rawReminder['subject_company_id'],
-                    $rawReminder['subject_company_name'],
+                    $rawReminder['subject_car_id'],
+                    $rawReminder['subject_car_name'],
                 );
             }
 
@@ -42,8 +42,8 @@ final class SubjectCondition extends IntCondition
         return [
             'subject_drivers.id as subject_driver_id',
             'subject_drivers.fio as subject_driver_name',
-            'subject_companies.id as subject_company_id',
-            'subject_companies.name as subject_company_name',
+            'subject_cars.id as subject_car_id',
+            'subject_cars.gos_number as subject_car_name',
         ];
     }
 
@@ -57,8 +57,8 @@ final class SubjectCondition extends IntCondition
         );
 
         $query->leftJoin(
-            'companies as subject_companies',
-            'subject_companies.id',
+            'cars as subject_cars',
+            'subject_cars.id',
             '=',
             DB::raw('JSON_EXTRACT(context, "$.'.$this->conditionName.'")')
         );

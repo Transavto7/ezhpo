@@ -103,11 +103,11 @@ const handleChangeSubjectTypes = (value) => {
 }
 
 const handleChangeSubjects = (value) => {
-    emit('update:subject', value)
+    emit('update:subjects', value)
 }
 
 const innerFetchSubjectsForSelect = ({search}) => {
-    return fetchSubjectsForSelect(search, props.subject_type)
+    return fetchSubjectsForSelect(search, props.subject_type.id)
 }
 
 const disableSubjectFilter = computed(() => {

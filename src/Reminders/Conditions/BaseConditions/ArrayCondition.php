@@ -7,12 +7,12 @@ namespace Src\Reminders\Conditions\BaseConditions;
 use Illuminate\Database\Query\Builder;
 use Src\Reminders\Conditions\Condition;
 
-abstract class IntCondition implements Condition
+abstract class ArrayCondition implements Condition
 {
     /** @var string */
     protected $conditionName = 'default-int';
 
-    /** @var int|null */
+    /** @var array<int, int|string>|null */
     protected $value;
 
     /**
@@ -29,27 +29,29 @@ abstract class IntCondition implements Condition
      */
     public function run(Builder $query): Builder
     {
-        return $query->where(function (Builder $query) {
+        $wheresString = implode(',', array_fill(0, count($this->value), '?'));
+
+        return $query->where(function (Builder $query) use ($wheresString) {
             return $query
-                ->whereRaw('JSON_EXTRACT(context, "$.'.$this->conditionName.'") = ?', [$this->value])
+                ->whereRaw('JSON_EXTRACT(context, "$.'.$this->conditionName.'") in ('.$wheresString.')', $this->value)
                 ->orWhereRaw('JSON_EXTRACT(context, "$.'.$this->conditionName.'") is null')
                 ->orWhereRaw("JSON_EXTRACT(context, \"$.role\") = CAST('null' AS JSON)");
         });
     }
 
     /**
-     * @param int|null $value
+     * @param array<int, int|string>|null $value
      * @return void
      */
     public function setValue($value): void
     {
-        $this->value = $value === null ? null : intval($value);
+        $this->value = $value === null ? null : $value;
     }
 
     /**
-     * @return int|null
+     * @return array<int, int|string>|null
      */
-    public function getValue(): ?int
+    public function getValue(): ?array
     {
         return $this->value;
     }
