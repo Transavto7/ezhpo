@@ -439,7 +439,7 @@
                         }
                     })
                     .finally(() => {
-                      btn.attr('disabled', false)
+                        btn.attr('disabled', false)
                     })
             }
 
@@ -476,7 +476,7 @@
                         url: '{{ route('trip-tickets.select-forms') }}',
                         dataType: 'json',
                         delay: 250,
-                        data: function(params) {
+                        data: function (params) {
                             return {
                                 term: params.term,
                                 page: params.page || 1,
@@ -484,7 +484,7 @@
                                 currentTripTicketId,
                             };
                         },
-                        processResults: function(data, params) {
+                        processResults: function (data, params) {
                             params.page = params.page || 1;
 
                             return {
@@ -503,7 +503,6 @@
             }
 
             medicSelect.change(function () {
-                console.log($(this).val())
                 enableLink('.medic-link', $(this).val())
             })
 
@@ -526,11 +525,15 @@
                         if (data.medic) {
                             medicSelect.append(new Option(data.medic.text, data.medic.id, true, true)).trigger('change')
                             enableLink('.medic-link', data.medic.id)
+                        } else {
+                            medicSelect.val(null).trigger('change')
                         }
 
                         if (data.tech) {
                             techSelect.append(new Option(data.tech.text, data.tech.id, true, true)).trigger('change')
                             enableLink('.tech-link', data.tech.id)
+                        } else {
+                            techSelect.val(null).trigger('change')
                         }
                     })
             })
@@ -591,31 +594,31 @@
             })
 
             $('#photos-view').on('click', '.delete-photo', function () {
-              const path = $(this).data('path')
-              const id = $(this).data('id')
-              const url = '/trip-tickets/'+id+'/delete-photo'
-              const photoDiv = $(this).closest('.row')
+                const path = $(this).data('path')
+                const id = $(this).data('id')
+                const url = '/trip-tickets/' + id + '/delete-photo'
+                const photoDiv = $(this).closest('.row')
 
-              axios
-                .post(url, {
-                  path
-                })
-                .then(() => {
-                  const modal = photoDiv.parent()
-                  photoDiv.remove()
+                axios
+                    .post(url, {
+                        path
+                    })
+                    .then(() => {
+                        const modal = photoDiv.parent()
+                        photoDiv.remove()
 
-                  if (modal.children().length === 0) {
-                    window.location.reload()
-                  }
-                })
-                .catch(error => {
-                  console.log(error.response.data)
-                  swal.fire({
-                    title: 'Ошибка',
-                    text: 'Ошибка удаления файла',
-                    icon: 'error'
-                  })
-                })
+                        if (modal.children().length === 0) {
+                            window.location.reload()
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error.response.data)
+                        swal.fire({
+                            title: 'Ошибка',
+                            text: 'Ошибка удаления файла',
+                            icon: 'error'
+                        })
+                    })
             })
 
             $('table').on('click', '.change-status', function () {

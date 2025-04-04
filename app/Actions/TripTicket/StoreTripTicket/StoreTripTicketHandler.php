@@ -14,7 +14,7 @@ use Carbon\Carbon;
 use DateTimeImmutable;
 use DB;
 use Exception;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 final class StoreTripTicketHandler extends TripTicketNumberGenerator

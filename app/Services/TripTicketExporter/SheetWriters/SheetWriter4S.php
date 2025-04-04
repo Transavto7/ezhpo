@@ -60,9 +60,9 @@ final class SheetWriter4S implements SheetWriterInterface
 
         $title = $number . '. ' . config('trip-ticket.print.4s.template.front.prefix');
 
-        if ($item->getTripTicket()->getTicketNumber()) {
-            $title .= ' (' . $item->getTripTicket()->getTicketNumber() . ')';
-        }
+        $title .= $item->getTripTicket()->getExternalTicketNumber()
+            ? ' (' . $item->getTripTicket()->getExternalTicketNumber() . ')'
+            : ' (' . $item->getTripTicket()->getTicketNumber() . ')';
 
         $this->sheet->setTitle($title);
 

@@ -12,7 +12,7 @@ use App\Services\TripTicketExporter\ViewModels\CarViewModel;
 use App\Services\TripTicketExporter\ViewModels\CompanyViewModel;
 use App\Services\TripTicketExporter\ViewModels\DriverViewModel;
 use App\Services\TripTicketExporter\ViewModels\ExportedItem;
-use App\Services\TripTicketExporter\ViewModels\ExportedItem4S;
+use App\Services\TripTicketExporter\ViewModels\ExportedTripTicketItem;
 use App\Services\TripTicketExporter\ViewModels\MedicFormViewModel;
 use App\Services\TripTicketExporter\ViewModels\StampViewModel;
 use App\Services\TripTicketExporter\ViewModels\TechFormViewModel;
@@ -23,7 +23,7 @@ final class ItemMapper3 implements ItemMapperInterface
 {
     /**
      * @param TripTicket $tripTicket
-     * @return ExportedItem4S
+     * @return ExportedTripTicketItem
      */
     public function fromEloquent(TripTicket $tripTicket): ExportedItem
     {
@@ -47,7 +47,7 @@ final class ItemMapper3 implements ItemMapperInterface
         $medicFormViewModel = $this->mapMedic($tripTicket);
         $techFormViewModel = $this->mapTechForm($tripTicket);
 
-        return new ExportedItem4S(
+        return new ExportedTripTicketItem(
             $tripTicketViewModel,
             $companyViewModel,
             $driverViewModel,
