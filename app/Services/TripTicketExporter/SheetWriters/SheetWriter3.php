@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -130,11 +131,19 @@ final class SheetWriter3 implements SheetWriterInterface
         if ($driver) {
             $value = "ID - " . $driver->getId() . " Водитель\n";
             $this->sheet->setCellValue($left ? 'BY2' : 'FT2', $value);
+            $this->sheet->getStyle($left ? 'BY2' : 'FT2')
+                ->getAlignment()
+                ->setVertical(Alignment::VERTICAL_BOTTOM)
+                ->setHorizontal(Alignment::HORIZONTAL_LEFT);
         }
 
         if ($car) {
             $value = "ID - " . $car->getId() . " Автомобиль";
             $this->sheet->setCellValue($left ? 'BY4' : 'FT4', $value);
+            $this->sheet->getStyle($left ? 'BY4' : 'FT4')
+                ->getAlignment()
+                ->setVertical(Alignment::VERTICAL_BOTTOM)
+                ->setHorizontal(Alignment::HORIZONTAL_LEFT);
         }
 
         return $this;

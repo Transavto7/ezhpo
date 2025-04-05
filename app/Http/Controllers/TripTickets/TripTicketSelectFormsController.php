@@ -44,6 +44,7 @@ class TripTicketSelectFormsController extends Controller
                 .($tripTicket->tech_form_id ? " and trip_tickets.tech_form_id != $tripTicket->tech_form_id " : ' ')
                 .")"
             )
+            ->where('forms.type_anketa', '=', $type)
             ->when($type === FormTypeEnum::MEDIC, function (Builder $query) use ($tripTicket) {
                 $query->leftJoin('medic_forms',
                     'forms.uuid',
@@ -88,7 +89,6 @@ class TripTicketSelectFormsController extends Controller
             })
             ->where('forms.company_id', '=', $tripTicket->company_id)
             ->whereNotNull('forms.driver_id')
-            ->where('forms.type_anketa', '=', $type)
             ->when($tripTicket->driver_id, function (Builder $query) use ($tripTicket) {
                 $query->where('forms.driver_id', '=', $tripTicket->driver_id);
             })
@@ -97,7 +97,9 @@ class TripTicketSelectFormsController extends Controller
                     ->where('forms.date', '<=', Carbon::parse($tripTicket->start_date)->addDay());
             })
             ->when(! $tripTicket->start_date && $tripTicket->period_pl, function (Builder $query) use ($tripTicket) {
-                $query->where('period_pl', '=', $tripTicket->period_pl);
+                $period = Carbon::parse($tripTicket->period_pl);
+                $query->where('forms.date', '>=', $period->startOfMonth()->format('Y-m-d H:i:s'))
+                    ->where('forms.date', '<=', $period->endOfMonth()->format('Y-m-d H:i:s'));
             });
 
         $results = $query->paginate($perPage, ['*'], 'page', $page);
