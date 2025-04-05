@@ -10,7 +10,7 @@ class TripTicketAttachPhotosRequest extends FormRequest
     {
         return [
             'photos' => 'required|array',
-            'photos.*' => 'file|mimes:jpeg,jpg,png,pdf,webp|max:8192',
+            'photos.*' => 'file|mimes:jpeg,jpg,png,pdf,webp',
         ];
     }
 
@@ -25,7 +25,6 @@ class TripTicketAttachPhotosRequest extends FormRequest
             'file.required' => 'Файл обязателен для загрузки.',
             'file.file' => 'Загруженный файл недействителен.',
             'file.mimes' => 'Файл должен быть в формате JPEG, JPG, PNG или PDF.',
-            'file.max' => 'Размер файла не должен превышать 8 МБ.',
         ];
     }
 }

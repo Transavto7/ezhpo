@@ -477,6 +477,7 @@ class AnketsController extends Controller
 
             return view('pages.form-verification.show', [
                 'details' => $details,
+                'maxFileSizeBytes' => return_bytes(ini_get('upload_max_filesize'))
             ]);
         } catch (HttpClientNotFoundException|ExpiredFormPeriodPlException $exception) {
             return view('pages.form-verification.404');

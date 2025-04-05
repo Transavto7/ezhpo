@@ -177,6 +177,7 @@
                                                     <attach-photos-index
                                                         :id="'{{ $details->getTripTicketDetails()->getTripTicket()->uuid }}'"
                                                         :items="JSON.parse('{{ json_encode($details->getTripTicketDetails()->getPhotos()) }}')"
+                                                        :max-file-size-bytes="{{ $maxFileSizeBytes }}"
                                                     ></attach-photos-index>
                                                 </form>
                                             </div>

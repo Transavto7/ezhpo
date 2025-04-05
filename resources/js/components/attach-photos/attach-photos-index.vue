@@ -13,10 +13,15 @@ export default {
       type: String,
       required: true,
     },
+      maxFileSizeBytes: {
+        type: Number,
+        required: true
+      }
   },
   data() {
     return {
       photos: [],
+      totalPhotosSizeBytes: 0
     }
   },
   methods: {
@@ -33,14 +38,30 @@ export default {
           }
         });
 
+        let totalSize = this.totalPhotosSizeBytes;
+
         newPhotos.forEach(file => {
-          const key = `${file.name}-${file.size}`
+          const fileSize = file.size
+          const key = `${file.name}-${fileSize}`
           if (!uniqueFiles.has(key)) {
             uniqueFiles.set(key, file)
+            totalSize += fileSize
           }
         })
 
         newPhotos = Array.from(uniqueFiles.values())
+
+        if (totalSize > this.maxFileSizeBytes) {
+            swal.fire({
+                title: 'Ошибка',
+                text: `Превышен суммарный максимальный размер всех фото: ${this.formatBytes(this.maxFileSizeBytes)}. Если вы загрузили всего 1 фото - попробуйте уменьшить его размер.`,
+                icon: 'error'
+            })
+
+            this.setPhotos(this.photos)
+
+            return
+        }
 
         if (this.items.length + newPhotos.length > 4) {
           swal.fire({
@@ -62,9 +83,14 @@ export default {
 
       const dataTransfer = new DataTransfer()
 
+      let totalPhotosSizeBytes = 0
+
       this.photos.forEach(file => {
           dataTransfer.items.add(file)
+          totalPhotosSizeBytes += file.size
       })
+
+      this.totalPhotosSizeBytes = totalPhotosSizeBytes
 
       const fileInput = $('.custom-file-input')[0]
       fileInput.files = dataTransfer.files
@@ -90,6 +116,17 @@ export default {
     },
     removeNew(index) {
       this.photos.splice(index, 1)
+    },
+    formatBytes(bytes, decimals = 2) {
+        if (!+bytes) return '0 Bytes'
+
+        const k = 1024
+        const dm = decimals < 0 ? 0 : decimals
+        const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
     }
   },
   async mounted() {
