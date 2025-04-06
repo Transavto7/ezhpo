@@ -1,9 +1,9 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Src\Reminders\Queries\GetReminderById;
 
-use Src\Reminders\Repositories\RemindersRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class GetReminderByIdHandler

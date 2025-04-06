@@ -1,9 +1,9 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Src\Terminals\Commands\SyncTerminalSettings;
 
-use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 use Src\Terminals\Eloquent\TerminalSettings;
 
@@ -13,10 +13,11 @@ final class SyncTerminalSettingsHandler
     {
         $settingsJson = json_encode($command->getTerminalSettings()->toArray(), JSON_THROW_ON_ERROR);
 
-        if (count($command->getTerminalIds()) === 0 ) {
+        if (count($command->getTerminalIds()) === 0) {
             TerminalSettings::query()->where('id', '=', Uuid::NIL)->update([
                 'settings' => $settingsJson,
             ]);
+
             return;
         }
 
@@ -31,6 +32,5 @@ final class SyncTerminalSettingsHandler
                 ]
             );
         }
-
     }
 }

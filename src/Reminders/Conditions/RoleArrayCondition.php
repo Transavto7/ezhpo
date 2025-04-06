@@ -8,7 +8,6 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Src\Core\ValueObjects\ClassifierViewModel;
 use Src\Reminders\Conditions\BaseConditions\ArrayCondition;
-use Src\Reminders\Conditions\BaseConditions\IntCondition;
 
 final class RoleArrayCondition extends ArrayCondition
 {

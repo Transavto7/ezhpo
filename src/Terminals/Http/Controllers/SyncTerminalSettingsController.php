@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Src\Terminals\Http\Controllers;
@@ -26,6 +27,7 @@ final class SyncTerminalSettingsController
             ));
 
             DB::commit();
+
             return response('', Response::HTTP_NO_CONTENT);
         } catch (\Exception $exception) {
             DB::rollBack();
