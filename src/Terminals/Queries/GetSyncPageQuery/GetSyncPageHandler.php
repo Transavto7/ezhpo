@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Src\Terminals\Queries\GetSyncPageQuery;
@@ -21,7 +22,7 @@ final class GetSyncPageHandler
                     'users.id',
                     'users.hash_id',
                     'terminal_checks.serial_number as serial_number',
-                    'users.name'
+                    'users.name',
                 ])
                 ->leftJoin('terminal_checks', 'users.id', '=', 'terminal_checks.user_id')
                 ->leftJoin('model_has_roles', function ($join) {
@@ -38,7 +39,7 @@ final class GetSyncPageHandler
                             '[%s] %s %s',
                             $model->hash_id,
                             $model->name,
-                            $model->serial_number ? "s/n: " . $model->serial_number : ""
+                            $model->serial_number ? 's/n: '.$model->serial_number : ''
                         )
                     );
                 })
@@ -50,7 +51,7 @@ final class GetSyncPageHandler
             ->with([
                 'roles',
                 'pv:id,name,pv_id',
-                'pv.town:id,name'
+                'pv.town:id,name',
             ])
             ->whereHas('roles', function ($q) {
                 $q->where('roles.id', 2);

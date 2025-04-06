@@ -18,7 +18,7 @@ class SmartEnum
 
     public function isDefined()
     {
-        return !is_null($this->value);
+        return ! is_null($this->value);
     }
 
     /**

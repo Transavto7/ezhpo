@@ -6,7 +6,6 @@ namespace Src\Reminders\Normalizers;
 
 use Src\Reminders\ConditionBuilder\AvailableConditions;
 use Src\Reminders\Conditions\Condition;
-use Src\Reminders\Entities\Reminder;
 
 final class ReminderContextDatabaseNormalizer
 {

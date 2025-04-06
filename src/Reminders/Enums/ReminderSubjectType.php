@@ -10,6 +10,7 @@ use Src\Core\Emuns\Enum;
 final class ReminderSubjectType extends Enum
 {
     const DRIVER = 'driver';
+
     const CAR = 'car';
 
     public static function from(string $value): self

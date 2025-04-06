@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Src\Core\Emuns;
@@ -74,4 +75,3 @@ abstract class Enum
         return $oClass->getConstants();
     }
 }
-

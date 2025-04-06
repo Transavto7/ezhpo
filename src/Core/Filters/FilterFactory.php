@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Src\Core\Filters;
@@ -36,5 +37,4 @@ abstract class FilterFactory
 
         return $this->pipe;
     }
-
 }
