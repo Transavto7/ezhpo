@@ -15,7 +15,7 @@ abstract class StringFilter implements Filter
      */
     protected $value;
 
-    private function __construct($value)
+    final private function __construct($value)
     {
         $this->value = $value;
     }

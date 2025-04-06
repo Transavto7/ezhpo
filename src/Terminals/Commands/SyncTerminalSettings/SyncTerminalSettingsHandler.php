@@ -22,7 +22,7 @@ final class SyncTerminalSettingsHandler
         }
 
         foreach ($command->getTerminalIds() as $terminalId) {
-            TerminalSettings::updateOrInsert(
+            TerminalSettings::query()->updateOrInsert(
                 ['terminal_id' => $terminalId],
                 [
                     'id' => Uuid::uuid4()->toString(),

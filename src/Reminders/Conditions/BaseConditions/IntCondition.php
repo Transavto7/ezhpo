@@ -15,6 +15,10 @@ abstract class IntCondition implements Condition
     /** @var int|null */
     protected $value;
 
+    final public function __construct()
+    {
+    }
+
     /**
      * @return string
      */

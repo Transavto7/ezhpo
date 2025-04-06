@@ -23,13 +23,13 @@ final class StoreWorkdayHandler
         $workDay->flag_pak = FlagPakEnum::INTERNAL;
         $workDay->admitted = true;
 
-        $employee = User::where('hash_id', $command->getEmployeeId())->first();
+        $employee = User::query()->where('hash_id', $command->getEmployeeId())->first();
         if (! $employee) {
             throw new Exception('Сотрудник с указанным ID не найден!', Response::HTTP_NOT_FOUND);
         }
         $workDay->employee_id = $employee->id;
 
-        $point = Point::find($command->getPointId());
+        $point = Point::query()->find($command->getPointId());
         if (! $point) {
             throw new Exception('ПВ с указанным ID не найден!', Response::HTTP_NOT_FOUND);
         }
@@ -37,7 +37,7 @@ final class StoreWorkdayHandler
 
         if ($command->getType()->isClose()) {
             /** @var Workday $openWorkday */
-            $openWorkday = Workday::where('employee_id', $employee->id)
+            $openWorkday = Workday::query()->where('employee_id', $employee->id)
                 ->whereDate('date', $command->getDate()->format('Y-m-d'))
                 ->where('type_anketa', WorkdayEventTypeEnum::OPEN)
                 ->where('admitted', 1)
@@ -53,7 +53,7 @@ final class StoreWorkdayHandler
             $workDay->open_workday_id = $openWorkday->id;
         }
 
-        $alreadyExistWorkday = Workday::where('employee_id', $employee->id)
+        $alreadyExistWorkday = Workday::query()->where('employee_id', $employee->id)
             ->whereDate('date', $command->getDate()->format('Y-m-d'))
             ->where('type_anketa', $command->getType()->getValue())
             ->where('admitted', 1)

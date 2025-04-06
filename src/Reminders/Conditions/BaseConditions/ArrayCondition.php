@@ -15,6 +15,10 @@ abstract class ArrayCondition implements Condition
     /** @var array<int, int|string>|null */
     protected $value;
 
+    final public function __construct()
+    {
+    }
+
     /**
      * @return string
      */

@@ -48,7 +48,7 @@ final class TrashWorkdayHandler
     {
         $date = $workday->date->format('Y-m-d');
 
-        $alreadyExistWorkday = Workday::where('employee_id', $workday->employee_id)
+        $alreadyExistWorkday = Workday::query()->where('employee_id', $workday->employee_id)
             ->whereDate('date', $date)
             ->where('type_anketa', $workday->type_anketa)
             ->where('admitted', 1)
@@ -59,7 +59,7 @@ final class TrashWorkdayHandler
 
         if ($workday->type_anketa === WorkdayEventTypeEnum::CLOSE) {
             /** @var Workday $openWorkday */
-            $openWorkday = Workday::where('employee_id', $workday->employee_id)
+            $openWorkday = Workday::query()->where('employee_id', $workday->employee_id)
                 ->whereDate('date', $date)
                 ->where('type_anketa', WorkdayEventTypeEnum::OPEN)
                 ->where('admitted', 1)

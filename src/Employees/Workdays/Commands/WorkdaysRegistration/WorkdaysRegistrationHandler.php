@@ -33,13 +33,13 @@ final class WorkdaysRegistrationHandler
             throw new Exception('Отсутствуют обязательные параметры', Response::HTTP_BAD_REQUEST);
         }
 
-        $employee = User::where('hash_id', $command->getEmployeeId())->first();
+        $employee = User::query()->where('hash_id', $command->getEmployeeId())->first();
         if (! $employee) {
             throw new Exception('Сотрудник с указанным ID не найден!', Response::HTTP_NOT_FOUND);
         }
 
         // Проверка на дубликат в этот же день
-        $existingWorkday = Workday::where('employee_id', $employee->id)
+        $existingWorkday = Workday::query()->where('employee_id', $employee->id)
             ->whereDate('date', $command->getDate()->format('Y-m-d'))
             ->where('type_anketa', $command->getTypeAnketa()->getValue())
             ->where('admitted', 1)
@@ -55,7 +55,7 @@ final class WorkdaysRegistrationHandler
         $openWorkday = null;
         if ($command->getTypeAnketa()->isClose()) {
             /** @var Workday $openWorkday */
-            $openWorkday = Workday::where('employee_id', $employee->id)
+            $openWorkday = Workday::query()->where('employee_id', $employee->id)
                 ->whereDate('date', $command->getDate()->format('Y-m-d'))
                 ->where('type_anketa', WorkdayEventTypeEnum::OPEN)
                 ->where('admitted', 1)
