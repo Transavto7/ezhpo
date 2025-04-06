@@ -6,7 +6,7 @@ class SmartEnum
 {
     protected $value = null;
 
-    public function __construct($value = null)
+    final public function __construct($value = null)
     {
         $this->setValue($value);
     }
