@@ -15,6 +15,10 @@ abstract class StringCondition implements Condition
     /** @var string|null */
     protected $value;
 
+    final public function __construct()
+    {
+    }
+
     /**
      * @return string
      */

@@ -11,7 +11,7 @@ final class SaveHolidaysHandler
     public function handle(SaveHolidaysAction $action)
     {
         if (count($action->getDeleteHolidays()) > 0) {
-            Holiday::whereIn('date', $action->getDeleteHolidays())->delete();
+            Holiday::query()->whereIn('date', $action->getDeleteHolidays())->delete();
         }
 
         if (count($action->getNewHolidays()) > 0) {

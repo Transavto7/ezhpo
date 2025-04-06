@@ -44,7 +44,7 @@ class SyncReqsHandler
      */
     public function handle(SyncReqsCommand $command)
     {
-        $company = Company::find($command->getCompanyId());
+        $company = Company::query()->find($command->getCompanyId());
         if ($company === null) {
             throw new Exception('Компания не найдена.');
         }

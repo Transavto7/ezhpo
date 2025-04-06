@@ -18,7 +18,7 @@ class Uuid implements JsonSerializable
     /**
      * @param UuidInterface $id
      */
-    private function __construct(UuidInterface $id)
+    final private function __construct(UuidInterface $id)
     {
         $this->id = $id;
     }
