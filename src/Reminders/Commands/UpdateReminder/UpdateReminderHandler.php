@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Src\Reminders\Commands\UpdateReminder;
@@ -33,7 +34,6 @@ final class UpdateReminderHandler
         $reminder->setAction($command->getAction());
         $reminder->setStatus($command->getStatus());
         $reminder->setType($command->getType());
-
 
         $this->repository->save($reminder);
     }

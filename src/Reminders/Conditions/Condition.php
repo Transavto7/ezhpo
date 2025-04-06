@@ -1,12 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Src\Reminders\Conditions;
 
 use Illuminate\Database\Query\Builder;
-use JsonSerializable;
 use Src\Core\ValueObjects\ClassifierViewModel;
-use Src\Reminders\ViewModels\SelectViewModel;
 
 interface Condition
 {

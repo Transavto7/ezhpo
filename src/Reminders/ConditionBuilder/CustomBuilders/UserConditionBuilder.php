@@ -4,15 +4,9 @@ declare(strict_types=1);
 
 namespace Src\Reminders\ConditionBuilder\CustomBuilders;
 
-use App\Point;
 use App\User;
-use Src\Reminders\Conditions\CityCondition;
-use Src\Reminders\Conditions\CompanyCondition;
 use Src\Reminders\Conditions\Condition;
-use Src\Reminders\Conditions\PointCondition;
 use Src\Reminders\Conditions\RoleArrayCondition;
-use Src\Reminders\Conditions\SubjectCondition;
-use Src\Reminders\Conditions\SubjectTypeCondition;
 use Src\Reminders\Conditions\UserCondition;
 
 final class UserConditionBuilder implements CustomConditionBuilder

@@ -1,6 +1,5 @@
 <?php
 
-use App\FieldPrompt;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -43,7 +42,6 @@ class CreateTerminalSettingsTable extends Migration
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-
     }
 
     /**

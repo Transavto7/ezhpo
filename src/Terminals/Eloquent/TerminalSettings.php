@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Src\Terminals\Eloquent;
@@ -22,6 +23,7 @@ final class TerminalSettings extends Model
     use HasTimestamps, HasUuid;
 
     protected $table = 'terminal_settings';
+
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -32,7 +34,7 @@ final class TerminalSettings extends Model
     {
         $rawSettings = json_decode($value, true);
 
-        if (!is_array($rawSettings)) {
+        if (! is_array($rawSettings)) {
             return null;
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Src\Terminals\Queries\GetSyncPageQuery;
@@ -34,14 +35,13 @@ final class MedicTerminalViewModel
      * @param string|null $pvName
      */
     public function __construct(
-        int    $id,
+        int $id,
         string $name,
         $eds,
         Carbon $validity_eds_start,
         $validity_eds_end,
         $pvName
-    )
-    {
+    ) {
         $this->id = $id;
         $this->name = $name;
         $this->eds = $eds;
@@ -49,7 +49,6 @@ final class MedicTerminalViewModel
         $this->validity_eds_end = $validity_eds_end;
         $this->pvName = $pvName;
     }
-
 
     public function toArray(): array
     {
@@ -62,5 +61,4 @@ final class MedicTerminalViewModel
             'pv_name' => $this->pvName,
         ];
     }
-
 }

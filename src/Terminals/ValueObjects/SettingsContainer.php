@@ -1,11 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Src\Terminals\ValueObjects;
 
 final class SettingsContainer
 {
-    /** @var array  */
+    /** @var array */
     private $settings = [];
 
     public function __construct(array $settings)
