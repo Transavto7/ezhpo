@@ -212,7 +212,7 @@
             </li>
         @endif
 
-        @if($user->access('report_service_company_read', 'report_schedule_pv_read'))
+        @if($user->access('report_service_company_read', 'report_schedule_pv_read', 'report_schedule_dynamic_mo', 'medic_read'))
             <li>
                 <a href="#" data-btn-collapse="#reports" role="button"><i class="fa fa-area-chart"></i> Отчеты</a>
                 <ul id="reports" class="collapse list-unstyle">
@@ -230,6 +230,10 @@
                                 <i class="fa fa-book"></i>Отчет по услугам компании
                             </a>
                         </li>
+                    @endif
+
+                    @if($user->access('medic_read'))
+                        @include('layouts.components.sidebar.dismissed-medic-forms')
                     @endif
 
                     @if($user->access('report_schedule_dynamic_mo'))
@@ -287,6 +291,8 @@
                 </ul>
             </li>
         @endif
+
+        @include('Workdays::sidebar')
 
         @if($accessToSettings)
             <li>

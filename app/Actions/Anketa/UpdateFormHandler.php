@@ -23,8 +23,8 @@ use App\Services\FormHash\MedicHashData;
 use App\Services\FormHash\TechHashData;
 use App\Settings;
 use App\User;
-use App\ValueObjects\PressureLimits;
-use App\ValueObjects\Tonometer;
+use App\ValueObjects\ForeignDevice\PressureLimit;
+use App\ValueObjects\ForeignDevice\Tonometer;
 use DateTimeImmutable;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -209,7 +209,7 @@ class UpdateFormHandler
     {
         $driver = Driver::where('hash_id', $form->driver_id)->first();
         $pressure = Tonometer::fromString($form->details->tonometer);
-        $pressureLimits = PressureLimits::create($driver);
+        $pressureLimits = PressureLimit::create($driver);
 
         if ($pressure->needNormalize($pressureLimits)) {
             MedicFormNormalizedPressure::store(

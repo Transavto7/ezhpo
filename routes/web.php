@@ -12,6 +12,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/', 'IndexController@index')->name('index');
     Route::get('/openapi', 'OpenApiUiPageController@index')->name('index');
+    Route::get('/swagger/{type}', 'OpenApiUiPageController@apiByType')->name('api_by_type');
 
     Route::prefix('contract')->group(function () {
         Route::get('/', 'ContractController@view');

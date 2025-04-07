@@ -179,11 +179,17 @@ return [
         App\Providers\UnleashServiceProvider::class,
         App\Providers\FormsServiceProvider::class,
 
+        /*
+         * Modules
+         */
+        Src\Terminals\TerminalsProvider::class,
+        Src\Companies\CompaniesProvider::class,
+        Src\Employees\EmployeesProvider::class,
+
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
         // PERMISSIONS
         Spatie\Permission\PermissionServiceProvider::class,
-
     ],
 
     /*

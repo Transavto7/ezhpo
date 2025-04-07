@@ -1,0 +1,238 @@
+openapi: 3.0.3
+info:
+  title: СДПО API
+  description: API для взаимодействия с СДПО
+  version: 0.0.1
+servers:
+  - url: https://test.ta-7.ru
+    description: Тестовый сервер
+  - url: http://ezhpo.localhost
+    description: Сервер для разработки
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Employee:
+      type: object
+      properties:
+        pressure_systolic:
+          type: integer
+          example: 160
+        pulse_upper:
+          type: integer
+          example: 1000
+        end_of_ban:
+          type: string
+          example: "2024-01-02 09:14:09"
+        time_of_alcohol_ban:
+          type: integer
+          example: 120
+        pulse_lower:
+          type: integer
+          example: 0
+        dismissed:
+          type: boolean
+          example: false
+        time_of_pressure_ban:
+          type: integer
+          example: 0
+        fio:
+          type: string
+          example: "Иванов Иван Иванович"
+        pressure_diastolic:
+          type: integer
+          example: 100
+        hash_id:
+          type: string
+          example: "459997"
+    WorkdayRegistration:
+      type: object
+      properties:
+        id:
+          type: integer
+        uuid:
+          type: string
+        date:
+          type: string
+          example: "2025-03-03 22:38:05"
+        employee_id:
+          type: string
+        terminal_id:
+          type: integer
+        pv_id:
+          type: integer
+        t_people:
+          type: number
+        t_people_test_status:
+          type: integer
+        pressure_systolic:
+          type: integer
+        pressure_diastolic:
+          type: integer
+        pressure_test_status:
+          type: integer
+        type_anketa:
+          type: integer
+        pulse:
+          type: integer
+        pulse_test_status:
+          type: integer
+        alcometer_result:
+          type: string
+        alcometer_mode:
+          type: string
+        alcometer_test_status:
+          type: integer
+        narko_test_status:
+          type: integer
+        photo:
+          type: string
+        video:
+          type: string
+        admitted:
+          type: string
+        flag_pak:
+          type: string
+        is_real:
+          type: boolean
+        created_at:
+          type: string
+          example: "2025-03-03 22:38:05"
+        updated_at:
+          type: string
+          example: "2025-03-03 22:38:05"
+  responses:
+    InternalServerError:
+      description: Внутренняя ошибка сервера
+    BadRequest:
+      description: Ошибка запроса
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                enum:
+                  - "Терминал временно заблокирован. Проверьте оплату услуг!"
+                  - "Сотрудник уже имеет запись в этот день"
+    NotFound:
+      description: Сотрудник не найден
+    SeeOther:
+      description: Сотрудник или компания временно заблокированы
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                enum:
+                  - "Сотрудник с указанным ID уволен!"
+                  - "Компания временно заблокирована. Необходимо связаться с руководителем!"
+paths:
+  /api/sdpo/employees:
+    get:
+      summary: Получение списка сотрудников
+      description: Возвращает информацию о сотрудниках.
+      tags:
+        - Employee
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Employee"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/sdpo/employees/{hash_id}:
+    get:
+      summary: Получение информации о конкретном сотруднике
+      description: Возвращает информацию о сотруднике по его hash_id.
+      tags:
+        - Employee
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: hash_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Employee"
+                  - type: object
+                    properties:
+                      inspection_types:
+                        type: array
+                        items:
+                          type: string
+                          enum: ["open", "close"]
+        "303":
+          $ref: "#/components/responses/SeeOther"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/sdpo/employees/workdays/registration:
+    post:
+      summary: Регистрация рабочего дня сотрудника
+      description: Создаёт запись о рабочем дне сотрудника.
+      tags:
+        - Workday
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                  example: "2025-03-03 22:38:05"
+                employee_id:
+                  type: string
+                proba_alko:
+                  type: string
+                t_people:
+                  type: number
+                tonometer:
+                  type: string
+                type_anketa:
+                  type: string
+                  enum: ["open", "close"]
+                pulse:
+                  type: integer
+                alcometer_result:
+                  type: string
+                alcometer_mode:
+                  type: string
+                test_narko:
+                  type: string
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkdayRegistration"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"

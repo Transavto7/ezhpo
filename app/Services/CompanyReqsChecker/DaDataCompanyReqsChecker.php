@@ -145,6 +145,8 @@ class DaDataCompanyReqsChecker implements CompanyReqsCheckerInterface
     {
         $companies = $this->getCompaniesByInn($companyReqs->getInn());
 
+        Log::info(json_encode($companies));
+
         if (count($companies) !== 1) {
             return null;
         }

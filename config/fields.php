@@ -461,6 +461,23 @@ return [
             'status' => true,
             'user_name' => true,
         ],
+        'workdays' => [
+            'date' => true,
+            'employee_id' => true,
+            'point_id' => true,
+            'type_anketa' => true,
+            'flag_pak' => true,
+            'is_real' => true,
+            'admitted' => true,
+            'photo' => true,
+            'video' => true,
+            't_people' => true,
+            'pressure_systolic' => true,
+            'pressure_diastolic' => true,
+            'pulse' => true,
+            'narko_test_status' => true,
+            'alcometer_result' => true
+        ]
     ],
 
     'client_exclude' => [

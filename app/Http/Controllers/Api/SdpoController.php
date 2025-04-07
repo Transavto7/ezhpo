@@ -29,8 +29,8 @@ use App\Traits\UserEdsTrait;
 use App\User;
 use App\ValueObjects\FormFeedback;
 use App\ValueObjects\Phone;
-use App\ValueObjects\PressureLimits;
-use App\ValueObjects\Tonometer;
+use App\ValueObjects\ForeignDevice\PressureLimit;
+use App\ValueObjects\ForeignDevice\Tonometer;
 use DateTimeImmutable;
 use DomainException;
 use Exception;
@@ -41,9 +41,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Src\Terminals\Eloquent\TerminalSettings;
+use Src\Terminals\Factories\SettingsFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
+use function Clue\StreamFilter\fun;
 
 class SdpoController extends Controller
 {
@@ -172,7 +175,7 @@ class SdpoController extends Controller
             //TODO: добавить валидацию
             $tonometer = $request->tonometer;
             if (!$tonometer) {
-                $tonometer = strval(Tonometer::random($driver));
+                $tonometer = strval(Tonometer::randomWithDriver($driver));
             }
 
             $medic = [];
@@ -281,7 +284,7 @@ class SdpoController extends Controller
             }
 
             $pressure = Tonometer::fromString($tonometer);
-            $pressureLimits = PressureLimits::create($driver);
+            $pressureLimits = PressureLimit::create($driver);
             if (!$pressure->isAdmitted($pressureLimits)) {
                 $notAdmittedReasons[] = ['Высокое давление'];
                 $admitted = 'Не допущен';
@@ -412,12 +415,14 @@ class SdpoController extends Controller
             return response()->json([
                 'serial_number' => null,
                 'date_check' => null,
+                'stamp' => null,
             ]);
         }
 
         return response()->json([
             'serial_number' => $user->terminalCheck->serial_number,
             'date_check' => $user->terminalCheck->date_check->format('Y-m-d'),
+            'stamp' => StampViewModel::fromStampOrDefault($user->getStamp())->toArray(),
         ]);
     }
 
@@ -464,6 +469,37 @@ class SdpoController extends Controller
             ->groupBy('id');
 
         return response()->json($stamps);
+    }
+
+    public function getSettings(Request $request): JsonResponse
+    {
+        $user = $request->user('api');
+        $settings = optional(TerminalSettings::settingsForTerminal($user->id)->first())->settings;
+
+        if ($settings === null) {
+            $settings = new \Src\Terminals\ValueObjects\Settings(
+                SettingsFactory::makeMain(),
+                SettingsFactory::makeSystem(),
+            );
+        }
+
+        $settings->getMain()->setSetting('terminal_is_blocked', $user->blocked == 1);
+        $settings->getMain()->setSetting('support_phone', Settings::setting('sdpo_support_phone'));
+
+        $medic = User::query()
+            ->select([
+                'id',
+                'name',
+                'eds',
+                'validity_eds_start',
+                'validity_eds_end'
+            ])
+            ->where('id', '=', $settings->getMain()->getSetting('selected_medic'))
+            ->first();
+
+        $settings->getMain()->setSetting('selected_medic', $medic->toArray());
+
+        return response()->json($settings->toArray());
     }
 
     /*
@@ -607,7 +643,123 @@ class SdpoController extends Controller
     */
     public function getDrivers(): JsonResponse
     {
-        $drivers = Driver::select('hash_id', 'fio')->get();
+        $drivers = Driver::query()
+            ->select([
+                'drivers.hash_id',
+                'drivers.fio',
+                'drivers.dismissed',
+                'drivers.end_of_ban',
+                'drivers.pressure_systolic',
+                'drivers.pressure_diastolic',
+                'drivers.time_of_pressure_ban',
+                'drivers.time_of_alcohol_ban',
+
+                'companies.dismissed as company_dismissed',
+                'companies.pressure_systolic as company_pressure_systolic',
+                'companies.pressure_diastolic as company_pressure_diastolic',
+                'companies.time_of_pressure_ban as company_time_of_pressure_ban',
+                'companies.time_of_alcohol_ban as company_time_of_alcohol_ban',
+
+                'settings_pressure_systolic.value as settings_pressure_systolic',
+                'settings_pressure_diastolic.value as settings_pressure_diastolic',
+                'settings_time_of_pressure_ban.value as settings_time_of_pressure_ban',
+                'settings_time_of_alcohol_ban.value as settings_time_of_alcohol_ban',
+                'settings_pulse_lower.value as settings_pulse_lower',
+                'settings_pulse_upper.value as settings_pulse_upper',
+
+                DB::raw('150 as default_pressure_systolic'),
+                DB::raw('100 as default_pressure_diastolic'),
+                DB::raw('0 as default_time_of_pressure_ban'),
+                DB::raw('0 as default_time_of_alcohol_ban'),
+                DB::raw('0 as default_pulse_lower'),
+                DB::raw('1000 as default_pulse_upper'),
+            ])
+            ->leftJoin('companies', 'companies.id', '=', 'drivers.company_id')
+            ->leftJoinSub(
+                DB::table('settings')->where('key', '=', 'pressure_systolic')->limit(1),
+                'settings_pressure_systolic',
+                'settings_pressure_systolic.value',
+                '=',
+                'settings_pressure_systolic.value'
+            )
+            ->leftJoinSub(
+                DB::table('settings')->where('key', '=', 'pressure_diastolic')->limit(1),
+                'settings_pressure_diastolic',
+                'settings_pressure_diastolic.value',
+                '=',
+                'settings_pressure_diastolic.value'
+            )
+            ->leftJoinSub(
+                DB::table('settings')->where('key', '=', 'time_of_pressure_ban')->limit(1),
+                'settings_time_of_pressure_ban',
+                'settings_time_of_pressure_ban.value',
+                '=',
+                'settings_time_of_pressure_ban.value'
+            )->leftJoinSub(
+                DB::table('settings')->where('key', '=', 'time_of_alcohol_ban')->limit(1),
+                'settings_time_of_alcohol_ban',
+                'settings_time_of_alcohol_ban.value',
+                '=',
+                'settings_time_of_alcohol_ban.value'
+            )
+            ->leftJoinSub(
+                DB::table('settings')->where('key', '=', 'pulse_lower')->limit(1),
+                'settings_pulse_lower',
+                'settings_pulse_lower.value',
+                '=',
+                'settings_pulse_lower.value'
+            )
+            ->leftJoinSub(
+                DB::table('settings')->where('key', '=', 'pulse_upper')->limit(1),
+                'settings_pulse_upper',
+                'settings_pulse_upper.value',
+                '=',
+                'settings_pulse_upper.value'
+            )
+            ->get()
+            ->map(function (Driver $item) {
+                return [
+                    "hash_id" => $item->hash_id,
+                    "fio" => $item->fio,
+                    "dismissed" => convertStringToBoolean(getValueByPriority(
+                        $item->dismissed,
+                        $item->company_dismissed
+                    )),
+                    "end_of_ban" => $item->end_of_ban,
+                    "pressure_systolic" => getValueByPriority(
+                        $item->pressure_systolic,
+                        $item->company_pressure_systolic,
+                        $item->settings_pressure_systolic,
+                        $item->default_pressure_systolic,
+                    ) ?? 0,
+                    "pressure_diastolic" => getValueByPriority(
+                        $item->pressure_diastolic,
+                        $item->company_pressure_diastolic,
+                        $item->settings_pressure_diastolic,
+                        $item->default_pressure_diastolic,
+                    ) ?? 0,
+                    "time_of_pressure_ban" => getValueByPriority(
+                        $item->time_of_pressure_ban,
+                        $item->company_time_of_pressure_ban,
+                        $item->settings_time_of_pressure_ban,
+                        $item->default_time_of_pressure_ban,
+                    ) ?? 0,
+                    "time_of_alcohol_ban" => getValueByPriority(
+                        $item->time_of_alcohol_ban,
+                        $item->company_time_of_alcohol_ban,
+                        $item->settings_time_of_alcohol_ban,
+                        $item->default_time_of_alcohol_ban,
+                    ) ?? 0,
+                    "pulse_lower" => getValueByPriority(
+                        $item->settings_pulse_lower,
+                        $item->default_pulse_lower
+                    ) ?? 0,
+                    "pulse_upper" => getValueByPriority(
+                        $item->settings_pulse_upper,
+                        $item->default_pulse_upper
+                    ) ?? 0
+                ];
+            });
 
         return response()->json($drivers);
     }

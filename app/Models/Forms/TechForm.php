@@ -4,11 +4,11 @@ namespace App\Models\Forms;
 
 use App\Car;
 use App\Enums\FormTypeEnum;
-use App\ValueObjects\PressureLimits;
-use App\ValueObjects\Pulse;
-use App\ValueObjects\PulseLimits;
-use App\ValueObjects\Temperature;
-use App\ValueObjects\Tonometer;
+use App\ValueObjects\ForeignDevice\PressureLimit;
+use App\ValueObjects\ForeignDevice\Pulse;
+use App\ValueObjects\ForeignDevice\PulseLimit;
+use App\ValueObjects\ForeignDevice\Temperature;
+use App\ValueObjects\ForeignDevice\Tonometer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

@@ -12,7 +12,7 @@ use App\Actions\Terminal\Update\TerminalCheckUpdateHandler;
 use App\Actions\Terminal\Update\TerminalUpdateHandler;
 use App\Enums\DeviceEnum;
 use App\FieldPrompt;
-use App\Models\Forms\Form;
+use App\Models\Forms\MedicForm;
 use App\Role;
 use App\Services\Terminals\TerminalsToCheckService;
 use App\TerminalCheck;
@@ -35,7 +35,7 @@ class TerminalController extends Controller
                 ->select([
                     'users.*',
                     'terminal_checks.serial_number',
-                    'terminal_checks.date_end_check'
+                    'terminal_checks.date_end_check',
                 ])
                 ->with([
                     'roles',
@@ -47,6 +47,7 @@ class TerminalController extends Controller
                     'terminalCheck'
                 ])
                 ->leftJoin('terminal_checks', 'users.id', '=', 'terminal_checks.user_id')
+                ->leftJoin('terminal_settings', 'users.id', '=', 'terminal_settings.terminal_id')
                 ->leftJoin('model_has_roles', function ($join) {
                     $join->on('users.id', '=', 'model_has_roles.model_id')
                         ->where('model_has_roles.role_id', '=', 9);
@@ -59,6 +60,16 @@ class TerminalController extends Controller
 
             if ($pvId = $request->get('point_id')) {
                 $terminals->whereIn('users.pv_id', $pvId);
+            }
+
+            $settingsFilter = $request->get('settings');
+            if ($settingsFilter && $settingsFilter !== 'all') {
+                if ($settingsFilter === 'with_settings') {
+                    $terminals->whereNotNull('terminal_settings.id');
+                }
+                if ($settingsFilter === 'without_settings') {
+                    $terminals->whereNull('terminal_settings.id');
+                }
             }
 
             if ($companyId = $request->get('company_id')) {
@@ -91,28 +102,36 @@ class TerminalController extends Controller
 
             $terminals = $paginate->getCollection();
 
-            $forms = Form::query()
+            $lastMonthAmount = MedicForm::query()
                 ->select([
-                    'forms.created_at',
+                    DB::raw('count(forms.id) as count'),
                     'medic_forms.terminal_id'
                 ])
-                ->leftJoin('medic_forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
-                ->whereIn('medic_forms.terminal_id', $terminals->pluck('id'))
+                ->leftJoin('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
                 ->where('forms.created_at', '>=', Carbon::now()->subMonth()->startOfMonth())
-                ->get();
+                ->where('forms.created_at', '<=', Carbon::now()->startOfMonth())
+                ->whereNotNull('medic_forms.terminal_id')
+                ->groupBy(['medic_forms.terminal_id'])
+                ->get()
+                ->pluck('count', 'terminal_id')
+                ->toArray();
 
-            $startOfMonth = Carbon::now()->startOfMonth();
+            $monthAmount = MedicForm::query()
+                ->select([
+                    DB::raw('count(forms.id) as count'),
+                    'medic_forms.terminal_id'
+                ])
+                ->leftJoin('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
+                ->where('forms.created_at', '>', Carbon::now()->startOfMonth())
+                ->whereNotNull('medic_forms.terminal_id')
+                ->groupBy(['medic_forms.terminal_id'])
+                ->get()
+                ->pluck('count', 'terminal_id')
+                ->toArray();
 
             foreach ($terminals as $terminal) {
-                $terminal->month_amount = $forms
-                    ->where('terminal_id', $terminal->id)
-                    ->where('created_at', '>=', $startOfMonth)
-                    ->count();
-
-                $terminal->last_month_amount = $forms
-                    ->where('terminal_id', $terminal->id)
-                    ->where('created_at', '<', $startOfMonth)
-                    ->count();
+                $terminal->month_amount = $monthAmount[$terminal->id] ?? 0;
+                $terminal->last_month_amount = $lastMonthAmount[$terminal->id] ?? 0;
             }
 
             return response([
