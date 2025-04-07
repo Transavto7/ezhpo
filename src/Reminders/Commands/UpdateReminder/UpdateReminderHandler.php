@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Src\Reminders\Commands\UpdateReminder;
 
+use Src\Reminders\Commands\CreateReminderLog\UpdateReminderLogCommand;
+use Src\Reminders\Commands\CreateReminderLog\UpdateReminderLogHandler;
+use Src\Reminders\Normalizers\ReminderContextDatabaseNormalizer;
+use Src\Reminders\Normalizers\ReminderDatabaseNormalizer;
 use Src\Reminders\Repositories\RemindersRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -28,6 +32,9 @@ final class UpdateReminderHandler
             throw new NotFoundHttpException();
         }
 
+        $normalizer = new ReminderDatabaseNormalizer(new ReminderContextDatabaseNormalizer());
+        $oldData = $normalizer->normalize($reminder);
+
         $reminder->setTitle($command->getTitle());
         $reminder->setContext($command->getContext());
         $reminder->setContent($command->getContent());
@@ -36,5 +43,7 @@ final class UpdateReminderHandler
         $reminder->setType($command->getType());
 
         $this->repository->save($reminder);
+
+        (new UpdateReminderLogHandler())->handle(new UpdateReminderLogCommand($oldData, $normalizer->normalize($reminder)));
     }
 }

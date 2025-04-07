@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Src\Reminders\Http\Controllers\CreateReminderController;
 use Src\Reminders\Http\Controllers\CreateReminderPageController;
 use Src\Reminders\Http\Controllers\DeleteReminderController;
+use Src\Reminders\Http\Controllers\ExecuteReminderLogController;
 use Src\Reminders\Http\Controllers\GetRemindersByContextController;
 use Src\Reminders\Http\Controllers\ListRemindersController;
 use Src\Reminders\Http\Controllers\ListRemindersPageController;
@@ -17,6 +18,7 @@ use Src\Reminders\Http\Controllers\Selects\SelectRolesController;
 use Src\Reminders\Http\Controllers\Selects\SelectSubjectsController;
 use Src\Reminders\Http\Controllers\Selects\SelectSubjectTypesController;
 use Src\Reminders\Http\Controllers\Selects\SelectUsersController;
+use Src\Reminders\Http\Controllers\ShowReminderLogController;
 use Src\Reminders\Http\Controllers\UpdateReminderController;
 use Src\Reminders\Http\Controllers\UpdateReminderPageController;
 
@@ -40,4 +42,7 @@ Route::middleware(['web', 'auth'])->prefix('reminders')->name('reminders.')->gro
     Route::get('/companies/select', SelectCompaniesController::class)->name('companies.select');
     Route::get('/subject-types/select', SelectSubjectTypesController::class)->name('subject_types.select');
     Route::get('/subjects/select', SelectSubjectsController::class)->name('subjects.select');
+
+    Route::post('/show-reminder-modal/{id}', ShowReminderLogController::class)->name('modal.show');
+    Route::post('/complete-reminder-modal/{id}', ExecuteReminderLogController::class)->name('modal.complete');
 });

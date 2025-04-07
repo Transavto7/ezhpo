@@ -3,9 +3,12 @@ export const fetchModalData = (data) => {
 }
 
 export const sendActionOk = (id) => {
-    console.log('Отправлен ответ OK для модального окна с id:', id);
 }
 
 export const sendActionComplete = (id) => {
-    console.log('Отправлен ответ COMPLETE для модального окна с id:', id);
+    axios.post(`/reminders/complete-reminder-modal/${id}`);
+}
+
+export const showModal = (id) => {
+    axios.post(`/reminders/show-reminder-modal/${id}`);
 }
