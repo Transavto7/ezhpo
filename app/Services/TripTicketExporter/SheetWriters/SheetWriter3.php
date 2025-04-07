@@ -303,7 +303,7 @@ final class SheetWriter3 implements SheetWriterInterface
 
         $date = $this->getDateString($medicForm);
 
-        $this->sheet->setCellValue($left ? 'N37' : 'DI37', $medicStamp . "\n\n" . $date);
+        $this->sheet->setCellValue($left ? 'N37' : 'DI37', $medicStamp . "\n" . $date);
 
         $url = route('anketa.verification.page', [
             'uuid' => $this->data->getMedicForm()->getUuid(),

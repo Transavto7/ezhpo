@@ -261,7 +261,7 @@ final class SheetWriter4S implements SheetWriterInterface
 
         $date = $this->getDateString($medicForm);
 
-        $this->sheet->setCellValue('R44', $medicStamp . "\n\n" . $date);
+        $this->sheet->setCellValue('R44', $medicStamp . "\n" . $date);
 
         $url = route('anketa.verification.page', [
             'uuid' => $this->data->getMedicForm()->getUuid(),
@@ -277,10 +277,10 @@ final class SheetWriter4S implements SheetWriterInterface
         $drawing->setDescription('Маркировка осмотра');
         $drawing->setPath($qrCodeFilePath);
         $drawing->setCoordinates('A43');
-        $drawing->setWidth(80);
-        $drawing->setHeight(80);
+        $drawing->setWidth(70);
+        $drawing->setHeight(70);
         $drawing->setOffsetX(15);
-        $drawing->setOffsetY(5);
+        $drawing->setOffsetY(10);
         $drawing->setWorksheet($this->sheet);
 
         return $this;
