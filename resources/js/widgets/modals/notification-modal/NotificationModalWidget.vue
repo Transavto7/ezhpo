@@ -1,7 +1,7 @@
 <script setup>
 
 import {computed, onMounted, onUnmounted, ref} from "vue";
-import {fetchModalData, sendActionComplete, sendActionOk} from "./api";
+import {fetchModalData, sendActionComplete, sendActionOk, showModal} from "./api";
 
 const globalNotificationModal = ref(null);
 const reminders = ref([]);
@@ -10,6 +10,9 @@ const reminders = ref([]);
 const handleGlobalEvent = (event) => {
     fetchModalData(event.detail).then(({data}) => {
         reminders.value = data;
+        if (currentReminder.value.id) {
+            showModal(currentReminder.value.id);
+        }
     })
 };
 
