@@ -2,8 +2,8 @@
 
 namespace App\Services\TripTicketExporter\Mappers;
 
-use App\Enums\LogisticsMethodEnum;
-use App\Enums\TransportationTypeEnum;
+use App\Enums\TripTicket\LogisticsMethodEnum;
+use App\Enums\TripTicket\TransportationTypeEnum;
 use App\Models\Forms\MedicForm;
 use App\Models\Forms\TechForm;
 use App\Models\TripTicket;
@@ -29,6 +29,7 @@ final class ItemMapper4S implements ItemMapperInterface
     {
         $tripTicketViewModel = new TripTicketViewModel(
             $tripTicket->ticket_number,
+            $tripTicket->external_number,
             $tripTicket->start_date
                 ? Carbon::parse($tripTicket->start_date)
                 : null,
@@ -72,7 +73,7 @@ final class ItemMapper4S implements ItemMapperInterface
         $company = $tripTicket->company;
 
         return new CompanyViewModel(
-            $company->name,
+            $company->official_name,
             $company->where_call,
             $reqName,
             $company->address,
@@ -127,7 +128,9 @@ final class ItemMapper4S implements ItemMapperInterface
         $stamp = $details->getStamp();
 
         return new MedicFormViewModel(
+            $form->uuid,
             $form->date ? Carbon::parse($form->date) : null,
+            $details->period_pl ? Carbon::parse($details->period_pl) : null,
             $form->user ? $form->user->name : null,
             $stamp ? StampViewModel::fromStampOrDefault($stamp) : null
         );
@@ -142,14 +145,17 @@ final class ItemMapper4S implements ItemMapperInterface
         $form = $tripTicket->techForm;
 
         $odometer = null;
+        $periodPl = null;
         $techForm = TechForm::where('forms_uuid', '=', $form->uuid)->first();
 
         if ($techForm) {
             $odometer = $techForm->odometer;
+            $periodPl = $techForm->period_pl;
         }
 
         return new TechFormViewModel(
             $form->date ? Carbon::parse($form->date) : null,
+            $periodPl ? Carbon::parse($periodPl) : null,
             $form->user ? $form->user->name : null,
             $odometer,
         );

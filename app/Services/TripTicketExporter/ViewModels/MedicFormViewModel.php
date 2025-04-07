@@ -7,9 +7,17 @@ use Carbon\Carbon;
 final class MedicFormViewModel
 {
     /**
+     * @var string
+     */
+    private $uuid;
+    /**
      * @var Carbon|null
      */
     private $date;
+    /**
+     * @var Carbon|null
+     */
+    private $periodPl;
     /**
      * @var string|null
      */
@@ -19,24 +27,33 @@ final class MedicFormViewModel
      */
     private $stamp;
 
-    /**
-     * @param Carbon|null $date
-     * @param string|null $username
-     * @param StampViewModel|null $stamp
-     */
     public function __construct(
+        string    $uuid,
         ?Carbon   $date,
+        ?Carbon   $periodPl,
         ?string   $username,
         ?StampViewModel   $stamp
     ) {
+        $this->uuid = $uuid;
         $this->date = $date;
+        $this->periodPl = $periodPl;
         $this->username = $username;
         $this->stamp = $stamp ?? StampViewModel::default();
+    }
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
     }
 
     public function getDate(): ?Carbon
     {
         return $this->date;
+    }
+
+    public function getPeriodPl(): ?Carbon
+    {
+        return $this->periodPl;
     }
 
     public function getUsername(): ?string

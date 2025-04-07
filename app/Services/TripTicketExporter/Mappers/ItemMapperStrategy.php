@@ -2,7 +2,7 @@
 
 namespace App\Services\TripTicketExporter\Mappers;
 
-use App\Enums\TripTicketTemplateEnum;
+use App\Enums\TripTicket\TripTicketTemplateEnum;
 use App\Models\TripTicket;
 use App\Services\TripTicketExporter\ViewModels\ExportedItem;
 use DomainException;
@@ -25,6 +25,9 @@ final class ItemMapperStrategy
         switch (true) {
             case $tripTicket->template_code === TripTicketTemplateEnum::S4:
                 $this->mapper = new ItemMapper4S();
+                break;
+            case $tripTicket->template_code === TripTicketTemplateEnum::_3:
+                $this->mapper = new ItemMapper3();
                 break;
             default:
                 throw new DomainException('Unsupported trip ticket template code' . $tripTicket->template_code);

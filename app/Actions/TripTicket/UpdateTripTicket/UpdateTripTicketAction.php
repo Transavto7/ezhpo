@@ -2,9 +2,9 @@
 
 namespace App\Actions\TripTicket\UpdateTripTicket;
 
-use App\Enums\LogisticsMethodEnum;
-use App\Enums\TransportationTypeEnum;
-use App\Enums\TripTicketTemplateEnum;
+use App\Enums\TripTicket\LogisticsMethodEnum;
+use App\Enums\TripTicket\TransportationTypeEnum;
+use App\Enums\TripTicket\TripTicketTemplateEnum;
 use App\Models\TripTicket;
 
 final class UpdateTripTicketAction
@@ -35,6 +35,11 @@ final class UpdateTripTicketAction
     private $validityPeriod;
 
     /**
+     * @var string|null
+     */
+    private $externalNumber;
+
+    /**
      * @var LogisticsMethodEnum
      */
     private $logisticsMethod;
@@ -55,6 +60,7 @@ final class UpdateTripTicketAction
      * @param string|null $carId
      * @param string|null $startDate
      * @param int $validityPeriod
+     * @param string|null $externalNumber
      * @param LogisticsMethodEnum $logisticsMethod
      * @param TransportationTypeEnum $transportationType
      * @param TripTicketTemplateEnum $templateCode
@@ -65,6 +71,7 @@ final class UpdateTripTicketAction
         ?string $carId,
         ?string $startDate,
         int $validityPeriod,
+        ?string $externalNumber,
         LogisticsMethodEnum $logisticsMethod,
         TransportationTypeEnum $transportationType,
         TripTicketTemplateEnum $templateCode
@@ -74,6 +81,7 @@ final class UpdateTripTicketAction
         $this->carId = $carId;
         $this->startDate = $startDate;
         $this->validityPeriod = $validityPeriod;
+        $this->externalNumber = $externalNumber;
         $this->logisticsMethod = $logisticsMethod;
         $this->transportationType = $transportationType;
         $this->templateCode = $templateCode;
@@ -102,6 +110,11 @@ final class UpdateTripTicketAction
     public function getValidityPeriod(): int
     {
         return $this->validityPeriod;
+    }
+
+    public function getExternalNumber(): ?string
+    {
+        return $this->externalNumber;
     }
 
     public function getLogisticsMethod(): LogisticsMethodEnum

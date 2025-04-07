@@ -134,6 +134,9 @@
                         @foreach($errors ?? [] as $error)
                             <div class="alert alert-danger" role="alert">{{ $error }}</div>
                         @endforeach
+                        @if(request()->has('msg'))
+                            <div class="alert alert-success" role="alert">{{ request()->get('msg') }}</div>
+                        @endif
 
                         @if(count($created ?? []))
                             <div class="row">
@@ -183,6 +186,12 @@
                                                 </p>
                                             @endforeach
 
+                                            @if(in_array($type_anketa, [\App\Enums\FormTypeEnum::MEDIC, \App\Enums\FormTypeEnum::TECH]))
+                                                <a class="btn btn-sm btn-success" target="_blank"
+                                                   href="{{ route('trip-tickets.create', ['form_id' => $form->id]) }}">
+                                                  Добавить ПЛ
+                                                </a>
+                                            @endif
                                         </div>
                                     </div>
                                 @endforeach

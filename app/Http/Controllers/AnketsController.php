@@ -309,11 +309,10 @@ class AnketsController extends Controller
         $form = Form::withTrashed()->findOrFail($id);
 
         try {
-
             $handler->handle($form, $request->all(), Auth::user());
 
             $referer = $request->input('REFERER');
-            if ($referer) {
+            if ($referer && ! str_contains($referer, route('forms.get', ['id' => $id]))) {
                 $response = redirect($referer);
             } else {
                 $response = redirect(route('forms.get', [
@@ -478,6 +477,7 @@ class AnketsController extends Controller
 
             return view('pages.form-verification.show', [
                 'details' => $details,
+                'maxFileSizeBytes' => return_bytes(ini_get('upload_max_filesize'))
             ]);
         } catch (HttpClientNotFoundException|ExpiredFormPeriodPlException $exception) {
             return view('pages.form-verification.404');

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\TripTickets;
 
-use App\Actions\TripTicket\TripTicketsQuery\TripTicketsQueryAction;
-use App\Actions\TripTicket\TripTicketsQuery\TripTicketsQueryHandler;
 use App\Enums\FeaturesEnum;
 use App\FieldPrompt;
 use App\Http\Controllers\Controller;
 use App\Models\TripTicket;
+use App\Services\TripTicket\TripTicketsQuery\TripTicketsQueryAction;
+use App\Services\TripTicket\TripTicketsQuery\TripTicketsQueryHandler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -48,22 +48,27 @@ class TripTicketIndexPageController extends Controller
             'page',
         ]);
 
-        $tripTickets = $handler->handle(new TripTicketsQueryAction(
-            $trash,
-            $orderKey,
-            $orderBy,
-            $filterActivated,
-            $filterParams
-        ));
+        if ($filterActivated) {
+            $tripTickets = $handler->handle(new TripTicketsQueryAction(
+                $trash,
+                $orderKey,
+                $orderBy,
+                $filterActivated,
+                $filterParams
+            ));
+
+            $tripTickets = $tripTickets->paginate($take);
+            $countResult = $tripTickets->total();
+        } else {
+            $tripTickets = [];
+            $countResult = 0;
+        }
 
         $fieldPrompts = FieldPrompt::query()
             ->where('type', $type)
             ->orderBy('sort')
             ->orderBy('id')
             ->get();
-
-        $tripTickets = $tripTickets->paginate($take);
-        $countResult = $tripTickets->total();
 
         $filters = TripTicket::FILTERS;
 
@@ -79,7 +84,7 @@ class TripTicketIndexPageController extends Controller
             'take' => $take,
             'orderBy' => $orderBy,
             'orderKey' => $orderKey,
-            'queryString' => Arr::query($queryParams)
+            'queryString' => Arr::query($request->except(['orderKey', 'orderBy']))
         ]);
     }
 }

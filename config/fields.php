@@ -443,6 +443,7 @@ return [
         ],
         'trip_tickets' => [
             'ticket_number' => true,
+            'external_number' => true,
             'created_at' => true,
             'company_name' => true,
             'start_date' => true,
@@ -455,6 +456,10 @@ return [
             'logistics_method' => true,
             'transportation_type' => true,
             'template_code' => true,
+            'photos' => true,
+            'type' => true,
+            'status' => true,
+            'user_name' => true,
         ],
         'workdays' => [
             'date' => true,
@@ -502,7 +507,10 @@ return [
             'created_at',
         ],
         'trip_tickets' => [
-
+            'photos',
+            'type',
+            'status',
+            'user_name',
         ],
     ]
 ];

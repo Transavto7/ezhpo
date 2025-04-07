@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Actions\TripTicket\CreateTripTickets;
+namespace App\Actions\TripTicket\GenerateTripTickets;
 
 use App\Actions\TripTicket\TripTicketNumberGenerator;
 use App\Enums\FormTypeEnum;
+use App\Enums\TripTicket\TripTicketStatus;
+use App\Enums\TripTicket\TripTicketType;
 use App\Models\Forms\Form;
 use App\Models\TripTicket;
 use App\ValueObjects\EntityId;
@@ -104,7 +106,6 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
             )
             ->where('type_anketa', '=', FormTypeEnum::TECH)
             ->where('tech_forms.point_reys_control', '=', 'Пройден')
-            ->whereNotNull('tech_forms.car_id')
             ->whereDoesntHave('tripTicketTech')
             ->get();
     }
@@ -144,6 +145,8 @@ final class TripTicketsHandler extends TripTicketNumberGenerator
             'transportation_type' => $action->getTransportationType(),
             'template_code' => $action->getTemplateCode(),
             'user_id' => Auth::user()->id,
+            'status' => TripTicketStatus::CREATED,
+            'type' => TripTicketType::GENERATED,
         ]);
     }
 }

@@ -5,12 +5,26 @@ namespace App\Actions\Anketa\GetFormVerificationDetails;
 use App\Enums\FormLabelingType;
 use App\Exceptions\ExpiredFormPeriodPlException;
 use App\Models\Forms\Form;
+use App\Models\TripTicket;
 use App\ViewModels\FormVerificationDetails\FormVerificationDetails;
 use Carbon\Carbon;
 use Http\Client\Common\Exception\HttpClientNotFoundException;
 
 final class GetFormVerificationDetailsQuery
 {
+    /**
+     * @var GetTripTicketDetailsQuery
+     */
+    private $tripTicketQuery;
+
+    /**
+     * @param GetTripTicketDetailsQuery $tripTicketQuery
+     */
+    public function __construct(GetTripTicketDetailsQuery $tripTicketQuery)
+    {
+        $this->tripTicketQuery = $tripTicketQuery;
+    }
+
     /**
      * @throws ExpiredFormPeriodPlException
      */
@@ -28,6 +42,7 @@ final class GetFormVerificationDetailsQuery
         $formPeriod = null;
         $driverName = null;
         $carGosNumber = null;
+        $tripTicketDetails = null;
 
         if ($form->deleted_at !== null) {
             $verified = false;
@@ -64,6 +79,8 @@ final class GetFormVerificationDetailsQuery
             if ($form->details->car && $form->details->car->gos_number) {
                 $carGosNumber = $form->details->car->gos_number;
             }
+
+            $tripTicketDetails = $this->tripTicketQuery->get($form);
         }
 
         return new FormVerificationDetails(
@@ -77,6 +94,7 @@ final class GetFormVerificationDetailsQuery
             $formPeriod,
             $driverName,
             $carGosNumber,
+            $tripTicketDetails
         );
     }
 }

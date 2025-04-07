@@ -10,7 +10,7 @@ final class QRCodeGenerator implements QRCodeGeneratorInterface
     /**
      * @inheritDoc
      */
-    public function generate(string $data, int $version = QRCodeGeneratorInterface::VERSION_4)
+    public function generate(string $data, int $version = QRCodeGeneratorInterface::VERSION_4, string $filePath = null)
     {
         $options = new QROptions;
         $options->version = $version;

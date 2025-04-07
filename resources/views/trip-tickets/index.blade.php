@@ -67,6 +67,22 @@
         .dropleft .dropdown-toggle::before {
             display: none;
         }
+
+        .form-link {
+            font-size: 13px;
+        }
+
+        .photo {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
     </style>
 @endsection
 
@@ -188,6 +204,7 @@
             massTrash: '{{ route('trip-tickets.mass-trash') }}',
             print: '{{ route('trip-tickets.print') }}',
             massPrint: '{{ route('trip-tickets.mass-print') }}',
+            massApprove: '{{ route('trip-tickets.mass-approve') }}',
         }
         const data = {
             items: [],
@@ -241,14 +258,17 @@
         function updateTripTicketsControl() {
             const control = $('#selected-items-control')
             const controlBtnDelete = $('#selected-items-control-btn-delete')
+            const controlBtnApprove = $('#mass-approve-btn')
 
             const tripTicketsStorage = getTripTicketsStorage()
 
             if (tripTicketsStorage.total) {
                 const records = pronunciationWithNumber(tripTicketsStorage.total, 'путевой лист', 'путевых листа', 'путевых листов')
                 const label = "Удалить " + tripTicketsStorage.total + " " + records
+                const approveLabel = "Утвердить " + tripTicketsStorage.total + " " + records
 
                 controlBtnDelete.html(label)
+                controlBtnApprove.html(approveLabel)
                 control.addClass('d-flex')
                 control.removeClass('d-none')
             } else {
@@ -326,6 +346,21 @@
                     })
             })
 
+            $('#mass-approve-btn').click(function () {
+                const tripTicketsStorage = getTripTicketsStorage()
+
+                axios
+                    .post(tripTicketsApi.massApprove, {
+                        ids: tripTicketsStorage.items
+                    })
+                    .then(() => {
+                        clearTripTicketsStorage()
+                        window.location.reload()
+                    })
+                    .catch(() => {
+                    })
+            })
+
             $('#select-all').click(function () {
                 $('.trip-tickets-table input[type="checkbox"]').each(function () {
                     if (!$(this).prop('checked')) {
@@ -342,7 +377,9 @@
                 updateTripTicketsControl()
             })
 
-            const downloadExcelFileToPrint = (url, params) => {
+            const downloadExcelFileToPrint = (url, params, btn) => {
+                btn.attr('disabled', true)
+
                 axios({
                     method: 'post',
                     url: url,
@@ -359,7 +396,7 @@
                             const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
                             const matches = filenameRegex.exec(contentDisposition);
                             if (matches != null && matches[1]) {
-                                filename = matches[1].replace(/['"]/g, ''); // Remove quotes
+                                filename = matches[1].replace(/['"]/g, '');
                             }
                         }
 
@@ -369,6 +406,8 @@
                         document.body.appendChild(link);
                         link.click();
                         link.remove();
+
+                        location.reload()
                     })
                     .catch((error) => {
                         if (error.response && error.response.data instanceof Blob) {
@@ -398,7 +437,10 @@
                                 icon: 'error'
                             });
                         }
-                    });
+                    })
+                    .finally(() => {
+                        btn.attr('disabled', false)
+                    })
             }
 
             $('.download-excel-to-print-btn').click((event) => {
@@ -407,20 +449,190 @@
 
                 downloadExcelFileToPrint(tripTicketsApi.print, {
                     id: uuid
-                })
+                }, btn)
             })
 
             $('#mass-download-excel-to-print-btn').click(function () {
+                const btn = $(this)
                 const tripTicketsStorage = getTripTicketsStorage()
 
                 downloadExcelFileToPrint(tripTicketsApi.massPrint, {
                     ids: tripTicketsStorage.items
-                })
+                }, btn)
             })
 
             $('#hv-alert-error-close').click(function () {
                 $('#hv-alert-error').addClass('d-none')
                 $('#hv-alert-error').removeClass('d-flex')
+            })
+
+            let currentTripTicketId = null
+            const medicSelect = setSelect2('#medic_form_id', 'medic')
+            const techSelect = setSelect2('#tech_form_id', 'tech')
+
+            function setSelect2(selector, type) {
+                return $(selector).select2({
+                    ajax: {
+                        url: '{{ route('trip-tickets.select-forms') }}',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return {
+                                term: params.term,
+                                page: params.page || 1,
+                                type: type,
+                                currentTripTicketId,
+                            };
+                        },
+                        processResults: function (data, params) {
+                            params.page = params.page || 1;
+
+                            return {
+                                results: data.items,
+                                pagination: {
+                                    more: data.more
+                                }
+                            };
+                        },
+                        cache: true
+                    },
+                    placeholder: 'Выберите значение из списка...',
+                    allowClear: true,
+                    dropdownParent: $('#from-actions')
+                })
+            }
+
+            medicSelect.change(function () {
+                enableLink('.medic-link', $(this).val())
+            })
+
+            techSelect.change(function () {
+                enableLink('.tech-link', $(this).val())
+            })
+
+            $('table').on('click', '.form-actions-modal-btn', function () {
+                currentTripTicketId = $(this).data('id')
+
+                axios
+                    .get('{{ route('trip-tickets.get-related-forms') }}', {
+                        params: {
+                            id: currentTripTicketId
+                        }
+                    })
+                    .then(response => {
+                        const {data} = response
+
+                        if (data.medic) {
+                            medicSelect.append(new Option(data.medic.text, data.medic.id, true, true)).trigger('change')
+                            enableLink('.medic-link', data.medic.id)
+                        } else {
+                            medicSelect.val(null).trigger('change')
+                        }
+
+                        if (data.tech) {
+                            techSelect.append(new Option(data.tech.text, data.tech.id, true, true)).trigger('change')
+                            enableLink('.tech-link', data.tech.id)
+                        } else {
+                            techSelect.val(null).trigger('change')
+                        }
+                    })
+            })
+
+            function enableLink(selector, id) {
+                const link = $(selector)
+                let url = '/forms/'
+
+                if (id === null) {
+                    link.attr('style', 'display: none')
+
+                    return
+                }
+
+                link.attr('href', url + id)
+                link.attr('style', '')
+            }
+
+            $('.table-card').on('click', '.update-forms-actions', function () {
+                axios
+                    .post('{{ route('trip-tickets.update-forms') }}', {
+                        id: currentTripTicketId,
+                        medic: medicSelect.val(),
+                        tech: techSelect.val(),
+                    })
+                    .then(response => {
+                        location.reload()
+                    })
+            })
+
+            $('table').on('click', '.photos-modal-btn', function () {
+                currentTripTicketId = $(this).data('id')
+
+                axios
+                    .get('{{ route('trip-tickets.get-photos') }}', {
+                        params: {
+                            id: currentTripTicketId
+                        }
+                    })
+                    .then(response => {
+                        const {data} = response
+
+                        const wrapper = $('.photos-wrapper')
+                        wrapper.empty()
+
+                        data.photos.forEach(photo => {
+                            const html = `
+                                <div class="row">
+                                    <div class="col-md-12 d-flex flex-row justify-content-between align-items-center">
+                                        <a href="${photo.url}" target="_blank"><img class="photo" src="${photo.url}" alt="${photo.original_name}"></a>
+                                        <button class="btn btn-outline-danger delete-photo" data-id="${currentTripTicketId}" data-path="${photo.path}" title="Удалить фото"><i class="fa fa-times"></i></button>
+                                    </div>
+                                </div>`
+
+                            wrapper.append(html)
+                        })
+                    })
+            })
+
+            $('#photos-view').on('click', '.delete-photo', function () {
+                const path = $(this).data('path')
+                const id = $(this).data('id')
+                const url = '/trip-tickets/' + id + '/delete-photo'
+                const photoDiv = $(this).closest('.row')
+
+                axios
+                    .post(url, {
+                        path
+                    })
+                    .then(() => {
+                        const modal = photoDiv.parent()
+                        photoDiv.remove()
+
+                        if (modal.children().length === 0) {
+                            window.location.reload()
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error.response.data)
+                        swal.fire({
+                            title: 'Ошибка',
+                            text: 'Ошибка удаления файла',
+                            icon: 'error'
+                        })
+                    })
+            })
+
+            $('table').on('click', '.change-status', function () {
+                const status = $(this).data('status')
+                const id = $(this).data('uuid')
+
+                axios
+                    .post('{{ route('trip-tickets.change-status') }}', {
+                        status,
+                        id,
+                    })
+                    .then(response => {
+                        location.reload()
+                    })
             })
         })
     </script>
@@ -429,8 +641,8 @@
 @php
     $permissionToView = user()->access('trip_tickets_read');
     $permissionToTrashView = user()->access('trip_tickets_trash');
-    $permissionToCreateMedicForm = user()->access('trip_tickets_create_medic_form');
-    $permissionToCreateTechForm = user()->access('trip_tickets_create_tech_form');
+    $permissionToCreateMedicForm = user()->access('trip_tickets_create_medic_form') || $user->access('medic_create');
+    $permissionToCreateTechForm = user()->access('trip_tickets_create_tech_form') || $user->access('tech_create');
     $permissionToEditMedicForm = user()->access('medic_update');
     $permissionToEditTechForm = user()->access('tech_update');
     $permissionToDelete = user()->access('trip_tickets_delete');
@@ -439,6 +651,7 @@
     $permissionToExportPrikaz = user()->access('trip_tickets_export_prikaz');
     $permissionToPrintTripTickets = user()->access('trip_tickets_print_trip_ticket');
     $notDeletedItems = session('not_deleted_items');
+    $notApprovedItems = session('not_approved_items');
 @endphp
 
 @section('content')
@@ -535,6 +748,9 @@
                             @if($permissionToDelete)
                                 <button id="selected-items-control-btn-delete" class="btn btn-danger btn-sm"></button>
                             @endif
+                            @if($permissionToUpdate)
+                                <button id="mass-approve-btn" class="btn btn-success btn-sm ml-2"></button>
+                            @endif
                             @if($permissionToPrintTripTickets)
                                 <button id="mass-download-excel-to-print-btn" class="btn btn-success btn-sm ml-2">Печать ПЛ</button>
                             @endif
@@ -553,6 +769,25 @@
                                 <div>Не удалось удалить ПЛ с ID:</div>
                                 <div class="d-flex align-items-center flex-wrap" style="gap: 5px;">
                                     @foreach($notDeletedItems as $item)
+                                        <code>{{ $item }}</code>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div>
+                                <div id="hv-alert-error-close">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($notApprovedItems)
+                        <div id="hv-alert-error"
+                             class="alert alert-danger hv-mass-deletion-alert-error d-flex justify-content-between align-items-center pl-3 pr-3">
+                            <div class="d-flex align-items-center" style="gap: 10px;">
+                                <div>Не удалось утвердить ПЛ с №:</div>
+                                <div class="d-flex align-items-center flex-wrap" style="gap: 5px;">
+                                    @foreach($notApprovedItems as $item)
                                         <code>{{ $item }}</code>
                                     @endforeach
                                 </div>
@@ -584,143 +819,7 @@
         <div class="card table-card">
             <div class="card-body">
                 @if((count($tripTickets) > 0) && $permissionToView)
-                    <table id="trip-tickets-table" class="trip-tickets-table table table-striped table-sm" style="min-height: 170px">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-
-                            @foreach($fieldPrompts as $field)
-                                <th data-field-key="{{ $field->field }}"
-                                    @isset($blockedToExportFields[$field->field])
-                                        class="not-export"
-                                    @endisset>
-                                    <span class="user-select-none"
-                                          @if ($field->content)
-                                              data-toggle="tooltip"
-                                          data-html="true"
-                                          data-trigger="click hover"
-                                          title="{{ $field->content }}"
-                                          @endif>
-                                        {{ $field->name }}
-                                    </span>
-                                    <a class="not-export"
-                                       href="?orderBy={{ $orderBy === 'DESC' ? 'ASC' : 'DESC' }}&orderKey={{ $field->field }}&{{ $queryString }}">
-                                        <i class="fa fa-sort"></i>
-                                    </a>
-                                </th>
-                            @endforeach
-
-                            @if(request()->get('trash'))
-                                <th width="60">Удаливший</th>
-                                <th width="60">Время удаления</th>
-                            @endif
-                            <th>#</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($tripTickets as $tripTicketKey => $tripTicket)
-                            <tr data-field="{{ $tripTicketKey }}">
-                                <td>
-                                    <input
-                                        type="checkbox"
-                                        data-id="{{ $tripTicket->uuid }}"
-                                        class="hv-checkbox-mass-deletion">
-                                </td>
-
-                                @foreach($fieldPrompts as $field)
-                                    <td data-field-key="{{ $field->field }}"
-                                        @isset($blockedToExportFields[$field->field])
-                                            class="not-export"
-                                        @endisset>
-                                        @if(in_array($field->field, ['start_date', 'created_at']) && $tripTicket[$field->field])
-                                            {{ date('d.m.Y', strtotime($tripTicket[$field->field])) }}
-                                        @elseif($field->field === 'period_pl' && $tripTicket[$field->field])
-                                            {{ date('m.Y', strtotime($tripTicket[$field->field])) }}
-                                        @elseif($field->field === 'driver_fio' && user()->access('drivers_read'))
-                                            <a href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'fio' => $tripTicket[$field->field] ]) }}">
-                                                {{ $tripTicket[$field->field] }}
-                                            </a>
-                                        @elseif($field->field === 'car_gos_number' && user()->access('cars_read'))
-                                            <a href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'gos_number' => $tripTicket[$field->field] ]) }}">
-                                                {{ $tripTicket[$field->field] }}
-                                            </a>
-                                        @elseif($field->field === 'logistics_method')
-                                            {{ \App\Enums\LogisticsMethodEnum::getLabel($tripTicket[$field->field]) }}
-                                        @elseif($field->field === 'transportation_type')
-                                            {{ \App\Enums\TransportationTypeEnum::getLabel($tripTicket[$field->field]) }}
-                                        @elseif($field->field === 'template_code')
-                                            {{ \App\Enums\TripTicketTemplateEnum::getLabel($tripTicket[$field->field]) }}
-                                        @else
-                                            {{ $tripTicket[$field->field] }}
-                                        @endif
-                                    </td>
-                                @endforeach
-
-                                @if($permissionToDelete && request()->get('trash'))
-                                    <td class="td-option">
-                                        {{ ($tripTicket->deleted_user_name) }}
-                                    </td>
-                                    <td class="td-option">
-                                        {{ ($tripTicket->deleted_at) }}
-                                    </td>
-                                @endif
-
-                                <td class="td-option not-export dropleft d-flex" style="width: 40px">
-                                    <a class="dropdown-toggle" type="button" data-toggle="dropdown"
-                                       aria-expanded="false" style="font-size: 1.5rem">
-                                        <i class="fa fa-ellipsis-h"></i>
-                                    </a>
-                                    <div class="dropdown-menu">
-                                        @if($permissionToUpdate)
-                                            <a href="{{ route('trip-tickets.edit', $tripTicket->uuid) }}"
-                                               class="dropdown-item"><i class="fa fa-edit"></i>ПЛ</a>
-                                        @endif
-                                        @if($permissionToEditMedicForm && $tripTicket['medic_form_id'])
-                                            <a href="{{ route('forms.get', $tripTicket->medic_form_id) }}"
-                                               class="dropdown-item"><i class="fa fa-edit"></i>МО</a>
-                                        @endif
-                                        @if($permissionToEditTechForm && $tripTicket['tech_form_id'])
-                                            <a href="{{ route('forms.get', $tripTicket->tech_form_id) }}"
-                                               class="dropdown-item"><i class="fa fa-edit"></i>ТО</a>
-                                        @endif
-
-                                        @if($permissionToCreateMedicForm && ! $tripTicket['medic_form_id'])
-                                            <a href="{{ route('trip-tickets.create-form', ['id' => $tripTicket->uuid, 'type' => \App\Enums\FormTypeEnum::MEDIC]) }}" class="dropdown-item">
-                                                <i class="fa fa-plus"></i> Добавить МО</a>
-                                        @endif
-                                        @if($permissionToCreateTechForm && ! $tripTicket['tech_form_id'])
-                                            <a href="{{ route('trip-tickets.create-form', ['id' => $tripTicket->uuid, 'type' => \App\Enums\FormTypeEnum::TECH]) }}" class="dropdown-item">
-                                                <i class="fa fa-plus"></i> Добавить ТО</a>
-                                        @endif
-
-                                        {{-- TODO: добавить кнопки "связывания" и "отвязывания" осмотров --}}
-
-                                        @if($permissionToPrintTripTickets)
-                                            <a class="dropdown-item download-excel-to-print-btn"
-                                               data-uuid="{{ $tripTicket->uuid }}" style="cursor: pointer">
-                                                <i class="fa fa-file-excel-o"></i> Печать ПЛ
-                                            </a>
-                                        @endif
-
-                                        @if($permissionToDelete)
-                                            <a
-                                                href="{{ route('trip-tickets.trash', ['id' => $tripTicket->uuid, 'action' => request()->get('trash') ? 0 : 1]) }}"
-                                                class="hv-btn-trash dropdown-item delete"
-                                                data-id="{{ $tripTicket->id }}"
-                                                data-action="{{ request()->get('trash') ? 0 : 1 }}">
-                                                @if(request()->get('trash', 0))
-                                                    <i class="fa fa-undo"></i> Восстановить
-                                                @else
-                                                    <i class="fa fa-trash"></i> Удалить
-                                                @endisset
-                                            </a>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
+                    @include('trip-tickets.components.table')
                 @endif
             </div>
         </div>

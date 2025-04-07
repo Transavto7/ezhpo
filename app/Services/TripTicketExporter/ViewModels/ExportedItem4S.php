@@ -44,8 +44,7 @@ final class ExportedItem4S extends ExportedItem
         ?CarViewModel          $car,
         ?MedicFormViewModel    $medicForm,
         ?TechFormViewModel $techForm
-    )
-    {
+    ) {
         $this->tripTicket = $tripTicket;
         $this->company = $company;
         $this->driver = $driver;

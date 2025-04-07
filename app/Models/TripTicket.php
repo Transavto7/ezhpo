@@ -51,6 +51,7 @@ class TripTicket extends Model
 
     const EXPORT_PRIKAZ_FIELDS = [
         'ticket_number' => 'Номер ПЛ',
+        'external_number' => 'Внешний номер ПЛ',
         'start_date' => 'Дата выдачи',
         'car_name' => 'Наименование марки, модели транспортного средства',
         'car_number' => 'Гос. регистрационный номер ТС',
@@ -68,9 +69,14 @@ class TripTicket extends Model
         });
     }
 
+    protected $casts = [
+        'photos' => 'array',
+    ];
+
     protected $fillable = [
         'uuid',
         'ticket_number',
+        'external_number',
         'company_id',
         'start_date',
         'validity_period',
@@ -83,6 +89,9 @@ class TripTicket extends Model
         'template_code',
         'user_id',
         'period_pl',
+        'photos',
+        'status',
+        'type',
     ];
 
     public function driver(): BelongsTo

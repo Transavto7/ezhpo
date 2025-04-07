@@ -36,7 +36,7 @@ final class FormVerificationDetails
      */
     private $formDate;
     /**
-     * @var string|null
+     * @var Carbon|null
      */
     private $formPeriod;
     /**
@@ -47,6 +47,10 @@ final class FormVerificationDetails
      * @var string|null
      */
     private $carGosNumber;
+    /**
+     * @var TripTicketDetails|null
+     */
+    private $tripTicketDetails;
 
     /**
      * @param bool $verified
@@ -59,18 +63,20 @@ final class FormVerificationDetails
      * @param Carbon|null $formPeriod
      * @param string|null $driverName
      * @param string|null $carGosNumber
+     * @param TripTicketDetails|null $tripTicketDetails
      */
     public function __construct(
-        bool             $verified,
-        string           $formUuid,
-        string           $formId,
-        FormLabelingType $formType,
-        ?string          $formNumber,
-        ?string          $companyName,
-        ?Carbon          $formDate,
-        ?Carbon          $formPeriod,
-        ?string          $driverName,
-        ?string          $carGosNumber
+        bool               $verified,
+        string             $formUuid,
+        string             $formId,
+        FormLabelingType   $formType,
+        ?string            $formNumber,
+        ?string            $companyName,
+        ?Carbon            $formDate,
+        ?Carbon            $formPeriod,
+        ?string            $driverName,
+        ?string            $carGosNumber,
+        ?TripTicketDetails $tripTicketDetails
     )
     {
         $this->verified = $verified;
@@ -83,6 +89,7 @@ final class FormVerificationDetails
         $this->formPeriod = $formPeriod;
         $this->driverName = $driverName;
         $this->carGosNumber = $carGosNumber;
+        $this->tripTicketDetails = $tripTicketDetails;
     }
 
     public function isVerified(): bool
@@ -123,6 +130,11 @@ final class FormVerificationDetails
     public function getFormPeriod(): ?Carbon
     {
         return $this->formPeriod;
+    }
+
+    public function getTripTicketDetails(): ?TripTicketDetails
+    {
+        return $this->tripTicketDetails;
     }
 
     public function getFormattedFormPeriod(): ?string
