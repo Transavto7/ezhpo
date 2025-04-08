@@ -120,9 +120,17 @@ export default {
             this.company = this.client_company;
             this.company_id = this.client_company.hash_id;
             this.client = true;
-        } else if (this.default_company) {
-            this.companies.push(this.default_company);
-            this.company = this.default_company;
+
+            return;
+        }
+
+        if (this.default_company) {
+            const company = this.default_company;
+            const inn = company.inn ? `ИНН: ${company.inn}` : '';
+            company.name = `[${company.hash_id}] ${company.name} ${inn}`;
+
+            this.companies.push(company);
+            this.company = company;
             this.company_id = this.default_company.hash_id;
 
             this.report();
@@ -182,7 +190,8 @@ export default {
                 }
             }).then(({ data }) => {
                 data.forEach(company => {
-                   company.name = `[${company.hash_id}] ${company.name}`;
+                   const inn = company.inn ? `ИНН: ${company.inn}` : '';
+                   company.name = `[${company.hash_id}] ${company.name} ${inn}`;
                 });
                 this.companies = data;
             });
