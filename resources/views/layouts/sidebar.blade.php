@@ -294,6 +294,7 @@
         @endif
 
         @include('Workdays::sidebar')
+        @include('reminders::sidebar')
 
         @if($accessToSettings)
             <li>
