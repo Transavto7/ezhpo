@@ -32,7 +32,8 @@ class ReportController extends Controller
                 ->select([
                     'id',
                     'hash_id',
-                    'name'
+                    'name',
+                    'inn'
                 ])
                 ->where('hash_id', $request->input('company_id'))
                 ->first();

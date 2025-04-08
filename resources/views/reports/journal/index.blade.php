@@ -11,7 +11,7 @@
         @endif
 
         @if (user()->hasRole('client'))
-            :client_company="{{ json_encode(auth()->user()->company->only('hash_id', 'name')) }}"
+            :client_company="{{ json_encode(auth()->user()->company->only('hash_id', 'name', 'inn')) }}"
        @endif
         :permissions='@json([
             'create' => user()->access('report_service_company_read'),
