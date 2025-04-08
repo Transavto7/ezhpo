@@ -84,6 +84,12 @@ class AnketasExport implements FromView, WithBatchInserts, WithChunkReading
                     }
                 }
             }
+
+            foreach ($this->fields as $key => $value) {
+                if ($key === "user_id") {
+                    $fields['user_name'] = $value;
+                }
+            }
         } catch (Throwable $th) {
             $fields = $this->fields;
         }
