@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Src\Reminders\Commands\UpdateReminder;
 
+use Src\Reminders\Commands\CreateReminderLog\ActivateReminderLogHandler;
 use Src\Reminders\Commands\CreateReminderLog\UpdateReminderLogCommand;
 use Src\Reminders\Commands\CreateReminderLog\UpdateReminderLogHandler;
 use Src\Reminders\Normalizers\ReminderContextDatabaseNormalizer;
@@ -16,12 +17,15 @@ final class UpdateReminderHandler
     /** @var RemindersRepository */
     private $repository;
 
+    private $activateReminderLogHandler;
+
     /**
      * @param RemindersRepository $repository
      */
-    public function __construct(RemindersRepository $repository)
+    public function __construct(RemindersRepository $repository, ActivateReminderLogHandler $activateReminderLogHandler)
     {
         $this->repository = $repository;
+        $this->activateReminderLogHandler = $activateReminderLogHandler;
     }
 
     public function handle(UpdateReminderCommand $command): void
@@ -44,6 +48,6 @@ final class UpdateReminderHandler
 
         $this->repository->save($reminder);
 
-        (new UpdateReminderLogHandler())->handle(new UpdateReminderLogCommand($oldData, $normalizer->normalize($reminder)));
+        (new UpdateReminderLogHandler($this->activateReminderLogHandler))->handle(new UpdateReminderLogCommand($oldData, $normalizer->normalize($reminder)));
     }
 }
