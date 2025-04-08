@@ -29,4 +29,20 @@ final class ReminderLogAction extends Enum
                 throw new LogicException('Invalid value');
         }
     }
+
+    public function toTranslate(): string
+    {
+        switch ($this->value()) {
+            case self::SHOW:
+                return 'Показ сотруднику';
+            case self::UPDATE:
+                return 'Обновление';
+            case self::ACTIVATE:
+                return 'Активация/деактивация';
+            case self::EXECUTE:
+                return 'Выполнение';
+            default:
+                throw new LogicException('Invalid value');
+        }
+    }
 }

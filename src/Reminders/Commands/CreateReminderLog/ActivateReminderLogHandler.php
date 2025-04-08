@@ -12,9 +12,9 @@ class ActivateReminderLogHandler
         $reminderLog = new ReminderLog();
         $reminderLog->reminder_id = $command->getReminderId();
         $reminderLog->action = ReminderLogAction::ACTIVATE;
-        $reminderLog->payload = [
+        $reminderLog->payload = json_encode([
             'is_activated' => $command->isActivated()
-        ];
+        ]);
 
         $reminderLog->save();
     }
