@@ -13,7 +13,7 @@ use App\Exceptions\CarWithSameVinAlreadyExist;
 use App\Exceptions\WrongCarGosNumberException;
 use App\Exceptions\WrongCarVinException;
 use App\Models\Contract;
-use App\Services\CarIdentifiersChecker\CarRepository;
+use App\Services\FindSimilarElement\Repositories\CarRepository;
 use App\ValueObjects\GosNumber;
 use App\ValueObjects\Vin;
 use Auth;

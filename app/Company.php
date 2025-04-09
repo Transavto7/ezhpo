@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Enums\ElementType;
 use App\Models\Contract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -45,6 +46,11 @@ class Company extends Model
         'reqs_validated',
         'one_c_synced',
     ];
+
+    public function getType(): ElementType
+    {
+        return ElementType::company();
+    }
 
     public static function getAll()
     {

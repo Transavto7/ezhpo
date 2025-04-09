@@ -66,7 +66,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-sm btn-success">Добавить</button>
+                        <button type="submit" class="btn btn-sm btn-success save-element-btn" data-model="{{ $model }}">Добавить</button>
                         <button type="button" data-dismiss="modal" class="btn btn-sm btn-secondary">Закрыть</button>
                     </div>
                 </form>
@@ -678,7 +678,8 @@
                 },
                 MODEL_SEARCHER: {
                     tableDataUrl: '{{ route('searchElement') }}',
-                }
+                },
+                FIND_SIMILAR: '{{ route('find-similar-element', ['type' => strtolower($model)]) }}',
             };
         </script>
     @endpush

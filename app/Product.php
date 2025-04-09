@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Enums\ElementType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -34,6 +35,11 @@ class Product extends Model
         'essence',
         'deleted_id'
     ];
+
+    public function getType(): ElementType
+    {
+        return ElementType::product();
+    }
 
     public function deleted_user(): BelongsTo
     {

@@ -42,7 +42,8 @@ class CreateDriverHandler extends AbstractCreateElementHandler implements Create
             ->where('company_id', $companyId)
             ->where('fio', trim($data['fio']))
             ->first();
-        if ($existItem) {
+
+        if ($existItem && ! $existItem->trashed()) {
             throw new EntityAlreadyExistException('Найден дубликат по ФИО Водителя');
         }
 

@@ -3,7 +3,7 @@
         <h4 class="modal-title">Редактирование элемента "{{ $title }}"</h4>
     </div>
     <form action="{{ route('updateElement', ['type' => $model, 'id' => $id ]) }}"
-          enctype="multipart/form-data"
+          enctype="multipart/form-data" data-id="{{ $id }}"
           method="POST">
         @csrf
         <div class="modal-body">
@@ -220,7 +220,7 @@
             @endif
         </div>
         <div class="modal-footer">
-            <button type="submit" class="btn btn-success">Сохранить</button>
+            <button type="submit" class="btn btn-success save-element-btn" data-model="{{ $model }}">Сохранить</button>
         </div>
     </form>
 </div>

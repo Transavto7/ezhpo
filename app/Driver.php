@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Enums\ElementType;
 use App\Models\Contract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -45,6 +46,11 @@ class Driver extends Model
         'auto_created',
         'deleted_at',
     ];
+
+    public function getType(): ElementType
+    {
+        return ElementType::driver();
+    }
 
     protected $casts = [
         'date_of_employment' => 'datetime',

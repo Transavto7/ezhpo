@@ -118,6 +118,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/export/{type}', 'Elements\ExportElementController')->name('exportElement');
             Route::post('/import', 'Elements\ImportElementController')->name('importElement');
             Route::post('/search', 'Elements\SearchElementsController')->name('searchElement');
+            Route::get('/find-similar/{type}', 'Elements\FindSimilarElementController')->name('find-similar-element');
             Route::middleware(StripEmptyParamsFromQueryString::class)->get('{type}', 'IndexController@RenderElements')->name('renderElements');
             Route::get('{type}/{id}', 'IndexController@RemoveElement')->name('removeElement');
             Route::post('{type}', 'IndexController@AddElement')->name('addElement');
