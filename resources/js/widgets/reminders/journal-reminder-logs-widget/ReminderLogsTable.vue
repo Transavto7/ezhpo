@@ -58,8 +58,12 @@ const handleSortUpdate = (e) => {
                     {{ item.action.name }}
                 </template>
 
+                <template #cell(user)="{ item }">
+                    {{ item.user.name }}
+                </template>
+
                 <template #cell(payload)="{ item }">
-                    <pre v-html="item.payload"></pre>
+                    <pre>{{item.payload}}</pre>
                 </template>
 
                 <template #cell(created_at)="{ item }">

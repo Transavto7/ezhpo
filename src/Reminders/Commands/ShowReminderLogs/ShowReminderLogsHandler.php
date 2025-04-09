@@ -4,6 +4,7 @@ namespace Src\Reminders\Commands\ShowReminderLogs;
 
 use Illuminate\Support\Facades\DB;
 use Src\Reminders\Enums\ReminderLogAction;
+use Src\Reminders\Queries\GetRemindersTableItems\Filters\UsersFilter;
 use Src\Reminders\Queries\GetRemindersTableItems\GetRemindersTableItemsHandler;
 use Src\Reminders\Queries\GetRemindersTableItems\GetRemindersTableItemsQuery;
 
@@ -23,9 +24,12 @@ class ShowReminderLogsHandler
                 'reminder_logs.action',
                 'reminder_logs.payload',
                 'reminder_logs.created_at',
-                'reminders.title'
+                'reminders.title',
+                'reminder_logs.user_id',
+                'users.name as user_name',
             ])
-            ->join('reminders', 'reminder_logs.reminder_id', '=', 'reminders.id');
+            ->join('reminders', 'reminder_logs.reminder_id', '=', 'reminders.id')
+            ->join('users', 'reminder_logs.user_id', '=', 'users.id');
 
         if ($command->getSortBy() && $command->getOrderBy()) {
             $query->orderBy($command->getSortBy(), $command->getOrderBy());
@@ -41,6 +45,11 @@ class ShowReminderLogsHandler
             ));
             $remindIds = array_column($tableItems->getItems(), 'id');
             $query->whereIn('reminder_logs.reminder_id', $remindIds);
+
+            $arrayFilter = $remindFilter->toArray();
+            if (!empty($arrayFilter[UsersFilter::NAME])) {
+                $query->orWhereIn('reminder_logs.user_id', $arrayFilter[UsersFilter::NAME]);
+            }
         }
 
         $paginator = $query->paginate($command->getPerPage(), ['*'], 'page', $command->getPage());
@@ -48,17 +57,26 @@ class ShowReminderLogsHandler
         $items = $paginator
             ->getCollection()->map(static function ($row) {
                 $action = ReminderLogAction::from($row->action);
-                $row->action = [
-                    'id' => $action->value(),
-                    'name' => $action->toTranslate(),
-                ];
 
-                return $row;
+                return [
+                    'action' => [
+                        'id' => $action->value(),
+                        'name' => $action->toTranslate(),
+                    ],
+                    'payload' => $row->payload,
+                    'created_at' => $row->created_at,
+                    'title' => $row->title,
+                    'user' => [
+                        'id' => $row->user_id,
+                        'name' => $row->user_name,
+                    ]
+                ];
             });
 
         return [
             'items' => $items->toArray(),
-            'total' => $paginator->total()
+            'total' => $paginator->total(),
+            'sql' => $query->toSql(),
         ];
 //        return $tableItems->toArray();
     }

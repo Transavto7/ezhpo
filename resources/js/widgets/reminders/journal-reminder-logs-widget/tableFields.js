@@ -14,6 +14,14 @@ export default [
         thStyle: { width: "150px" },
     },
     {
+        key: 'user',
+        sortable: false,
+        label: 'Пользователь',
+        thClass: 'text-center',
+        tdClass: 'text-center',
+        thStyle: { width: "150px" },
+    },
+    {
         key: 'payload',
         label: 'Пайлоад',
         sortable: false,
