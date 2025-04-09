@@ -641,8 +641,8 @@
 @php
     $permissionToView = user()->access('trip_tickets_read');
     $permissionToTrashView = user()->access('trip_tickets_trash');
-    $permissionToCreateMedicForm = user()->access('trip_tickets_create_medic_form') || $user->access('medic_create');
-    $permissionToCreateTechForm = user()->access('trip_tickets_create_tech_form') || $user->access('tech_create');
+    $permissionToCreateMedicForm = user()->access('trip_tickets_create_medic_form') || user()->access('medic_create');
+    $permissionToCreateTechForm = user()->access('trip_tickets_create_tech_form') || user()->access('tech_create');
     $permissionToEditMedicForm = user()->access('medic_update');
     $permissionToEditTechForm = user()->access('tech_update');
     $permissionToDelete = user()->access('trip_tickets_delete');
