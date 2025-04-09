@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Enums\ElementType;
 use App\Enums\FormTypeEnum;
 use App\Enums\UserEntityType;
 use App\Models\Forms\Form;
@@ -38,6 +39,11 @@ class User extends Authenticatable
         'deleted_at',
         'auto_created',
     ];
+
+    public function getType(): ElementType
+    {
+        return ElementType::user();
+    }
 
     protected $hidden = [
         'password',

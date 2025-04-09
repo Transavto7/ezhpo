@@ -5,6 +5,8 @@ namespace App\Actions\Element;
 use App\Company;
 use App\Enums\UserEntityType;
 use App\Enums\UserRoleEnum;
+use App\Exceptions\CompanyWithSameINNAlreadyExist;
+use App\Exceptions\CompanyWithSameNameAlreadyExist;
 use App\Exceptions\EntityAlreadyExistException;
 use App\Exceptions\WrongCompanyReqsException;
 use App\Services\CompanyReqsChecker\CompanyRepository;
@@ -83,11 +85,9 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
      */
     protected function validateData($data): array
     {
-        $existItem = Company::query()
-            ->where('name', trim($data['name'] ?? ''))
-            ->first();
+        $existItem = $this->companyRepository->findByName($data['name']);
         if ($existItem) {
-            throw new EntityAlreadyExistException('Найден дубликат по названию компании');
+            throw new CompanyWithSameNameAlreadyExist();
         }
 
         $data = $this->validateReqs($data);
@@ -96,7 +96,7 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
     }
 
     /**
-     * @throws EntityAlreadyExistException
+     * @throws CompanyWithSameINNAlreadyExist
      * @throws Exception
      */
     protected function validateReqs($data): array
@@ -114,7 +114,7 @@ class CreateCompanyHandler extends AbstractCreateElementHandler implements Creat
 
         $existItem = $this->companyRepository->findByReqs($companyReqs);
         if ($existItem) {
-            throw new EntityAlreadyExistException('Найден дубликат компании по ИНН (+КПП) или ОГРН');
+            throw new CompanyWithSameINNAlreadyExist();
         }
 
         return $data;

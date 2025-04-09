@@ -1145,6 +1145,97 @@ $(document).ready(function () {
 
             return
         }
+
+        if (event) {
+            findSimilarAlert(form, event)
+        }
+    }
+
+    function findSimilarAlert(form, event) {
+        const $form = $(form)
+        const $saveBtn = $form.find('.save-element-btn')
+        const id = $form.data('id')
+        const type = $saveBtn.data('model')
+        const data = {}
+
+        if (! ['Car', 'Driver', 'Company'].includes(type)) {
+            return
+        }
+
+        event.preventDefault()
+
+        $saveBtn.prop('disabled', true)
+        const defaultHtml = $saveBtn.html()
+        const html = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Загрузка...`
+        $saveBtn.html(html)
+
+        if (id) {
+            data.id = id
+        }
+        if (type === 'Car') {
+            data.vin = $form.find('[name="vin"]').val()
+            data.gos_number = $form.find('[name="gos_number"]').val()
+            data.company_id = $form.find('[name="company_id"]').val()
+        }
+        if (type === 'Driver') {
+            data.fio = $form.find('[name="fio"]').val()
+            data.company_id = $form.find('[name="company_id"]').val()
+        }
+        if (type === 'Company') {
+            data.name = $form.find('[name="name"]').val()
+            data.inn = $form.find('[name="inn"]').val()
+            data.kpp = $form.find('[name="kpp"]').val()
+            data.ogrn = $form.find('[name="ogrn"]').val()
+        }
+
+        axios
+            .get(window.PAGE_SETUP.FIND_SIMILAR, {
+                params: {
+                    ...data
+                }
+            })
+            .then(() => {
+                $form.off('submit')[0].submit()
+            })
+            .catch(error => {
+                if (error.response) {
+                    const {response} = error
+                    const {status} = response
+                    const {data} = response
+
+                    if (status === 422) {
+                        swal.fire({
+                            title: 'Внимание!',
+                            text: data.error + '. Всё равно сохранить?',
+                            icon: 'error',
+                            showCancelButton: true,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Сохранить',
+                            cancelButtonText: 'Отмена',
+                        })
+                            .then(function (result) {
+                                if (result.isConfirmed) {
+                                    $form.off('submit')[0].submit()
+                                } else {
+                                    $saveBtn.html(defaultHtml)
+                                    $saveBtn.prop('disabled', false)
+                                }
+                            })
+
+                        return
+                    }
+
+                    swal.fire({
+                        title: 'Ошибка!',
+                        text: data.error,
+                        icon: 'error'
+                    })
+                        .then(() => {
+                            $saveBtn.html(defaultHtml)
+                            $saveBtn.prop('disabled', false)
+                        })
+                }
+            })
     }
 
     function initElementsModalCheckFields() {
@@ -1394,6 +1485,10 @@ $(document).ready(function () {
                 )
             })
 
+    })
+
+    $('#modalEditor').on('submit', 'form', function (event) {
+        findSimilarAlert(this, event)
     })
 
     /**

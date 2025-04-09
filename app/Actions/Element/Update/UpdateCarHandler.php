@@ -2,15 +2,33 @@
 
 namespace App\Actions\Element\Update;
 
-use App\Car;
 use App\Company;
-use App\Exceptions\EntityAlreadyExistException;
+use App\Exceptions\CarWithSameGosNumberAlreadyExist;
+use App\Exceptions\CarWithSameVinAlreadyExist;
 use App\Exceptions\WrongCarGosNumberException;
+use App\Exceptions\WrongCarVinException;
+use App\Services\FindSimilarElement\Repositories\CarRepository;
+use App\ValueObjects\GosNumber;
 use App\ValueObjects\Vin;
 use Exception;
 
 class UpdateCarHandler extends UpdateElementHandler
 {
+    /**
+     * @var CarRepository
+     */
+    private $carRepository;
+
+    /**
+     * @throws Exception
+     */
+    public function __construct(string $type)
+    {
+        $this->carRepository = new CarRepository();
+
+        parent::__construct($type);
+    }
+
     /**
      * @throws Exception
      */
@@ -42,29 +60,27 @@ class UpdateCarHandler extends UpdateElementHandler
         $this->validateVin();
     }
 
-    /**
-     * @throws EntityAlreadyExistException
-     */
     private function validateCarGosNumber()
     {
-        if (!isset($this->data['gos_number'])) {
+        if (! isset($this->data['gos_number'])) {
             return;
         }
 
-        $this->data['gos_number'] = preg_replace('/\s+/', '', $this->data['gos_number']);
+        $gosNumber = new GosNumber($this->data['gos_number']);
 
-        $existItem = Car::query()
-            ->where('id', '!=', $this->element->id)
-            ->where('company_id', $this->data['company_id'])
-            ->where('gos_number', $this->data['gos_number'])
-            ->first();
-        if ($existItem) {
-            throw new EntityAlreadyExistException('Найден дубликат по гос.номеру Автомобиля');
+        if (!$gosNumber->isValid()) {
+            throw new WrongCarGosNumberException();
+        }
+
+        $this->data['gos_number'] = $gosNumber->getSanitized();
+        $existItemByGosNumber = $this->carRepository->findByGosNumber($gosNumber->getSanitized(), $this->data['company_id'], $this->element->id);
+        if ($existItemByGosNumber) {
+            throw new CarWithSameGosNumberAlreadyExist();
         }
     }
 
     /**
-     * @throws EntityAlreadyExistException
+     * @throws CarWithSameVinAlreadyExist
      * @throws Exception
      */
     private function validateVin()
@@ -74,19 +90,16 @@ class UpdateCarHandler extends UpdateElementHandler
         }
 
         $vin = new Vin($this->data['vin']);
-        if (!$vin->isValid()) {
-            throw new WrongCarGosNumberException();
+
+        if (! $vin->isValid()) {
+            throw new WrongCarVinException();
         }
 
         $this->data['vin'] = $vin->getSanitized();
 
-        $existItem = Car::query()
-            ->where('id', '!=', $this->element->id)
-            ->where('company_id', $this->data['company_id'])
-            ->where('vin', $this->data['vin'])
-            ->first();
-        if ($existItem) {
-            throw new EntityAlreadyExistException('Найден дубликат по VIN-коду Автомобиля');
+        $existItemByVin = $this->carRepository->findByVin($vin->getSanitized(), $this->data['company_id'], $this->element->id);
+        if ($existItemByVin) {
+            throw new CarWithSameVinAlreadyExist();
         }
     }
 }

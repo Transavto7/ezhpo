@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Enums\ElementType;
 use App\Models\Contract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -37,6 +38,11 @@ class Car extends Model
             'auto_created',
             'deleted_at'
         ];
+
+    public function getType(): ElementType
+    {
+        return ElementType::car();
+    }
 
     public function deleted_user(): BelongsTo
     {
