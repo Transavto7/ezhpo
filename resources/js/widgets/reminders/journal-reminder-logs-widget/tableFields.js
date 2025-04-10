@@ -27,6 +27,7 @@ export default [
         sortable: false,
         thClass: 'text-center',
         tdClass: 'text-center',
+        showWithAction: ['update', 'activate']
     },
     {
         key: 'created_at',
