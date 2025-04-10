@@ -62,6 +62,7 @@ export const useReminderLogsTable = () => {
 
             table.items = data.items;
             table.total = data.total;
+            table.mapList = data.mapList;
         } catch (e) {
             console.log(e)
         } finally {

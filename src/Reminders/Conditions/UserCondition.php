@@ -11,6 +11,9 @@ use Src\Reminders\Conditions\BaseConditions\IntCondition;
 
 final class UserCondition extends IntCondition
 {
+    public const TABLE_NAME = 'users';
+    public const FIELD_NAME = "concat(users.name, ' (', users.login , ')')";
+
     protected $conditionName = 'user';
 
     public function makeViewModel(array $rawReminder): ?ClassifierViewModel

@@ -3,6 +3,8 @@
 namespace Src\Reminders\Commands\ShowReminderLogs;
 
 use Illuminate\Support\Facades\DB;
+use Src\Core\EntityMap;
+use Src\Reminders\ConditionBuilder\AvailableConditions;
 use Src\Reminders\Enums\ReminderLogAction;
 use Src\Reminders\Queries\GetRemindersTableItems\Filters\UsersFilter;
 use Src\Reminders\Queries\GetRemindersTableItems\GetRemindersTableItemsHandler;
@@ -54,16 +56,41 @@ class ShowReminderLogsHandler
 
         $paginator = $query->paginate($command->getPerPage(), ['*'], 'page', $command->getPage());
 
+        $entityMapList = [];
+
         $items = $paginator
-            ->getCollection()->map(static function ($row) {
+            ->getCollection()->map(static function ($row) use (&$entityMapList) {
                 $action = ReminderLogAction::from($row->action);
+                $payload = json_decode($row->payload, true);
+
+                foreach ($payload as $key => $value) {
+                    if (empty(AvailableConditions::AVAILABLE_CONDITIONS[$key])) {
+                        continue;
+                    }
+                    if (empty($entityMapList[$key])) {
+                        $tableName = AvailableConditions::AVAILABLE_CONDITIONS[$key]::TABLE_NAME;
+                        if (empty($tableName)) {
+                            continue;
+                        }
+                        $entityMapList[$key] = (new EntityMap($tableName))
+                            ->setNameField(AvailableConditions::AVAILABLE_CONDITIONS[$key]::FIELD_NAME);
+                    }
+                    /** @var EntityMap $entityMap */
+                    $entityMap = $entityMapList[$key];
+                    if (!empty($value['new'])) {
+                        $entityMap->addId($value['new']);
+                    }
+                    if (!empty($value['old'])) {
+                        $entityMap->addId($value['old']);
+                    }
+                }
 
                 return [
                     'action' => [
                         'id' => $action->value(),
                         'name' => $action->toTranslate(),
                     ],
-                    'payload' => $row->payload,
+                    'payload' => $payload,
                     'created_at' => $row->created_at,
                     'title' => $row->title,
                     'user' => [
@@ -73,9 +100,16 @@ class ShowReminderLogsHandler
                 ];
             });
 
+        $mapList = [];
+        /** @var EntityMap $entityMap */
+        foreach ($entityMapList as $key => $entityMap) {
+            $mapList[$key] = $entityMap->getKeyValueMap();
+        }
+
         return [
             'items' => $items->toArray(),
             'total' => $paginator->total(),
+            'mapList' => $mapList,
         ];
 //        return $tableItems->toArray();
     }
