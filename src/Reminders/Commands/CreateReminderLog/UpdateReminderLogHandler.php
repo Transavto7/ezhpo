@@ -23,16 +23,20 @@ class UpdateReminderLogHandler
         $reminderLog->user_id = Auth::user()->id;
 
         $payload = [];
-        foreach ($command->getOldReminderData() as $key => $value) {
-            if ($value !== $command->getNewReminderData()[$key]) {
-                $payload[$key] = $command->getNewReminderData()[$key];
+        foreach ($command->getNewReminderData() as $key => $newValue) {
+            $oldValue = $command->getOldReminderData()[$key] ?? null;
+            if ($newValue !== $oldValue) {
+                $payload[$key] = [
+                    'old' => $oldValue,
+                    'new' => $newValue,
+                ];
             }
         }
 
         if (isset($payload['status'])) {
             $this->activateReminderLogHandler->handle(new ActivateReminderLogCommand(
                 $command->getOldReminderData()['id'],
-                $payload['status']
+                $payload['status']['new']
             ));
             unset($payload['status']);
         }
