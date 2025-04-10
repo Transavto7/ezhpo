@@ -39,7 +39,7 @@ abstract class ArrayCondition implements Condition
             return $query
                 ->whereRaw('JSON_EXTRACT(context, "$.'.$this->conditionName.'") in ('.$wheresString.')', $this->value)
                 ->orWhereRaw('JSON_EXTRACT(context, "$.'.$this->conditionName.'") is null')
-                ->orWhereRaw("JSON_EXTRACT(context, \"$.role\") = CAST('null' AS JSON)");
+                ->orWhereRaw("JSON_EXTRACT(context, \"$.$this->conditionName\") = CAST('null' AS JSON)");
         });
     }
 
