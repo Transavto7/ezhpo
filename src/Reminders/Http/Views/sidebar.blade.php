@@ -15,6 +15,7 @@
             @if(user()->access('employees_workdays_create'))
                 <li>
                     <a href="{{ route('reminders.list-page') }}">Список напоминаний</a>
+                    <a href="{{ route('reminders.log.journal') }}">Логи напоминаний</a>
                 </li>
             @endif
         </ul>

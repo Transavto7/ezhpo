@@ -76,7 +76,6 @@ class ShowReminderLogsHandler
         return [
             'items' => $items->toArray(),
             'total' => $paginator->total(),
-            'sql' => $query->toSql(),
         ];
 //        return $tableItems->toArray();
     }

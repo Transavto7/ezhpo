@@ -34,6 +34,8 @@ const handleSortUpdate = (e) => {
     emit('update:sort-by', e.sortBy)
     emit('update:sort-desc', e.sortDesc)
 }
+
+const showPayloadWithAction = tableFields.find(field => field.key === 'payload').showWithAction
 </script>
 
 <template>
@@ -63,7 +65,7 @@ const handleSortUpdate = (e) => {
                 </template>
 
                 <template #cell(payload)="{ item }">
-                    <pre>{{item.payload}}</pre>
+                    <pre class="payload" v-if="showPayloadWithAction.indexOf(item.action.id) !== -1">{{item.payload}}</pre>
                 </template>
 
                 <template #cell(created_at)="{ item }">
@@ -90,5 +92,9 @@ const handleSortUpdate = (e) => {
 .action-btn {
     width: 32px;
     height: 32px;
+}
+
+pre.payload {
+    white-space: pre-wrap;
 }
 </style>
