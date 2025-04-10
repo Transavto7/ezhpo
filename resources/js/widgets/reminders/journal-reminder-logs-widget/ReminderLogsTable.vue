@@ -1,5 +1,6 @@
 <script setup>
 import tableFields from "./tableFields";
+import PayloadReminderCell from "./PayloadReminderCell.vue";
 
 const props = defineProps({
     items: {
@@ -23,6 +24,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    mapList: {
+        type: Object,
+        required: false,
+    }
 })
 
 const emit = defineEmits([
@@ -65,7 +70,7 @@ const showPayloadWithAction = tableFields.find(field => field.key === 'payload')
                 </template>
 
                 <template #cell(payload)="{ item }">
-                    <pre class="payload" v-if="showPayloadWithAction.indexOf(item.action.id) !== -1">{{item.payload}}</pre>
+                    <PayloadReminderCell :payload="item.payload" :mapList="mapList" />
                 </template>
 
                 <template #cell(created_at)="{ item }">

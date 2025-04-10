@@ -9,6 +9,9 @@ use Src\Core\ValueObjects\ClassifierViewModel;
 
 interface Condition
 {
+    public const TABLE_NAME = null;
+    public const FIELD_NAME = null;
+
     public function run(Builder $query): Builder;
 
     public function makeViewModel(array $rawReminder): ?ClassifierViewModel;

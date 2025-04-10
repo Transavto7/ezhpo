@@ -7,12 +7,14 @@ use Src\Reminders\Entities\Reminder;
 class ActivateReminderLogCommand
 {
     private $reminderId;
-    private $isActivated;
+    private $isActivatedOld;
+    private $isActivatedNew;
 
-    public function __construct(string $reminderId, bool $isActivated)
+    public function __construct(string $reminderId, string $isActivatedOld, string $isActivatedNew)
     {
         $this->reminderId = $reminderId;
-        $this->isActivated = $isActivated;
+        $this->isActivatedOld = $isActivatedOld;
+        $this->isActivatedNew = $isActivatedNew;
     }
 
     public function getReminderId(): string
@@ -20,8 +22,13 @@ class ActivateReminderLogCommand
         return $this->reminderId;
     }
 
-    public function isActivated(): bool
+    public function isActivatedOld(): string
     {
-        return $this->isActivated;
+        return $this->isActivatedOld;
+    }
+
+    public function isActivatedNew(): string
+    {
+        return $this->isActivatedNew;
     }
 }

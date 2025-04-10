@@ -11,6 +11,9 @@ use Src\Reminders\Conditions\BaseConditions\IntCondition;
 
 final class PointCondition extends IntCondition
 {
+    public const TABLE_NAME = 'points';
+    public const FIELD_NAME = 'name';
+
     protected $conditionName = 'point';
 
     public function makeViewModel(array $rawReminder): ?ClassifierViewModel
