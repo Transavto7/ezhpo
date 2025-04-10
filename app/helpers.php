@@ -57,3 +57,43 @@ if(!function_exists('convertStringToBoolean'))
         return false;
     }
 }
+
+if(!function_exists('replaceRuSymbolsToEnEquals'))
+{
+    function replaceRuSymbolsToEnEquals(string $string): string
+    {
+        $ruToEnAlphabet = [
+            'А' => 'A',
+            'В' => 'B',
+            'Е' => 'E',
+            'К' => 'K',
+            'М' => 'M',
+            'Н' => 'H',
+            'О' => 'О',
+            'Р' => 'P',
+            'C' => 'C',
+            'Т' => 'T',
+            'У' => 'Y',
+            'Х' => 'X',
+
+            'а' => 'a',
+            'в' => 'b',
+            'е' => 'e',
+            'к' => 'k',
+            'м' => 'm',
+            'н' => 'h',
+            'о' => 'о',
+            'р' => 'p',
+            'c' => 'c',
+            'т' => 't',
+            'у' => 'y',
+            'х' => 'x',
+        ];
+
+        foreach ($ruToEnAlphabet as $ru => $en) {
+            $string = str_replace($ru, $en, $string);
+        }
+
+        return $string;
+    }
+}

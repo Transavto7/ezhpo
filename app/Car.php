@@ -31,6 +31,7 @@ class Car extends Model
             'date_osago',
             'town_id',
             'dismissed',
+            'vin',
             'autosync_fields',
             'deleted_id',
             'auto_created',

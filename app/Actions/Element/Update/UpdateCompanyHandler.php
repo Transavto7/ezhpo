@@ -60,17 +60,17 @@ class UpdateCompanyHandler extends UpdateElementHandler
     /**
      * @throws Exception
      */
-    protected function validateData($id)
+    protected function validateData()
     {
         $existItem = Company::query()
-            ->where('id', '!=', $id)
+            ->where('id', '!=', $this->element->id)
             ->where('name', trim($this->data['name'] ?? ''))
             ->first();
         if ($existItem) {
             throw new EntityAlreadyExistException('Найден дубликат по названию компании');
         }
 
-        $this->validateReqs($id, $this->element);
+        $this->validateReqs();
         $this->validatePhoneNumber();
     }
 

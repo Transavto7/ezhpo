@@ -462,6 +462,11 @@ return [
                 'type' => 'text',
                 'noRequired' => 1
             ],
+            'vin' => [
+                'label' => 'VIN-код',
+                'type' => 'text',
+                'noRequired' => 1
+            ],
             'trailer' => [
                 'label' => 'Прицеп',
                 'type' => 'select',
