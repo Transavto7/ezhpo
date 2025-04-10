@@ -42,6 +42,9 @@ const actionComplete = (bvModalEvent) => {
 
 const removeReminder = () => {
     reminders.value.splice(0, 1);
+    if (currentReminder.value.id) {
+        showModal(currentReminder.value.id);
+    }
 }
 
 const hasReminders = computed(() => {
