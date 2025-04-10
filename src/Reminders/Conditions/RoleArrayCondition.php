@@ -11,6 +11,9 @@ use Src\Reminders\Conditions\BaseConditions\ArrayCondition;
 
 final class RoleArrayCondition extends ArrayCondition
 {
+    public const TABLE_NAME = 'roles';
+    public const FIELD_NAME = 'guard_name';
+
     protected $conditionName = 'role';
 
     public function makeViewModel(array $rawReminder): ?ClassifierViewModel

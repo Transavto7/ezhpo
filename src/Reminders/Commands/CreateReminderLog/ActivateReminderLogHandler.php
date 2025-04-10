@@ -15,7 +15,10 @@ class ActivateReminderLogHandler
         $reminderLog->action = ReminderLogAction::ACTIVATE;
         $reminderLog->user_id = Auth::user()->id;
         $reminderLog->payload = json_encode([
-            'is_activated' => $command->isActivated()
+            'is_activated' => [
+                'old' => $command->isActivatedOld(),
+                'new' => $command->isActivatedNew(),
+            ]
         ]);
 
         $reminderLog->save();

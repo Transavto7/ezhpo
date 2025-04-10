@@ -62,6 +62,7 @@ watch([
             :current-page="params.page"
             :pending="fetchTablePending"
             :items="table.items"
+            :mapList="table.mapList"
             :sort-by.sync="params.sortBy"
             :sort-desc.sync="params.sortDesc"
         />

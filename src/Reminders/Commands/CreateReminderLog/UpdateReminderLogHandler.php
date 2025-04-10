@@ -25,7 +25,18 @@ class UpdateReminderLogHandler
         $payload = [];
         foreach ($command->getNewReminderData() as $key => $newValue) {
             $oldValue = $command->getOldReminderData()[$key] ?? null;
-            if ($newValue !== $oldValue) {
+            if ($key === 'context') {
+                $oldValue = json_decode($oldValue, true);
+                $newValue = json_decode($newValue, true);
+                foreach ($newValue as $contextKey => $contextNewValue) {
+                    if ($contextNewValue !== $oldValue[$contextKey]) {
+                        $payload[$contextKey] = [
+                            'old' => $oldValue[$contextKey] ?? null,
+                            'new' => $contextNewValue,
+                        ];
+                    }
+                }
+            } elseif ($newValue !== $oldValue) {
                 $payload[$key] = [
                     'old' => $oldValue,
                     'new' => $newValue,
@@ -36,6 +47,7 @@ class UpdateReminderLogHandler
         if (isset($payload['status'])) {
             $this->activateReminderLogHandler->handle(new ActivateReminderLogCommand(
                 $command->getOldReminderData()['id'],
+                $payload['status']['old'],
                 $payload['status']['new']
             ));
             unset($payload['status']);
