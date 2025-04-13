@@ -8,6 +8,6 @@ final class ListRemindersPageController
 {
     public function __invoke()
     {
-        return view('reminders::list');
+        return view('Reminders::list');
     }
 }

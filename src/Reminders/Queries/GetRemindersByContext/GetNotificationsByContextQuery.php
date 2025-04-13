@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Src\Reminders\Queries\GetRemindersByContext;
 
+use App\User;
 use Src\Reminders\Conditions\Condition;
 use Src\Reminders\Enums\ReminderAction;
 
-final class GetRemindersByContextQuery
+final class GetNotificationsByContextQuery
 {
     /** @var ReminderAction */
     private $action;
@@ -16,13 +17,20 @@ final class GetRemindersByContextQuery
     private $context;
 
     /**
+     * @var User|null
+     */
+    private $user;
+
+    /**
      * @param ReminderAction $action
      * @param Condition[] $context
+     * @param User|null $user
      */
-    public function __construct(ReminderAction $action, array $context)
+    public function __construct(ReminderAction $action, array $context, ?User $user = null)
     {
         $this->action = $action;
         $this->context = $context;
+        $this->user = $user;
     }
 
     public function getAction(): ReminderAction
@@ -36,5 +44,13 @@ final class GetRemindersByContextQuery
     public function getContext(): array
     {
         return $this->context;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getUser(): ?User
+    {
+        return $this->user;
     }
 }

@@ -8,6 +8,6 @@ final class JournalReminderLogsPageController
 {
     public function __invoke()
     {
-        return view('reminders::log');
+        return view('Reminders::log');
     }
 }

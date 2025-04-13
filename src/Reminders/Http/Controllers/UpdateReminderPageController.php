@@ -14,7 +14,7 @@ final class UpdateReminderPageController
     {
         $viewModel = $getReminderByIdHandler->handle(new GetReminderByIdQuery(Uuid::fromString($reminderId)));
 
-        return view('reminders::update', [
+        return view('Reminders::update', [
             'reminder' => $viewModel,
         ]);
     }

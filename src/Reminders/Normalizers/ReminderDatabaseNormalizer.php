@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Src\Reminders\Normalizers;
 
+use DateTimeImmutable;
 use Src\Core\ValueObjects\Uuid;
 use Src\Reminders\Entities\Reminder;
 use Src\Reminders\Enums\ReminderAction;
@@ -37,6 +38,10 @@ final class ReminderDatabaseNormalizer
             'type' => $reminder->getType()->value(),
             'action' => $reminder->getAction()->value(),
             'context' => json_encode($this->contextNormalizer->normalize($reminder->getContext())),
+            'expires_at' => $reminder->getExpiresAt() ? $reminder->getExpiresAt()->format('Y-m-d H:i') : null,
+            'expires_in_minutes' => $reminder->getExpiresInMinutes(),
+            'hidden_from_initiator' => $reminder->isHiddenFromInitiator(),
+            'users_to_notify' => json_encode($reminder->getUsersToNotify())
         ];
     }
 
@@ -56,6 +61,10 @@ final class ReminderDatabaseNormalizer
             $this->contextNormalizer->denormalize($context),
             ReminderStatus::from($reminder['status']),
             ReminderType::from($reminder['type']),
+            (bool) $reminder['hidden_from_initiator'] ?? false,
+            json_decode($reminder['users_to_notify'] ?? '[]', true),
+            $reminder['expires_at'] ? DateTimeImmutable::createFromFormat('Y-m-d H:i', $reminder['expires_at']) : null,
+            $reminder['expires_in_minutes'] ?? null
         );
     }
 }

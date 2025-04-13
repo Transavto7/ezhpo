@@ -36,6 +36,10 @@ final class CreateReminderHandler
             $command->getContext(),
             $command->getStatus(),
             $command->getType(),
+            $command->hiddenFromInitiator(),
+            $command->getUsersToNotify(),
+            $command->getExpiresAt(),
+            $command->getExpiresInMinutes(),
         );
 
         $this->repository->add($reminder);

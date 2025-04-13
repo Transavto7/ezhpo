@@ -21,7 +21,7 @@ final class RemindersProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->loadViewsFrom(__DIR__.'/Http/Views', 'reminders');
+        $this->loadViewsFrom(__DIR__.'/Http/Views', 'Reminders');
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
         $this->loadMigrationsFrom(__DIR__.'/Database/Migrations');
         $this->loadTranslationsFrom(__DIR__.'/Http/Lang', 'reminders');

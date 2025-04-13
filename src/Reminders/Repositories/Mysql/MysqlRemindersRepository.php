@@ -15,7 +15,7 @@ use Src\Reminders\Normalizers\ReminderDatabaseNormalizer;
 use Src\Reminders\Queries\GetReminderById\GetReminderRepositoryInterface;
 use Src\Reminders\Queries\GetReminderById\ReminderViewModel;
 use Src\Reminders\Queries\GetRemindersByContext\GetReminderByContextRepository;
-use Src\Reminders\Queries\GetRemindersByContext\ReminderByContextViewModel;
+use Src\Reminders\Queries\GetRemindersByContext\ReminderByContext;
 use Src\Reminders\Repositories\RemindersRepository;
 
 final class MysqlRemindersRepository implements RemindersRepository, GetReminderRepositoryInterface, GetReminderByContextRepository
@@ -99,12 +99,20 @@ final class MysqlRemindersRepository implements RemindersRepository, GetReminder
     /**
      * @param ReminderAction $action
      * @param Condition[] $context
-     * @return ReminderByContextViewModel[]
+     * @return ReminderByContext[]
      */
     public function getReminderByContext(ReminderAction $action, array $context): array
     {
         $builder = DB::table('reminders')
-            ->select(['reminders.id', 'reminders.title', 'reminders.content'])
+            ->select([
+                'reminders.id',
+                'reminders.title',
+                'reminders.content',
+                'reminders.expires_at',
+                'reminders.expires_in_minutes',
+                'reminders.hidden_from_initiator',
+                'reminders.users_to_notify'
+            ])
             ->where('action', '=', $action->value())
             ->orderBy('reminders.created_at', 'desc');
 
@@ -116,10 +124,14 @@ final class MysqlRemindersRepository implements RemindersRepository, GetReminder
         $rawReminders = $builder->get()->toArray();
 
         return array_map(function (object $reminder) {
-            return new ReminderByContextViewModel(
+            return new ReminderByContext(
                 Uuid::fromString($reminder->id),
                 $reminder->title,
                 $reminder->content,
+                ((bool) $reminder->hidden_from_initiator) ?? false,
+                json_decode($reminder->users_to_notify ?? '[]', true),
+                $reminder->expires_at ? \DateTimeImmutable::createFromFormat('Y-m-d H:i', $reminder->expires_at) : null,
+                $reminder->expires_in_minutes,
             );
         }, $rawReminders);
     }

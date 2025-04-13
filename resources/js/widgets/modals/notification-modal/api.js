@@ -1,18 +1,18 @@
 export const fetchModalData = (data) => {
-    return axios.post(`/reminders/by-context`, data);
+    return axios.post(`/notifications/by-context`, data);
 }
 
 export const fetchUnreadNotifications = () => {
-    return axios.get(`/reminders/modal/unread-reminders-modal`);
+    return axios.post(`/notifications/unread`);
 }
 
 export const sendActionOk = (id) => {
 }
 
 export const sendActionComplete = (id) => {
-    axios.post(`/reminders/complete-reminder-modal/${id}`);
+    axios.post(`/notifications/${id}/complete`);
 }
 
 export const showModal = (id) => {
-    axios.post(`/reminders/show-reminder-modal/${id}`);
+    axios.post(`/notifications/${id}/show`);
 }

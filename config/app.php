@@ -187,6 +187,7 @@ return [
         Src\Employees\EmployeesProvider::class,
         Src\Users\UsersProvider::class,
         Src\Reminders\RemindersProvider::class,
+        Src\Notifications\NotificationsProvider::class,
 
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
