@@ -21,6 +21,11 @@ final class CreateReminderRequest extends FormRequest
             'action.id' => ['required', 'string', 'in:'.implode(',', ReminderAction::cases())],
             'conditions' => ['required', 'array'],
             'conditions.*' => ['nullable', 'array'],
+            'hidden_from_initiator' => ['nullable', 'boolean'],
+            'users_to_notify' => ['nullable', 'array'],
+            'users_to_notify.*' => ['nullable', 'integer'],
+            'expires_at' => ['nullable', 'date_format:Y-m-d H:i'],
+            'expires_in_minutes' => ['nullable', 'integer', 'min:0', 'max:43200']
         ];
     }
 }

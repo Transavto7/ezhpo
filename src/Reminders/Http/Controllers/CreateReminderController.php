@@ -30,7 +30,11 @@ final class CreateReminderController
                 ReminderAction::from($request->input('action.id')),
                 $conditionBuilder->build($request->input('conditions', [])),
                 ReminderStatus::enable(),
-                ReminderType::from('info')
+                ReminderType::from('info'),
+                filter_var($request->input('hidden_from_initiator'), FILTER_VALIDATE_BOOLEAN),
+                $request->input('users_to_notify') ?? [],
+                $request->input('expires_at') ? \DateTimeImmutable::createFromFormat('Y-m-d H:i', $request->input('expires_at')) : null,
+                $request->input('expires_in_minutes')
             ));
 
             DB::commit();

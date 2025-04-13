@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Src\Reminders\Commands\CreateReminder;
 
+use DateTimeImmutable;
 use Src\Reminders\Conditions\Condition;
 use Src\Reminders\Enums\ReminderAction;
 use Src\Reminders\Enums\ReminderStatus;
@@ -28,6 +29,22 @@ final class CreateReminderCommand
 
     /** @var ReminderType */
     private $type;
+    /**
+     * @var bool
+     */
+    private $hiddenFromInitiator;
+    /**
+     * @var array
+     */
+    private $usersToNotify;
+    /**
+     * @var DateTimeImmutable|null
+     */
+    private $expiresAt;
+    /**
+     * @var int|null
+     */
+    private $expiresInMinutes;
 
     /**
      * @param string $title
@@ -38,12 +55,16 @@ final class CreateReminderCommand
      * @param ReminderType $type
      */
     public function __construct(
-        string $title,
-        string $content,
-        ReminderAction $action,
-        array $context,
-        ReminderStatus $status,
-        ReminderType $type
+        string             $title,
+        string             $content,
+        ReminderAction     $action,
+        array              $context,
+        ReminderStatus     $status,
+        ReminderType       $type,
+        bool               $hiddenFromInitiator,
+        array              $usersToNotify,
+        ?DateTimeImmutable $expiresAt,
+        ?int               $expiresInMinutes
     ) {
         $this->title = $title;
         $this->content = $content;
@@ -51,6 +72,10 @@ final class CreateReminderCommand
         $this->context = $context;
         $this->status = $status;
         $this->type = $type;
+        $this->hiddenFromInitiator = $hiddenFromInitiator;
+        $this->usersToNotify = $usersToNotify;
+        $this->expiresAt = $expiresAt;
+        $this->expiresInMinutes = $expiresInMinutes;
     }
 
     public function getTitle(): string
@@ -81,5 +106,37 @@ final class CreateReminderCommand
     public function getType(): ReminderType
     {
         return $this->type;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hiddenFromInitiator(): bool
+    {
+        return $this->hiddenFromInitiator;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUsersToNotify(): array
+    {
+        return $this->usersToNotify;
+    }
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getExpiresAt(): ?DateTimeImmutable
+    {
+        return $this->expiresAt;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getExpiresInMinutes(): ?int
+    {
+        return $this->expiresInMinutes;
     }
 }

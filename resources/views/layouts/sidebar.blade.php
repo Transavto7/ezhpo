@@ -294,9 +294,10 @@
         @endif
 
         @include('Workdays::sidebar')
-        @include('reminders::sidebar')
+        @include('Reminders::sidebar')
+        @include('Notifications::sidebar')
 
-        @if($accessToSettings)
+    @if($accessToSettings)
             <li>
                 <a href="#" data-btn-collapse="#spis-pol" role="button"><i class="fa fa-cog"></i> Настройки</a>
                 <ul id="spis-pol" class="collapse list-unstyle">

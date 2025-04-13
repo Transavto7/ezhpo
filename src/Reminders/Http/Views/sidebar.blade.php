@@ -1,23 +1,25 @@
 @php
-    $accessToWorkdays = user()->access(
-            'employees_workdays_read',
-            'employees_workdays_create',
-            'employees_workdays_report',
-            'employees_workdays_holidays',
-            'employees_workdays_tariffs'
-        )
+    //TODO: убрать после теста
+    $accessToReminders = true || user()->access(
+        'reminders_read',
+        'reminders_logs',
+    )
 @endphp
 
-@if($accessToWorkdays)
+@if($accessToReminders)
     <li>
         <a href="#" data-btn-collapse="#reminders" role="button"><i class="fa fa-sticky-note"></i>Напоминания</a>
         <ul id="reminders" class="collapse list-unstyle">
-            @if(user()->access('employees_workdays_create'))
-                <li>
+            <li>
+                {{-- TODO: убрать после теста --}}
+                @if(true || user()->access('reminders_read'))
                     <a href="{{ route('reminders.list-page') }}">Список напоминаний</a>
-                    <a href="{{ route('reminders.log.journal') }}">Логи напоминаний</a>
-                </li>
-            @endif
+                @endif
+                {{-- TODO: убрать после теста --}}
+                @if(true || user()->access('reminders_logs'))
+                    <a href="{{ route('reminders.logs.list-page') }}">Журнал действий с напоминаниями</a>
+                @endif
+            </li>
         </ul>
     </li>
 @endif

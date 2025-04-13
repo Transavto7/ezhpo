@@ -33,6 +33,24 @@ final class UpdateReminderCommand
     /** @var ReminderType */
     private $type;
 
+    /** @var bool */
+    private $hiddenFromInitiator;
+
+    /**
+     * @var array
+     */
+    private $usersToNotify;
+
+    /**
+     * @var \DateTimeImmutable|null
+     */
+    private $expiresAt;
+
+    /**
+     * @var int|null
+     */
+    private $expiresInMinutes;
+
     /**
      * @param Uuid $id
      * @param string $title
@@ -49,7 +67,11 @@ final class UpdateReminderCommand
         ReminderAction $action,
         array $context,
         ReminderStatus $status,
-        ReminderType $type
+        ReminderType $type,
+        bool $hiddenFromInitiator,
+        array $usersToNotify,
+        ?\DateTimeImmutable $expiresAt = null,
+        ?int $expiresInMinutes = null
     ) {
         $this->id = $id;
         $this->title = $title;
@@ -58,6 +80,10 @@ final class UpdateReminderCommand
         $this->context = $context;
         $this->status = $status;
         $this->type = $type;
+        $this->hiddenFromInitiator = $hiddenFromInitiator;
+        $this->usersToNotify = $usersToNotify;
+        $this->expiresAt = $expiresAt;
+        $this->expiresInMinutes = $expiresInMinutes;
     }
 
     public function getId(): Uuid
@@ -93,5 +119,25 @@ final class UpdateReminderCommand
     public function getType(): ReminderType
     {
         return $this->type;
+    }
+
+    public function hiddenFromInitiator(): bool
+    {
+        return $this->hiddenFromInitiator;
+    }
+
+    public function getUsersToNotify(): array
+    {
+        return $this->usersToNotify;
+    }
+
+    public function getExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->expiresAt;
+    }
+
+    public function getExpiresInMinutes(): ?int
+    {
+        return $this->expiresInMinutes;
     }
 }

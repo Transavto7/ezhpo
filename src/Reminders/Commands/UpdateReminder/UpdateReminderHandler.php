@@ -45,6 +45,10 @@ final class UpdateReminderHandler
         $reminder->setAction($command->getAction());
         $reminder->setStatus($command->getStatus());
         $reminder->setType($command->getType());
+        $reminder->setHiddenFromInitiator($command->hiddenFromInitiator());
+        $reminder->setUsersToNotify($command->getUsersToNotify());
+        $reminder->setExpiresAt($command->getExpiresAt());
+        $reminder->setExpiresInMinutes($command->getExpiresInMinutes());
 
         $this->repository->save($reminder);
 
