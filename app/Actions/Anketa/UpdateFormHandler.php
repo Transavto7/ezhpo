@@ -15,6 +15,7 @@ use App\Exceptions\InvalidCarTypeAutoForIsDopTechForm;
 use App\MedicFormNormalizedPressure;
 use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
+use App\Models\Forms\ReportCartForm;
 use App\Models\Forms\TechForm;
 use App\Point;
 use App\Services\DuplicatesCheckerService;
@@ -28,8 +29,11 @@ use App\ValueObjects\ForeignDevice\Tonometer;
 use DateTimeImmutable;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
+use Ramsey\Uuid\Uuid;
 
 class UpdateFormHandler
 {
@@ -181,6 +185,19 @@ class UpdateFormHandler
                     $data['day_hash'] = FormHashGenerator::generate($hashData);
                 }
             }
+        }
+
+        if ($form->type_anketa === FormTypeEnum::REPORT_CARD && isset($data['attachment']) && $this->isValidAttachment($data['attachment'])) {
+            $attachment = $data['attachment'];
+            $path = Uuid::uuid4().'.'.ReportCartForm::FILE_EXTENSION;
+            $filename = $attachment->getClientOriginalName();
+
+            Storage::disk(ReportCartForm::DISK)->putFileAs('', $attachment, $path);
+
+            $data['attachment'] = [
+                'filename' => $filename,
+                'path' => $path,
+            ];
         }
 
         $this->checkRelatedTripTicket($form, $data);
@@ -342,5 +359,26 @@ class UpdateFormHandler
                 }
             }
         }
+    }
+
+    private function isValidAttachment(?UploadedFile $attachment): bool
+    {
+        if (! $attachment) {
+            return true;
+        }
+
+        if (strtolower($attachment->getClientOriginalExtension()) !== strtolower(ReportCartForm::FILE_EXTENSION)) {
+            $this->errors[] = 'Загруженный файл отчета должен иметь расширение '.ReportCartForm::FILE_EXTENSION.' Получено: '.$attachment->getClientOriginalExtension();
+
+            return false;
+        }
+
+        if ($attachment->getSize() > 100000) {
+            $this->errors[] = 'Размер файла отчета не должен превышать 100 кБ. Получено: '. ($attachment->getSize() / 1000.0);
+
+            return false;
+        }
+
+        return true;
     }
 }

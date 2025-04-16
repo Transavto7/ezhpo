@@ -497,6 +497,10 @@ class HomeController extends Controller
                 $fields = $filterFields(collect(Anketa::$fieldsKeys[$validTypeForm]));
                 $forms = $forms->get();
                 $title = 'ЭЖ.xlsx';
+
+                if ($validTypeForm === FormTypeEnum::REPORT_CARD) {
+                    unset($fields['attachment']);
+                }
             }
 
             return Excel::download(new AnketasExport($forms, $fields, $request->get('exportPrikaz', false)), $title);

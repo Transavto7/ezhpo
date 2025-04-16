@@ -11,7 +11,7 @@ use Throwable;
 
 class TripTicketAttachPhotosController extends Controller
 {
-    public function __invoke(string $tripTicketId, TripTicketAttachPhotosRequest $request, UpdateTripTicketPhotosHandler  $handler)
+    public function __invoke(string $tripTicketId, TripTicketAttachPhotosRequest $request, UpdateTripTicketPhotosHandler $handler)
     {
         try {
             $tripTicket = TripTicket::where('uuid', '=', $tripTicketId)->firstOrFail();
