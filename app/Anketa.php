@@ -208,6 +208,9 @@ class Anketa extends Model
             'tech'  => [
                 'realy'        => 'Осмотр реальный?',
             ],
+            'report_cart'  => [
+                'attachment'   => 'Отчет',
+            ],
         ];
 
     public static $fieldsKeysTable = [
@@ -292,6 +295,7 @@ class Anketa extends Model
             'pv_id',
             'user_eds',
             'signature',
+            'attachment',
         ],
     ];
 
@@ -428,6 +432,7 @@ class Anketa extends Model
                 'pv_id'        => 'Пункт выпуска',
                 'town_id'      => 'Город',
                 'created_at'   => 'Дата/Время создания записи',
+                'attachment'   => 'Отчет',
             ],
             'pak' => [
                 'company_id'             => 'Компания',

@@ -54,6 +54,7 @@
         }
     </script>
     @yield('custom-styles')
+    @stack('setup-styles')
 </head>
 <body>
 <div id="page-preloader" class="preloader">

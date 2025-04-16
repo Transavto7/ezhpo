@@ -841,6 +841,11 @@
                                             <a href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'fio' => $anketa[$field->field] ]) }}">
                                                 {{ $anketa[$field->field] }}
                                             </a>
+                                        @elseif($type_ankets === FormTypeEnum::REPORT_CARD && $field->field === 'attachment' && $anketa[$field->field] !== null)
+                                            @php $attachment = json_decode($anketa[$field->field], true) @endphp
+                                            <a href="{{ Storage::disk('report_cart')->url($attachment['path']) }}" download="{{ $attachment['filename'] }}">
+                                                <i class="fa fa-file"></i>
+                                            </a>
                                         @elseif($field->field === 'car_gos_number' && user()->access('cars_read'))
                                             <a href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'gos_number' => $anketa[$field->field] ]) }}">
                                                 {{ $anketa[$field->field] }}

@@ -9,7 +9,10 @@ use App\Enums\FormTypeEnum;
 use App\Models\Forms\Form;
 use App\Models\Forms\ReportCartForm;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
+use Ramsey\Uuid\Uuid;
+use Storage;
 
 class CreateReportCardFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
 {
@@ -39,7 +42,8 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
             'date' => date('Y-m-d H:i:s'),
             'admitted' => 'Допущен',
             'realy' => 'нет',
-            'created_at' => $this->time
+            'attachment' => null,
+            'created_at' => $this->time,
         ];
 
         $form = $this->mergeFormData($form, $defaultData);
@@ -119,6 +123,21 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
             $form['realy'] = 'да';
         }
 
+        $attachment = $form['attachment'];
+        if (! $this->isValidAttachment($attachment)) {
+            return;
+        } else if ($attachment) {
+            $path = Uuid::uuid4().'.'.ReportCartForm::FILE_EXTENSION;
+            $filename = $attachment->getClientOriginalName();
+
+            Storage::disk(ReportCartForm::DISK)->putFileAs('', $attachment, $path);
+
+            $form['attachment'] = [
+                'filename' => $filename,
+                'path' => $path,
+            ];
+        }
+
         $formModel = new Form($form);
 
         $formModel->save();
@@ -128,5 +147,26 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
         $formDetailsModel->save();
 
         $this->createdForms->push($formModel);
+    }
+
+    private function isValidAttachment(?UploadedFile $attachment): bool
+    {
+        if (! $attachment) {
+            return true;
+        }
+
+        if (strtolower($attachment->getClientOriginalExtension()) !== strtolower(ReportCartForm::FILE_EXTENSION)) {
+            $this->errors[] = 'Загруженный файл отчета должен иметь расширение '.ReportCartForm::FILE_EXTENSION.' Получено: '.$attachment->getClientOriginalExtension();
+
+            return false;
+        }
+
+        if ($attachment->getSize() > 100000) {
+            $this->errors[] = 'Размер файла отчета не должен превышать 100 кБ. Получено: '. ($attachment->getSize() / 1000.0);
+
+            return false;
+        }
+
+        return true;
     }
 }

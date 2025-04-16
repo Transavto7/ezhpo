@@ -990,6 +990,13 @@ $(document).ready(function () {
         // Создаем клон
         clone_to.append(clone)
 
+        // убираем файл, если это report_cart
+        const attachment = clone.find('.attachment')
+        if (attachment) {
+            attachment.val(null)
+            attachment.parent().find('#attachment-label').html('Выберите файл...')
+        }
+
         clone.find('input,select').each(function () {
             this.name = this.name.replace('anketa[' + (count_anketa - 1) + ']', 'anketa[' + count_anketa + ']');
             $(this).trigger('input');

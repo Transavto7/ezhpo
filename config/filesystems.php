@@ -69,6 +69,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'report_cart' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/report_cart'),
+            'url' => env('APP_URL').'/storage/report_cart',
+            'visibility' => 'public',
+        ],
+
         'examples' => [
             'driver' => 'local',
             'root' => storage_path('app/public/examples'),
