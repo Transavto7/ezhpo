@@ -50,6 +50,9 @@ final class ReminderByContextViewModel
             'id' => $this->id->value(),
             'name' => $this->name,
             'content' => $this->content,
+            'created_at' => (new \DateTime())->format('Y-m-d H:i'),
+            'expires_at' => (new \DateTime())->format('Y-m-d H:i'),
+            'is_expired' => true,
         ];
     }
 }

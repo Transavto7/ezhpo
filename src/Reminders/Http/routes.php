@@ -8,6 +8,7 @@ use Src\Reminders\Http\Controllers\CreateReminderPageController;
 use Src\Reminders\Http\Controllers\DeleteReminderController;
 use Src\Reminders\Http\Controllers\ExecuteReminderLogController;
 use Src\Reminders\Http\Controllers\GetRemindersByContextController;
+use Src\Reminders\Http\Controllers\GetUnreadRemindersController;
 use Src\Reminders\Http\Controllers\JournalReminderLogsController;
 use Src\Reminders\Http\Controllers\JournalReminderLogsPageController;
 use Src\Reminders\Http\Controllers\ListRemindersController;
@@ -47,6 +48,7 @@ Route::middleware(['web', 'auth'])->prefix('reminders')->name('reminders.')->gro
 
     Route::post('/show-reminder-modal/{id}', ShowReminderLogController::class)->name('modal.show');
     Route::post('/complete-reminder-modal/{id}', ExecuteReminderLogController::class)->name('modal.complete');
+    Route::get('/modal/unread-reminders-modal', GetUnreadRemindersController::class)->name('modal.get-unread');
     Route::get('/log/show', JournalReminderLogsPageController::class)->name('log.journal');
     Route::post('/log/show', JournalReminderLogsController::class)->name('log.journal-data');
 });
