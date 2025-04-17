@@ -2,6 +2,10 @@ export const fetchModalData = (data) => {
     return axios.post(`/reminders/by-context`, data);
 }
 
+export const fetchUnreadNotifications = () => {
+    return axios.get(`/reminders/modal/unread-reminders-modal`);
+}
+
 export const sendActionOk = (id) => {
 }
 
