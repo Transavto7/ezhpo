@@ -104,6 +104,24 @@ components:
         updated_at:
           type: string
           example: "2025-03-03 22:38:05"
+    Verification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        next_try_at:
+          type: string
+          example: "2025-03-03 22:38"
+        attempts:
+          type: integer
+    VerificationResult:
+      type: object
+      properties:
+        verify:
+          type: boolean
   responses:
     InternalServerError:
       description: Внутренняя ошибка сервера
@@ -234,5 +252,73 @@ paths:
                 $ref: "#/components/schemas/WorkdayRegistration"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/sdpo/verification:
+    post:
+      summary: Создание объекта верификации
+      description: Создает объект верификации и возвращает его параметры.
+      tags:
+        - Verification
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Verification"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    get:
+      summary: Проверка кода верификации
+      description: Проверяет введённый код верификации.
+      tags:
+        - Verification
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Результат проверки кода
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerificationResult"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/sdpo/verification/retry:
+    post:
+      summary: Добавление попытки верификации
+      description: Увеличивает счетчик попыток верификации для заданного UUID.
+      tags:
+        - Verification
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+      responses:
+        "200":
+          description: Попытка добавлена успешно
         "500":
           $ref: "#/components/responses/InternalServerError"
