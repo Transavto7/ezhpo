@@ -25,6 +25,7 @@
                         <textarea name="{{ $k }}"
                                   @if($is_required) required @endif
                                   @if(in_array($k, $disabledFields)) disabled @endif
+                                  @if(in_array($k, $readonlyFields)) readonly @endif
                                   data-label="{{ $v['label'] }}"
                                   placeholder="{{ $v['label'] }}"
                                   data-field="Company_{{ $k }}"
@@ -180,7 +181,8 @@
                         'k' => $k,
                         'default_value' => $el[$k],
                         'element_id' => $el['id'],
-                        'disabled' => in_array($k, $disabledFields)
+                        'disabled' => in_array($k, $disabledFields),
+                        'readonly' => in_array($k, $readonlyFields)
                     ])
 
                     @if(isset($v['syncData']) && $model !== 'Company')

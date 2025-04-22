@@ -79,15 +79,39 @@ class UpdateCompanyHandler extends UpdateElementHandler
      */
     protected function validateReqs($id, Company $company)
     {
-        if (!(isset($this->data['inn']))) {
-            return;
+        $reqsValidated = $company->getAttribute('reqs_validated');
+
+        $inn = trim($this->data['inn'] ?? '');
+        $existInn = $this->element->getAttribute('inn');
+        $innChanged = $inn !== $existInn;
+        if ($reqsValidated && $innChanged) {
+            throw new Exception('Попытка смены корректных реквизитов компании (ИНН)!');
         }
 
-        if ($company->getAttribute('reqs_validated')) {
-            throw new Exception('Попытка смены корректных реквизитов компании!');
+        $ogrn = trim($this->data['ogrn'] ?? '');
+        $existOgrn = $this->element->getAttribute('ogrn');
+        $ogrnChanged = ($ogrn !== $existOgrn) && !empty($existOgrn);
+        if ($reqsValidated && $ogrnChanged) {
+            throw new Exception('Попытка смены корректных реквизитов компании (ОГРН)!');
+        }
+
+        $kpp = trim($this->data['kpp'] ?? '');
+        $existKpp = $this->element->getAttribute('kpp');
+        $kppChanged = ($kpp !== $existKpp) && !empty($existKpp);
+        if ($reqsValidated && $kppChanged) {
+            throw new Exception('Попытка смены корректных реквизитов компании (КПП)!');
         }
 
         $companyReqs = new CompanyReqs($this->data['inn'] ?? '', $this->data['kpp'] ?? '', $this->data['ogrn'] ?? '');
+        if ($reqsValidated && !$companyReqs->isValidFormat()) {
+            throw new Exception('Попытка смены корректных реквизитов компании (невалидный формат)!');
+        }
+
+        $noOneReqsChangedOrFilled = !$innChanged && !$kppChanged && !$ogrnChanged;
+        if ($noOneReqsChangedOrFilled) {
+            return;
+        }
+
         //TODO: проверять отдельно ЮЛ, СЗ и ФЛ
         if ($companyReqs->isValidFormat()) {
             /** @var CompanyReqsCheckerInterface $companyReqsChecker */

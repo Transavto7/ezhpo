@@ -2,11 +2,16 @@
 
 namespace App\Actions\Element\Update;
 
+use App\Car;
 use App\Company;
+use App\Driver;
 use App\Events\Relations\Attached;
 use App\Events\Relations\Detached;
 use App\Models\Contract;
+use App\Point;
+use App\Town;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid;
 
@@ -14,6 +19,7 @@ class UpdateElementHandler implements UpdateElementHandlerInterface
 {
     protected $model;
 
+    /** @var Model|Company|Driver|Town|Car|Point */
     protected $element;
 
     /** @var array */

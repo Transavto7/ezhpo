@@ -11,6 +11,7 @@
     $value = $v['getField'] ?? 'name';
     $concatField = $v['concatField'] ?? false;
     $disabled = $disabled ?? false;
+    $readonly = $readonly ?? false;
     if (($el->type_product ?? '') == 'Абонентская плата без реестров' && in_array($k, ['type_view', 'type_anketa'])) {
         $disabled = true;
     }
@@ -22,6 +23,9 @@
 <select
     {{ $is_required }}
     @if($disabled)
+        disabled
+    @endif
+    @if($readonly)
         disabled
     @endif
     @isset($v['saveToHistory'])

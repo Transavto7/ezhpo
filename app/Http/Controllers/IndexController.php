@@ -346,11 +346,12 @@ class IndexController extends Controller
             $disabledFields[] = 'pressure_diastolic';
         }
 
+        $readonlyFields = [];
         /** @var Model|null $element */
         if (($model === 'Company') && $element->getAttribute('reqs_validated')) {
-            $disabledFields[] = 'inn';
-            $disabledFields[] = 'kpp';
-            $disabledFields[] = 'ogrn';
+            $readonlyFields[] = 'inn';
+            $readonlyFields[] = 'kpp';
+            $readonlyFields[] = 'ogrn';
 
             $companyReqs = new CompanyReqs(
                 $element->getAttribute('inn'),
@@ -359,7 +360,7 @@ class IndexController extends Controller
             );
 
             if ($companyReqs->isOrganizationFormat()) {
-                $disabledFields[] = 'official_name';
+                $readonlyFields[] = 'official_name';
             }
         }
 
@@ -369,6 +370,7 @@ class IndexController extends Controller
         }
 
         $page['disabledFields'] = $disabledFields;
+        $page['readonlyFields'] = $readonlyFields;
 
         $fieldsToSkip = [
             'essence',
