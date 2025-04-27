@@ -1,24 +1,22 @@
 <?php
 
-namespace App\Services\Notifier;
+namespace Src\Notifications\TelegramNotifier;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
+use Src\Notifications\Notifier;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
-class TelegramNotifierService
+class TelegramNotifier implements Notifier
 {
-    public function notify(string $chatId, string $message)
+    public function notify(string $subject, string $message): bool
     {
         try {
-            if (config('app.env') !== 'production') {
-                return '';
-            }
-
             $token = config('telegram.bot_token');
 
             if (empty($token)) {
-                return '';
+                return false;
             }
 
             $client = new Client();
@@ -26,24 +24,31 @@ class TelegramNotifierService
             $url = "https://api.telegram.org/bot$token/sendMessage";
 
             $query = [
-                'chat_id' => $chatId,
+                'chat_id' => $subject,
                 'text' => $message,
                 'parse_mode' => 'markdown',
             ];
 
             $response = $client->post($url, ['query' => $query]);
 
-            return json_encode($response->getBody());
+            if ($response->getStatusCode() !== 200) {
+                throw new HttpException(
+                    $response->getStatusCode(),
+                    'Ошибка при выполнении запроса к telegram API!',
+                );
+            }
+
+            return true;
         } catch (Throwable $exception) {
             $logData = [
-                'to' => $chatId,
+                'to' => $subject,
                 'message' => $message,
                 'exception' => $exception->getMessage(),
             ];
 
             Log::channel('tg-api')->info(json_encode($logData));
 
-            return '';
+            return false;
         }
     }
 }

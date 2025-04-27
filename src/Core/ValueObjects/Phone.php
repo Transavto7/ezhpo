@@ -1,6 +1,7 @@
 <?php
 
-namespace App\ValueObjects;
+namespace Src\Core\ValueObjects;
+
 
 use Stringable;
 
@@ -58,7 +59,7 @@ class Phone implements Stringable
 
         $firstNumber = $phone[0] ?? '';
         if ((strlen($phone) === 10) && ($firstNumber === '9')) {
-            $phone = "7" . $phone;
+            $phone = '7'.$phone;
         }
 
         if (strlen($phone) !== 11) {
@@ -68,7 +69,7 @@ class Phone implements Stringable
         }
 
         $firstNumber = $phone[0] ?? '';
-        if (!in_array($firstNumber, ['8', '7'])) {
+        if (! in_array($firstNumber, ['8', '7'])) {
             $this->isValid = false;
 
             return;

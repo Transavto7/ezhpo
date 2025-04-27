@@ -51,8 +51,8 @@ class NotifyDismissingSMS
 
         $phoneToCall = Settings::setting('sms_text_phone');
         if ($form->type_anketa === FormTypeEnum::MEDIC) {
-            $message = Settings::setting('sms_text_driver') . " $driver->fio. $phoneToCall";
-        } else if ($form->type_anketa === FormTypeEnum::TECH) {
+            $message = Settings::setting('sms_text_driver')." $driver->fio. $phoneToCall";
+        } elseif ($form->type_anketa === FormTypeEnum::TECH) {
             $details = $form->details;
             if ($details === null) {
                 return;
@@ -63,7 +63,7 @@ class NotifyDismissingSMS
                 return;
             }
 
-            $message = Settings::setting('sms_text_car') . " $car->gos_number. $phoneToCall";
+            $message = Settings::setting('sms_text_car')." $car->gos_number. $phoneToCall";
         } else {
             return;
         }

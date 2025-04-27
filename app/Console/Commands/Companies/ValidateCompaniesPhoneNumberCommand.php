@@ -3,8 +3,8 @@
 namespace App\Console\Commands\Companies;
 
 use App\Company;
-use App\ValueObjects\Phone;
 use Illuminate\Console\Command;
+use Src\Core\ValueObjects\Phone;
 
 class ValidateCompaniesPhoneNumberCommand extends Command
 {
@@ -48,7 +48,7 @@ class ValidateCompaniesPhoneNumberCommand extends Command
             ->select([
                 'id',
                 'hash_id',
-                'where_call'
+                'where_call',
             ])
             ->whereNotNull('where_call')
             ->get();
@@ -61,11 +61,11 @@ class ValidateCompaniesPhoneNumberCommand extends Command
             $nativePhone = $company->getAttribute('where_call');
             $phone = new Phone($nativePhone);
 
-            if (!$phone->isValid()) {
+            if (! $phone->isValid()) {
                 $invalidCount++;
 
                 $message = sprintf(
-                    "%s: %s",
+                    '%s: %s',
                     $company->getAttribute('hash_id'),
                     $nativePhone
                 );
@@ -75,7 +75,7 @@ class ValidateCompaniesPhoneNumberCommand extends Command
 
             if ($showValid && $phone->isValid()) {
                 $message = sprintf(
-                    "%s: %s => %s",
+                    '%s: %s => %s',
                     $company->getAttribute('hash_id'),
                     $nativePhone,
                     $phone
@@ -84,7 +84,7 @@ class ValidateCompaniesPhoneNumberCommand extends Command
                 $this->info($message);
             }
 
-            if ($updateAfterValidate && $phone->isValid() && !$phone->isSanitized()) {
+            if ($updateAfterValidate && $phone->isValid() && ! $phone->isSanitized()) {
                 $company->setAttribute('where_call', $phone);
                 $company->save();
 
@@ -92,8 +92,8 @@ class ValidateCompaniesPhoneNumberCommand extends Command
             }
         }
 
-        $this->info("Компаний с номерами мобильных телефонов = " . $companies->count());
-        $this->info("Компаний с обновленными номерами = " . $updatedCount);
-        $this->warn("Компаний с невалидными номерами = " . $invalidCount);
+        $this->info('Компаний с номерами мобильных телефонов = '.$companies->count());
+        $this->info('Компаний с обновленными номерами = '.$updatedCount);
+        $this->warn('Компаний с невалидными номерами = '.$invalidCount);
     }
 }

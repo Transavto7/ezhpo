@@ -11,7 +11,7 @@ use App\Services\CompanyReqsChecker\CompanyRepository;
 use App\Services\CompanyReqsChecker\CompanyReqsCheckerInterface;
 use App\Services\OneC\CompanySync\CompanySyncServiceInterface;
 use App\ValueObjects\CompanyReqs;
-use App\ValueObjects\Phone;
+use Src\Core\ValueObjects\Phone;
 use Exception;
 use Throwable;
 

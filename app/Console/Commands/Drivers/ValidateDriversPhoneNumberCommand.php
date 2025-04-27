@@ -3,7 +3,7 @@
 namespace App\Console\Commands\Drivers;
 
 use App\Driver;
-use App\ValueObjects\Phone;
+use Src\Core\ValueObjects\Phone;
 use Illuminate\Console\Command;
 
 class ValidateDriversPhoneNumberCommand extends Command

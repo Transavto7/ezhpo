@@ -1,36 +1,33 @@
 <?php
 
-namespace App\Services\Notifier;
+namespace Src\Notifications\SMSNotifier;
 
 use App\Settings;
-use Src\Core\ValueObjects\Phone;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Src\Core\ValueObjects\Phone;
+use Src\Notifications\Notifier;
 use Throwable;
 
-class SMSNotifierService
+class SMSNotifier implements Notifier
 {
-    public function notify($to, string $message)
+    public function notify(string $subject, string $message): bool
     {
         try {
-            if (config('app.env') !== 'production') {
-                return '';
-            }
-
             $apiKey = Settings::setting('sms_api_key');
             if (empty($apiKey)) {
-                return '';
+                return false;
             }
 
-            $phone = new Phone($to);
+            $phone = new Phone($subject);
             if (! $phone->isValid()) {
                 $errorMessage = 'Не валидный номер телефона';
                 throw new Exception($errorMessage);
             }
 
-            $to = $phone->getSanitized();
+            $subject = $phone->getSanitized();
 
-            $body = file_get_contents("https://sms.ru/sms/send?api_id=$apiKey&to=$to&msg=".urlencode($message).'&json=1');
+            $body = file_get_contents("https://sms.ru/sms/send?api_id=$apiKey&to=$subject&msg=".urlencode($message).'&json=1');
 
             $json = json_decode($body);
 
@@ -58,17 +55,17 @@ class SMSNotifierService
                 throw new Exception(implode('', $wrongNumbers));
             }
 
-            return $json;
+            return true;
         } catch (Throwable $exception) {
             $logData = [
-                'to' => $to,
+                'to' => $subject,
                 'message' => $message,
                 'exception' => $exception->getMessage(),
             ];
 
             Log::channel('sms-api')->info(json_encode($logData));
 
-            return '';
+            return false;
         }
     }
 }
