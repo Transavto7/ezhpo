@@ -33,9 +33,10 @@
             </div>
 
             @if ($attachment ?? null)
-                <div>
+                <div class="d-flex flex-column">
                     <label class="form-control-label" for="attachment">Загруженный отчет:</label>
-                    <a class="filename mb-0" href="{{ Storage::disk('report_cart')->url($attachment['path']) }}" download="{{ $attachment['filename'] }}">{{ $attachment['filename'] }}</a>
+                    <a class="filename" href="{{ Storage::disk('report_cart')->url($attachment['path']) }}"
+                       download="{{ $attachment['filename'] }}" title="{{ $attachment['filename'] }}">{{ $attachment['filename'] }}</a>
                 </div>
             @endif
 
