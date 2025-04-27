@@ -3,6 +3,7 @@
 namespace App\Actions\TripTicket\UpdateTripTicket;
 
 
+use App\Events\TripTickets\UpdateRelatedItems;
 use App\Models\TripTicket;
 use Carbon\Carbon;
 use Exception;
@@ -26,6 +27,8 @@ final class UpdateTripTicketHandler
             'transportation_type' => $action->getTransportationType(),
             'template_code' => $action->getTemplateCode(),
         ]);
+
+        event(new UpdateRelatedItems($action->getTripTicket()));
 
         return $action->getTripTicket();
     }
