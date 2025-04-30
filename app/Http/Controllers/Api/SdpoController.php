@@ -499,7 +499,7 @@ class SdpoController extends Controller
     public function getSettings(Request $request): JsonResponse
     {
         $user = $request->user('api');
-        $settings = optional(TerminalSettings::settingsForTerminal($user->id)->first())->settings;
+        $settings = optional(TerminalSettings::settingsForTerminal($user->relatedTerminal->id)->first())->settings;
 
         if ($settings === null) {
             $settings = new \Src\Terminals\ValueObjects\Settings(
