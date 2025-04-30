@@ -36,7 +36,7 @@ class TripTicketCreateFormPageController extends Controller
 
         $employee = $user->relatedEmployee;
 
-        $timezone = $employee->timezone ?: 3;
+        $timezone = $employee->timezone ?? 3;
         $time += $timezone * 3600;
         $time = date('Y-m-d', $time);
 

@@ -57,7 +57,7 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
         $this->data['terminal_id'] = $terminal->id;
 
         date_default_timezone_set('UTC');
-        $this->time = date('Y-m-d H:i:s', time() + ($user->entity->timezone ?: 3) * 3600);
+        $this->time = date('Y-m-d H:i:s', time() + ($user->entity->timezone ?? 3) * 3600);
 
         foreach ($this->data['anketa'] as $form) {
             $this->createForm($form, $apiClient);
