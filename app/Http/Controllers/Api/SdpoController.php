@@ -362,7 +362,7 @@ class SdpoController extends Controller
 
             $form['sleep_status'] = $request->sleep_status;
             $form['people_status'] = $request->people_status;
-            $form['user_name'] = $user->name;
+            $form['user_name'] = $employee ? $employee->name : null;
             $form['driver_fio'] = $driver->fio;
 
             if ($form['admitted'] === 'Не допущен') {
@@ -817,8 +817,8 @@ class SdpoController extends Controller
             $data['validity'] = $validity;
         }
 
-        if ($inspection->user) {
-            $data['user_name'] = $inspection->user->name;
+        if ($inspection->user && $inspection->user->relatedEmployee) {
+            $data['user_name'] = $inspection->user->relatedEmployee->name;
         }
 
         if ($inspection->driver) {
