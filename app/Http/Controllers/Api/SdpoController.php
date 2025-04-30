@@ -170,7 +170,7 @@ class SdpoController extends Controller
 
             date_default_timezone_set('UTC');
             $time = time();
-            $timezone = $apiClient->relatedTerminal->timezone ?: 3;
+            $timezone = $apiClient->relatedTerminal->timezone ?? 3;
             $time += $timezone * 3600;
             $time = date('Y-m-d H:i:s', $time);
 
@@ -559,7 +559,7 @@ class SdpoController extends Controller
 
         date_default_timezone_set('UTC');
         $time = time();
-        $timezone = $terminal->timezone;
+        $timezone = $terminal->timezone ?? 3;
         $time += $timezone * 3600;
         $time = date('Y-m-d H:i:s', $time);
 

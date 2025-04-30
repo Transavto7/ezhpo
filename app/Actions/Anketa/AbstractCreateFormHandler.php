@@ -62,7 +62,7 @@ abstract class AbstractCreateFormHandler
         }
 
         date_default_timezone_set('UTC');
-        $this->time = date('Y-m-d H:i:s', time() + ($timezone) * 3600);
+        $this->time = date('Y-m-d H:i:s', time() + ($timezone ?? 3) * 3600);
 
         $this->validateData();
         if (count($this->errors ?? [])) {

@@ -49,7 +49,7 @@ final class WorkdaysRegistrationHandler
         }
 
         $workDay->date = $command->getDate();
-        $workDay->timezone = $command->getTerminal()->timezone ?: 3;
+        $workDay->timezone = $command->getTerminal()->timezone ?? 3;
 
         // Нельзя закрыть неоткрытую смену
         $openWorkday = null;

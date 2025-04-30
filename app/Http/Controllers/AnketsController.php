@@ -108,7 +108,6 @@ class AnketsController extends Controller
 
         // Конвертация текущего времени Юзера
         date_default_timezone_set('UTC');
-        $time = time();
 
         $timezone = 3;
         if ($user->isTerminal()) {
@@ -118,8 +117,7 @@ class AnketsController extends Controller
             $timezone = $user->relatedEmployee->timezone;
         }
 
-        $time += $timezone * 3600;
-        $time = date('Y-m-d\TH:i', $time);
+        $time = date('Y-m-d\TH:i', ($timezone ?? 3) * 3600);
 
         // Дефолтные значения
         $pv = $user->entity->point;

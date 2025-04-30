@@ -24,7 +24,7 @@ final class WorkdayCreatePageController extends Controller
 
         date_default_timezone_set('UTC');
         $time = time();
-        $timezone = $employee->timezone ?: 3;
+        $timezone = $employee->timezone ?? 3;
         $time += $timezone * 3600;
         $time = date('Y-m-d\TH:i', $time);
 
