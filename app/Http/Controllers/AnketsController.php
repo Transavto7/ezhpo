@@ -117,7 +117,7 @@ class AnketsController extends Controller
             $timezone = $user->relatedEmployee->timezone;
         }
 
-        $time = date('Y-m-d\TH:i', ($timezone ?? 3) * 3600);
+        $time = date('Y-m-d\TH:i', (time() + $timezone ?? 3) * 3600);
 
         // Дефолтные значения
         $pv = $user->entity->point;
