@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Src\Terminals\Eloquent\TerminalSettings;
+use Src\Terminals\Settings\Eloquent\TerminalSettings;
 
 final class Terminal extends Model
 {

@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace Src\Terminals;
 
-
 use Illuminate\Support\ServiceProvider;
+use Src\Terminals\Settings\TerminalsSettingsProvider;
+use Src\Terminals\Verification\TerminalVerificationProvider;
 
 final class TerminalsProvider extends ServiceProvider
 {
-    public function boot(): void
+    public function register(): void
     {
-        $this->loadViewsFrom(__DIR__ . '/Http/Views', 'terminals');
-        $this->loadRoutesFrom(__DIR__ . '/Http/routes.php');
-        $this->loadMigrationsFrom(__DIR__ . '/Database/Migrations');
+        $this->app->register(TerminalsSettingsProvider::class);
+        $this->app->register(TerminalVerificationProvider::class);
     }
 }

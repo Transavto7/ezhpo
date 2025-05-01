@@ -20,5 +20,7 @@ interface Verifier
 
     public function verify(string $code, $subject): bool;
 
+    public function verifyById(string $code, UuidInterface $verificationId): bool;
+
     public function retry(UuidInterface $verificationId): void;
 }

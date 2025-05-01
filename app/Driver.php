@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property string|null $phone
+ * @method static Driver findOrFail(string $driver_id)
+ */
 class Driver extends Model
 {
     use SoftDeletes;
@@ -98,9 +102,9 @@ class Driver extends Model
 
     public static function getName($id = 0): string
     {
-        $driver = Driver::where('hash_id', $id)->first();
+        $driver = self::where('hash_id', $id)->first();
 
-        if (!$driver) {
+        if (! $driver) {
             return '';
         }
 
@@ -111,8 +115,7 @@ class Driver extends Model
         string $tonometer = null,
         string $testDrugs = null,
         string $testAlko = null
-    )
-    {
+    ) {
         $currentYear = date('Y');
         $birthdayYear = date('Y', strtotime($this->getAttribute('year_birthday')));
         $age = $currentYear - $birthdayYear;

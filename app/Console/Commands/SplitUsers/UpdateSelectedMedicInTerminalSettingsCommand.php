@@ -5,7 +5,7 @@ namespace App\Console\Commands\SplitUsers;
 use App\Employee;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Src\Terminals\Eloquent\TerminalSettings;
+use Src\Terminals\Settings\Eloquent\TerminalSettings;
 
 final class UpdateSelectedMedicInTerminalSettingsCommand extends Command
 {

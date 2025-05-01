@@ -111,6 +111,26 @@ final class DefaultVerifier implements Verifier
 
     /**
      * @throws VerificationsNotFound
+     */
+    public function verifyById(string $code, UuidInterface $verificationId): bool
+    {
+        $verification = $this->repository->getVerificationById($verificationId);
+
+        if ($verification === null) {
+            throw new VerificationsNotFound('Verifications not found!');
+        }
+
+        if ($verification->getCode() === $code) {
+            $this->repository->useVerificationsById([$verificationId->toString()]);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @throws VerificationsNotFound
      * @throws VerificationSendFailed
      */
     public function retry(UuidInterface $verificationId): void

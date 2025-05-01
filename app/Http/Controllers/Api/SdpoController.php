@@ -44,8 +44,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Src\Core\ValueObjects\Phone;
-use Src\Terminals\Eloquent\TerminalSettings;
-use Src\Terminals\Factories\SettingsFactory;
+use Src\Terminals\Settings\Eloquent\TerminalSettings;
+use Src\Terminals\Settings\Factories\SettingsFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
@@ -502,7 +502,7 @@ class SdpoController extends Controller
         $settings = optional(TerminalSettings::settingsForTerminal($user->id)->first())->settings;
 
         if ($settings === null) {
-            $settings = new \Src\Terminals\ValueObjects\Settings(
+            $settings = new \Src\Terminals\Settings\ValueObjects\Settings(
                 SettingsFactory::makeMain(),
                 SettingsFactory::makeSystem(),
             );
