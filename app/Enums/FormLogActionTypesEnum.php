@@ -7,13 +7,22 @@ use Illuminate\Support\Collection;
 class FormLogActionTypesEnum
 {
     const UPDATING = 'updating';
+
     const DELETING = 'deleting';
+
     const RESTORING = 'restoring';
+
     const APPROVAL = 'approval';
+
     const QUEUE_PROCESSING = 'queue_processing';
+
     const SET_FEEDBACK = 'set_feedback';
+
     const ATTACH_TO_TRIP_TICKET = 'attach_to_trip_ticket';
+
     const DETACH_FROM_TRIP_TICKET = 'detach_from_trip_ticket';
+
+    const CORRECTION = 'correction';
 
     public static function labels(): array
     {
@@ -26,6 +35,7 @@ class FormLogActionTypesEnum
             self::SET_FEEDBACK => 'Оценка осмотра',
             self::ATTACH_TO_TRIP_TICKET => 'Привязан к путевому листу',
             self::DETACH_FROM_TRIP_TICKET => 'Отвязан от путевого листа',
+            self::CORRECTION => 'Коррекция ошибок',
         ];
     }
 
@@ -35,7 +45,7 @@ class FormLogActionTypesEnum
             ->map(function ($value, $key) {
                 return [
                     'id' => $key,
-                    'text' => $value
+                    'text' => $value,
                 ];
             })
             ->values();
