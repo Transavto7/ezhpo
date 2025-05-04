@@ -70,7 +70,7 @@ final class GetEmployeesTableItemsController extends Controller
                 if (in_array($sortBy, $userAttrs)) {
                     $builder
                         ->join('users', 'users.id', '=', 'employees.related_user_id')
-                        ->select('employees.*', 'users.' . $sortBy)
+                        ->select('employees.*', 'users.'.$sortBy)
                         ->orderBy("users.$sortBy", $sortOrder)
                         ->groupBy(['employees.id']);
                 } else {
