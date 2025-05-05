@@ -63,7 +63,6 @@ class HomeController extends Controller
         /**
          * Очистка корзины в очереди на утверждение от СДПО
          */
-
         $formType = $request->type_ankets;
         $validTypeForm = User::$defaultUserJournalByRole[$user->role] ?? FormTypeEnum::MEDIC;
         if (isset(Anketa::$anketsKeys[$formType])) {
@@ -151,7 +150,7 @@ class HomeController extends Controller
         /**
          * Фильтрация анкет
          */
-        $filterActivated = !empty($request->get('filter'));
+        $filterActivated = ! empty($request->get('filter'));
         $filterParams = $request->except([
             'getCounts',
             'trash',
@@ -176,7 +175,7 @@ class HomeController extends Controller
             'car_mark_model' => 'cars.mark_model',
             'driver_id' => 'forms.driver_id',
             'car_id' => 'tech_forms.car_id',
-            'period_pl' => "$formDetailsTable.period_pl"
+            'period_pl' => "$formDetailsTable.period_pl",
         ];
 
         if (count($filterParams) > 0 && $filterActivated) {
@@ -185,7 +184,9 @@ class HomeController extends Controller
                     $filterKey = $filtersToTablesMap[$filterKey];
                 }
 
-                if ($filterValue === null) continue;
+                if ($filterValue === null) {
+                    continue;
+                }
 
                 if ($filterKey == 'TO_date' || $filterKey == 'date') {
                     continue;
@@ -200,12 +201,12 @@ class HomeController extends Controller
                 }
 
                 if ($filterKey === 'hour_from') {
-                    $forms->whereTime('forms.date', '>=', $filterValue . ':00');
+                    $forms->whereTime('forms.date', '>=', $filterValue.':00');
                     continue;
                 }
 
                 if ($filterKey === 'hour_to') {
-                    $forms->whereTime('forms.date', '<=', $filterValue . ':00');
+                    $forms->whereTime('forms.date', '<=', $filterValue.':00');
                     continue;
                 }
 
@@ -220,7 +221,7 @@ class HomeController extends Controller
                 }
 
                 if ($filterKey === 'is_dop') {
-                    if (!$filterValue) {
+                    if (! $filterValue) {
                         $compareSign = '<>';
                     } else {
                         $compareSign = '=';
@@ -273,7 +274,7 @@ class HomeController extends Controller
                     if ($filterKey === 'driver_group_risk') {
                         $forms = $forms->where(function ($query) use ($filterValue, $filterKey) {
                             foreach ($filterValue as $fvItemValue) {
-                                $query = $query->orWhere('driver_group_risk', 'like', '%' . $fvItemValue . '%');
+                                $query = $query->orWhere('driver_group_risk', 'like', '%'.$fvItemValue.'%');
                             }
 
                             return $query;
@@ -315,7 +316,7 @@ class HomeController extends Controller
                         continue;
                     }
 
-                    $forms = $forms->where($filterKey, 'LIKE', '%' . $filterValue . '%');
+                    $forms = $forms->where($filterKey, 'LIKE', '%'.$filterValue.'%');
                 }
             }
 
@@ -327,7 +328,7 @@ class HomeController extends Controller
                     ? Carbon::parse($filterParams['TO_date'])->endOfDay()
                     : Carbon::now()->addYears(10);
 
-                if (!in_array($validTypeForm, [FormTypeEnum::MEDIC, FormTypeEnum::TECH])) {
+                if (! in_array($validTypeForm, [FormTypeEnum::MEDIC, FormTypeEnum::TECH])) {
                     $forms = $forms
                         ->whereNotNull('forms.date')
                         ->whereBetween('forms.date', [$dateFrom, $dateTo]);
@@ -342,7 +343,7 @@ class HomeController extends Controller
                                 ->whereNull('forms.date')
                                 ->whereBetween("$formDetailsTable.period_pl", [
                                     $dateFrom->format('Y-m'),
-                                    $dateTo->format('Y-m')
+                                    $dateTo->format('Y-m'),
                                 ]);
                         });
                     });
@@ -379,7 +380,6 @@ class HomeController extends Controller
         /**
          * <Измеряем количество Авто и Водителей (уникальные ID)>
          */
-
         $export = $filterActivated && $request->get('export');
 
         $defaultFieldsToSelect = [
@@ -404,25 +404,25 @@ class HomeController extends Controller
                 ->leftJoin('trip_tickets', 'forms.id', '=', 'trip_tickets.tech_form_id')
                 ->leftJoin('cars', 'tech_forms.car_id', '=', 'cars.hash_id')
                 ->select(array_merge($defaultFieldsToSelect, [
-                    DB::raw("COALESCE(cars.type_auto, tech_forms.car_type_auto) as car_type_auto"),
+                    DB::raw('COALESCE(cars.type_auto, tech_forms.car_type_auto) as car_type_auto'),
                     'cars.mark_model as car_mark_model',
                     'cars.gos_number as car_gos_number',
                     'cars.date_prto as date_prto',
-                    'trip_tickets.id as trip_tickets_id'
+                    'trip_tickets.id as trip_tickets_id',
                 ]));
-        } else if (($validTypeForm === FormTypeEnum::MEDIC) && ($export || $user->hasRole('client'))) {
+        } elseif (($validTypeForm === FormTypeEnum::MEDIC) && ($export || $user->hasRole('client'))) {
             $forms = $forms
                 ->leftJoin('medic_form_normalized_pressures', 'forms.id', '=', 'medic_form_normalized_pressures.form_id')
                 ->leftJoin('trip_tickets', 'forms.id', '=', 'trip_tickets.medic_form_id')
                 ->select(array_merge($defaultFieldsToSelect, [
                     'drivers.date_prmo as date_prmo',
                     'trip_tickets.id as trip_tickets_id',
-                    DB::raw("COALESCE(medic_form_normalized_pressures.pressure, medic_forms.tonometer, NULL) as tonometer")
+                    DB::raw('COALESCE(medic_form_normalized_pressures.pressure, medic_forms.tonometer, NULL) as tonometer'),
                 ]));
-        } else if ($validTypeForm === FormTypeEnum::MEDIC) {
+        } elseif ($validTypeForm === FormTypeEnum::MEDIC) {
             $forms = $forms
                 ->select(array_merge($defaultFieldsToSelect, [
-                    'drivers.date_prmo as date_prmo'
+                    'drivers.date_prmo as date_prmo',
                 ]));
         } else {
             $forms = $forms
@@ -443,7 +443,7 @@ class HomeController extends Controller
         $filterFields = function (Collection $fields, bool $itemsIsModels = false) use ($user, $validTypeForm) {
             $exclude = [];
             if ($user->hasRole('client')) {
-                $exclude = config('fields.client_exclude.' . $validTypeForm) ?? [];
+                $exclude = config('fields.client_exclude.'.$validTypeForm) ?? [];
             }
             $exclude[] = 'town_id';
 
@@ -453,12 +453,12 @@ class HomeController extends Controller
 
             if ($itemsIsModels) {
                 return $fields->filter(function ($field) use ($exclude) {
-                    return !in_array($field->field, $exclude);
+                    return ! in_array($field->field, $exclude);
                 });
             }
 
             return $fields->filter(function ($title, $field) use ($exclude) {
-                return !in_array($field, $exclude);
+                return ! in_array($field, $exclude);
             });
         };
         /**
@@ -477,19 +477,20 @@ class HomeController extends Controller
                 $fields = $filterFields(collect(Anketa::$fieldsKeys['tech_export_to']));
                 $forms = $forms->get();
                 $title = 'ЭЖ ПРТО.xlsx';
-            } else if ($validTypeForm == FormTypeEnum::TECH && $request->get('exportPrikazPL')) {
+            } elseif ($validTypeForm == FormTypeEnum::TECH && $request->get('exportPrikazPL')) {
                 $fields = $filterFields(collect(Anketa::$fieldsKeys['tech_export_pl']));
                 $forms = $forms->where(['type_view' => 'Предрейсовый/Предсменный'])->get();
                 $title = 'ЭЖ учета ПЛ.xlsx';
-            } else if ($validTypeForm === FormTypeEnum::MEDIC && $request->get('exportPrikaz')) {
+            } elseif ($validTypeForm === FormTypeEnum::MEDIC && $request->get('exportPrikaz')) {
                 $fields = $filterFields(collect(Anketa::$fieldsKeys['medic_export_pl']));
                 $forms = $forms->get();
                 $title = 'ЭЖ ПРМО.xlsx';
-            } else if ($validTypeForm === FormTypeEnum::BDD && $request->get('exportPrikaz')) {
+            } elseif ($validTypeForm === FormTypeEnum::BDD && $request->get('exportPrikaz')) {
                 $fields = $filterFields(collect(Anketa::$fieldsKeys['bdd_export_prikaz']));
                 $forms = $forms->with(['user.roles'])->get()->map(function ($form) {
                     $form->user_id = 'Инженер по безопасности дорожного движения';
                     unset($form->user);
+
                     return $form;
                 });
                 $title = 'ЭЖ инструктажей БДД.xlsx';
@@ -520,7 +521,7 @@ class HomeController extends Controller
                 'period_pl',
                 'company_id',
                 'is_dop',
-                'driver_id'
+                'driver_id',
             ];
             foreach ($fieldsKeysToReset as $fieldsKeyToReset) {
                 unset($fieldsKeys[$fieldsKeyToReset]);
@@ -542,7 +543,7 @@ class HomeController extends Controller
         if ($filterActivated || $validTypeForm === FormTypeEnum::PAK_QUEUE) {
             $forms = $forms->orderBy($orderKey, $orderBy);
             if ($orderKey === 'result_dop') {
-                $forms = $forms->orderBy( 'is_dop', $orderBy === 'ASC' ? 'DESC' : 'ASC');
+                $forms = $forms->orderBy('is_dop', $orderBy === 'ASC' ? 'DESC' : 'ASC');
             }
 
             $forms = $forms->paginate($take);
@@ -554,7 +555,6 @@ class HomeController extends Controller
         /**
          * Получение данных
          */
-
         $formsFields = array_keys($fieldsKeys);
 
         $currentRole = $validTypeForm;
@@ -592,7 +592,7 @@ class HomeController extends Controller
             'take' => $take,
             'orderBy' => $orderBy,
             'orderKey' => $orderKey,
-            'queryString' => Arr::query($request->except(['orderKey', 'orderBy']))
+            'queryString' => Arr::query($request->except(['orderKey', 'orderBy'])),
         ]);
     }
 
@@ -617,14 +617,14 @@ class HomeController extends Controller
             unset($fields['is_pak']);
         }
 
-        $exclude = config('fields.client_exclude.' . $validFormType) ?? [];
+        $exclude = config('fields.client_exclude.'.$validFormType) ?? [];
 
         return view('home_filters', [
             'anketsFields' => $fieldsKeys,
             'type_ankets' => $validFormType,
             'fieldsKeys' => $fields,
             'fieldsGroupFirst' => $fieldsGroupFirst,
-            'exclude' => $exclude
+            'exclude' => $exclude,
         ]);
     }
 
@@ -642,7 +642,7 @@ class HomeController extends Controller
                 break;
             default:
                 throw new \Exception("Проверка дубликатов для типа осмотра - $formType не доступна");
-        };
+        }
 
         $duplicates = DB::table($table)
             ->select("$table.day_hash")

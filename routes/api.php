@@ -81,12 +81,6 @@ Route::middleware('auth:api')->group(function () {
         });
     });
 
-    Route::prefix('reports')->group(function () {
-        Route::get('/journal', 'ReportController@getJournalData');
-        Route::get('/journal/export', 'ReportController@exportJournalData');
-        Route::get('/graph_pv', 'ReportController@getGraphPvData');
-    });
-
     // Отображаем ПВ
     Route::get('pvs/{id?}', function () {
         $id = isset(request()->id) ? request()->id : null;

@@ -872,7 +872,7 @@
                                                          style="gap: 3px">
                                                         <a class="btn primary btn-sm btn-table"
                                                            href="{{ route('docs.get', ['type' => 'closing', 'anketa_id' => $anketa->id]) }}">
-                                                            Мед. заключение
+                                                           Справка
                                                         </a>
 
                                                         @if($anketa['closing_path'])
@@ -889,7 +889,7 @@
                                                         <a target="_blank"
                                                            class="btn primary btn-sm btn-table"
                                                            href="{{ route('docs.get.pdf', ['type' => 'closing', 'anketa_id' => $anketa->id]) }}">
-                                                            Мед. заключение
+                                                            Справка
                                                         </a>
                                                     </div>
                                                 @endif

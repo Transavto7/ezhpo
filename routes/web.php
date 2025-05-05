@@ -14,27 +14,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/openapi', 'OpenApiUiPageController@index')->name('openapi');
     Route::get('/swagger/{type}', 'OpenApiUiPageController@apiByType')->name('api_by_type');
 
-    Route::prefix('contract')->group(function () {
-        Route::get('/', 'ContractController@view');
-        Route::put('restore/{id}', 'ContractController@restore');
-        Route::get('index', 'ContractController@index');
-        Route::post('update', 'ContractController@update');
-        Route::get('create', 'ContractController@create');
-        Route::delete('{id}', 'ContractController@destroy');
-        Route::get('getTypes', 'ContractController@getTypes');
-        Route::post('getCarsByCompany/{id}', 'ContractController@getCarsByCompany');
-        Route::post('getDriversByCompany/{id}', 'ContractController@getDriversByCompany');
-        Route::post('getAvailableForCompany', 'ContractController@getAvailableForCompany');
-
-        Route::prefix('select')->group(function () {
-            Route::get('companies', 'ContractSelectsController@companies');
-            Route::get('cars', 'ContractSelectsController@cars');
-            Route::get('drivers', 'ContractSelectsController@drivers');
-            Route::get('products', 'ContractSelectsController@products');
-            Route::get('our_companies', 'ContractSelectsController@ourCompanies');
-        });
-    });
-
     Route::get('add-client', 'IndexController@RenderAddClient')->name('pages.add_client');
 
     Route::get('driver-dashboard', 'DriverController@index')->name('driver.index');
@@ -79,11 +58,6 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('stamp')->as('stamp.')->group(function () {
         Route::any('filter', 'StampController@getAll');
         Route::any('find', 'StampController@find');
-    });
-
-    Route::prefix('trip-tickets')->as('trip-tickets.')->group(function () {
-        Route::post('{id}/attach-photos', 'TripTickets\TripTicketAttachPhotosController')->name('attach-photos');
-        Route::post('{id}/delete-photo', 'TripTickets\TripTicketDeletePhotoController')->name('delete-photo');
     });
 
     Route::middleware([CheckDriver::class])->group(function () {
@@ -142,40 +116,11 @@ Route::middleware(['auth'])->group(function () {
             Route::get('{id}/change-resultdop-queue/{result_dop}', 'AnketsController@ChangeResultDop')->name('changeResultDop');
         });
 
-        Route::prefix('report')->as('report.')->group(function () {
-            Route::get('journal', 'ReportController@index')->name('journal');
-            Route::get('{type_report}', 'ReportController@getReport')->name('get');
-            Route::get('/dynamic/{journal}', 'ReportController@getDynamic')->name('dynamic');
-        });
-
         Route::post('save-fields-home/{type_ankets}', 'HomeController@SaveCheckedFieldsFilter')->name('home.save-fields');
         Route::get('anketa-trash/{id}/{action}', 'AnketsController@Trash')->name('forms.trash');
         Route::get('anketa-mass-trash', 'AnketsController@MassTrash')->name('forms.mass-trash');
 
         Route::post('ankets-export-pdf-labeling', 'AnketsController@exportPdfLabeling')->name('ankets.export-pdf-labeling');
-
-        Route::prefix('trip-tickets')->as('trip-tickets.')->group(function () {
-            Route::get('/', 'TripTickets\TripTicketIndexPageController')->name('index');
-            Route::post('generate', 'TripTickets\TripTicketGenerateFromFormsController')->name('generate');
-            Route::get('create', 'TripTickets\TripTicketCreatePage')->name('create');
-            Route::post('store', 'TripTickets\StoreTripTicketController')->name('store');
-            Route::get('{id}/edit', 'TripTickets\TripTicketEditPageController')->name('edit');
-            Route::post('{id}/update', 'TripTickets\UpdateTripTicketController')->name('update');
-            Route::get('trash', 'TripTickets\TripTicketTrashController')->name('trash');
-            Route::get('mass-trash', 'TripTickets\TripTicketMassTrashController')->name('mass-trash');
-            Route::get('photos', 'TripTickets\GetTripTicketPhotosController')->name('get-photos');
-            Route::get('{id}/attach-photos', 'TripTickets\TripTicketAttachPhotosPageController')->name('attach-photos-page');
-            Route::post('change-status', 'TripTickets\ApproveTripTicketController')->name('change-status');
-            Route::post('mass-approve', 'TripTickets\MassApproveTripTicketController')->name('mass-approve');
-            Route::get('{id}/{type}', 'TripTickets\TripTicketCreateFormPageController')->name('create-form');
-            Route::post('{id}/store-form', 'TripTickets\TripTicketStoreFormController')->name('store-form');
-            Route::post('print', 'TripTickets\PrintTripTicketController')->name('print');
-            Route::post('mass-print', 'TripTickets\MassPrintTripTicketsController')->name('mass-print');
-            Route::get('table-export', 'TripTickets\TripTicketTableExportController')->name('table-export');
-            Route::get('select-forms', 'TripTickets\TripTicketSelectFormsController')->name('select-forms');
-            Route::get('get-related-forms', 'TripTickets\TripTicketRelatedFormsController')->name('get-related-forms');
-            Route::post('update-forms', 'TripTickets\TripTicketUpdateFormsController')->name('update-forms');
-        });
     });
 
     /**
@@ -199,11 +144,6 @@ Route::middleware(['auth'])->group(function () {
             Route::post('list', 'FormLogController@list')->name('list');
             Route::post('list-model', 'FormLogController@listByModel')->name('list-model');
             Route::post('list-model-map', 'FormLogController@listByModelMaps')->name('list-model-map');
-        });
-
-        Route::prefix('sdpo-crash-logs')->as('sdpo_crash_logs.')->group(function () {
-            Route::get('/', 'SdpoCrashLogController@index')->name('index');
-            Route::post('list', 'SdpoCrashLogController@list')->name('list');
         });
     });
 });

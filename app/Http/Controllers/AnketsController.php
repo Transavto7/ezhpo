@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Anketa\ChangeResultDopHandler;
-use App\Actions\Anketa\CreateFormHandlerFactory;
-use App\Actions\Anketa\CreateSdpoFormHandler;
 use App\Actions\Anketa\ExportFormsLabelingPdf\ExportFormsLabelingPdfCommand;
 use App\Actions\Anketa\ExportFormsLabelingPdf\ExportFormsLabelingPdfHandler;
 use App\Actions\Anketa\GetFormVerificationDetails\GetFormVerificationDetailsParams;
@@ -14,14 +12,11 @@ use App\Actions\Anketa\GetFormVerificationHistory\GetFormVerificationHistoryQuer
 use App\Actions\Anketa\StoreFormVerification\StoreFormVerificationCommand;
 use App\Actions\Anketa\StoreFormVerification\StoreFormVerificationHandler;
 use App\Actions\Anketa\TrashFormHandler;
-use App\Actions\Anketa\UpdateFormHandler;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueAction;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueHandler;
 use App\Enums\FormTypeEnum;
-use App\Enums\QRCodeLinkParameter;
 use App\Exceptions\ExpiredFormPeriodPlException;
 use App\Models\Forms\ActionsPolicy\Builders\BuildersFactory;
-use App\Models\Forms\ActionsPolicy\Policies\DisabledPolicy;
 use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
 use App\Point;
@@ -38,107 +33,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class AnketsController extends Controller
 {
-    public function index(Request $request)
-    {
-        /** @var User $user */
-        $user = Auth::user();
-
-        $type = $request->get('type');
-        if (! $type) {
-            if ($user->hasRole('manager') || $user->hasRole('engineer_bdd')) {
-                return redirect()->route('renderElements', 'Company');
-            }
-            if ($user->hasRole('operator_sdpo')) {
-                return redirect()->route('home', ['type_ankets' => FormTypeEnum::PAK_QUEUE]);
-            }
-            if ($user->isCompany()) {
-                return redirect()->route('home', ['type_ankets' => FormTypeEnum::MEDIC]);
-            }
-            if ($user->hasRole('tech')) {
-                $type = FormTypeEnum::TECH;
-            }
-            if ($user->hasRole('medic')) {
-                $type = FormTypeEnum::TECH;
-            }
-            if (! $type) {
-                return redirect()->route('index');
-            }
-        }
-
-        $forms = [
-            'medic' => [
-                'title' => 'Медицинский осмотр',
-                'anketa_view' => 'profile.ankets.medic',
-            ],
-            'tech' => [
-                'title' => 'Технический осмотр',
-                'anketa_view' => 'profile.ankets.tech',
-            ],
-            'pechat_pl' => [
-                'title' => 'Журнал печати путевых листов',
-                'anketa_view' => 'profile.ankets.pechat_pl',
-            ],
-            'pak' => [
-                'title' => 'СДПО',
-                'anketa_view' => 'profile.ankets.pak',
-            ],
-            'pak_queue' => [
-                'title' => 'Очередь на утверждение',
-                'anketa_view' => 'profile.ankets.pak_queue',
-            ],
-            'bdd' => [
-                'title' => 'Журнал инструктажей по БДД',
-                'anketa_view' => 'profile.ankets.bdd',
-            ],
-            'report_cart' => [
-                'title' => 'Журнал снятия отчетов с карт',
-                'anketa_view' => 'profile.ankets.report_cart',
-            ],
-        ];
-
-        // Отображаем данные
-        $data = $forms[$type];
-
-        // Конвертация текущего времени Юзера
-        date_default_timezone_set('UTC');
-
-        $timezone = 3;
-        if ($user->isTerminal()) {
-            $timezone = $user->relatedTerminal->timezone;
-        }
-        if ($user->isEmployee()) {
-            $timezone = $user->relatedEmployee->timezone;
-        }
-
-        $time = date('Y-m-d\TH:i', time() + ($timezone ?? 3) * 3600);
-
-        // Дефолтные значения
-        $pv = $user->entity->point;
-
-        $data['default_current_date'] = $time;
-        $data['points'] = Point::getAll();
-        $data['type_anketa'] = $type;
-        $data['default_pv_id'] = $pv ? $pv->id : null;
-        $data['car_id'] = $request->input(QRCodeLinkParameter::CAR_ID);
-        $data['driver_id'] = $request->input(QRCodeLinkParameter::DRIVER_ID);
-
-        // Проверяем выставленный ПВ
-        if (session()->exists('anketa_pv_id') && ((date('d.m') > session('anketa_pv_id')['expired']))) {
-            session()->remove('anketa_pv_id');
-        }
-
-        $data['actions_policy'] = new DisabledPolicy();
-
-        return view('profile.anketa', $data);
-    }
-
     public function Get(Request $request, BuildersFactory $buildersFactory)
     {
         /** @var Form $form */
@@ -308,127 +207,6 @@ class AnketsController extends Controller
         return response()->json();
     }
 
-    public function Update(Request $request, UpdateFormHandler $handler): RedirectResponse
-    {
-        DB::beginTransaction();
-
-        $id = $request->id;
-
-        $form = Form::withTrashed()->findOrFail($id);
-
-        try {
-            $handler->handle($form, $request->all(), Auth::user());
-
-            $referer = $request->input('REFERER');
-            if ($referer && ! str_contains($referer, route('forms.get', ['id' => $id]))) {
-                $response = redirect($referer);
-            } else {
-                $response = redirect(route('forms.get', [
-                    'id' => $id,
-                    'msg' => 'Осмотр успешно обновлён!'
-                ]));
-            }
-
-            DB::commit();
-        } catch (Throwable $exception) {
-            $response = redirect(route('forms.get', [
-                'id' => $id,
-                'errors' => [$exception->getMessage()],
-            ]));
-
-            DB::rollBack();
-        }
-
-        return $response;
-    }
-
-    public function AddForm(Request $request, CreateFormHandlerFactory $factory): RedirectResponse
-    {
-        DB::beginTransaction();
-
-        $formType = $request->input('type_anketa');
-
-        $responseData = [];
-
-        try {
-            // TODO: добавить время действия
-            session(['anketa_pv_id' => [
-                'value' => $request->get('pv_id', 0),
-                'expired' => date('d.m')
-            ]]);
-
-            $handler = $factory->make($formType);
-
-            $responseData = $handler->handle($request->all(), Auth::user());
-
-            DB::commit();
-        } catch (Throwable $exception) {
-            $responseData['errors'] = [$exception->getMessage()];
-
-            DB::rollBack();
-        }
-
-        $responseData['type'] = $formType;
-        $responseData['is_dop'] = $responseData['is_dop'] ?? $request->input('is_dop', 0);
-
-        return back()->with($responseData);
-    }
-
-    /**
-     * @deprecated
-     * API ROUTE FOR SDPO
-     */
-    public function ApiAddForm(Request $request, CreateSdpoFormHandler $handler): JsonResponse
-    {
-        try {
-            DB::beginTransaction();
-
-            $data = $request->all();
-
-            if ($request->hasFile('photos')) {
-                $photos = $request->file('photos');
-                $photosPaths = [];
-
-                foreach ($photos as $photo) {
-                    $photosPaths[] = Storage::disk('public')
-                        ->putFile('ankets', $photo);
-                }
-
-                $data['photos'] = implode(',', $photosPaths);
-            }
-
-            $responseData = $handler->handle($data, $request->user('api'));
-
-            DB::commit();
-
-            Log::channel('deprecated-api')->info(json_encode(
-                [
-                    'request' => $request->all(),
-                    'ip' => $request->getClientIp() ?? null,
-                    'response' => $responseData
-                ]
-            ));
-
-            return response()->json(response()->json($responseData));
-        } catch (Throwable $exception) {
-            DB::rollBack();
-
-            $responseData = [
-                'errors' => [$exception->getMessage()],
-            ];
-
-            Log::channel('deprecated-api')->info(json_encode(
-                [
-                    'request' => $request->all(),
-                    'ip' => $request->getClientIp() ?? null,
-                    'response' => $responseData
-                ]
-            ));
-
-            return response()->json(response()->json($responseData), 500);
-        }
-    }
-
     public function print($id)
     {
         $form = Form::withTrashed()->findOrFail($id);
@@ -442,7 +220,7 @@ class AnketsController extends Controller
             'validity' => UserEdsTrait::getValidityString(
                 $form->user_validity_eds_start,
                 $form->user_validity_eds_end
-            )
+            ),
         ]);
 
         $response = response()->make($pdf->output(), 200);
@@ -463,7 +241,7 @@ class AnketsController extends Controller
             return $handler->handle(new ExportFormsLabelingPdfCommand($anketIds));
         } catch (Throwable $exception) {
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -475,7 +253,7 @@ class AnketsController extends Controller
 
             return view('pages.form-verification.show', [
                 'details' => $details,
-                'maxFileSizeBytes' => return_bytes(ini_get('upload_max_filesize'))
+                'maxFileSizeBytes' => return_bytes(ini_get('upload_max_filesize')),
             ]);
         } catch (HttpClientNotFoundException|ExpiredFormPeriodPlException $exception) {
             return view('pages.form-verification.404');
@@ -487,17 +265,16 @@ class AnketsController extends Controller
     }
 
     public function verificationHistory(
-        string                          $uuid,
-        Request                         $request,
+        string $uuid,
+        Request $request,
         GetFormVerificationHistoryQuery $getVerificationHistoryQuery,
-        StoreFormVerificationHandler    $createVerificationHandler
+        StoreFormVerificationHandler $createVerificationHandler
 
-    ): JsonResponse
-    {
-        $clientHash = $request->input("client_hash");
-        $date = $request->input("date");
+    ): JsonResponse {
+        $clientHash = $request->input('client_hash');
+        $date = $request->input('date');
 
-        if (!$clientHash) {
+        if (! $clientHash) {
             $clientHash = ClientHash::from($request->ip(), $request->header('User-Agent'))->value();
         }
 
@@ -524,7 +301,7 @@ class AnketsController extends Controller
             return response()->json()->setStatusCode(Response::HTTP_NOT_FOUND);
         } catch (Throwable $exception) {
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ])->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

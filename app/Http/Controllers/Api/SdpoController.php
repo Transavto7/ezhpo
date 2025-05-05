@@ -904,51 +904,6 @@ class SdpoController extends Controller
         }
     }
 
-    public function storeFormFeedback(
-        StoreSdpoFormFeedbackRequest $request,
-        string $id,
-        StoreFormEventHandler $handler
-    ) {
-        /** @var User $user */
-        $user = $request->user('api');
-
-        if ($user->isBlocked()) {
-            return response()->json(['message' => BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::TERMINAL_BLOCK)], Response::HTTP_BAD_REQUEST);
-        }
-
-        DB::beginTransaction();
-
-        try {
-            $formFeedback = FormFeedback::fromItems($request->input('feedback'));
-
-            $handler->handle(new StoreFormEventCommand(
-                $id,
-                $formFeedback->toArray(),
-                $user->id
-            ));
-
-            DB::commit();
-
-            $wishMessages = config('wishes.messages');
-
-            return response()
-                ->json(['wish_message' => $wishMessages[array_rand($wishMessages)]])
-                ->setStatusCode(Response::HTTP_CREATED);
-        } catch (NotFoundHttpException $exception) {
-            DB::rollBack();
-
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ])->setStatusCode(Response::HTTP_NOT_FOUND);
-        } catch (Exception $exception) {
-            DB::rollBack();
-
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ])->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
     public function getAnketLabelingQr($id, ExportFormsLabelingPdfHandler $handler)
     {
         try {

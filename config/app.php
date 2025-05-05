@@ -184,7 +184,6 @@ return [
          */
         Src\Terminals\TerminalsProvider::class,
         Src\Companies\CompaniesProvider::class,
-        Src\Employees\EmployeesProvider::class,
         Src\Notifications\NotificationsProvider::class,
         Src\Verification\VerificationProvider::class,
         Src\Users\UsersProvider::class,

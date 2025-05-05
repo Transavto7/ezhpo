@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Employees;
 
-use App\Actions\Employees\CreateEmployee\CreateEmployeeHandler;
 use App\Actions\Employees\CreateEmployee\CreateEmployeeCommand;
+use App\Actions\Employees\CreateEmployee\CreateEmployeeHandler;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Employees\CreateEmployeeRequest;
-use Dotenv\Exception\ValidationException;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 

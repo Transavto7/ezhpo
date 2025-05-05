@@ -39,7 +39,7 @@ class IndexController extends Controller
     public function showVideo(Request $request): View
     {
         return view('showVideo', [
-            'video' => $request->input('url', '')
+            'video' => $request->input('url', ''),
         ]);
     }
 
@@ -54,7 +54,7 @@ class IndexController extends Controller
             }
 
             $field = $this->elements[$model]['fields'][$fieldKey] ?? null;
-            if (!$field) {
+            if (! $field) {
                 return 'Поле не найдено';
             }
 
@@ -91,11 +91,11 @@ class IndexController extends Controller
         $eloquentModel = app("App\\$modelName");
         $isApi = $request->get('api', 0);
 
-        if (!$eloquentModel && $isApi) {
+        if (! $eloquentModel && $isApi) {
             return 0;
         }
 
-        if (!$eloquentModel) {
+        if (! $eloquentModel) {
             abort(500, 'Не найдена модель');
         }
 
@@ -158,7 +158,7 @@ class IndexController extends Controller
             DB::rollBack();
 
             return back()->withErrors([
-                'errors' => $exception->getMessage()
+                'errors' => $exception->getMessage(),
             ]);
         }
     }
@@ -170,7 +170,7 @@ class IndexController extends Controller
 
             DB::beginTransaction();
 
-            $handler->handle($request->id, !$request->undo);
+            $handler->handle($request->id, ! $request->undo);
 
             DB::commit();
 
@@ -179,7 +179,7 @@ class IndexController extends Controller
             DB::rollBack();
 
             return back()->withErrors([
-                'errors' => $exception->getMessage()
+                'errors' => $exception->getMessage(),
             ]);
         }
     }
@@ -196,12 +196,12 @@ class IndexController extends Controller
             $id = $request->id;
             $company = Company::find($id);
 
-            if (!$company) {
+            if (! $company) {
                 throw new Exception('Компания с таким ID не найдена');
             }
 
             $productIds = $company->products_id;
-            if (!$productIds) {
+            if (! $productIds) {
                 return back();
             }
 
@@ -211,27 +211,29 @@ class IndexController extends Controller
                 app($class)::query()
                     ->select([
                         'id',
-                        'products_id'
+                        'products_id',
                     ])
                     ->where('company_id', $id)
                     ->get()
                     ->each(function ($model) use ($productIds, $userId) {
                         $oldValue = $model->products_id;
 
-                        if ($oldValue == $productIds) return;
+                        if ($oldValue == $productIds) {
+                            return;
+                        }
 
                         /** @var \App\Log $log */
                         $log = Log::create([
                             'user_id' => $userId,
-                            'type' => LogActionTypesEnum::UPDATING
+                            'type' => LogActionTypesEnum::UPDATING,
                         ]);
 
                         $log->setAttribute('data', [
                             [
                                 'name' => 'products_id',
                                 'oldValue' => $oldValue,
-                                'newValue' => $productIds
-                            ]
+                                'newValue' => $productIds,
+                            ],
                         ]);
 
                         $log->model()->associate($model);
@@ -249,7 +251,7 @@ class IndexController extends Controller
             DB::rollBack();
 
             return back()->withErrors([
-                'errors' => $exception->getMessage()
+                'errors' => $exception->getMessage(),
             ]);
         }
     }
@@ -299,7 +301,7 @@ class IndexController extends Controller
             DB::rollBack();
 
             return back()->withErrors([
-                'errors' => $exception->getMessage()
+                'errors' => $exception->getMessage(),
             ]);
         }
 
@@ -314,7 +316,7 @@ class IndexController extends Controller
         $attachServices = in_array($modelClass, [
             Company::class,
             Driver::class,
-            Car::class
+            Car::class,
         ]);
         if ($attachServices) {
             $query = $query->with(['contracts.services']);
@@ -328,11 +330,11 @@ class IndexController extends Controller
         $page['el'] = $element;
 
         $disabledFields = [];
-        if (($model === 'Company') && (user()->hasRole('client') || !user()->access('company_update_pressure_fields'))) {
+        if (($model === 'Company') && (user()->hasRole('client') || ! user()->access('company_update_pressure_fields'))) {
             $disabledFields[] = 'pressure_systolic';
             $disabledFields[] = 'pressure_diastolic';
         }
-        if (($model === 'Driver') && (user()->hasRole('client') || !user()->access('drivers_update_pressure_fields'))) {
+        if (($model === 'Driver') && (user()->hasRole('client') || ! user()->access('drivers_update_pressure_fields'))) {
             $disabledFields[] = 'pressure_systolic';
             $disabledFields[] = 'pressure_diastolic';
         }
@@ -359,7 +361,7 @@ class IndexController extends Controller
 
             $companyReqs = new CompanyReqs(
                 $element->getAttribute('inn'),
-            $element->getAttribute('kpp') ?? '',
+                $element->getAttribute('kpp') ?? '',
                 $element->getAttribute('ogrn') ?? '',
             );
 
@@ -369,7 +371,7 @@ class IndexController extends Controller
         }
 
         /** @var Model|null $element */
-        if (($model === 'Company') && !user()->access('companies_access_field_note')) {
+        if (($model === 'Company') && ! user()->access('companies_access_field_note')) {
             $disabledFields[] = 'note';
         }
 
@@ -381,15 +383,15 @@ class IndexController extends Controller
             'hash_id',
             'id',
             'reqs_validated',
-            'one_c_synced'
+            'one_c_synced',
         ];
         if (user()->hasRole('client')) {
             $fieldsToSkip[] = 'products_id';
         }
-        if (!user()->access('companies_access_field_where_call_name')) {
+        if (! user()->access('companies_access_field_where_call_name')) {
             $fieldsToSkip[] = 'where_call_name';
         }
-        if (!user()->access('companies_access_field_where_call')) {
+        if (! user()->access('companies_access_field_where_call')) {
             $fieldsToSkip[] = 'where_call';
         }
         if ($model === 'Instr') {
@@ -407,7 +409,7 @@ class IndexController extends Controller
     {
         $isAdminOrClient = (Auth::user()->hasRole('admin') || Auth::user()->hasRole('client'));
         $type = $request->type;
-        if (!isset($this->elements[$type])) {
+        if (! isset($this->elements[$type])) {
             return redirect(route('home'));
         }
 
@@ -423,8 +425,8 @@ class IndexController extends Controller
             }));
 
             $dateConditions = array_reduce($dateFields, function (array $carry, string $fieldName) {
-                $carry[$fieldName . '_start'] = [$fieldName, '>='];
-                $carry[$fieldName . '_end'] = [$fieldName, '<='];
+                $carry[$fieldName.'_start'] = [$fieldName, '>='];
+                $carry[$fieldName.'_end'] = [$fieldName, '<='];
 
                 return $carry;
             }, []);
@@ -445,7 +447,7 @@ class IndexController extends Controller
         $attachServices = in_array($modelClass, [
             Company::class,
             Driver::class,
-            Car::class
+            Car::class,
         ]);
         if ($attachServices) {
             $query = $query->with(['contracts.services']);
@@ -463,7 +465,7 @@ class IndexController extends Controller
                 'orderBy',
                 'orderKey',
                 'page',
-                'deleted'
+                'deleted',
             ]);
 
             foreach ($filters as $filterKey => $filterValue) {
@@ -471,7 +473,7 @@ class IndexController extends Controller
                     continue;
                 }
 
-                if (!is_array($filterValue)) {
+                if (! is_array($filterValue)) {
                     if (isset($dateConditions[$filterKey])) {
                         $conditions = $dateConditions[$filterKey];
 
@@ -479,7 +481,7 @@ class IndexController extends Controller
 
                         if ($conditions[1] === '>=') {
                             $value = $value->startOfDay();
-                        } else if ($conditions[1] === '<=') {
+                        } elseif ($conditions[1] === '<=') {
                             $value = $value->endOfDay();
                         }
 
@@ -500,13 +502,13 @@ class IndexController extends Controller
                     if ($filterKey == 'date_of_employment') {
                         $query = $query->whereBetween($filterKey, [
                             Carbon::parse($filterValue)->startOfDay(),
-                            Carbon::parse($filterValue)->endOfDay()
+                            Carbon::parse($filterValue)->endOfDay(),
                         ]);
 
                         continue;
                     }
 
-                    $query = $query->where($filterKey, 'LIKE', '%' . trim($filterValue) . '%');
+                    $query = $query->where($filterKey, 'LIKE', '%'.trim($filterValue).'%');
 
                     continue;
                 }
@@ -522,13 +524,13 @@ class IndexController extends Controller
                                 ->orWhere($filterKey, 'like', "%,$filterValueItem,%")
                                 ->orWhere($filterKey, 'like', "%,$filterValueItem")
                                 ->orWhere($filterKey, 'like', "$filterValueItem,%");
-                        } else if (strpos($filterKey, '_id')) {
+                        } elseif (strpos($filterKey, '_id')) {
                             $subQuery = $subQuery->orWhere($filterKey, $filterValueItem);
-                        } else if (strlen($filterValueItem) === 0) {
+                        } elseif (strlen($filterValueItem) === 0) {
                             //TODO: странный фильтр только на пустую строку
                             $subQuery = $subQuery->orWhere($filterKey, $filterValueItem);
                         } else {
-                            $subQuery = $subQuery->orWhere($filterKey, 'LIKE', '%' . trim($filterValueItem) . '%');
+                            $subQuery = $subQuery->orWhere($filterKey, 'LIKE', '%'.trim($filterValueItem).'%');
                         }
                     }
 
@@ -573,7 +575,7 @@ class IndexController extends Controller
 
         $loadWithoutFiltersElementTypesForClients = [
             'Driver',
-            'Car'
+            'Car',
         ];
 
         $take = $request->get('take', 500);
@@ -617,7 +619,7 @@ class IndexController extends Controller
     public function RenderAddClient()
     {
         return view('pages.add_client', [
-            'title' => 'Добавление клиента'
+            'title' => 'Добавление клиента',
         ]);
     }
 

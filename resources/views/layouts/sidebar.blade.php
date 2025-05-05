@@ -77,55 +77,6 @@
     </div>
 
     <ul class="list-unstyled">
-        <li>
-            <a class="bg-info text-white">МЕНЮ</a>
-        </li>
-
-        @if($user->access('medic_create'))
-            <li>
-                <a href="{{ route('forms.index', ['type' => FormTypeEnum::MEDIC]) }}"
-                   class="bg-red text-white"><i
-                        class="icon-padnote"></i>Провести мед. осмотр</a>
-            </li>
-        @endif
-
-        @if($user->access('tech_create'))
-            <li>
-                <a href="{{ route('forms.index', ['type' => FormTypeEnum::TECH]) }}"
-                   class="bg-blue text-white"><i
-                        class="icon-padnote"></i>Провести тех. осмотр</a>
-            </li>
-        @endif
-
-        @if($user->access('map_report_create'))
-            <li>
-                <a href="{{ route('forms.index', ['type' => FormTypeEnum::REPORT_CARD]) }}"
-                   class="bg-gray"><i
-                        class="icon-padnote"></i>Внести Отчёт с карты</a>
-            </li>
-        @endif
-
-        @if($user->access('print_register_pl_create'))
-            <li>
-                <a href="{{ route('forms.index', ['type' => FormTypeEnum::PRINT_PL]) }}" class="bg-gray"><i
-                        class="icon-padnote"></i>Внести запись в Реестр печати ПЛ</a>
-            </li>
-        @endif
-
-        @if($user->access('trip_tickets_create'))
-            <li>
-                <a href="{{ route('trip-tickets.create') }}" class="bg-gray"><i
-                        class="icon-padnote"></i>Внести путевой лист</a>
-            </li>
-        @endif
-
-        @if($user->access('journal_briefing_bdd_create'))
-            <li>
-                <a href="{{ route('forms.index', ['type' => FormTypeEnum::BDD]) }}" class="bg-gray"><i
-                        class="icon-padnote"></i>Внести Инструктаж БДД</a>
-            </li>
-        @endif
-
         @if($user->access('approval_queue_view', 'approval_queue_clear'))
             @php
                 $countPakQueue = Form::pakQueueCount($user);
@@ -148,104 +99,9 @@
             </li>
         @endif
 
-        @if($accessToJournals)
-            <li>
-                <a href="#" data-btn-collapse="#views" role="button"> <i class="icon-grid"></i>Журналы осмотров</a>
-                <ul id="views" class="collapse list-unstyle">
-                    @if($user->access('medic_read'))
-                        <li><a href="{{ route('home', FormTypeEnum::MEDIC) }}"><i class="fa fa-plus"></i>Журнал
-                                МО</a></li>
-                    @endif
-
-                    @if($user->access('tech_read'))
-                        <li><a href="{{ route('home', FormTypeEnum::TECH) }}"><i class="fa fa-wrench"></i>Журнал
-                                ТО</a></li>
-                    @endif
-
-                    @if($user->access('journal_briefing_bdd_read'))
-                        <li>
-                            <a href="{{ route('home', FormTypeEnum::BDD) }}">
-                                <i class="fa fa-book"></i>Журнал инструктажей по БДД
-                            </a>
-                        </li>
-                    @endif
-
-                    @if($user->access('trip_tickets_read'))
-                        <li>
-                            <a href="{{ route('trip-tickets.index') }}"><i class="fa fa-book"></i>Реестр путевых листов</a>
-                        </li>
-                    @endif
-
-                    @if($user->access('journal_pl_read'))
-                        <li>
-                            <a href="{{ route('home', FormTypeEnum::PRINT_PL) }}"><i class="fa fa-book"></i>Журнал
-                                печати
-                                ПЛ</a>
-                        </li>
-                    @endif
-
-                    @if($user->access('map_report_read'))
-                        <li>
-                            <a href="{{ route('home', FormTypeEnum::REPORT_CARD) }}"><i
-                                    class="fa fa-book"></i>Реестр снятия
-                                отчетов
-                                с карт</a>
-                        </li>
-                    @endif
-
-
-                    @if($user->access('errors_sdpo_read', 'errors_sdpo_create'))
-                        @php
-                            $countErrorsPak = Cache::remember('countErrorsPak', 3600,
-                                function () {
-                                    return Form::where('type_anketa', FormTypeEnum::PAK)->count();
-                                }
-                            );
-
-                        @endphp
-                        <li>
-                            <a href="{{ route('home', 'pak') }}"><i class="fa fa-close"></i>Реестр ошибок СДПО <span
-                                    class="badge bg-primary text-white">{{ $countErrorsPak < 99 ? $countErrorsPak : '99+' }}
-                            </a>
-                        </li>
-                    @endif
-                </ul>
-            </li>
-        @endif
-
-        @if($user->access('report_service_company_read', 'report_schedule_pv_read', 'report_schedule_dynamic_mo', 'medic_read'))
-            <li>
-                <a href="#" data-btn-collapse="#reports" role="button"><i class="fa fa-area-chart"></i> Отчеты</a>
-                <ul id="reports" class="collapse list-unstyle">
-                    @if($user->access('report_schedule_pv_read'))
-                        <li>
-                            <a href="{{ route('report.get', 'graph_pv') }}">
-                                <i class="fa fa-book"></i>График работы пунктов выпуска
-                            </a>
-                        </li>
-                    @endif
-
-                    @if($user->access('report_service_company_read', 'report_service_company_export'))
-                        <li>
-                            <a href="{{ route('report.journal') }}">
-                                <i class="fa fa-book"></i>Отчет по услугам компании
-                            </a>
-                        </li>
-                    @endif
-
-                    @if($user->access('medic_read'))
-                        @include('layouts.components.sidebar.dismissed-medic-forms')
-                    @endif
-
-                    @if($user->access('report_schedule_dynamic_mo'))
-                        <li>
-                            <a href="{{ route('report.dynamic', ['journal' => FormTypeEnum::MEDIC]) }}">
-                                <i class="fa fa-book"></i>Отчет по количеству осмотров
-                            </a>
-                        </li>
-                    @endif
-                </ul>
-            </li>
+        @if($user->access('medic_read'))
+            <li><a href="{{ route('home', FormTypeEnum::MEDIC) }}"><i class="fa fa-plus"></i>Журнал
+                    МО</a></li>
         @endif
 
         @if($accessToElements)
@@ -253,47 +109,15 @@
                 <a href="#" data-btn-collapse="#phoenic" role="button"> <i
                         class="icon-interface-windows"></i>CRM</a>
                 <ul id="phoenic" class="collapse list-unstyle">
-
-                    @if($user->access('contract_read', 'contract_create'))
-                        <li>
-                            <a href="/contract">
-                                Договор
-                                <span class="
-                                    start-100
-                                    translate-middle
-                                    badge
-                                    text-white
-                                    rounded-pill
-                                    bg-success"
-                                >
-                                    new
-                                </span>
-                            </a>
-                        </li>
-                    @endif
                     @if($user->access('drivers_read', 'drivers_create'))
                         <li><a href="{{ route('renderElements', 'Driver') }}">Водители</a></li>
-                    @endif
-                    @if($user->access('cars_read', 'cars_create'))
-                        <li><a href="{{ route('renderElements', 'Car') }}">Автомобили</a></li>
                     @endif
                     @if($user->access('company_read', 'company_create'))
                         <li><a href="{{ route('renderElements', 'Company') }}">Компании</a></li>
                     @endif
-                    @if($user->access('service_read', 'service_create'))
-                        <li><a href="{{ route('renderElements', 'Product') }}">Услуги</a></li>
-                    @endif
-                    @if($user->access('discount_read', 'discount_create'))
-                        <li><a href="{{ route('renderElements', 'Discount') }}">Скидки</a></li>
-                    @endif
-                    @if($user->access('briefings_read', 'briefings_create'))
-                        <li><a href="{{ route('renderElements', 'Instr') }}">Виды инструктажей</a></li>
-                    @endif
                 </ul>
             </li>
         @endif
-
-        @include('Workdays::sidebar')
 
         @if($accessToSettings)
             <li>
@@ -366,10 +190,6 @@
                     @if($user->access('logs_read'))
                         <li><a href="{{ route('logs.index') }}">Журнал действий</a></li>
                         <li><a href="{{ route('form-logs.index') }}">Журнал действий с осмотрами</a></li>
-                    @endif
-
-                    @if($user->access('sdpo_crash_logs_read'))
-                        <li><a href="{{ route('sdpo_crash_logs.index') }}">Отказы СДПО</a></li>
                     @endif
                 </ul>
             </li>
