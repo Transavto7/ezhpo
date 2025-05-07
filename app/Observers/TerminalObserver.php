@@ -35,10 +35,18 @@ class TerminalObserver
      */
     public function updating(Terminal $terminal)
     {
+        $skipAttributeChanges = [
+            'last_connection_at',
+        ];
+
         $logData = [];
 
         foreach ($terminal->getDirty() as $attribute => $newValue) {
             if (empty($newValue) && empty($terminal->getOriginal($attribute))) {
+                continue;
+            }
+
+            if (in_array($attribute, $skipAttributeChanges)) {
                 continue;
             }
 

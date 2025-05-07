@@ -12,6 +12,7 @@ class LogActionTypesEnum
     const RESTORING = 'restoring';
     const DETACHING = 'detaching';
     const ATTACHING = 'attaching';
+    const CORRECTION = 'correction';
 
     public static function labels(): array
     {
@@ -21,7 +22,8 @@ class LogActionTypesEnum
             self::DELETING => 'Удаление',
             self::RESTORING => 'Восстановление',
             self::ATTACHING => 'Добавление связи',
-            self::DETACHING => 'Удаление связи'
+            self::DETACHING => 'Удаление связи',
+            self::CORRECTION => 'Коррекция ошибок',
         ];
     }
 
@@ -31,7 +33,7 @@ class LogActionTypesEnum
             ->map(function ($value, $key) {
                 return [
                     'id' => $key,
-                    'text' => $value
+                    'text' => $value,
                 ];
             })
             ->values();
