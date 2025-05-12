@@ -27,7 +27,9 @@ class HideAdmin
 
             Employee::addGlobalScope('hideDefaultUser', function ($builder) use ($user) {
                 $builder->whereHas('user', function ($query) {
-                    $query->where('login', '!=', User::DEFAULT_USER_LOGIN);
+                    $query->withTrashed()
+                        ->where('login', '!=', User::DEFAULT_USER_LOGIN);
+
                 });
             });
         }

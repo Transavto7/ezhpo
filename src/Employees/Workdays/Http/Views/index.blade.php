@@ -413,10 +413,16 @@
                                             @include('Workdays::components.columns.photo', compact($workday, $field))
                                         @elseif(($field->field === 'video') && $workday[$field->field])
                                             @include('Workdays::components.columns.video', compact($workday, $field))
-                                        @elseif($field->field === 'employee_id' && user()->access('employee_read'))
-                                            <a href="{{ route('employees.index', ['employee_id' => [$workday[$field->field]] ]) }}">
-                                                {{ $workday['employee_fio'] }}
-                                            </a>
+                                        @elseif($field->field === 'employee_id')
+                                            @if(user()->access('employee_read'))
+                                                <a href="{{ route('employees.index', ['employee_id' => [$workday[$field->field]] ]) }}">
+                                                    {{ $workday['employee_fio'] }}
+                                                </a>
+                                            @else
+                                                <span>
+                                                    {{ $workday['employee_fio'] }}
+                                                </span>
+                                            @endif
                                         @elseif($field->field === 'type_anketa')
                                             {{ \Src\Employees\Workdays\SmartEnum\WorkdayEventTypeEnum::create($workday[$field->field])->getTitle() }}
                                         @elseif($field->field === 'is_real')
