@@ -10,7 +10,7 @@
     disabled
     name="company_id"
     class="filled-select2 filled-select">
-    <option selected value="{{ $company->hash_id }}">
+    <option selected value="{{ $company->id }}">
         [{{ $company->hash_id }}] {{ $company->name }}
     </option>
 </select>
