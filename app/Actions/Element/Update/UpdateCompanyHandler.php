@@ -71,16 +71,16 @@ class UpdateCompanyHandler extends UpdateElementHandler
             throw new EntityAlreadyExistException('Найден дубликат по названию компании');
         }
 
-        $this->validateReqs($existItem);
+        $this->validateReqs();
         $this->validatePhoneNumber();
     }
 
     /**
      * @throws Exception
      */
-    protected function validateReqs(Company $company)
+    protected function validateReqs()
     {
-        $reqsValidated = $company->getAttribute('reqs_validated');
+        $reqsValidated = $this->element->getAttribute('reqs_validated');
 
         $inn = trim($this->data['inn'] ?? '');
         $existInn = $this->element->getAttribute('inn');
@@ -124,7 +124,7 @@ class UpdateCompanyHandler extends UpdateElementHandler
             }
         }
 
-        $existItem = $this->companyRepository->findByReqs($companyReqs, $company->getAttribute('id'));
+        $existItem = $this->companyRepository->findByReqs($companyReqs, $this->element->getAttribute('id'));
         if ($existItem) {
             throw new EntityAlreadyExistException('Найден дубликат компании по ИНН (+КПП)');
         }
