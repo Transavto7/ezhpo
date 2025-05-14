@@ -28,3 +28,11 @@
     max-height: 1000px;
     overflow: scroll;
 }
+
+div.b24-widget-button-icon-container > div.b24-widget-button-inner-item.b24-widget-button-icon-animation {
+    transform: translateY(0px)!important;
+
+    svg {
+        transform: translateY(0px)!important;
+    }
+}

@@ -163,5 +163,6 @@
 <script src="{{ mix('/js/app.js') }}"></script>
 
 @yield('custom-scripts')
+@include('layouts.client-chat.client-chat')
 </body>
 </html>
