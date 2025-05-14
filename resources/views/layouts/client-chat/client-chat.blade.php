@@ -1,0 +1,9 @@
+@if(user() && user()->isCompany() && config('client-chat.enabled'))
+    <script>
+      (function(w,d,u){
+        var s=d.createElement('script');s.async=true;s.src=u+'?'+(Date.now()/60000|0);
+        var h=d.getElementsByTagName('script')[0];h.parentNode.insertBefore(s,h);
+        console.log(h)
+      })(window,document,'{{ config('client-chat.widget_url') }}');
+    </script>
+@endif
