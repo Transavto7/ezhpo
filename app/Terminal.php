@@ -14,6 +14,8 @@ final class Terminal extends Model
     use SoftDeletes;
 
     public $fillable = [
+        'month_amount',
+        'last_month_amount',
         'hash_id',
         'related_user_id',
         'name',

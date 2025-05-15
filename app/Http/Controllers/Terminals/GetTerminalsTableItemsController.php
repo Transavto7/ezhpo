@@ -100,33 +100,6 @@ final class GetTerminalsTableItemsController
             }
         }
 
-        $lastMonthAmount = MedicForm::query()
-            ->select([
-                DB::raw('count(forms.id) as count'),
-                'medic_forms.terminal_id',
-            ])
-            ->leftJoin('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
-            ->where('forms.created_at', '>=', Carbon::now()->subMonth()->startOfMonth())
-            ->where('forms.created_at', '<=', Carbon::now()->startOfMonth())
-            ->whereNotNull('medic_forms.terminal_id')
-            ->groupBy(['medic_forms.terminal_id'])
-            ->get()
-            ->pluck('count', 'terminal_id')
-            ->toArray();
-
-        $monthAmount = MedicForm::query()
-            ->select([
-                DB::raw('count(forms.id) as count'),
-                'medic_forms.terminal_id',
-            ])
-            ->leftJoin('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
-            ->where('forms.created_at', '>', Carbon::now()->startOfMonth())
-            ->whereNotNull('medic_forms.terminal_id')
-            ->groupBy(['medic_forms.terminal_id'])
-            ->get()
-            ->pluck('count', 'terminal_id')
-            ->toArray();
-
         $paginator = $builder->paginate(100);
 
         $terminals = $paginator
@@ -174,8 +147,8 @@ final class GetTerminalsTableItemsController
                     'who_deleted' => $whoDeleted,
                     'deleted_at' => $deletedAt,
                     'date_end_check' => $dateEndCheck,
-                    'month_amount' => $monthAmount[$terminal->id] ?? 0,
-                    'last_month_amount' => $lastMonthAmount[$terminal->id] ?? 0,
+                    'month_amount' => $terminal->monthAmount,
+                    'last_month_amount' => $terminal->lastMonthAmount,
                 ];
             });
 

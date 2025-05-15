@@ -31,6 +31,11 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('companies:inspect')->monthlyOn(1, '6:00');
         $schedule->command("run:briefings")->monthlyOn(10, '10:00');
+
+        // Обновление статистики терминалов каждый день
+        $schedule->command('terminals:update-examinations-count')
+            ->dailyAt('23:50')
+            ->withoutOverlapping();
     }
 
     /**
