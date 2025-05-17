@@ -24,7 +24,8 @@ RUN docker-php-ext-configure zip \
 WORKDIR /usr/share/nginx/html/
 
 # Copy the codebase
-COPY ../../ ./
+COPY . ./
+
 
 # Run composer install for production and give permissions
 RUN sed 's_@php artisan package:discover_/bin/true_;' -i composer.json \
@@ -42,7 +43,7 @@ RUN echo "Running NPM clean install" \
     && rm -rf node_modules
 
 # Copy entrypoint
-COPY ./php-fpm-entrypoint /usr/local/bin/php-entrypoint
+COPY ./production/php-fpm/php-fpm-entrypoint /usr/local/bin/php-entrypoint
 
 # Give permisisons to everything in bin/
 RUN chmod a+x /usr/local/bin/*

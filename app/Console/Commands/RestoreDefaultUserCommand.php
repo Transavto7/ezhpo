@@ -59,7 +59,7 @@ class RestoreDefaultUserCommand extends Command
             $adminRole = Role::query()
                 ->where('name', 'admin')
                 ->first();
-            if (!$adminRole) {
+            if (! $adminRole) {
                 throw new Exception('Не найдена базовая роль Администратора');
             }
 
@@ -70,7 +70,7 @@ class RestoreDefaultUserCommand extends Command
                 ->where('login', $baseUserLogin)
                 ->first();
 
-            if (!$existUser) {
+            if (! $existUser) {
                 $validator = function (int $hashId) {
                     if (User::where('hash_id', $hashId)->first()) {
                         return false;
@@ -90,10 +90,10 @@ class RestoreDefaultUserCommand extends Command
                     'hash_id' => $userHashId,
                     'login' => $baseUserLogin,
                     'password' => $password,
-                    'api_token' => Hash::make(date('H:i:s') . sha1($userHashId)),
+                    'api_token' => Hash::make(date('H:i:s').sha1($userHashId)),
                     'name' => 'Администратор',
                     'role' => 777,
-                    'email' => $baseUserLogin
+                    'email' => $baseUserLogin,
                 ];
 
                 $existUser = User::create($data);
@@ -102,7 +102,7 @@ class RestoreDefaultUserCommand extends Command
                     'password' => $password,
                     'role' => 777,
                     'deleted_at' => null,
-                    'deleted_id' => null
+                    'deleted_id' => null,
                 ]);
                 $existUser->restore();
             }
@@ -115,7 +115,7 @@ class RestoreDefaultUserCommand extends Command
         } catch (Throwable $exception) {
             DB::rollBack();
 
-            $this->error("Ошибка: " . $exception->getMessage());
+            $this->error('Ошибка: '.$exception->getMessage());
         }
     }
 }

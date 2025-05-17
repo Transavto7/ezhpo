@@ -10,6 +10,7 @@ volumes:
 services:
   traefik:
     image: traefik:3.2
+    restart: unless-stopped
     command:
       # Set the log level (DEBUG, INFO, WARN, ERROR)
       - "--log.level=INFO"

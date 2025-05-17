@@ -1,4 +1,5 @@
 version: "3.9"
+name: myprefix
 
 networks:
   ehzpo-network:
@@ -7,23 +8,29 @@ networks:
     external: true
 
 volumes:
-  api-postgres:
+  storage:
+  public:
+  db-data:
 
 services:
   nginx:
     build:
-      context: api/docker
-      dockerfile: production/nginx/Dockerfile
-    volumes:
-      - ./api:/app
+      context: nginx
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:80"
     networks:
       - traefik-network
       - ehzpo-network
+    volumes:
+      - storage:/usr/share/nginx/html/storage:rw
+      - public:/usr/share/nginx/html/public:ro
     labels:
       # Enable Traefik for this container
       - "traefik.enable=true"
       # Match incoming requests on a specific hostname
-      - "traefik.http.routers.nginx.rule=Host(`${ZABBIX_DASHBOARD_HOSTNAME}`)"
+      - "traefik.http.routers.nginx.rule=Host(`registration.ta-7.ru`)"
       # Assign the router to a named Traefik service
       - "traefik.http.routers.nginx.service=nginx"
       # Use the 'websecure' (HTTPS) entry point
@@ -44,27 +51,56 @@ services:
       # Specify which Docker network Traefik should use for routing
       - "traefik.docker.network=traefik-network"
 
-  api-php-fpm:
-    build:
-      context: api/docker
-      dockerfile: production/php-fpm/Dockerfile
+  php-fpm:
+    image: docker.registry.ta-7.ru/ehzpo:0.0.1
+    restart: unless-stopped
+    networks:
+      - ehzpo-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+    env_file:
+      - .env.production
     volumes:
-      - ./api:/app
+      - storage:/usr/share/nginx/html/storage:rw
+      - public:/usr/share/nginx/html/public:rw
 
-  api-php-cli:
-    build:
-      context: api/docker
-      dockerfile: production/php-cli/Dockerfile
-    volumes:
-      - ./api:/app
+#  php-fpm:
+#    build:
+#      context: ../
+#      dockerfile: production/php-fpm/Dockerfile
+#    restart: unless-stopped
+#    networks:
+#      - ehzpo-network
+#    depends_on:
+#      mysql:
+#        condition: service_healthy
+#    env_file:
+#      - ../.env.production
+#    volumes:
+#      - storage:/usr/share/nginx/html/storage:rw
+#      - public:/usr/share/nginx/html/public:rw
 
   mysql:
-    image: postgres:13-alpine
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: phonebook
+    image: mysql:8.0.29
+    restart: unless-stopped
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    networks:
+      - ehzpo-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-psecret" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
     volumes:
-      - api-postgres:/var/lib/postgresql/data
-    ports:
-      - "54321:5432"
+      - ./mysql:/etc/mysql/conf.d/
+      - db-data:/var/lib/mysql
+      - ./template.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=ezhpo_registry

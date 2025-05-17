@@ -21,3 +21,5 @@ yarn-error.log
 /public/assets/
 docker/
 .php-cs-fixer.cache
+production/.env.production
+production/template.sql

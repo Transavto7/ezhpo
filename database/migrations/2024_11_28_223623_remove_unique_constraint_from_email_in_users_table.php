@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class RemoveUniqueConstraintFromEmailInUsersTable extends Migration
 {
@@ -13,9 +14,13 @@ class RemoveUniqueConstraintFromEmailInUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropUnique('users_email_unique');
-        });
+        try {
+            Schema::table('users', function (Blueprint $table) {
+                $table->dropUnique('users_email_unique');
+            });
+        } catch (\Exception $e) {
+            Log::warning('Failed to drop index: '.$e->getMessage());
+        }
     }
 
     /**

@@ -6,8 +6,8 @@ main() {
     else
         prepare_file_permissions
         prepare_storage
-#        wait_for_db
-#        run_migrations
+        wait_for_db
+        run_migrations
         optimize_app
         run_server "$@"
     fi
@@ -33,7 +33,8 @@ prepare_storage() {
 
 wait_for_db() {
     echo "Waiting for DB to be ready"
-    until ./artisan migrate:status 2>&1 | grep -q -E "(Migration table not found|Migration name)"; do
+    until ./artisan migrate:status 2>&1 | grep -q -E "(Ran\?|Migration table not found|No migrations found)"; do
+        echo "Waiting for migrations to stabilize..."
         sleep 1
     done
 }
