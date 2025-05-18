@@ -116,6 +116,10 @@ export default {
 
         // ДАТА ОСМОТРА
         this.data.forEach((dataItem, dataIndex) => {
+            if (!dataItem.date) {
+              return
+            }
+
             let date = new Date( '2021-11-25 ' + dataItem.date.replace(/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/g, '').trim() )
 
             labels.forEach((item, index) => {
