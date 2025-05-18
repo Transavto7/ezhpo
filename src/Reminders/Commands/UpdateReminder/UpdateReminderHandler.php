@@ -52,6 +52,10 @@ final class UpdateReminderHandler
 
         $this->repository->save($reminder);
 
-        (new UpdateReminderLogHandler($this->activateReminderLogHandler))->handle(new UpdateReminderLogCommand($oldData, $normalizer->normalize($reminder)));
+        (new UpdateReminderLogHandler($this->activateReminderLogHandler))->handle(new UpdateReminderLogCommand(
+            $oldData,
+            $normalizer->normalize($reminder),
+            $command->getUserId()
+        ));
     }
 }

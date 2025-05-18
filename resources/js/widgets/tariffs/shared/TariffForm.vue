@@ -1,7 +1,7 @@
 <script setup>
 import {computed, ref, watch} from "vue";
 import HoursBlock from "./components/HoursBlock.vue";
-import VSelectRemote from "../../../v-components/VSelectRemote.vue";
+import VSelectRemote from "@/ui/VSelectRemote.vue";
 import {fetchPointsForSelectWithTown, fetchRolesForSelect, fetchTownsForSelect} from "./api";
 import moment from "moment";
 

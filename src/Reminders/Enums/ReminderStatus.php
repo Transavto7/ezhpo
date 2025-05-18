@@ -34,4 +34,16 @@ final class ReminderStatus extends Enum
     {
         return new self(self::DISABLE);
     }
+
+    public function getTitle(): string
+    {
+        switch ($this->value()) {
+            case self::ENABLE:
+                return 'Активно';
+            case self::DISABLE:
+                return 'Неактивно';
+            default:
+                throw new \LogicException("Invalid reminder status: {$this->value()}");
+        }
+    }
 }

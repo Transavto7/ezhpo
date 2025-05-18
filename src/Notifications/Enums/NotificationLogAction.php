@@ -4,35 +4,64 @@ declare(strict_types=1);
 
 namespace Src\Notifications\Enums;
 
-use LogicException;
 use Src\Core\Emuns\Enum;
 
 final class NotificationLogAction extends Enum
 {
-    const SHOW = 'show'; // Показ напоминания сотруднику
-    const EXECUTE = 'execute'; // Выполнение напоминания сотрудником
+    const CREATE = 'create';
+    const VIEW = 'view';
+    const READ = 'read';
+    const COMPLETE = 'complete';
+
+    public static function create(): self
+    {
+        return new self(self::CREATE);
+    }
+
+    public static function view(): self
+    {
+        return new self(self::VIEW);
+    }
+
+    public static function read(): self
+    {
+        return new self(self::READ);
+    }
+
+    public static function complete(): self
+    {
+        return new self(self::COMPLETE);
+    }
 
     public static function from(string $value): self
     {
         switch ($value) {
-            case self::SHOW:
-                return new self(self::SHOW);
-            case self::EXECUTE:
-                return new self(self::EXECUTE);
+            case self::CREATE:
+                return self::create();
+            case self::VIEW:
+                return self::view();
+            case self::READ:
+                return self::read();
+            case self::COMPLETE:
+                return self::complete();
             default:
-                throw new LogicException('Invalid value');
+                throw new \LogicException("Invalid notification log action value: $value");
         }
     }
 
-    public function toTranslate(): string
+    public function getTitle(): string
     {
         switch ($this->value()) {
-            case self::SHOW:
-                return 'Показ сотруднику';
-            case self::EXECUTE:
+            case self::CREATE:
+                return 'Создание';
+            case self::VIEW:
+                return 'Просмотр';
+            case self::READ:
+                return 'Прочтение';
+            case self::COMPLETE:
                 return 'Выполнение';
             default:
-                throw new LogicException('Invalid value');
+                throw new \LogicException("Invalid notification log action value: {$this->value()}");
         }
     }
 }

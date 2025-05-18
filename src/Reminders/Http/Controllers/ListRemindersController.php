@@ -26,6 +26,7 @@ final class ListRemindersController
             $sortOrder,
             new RemindersTableFilters(
                 $request->input('filters.search'),
+                $request->input('filters.reminders'),
                 $request->input('filters.cities'),
                 $request->input('filters.companies'),
                 $request->input('filters.points'),

@@ -9,6 +9,7 @@ use Src\Reminders\Queries\GetRemindersTableItems\Filters\ActionsFilter;
 use Src\Reminders\Queries\GetRemindersTableItems\Filters\CitiesFilter;
 use Src\Reminders\Queries\GetRemindersTableItems\Filters\CompaniesFilter;
 use Src\Reminders\Queries\GetRemindersTableItems\Filters\PointsFilter;
+use Src\Reminders\Queries\GetRemindersTableItems\Filters\RemindersFilter;
 use Src\Reminders\Queries\GetRemindersTableItems\Filters\RolesFilter;
 use Src\Reminders\Queries\GetRemindersTableItems\Filters\SearchFilter;
 use Src\Reminders\Queries\GetRemindersTableItems\Filters\SubjectsFilter;
@@ -20,6 +21,7 @@ final class RemindersTableFiltersFactory extends FilterFactory
     protected $filterClasses = [
         SearchFilter::NAME => SearchFilter::class,
         ActionsFilter::NAME => ActionsFilter::class,
+        RemindersFilter::NAME => RemindersFilter::class,
         CitiesFilter::NAME => CitiesFilter::class,
         CompaniesFilter::NAME => CompaniesFilter::class,
         PointsFilter::NAME => PointsFilter::class,

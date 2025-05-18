@@ -2,7 +2,7 @@
 
 namespace Src\Notifications\Normalizer;
 
-use Src\Notifications\Entitites\NotificationLog;
+use Src\Notifications\Entities\NotificationLog;
 
 final class NotificationLogDatabaseNormalizer
 {

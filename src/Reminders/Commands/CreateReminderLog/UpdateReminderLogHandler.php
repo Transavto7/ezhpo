@@ -2,7 +2,6 @@
 
 namespace Src\Reminders\Commands\CreateReminderLog;
 
-use Illuminate\Support\Facades\Auth;
 use Src\Reminders\Eloquent\ReminderLog;
 use Src\Reminders\Enums\ReminderLogAction;
 
@@ -20,7 +19,7 @@ class UpdateReminderLogHandler
         $reminderLog = new ReminderLog();
         $reminderLog->reminder_id = $command->getOldReminderData()['id'];
         $reminderLog->action = ReminderLogAction::UPDATE;
-        $reminderLog->user_id = Auth::user()->id;
+        $reminderLog->user_id = $command->getUserId();
 
         $payload = [];
         foreach ($command->getNewReminderData() as $key => $newValue) {

@@ -2,8 +2,6 @@
 
 namespace Src\Notifications\Queries\GetUnreadUserNotifications;
 
-use Src\Notifications\Queries\NotificationViewModel;
-
 interface GetUnreadUserNotificationsRepository
 {
     /**

@@ -18,78 +18,71 @@ final class ReminderViewModel
     /** @var string */
     private $content;
 
-    /** @var ClassifierViewModel */
-    private $action;
-
     /** @var array<string, ClassifierViewModel> */
     private $conditions;
 
-    /** @var string */
+    /** @var \DateTimeImmutable|null */
+    private $expiresAt;
+
+    /** @var int|null */
+    private $expiresInMinutes;
+
+    /** @var ClassifierViewModel */
     private $status;
 
-    /** @var string */
+    /** @var ClassifierViewModel */
+    private $action;
+
+    /** @var ClassifierViewModel */
     private $type;
+
+    /**
+     * @var bool
+     */
+    private $hiddenFromInitiator;
+
+    /**
+     * @var ClassifierViewModel[]
+     */
+    private $usersToNotify;
 
     /**
      * @param Uuid $id
      * @param string $title
      * @param string $content
-     * @param ClassifierViewModel $action
      * @param ClassifierViewModel[] $conditions
-     * @param string $status
-     * @param string $type
+     * @param \DateTimeImmutable|null $expiresAt
+     * @param int|null $expiresInMinutes
+     * @param ClassifierViewModel $status
+     * @param ClassifierViewModel $action
+     * @param ClassifierViewModel $type
+     * @param bool $hiddenFromInitiator
+     * @param ClassifierViewModel[] $usersToNotify
      */
     public function __construct(
         Uuid $id,
         string $title,
         string $content,
-        ClassifierViewModel $action,
         array $conditions,
-        string $status,
-        string $type
+        ?\DateTimeImmutable $expiresAt,
+        ?int $expiresInMinutes,
+        ClassifierViewModel $status,
+        ClassifierViewModel $action,
+        ClassifierViewModel $type,
+        bool $hiddenFromInitiator,
+        array $usersToNotify
     ) {
         $this->id = $id;
         $this->title = $title;
         $this->content = $content;
-        $this->action = $action;
         $this->conditions = $conditions;
+        $this->expiresAt = $expiresAt;
+        $this->expiresInMinutes = $expiresInMinutes;
         $this->status = $status;
+        $this->action = $action;
         $this->type = $type;
-    }
-
-    public function getId(): Uuid
-    {
-        return $this->id;
-    }
-
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
-
-    public function getContent(): string
-    {
-        return $this->content;
-    }
-
-    public function getAction(): ClassifierViewModel
-    {
-        return $this->action;
-    }
-
-    public function getConditions(): array
-    {
-        return $this->conditions;
-    }
-
-    public function getStatus(): string
-    {
-        return $this->status;
-    }
-
-    public function getType(): string
-    {
-        return $this->type;
+        $this->hiddenFromInitiator = $hiddenFromInitiator;
+        $this->usersToNotify = $usersToNotify;
     }
 
     public function toArray(): array
@@ -98,10 +91,16 @@ final class ReminderViewModel
             'id' => $this->id->value(),
             'title' => $this->title,
             'content' => $this->content,
-            'action' => $this->action->toArray(),
             'conditions' => $this->conditions,
-            'status' => $this->status,
-            'type' => $this->type,
+            'expiresAt' => $this->expiresAt ? $this->expiresAt->format('Y-m-d H:i:s') : null,
+            'expiresInMinutes' => $this->expiresInMinutes,
+            'status' => $this->status->toArray(),
+            'action' => $this->action->toArray(),
+            'type' => $this->type->toArray(),
+            'hiddenFromInitiator' => $this->hiddenFromInitiator,
+            'usersToNotify' => array_map(function (ClassifierViewModel $user) {
+                return $user->toArray();
+            }, $this->usersToNotify),
         ];
     }
 }

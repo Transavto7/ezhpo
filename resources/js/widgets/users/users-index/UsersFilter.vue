@@ -1,6 +1,6 @@
 <script setup>
 import {useIndexPageSetup} from "@/widgets/users/users-index/useIndexPageSetup";
-import VSelectRemote from "@/v-components/VSelectRemote.vue";
+import VSelectRemote from "@/ui/VSelectRemote.vue";
 import {fetchUsersSelect} from "@/widgets/users/users-index/api";
 
 const {statusFilterOptions, entityTypeFilterOptions} = useIndexPageSetup()

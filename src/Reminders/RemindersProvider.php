@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Src\Reminders;
 
+use Illuminate\Bus\Dispatcher;
 use Illuminate\Support\ServiceProvider;
+use Src\Reminders\Commands\SwitchReminderStatus\SwitchReminderStatusCommand;
+use Src\Reminders\Commands\SwitchReminderStatus\SwitchReminderStatusHandler;
 use Src\Reminders\Queries\GetReminderById\GetReminderRepositoryInterface;
-use Src\Reminders\Queries\GetRemindersByContext\GetReminderByContextRepository;
+use Src\Reminders\Repositories\GetReminderByContextRepository;
+use Src\Reminders\Repositories\Mysql\GetReminderByContextMysqlRepository;
 use Src\Reminders\Repositories\Mysql\MysqlRemindersRepository;
 use Src\Reminders\Repositories\RemindersRepository;
 
@@ -16,7 +20,7 @@ final class RemindersProvider extends ServiceProvider
     {
         $this->app->bind(RemindersRepository::class, MysqlRemindersRepository::class);
         $this->app->bind(GetReminderRepositoryInterface::class, MysqlRemindersRepository::class);
-        $this->app->bind(GetReminderByContextRepository::class, MysqlRemindersRepository::class);
+        $this->app->bind(GetReminderByContextRepository::class, GetReminderByContextMysqlRepository::class);
     }
 
     public function boot(): void
@@ -25,5 +29,13 @@ final class RemindersProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
         $this->loadMigrationsFrom(__DIR__.'/Database/Migrations');
         $this->loadTranslationsFrom(__DIR__.'/Http/Lang', 'reminders');
+
+        $this->app->extend(Dispatcher::class, function (Dispatcher $dispatcher) {
+            $dispatcher->map([
+                SwitchReminderStatusCommand::class => SwitchReminderStatusHandler::class,
+            ]);
+
+            return $dispatcher;
+        });
     }
 }

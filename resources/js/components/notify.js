@@ -17,4 +17,8 @@ export default class Notify {
     static error(message) {
         toast.error(message);
     }
+
+  static warning(message) {
+    toast.warning(message);
+  }
 }

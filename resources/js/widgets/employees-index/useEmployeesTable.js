@@ -33,7 +33,7 @@ export const useEmployeesTable = () => {
       table.page = data.page;
       table.total = data.total;
     } catch (e) {
-      console.log(e)
+      console.error(e)
     } finally {
       fetchTablePending.value = false
     }

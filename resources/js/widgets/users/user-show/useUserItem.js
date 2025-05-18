@@ -18,7 +18,7 @@ export const useUserItem = () => {
 
       user.value = data
     } catch (e) {
-      console.log(e)
+      console.error(e)
     } finally {
       pendingFetchUserItem.value = false
     }

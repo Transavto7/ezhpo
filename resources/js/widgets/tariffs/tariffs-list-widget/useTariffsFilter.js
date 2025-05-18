@@ -7,7 +7,7 @@ export const useTariffsFilter = () => {
                 ...params,
             })
         } catch (e) {
-            console.log(e)
+            console.error(e)
         }
     }
 
@@ -17,7 +17,7 @@ export const useTariffsFilter = () => {
                 ...params,
             })
         } catch (e) {
-            console.log(e)
+            console.error(e)
         }
     }
 
@@ -27,7 +27,7 @@ export const useTariffsFilter = () => {
                 ...params,
             })
         } catch (e) {
-            console.log(e)
+            console.error(e)
         }
     }
 

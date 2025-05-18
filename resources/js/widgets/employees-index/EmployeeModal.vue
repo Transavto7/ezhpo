@@ -75,7 +75,6 @@ const handleSubmit = async () => {
       await createEmployee(params)
     }
 
-    console.log('exit')
     emit('close', true)
     isShow.value = false
   } catch (e) {

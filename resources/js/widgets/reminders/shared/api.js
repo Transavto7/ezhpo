@@ -45,3 +45,21 @@ export const fetchSubjectsForSelect = (search, subjectType) => {
         params: {search, subject_type: subjectType}
     });
 }
+
+export const fetchRemindersForSelect = ({search}) => {
+    return axios.get(`/reminders/reminders/select`, {
+        params: {search}
+    });
+}
+
+export const fetchReminderTypesForSelect = ({search}) => {
+    return axios.get(`/reminders/types/select`, {
+        params: {search}
+    });
+}
+
+export const fetchReminderStatusesForSelect = ({search}) => {
+  return axios.get(`/reminders/statuses/select`, {
+    params: {search}
+  });
+}

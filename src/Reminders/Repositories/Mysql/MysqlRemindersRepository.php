@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Src\Reminders\Repositories\Mysql;
 
+use App\Employee;
 use Illuminate\Support\Facades\DB;
 use Src\Core\ValueObjects\ClassifierViewModel;
 use Src\Core\ValueObjects\Uuid;
@@ -11,14 +12,14 @@ use Src\Reminders\ConditionBuilder\AvailableConditions;
 use Src\Reminders\Conditions\Condition;
 use Src\Reminders\Entities\Reminder;
 use Src\Reminders\Enums\ReminderAction;
+use Src\Reminders\Enums\ReminderStatus;
+use Src\Reminders\Enums\ReminderType;
 use Src\Reminders\Normalizers\ReminderDatabaseNormalizer;
 use Src\Reminders\Queries\GetReminderById\GetReminderRepositoryInterface;
 use Src\Reminders\Queries\GetReminderById\ReminderViewModel;
-use Src\Reminders\Queries\GetRemindersByContext\GetReminderByContextRepository;
-use Src\Reminders\Queries\GetRemindersByContext\ReminderByContext;
 use Src\Reminders\Repositories\RemindersRepository;
 
-final class MysqlRemindersRepository implements RemindersRepository, GetReminderRepositoryInterface, GetReminderByContextRepository
+final class MysqlRemindersRepository implements RemindersRepository, GetReminderRepositoryInterface
 {
     /** @var ReminderDatabaseNormalizer */
     private $normalizer;
@@ -85,54 +86,55 @@ final class MysqlRemindersRepository implements RemindersRepository, GetReminder
             $conditionsViewModels[$condition->getName()] = $condition->makeViewModel((array) $rawReminder);
         }
 
+        $type = ReminderType::from($rawReminder->type);
+        $status = ReminderStatus::from($rawReminder->status);
+        $action = ReminderAction::from($rawReminder->action);
+
+        $expiresAt = $rawReminder->expires_at;
+        if ($expiresAt) {
+            $expiresAt = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $expiresAt);
+        }
+
+        $usersToNotify = [];
+        if ($rawReminder->users_to_notify) {
+            $usersToNotify = json_decode($rawReminder->users_to_notify, true);
+            $usersToNotify = array_reduce($usersToNotify, function (array $carry, string $id) {
+                $employee = Employee::withTrashed()->find($id);
+
+                if (! $employee) {
+                    return $carry;
+                }
+
+                return array_merge($carry, [
+                    new ClassifierViewModel(
+                        $id,
+                        "[$employee->hash_id] $employee->name"
+                    )
+                ]);
+            }, []);
+        }
+
         return new ReminderViewModel(
             Uuid::fromString($rawReminder->id),
             $rawReminder->title,
             $rawReminder->content,
-            new ClassifierViewModel($rawReminder->action, trans('reminders::actions.'.$rawReminder->action)),
             $conditionsViewModels,
-            $rawReminder->status,
-            $rawReminder->type,
+            $expiresAt,
+            $rawReminder->expires_in_minutes,
+            new ClassifierViewModel(
+                $status->value(),
+                $status->getTitle()
+            ),
+            new ClassifierViewModel(
+                $action->value(),
+                $action->getTitle()
+            ),
+            new ClassifierViewModel(
+                $type->value(),
+                $type->getTitle()
+            ),
+            $rawReminder->hidden_from_initiator !== 0,
+            $usersToNotify
         );
-    }
-
-    /**
-     * @param ReminderAction $action
-     * @param Condition[] $context
-     * @return ReminderByContext[]
-     */
-    public function getReminderByContext(ReminderAction $action, array $context): array
-    {
-        $builder = DB::table('reminders')
-            ->select([
-                'reminders.id',
-                'reminders.title',
-                'reminders.content',
-                'reminders.expires_at',
-                'reminders.expires_in_minutes',
-                'reminders.hidden_from_initiator',
-                'reminders.users_to_notify'
-            ])
-            ->where('action', '=', $action->value())
-            ->orderBy('reminders.created_at', 'desc');
-
-        foreach ($context as $condition) {
-            $builder = $condition->run($builder);
-        }
-
-        /** @var object{id: string, title: string, content: string}[] $rawReminders */
-        $rawReminders = $builder->get()->toArray();
-
-        return array_map(function (object $reminder) {
-            return new ReminderByContext(
-                Uuid::fromString($reminder->id),
-                $reminder->title,
-                $reminder->content,
-                ((bool) $reminder->hidden_from_initiator) ?? false,
-                json_decode($reminder->users_to_notify ?? '[]', true),
-                $reminder->expires_at ? \DateTimeImmutable::createFromFormat('Y-m-d H:i', $reminder->expires_at) : null,
-                $reminder->expires_in_minutes,
-            );
-        }, $rawReminders);
     }
 }

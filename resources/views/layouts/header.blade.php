@@ -17,6 +17,10 @@
                 <!-- Navbar Menu -->
                 <ul class="nav-menu list-unstyled d-flex flex-md-row align-items-md-center">
 
+                    @if(\Illuminate\Support\Facades\Auth::user())
+                        <notifications-hub></notifications-hub>
+                    @endif
+
                     @guest
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('login') }}">{{ __('Войти') }}</a>

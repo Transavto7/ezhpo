@@ -1,6 +1,6 @@
 <script setup>
 import {useTariffsFilter} from "./useTariffsFilter";
-import VSelectRemote from "../../../v-components/VSelectRemote.vue";
+import VSelectRemote from "@/ui/VSelectRemote.vue";
 
 const {fetchPoints, fetchTowns, fetchRoles} = useTariffsFilter()
 

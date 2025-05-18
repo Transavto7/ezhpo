@@ -46,7 +46,7 @@ export const useUsersTable = () => {
       table.items = data.items;
       table.total = data.total;
     } catch (e) {
-      console.log(e)
+      console.error(e)
     } finally {
       fetchTablePending.value = false
     }

@@ -6,9 +6,14 @@ import {useRemindersTable} from "./useRemindersTable";
 import RemindersFilter from "./RemindersFilter.vue";
 import RemindersTable from "./RemindersTable.vue";
 import RemindersTablePagination from "./RemindersTablePagination.vue";
-import { ACTIONS, CONDITIONS, SUBJECT_TYPES } from "../../../common/reminderContextEnums";
+import { ACTIONS, CONDITIONS, SUBJECT_TYPES } from "@/common/reminderContextEnums";
+import {switchReminderStatus} from "@/widgets/reminders/reminders-list-widget/api";
+import {useGlobalEvent} from "@/composables/useGlobalEvent";
+import {GLOBAL_EVENTS} from "@/conf";
 
 const { table, params, fetchTablePending, fetchRemindersTable, resetFilter, filter, performDeleteReminder } = useRemindersTable()
+
+const { dispatchGlobalEvent } = useGlobalEvent()
 
 const handleFilterApply = async () => {
     params.page = 1
@@ -21,14 +26,12 @@ const handleFilterReset = async () => {
 }
 
 const handleSend = async () => {
-    window.dispatchEvent(new CustomEvent('showModalNotificationWindow', {
-        detail: {
-            context:{
-                [CONDITIONS.SUBJECT_TYPE]: SUBJECT_TYPES.CAR
-            },
-            action: ACTIONS.CREATE_INSPECTION
-        },
-    }));
+  dispatchGlobalEvent(GLOBAL_EVENTS.showModalNotificationWindow, {
+    context:{
+      [CONDITIONS.SUBJECT_TYPE]: SUBJECT_TYPES.CAR
+    },
+    action: ACTIONS.CREATE_INSPECTION
+  })
 }
 
 const handleDelete = async (id) => {
@@ -39,10 +42,10 @@ const handleDelete = async (id) => {
     })
 }
 
-
-onMounted(async () => {
-    await fetchRemindersTable()
-})
+const handleSwitchStatus = async (payload) => {
+  await switchReminderStatus(payload.id, payload.enable)
+  await fetchRemindersTable()
+}
 
 watch([
         () => params.page,
@@ -54,6 +57,24 @@ watch([
         await fetchRemindersTable()
     }, 200)
 )
+
+onMounted(async () => {
+  const urlParams = new URLSearchParams(window.location.search)
+  const id = urlParams.get('id')
+  const title = urlParams.get('title')
+
+  if (id && title) {
+    filter.reminders = [{id, name: title}]
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete('id');
+    url.searchParams.delete('title');
+
+    history.replaceState(null, '', url.toString());
+  }
+
+  await fetchRemindersTable()
+})
 </script>
 
 <template>
@@ -63,6 +84,7 @@ watch([
                 <reminders-filter
                     :search.sync="filter.search"
                     :actions.sync="filter.actions"
+                    :reminders.sync="filter.reminders"
                     :cities.sync="filter.cities"
                     :points.sync="filter.points"
                     :users.sync="filter.users"
@@ -87,6 +109,7 @@ watch([
             :sort-by.sync="params.sortBy"
             :sort-desc.sync="params.sortDesc"
             @delete="handleDelete"
+            @switch-status="handleSwitchStatus"
         />
 
         <reminders-table-pagination

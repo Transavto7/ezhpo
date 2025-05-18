@@ -36,20 +36,17 @@ final class UpdateReminderCommand
     /** @var bool */
     private $hiddenFromInitiator;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $usersToNotify;
 
-    /**
-     * @var \DateTimeImmutable|null
-     */
+    /** @var \DateTimeImmutable|null */
     private $expiresAt;
 
-    /**
-     * @var int|null
-     */
+    /** @var int|null */
     private $expiresInMinutes;
+
+    /** @var ?int */
+    private $userId;
 
     /**
      * @param Uuid $id
@@ -59,6 +56,11 @@ final class UpdateReminderCommand
      * @param Condition[] $context
      * @param ReminderStatus $status
      * @param ReminderType $type
+     * @param bool $hiddenFromInitiator
+     * @param array $usersToNotify
+     * @param \DateTimeImmutable|null $expiresAt
+     * @param int|null $expiresInMinutes
+     * @param int|null $userId
      */
     public function __construct(
         Uuid $id,
@@ -71,7 +73,8 @@ final class UpdateReminderCommand
         bool $hiddenFromInitiator,
         array $usersToNotify,
         ?\DateTimeImmutable $expiresAt = null,
-        ?int $expiresInMinutes = null
+        ?int $expiresInMinutes = null,
+        ?int $userId = null
     ) {
         $this->id = $id;
         $this->title = $title;
@@ -84,6 +87,7 @@ final class UpdateReminderCommand
         $this->usersToNotify = $usersToNotify;
         $this->expiresAt = $expiresAt;
         $this->expiresInMinutes = $expiresInMinutes;
+        $this->userId = $userId;
     }
 
     public function getId(): Uuid
@@ -139,5 +143,10 @@ final class UpdateReminderCommand
     public function getExpiresInMinutes(): ?int
     {
         return $this->expiresInMinutes;
+    }
+
+    public function getUserId(): ?int
+    {
+        return $this->userId;
     }
 }

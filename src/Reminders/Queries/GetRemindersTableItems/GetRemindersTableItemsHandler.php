@@ -6,13 +6,13 @@ namespace Src\Reminders\Queries\GetRemindersTableItems;
 
 use Illuminate\Support\Facades\DB;
 use Src\Core\Constants\DateFormats;
-use Src\Core\ValueObjects\ClassifierViewModel;
 use Src\Core\ValueObjects\TableItems;
-use Src\Core\ValueObjects\Uuid;
 use Src\Reminders\ConditionBuilder\AvailableConditions;
 use Src\Reminders\Conditions\Condition;
+use Src\Reminders\Enums\ReminderAction;
+use Src\Reminders\Enums\ReminderStatus;
+use Src\Reminders\Enums\ReminderType;
 use Src\Reminders\Normalizers\ReminderDatabaseNormalizer;
-use Src\Reminders\Queries\GetReminderById\ReminderViewModel;
 
 final class GetRemindersTableItemsHandler
 {
@@ -64,15 +64,8 @@ final class GetRemindersTableItemsHandler
                     $conditionsViewModels[$condition->getName()] = $condition->makeViewModel((array) $rawReminder);
                 }
 
-                $reminder = new ReminderViewModel(
-                    Uuid::fromString($rawReminder->id),
-                    $rawReminder->title,
-                    $rawReminder->content,
-                    new ClassifierViewModel($rawReminder->action, trans('reminders::actions.'.$rawReminder->action)),
-                    $conditionsViewModels,
-                    $rawReminder->status,
-                    $rawReminder->type,
-                );
+                $status = ReminderStatus::from($rawReminder->status);
+                $action = ReminderAction::from($rawReminder->action);
 
                 $updatedAt = null;
                 if ($rawReminder->updated_at) {
@@ -80,10 +73,11 @@ final class GetRemindersTableItemsHandler
                 }
 
                 return [
-                    'id' => $reminder->getId()->value(),
-                    'title' => $reminder->getTitle(),
-                    'action' => $reminder->getAction(),
-                    'context' => $reminder->getConditions(),
+                    'id' => $rawReminder->id,
+                    'title' => $rawReminder->title,
+                    'action' => $action->getTitle(),
+                    'enabled' => ! $status->equal(ReminderStatus::disable()),
+                    'context' => $conditionsViewModels,
                     'updated_at' => $updatedAt,
                 ];
             })

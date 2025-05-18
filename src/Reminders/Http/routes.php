@@ -14,10 +14,14 @@ use Src\Reminders\Http\Controllers\Selects\SelectActionsController;
 use Src\Reminders\Http\Controllers\Selects\SelectCitiesController;
 use Src\Reminders\Http\Controllers\Selects\SelectCompaniesController;
 use Src\Reminders\Http\Controllers\Selects\SelectPointsController;
+use Src\Reminders\Http\Controllers\Selects\SelectRemindersController;
+use Src\Reminders\Http\Controllers\Selects\SelectReminderStatusesController;
+use Src\Reminders\Http\Controllers\Selects\SelectReminderTypesController;
 use Src\Reminders\Http\Controllers\Selects\SelectRolesController;
 use Src\Reminders\Http\Controllers\Selects\SelectSubjectsController;
 use Src\Reminders\Http\Controllers\Selects\SelectSubjectTypesController;
 use Src\Reminders\Http\Controllers\Selects\SelectUsersController;
+use Src\Reminders\Http\Controllers\SwitchReminderStatusController;
 use Src\Reminders\Http\Controllers\UpdateReminderController;
 use Src\Reminders\Http\Controllers\UpdateReminderPageController;
 
@@ -28,8 +32,12 @@ Route::middleware(['web', 'auth'])->prefix('reminders')->name('reminders.')->gro
     Route::post('/create', CreateReminderController::class)->name('create');
     Route::post('/delete', DeleteReminderController::class)->name('delete');
 
+    Route::get('/logs', JournalReminderLogsPageController::class)->name('logs.list-page');
+    Route::post('/logs', JournalReminderLogsController::class)->name('logs.list');
+
     Route::get('/{id}', UpdateReminderPageController::class)->name('update-page');
     Route::post('/{id}', UpdateReminderController::class)->name('update');
+    Route::post('/{id}/switch-status', SwitchReminderStatusController::class)->name('switch-status');
 
     Route::get('/actions/select', SelectActionsController::class)->name('actions.select');
     Route::get('/cities/select', SelectCitiesController::class)->name('cities.select');
@@ -39,7 +47,7 @@ Route::middleware(['web', 'auth'])->prefix('reminders')->name('reminders.')->gro
     Route::get('/companies/select', SelectCompaniesController::class)->name('companies.select');
     Route::get('/subject-types/select', SelectSubjectTypesController::class)->name('subject_types.select');
     Route::get('/subjects/select', SelectSubjectsController::class)->name('subjects.select');
-
-    Route::get('/logs', JournalReminderLogsPageController::class)->name('logs.list-page');
-    Route::post('/logs', JournalReminderLogsController::class)->name('logs.list');
+    Route::get('/reminders/select', SelectRemindersController::class)->name('reminders.select');
+    Route::get('/types/select', SelectReminderTypesController::class)->name('reminder_types.select');
+    Route::get('/statuses/select', SelectReminderStatusesController::class)->name('reminder_statuses.select');
 });
