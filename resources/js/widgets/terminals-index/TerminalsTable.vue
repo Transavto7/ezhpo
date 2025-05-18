@@ -66,7 +66,6 @@ const emit = defineEmits(['edit', 'delete', 'restore', 'read-logs', 'update:sort
 const sortChanged = (e) => {
   emit('update:sort-by', e.sortBy)
   emit('update:sort-desc', e.sortDesc)
-  console.log(e.sortBy, e.sortDesc)
 }
 
 const tableRowClass = (item, type) => {

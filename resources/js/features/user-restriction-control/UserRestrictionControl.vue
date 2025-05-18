@@ -28,7 +28,7 @@ const handleUnblock = async () => {
     emit('unblocked')
     emit('changed')
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }
 
@@ -39,7 +39,7 @@ const handleBlock = async () => {
     emit('blocked')
     emit('changed')
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }
 </script>

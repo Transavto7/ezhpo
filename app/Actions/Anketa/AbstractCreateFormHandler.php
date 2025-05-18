@@ -2,14 +2,19 @@
 
 namespace App\Actions\Anketa;
 
+use App\Enums\FormTypeEnum;
+use App\Models\Forms\Form;
 use App\Services\DuplicatesCheckerService;
 use App\Services\RedDatesCheckerService;
 use App\User;
 use DateTime;
 use Exception;
+use Illuminate\Bus\Dispatcher;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Src\Notifications\Commands\CreateNotificationsByContext\CreateNotificationsByContextCommand;
+use Src\Reminders\Enums\ReminderAction;
 use Throwable;
 
 abstract class AbstractCreateFormHandler
@@ -61,6 +66,7 @@ abstract class AbstractCreateFormHandler
             $timezone = $user->relatedTerminal->timezone;
         }
 
+        $originalTz = date_default_timezone_get();
         date_default_timezone_set('UTC');
         $this->time = date('Y-m-d H:i:s', time() + ($timezone ?? 3) * 3600);
 
@@ -88,6 +94,26 @@ abstract class AbstractCreateFormHandler
 
         if ($this->data['is_dop'] ?? 0 === 1) {
             $responseData['is_dop'] = 1;
+        }
+
+        $form = $this->createdForms->first();
+        date_default_timezone_set($originalTz);
+
+        if ($form && $data['type_anketa'] === FormTypeEnum::MEDIC) {
+            /**
+             * @var Form $form
+             */
+            $dispatcher = app()->make(Dispatcher::class);
+            $dispatcher->dispatch(new CreateNotificationsByContextCommand(
+                ReminderAction::createInspection(),
+                [
+                    'subject_type' => 'driver',
+                    'subject' => $form->driver_id,
+                    'point' => $form->point_id,
+                    'company' => $form->company_id,
+                ],
+                $user,
+            ));
         }
 
         return $responseData;

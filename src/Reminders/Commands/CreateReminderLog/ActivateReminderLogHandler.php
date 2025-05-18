@@ -18,7 +18,7 @@ class ActivateReminderLogHandler
             'is_activated' => [
                 'old' => $command->isActivatedOld(),
                 'new' => $command->isActivatedNew(),
-            ]
+            ],
         ]);
 
         $reminderLog->save();

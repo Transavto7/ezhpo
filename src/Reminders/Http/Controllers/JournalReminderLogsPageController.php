@@ -8,6 +8,14 @@ final class JournalReminderLogsPageController
 {
     public function __invoke()
     {
-        return view('Reminders::log');
+        $user = auth()->user();
+
+        $canEmployeeRead = $user->access('employee_read');
+        $canRemindersRead = $user->access('reminders_read');
+
+        return view('Reminders::logs-list', [
+            'canEmployeeRead' => $canEmployeeRead,
+            'canRemindersRead' => $canRemindersRead,
+        ]);
     }
 }

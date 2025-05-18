@@ -25,7 +25,7 @@ const handleSaveClick = async () => {
     await performUpdateUserAccess(props.userId)
     emit('changed')
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }
 

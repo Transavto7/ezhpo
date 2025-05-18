@@ -27,7 +27,7 @@ final class ReminderLogAction extends Enum
         }
     }
 
-    public function toTranslate(): string
+    public function getTitle(): string
     {
         switch ($this->value()) {
             case self::SHOW:

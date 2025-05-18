@@ -2,17 +2,21 @@
 
 namespace Src\Reminders\Commands\CreateReminderLog;
 
-use Src\Reminders\Entities\Reminder;
-
 class UpdateReminderLogCommand
 {
     private $oldReminderData;
     private $newReminderData;
 
-    public function __construct(array $oldReminderData, array $newReminderData)
+    /**
+     * @var ?int
+     */
+    private $userId;
+
+    public function __construct(array $oldReminderData, array $newReminderData, ?int $userId)
     {
         $this->oldReminderData = $oldReminderData;
         $this->newReminderData = $newReminderData;
+        $this->userId = $userId;
     }
 
     public function getOldReminderData(): array
@@ -23,5 +27,10 @@ class UpdateReminderLogCommand
     public function getNewReminderData(): array
     {
         return $this->newReminderData;
+    }
+
+    public function getUserId(): ?int
+    {
+        return $this->userId;
     }
 }

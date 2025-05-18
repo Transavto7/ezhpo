@@ -27,4 +27,18 @@ final class ReminderType extends Enum
                 throw new \LogicException('Unknown reminder type: '.$value);
         }
     }
+
+    public function getTitle(): string
+    {
+        switch ($this->value()) {
+            case self::INFO:
+                return 'Информационное';
+            case self::WARNING:
+                return 'Предупреждение';
+            case self::DANGER:
+                return 'Критическое';
+            default:
+                throw new \LogicException("Invalid reminder type: {$this->value()}");
+        }
+    }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Src\Reminders\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Src\Core\ValueObjects\Uuid;
 use Src\Reminders\Commands\UpdateReminder\UpdateReminderCommand;
@@ -24,6 +25,19 @@ final class UpdateReminderController
         SelectsArrayConditionBuilder $conditionBuilder
     ) {
         DB::beginTransaction();
+
+        $user = Auth::user();
+
+        $usersToNotify = $request->input('usersToNotify') ?? [];
+        $usersToNotify = array_map(static function ($user) {
+            return (int) $user['id'];
+        }, $usersToNotify);
+
+        $expiresInMinutes = $request->input('expiresInMinutes');
+        if ($expiresInMinutes !== null) {
+            $expiresInMinutes = (int) $expiresInMinutes;
+        }
+
         try {
             $handler->handle(new UpdateReminderCommand(
                 Uuid::fromString($reminderId),
@@ -31,12 +45,13 @@ final class UpdateReminderController
                 $request->input('content'),
                 ReminderAction::from($request->input('action.id')),
                 $conditionBuilder->build($request->input('conditions', [])),
-                ReminderStatus::enable(),
-                ReminderType::from('info'),
-                filter_var($request->input('hidden_from_initiator'), FILTER_VALIDATE_BOOLEAN),
-                $request->input('users_to_notify') ?? [],
-                $request->input('expires_at') ? \DateTimeImmutable::createFromFormat('Y-m-d H:i', $request->input('expires_at')) : null,
-                $request->input('expires_in_minutes')
+                ReminderStatus::from($request->input('status.id')),
+                ReminderType::from($request->input('type.id')),
+                filter_var($request->input('hiddenFromInitiator'), FILTER_VALIDATE_BOOLEAN),
+                $usersToNotify,
+                $request->input('expiresAt') ? \DateTimeImmutable::createFromFormat('Y-m-d H:i', $request->input('expiresAt')) : null,
+                $expiresInMinutes,
+                $user->id
             ));
 
             DB::commit();

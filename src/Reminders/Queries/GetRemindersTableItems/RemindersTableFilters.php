@@ -8,6 +8,7 @@ use Src\Reminders\Queries\GetRemindersTableItems\Filters\ActionsFilter;
 use Src\Reminders\Queries\GetRemindersTableItems\Filters\CitiesFilter;
 use Src\Reminders\Queries\GetRemindersTableItems\Filters\CompaniesFilter;
 use Src\Reminders\Queries\GetRemindersTableItems\Filters\PointsFilter;
+use Src\Reminders\Queries\GetRemindersTableItems\Filters\RemindersFilter;
 use Src\Reminders\Queries\GetRemindersTableItems\Filters\RolesFilter;
 use Src\Reminders\Queries\GetRemindersTableItems\Filters\SearchFilter;
 use Src\Reminders\Queries\GetRemindersTableItems\Filters\SubjectsFilter;
@@ -18,6 +19,9 @@ final class RemindersTableFilters
 {
     /** @var string|null */
     private $search;
+
+    /** @var array<int>|null */
+    private $reminderIds;
 
     /** @var array<int>|null */
     private $cityIds;
@@ -45,6 +49,7 @@ final class RemindersTableFilters
 
     /**
      * @param string|null $search
+     * @param int[]|null $reminderIds
      * @param int[]|null $cityIds
      * @param int[]|null $companyIds
      * @param int[]|null $pointIds
@@ -56,6 +61,7 @@ final class RemindersTableFilters
      */
     public function __construct(
         ?string $search,
+        ?array $reminderIds,
         ?array $cityIds,
         ?array $companyIds,
         ?array $pointIds,
@@ -66,6 +72,7 @@ final class RemindersTableFilters
         ?array $actions
     ) {
         $this->search = $search;
+        $this->reminderIds = $reminderIds;
         $this->cityIds = $cityIds;
         $this->companyIds = $companyIds;
         $this->pointIds = $pointIds;
@@ -80,6 +87,7 @@ final class RemindersTableFilters
     {
         return [
             SearchFilter::NAME => $this->search,
+            RemindersFilter::NAME => $this->reminderIds,
             ActionsFilter::NAME => $this->actions,
             CitiesFilter::NAME => $this->cityIds,
             CompaniesFilter::NAME => $this->companyIds,

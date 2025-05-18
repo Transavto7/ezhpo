@@ -13,6 +13,6 @@
 
 @section('content')
     <div class="col-md-12">
-            <edit-reminder-widget/>
+        <edit-reminder-widget></edit-reminder-widget>
     </div>
 @endsection

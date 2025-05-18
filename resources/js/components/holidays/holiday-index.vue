@@ -2,7 +2,7 @@
 import {range} from "lodash";
 import CalendarMonth from "./calendar-month.vue";
 import Notify from "../notify";
-import Preloader from "../../common/Preloader.vue";
+import Preloader from "@/ui/Preloader.vue";
 
 export default {
     components: {Preloader, CalendarMonth},

@@ -3,7 +3,7 @@ import TariffForm from "../shared/TariffForm.vue";
 import {ref} from "vue";
 import {createTariff} from "./api";
 import Notify from "../../../components/notify";
-import Preloader from "../../../common/Preloader.vue";
+import Preloader from "@/ui/Preloader.vue";
 import moment from "moment/moment";
 
 const tariff = ref({

@@ -7,6 +7,7 @@ namespace Src\Reminders\Factories;
 use App\Car;
 use App\Driver;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Src\Reminders\Enums\ReminderSubjectType;
 
 final class SubjectBuilderFactory
@@ -18,9 +19,15 @@ final class SubjectBuilderFactory
     {
         switch ($type) {
             case ReminderSubjectType::DRIVER:
-                return Driver::query()->select('id', 'fio as name');
+                return Driver::query()->select([
+                    'id',
+                    DB::raw("concat('[', hash_id, '] ', fio) as name"),
+                ]);
             case ReminderSubjectType::CAR:
-                return Car::query()->select('id', 'gos_number as name');
+                return Car::query()->select([
+                    'id',
+                    DB::raw("concat('[', hash_id, '] ', gos_number) as name"),
+                ]);
             default:
                 throw new \Exception('Unsupported subject type');
         }

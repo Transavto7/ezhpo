@@ -71,7 +71,7 @@ export const useEmployeeForm = () => {
 
       form.permissionIds = data.permission_ids
     } catch (e) {
-      console.log(e)
+      console.error(e)
     } finally {
       fetchFormPending.value = false
     }

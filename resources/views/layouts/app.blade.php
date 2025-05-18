@@ -33,9 +33,11 @@
             window.DADATA_TOKEN = '{{ config('services.dadata.token') }}';
         @endauth
 
-        window.PAGE_SETUP = {
-            baseUrl: '{{ config('app.url') }}'
+        window.APP_PAGE_SETUP = {
+            baseUrl: '{{ config('app.url') }}',
+            notificationsPoolingInterval: '{{ config('notifications.pooling_interval') }}',
         }
+        window.PAGE_SETUP = {}
         window.DOC_FIELDS = @json(config('docs.fields'));
 
         window.addEventListener("load", function (event) {
@@ -69,8 +71,6 @@
 
 <div id="app" class="page @yield('class-page')">
     @include('layouts.header')
-
-    <notification-modal-widget></notification-modal-widget>
 
     <main
         class="page-content d-flex align-items-stretch @if (user() && (user()->hasRole('driver') || user()->hasRole('client'))) blue @endif">

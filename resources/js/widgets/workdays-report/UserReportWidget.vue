@@ -39,7 +39,6 @@ const runSearch = () => {
     }).then(response => {
         isDisabledSearchButton.value = false;
         const data = response.data;
-        console.log(data);
 
         if (data.errorReport) {
             for (let report in data.errorReport) {

@@ -29,21 +29,17 @@ final class CreateReminderCommand
 
     /** @var ReminderType */
     private $type;
-    /**
-     * @var bool
-     */
+
+    /** @var bool */
     private $hiddenFromInitiator;
-    /**
-     * @var array
-     */
+
+    /** @var array */
     private $usersToNotify;
-    /**
-     * @var DateTimeImmutable|null
-     */
+
+    /** @var DateTimeImmutable|null */
     private $expiresAt;
-    /**
-     * @var int|null
-     */
+
+    /** * @var int|null */
     private $expiresInMinutes;
 
     /**
@@ -53,18 +49,22 @@ final class CreateReminderCommand
      * @param Condition[] $context
      * @param ReminderStatus $status
      * @param ReminderType $type
+     * @param bool $hiddenFromInitiator
+     * @param array $usersToNotify
+     * @param DateTimeImmutable|null $expiresAt
+     * @param int|null $expiresInMinutes
      */
     public function __construct(
-        string             $title,
-        string             $content,
-        ReminderAction     $action,
-        array              $context,
-        ReminderStatus     $status,
-        ReminderType       $type,
-        bool               $hiddenFromInitiator,
-        array              $usersToNotify,
+        string $title,
+        string $content,
+        ReminderAction $action,
+        array $context,
+        ReminderStatus $status,
+        ReminderType $type,
+        bool $hiddenFromInitiator,
+        array $usersToNotify,
         ?DateTimeImmutable $expiresAt,
-        ?int               $expiresInMinutes
+        ?int $expiresInMinutes
     ) {
         $this->title = $title;
         $this->content = $content;

@@ -14,6 +14,7 @@ export const useRemindersTable = () => {
         search: null,
         actions: null,
         cities: null,
+        reminders: null,
         points: null,
         users: null,
         roles: null,
@@ -25,6 +26,7 @@ export const useRemindersTable = () => {
     const resetFilter = () => {
         filter.search = null
         filter.actions = null
+        filter.reminders = null
         filter.cities = null
         filter.points = null
         filter.users = null
@@ -50,6 +52,7 @@ export const useRemindersTable = () => {
                 filters: {
                     search: filter.search,
                     actions: filter.actions?.map((item) => item.id),
+                    reminders: filter.reminders?.map((item) => item.id),
                     cities: filter.cities?.map((item) => item.id),
                     points: filter.points?.map((item) => item.id),
                     users: filter.users?.map((item) => item.id),
@@ -63,7 +66,7 @@ export const useRemindersTable = () => {
             table.items = data.items;
             table.total = data.total;
         } catch (e) {
-            console.log(e)
+            console.error(e)
         } finally {
             fetchTablePending.value = false
         }

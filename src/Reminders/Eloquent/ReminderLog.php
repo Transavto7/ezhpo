@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $action Действие
  * @property int $reminder_id ID напоминания
  * @property array $payload Параметры напоминания (JSON)
- * @property int $user_id ID сотрудника
+ * @property int|null $user_id ID сотрудника
  * @property DateTime $created_at
  * @property DateTime $updated_at
  */
@@ -30,7 +30,7 @@ class ReminderLog extends Model
         'payload',
         'user_id',
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     public function user(): BelongsTo

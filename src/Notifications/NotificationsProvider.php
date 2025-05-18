@@ -4,12 +4,19 @@ declare(strict_types=1);
 
 namespace Src\Notifications;
 
+use Illuminate\Bus\Dispatcher;
 use Illuminate\Support\ServiceProvider;
+use Src\Notifications\Commands\CreateNotificationsByContext\CreateNotificationsByContextCommand;
+use Src\Notifications\Commands\CreateNotificationsByContext\CreateNotificationsByContextHandler;
+use Src\Notifications\Commands\LogNotificationActivity\LogNotificationActivityCommand;
+use Src\Notifications\Commands\LogNotificationActivity\LogNotificationActivityHandler;
+use Src\Notifications\Commands\MarkNotificationAsViewed\MarkNotificationAsViewedCommand;
+use Src\Notifications\Commands\MarkNotificationAsViewed\MarkNotificationAsViewedHandler;
 use Src\Notifications\Queries\GetUnreadUserNotifications\GetUnreadUserNotificationsRepository;
-use Src\Notifications\Repository\Mysql\MysqlNotificationLogRepository;
-use Src\Notifications\Repository\Mysql\MysqlNotificationRepository;
-use Src\Notifications\Repository\NotificationLogRepository;
-use Src\Notifications\Repository\NotificationRepository;
+use Src\Notifications\Repositories\Mysql\MysqlNotificationLogRepository;
+use Src\Notifications\Repositories\Mysql\MysqlNotificationRepository;
+use Src\Notifications\Repositories\NotificationLogRepository;
+use Src\Notifications\Repositories\NotificationRepository;
 
 final class NotificationsProvider extends ServiceProvider
 {
@@ -25,6 +32,15 @@ final class NotificationsProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/Http/Views', 'Notifications');
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
         $this->loadMigrationsFrom(__DIR__.'/Database/Migrations');
-        $this->loadTranslationsFrom(__DIR__.'/Http/Lang', 'notifications');
+
+        $this->app->extend(Dispatcher::class, function (Dispatcher $dispatcher) {
+            $dispatcher->map([
+                CreateNotificationsByContextCommand::class => CreateNotificationsByContextHandler::class,
+                LogNotificationActivityCommand::class => LogNotificationActivityHandler::class,
+                MarkNotificationAsViewedCommand::class => MarkNotificationAsViewedHandler::class,
+            ]);
+
+            return $dispatcher;
+        });
     }
 }

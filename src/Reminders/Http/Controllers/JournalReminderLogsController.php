@@ -6,13 +6,13 @@ namespace Src\Reminders\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Src\Reminders\Commands\ShowReminderLogs\ShowReminderLogsCommand;
-use Src\Reminders\Commands\ShowReminderLogs\ShowReminderLogsHandler;
 use Src\Reminders\Queries\GetRemindersTableItems\RemindersTableFilters;
+use Src\Reminders\Queries\GetReminderLogsTableItems\GetReminderLogsTableItemsCommand;
+use Src\Reminders\Queries\GetReminderLogsTableItems\GetReminderLogsTableItemsHandler;
 
 final class JournalReminderLogsController
 {
-    public function __invoke(Request $request, ShowReminderLogsHandler $handler): JsonResponse
+    public function __invoke(Request $request, GetReminderLogsTableItemsHandler $handler): JsonResponse
     {
         $sortOrder = null;
         if ($request->input('sortDesc') !== null) {
@@ -22,7 +22,7 @@ final class JournalReminderLogsController
         $reminderFilterRaw = $request->input('filters');
         $isUseReminderFilter = false;
         foreach ($reminderFilterRaw as $field => $value) {
-            if (!empty($value)) {
+            if (! empty($value)) {
                 $isUseReminderFilter = true;
                 break;
             }
@@ -30,6 +30,7 @@ final class JournalReminderLogsController
         $reminderFilter = $isUseReminderFilter
             ? new RemindersTableFilters(
                 $request->input('filters.search'),
+                $request->input('filters.reminders'),
                 $request->input('filters.cities'),
                 $request->input('filters.companies'),
                 $request->input('filters.points'),
@@ -41,10 +42,10 @@ final class JournalReminderLogsController
             )
             : null;
 
-        $command = new ShowReminderLogsCommand(
+        $command = new GetReminderLogsTableItemsCommand(
             $reminderFilter,
-            (int)$request->input('page'),
-            (int)$request->input('perPage'),
+            (int) $request->input('page'),
+            (int) $request->input('perPage'),
             $request->input('sortBy'),
             $sortOrder,
         );

@@ -123,4 +123,12 @@
   .vs__actions {
 
   }
+
+  .vs__clear {
+    &:after {
+      display: inline-block;
+      content: "\00d7";
+      font-size: 16px;
+    }
+  }
 }

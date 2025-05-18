@@ -3,7 +3,6 @@
 namespace Src\Users\Management\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
 
 final class GetPermissionsByRolesController
 {

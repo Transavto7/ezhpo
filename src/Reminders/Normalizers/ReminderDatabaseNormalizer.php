@@ -41,7 +41,7 @@ final class ReminderDatabaseNormalizer
             'expires_at' => $reminder->getExpiresAt() ? $reminder->getExpiresAt()->format('Y-m-d H:i') : null,
             'expires_in_minutes' => $reminder->getExpiresInMinutes(),
             'hidden_from_initiator' => $reminder->isHiddenFromInitiator(),
-            'users_to_notify' => json_encode($reminder->getUsersToNotify())
+            'users_to_notify' => json_encode($reminder->getUsersToNotify()),
         ];
     }
 
