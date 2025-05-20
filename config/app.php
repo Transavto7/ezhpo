@@ -182,6 +182,7 @@ return [
         /*
          * Modules
          */
+        Src\Documents\DocumentsProvider::class,
         Src\Terminals\TerminalsProvider::class,
         Src\Companies\CompaniesProvider::class,
         Src\Employees\EmployeesProvider::class,

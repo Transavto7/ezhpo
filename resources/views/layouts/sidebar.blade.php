@@ -81,6 +81,12 @@
             <a class="bg-info text-white">МЕНЮ</a>
         </li>
 
+        <li>
+            <a href="{{ route('documents.index') }}" class="bg-blue text-white">
+                <i class="icon-padnote"></i>Документы
+            </a>
+        </li>
+
         @if($user->access('medic_create'))
             <li>
                 <a href="{{ route('forms.index', ['type' => FormTypeEnum::MEDIC]) }}"
