@@ -22,6 +22,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/', 'BddController@store')->name('store');
     });
 
+    Route::prefix('report')->as('report.')->group(function () {
+        Route::get('journal', 'ReportController@index')->name('journal');
+        Route::get('{type_report}', 'ReportController@getReport')->name('get');
+        Route::get('/dynamic/{journal}', 'ReportController@getDynamic')->name('dynamic');
+    });
+
     Route::prefix('settings/employees')->as('employees.')->middleware('auth')->group(function () {
         Route::get('/', 'Employees\IndexEmployeesPageController')->name('index');
         Route::post('/', 'Employees\CreateEmployeeController')->name('create');

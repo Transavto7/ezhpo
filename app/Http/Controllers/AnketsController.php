@@ -12,6 +12,7 @@ use App\Actions\Anketa\GetFormVerificationHistory\GetFormVerificationHistoryQuer
 use App\Actions\Anketa\StoreFormVerification\StoreFormVerificationCommand;
 use App\Actions\Anketa\StoreFormVerification\StoreFormVerificationHandler;
 use App\Actions\Anketa\TrashFormHandler;
+use App\Actions\Anketa\UpdateFormHandler;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueAction;
 use App\Actions\PakQueue\ChangePakQueue\ChangePakQueueHandler;
 use App\Enums\FormTypeEnum;
@@ -49,14 +50,14 @@ class AnketsController extends Controller
         $companyFields = config('elements')['Driver']['fields']['company_id'];
         $companyFields['getFieldKey'] = 'name';
 
-        $data['title'] = 'Редактирование осмотра';
+        $data['title'] = 'Просмотр осмотра';
 
         if ($form->date) {
             $data['default_current_date'] = date('Y-m-d\TH:i', strtotime($form->date));
         }
 
         $data['points'] = Point::getAll();
-        $data['anketa_view'] = 'profile.ankets.' . $form->type_anketa;
+        $data['anketa_view'] = 'profile.ankets.'.$form->type_anketa;
         $data['pv_id'] = $form->point_id ?? $form->pv_id;
         $data['anketa_route'] = 'forms.update';
         $data['company_fields'] = $companyFields;
@@ -69,6 +70,40 @@ class AnketsController extends Controller
         $data['actions_policy'] = $buildersFactory->make()->build($form, Auth::user());
 
         return view('profile.anketa', $data)->with('errors', $request->get('errors', []));
+    }
+
+    public function Update(Request $request, UpdateFormHandler $handler): RedirectResponse
+    {
+        DB::beginTransaction();
+
+        $id = $request->id;
+
+        $form = Form::withTrashed()->findOrFail($id);
+
+        try {
+            $handler->handle($form, $request->all(), Auth::user());
+
+            $referer = $request->input('REFERER');
+            if ($referer && ! str_contains($referer, route('forms.get', ['id' => $id]))) {
+                $response = redirect($referer);
+            } else {
+                $response = redirect(route('forms.get', [
+                    'id' => $id,
+                    'msg' => 'Осмотр успешно обновлён!',
+                ]));
+            }
+
+            DB::commit();
+        } catch (Throwable $exception) {
+            $response = redirect(route('forms.get', [
+                'id' => $id,
+                'errors' => [$exception->getMessage()],
+            ]));
+
+            DB::rollBack();
+        }
+
+        return $response;
     }
 
     public function Trash(Request $request, TrashFormHandler $handler)

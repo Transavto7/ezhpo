@@ -53,7 +53,7 @@ class LogFormActions
             $logData[] = [
                 'name' => $attribute,
                 'oldValue' => $form->getOriginal($attribute),
-                'newValue' => $newValue
+                'newValue' => $newValue,
             ];
         }
 

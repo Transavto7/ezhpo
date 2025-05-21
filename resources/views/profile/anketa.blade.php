@@ -111,19 +111,6 @@
     @include('profile.ankets.components.fast-scroll')
 
     <div class="row" data-anketa="{{ $anketa_view }}" id="ANKETA_FORM_VIEW">
-        <!-- Анкета -->
-        <div class="col-lg-3" id="ANKETA_FORM_VIEW_FIRST">
-            <div class="card">
-                <div class="card-body">
-                    <p><b>Карточка автомобиля</b></p>
-
-                    <div id="CARD_CAR">
-                        Не найдено
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="col-lg-3" id="ANKETA_FORM_ROOT">
             <div class="card">
                 <div class="card-body">
@@ -237,10 +224,6 @@
                                             {{ __('Вернуться в журнал') }}
                                         </a>
                                     @endif
-                                    <button type="submit"
-                                            class="m-center btn btn-sm btn-success submit-btn">
-                                        {{ __('ankets.submit') }}
-                                    </button>
                                 @endif
                             </div>
                         </form>

@@ -21,7 +21,8 @@ class ChangePakQueueAction
      */
     private $medic;
 
-    public function __construct(int $id, string $admitted, User $medic) {
+    public function __construct(int $id, string $admitted, User $medic)
+    {
         $this->id = $id;
         $this->admitted = $admitted;
         $this->medic = $medic;

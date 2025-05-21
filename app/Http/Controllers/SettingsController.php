@@ -26,8 +26,7 @@ class SettingsController extends Controller
             'pulse_upper' => Settings::setting('pulse_upper') ?? null,
             'time_of_pressure_ban' => Settings::setting('time_of_pressure_ban') ?? 20,
             'time_of_alcohol_ban' => Settings::setting('time_of_alcohol_ban') ?? 120,
-            'timeout' => Settings::setting('timeout') ?? null,
-            'sdpo_support_phone' => Settings::setting('sdpo_support_phone') ?? null
+            'sdpo_support_phone' => Settings::setting('sdpo_support_phone') ?? null,
         ]);
     }
 

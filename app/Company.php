@@ -20,7 +20,6 @@ class Company extends Model
         'dismissed',
         'note',
         'comment',
-        'procedure_pv',
         'responsible_id',
         'req_id',
         'pv_id',

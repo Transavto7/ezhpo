@@ -55,41 +55,6 @@ export default {
                 </label>
             </div>
             <div class="admin__system-card__item">
-                <span>Проверять номер телефона</span>
-                <label class="switch">
-                    <input type="checkbox" v-model="settings.system.check_phone_number">
-                    <div class="slider round"></div>
-                </label>
-            </div>
-            <div class="admin__system-card__item">
-                <span>Тип осмотра</span>
-                <label class="switch">
-                    <input type="checkbox" v-model="settings.system.type_ride">
-                    <div class="slider round"></div>
-                </label>
-            </div>
-            <div class="admin__system-card__item">
-                <span>Вопрос о сне</span>
-                <label class="switch">
-                    <input type="checkbox" v-model="settings.system.question_sleep">
-                    <div class="slider round"></div>
-                </label>
-            </div>
-            <div class="admin__system-card__item">
-                <span>вопрос о самочувствии</span>
-                <label class="switch">
-                    <input type="checkbox" v-model="settings.system.question_helth">
-                    <div class="slider round"></div>
-                </label>
-            </div>
-            <div class="admin__system-card__item">
-                <span>Ручной режим</span>
-                <label class="switch">
-                    <input type="checkbox" v-model="settings.system.manual_mode">
-                    <div class="slider round"></div>
-                </label>
-            </div>
-            <div class="admin__system-card__item">
                 <span>Переход в начало</span>
                 <label class="switch">
                     <input type="checkbox" v-model="settings.system.auto_start">
@@ -107,59 +72,6 @@ export default {
             </div>
         </div>
         <div class="admin__system-card g2">
-            <div class="admin__system-card__title">
-                Автономный режим
-            </div>
-            <div class="admin__system-card__item">
-                <span>Максимальное количество <br> дней работы <br> в автономном режиме</span>
-                <input min="0" class="medium" type="number" v-model="settings.system.delay_day_in_offline_mod">
-            </div>
-            <div class="admin__system-card__item">
-                <span>Максимальное количество <br> осмотров <br> в автономном режиме</span>
-                <input min="1" class="medium" type="number" v-model="settings.system.max_inspection_in_offline_mod">
-            </div>
-            <div class="admin__system-card__item">
-                <span>Автоматическая отправка на сервер</span>
-                <label class="switch">
-                    <input type="checkbox" v-model="settings.system.auto_send_to_crm">
-                    <div class="slider round"></div>
-                </label>
-            </div>
-        </div>
-        <div class="admin__system-card g3">
-            <div class="admin__system-card__title">
-                Алкометр
-            </div>
-            <div class="admin__system-card__item">
-                <span>Пропуск</span>
-                <label class="switch">
-                    <input type="checkbox" v-model="settings.system.alcometer_skip">
-                    <div class="slider round"></div>
-                </label>
-            </div>
-            <div class="admin__system-card__item">
-                <span>включен</span>
-                <label class="switch">
-                    <input type="checkbox" v-model="settings.system.alcometer_visible">
-                    <div class="slider round"></div>
-                </label>
-            </div>
-            <div class="admin__system-card__item">
-                <span>Быстрый режим</span>
-                <label class="switch">
-                    <input type="checkbox" v-model="settings.system.alcometer_fast">
-                    <div class="slider round"></div>
-                </label>
-            </div>
-            <div class="admin__system-card__item">
-                <span>Количественный замер <br> при положительном тесте</span>
-                <label class="switch">
-                    <input type="checkbox" v-model="settings.system.alcometer_retry">
-                    <div class="slider round"></div>
-                </label>
-            </div>
-        </div>
-        <div class="admin__system-card g4">
             <div class="admin__system-card__title">
                 Камера
             </div>
@@ -185,7 +97,7 @@ export default {
                 </label>
             </div>
         </div>
-        <div class="admin__system-card g5">
+        <div class="admin__system-card g3">
             <div class="admin__system-card__title">
                 Принтер
             </div>
@@ -208,45 +120,7 @@ export default {
                 </label>
             </div>
         </div>
-        <div class="admin__system-card g6">
-            <div class="admin__system-card__title">
-                Тонометр
-            </div>
-            <div class="admin__system-card__item">
-                <span>Пропуск</span>
-                <label class="switch">
-                    <input type="checkbox" v-model="settings.system.tonometer_skip">
-                    <div class="slider round"></div>
-                </label>
-            </div>
-            <div class="admin__system-card__item">
-                <span>включен</span>
-                <label class="switch">
-                    <input type="checkbox" v-model="settings.system.tonometer_visible">
-                    <div class="slider round"></div>
-                </label>
-            </div>
-        </div>
-        <div class="admin__system-card g7">
-            <div class="admin__system-card__title">
-                Термометр
-            </div>
-            <div class="admin__system-card__item">
-                <span>Пропуск</span>
-                <label class="switch">
-                    <input type="checkbox" v-model="settings.system.thermometer_skip">
-                    <div class="slider round"></div>
-                </label>
-            </div>
-            <div class="admin__system-card__item">
-                <span>включен</span>
-                <label class="switch">
-                    <input type="checkbox" v-model="settings.system.thermometer_visible">
-                    <div class="slider round"></div>
-                </label>
-            </div>
-        </div>
-        <div class="admin__system-card g8">
+        <div class="admin__system-card g4">
             <div class="admin__system-card__title">
                 Настройки доступа
             </div>
@@ -260,7 +134,7 @@ export default {
             </div>
         </div>
 
-        <div class="admin__system-card g9">
+        <div class="admin__system-card g5">
             <div class="admin__system-card__title">
                 Настройки сотрудников
             </div>
@@ -272,7 +146,7 @@ export default {
             </div>
         </div>
 
-        <div class="admin__system-footer g10">
+        <div class="admin__system-footer g6">
             <a href="/terminals" class="btn btn-default mr-2">Назад</a>
 
             <button-with-pending @click="save" class="btn btn-success" :pending="pending" description="Сохранить">
@@ -308,34 +182,17 @@ export default {
     grid-area: g6;
 }
 
-.g7 {
-    grid-area: g7;
-}
-
-.g8 {
-    grid-area: g8;
-}
-
-.g9 {
-    grid-area: g9;
-}
-
-.g10 {
-    grid-area: g10;
-}
-
 .admin {
     &__system {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
         grid-template-rows: 1fr 1fr;
         gap: 5px 5px;
         grid-auto-flow: row;
         grid-template-areas:
-            "g1 g2 g3 g4"
-            "g1 g5 g6 g7"
-            "g8 g8 g9 g9"
-            "g10 g10 g10 g10";
+            "g1 g2 g3"
+            "g1 g4 g5"
+            "g6 g6 g6";
     }
 
     &__system-card {

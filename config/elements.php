@@ -14,12 +14,12 @@ return [
                 'values' => 'Town',
                 'getField' => 'name',
                 'concatField' => 'hash_id',
-                'getFieldKey' => 'hash_id'
+                'getFieldKey' => 'hash_id',
             ],
             'name' => [
                 'label' => 'Город',
                 'type' => 'text',
-                'hideFilter' => 1
+                'hideFilter' => 1,
             ],
             'stamp_id' => [
                 'label' => 'Штамп',
@@ -44,12 +44,12 @@ return [
                 'values' => 'Point',
                 'getField' => 'name',
                 'concatField' => 'hash_id',
-                'getFieldKey' => 'hash_id'
+                'getFieldKey' => 'hash_id',
             ],
             'name' => [
                 'label' => 'Пункт выпуска',
                 'type' => 'text',
-                'hideFilter' => 1
+                'hideFilter' => 1,
             ],
             'pv_id' => [
                 'label' => 'Город',
@@ -57,7 +57,7 @@ return [
                 'values' => 'Town',
                 'getField' => 'name',
                 'getFieldKey' => 'id',
-                'concatField' => 'hash_id'
+                'concatField' => 'hash_id',
             ],
             'company_id' => [
                 'label' => 'Компания',
@@ -87,47 +87,47 @@ return [
         'fields' => [
             'name' => [
                 'label' => 'Название',
-                'type' => 'text'
+                'type' => 'text',
             ],
             'inn' => [
                 'label' => 'ИНН',
                 'type' => 'number',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'bik' => [
                 'label' => 'БИК',
                 'type' => 'number',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'kc' => [
                 'label' => 'К/С',
                 'type' => 'number',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'rc' => [
                 'label' => 'Р/С',
                 'type' => 'number',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'banks' => [
                 'label' => 'Банки',
                 'type' => 'text',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'director' => [
                 'label' => 'Должность руководителя',
                 'type' => 'text',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'director_fio' => [
                 'label' => 'ФИО Руководителя',
                 'type' => 'text',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'seal' => [
                 'label' => 'Печать',
                 'type' => 'file',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
         ],
     ],
@@ -160,19 +160,19 @@ return [
                     'time_card_driver' => 'Срок действия карты водителя (водитель)',
                     'date_osago' => 'Дата осаго (автомобиль)',
                     'date_driver_license' => 'Срок действия водительского удостоверения (водитель)',
-                    'date_narcotic_test' => 'Дата тестирования на наркотики (водитель)'
+                    'date_narcotic_test' => 'Дата тестирования на наркотики (водитель)',
                 ],
             ],
             'days' => [
                 'label' => 'Кол-во дней',
-                'type' => 'number'
+                'type' => 'number',
             ],
             'action' => [
                 'label' => 'Действие',
                 'type' => 'select',
                 'values' => [
                     '+' => '+',
-                    '-' => '-'
+                    '-' => '-',
                 ],
                 'defaultValue' => '+',
             ],
@@ -189,12 +189,12 @@ return [
             'logo' => [
                 'label' => 'Логотип системы',
                 'type' => 'file',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'sms_api_key' => [
                 'label' => 'API key sms.ru',
                 'type' => 'text',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'sms_text_driver' => [
                 'label' => 'Текст SMS для Водителя при непрохождении осмотра',
@@ -225,7 +225,7 @@ return [
         'otherRoles' => [
             'medic',
             'tech',
-            'client'
+            'client',
         ],
         'editOnField' => 'fio',
         'model' => 'Driver',
@@ -237,7 +237,7 @@ return [
                 'values' => 'Company',
                 'getField' => 'name',
                 'concatField' => 'hash_id',
-                'getFieldKey' => 'id'
+                'getFieldKey' => 'id',
             ],
             'hash_id' => [
                 'label' => 'ID водителя',
@@ -245,21 +245,21 @@ return [
                 'values' => 'Driver',
                 'getField' => 'fio',
                 'concatField' => 'hash_id',
-                'getFieldKey' => 'hash_id'
+                'getFieldKey' => 'hash_id',
             ],
             'fio' => [
                 'label' => 'ФИО',
-                'type' => 'text'
+                'type' => 'text',
             ],
             'year_birthday' => [
                 'label' => 'Дата рождения',
-                'type' => 'date'
+                'type' => 'date',
             ],
             'photo' => [
                 'label' => 'Фото',
                 'type' => 'file',
                 'resize' => 1,
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'phone' => [
                 'label' => 'Телефон',
@@ -294,54 +294,42 @@ return [
             'note' => [
                 'label' => 'Примечание',
                 'type' => 'text',
-                'noRequired' => 1
-            ],
-            'procedure_pv' => [
-                'label' => 'Порядок выпуска',
-                'type' => 'select',
-                'values' => [
-                    'Наперед без дат' => 'Наперед без дат',
-                    'Наперёд с датами' => 'Наперёд с датами',
-                    'Задним числом' => 'Задним числом',
-                    'Фактовый' => 'Фактовый',
-                ],
-                'defaultValue' => 'Фактовый',
                 'noRequired' => 1,
             ],
             'date_bdd' => [
                 'label' => 'Дата БДД',
                 'type' => 'date',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'date_prmo' => [
                 'label' => 'Дата ПРМО',
                 'type' => 'date',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'driver_license_issued_at' => [
                 'label' => 'Дата выдачи ВУ',
                 'type' => 'date',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'driver_license' => [
                 'label' => 'Серия/номер ВУ',
                 'type' => 'text',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'date_driver_license' => [
                 'label' => 'Срок действия водительского удостоверения',
                 'type' => 'date',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'snils' => [
                 'label' => 'СНИЛС',
                 'type' => 'text',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'date_narcotic_test' => [
                 'label' => 'Дата тестирования на наркотики',
                 'type' => 'date',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'date_report_driver' => [
                 'label' => 'Дата снятия отчета с карты водителя',
@@ -413,7 +401,7 @@ return [
         'otherRoles' => [
             'medic',
             'tech',
-            'client'
+            'client',
         ],
         'editOnField' => 'gos_number',
         'model' => 'Car',
@@ -424,7 +412,7 @@ return [
                 'values' => 'Company',
                 'getField' => 'name',
                 'getFieldKey' => 'id',
-                'concatField' => 'hash_id'
+                'concatField' => 'hash_id',
             ],
             'hash_id' => [
                 'label' => 'ID автомобиля',
@@ -432,15 +420,15 @@ return [
                 'values' => 'Car',
                 'getField' => 'gos_number',
                 'concatField' => 'hash_id',
-                'getFieldKey' => 'hash_id'
+                'getFieldKey' => 'hash_id',
             ],
             'gos_number' => [
                 'label' => 'Гос.номер',
-                'type' => 'text'
+                'type' => 'text',
             ],
             'mark_model' => [
                 'label' => 'Марка и модель',
-                'type' => 'text'
+                'type' => 'text',
             ],
             'type_auto' => [
                 'label' => 'Категория Т\С',
@@ -460,14 +448,14 @@ return [
             'official_type_auto' => [
                 'label' => 'Тип Т\С',
                 'type' => 'text',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'trailer' => [
                 'label' => 'Прицеп',
                 'type' => 'select',
                 'values' => [
                     'Нет' => 'Нет',
-                    'Да' => 'Да'
+                    'Да' => 'Да',
                 ],
                 'defaultValue' => '',
             ],
@@ -479,39 +467,27 @@ return [
             'note' => [
                 'label' => 'Примечание',
                 'type' => 'text',
-                'noRequired' => 1
-            ],
-            'procedure_pv' => [
-                'label' => 'Порядок выпуска',
-                'type' => 'select',
-                'values' => [
-                    'Наперед без дат' => 'Наперед без дат',
-                    'Наперёд с датами' => 'Наперёд с датами',
-                    'Задним числом' => 'Задним числом',
-                    'Фактовый' => 'Фактовый',
-                ],
-                'defaultValue' => 'Фактовый',
                 'noRequired' => 1,
             ],
             'date_prto' => [
                 'label' => 'Дата ПРТО',
                 'type' => 'date',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'date_techview' => [
                 'label' => 'Дата техосмотра',
                 'type' => 'date',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'time_skzi' => [
                 'label' => 'Срок действия СКЗИ\настройки тахографа ЕСТР',
                 'type' => 'date',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'date_osago' => [
                 'label' => 'Дата ОСАГО',
                 'type' => 'date',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'town_id' => [
                 'label' => 'Город',
@@ -556,7 +532,7 @@ return [
                 'values' => 'Company',
                 'getField' => 'name',
                 'concatField' => 'hash_id',
-                'getFieldKey' => 'hash_id'
+                'getFieldKey' => 'hash_id',
             ],
             'official_name' => [
                 'label' => 'Официальное название компании',
@@ -565,28 +541,16 @@ return [
             'name' => [
                 'label' => 'Название компании',
                 'type' => 'text',
-                'hideFilter' => 1
+                'hideFilter' => 1,
             ],
             'note' => [
                 'label' => 'Договоренности с клиентом',
                 'type' => 'text',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'comment' => [
                 'label' => 'Комментарий',
                 'type' => 'text',
-                'noRequired' => 1
-            ],
-            'procedure_pv' => [
-                'label' => 'Порядок выпуска',
-                'type' => 'select',
-                'values' => [
-                    'Наперед без дат' => 'Наперед без дат',
-                    'Наперёд с датами' => 'Наперёд с датами',
-                    'Задним числом' => 'Задним числом',
-                    'Фактовый' => 'Фактовый',
-                ],
-                'defaultValue' => 'Фактовый',
                 'noRequired' => 1,
             ],
             'responsible_id' => [
@@ -600,7 +564,7 @@ return [
             'req_id' => [
                 'label' => 'Реквизиты нашей компании',
                 'type' => 'select',
-                'values' => 'Req'
+                'values' => 'Req',
             ],
             'pv_id' => [
                 'label' => 'ПВ',
@@ -608,7 +572,7 @@ return [
                 'values' => 'Point',
                 'getFieldKey' => 'id',
                 'concatField' => 'hash_id',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'town_id' => [
                 'label' => 'Город',
@@ -622,12 +586,12 @@ return [
                     [
                         'model' => 'Car',
                         'fieldFind' => 'company_id',
-                        'text' => 'Автомобиль'
+                        'text' => 'Автомобиль',
                     ],
                     [
                         'model' => 'Driver',
                         'fieldFind' => 'company_id',
-                        'text' => 'Водитель'
+                        'text' => 'Водитель',
                     ],
                 ],
             ],
@@ -649,7 +613,7 @@ return [
             ],
             'inn' => [
                 'label' => 'ИНН',
-                'type' => 'text'
+                'type' => 'text',
             ],
             'kpp' => [
                 'label' => 'КПП',
@@ -741,12 +705,12 @@ return [
                 'values' => 'Product',
                 'getField' => 'name',
                 'getFieldKey' => 'hash_id',
-                'concatField' => 'hash_id'
+                'concatField' => 'hash_id',
             ],
             'name' => [
                 'label' => 'Название',
                 'type' => 'text',
-                'hideFilter' => 1
+                'hideFilter' => 1,
             ],
             'type_product' => [
                 'label' => 'Тип',
@@ -760,11 +724,11 @@ return [
             ],
             'unit' => [
                 'label' => 'Ед.изм.',
-                'type' => 'text'
+                'type' => 'text',
             ],
             'price_unit' => [
                 'label' => 'Стоимость за единицу',
-                'type' => 'number'
+                'type' => 'number',
             ],
             'type_anketa' => [
                 'label' => 'Реестр',
@@ -795,7 +759,7 @@ return [
             'essence' => [
                 'label' => 'Сущности',
                 'type' => 'text',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
         ],
     ],
@@ -812,7 +776,7 @@ return [
                 'values' => 'Product',
                 'getField' => 'name',
                 'getFieldKey' => 'id',
-                'concatField' => 'hash_id'
+                'concatField' => 'hash_id',
             ],
             'trigger' => [
                 'label' => 'Триггер (больше/меньше)',
@@ -825,11 +789,11 @@ return [
             ],
             'porog' => [
                 'label' => 'Пороговое значение',
-                'type' => 'number'
+                'type' => 'number',
             ],
             'discount' => [
                 'label' => 'Скидка (%)',
-                'type' => 'porog'
+                'type' => 'porog',
             ],
         ],
     ],
@@ -844,7 +808,7 @@ return [
                 'label' => 'Фото',
                 'type' => 'file',
                 'noRequired' => 1,
-                'hideFilter' => 1
+                'hideFilter' => 1,
             ],
             'hash_id' => [
                 'label' => 'Инструктаж',
@@ -852,16 +816,16 @@ return [
                 'values' => 'Instr',
                 'getField' => 'name',
                 'concatField' => 'hash_id',
-                'getFieldKey' => 'hash_id'
+                'getFieldKey' => 'hash_id',
             ],
             'name' => [
                 'label' => 'Название',
                 'type' => 'text',
-                'hideFilter' => 1
+                'hideFilter' => 1,
             ],
             'descr' => [
                 'label' => 'Описание',
-                'type' => 'text'
+                'type' => 'text',
             ],
             'type_briefing' => [
                 'label' => 'Вид инструктажа',
@@ -877,7 +841,7 @@ return [
             ],
             'youtube' => [
                 'label' => 'Ссылка на YouTube\RUTUBE',
-                'type' => 'text'
+                'type' => 'text',
             ],
             'active' => [
                 'label' => 'Активен',
@@ -892,12 +856,12 @@ return [
                 'label' => 'Сортировка',
                 'type' => 'number',
                 'noRequired' => 1,
-                'hideFilter' => 1
+                'hideFilter' => 1,
             ],
             'signature' => [
                 'label' => 'ЭЛ подпись водителя',
                 'type' => 'number',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
         ],
     ],
@@ -912,12 +876,12 @@ return [
             'name' => [
                 'label' => 'ФИО',
                 'type' => 'text',
-                'hideFilter' => 1
+                'hideFilter' => 1,
             ],
             'email' => [
                 'label' => 'ФИО',
                 'type' => 'text',
-                'hideFilter' => 1
+                'hideFilter' => 1,
             ],
             'hash_id' => [
                 'label' => 'ID водителя',
@@ -925,13 +889,13 @@ return [
                 'values' => 'Driver',
                 'getField' => 'fio',
                 'concatField' => 'hash_id',
-                'getFieldKey' => 'hash_id'
+                'getFieldKey' => 'hash_id',
             ],
             'photo' => [
                 'label' => 'Фото',
                 'type' => 'file',
                 'resize' => 1,
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
             'pv_id' => [
                 'label' => 'ПВ',
@@ -939,9 +903,9 @@ return [
                 'values' => 'Point',
                 'getFieldKey' => 'id',
                 'concatField' => 'hash_id',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
-        ]
+        ],
     ],
 
     'Employee' => [
@@ -953,7 +917,7 @@ return [
             'name' => [
                 'label' => 'ФИО',
                 'type' => 'text',
-                'hideFilter' => 1
+                'hideFilter' => 1,
             ],
             'hash_id' => [
                 'label' => 'ID сотрудника',
@@ -961,7 +925,7 @@ return [
                 'values' => 'Driver',
                 'getField' => 'fio',
                 'concatField' => 'hash_id',
-                'getFieldKey' => 'hash_id'
+                'getFieldKey' => 'hash_id',
             ],
             'pv_id' => [
                 'label' => 'ПВ',
@@ -969,9 +933,9 @@ return [
                 'values' => 'Point',
                 'getFieldKey' => 'id',
                 'concatField' => 'hash_id',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
-        ]
+        ],
     ],
 
     'Terminal' => [
@@ -983,7 +947,7 @@ return [
             'name' => [
                 'label' => 'AnyDesk',
                 'type' => 'text',
-                'hideFilter' => 1
+                'hideFilter' => 1,
             ],
             'hash_id' => [
                 'label' => 'ID терминала',
@@ -991,7 +955,7 @@ return [
                 'values' => 'Driver',
                 'getField' => 'fio',
                 'concatField' => 'hash_id',
-                'getFieldKey' => 'hash_id'
+                'getFieldKey' => 'hash_id',
             ],
             'pv_id' => [
                 'label' => 'ПВ',
@@ -999,8 +963,8 @@ return [
                 'values' => 'Point',
                 'getFieldKey' => 'id',
                 'concatField' => 'hash_id',
-                'noRequired' => 1
+                'noRequired' => 1,
             ],
-        ]
-    ]
+        ],
+    ],
 ];

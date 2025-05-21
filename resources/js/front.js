@@ -11,6 +11,15 @@ require('suggestions-jquery')
 require('./common/camera')
 require('./common/findDuplicates')
 
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
+}
+
+axios.defaults.withCredentials = true;
+axios.defaults.headers.common['X-XSRF-TOKEN'] = getCookie('XSRF-TOKEN');
+
 $.fn.select2.amd.require(['select2/selection/search'], function (Search) {
     Search.prototype.searchRemoveChoice = function (decorated, item) {
         this.trigger('unselect', {

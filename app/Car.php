@@ -24,7 +24,6 @@ class Car extends Model
             'company_id',
             'count_pl',
             'note',
-            'procedure_pv',
             'date_prto',
             'date_techview',
             'time_skzi',

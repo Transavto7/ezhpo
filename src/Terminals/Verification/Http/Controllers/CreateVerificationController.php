@@ -19,7 +19,9 @@ final class CreateVerificationController
     {
         /** @var string $driver_id */
         $driver_id = $request->input('driver_id');
-        $driver = Driver::findOrFail($driver_id);
+        /** @var Driver $driver */
+        $driver = Driver::query()->where('hash_id', $driver_id)->firstOrFail();
+
         try {
             $result = $handler->handle(new CreateVerificationCommand(
                 $driver

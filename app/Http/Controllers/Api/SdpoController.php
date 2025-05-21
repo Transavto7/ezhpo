@@ -350,8 +350,6 @@ class SdpoController extends Controller
 
             $form = $formModel->toArray() + $formDetailsModel->toArray();
 
-            $form['timeout'] = Settings::setting('timeout') ?? 20;
-
             $stampViewModel = StampViewModel::fromStampOrDefault($formDetailsModel->getStamp());
             $form = array_merge($form, $stampViewModel->toArray());
 

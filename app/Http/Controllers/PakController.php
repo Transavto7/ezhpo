@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Anketa\ChangeSdpoMedicFormType\ChangeSdpoMedicFormTypeHandler;
+use App\Actions\Anketa\TrashFormHandler;
 use App\Enums\FormTypeEnum;
 use App\FieldPrompt;
 use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
+use App\User;
 use App\ValueObjects\NotAdmittedReasons;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,32 +21,29 @@ class PakController extends Controller
     public function index()
     {
         return view('pak.index', [
-            'fields' => FieldPrompt::where('type', FormTypeEnum::PAK_QUEUE)->get()
+            'fields' => FieldPrompt::query()->where('type', FormTypeEnum::PAK_QUEUE)->get(),
         ]);
     }
 
-    public function clear(ChangeSdpoMedicFormTypeHandler $handler)
+    public function clear(TrashFormHandler $handler)
     {
+        /** @var User $user */
         $user = Auth::user();
-
-        $formsIds = Form::query()
-            ->select('forms.id')
+        $forms = Form::query()
             ->pakQueueByUser($user)
-            ->get()
-            ->pluck('id')
-            ->toArray();
+            ->get();
 
         $errors = [];
 
-        foreach ($formsIds as $formsId) {
+        foreach ($forms as $form) {
             try {
                 DB::beginTransaction();
 
-                $handler->handle($formsId, $user);
+                $handler->handle($form, true, $user);
 
                 DB::commit();
             } catch (Throwable $exception) {
-                $errors[] = "$formsId . {$exception->getMessage()}";
+                $errors[] = "$form->id . {$exception->getMessage()}";
 
                 DB::rollBack();
             }
@@ -61,12 +59,13 @@ class PakController extends Controller
                 'forms.*',
                 'medic_forms.*',
                 'drivers.fio as driver_fio',
-                'points.name as pv_id'
+                'points.name as pv_id',
             ])
             ->join('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
             ->pakQueueByUser($request->user())
             ->leftJoin('drivers', 'drivers.hash_id', '=', 'forms.driver_id')
             ->leftJoin('points', 'points.id', '=', 'forms.point_id')
+            ->whereNull('forms.deleted_at')
             ->where('forms.date', '>=', Carbon::now()->subDay());
 
         if ($request->order_key) {

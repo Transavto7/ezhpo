@@ -15,16 +15,16 @@ class FieldPrompt extends Model
         'name',
         'content',
         'deleted_id',
-        'sort'
+        'sort',
     ];
 
     public static function getTypes(): array
     {
         $types = [];
-        foreach (FieldPrompt::groupBy('type')->pluck('type') as $type) {
+        foreach (self::groupBy('type')->pluck('type') as $type) {
             $types[] = [
                 'key' => $type,
-                'name' => __('ankets.' . strtolower($type)),
+                'name' => __('ankets.'.strtolower($type)),
             ];
         }
 
@@ -34,10 +34,10 @@ class FieldPrompt extends Model
     public static function getFields(): array
     {
         $fields = [];
-        foreach (FieldPrompt::select('type', 'field', 'name')->get() as $field) {
+        foreach (self::query()->select('type', 'field', 'name')->get() as $field) {
             $fields[$field->type][] = [
                 'key' => $field->field,
-                'name'=> $field->name
+                'name' => $field->name,
             ];
         }
 
@@ -66,13 +66,13 @@ class FieldPrompt extends Model
         $sort = 0;
         $resultSort = null;
 
-        FieldPrompt::query()
+        self::query()
             ->where('type', $type)
             ->where('field', '!=', $field)
             ->orderBy('sort')
             ->orderBy('id')
             ->get()
-            ->each(function (FieldPrompt $fieldPrompt) use ($nextField, &$sort, &$resultSort)  {
+            ->each(function (self $fieldPrompt) use ($nextField, &$sort, &$resultSort) {
                 if ($fieldPrompt->field === $nextField) {
                     $resultSort = $sort;
                     $sort++;
@@ -86,7 +86,7 @@ class FieldPrompt extends Model
             return;
         }
 
-        FieldPrompt::query()
+        self::query()
             ->where('type', $type)
             ->where('field', $field)
             ->update(['sort' => $resultSort]);
@@ -97,13 +97,13 @@ class FieldPrompt extends Model
         $sort = 0;
         $resultSort = 0;
 
-        FieldPrompt::query()
+        self::query()
             ->where('type', $type)
             ->where('field', '!=', $field)
             ->orderBy('sort')
             ->orderBy('id')
             ->get()
-            ->each(function (FieldPrompt $fieldPrompt) use ($previousField, &$sort, &$resultSort)  {
+            ->each(function (self $fieldPrompt) use ($previousField, &$sort, &$resultSort) {
                 $fieldPrompt->update(['sort' => $sort]);
                 $sort++;
 
@@ -117,7 +117,7 @@ class FieldPrompt extends Model
             return;
         }
 
-        FieldPrompt::query()
+        self::query()
             ->where('type', $type)
             ->where('field', $field)
             ->update(['sort' => $resultSort]);

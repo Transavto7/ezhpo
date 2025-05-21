@@ -14,12 +14,12 @@ class DriverImport implements ToModel
      *
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-
-    public function generateHash () {
+    public function generateHash()
+    {
         $hash = rand(100000, 499000);
         $findElem = Driver::where('hash_id', $hash)->first();
 
-        if($findElem) {
+        if ($findElem) {
             return $this->generateHash();
         }
 
@@ -34,17 +34,19 @@ class DriverImport implements ToModel
         $company_id = Company::where('hash_id', $company_id)->first();
         $date = date('d.m.Y H:i:s');
 
-        if($row[0] == 'fio' || $row[1] == 'year_birthday') return;
+        if ($row[0] == 'fio' || $row[1] == 'year_birthday') {
+            return;
+        }
 
         $hash_id = $this->generateHash();
 
-        if(!empty($row[9])) {
+        if (! empty($row[9])) {
             $dublicate_old_id = Driver::where('old_id', $row[9])->first();
         } else {
             $dublicate_old_id = false;
         }
 
-        if($company_id && !$dublicate_old_id) {
+        if ($company_id && ! $dublicate_old_id) {
             $data = [
                 'hash_id' => $hash_id,
                 'fio' => $row[0] ?? '-',
@@ -55,11 +57,10 @@ class DriverImport implements ToModel
                 'payment_form' => $row[5] ?? '',
                 'count_pl' => $row[6] ?? '',
                 'note' => $row[7] ?? '',
-                'procedure_pv' => $row[8] ?? '',
-                'phone' => $row[10] ?? ''
+                'phone' => $row[10] ?? '',
             ];
 
-            if(!empty($row[9]) && $row[9] > 0) {
+            if (! empty($row[9]) && $row[9] > 0) {
                 $data['old_id'] = $row[9];
             }
 

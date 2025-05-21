@@ -27,11 +27,6 @@
                             </li>--}}
                         @endif
                     @else
-                        @if (!user()->hasRole('driver') && !user()->hasRole('client'))
-                            <a href="https://crmta7.ru/" style="font-size: 18px; font-weight: bold" class="mr-3"
-                               target="_blank">Полезная информация</a>
-                        @endif
-
                         @if(user()->hasRole('client') && config('payment-qr-code.payment_qr_code_enable'))
                             <button type="button" class="btn btn-success px-5" data-toggle="modal"
                                     data-target="#paymentQrCodeModal">Внести оплату

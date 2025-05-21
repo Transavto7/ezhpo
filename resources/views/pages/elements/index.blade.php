@@ -319,7 +319,7 @@
                                     </div>
                                 </div>
                             @endforeach
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                            <div class="col-12">
                                 <button type="submit" class="btn btn-sm btn-info">Поиск</button>
                                 <a href="?" class="btn btn-sm btn-danger">Сбросить</a>
                             </div>
@@ -431,12 +431,6 @@
                                                 {{ app('App\Company')->getName($el->company_id) }}
                                             @endif
                                             <p>
-                                                @if(user()->access('cars_read'))
-                                                    <a class="btn btn-sm btn-outline-info"
-                                                       href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'company_id' => $el->company_id ]) }}">
-                                                        <i class="fa fa-car"></i>
-                                                    </a>
-                                                @endif
                                                 @if(user()->access('drivers_read'))
                                                     <a class="btn btn-sm btn-outline-info"
                                                        href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'company_id' => $el->company_id ]) }}">
@@ -457,12 +451,6 @@
                                                     МЕД
                                                 </a>
                                             @endif
-                                            @if(user()->access('tech_read') )
-                                                <a class="btn btn-sm btn-outline-info"
-                                                   href="{{ route('home', \App\Enums\FormTypeEnum::TECH) }}/?filter=1&{{ $field->type . '_id' }}={{ $el->hash_id }}&date={{ $date_from_filter }}&TO_date={{ $date_to_filter }}">
-                                                    ТЕХ
-                                                    @endif
-                                                </a>
                                         </nobr>
                                     @elseif($field->field === 'reqs_validated' && $model === 'Company')
                                         {{ $el[$field->field] == 1 ? 'Да' : 'Нет' }}
@@ -523,18 +511,6 @@
                                         @endif
                                     @elseif ($field->field === 'crm')
                                         <nobr>
-                                            @if(user()->access('report_service_company_read'))
-                                                <a class="btn btn-sm btn-outline-info"
-                                                   href="{{ route('report.get', ['type' => 'journal', 'company_id' => $el->hash_id]) }}">
-                                                    ₽
-                                                </a>
-                                            @endif
-                                            @if(user()->access('cars_read'))
-                                                <a class="btn btn-sm btn-outline-info"
-                                                   href="{{ route('renderElements', ['model' => 'Car', 'filter' => 1, 'company_id' => $el->id ]) }}">
-                                                    <i class="fa fa-car"></i>
-                                                </a>
-                                            @endif
                                             @if(user()->access('drivers_read'))
                                                 <a class="btn btn-sm btn-outline-info"
                                                    href="{{ route('renderElements', ['model' => 'Driver', 'filter' => 1, 'company_id' => $el->id ]) }}">

@@ -47,7 +47,7 @@ class UpdateFormHandler
         if (isset($data['anketa'])) {
             $this->findDuplicates($form, $data);
 
-            foreach($data['anketa'][0] as $key => $value) {
+            foreach ($data['anketa'][0] as $key => $value) {
                 $data[$key] = $value;
             }
         }
@@ -73,7 +73,7 @@ class UpdateFormHandler
                 throw new Exception(BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::DRIVER_BLOCK));
             }
 
-            if (!$driver->company_id || !$driver->company) {
+            if (! $driver->company_id || ! $driver->company) {
                 throw new Exception('У Водителя не найдена Компания');
             }
 
@@ -102,7 +102,7 @@ class UpdateFormHandler
                 throw new Exception(BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::CAR_BLOCK));
             }
 
-            if (!$car->company_id || !$car->company) {
+            if (! $car->company_id || ! $car->company) {
                 throw new Exception('У Автомобиля не найдена Компания');
             }
 
@@ -283,7 +283,7 @@ class UpdateFormHandler
 
         $datesDiapason = [
             Carbon::parse($formNewDate)->subSeconds(Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS),
-            Carbon::parse($formNewDate)->addSeconds(Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS)
+            Carbon::parse($formNewDate)->addSeconds(Anketa::MIN_DIFF_BETWEEN_FORMS_IN_SECONDS),
         ];
 
         if ($form->type_anketa === FormTypeEnum::MEDIC) {

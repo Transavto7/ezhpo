@@ -1,4 +1,5 @@
 <?php
+
 return [
     /*
      * List fields all registries
@@ -37,7 +38,7 @@ return [
             'med_view' => 'Мед показания',
             'pv_id' => 'Пункт выпуска',
             'flag_pak' => 'Флаг СДПО',
-            'is_dop' => 'Неполный осмотр'
+            'is_dop' => 'Неполный осмотр',
         ],
 
         'tech' => [
@@ -152,7 +153,6 @@ return [
             'contracts' => 'Договоры',
             'services' => 'Услуги',
             'note' => 'Примечание',
-            'procedure_pv' => 'Порядок выпуска',
             'date_bdd' => 'Дата БДД',
             'date_prmo' => 'Дата ПРМО',
             'snils' => 'СНИЛС',
@@ -166,7 +166,7 @@ return [
             'dismissed' => 'Уволен',
             'date_of_employment' => 'Дата устройства на работу',
             'pressure_systolic' => 'Порог верхнего давления',
-            'pressure_diastolic' => 'Порог нижнего давления'
+            'pressure_diastolic' => 'Порог нижнего давления',
         ],
 
         'car' => [
@@ -179,7 +179,6 @@ return [
             'trailer' => 'Прицеп',
             'company_id' => 'Компания',
             'note' => 'Примечание',
-            'procedure_pv' => 'Порядок выпуска',
             'date_prto' => 'Дата ПРТО',
             'date_techview' => 'Дата техосмотра',
             'time_skzi' => 'Срок действия СКЗИ\настройки тахографа ЕСТР',
@@ -208,13 +207,12 @@ return [
             'kpp' => 'КПП',
             'ogrn' => 'ОГРН',
             'address' => 'Адрес',
-            'procedure_pv' => 'Порядок выпуска',
             'has_actived_prev_month' => 'Были ли активны в прошлом месяце',
             'bitrix_link' => 'Ссылка на компанию в Bitrix24',
             'document_bdd' => 'Ссылка на таблицу с документами по бдд',
             'link_waybill' => 'Ссылка на ПЛ',
             'pressure_systolic' => 'Порог верхнего давления',
-            'pressure_diastolic' => 'Порог нижнего давления'
+            'pressure_diastolic' => 'Порог нижнего давления',
         ],
 
         'product' => [
@@ -354,15 +352,15 @@ return [
             'our_company.inn' => 'ИНН нашей компании',
             'date_of_start' => 'Дата начала договора',
             'date_of_end' => 'Дата окончания договора',
-            'created_at' => 'Дата создания'
+            'created_at' => 'Дата создания',
         ],
 
         'stamps' => [
             'id' => 'ID',
             'name' => 'Название',
             'company_name' => 'Заголовок',
-            'licence' => 'Лицензия'
-        ]
+            'licence' => 'Лицензия',
+        ],
     ],
 
     /*
@@ -476,8 +474,8 @@ return [
             'pressure_diastolic' => true,
             'pulse' => true,
             'narko_test_status' => true,
-            'alcometer_result' => true
-        ]
+            'alcometer_result' => true,
+        ],
     ],
 
     'client_exclude' => [
@@ -499,7 +497,7 @@ return [
             'realy',
             'is_dop',
             'date_prto',
-            'period_pl'
+            'period_pl',
         ],
         'bdd' => [
             'company_id',
@@ -512,5 +510,5 @@ return [
             'status',
             'user_name',
         ],
-    ]
+    ],
 ];

@@ -9,12 +9,12 @@ use App\Point;
 use App\Stamp;
 use App\Terminal;
 use App\User;
-use App\ValueObjects\NotAdmittedReasons;
 use App\ValueObjects\ForeignDevice\PressureLimit;
 use App\ValueObjects\ForeignDevice\Pulse;
 use App\ValueObjects\ForeignDevice\PulseLimit;
 use App\ValueObjects\ForeignDevice\Temperature;
 use App\ValueObjects\ForeignDevice\Tonometer;
+use App\ValueObjects\NotAdmittedReasons;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -61,7 +61,7 @@ class MedicForm extends Model
         'videos',
 
         'protokol_path',
-        'closing_path'
+        'closing_path',
     ];
 
     public function form(): BelongsTo
@@ -107,17 +107,17 @@ class MedicForm extends Model
 
         $pressure = Tonometer::fromString($this->attributes['tonometer']);
         $pressureLimits = PressureLimit::create($driver);
-        if (!$pressure->isAdmitted($pressureLimits)) {
+        if (! $pressure->isAdmitted($pressureLimits)) {
             $result[] = 'давление';
         }
 
         $pulse = new Pulse(intval($this->attributes['pulse']));
         $pulseLimits = PulseLimit::create($driver);
-        if (!$pulse->isAdmitted($pulseLimits)) {
+        if (! $pulse->isAdmitted($pulseLimits)) {
             $result[] = 'повышенный пульс';
         }
 
-        if (!(new Temperature(floatval($this->attributes['t_people'])))->isAdmitted()) {
+        if (! (new Temperature(floatval($this->attributes['t_people'])))->isAdmitted()) {
             $result[] = 'повышенная температура';
         }
 
@@ -129,8 +129,7 @@ class MedicForm extends Model
         $query->where('forms.type_anketa', FormTypeEnum::PAK_QUEUE);
 
         if ($user->access('approval_queue_view_all')) {
-
-        } else if ($user->hasRole('head_operator_sdpo')) {
+        } elseif ($user->hasRole('head_operator_sdpo')) {
             $employee = $user->relatedEmployee;
 
             $query->join('points_to_employees', function ($join) use ($employee) {

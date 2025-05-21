@@ -29,7 +29,6 @@ class Driver extends Model
         'products_id',
         'count_pl',
         'note',
-        'procedure_pv',
         'date_bdd',
         'date_prmo',
         'snils',

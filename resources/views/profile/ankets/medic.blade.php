@@ -4,7 +4,7 @@
 
         @include('profile.ankets.components.pvs')
 
-        @include('profile.ankets.components.is_dop')
+{{--        @include('profile.ankets.components.is_dop')--}}
 
         @if($is_dop)
             @include('profile.ankets.medic.is_dop')

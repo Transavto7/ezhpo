@@ -26,7 +26,6 @@ WORKDIR /usr/share/nginx/html/
 # Copy the codebase
 COPY . ./
 
-
 # Run composer install for production and give permissions
 RUN sed 's_@php artisan package:discover_/bin/true_;' -i composer.json \
     && composer install --no-dev --optimize-autoloader \
@@ -35,12 +34,6 @@ RUN sed 's_@php artisan package:discover_/bin/true_;' -i composer.json \
     && chmod -R 775 storage \
     && chown -R www-data:www-data storage \
     && mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache
-
-RUN echo "Running NPM clean install" \
-    && npm ci \
-    && echo "Running NPM build" \
-    && npm run production \
-    && rm -rf node_modules
 
 # Copy entrypoint
 COPY ./production/php-fpm/php-fpm-entrypoint /usr/local/bin/php-entrypoint

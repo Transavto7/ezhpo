@@ -42,7 +42,6 @@ class CompanyImport implements ToModel
                 'name' => $row[0],
                 'user_id' => $row[1] ?? 1,
                 'note' => $row[2] ?? '',
-                'procedure_pv' => $row[3] ?? '',
                 'payment_form' => $row[4] ?? '',
                 'inn' => $row[5] ?? 0,
                 //'req_id' => $row[3] ?? 0,

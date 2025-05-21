@@ -20,7 +20,7 @@ final class TrashFormHandler
 
         $form->deleted_id = $user->id;
 
-        if (!$action) {
+        if (! $action) {
             $form->deleted_at = null;
         } else {
             if ($form->type_anketa === FormTypeEnum::MEDIC && $form->driver_id) {
@@ -58,17 +58,17 @@ final class TrashFormHandler
     {
         $driver = Driver::where('hash_id', $form->driver_id)->first();
 
-        if (!$driver) {
+        if (! $driver) {
             return;
         }
 
-        if (!$driver->end_of_ban) {
+        if (! $driver->end_of_ban) {
             return;
         }
 
         $last = Form::query()
             ->select([
-                'id'
+                'id',
             ])
             ->where('type_anketa', FormTypeEnum::MEDIC)
             ->where('driver_id', $form->driver_id)

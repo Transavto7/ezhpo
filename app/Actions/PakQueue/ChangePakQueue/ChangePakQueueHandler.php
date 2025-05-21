@@ -2,8 +2,8 @@
 
 namespace App\Actions\PakQueue\ChangePakQueue;
 
-use App\Enums\FormLogActionTypesEnum;
 use App\Enums\FlagPakEnum;
+use App\Enums\FormLogActionTypesEnum;
 use App\Enums\FormTypeEnum;
 use App\Events\Forms\DriverDismissed;
 use App\Events\Forms\FormAction;
@@ -11,7 +11,6 @@ use App\Models\Forms\Form;
 use App\Models\Forms\MedicForm;
 use App\Settings;
 use Exception;
-use Illuminate\Support\Facades\Auth;
 
 class ChangePakQueueHandler
 {
@@ -24,13 +23,13 @@ class ChangePakQueueHandler
         $id = $action->getId();
 
         $allowedAdmitted = ['Допущен', 'Не идентифицирован', 'Не допущен'];
-        if (!in_array($admitted, $allowedAdmitted)) {
+        if (! in_array($admitted, $allowedAdmitted)) {
             throw new Exception('Недопустимый результат осмотра');
         }
 
         $form = Form::withTrashed()->find($id);
 
-        if (!$form) {
+        if (! $form) {
             throw new Exception('Осмотр не найден');
         }
 

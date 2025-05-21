@@ -8,9 +8,19 @@ main() {
         prepare_storage
         wait_for_db
         run_migrations
+        build_front
         optimize_app
         run_server "$@"
     fi
+}
+
+
+build_front() {
+    echo "Running NPM clean install"
+    npm ci
+    echo "Running NPM build"
+    npm run production
+    rm -rf node_modules
 }
 
 prepare_file_permissions() {
@@ -40,7 +50,7 @@ wait_for_db() {
 }
 
 run_migrations() {
-    ./artisan migrate
+    ./artisan migrate --force
 }
 
 optimize_app() {

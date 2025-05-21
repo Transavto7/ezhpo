@@ -44,7 +44,7 @@
                 <pak-index
                     :fields='@json($fields)'
                     time="{{ \Carbon\Carbon::now() }}"
-                    :reload-interval="1000" />
+                    :reload-interval="1000"/>
             </div>
         </div>
     </div>
@@ -52,12 +52,10 @@
 
 @section('custom-scripts')
     <script type="text/javascript">
-        console.log("{{ route('pak.index', ['clear' => 1]) }}")
-
         $('#clearQueueBtn').on('click', function (event) {
             window.swal.fire({
                 title: 'Очистка очереди!',
-                text: 'Перевести все осмотры в режим СДПО-А и принять решение о допуске автоматически?',
+                text: 'Удалить все осмотры в корзину?',
                 icon: 'error',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',

@@ -318,26 +318,6 @@
                             </div>
 
                             <div class="form-group col-lg-6">
-                                <label for="timeout" class="mb-1">Время ожидания ручного режима</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="timeout">
-                                            <i class="fa fa-times"></i>
-                                        </span>
-                                    </div>
-                                    <input type="number"
-                                           class="form-control"
-                                           id="timeout"
-                                           style="height: auto"
-                                           placeholder="Введите ожидания ручного режима"
-                                           name="timeout"
-                                           aria-describedby="timeout"
-                                           value="{{ $timeout }}"
-                                    >
-                                </div>
-                            </div>
-
-                            <div class="form-group col-lg-6">
                                 <label for="timeout" class="mb-1">Телефон поддержки для СДПО</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
