@@ -28,6 +28,10 @@ class UpdateRelatedItemsAction
             $medicForm = $updatedItem->medicForm;
             $techForm = $updatedItem->techForm;
 
+            if ($date instanceof \DateTimeImmutable || $date instanceof Carbon) {
+                $date = $date->format('Y-m-d');
+            }
+
             if ($medicForm) {
                 $this->updateMedicForm($medicForm, $date, $period, $driverId);
             }
