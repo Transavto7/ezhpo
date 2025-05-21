@@ -335,9 +335,9 @@ class UpdateFormHandler
         }
 
         if ($tripTicket) {
-            if ($tripTicket->start_date && ! $data['date']) {
+            if ($tripTicket->start_date && isset($data['date']) && ! $data['date']) {
                 throw new Exception('Нельзя удалить дату осмотра, который связан с путевым листом');
-            } elseif ($tripTicket->start_date && Carbon::parse($data['date'])->format('Y-m-d') !== $tripTicket->start_date) {
+            } elseif ($tripTicket->start_date && isset($data['date']) && Carbon::parse($data['date'])->format('Y-m-d') !== $tripTicket->start_date) {
                 throw new Exception('Нельзя изменить дату осмотра, который связан с путевым листом');
             }
 
@@ -345,16 +345,16 @@ class UpdateFormHandler
                 throw new Exception('Период ПЛ не совпадает с периодом ПЛ осмотра, который связан с путевым листом');
             }
 
-            if ($tripTicket->driver_id && ! $data['driver_id']) {
+            if ($tripTicket->driver_id && isset($data['driver_id']) && ! $data['driver_id']) {
                 throw new Exception('Нельзя удалить водителя у осмотра, который связан с путевым листом');
-            } elseif ($tripTicket->driver_id && $data['driver_id'] !== $tripTicket->driver_id) {
+            } elseif ($tripTicket->driver_id && isset($data['driver_id']) && $data['driver_id'] !== $tripTicket->driver_id) {
                 throw new Exception('Нельзя изменить водителя у осмотра, который связан с путевым листом');
             }
 
             if ($form->type_anketa === FormTypeEnum::TECH) {
-                if ($tripTicket->car_id && ! $data['car_id']) {
+                if ($tripTicket->car_id && isset($data['car_id']) && ! $data['car_id']) {
                     throw new Exception('Нельзя удалить водителя у осмотра, который связан с путевым листом');
-                } elseif ($tripTicket->car_id && $data['car_id'] !== $tripTicket->car_id) {
+                } elseif ($tripTicket->car_id && isset($data['car_id']) && $data['car_id'] !== $tripTicket->car_id) {
                     throw new Exception('Нельзя изменить водителя у осмотра, который связан с путевым листом');
                 }
             }
