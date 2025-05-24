@@ -44,7 +44,6 @@ class AnketsController extends Controller
         /** @var Form $form */
         $form = Form::withTrashed()->findOrFail($request->id);
         $details = $form->details;
-
         $data = array_merge($form->toArray(), $details->toArray());
 
         $companyFields = config('elements')['Driver']['fields']['company_id'];

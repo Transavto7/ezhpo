@@ -54,6 +54,17 @@
         </div>
 
         <div class="form-group">
+            <label class="form-control-label">Пульс:</label>
+            <article>
+                <input type="number"
+                       step="1"
+                       value="{{ $pulse ?? '' }}"
+                       name="t_people"
+                       class="form-control">
+            </article>
+        </div>
+
+        <div class="form-group">
             <label class="form-control-label">Температура тела:</label>
             <article>
                 <input type="number"

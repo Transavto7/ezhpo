@@ -3,7 +3,7 @@
 namespace Src\Users\Management\Http\Controllers;
 
 use App\Enums\UserRoleEnum;
-use Spatie\Permission\Models\Role;
+use App\Role;
 
 final class GetRoleItemsController
 {
