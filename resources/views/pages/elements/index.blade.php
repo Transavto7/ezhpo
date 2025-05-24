@@ -885,6 +885,55 @@
                         input.value = input.value.slice(0, 18)
                     }
                 }
+
+                $('#elements-modal-add select[name="type_auto"]').on('change', function() {
+                    $('#elements-modal-add input[name="gos_number"]').prop('disabled', ! $(this).val())
+                })
+
+                $('#elements-modal-add input[name="gos_number"]').on('input', function() {
+                    const $gosNumber = $(this)
+                    const type = $('#elements-modal-add select[name="type_auto"]').val()
+                    const value = $gosNumber.val()
+                    $gosNumber.val(value.toUpperCase())
+
+                    $gosNumber.removeClass('is-valid')
+                    $gosNumber.removeClass('is-invalid')
+
+                    if (value === '') {
+                        return
+                    }
+
+                    $gosNumber.addClass(validateGosNumber(value, type) ? 'is-valid' : 'is-invalid')
+                })
+
+                function validateGosNumber(number, type) {
+                    const cleanedNumber = number.replace(/\s+/g, '').toUpperCase();
+                    let patterns
+
+                    switch(true) {
+                        case type === 'Е - прицепы': // Номера прицепов (АА111196)
+                            patterns = [/^[АВЕКМНОРСТУХABEKMHOPCTYX]{2}\d{4}\d{2,3}$/]
+                            break;
+                        case type === 'М - мототехника (мопеды\\мотоциклы\\трициклы и т.п.)': // Мотоциклы, трактора (1111АА96)
+                        case type === 'Tr - трактора\\с-х техника':
+                            patterns = [/^\d{4}[АВЕКМНОРСТУХABEKMHOPCTYX]{2}\d{2,3}$/]
+                            break;
+                        case type === 'В - легковые и грузовые автомобили до 3.5 тн': // Стандартный (А111АА96)
+                        case type === 'С - грузовые т\\с от 3.5 тн':
+                        case type === 'Ст - спецтранспорт':
+                        case type === 'D - автобусы':
+                            patterns = [/^[АВЕКМНОРСТУХABEKMHOPCTYX]\d{3}[АВЕКМНОРСТУХABEKMHOPCTYX]{2}\d{2,3}$/]
+                            break;
+                        default:
+                            patterns = [
+                                /^[АВЕКМНОРСТУХABEKMHOPCTYX]\d{3}[АВЕКМНОРСТУХABEKMHOPCTYX]{2}\d{2,3}$/, // Стандартный (А111АА96)
+                                /^\d{4}[АВЕКМНОРСТУХABEKMHOPCTYX]{2}\d{2,3}$/, // Мотоциклы, трактора (1111АА96)
+                                /^[АВЕКМНОРСТУХABEKMHOPCTYX]{2}\d{4}\d{2,3}$/, // Номера прицепов (АА111196)
+                            ];
+                    }
+
+                    return patterns.some(pattern => pattern.test(cleanedNumber));
+                }
             })
 
         </script>
