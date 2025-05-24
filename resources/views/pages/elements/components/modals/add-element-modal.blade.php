@@ -49,6 +49,9 @@
                 $disabled = true;
             }
         }
+        if ($k === 'gos_number') {
+            $disabled = true;
+        }
     @endphp
 
     @if($k === 'year_birthday' && $model === 'Driver')
@@ -59,7 +62,7 @@
             </label>
 
             <input
-                type="{{ $v['type'] }}" {{ $is_required }}
+                type="{{ $v['type'] }}" {{ $is_required }} {{ $disabled ? 'disabled' : '' }}
                 name="{{ $k }}"
                 data-label="{{ $v['label'] ?? $k }}"
                 placeholder="{{ $v['label'] }}"

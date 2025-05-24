@@ -434,14 +434,6 @@ return [
                 'concatField' => 'hash_id',
                 'getFieldKey' => 'hash_id'
             ],
-            'gos_number' => [
-                'label' => 'Гос.номер',
-                'type' => 'text'
-            ],
-            'mark_model' => [
-                'label' => 'Марка и модель',
-                'type' => 'text'
-            ],
             'type_auto' => [
                 'label' => 'Категория Т\С',
                 'type' => 'select',
@@ -456,6 +448,14 @@ return [
                     'Е - прицепы' => 'Е - прицепы',
                 ],
                 'defaultValue' => 'Не установлено',
+            ],
+            'gos_number' => [
+                'label' => 'Гос.номер',
+                'type' => 'text'
+            ],
+            'mark_model' => [
+                'label' => 'Марка и модель',
+                'type' => 'text'
             ],
             'official_type_auto' => [
                 'label' => 'Тип Т\С',
