@@ -17,6 +17,7 @@ class Car extends Model
         = [
             'hash_id',
             'gos_number',
+            'gos_number_details',
             'mark_model',
             'type_auto',
             'official_type_auto',

@@ -886,13 +886,41 @@
                     }
                 }
 
-                $('#elements-modal-add select[name="type_auto"]').on('change', function() {
-                    $('#elements-modal-add input[name="gos_number"]').prop('disabled', ! $(this).val())
+                $(document).on('change', 'select[name="type_auto"]', function() {
+                    const $gosNumber = $(this).closest('form').find('input[name="gos_number"]')
+                    const type = $(this).val()
+                    $gosNumber.prop('disabled', !$(this).val())
+                    let mask
+
+                    switch (true) {
+                        case type === 'Е - прицепы': // Номера прицепов (АА111196)
+                            $gosNumber.attr('placeholder', 'Гос номер (АА123496)')
+                            mask = 'YY0000000'
+                            break;
+                        case type === 'М - мототехника (мопеды\\мотоциклы\\трициклы и т.п.)': // Мотоциклы, трактора (1111АА96)
+                        case type === 'Tr - трактора\\с-х техника':
+                            $gosNumber.attr('placeholder', 'Гос номер (1234АА96)')
+                            mask = '0000YY000'
+                            break;
+                        case type === 'В - легковые и грузовые автомобили до 3.5 тн': // Стандартный (А111АА96)
+                        case type === 'С - грузовые т\\с от 3.5 тн':
+                        case type === 'Ст - спецтранспорт':
+                        case type === 'D - автобусы':
+                        default:
+                            $gosNumber.attr('placeholder', 'Гос номер (А123АА96)')
+                            mask = 'Y000YY000'
+                    }
+
+                    $gosNumber.mask(mask, {
+                        'translation': {
+                            Y: {pattern: /[АВЕКМНОРСТУХABEKMHOPCTYXавекмнорстухabekmhopctyx]/},
+                        }
+                    })
                 })
 
-                $('#elements-modal-add input[name="gos_number"]').on('input', function() {
+                $(document).on('input', 'input[name="gos_number"]', function() {
                     const $gosNumber = $(this)
-                    const type = $('#elements-modal-add select[name="type_auto"]').val()
+                    const type = $(this).closest('form').find('select[name="type_auto"]').val()
                     const value = $gosNumber.val()
                     $gosNumber.val(value.toUpperCase())
 
@@ -934,6 +962,13 @@
 
                     return patterns.some(pattern => pattern.test(cleanedNumber));
                 }
+
+                $('#modalEditor').on('shown.bs.modal', function () {
+                    setTimeout(function() {
+                        var selectElement = $('#modalEditor select[name="type_auto"]')
+                        selectElement.trigger('change')
+                    }, 2000)
+                })
             })
 
         </script>
