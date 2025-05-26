@@ -103,9 +103,8 @@ class CreateCarHandler extends AbstractCreateElementHandler implements CreateEle
         }
 
         $data = $this->validateCarGosNumber($data);
-        $data = $this->validateVin($data);
 
-        return $data;
+        return $this->validateVin($data);
     }
 
     /**
@@ -118,13 +117,15 @@ class CreateCarHandler extends AbstractCreateElementHandler implements CreateEle
             throw new Exception('Не заполнен гос.номер Автомобиля');
         }
 
-        $gosNumber = new GosNumber($data['gos_number']);
+        $gosNumber = new GosNumber($data['gos_number'], $data['type_auto']);
 
         if (!$gosNumber->isValid()) {
             throw new WrongCarGosNumberException();
         }
 
         $data['gos_number'] = $gosNumber->getSanitized();
+        $data['gos_number_details'] = json_encode($gosNumber->getDetails());
+
         $existItemByGosNumber = $this->carRepository->findByGosNumber($gosNumber->getSanitized(), $data['company_id']);
         if ($existItemByGosNumber) {
             throw new CarWithSameGosNumberAlreadyExist();

@@ -66,13 +66,15 @@ class UpdateCarHandler extends UpdateElementHandler
             return;
         }
 
-        $gosNumber = new GosNumber($this->data['gos_number']);
+        $gosNumber = new GosNumber($this->data['gos_number'], $this->data['type_auto']);
 
         if (!$gosNumber->isValid()) {
             throw new WrongCarGosNumberException();
         }
 
         $this->data['gos_number'] = $gosNumber->getSanitized();
+        $this->data['gos_number_details'] = json_encode($gosNumber->getDetails());
+
         $existItemByGosNumber = $this->carRepository->findByGosNumber($gosNumber->getSanitized(), $this->data['company_id'], $this->element->id);
         if ($existItemByGosNumber) {
             throw new CarWithSameGosNumberAlreadyExist();
