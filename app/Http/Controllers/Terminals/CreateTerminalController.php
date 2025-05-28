@@ -58,7 +58,7 @@ final class CreateTerminalController
             DB::rollBack();
 
             return response()->json([
-                'message' => $exception->getMessage(),
+                'errors' => [$exception->getMessage()],
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
