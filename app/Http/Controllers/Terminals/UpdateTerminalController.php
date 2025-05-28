@@ -70,7 +70,7 @@ final class UpdateTerminalController
 
             return response()
                 ->json([
-                    'errors' => $exception->getMessage()
+                    'errors' => [$exception->getMessage()]
                 ])
                 ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
