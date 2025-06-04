@@ -23,10 +23,6 @@ abstract class NotificationsStatusFilter implements Filter
 
     public function apply($query)
     {
-        if ($this->value->equal(NotificationFilterStatus::VIEWED)) {
-            $query->whereNotNull('notifications.viewed_at');
-        }
-
         if ($this->value->equal(NotificationFilterStatus::READ)) {
             $query->whereNotNull('notifications.read_at');
         }

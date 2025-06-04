@@ -76,7 +76,7 @@ final class GetRemindersTableItemsHandler
                     'id' => $rawReminder->id,
                     'title' => $rawReminder->title,
                     'action' => $action->getTitle(),
-                    'enabled' => ! $status->equal(ReminderStatus::disable()),
+                    'enabled' => $status->equal(ReminderStatus::enable()),
                     'context' => $conditionsViewModels,
                     'updated_at' => $updatedAt,
                 ];

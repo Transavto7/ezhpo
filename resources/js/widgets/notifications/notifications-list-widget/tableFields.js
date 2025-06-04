@@ -41,14 +41,6 @@ export default [
     tdClass: 'text-center',
   },
   {
-    key: 'viewed_at',
-    label: 'Дата просмотра',
-    sortable: true,
-    thClass: 'text-center',
-    tdClass: 'text-center',
-    thStyle: {width: "150px"},
-  },
-  {
     key: 'read_at',
     label: 'Дата прочтения',
     sortable: true,

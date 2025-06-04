@@ -14,7 +14,7 @@ use Src\Notifications\Queries\GetNotificationTableItems\Filters\RemindersFilter;
 use Src\Notifications\Queries\GetNotificationTableItems\Filters\SearchFilter;
 use Src\Notifications\Queries\GetNotificationTableItems\Filters\StatusFilter;
 use Src\Notifications\Queries\GetNotificationTableItems\Filters\UsersFilter;
-use Src\Notifications\Queries\GetNotificationTableItems\Filters\ViewedAtFilter;
+use Src\Notifications\Queries\GetNotificationTableItems\Filters\ReadAtFilter;
 
 final class GetNotificationTableItemsFilters
 {
@@ -56,12 +56,12 @@ final class GetNotificationTableItemsFilters
     /**
      * @var Carbon|null
      */
-    private $viewedAtBegin;
+    private $readAtBegin;
 
     /**
      * @var Carbon|null
      */
-    private $viewedAtEnd;
+    private $readAtEnd;
 
     /**
      * @var Carbon|null
@@ -96,8 +96,8 @@ final class GetNotificationTableItemsFilters
      * @param int[] $reminders
      * @param Carbon|null $expiresAtBegin
      * @param Carbon|null $expiresAtEnd
-     * @param Carbon|null $viewedAtBegin
-     * @param Carbon|null $viewedAtEnd
+     * @param Carbon|null $readAtBegin
+     * @param Carbon|null $readAtEnd
      * @param Carbon|null $completedAtBegin
      * @param Carbon|null $completedAtEnd
      * @param Carbon|null $createdAtBegin
@@ -112,8 +112,8 @@ final class GetNotificationTableItemsFilters
         array $reminders,
         ?Carbon $expiresAtBegin,
         ?Carbon $expiresAtEnd,
-        ?Carbon $viewedAtBegin,
-        ?Carbon $viewedAtEnd,
+        ?Carbon $readAtBegin,
+        ?Carbon $readAtEnd,
         ?Carbon $completedAtBegin,
         ?Carbon $completedAtEnd,
         ?Carbon $createdAtBegin,
@@ -127,8 +127,8 @@ final class GetNotificationTableItemsFilters
         $this->reminders = $reminders;
         $this->expiresAtBegin = $expiresAtBegin;
         $this->expiresAtEnd = $expiresAtEnd;
-        $this->viewedAtBegin = $viewedAtBegin;
-        $this->viewedAtEnd = $viewedAtEnd;
+        $this->readAtBegin = $readAtBegin;
+        $this->readAtEnd = $readAtEnd;
         $this->completedAtBegin = $completedAtBegin;
         $this->completedAtEnd = $completedAtEnd;
         $this->createdAtBegin = $createdAtBegin;
@@ -144,7 +144,7 @@ final class GetNotificationTableItemsFilters
             InitiatorUsersFilter::NAME => $this->initiatorUsers,
             NotificationsFilter::NAME => $this->notificationsIds,
             RemindersFilter::NAME => $this->reminders,
-            ViewedAtFilter::NAME => new DateRange($this->viewedAtBegin, $this->viewedAtEnd),
+            ReadAtFilter::NAME => new DateRange($this->readAtBegin, $this->readAtEnd),
             CompletedAtFilter::NAME => new DateRange($this->completedAtBegin, $this->completedAtEnd),
             ExpiresAtFilter::NAME => new DateRange($this->expiresAtBegin, $this->expiresAtEnd),
             CreatedAtFilter::NAME => new DateRange($this->createdAtBegin, $this->createdAtEnd),

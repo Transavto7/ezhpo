@@ -8,7 +8,6 @@ use Src\Core\Emuns\Enum;
 
 final class NotificationFilterStatus extends Enum
 {
-    const VIEWED = 'viewed';
     const READ = 'read';
     const COMPLETED = 'completed';
     const EXPIRED = 'expired';
@@ -16,8 +15,6 @@ final class NotificationFilterStatus extends Enum
     public static function from(string $value): self
     {
         switch ($value) {
-            case self::VIEWED:
-                return new self(self::VIEWED);
             case self::READ:
                 return new self(self::READ);
             case self::COMPLETED:
@@ -32,8 +29,6 @@ final class NotificationFilterStatus extends Enum
     public function getTitle(): string
     {
         switch ($this->value()) {
-            case self::VIEWED:
-                return 'Просмотрено';
             case self::READ:
                 return 'Прочтено';
             case self::EXPIRED:

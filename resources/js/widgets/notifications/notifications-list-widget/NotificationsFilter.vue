@@ -44,14 +44,6 @@ const handleRemindersInput = (value) => {
   update('reminders', value)
 }
 
-const handleViewedAtBeginInput = (e) => {
-  update('viewedAtBegin', e.target.value)
-}
-
-const handleViewedAtEndInput = (e) => {
-  update('viewedAtEnd', e.target.value)
-}
-
 const handleReadAtBeginInput = (e) => {
   update('readAtBegin', e.target.value)
 }
@@ -143,20 +135,6 @@ const handleStatusInput = (value) => {
       </div>
 
       <div class="col-12 col-md-4 col-lg-3 form-group">
-        <label for="viewedAtBegin">Дата просмотра</label>
-        <div class="d-flex align-items-center justify-content-center" style="gap: 15px">
-          <div class="d-flex align-items-center" style="gap: 5px; width: 100%">
-            <span class="sub-label">С</span>
-            <input v-model="props.filter.viewedAtBegin" type="date" name="viewedAtBegin" class="form-control" @input="handleViewedAtBeginInput" />
-          </div>
-          <div class="d-flex align-items-center" style="gap: 5px; width: 100%">
-            <span class="sub-label">По</span>
-            <input v-model="props.filter.viewedAtEnd" type="date" name="viewedAtEnd" class="form-control" @input="handleViewedAtEndInput" />
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-md-4 col-lg-3 form-group">
         <label for="readAtBegin">Дата прочтения</label>
         <div class="d-flex align-items-center justify-content-center" style="gap: 15px">
           <div class="d-flex align-items-center" style="gap: 5px; width: 100%">
@@ -171,7 +149,7 @@ const handleStatusInput = (value) => {
       </div>
 
       <div class="col-12 col-md-4 col-lg-3 form-group">
-        <label for="viewedAtBegin">Дата выполнения</label>
+        <label for="completedAtBegin">Дата выполнения</label>
         <div class="d-flex align-items-center justify-content-center" style="gap: 15px">
           <div class="d-flex align-items-center" style="gap: 5px; width: 100%">
             <span class="sub-label">С</span>
@@ -185,7 +163,7 @@ const handleStatusInput = (value) => {
       </div>
 
       <div class="col-12 col-md-4 col-lg-3 form-group">
-        <label for="viewedAtBegin">Когда истекает</label>
+        <label for="expiredAtBegin">Когда истекает</label>
         <div class="d-flex align-items-center justify-content-center" style="gap: 15px">
           <div class="d-flex align-items-center" style="gap: 5px; width: 100%">
             <span class="sub-label">С</span>
@@ -199,7 +177,7 @@ const handleStatusInput = (value) => {
       </div>
 
       <div class="col-12 col-md-4 col-lg-3 form-group">
-        <label for="viewedAtBegin">Дата создания</label>
+        <label for="createdAtBegin">Дата создания</label>
         <div class="d-flex align-items-center justify-content-center" style="gap: 15px">
           <div class="d-flex align-items-center" style="gap: 5px; width: 100%">
             <span class="sub-label">С</span>

@@ -43,7 +43,6 @@ class MarkNotificationAsReadHandler
 
         $now = new DateTimeImmutable();
 
-        $notification->viewed($now);
         $notification->read($now);
 
         $this->notificationRepository->update($notification);

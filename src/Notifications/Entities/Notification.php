@@ -38,11 +38,6 @@ class Notification
     /**
      * @var DateTimeImmutable|null
      */
-    private $viewedAt;
-
-    /**
-     * @var DateTimeImmutable|null
-     */
     private $readAt;
 
     /**
@@ -67,7 +62,6 @@ class Notification
      * @param string $content
      * @param int $recipientId
      * @param int|null $senderId
-     * @param DateTimeImmutable|null $viewedAt
      * @param DateTimeImmutable|null $readAt
      * @param DateTimeImmutable|null $completedAt
      * @param DateTimeImmutable|null $expiresAt
@@ -80,7 +74,6 @@ class Notification
         string $content,
         int $recipientId,
         ?int $senderId,
-        ?DateTimeImmutable $viewedAt,
         ?DateTimeImmutable $readAt,
         ?DateTimeImmutable $completedAt,
         ?DateTimeImmutable $expiresAt,
@@ -92,7 +85,6 @@ class Notification
         $this->content = $content;
         $this->recipientId = $recipientId;
         $this->senderId = $senderId;
-        $this->viewedAt = $viewedAt;
         $this->readAt = $readAt;
         $this->completedAt = $completedAt;
         $this->expiresAt = $expiresAt;
@@ -129,11 +121,6 @@ class Notification
         return $this->senderId;
     }
 
-    public function getViewedAt(): ?DateTimeImmutable
-    {
-        return $this->viewedAt;
-    }
-
     public function getReadAt(): ?DateTimeImmutable
     {
         return $this->readAt;
@@ -161,13 +148,6 @@ class Notification
         }
 
         return $this->expiresAt <= $this->createdAt;
-    }
-
-    public function viewed(DateTimeImmutable $now)
-    {
-        if ($this->viewedAt === null) {
-            $this->viewedAt = $now;
-        }
     }
 
     public function read(DateTimeImmutable $now)

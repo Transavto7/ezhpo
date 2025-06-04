@@ -38,11 +38,6 @@ class NotificationViewModel implements \JsonSerializable
     /**
      * @var bool
      */
-    private $isViewed;
-
-    /**
-     * @var bool
-     */
     private $isExpired;
 
     /**
@@ -66,7 +61,6 @@ class NotificationViewModel implements \JsonSerializable
      * @param string $content
      * @param DateTimeImmutable $createdAt
      * @param DateTimeImmutable|null $expiresAt
-     * @param bool $isViewed
      * @param bool $isExpired
      * @param bool $isImmediate
      * @param ReminderType $reminderType
@@ -78,7 +72,6 @@ class NotificationViewModel implements \JsonSerializable
         string $content,
         DateTimeImmutable $createdAt,
         ?DateTimeImmutable $expiresAt,
-        bool $isViewed,
         bool $isExpired,
         bool $isImmediate,
         ReminderType $reminderType,
@@ -89,7 +82,6 @@ class NotificationViewModel implements \JsonSerializable
         $this->content = $content;
         $this->createdAt = $createdAt;
         $this->expiresAt = $expiresAt;
-        $this->isViewed = $isViewed;
         $this->isExpired = $isExpired;
         $this->isImmediate = $isImmediate;
         $this->reminderType = $reminderType;
@@ -104,7 +96,6 @@ class NotificationViewModel implements \JsonSerializable
             'title' => $this->title,
             'content' => $this->content,
             'expiresAt' => $this->expiresAt ? $this->expiresAt->format('H:i d.m.Y') : null,
-            'isViewed' => $this->isViewed,
             'isExpired' => $this->isExpired,
             'isImmediate' => $this->isImmediate,
             'reminderType' => [
@@ -120,7 +111,7 @@ class NotificationViewModel implements \JsonSerializable
 
     public static function createFrom(Notification $notification, ReminderType $reminderType, ReminderAction $reminderAction): self
     {
-        $isImmediate = ! $notification->getViewedAt() && $notification->getSenderId() === $notification->getRecipientId();
+        $isImmediate = ! $notification->getReadAt() && $notification->getSenderId() === $notification->getRecipientId();
 
         return new self(
             $notification->getId(),
@@ -128,7 +119,6 @@ class NotificationViewModel implements \JsonSerializable
             $notification->getContent(),
             $notification->getCreatedAt(),
             $notification->getExpiresAt(),
-            $notification->getViewedAt() !== null,
             $notification->isExpired(),
             $isImmediate,
             $reminderType,

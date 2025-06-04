@@ -30,14 +30,14 @@ final class GetNotificationTableItemsController extends Controller
             $expiresAtEnd = Carbon::parse($request->input('filters.expiresAtEnd'));
         }
 
-        $viewedAtBegin = null;
-        if ($request->input('filters.viewedAtBegin')) {
-            $viewedAtBegin = Carbon::parse($request->input('filters.viewedAtBegin'));
+        $readAtBegin = null;
+        if ($request->input('filters.readAtBegin')) {
+            $readAtBegin = Carbon::parse($request->input('filters.readAtBegin'));
         }
 
-        $viewedAtEnd = null;
-        if ($request->input('filters.viewedAtEnd')) {
-            $viewedAtEnd = Carbon::parse($request->input('filters.viewedAtEnd'));
+        $readAtEnd = null;
+        if ($request->input('filters.readAtEnd')) {
+            $readAtEnd = Carbon::parse($request->input('filters.readAtEnd'));
         }
 
         $completedAtBegin = null;
@@ -82,8 +82,8 @@ final class GetNotificationTableItemsController extends Controller
                 $request->input('filters.reminders') ?? [],
                 $expiresAtBegin,
                 $expiresAtEnd,
-                $viewedAtBegin,
-                $viewedAtEnd,
+                $readAtBegin,
+                $readAtEnd,
                 $completedAtBegin,
                 $completedAtEnd,
                 $createdAtBegin,

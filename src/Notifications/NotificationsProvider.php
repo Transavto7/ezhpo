@@ -10,8 +10,6 @@ use Src\Notifications\Commands\CreateNotificationsByContext\CreateNotificationsB
 use Src\Notifications\Commands\CreateNotificationsByContext\CreateNotificationsByContextHandler;
 use Src\Notifications\Commands\LogNotificationActivity\LogNotificationActivityCommand;
 use Src\Notifications\Commands\LogNotificationActivity\LogNotificationActivityHandler;
-use Src\Notifications\Commands\MarkNotificationAsViewed\MarkNotificationAsViewedCommand;
-use Src\Notifications\Commands\MarkNotificationAsViewed\MarkNotificationAsViewedHandler;
 use Src\Notifications\Queries\GetUnreadUserNotifications\GetUnreadUserNotificationsRepository;
 use Src\Notifications\Repositories\Mysql\MysqlNotificationLogRepository;
 use Src\Notifications\Repositories\Mysql\MysqlNotificationRepository;
@@ -37,7 +35,6 @@ final class NotificationsProvider extends ServiceProvider
             $dispatcher->map([
                 CreateNotificationsByContextCommand::class => CreateNotificationsByContextHandler::class,
                 LogNotificationActivityCommand::class => LogNotificationActivityHandler::class,
-                MarkNotificationAsViewedCommand::class => MarkNotificationAsViewedHandler::class,
             ]);
 
             return $dispatcher;

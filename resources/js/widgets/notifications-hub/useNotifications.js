@@ -1,6 +1,6 @@
 import {useSidebarCounter} from "@/widgets/notifications-hub/useSidebarCounter";
 import {ref} from "vue";
-import {fetchNotifications, markAsViewed, markAsRead, markAsCompleted} from "@/widgets/notifications-hub/api";
+import {fetchNotifications, markAsRead, markAsCompleted} from "@/widgets/notifications-hub/api";
 import {onMounted, onUnmounted, watch} from "vue";
 import {useAppPageSetup} from "@/composables/useAppPageSetup";
 import Notify from "@/components/notify";
@@ -40,20 +40,24 @@ export const useNotifications = () => {
     try {
       const { data } = await fetchNotifications()
 
-      const newNotifications = data
-        .filter((item) => !notifications.value.find((i) => i.id === item.id))
-        .map((item) => ({
-          ...item,
-          createdAtFormatted: formatCreatedAt(item.createdAt)
-        }))
+      const active = activeNotification.value
+
+      const restNotifications = active
+        ? data.filter((item) => item.id !== active.id)
+        : data
 
       notifications.value = [
-        ...notifications.value,
-        ...newNotifications,
+        ...(active ? [active] : []),
+        ...restNotifications,
       ]
 
-      if (!activeNotification.value) {
-        activeNotification.value = notifications.value?.[0] ?? null
+      notifications.value = notifications.value.map((item) => ({
+        ...item,
+        createdAtFormatted: formatCreatedAt(item.createdAt)
+      }))
+
+      if (notifications.value.length) {
+        activeNotification.value = notifications.value[0]
       }
 
       const immediateNotification = notifications.value.find((item) => item.isImmediate)
@@ -61,28 +65,6 @@ export const useNotifications = () => {
       isShowModal.value = !!immediateNotification || (!!notifications.value.length && isNotificationMode.value)
     } catch (e) {
       console.error('Ошибка при загрузке уведомлений', e)
-    }
-  }
-
-  const performAsViewed = async (id) => {
-    try {
-      pendingPerform.value = true
-
-      await markAsViewed(id)
-      notifications.value = notifications.value.map((item) => {
-        if (item.id === id) {
-          return {
-            ...item,
-            isViewed: true,
-          }
-        }
-
-        return item;
-      })
-
-      pendingPerform.value = false
-    } catch (e) {
-      console.error(e)
     }
   }
 
@@ -95,7 +77,7 @@ export const useNotifications = () => {
 
       removeNotificationById(id)
     } catch (e) {
-      Notify.error('Ошибка при попытке отметить уведомление прочитанным')
+      Notify.error('Ошибка при попытке отметить уведомление как прочитанное')
     }
   }
 
@@ -108,7 +90,7 @@ export const useNotifications = () => {
 
       removeNotificationById(id)
     } catch (e) {
-      Notify.error('Ошибка при попытке отметить уведомление выполненным')
+      Notify.error('Ошибка при попытке отметить уведомление как выполненное')
     }
   }
 
@@ -145,7 +127,6 @@ export const useNotifications = () => {
     activeNotification,
     notifications,
     fetchNotificationItems,
-    performAsViewed,
     performMarkAsRead,
     performMarkAsCompleted,
   }

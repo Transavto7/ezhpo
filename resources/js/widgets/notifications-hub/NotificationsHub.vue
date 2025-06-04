@@ -15,7 +15,6 @@ const {
   activeNotification,
   notifications,
   fetchNotificationItems,
-  performAsViewed,
   performMarkAsCompleted,
   performMarkAsRead,
 } = useNotifications()
@@ -40,17 +39,6 @@ const handleMarkAsRead = async (id) => {
 const handleMarkAsCompleted = async (id) => {
   await performMarkAsCompleted(id)
 }
-
-watch(
-  () => activeNotification.value,
-  async (newValue) => {
-    if (newValue.isViewed || !isShowModal.value) {
-      return
-    }
-
-    await performAsViewed(newValue.id)
-  }
-)
 
 watch(() => isShowModal.value, (newValue) => {
   if (newValue) {
