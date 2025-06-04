@@ -41,8 +41,8 @@ class MysqlNotificationRepository implements NotificationRepository, GetUnreadUs
             ->where('user_id', $userId)
             ->whereNull('read_at')
             ->whereNull('completed_at')
-            ->orderByRaw('n.viewed_at is null and n.user_id = n.initiator_user_id desc')
-            ->orderByRaw('viewed_at is not null')
+            ->orderByRaw('n.user_id = n.initiator_user_id desc')
+            ->orderByRaw('read_at is not null')
             ->orderByDesc('created_at')
             ->get()
             ->toArray();

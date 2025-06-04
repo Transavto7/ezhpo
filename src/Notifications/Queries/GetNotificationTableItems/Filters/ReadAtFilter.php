@@ -6,9 +6,9 @@ namespace Src\Notifications\Queries\GetNotificationTableItems\Filters;
 
 use Src\Core\Filters\AbstractFilters\DateRangeFilter;
 
-final class ViewedAtFilter extends DateRangeFilter
+final class ReadAtFilter extends DateRangeFilter
 {
-    const NAME = 'viewed_at';
+    const NAME = 'read_at';
 
-    protected $column = 'notifications.viewed_at';
+    protected $column = 'notifications.read_at';
 }

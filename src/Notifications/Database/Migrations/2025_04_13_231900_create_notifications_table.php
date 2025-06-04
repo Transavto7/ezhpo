@@ -27,7 +27,6 @@ class CreateNotificationsTable extends Migration
             $table->unsignedBigInteger('initiator_user_id')->nullable();
             $table->foreign('initiator_user_id')->references('id')->on('users');
 
-            $table->timestamp('viewed_at')->nullable();
             $table->timestamp('read_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamp('expires_at')->nullable();

@@ -69,7 +69,6 @@ final class GetNotificationTableItemsHandler
                     'initiator_user_url' => route('employees.index', ['employee_id' => [$item->initiator_employee_id]]),
                     'is_expired' => $item->is_expired !== 0,
                     'expires_at' => $item->expires_at ? Carbon::parse($item->expires_at)->format('d.m.Y H:i') : null,
-                    'viewed_at' => $item->viewed_at ? Carbon::parse($item->viewed_at)->format('d.m.Y H:i') : null,
                     'read_at' => $item->read_at ? Carbon::parse($item->read_at)->format('d.m.Y H:i') : null,
                     'completed_at' => $item->completed_at ? Carbon::parse($item->completed_at)->format('d.m.Y H:i') : null,
                     'created_at' => Carbon::parse($item->created_at)->format('d.m.Y H:i'),

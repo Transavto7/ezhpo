@@ -46,7 +46,6 @@ class MarkNotificationAsCompletedHandler
 
         $now = new DateTimeImmutable();
 
-        $notification->viewed($now);
         $notification->read($now);
         $notification->completed($now);
 

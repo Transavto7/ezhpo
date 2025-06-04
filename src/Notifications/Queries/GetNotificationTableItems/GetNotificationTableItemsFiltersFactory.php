@@ -14,7 +14,7 @@ use Src\Notifications\Queries\GetNotificationTableItems\Filters\RemindersFilter;
 use Src\Notifications\Queries\GetNotificationTableItems\Filters\SearchFilter;
 use Src\Notifications\Queries\GetNotificationTableItems\Filters\StatusFilter;
 use Src\Notifications\Queries\GetNotificationTableItems\Filters\UsersFilter;
-use Src\Notifications\Queries\GetNotificationTableItems\Filters\ViewedAtFilter;
+use Src\Notifications\Queries\GetNotificationTableItems\Filters\ReadAtFilter;
 
 final class GetNotificationTableItemsFiltersFactory extends FilterFactory
 {
@@ -24,7 +24,7 @@ final class GetNotificationTableItemsFiltersFactory extends FilterFactory
         InitiatorUsersFilter::NAME => InitiatorUsersFilter::class,
         NotificationsFilter::NAME => NotificationsFilter::class,
         RemindersFilter::NAME => RemindersFilter::class,
-        ViewedAtFilter::NAME => ViewedAtFilter::class,
+        ReadAtFilter::NAME => ReadAtFilter::class,
         CompletedAtFilter::NAME => CompletedAtFilter::class,
         ExpiresAtFilter::NAME => ExpiresAtFilter::class,
         CreatedAtFilter::NAME => CreatedAtFilter::class,

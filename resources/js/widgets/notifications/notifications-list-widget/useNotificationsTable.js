@@ -17,8 +17,6 @@ export const useNotificationTable = () => {
     reminders: null,
     expiresAtBegin: null,
     expiresAtEnd: null,
-    viewedAtBegin: null,
-    viewedAtEnd: null,
     readAtBegin: null,
     readAtEnd: null,
     completedAtBegin: null,
@@ -36,8 +34,6 @@ export const useNotificationTable = () => {
     filter.reminders = null
     filter.expiresAtBegin = null
     filter.expiresAtEnd = null
-    filter.viewedAtBegin = null
-    filter.viewedAtEnd = null
     filter.readAtBegin = null
     filter.readdAtEnd = null
     filter.completedAtBegin = null
@@ -68,8 +64,6 @@ export const useNotificationTable = () => {
           reminders: filter.reminders?.map((item) => +item.id) ?? [],
           expiresAtBegin: filter.expiresAtBegin,
           expiresAtEnd: filter.expiresAtEnd,
-          viewedAtBegin: filter.viewedAtBegin,
-          viewedAtEnd: filter.viewedAtEnd,
           readAtBegin: filter.readAtBegin,
           readAtEnd: filter.readAtEnd,
           completedAtBegin: filter.completedAtBegin,

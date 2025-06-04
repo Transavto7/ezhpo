@@ -98,7 +98,7 @@ const handleSwitchStatus = (id, enable) => {
                 'btn-success': !item.enabled,
               }"
               @click.prevent="handleSwitchStatus(item.id, !item.enabled)">
-              <span v-if="!item.enabled" class="fa fa-lock"></span>
+              <span v-if="item.enabled" class="fa fa-lock"></span>
               <span v-else class="fa fa-unlock"></span>
             </button>
             <a

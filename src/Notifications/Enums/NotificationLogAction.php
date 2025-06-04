@@ -9,18 +9,12 @@ use Src\Core\Emuns\Enum;
 final class NotificationLogAction extends Enum
 {
     const CREATE = 'create';
-    const VIEW = 'view';
     const READ = 'read';
     const COMPLETE = 'complete';
 
     public static function create(): self
     {
         return new self(self::CREATE);
-    }
-
-    public static function view(): self
-    {
-        return new self(self::VIEW);
     }
 
     public static function read(): self
@@ -38,8 +32,6 @@ final class NotificationLogAction extends Enum
         switch ($value) {
             case self::CREATE:
                 return self::create();
-            case self::VIEW:
-                return self::view();
             case self::READ:
                 return self::read();
             case self::COMPLETE:
@@ -54,8 +46,6 @@ final class NotificationLogAction extends Enum
         switch ($this->value()) {
             case self::CREATE:
                 return 'Создание';
-            case self::VIEW:
-                return 'Просмотр';
             case self::READ:
                 return 'Прочтение';
             case self::COMPLETE:

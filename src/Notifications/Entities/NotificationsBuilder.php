@@ -19,7 +19,6 @@ class NotificationsBuilder
             $sender ? $sender->getAttribute('id') : null,
             null,
             null,
-            null,
             $reminderByContext->getExpiresAt(),
             $createdAt,
         );

@@ -62,8 +62,7 @@ const handleSortUpdate = (e) => {
                 </template>
 
                 <template #cell(action)="{ item }">
-                  <span v-if="item.action.value === 'create'" class="badge badge-secondary">{{ item.action.name }}</span>
-                  <span v-if="item.action.value === 'view'" class="badge badge-warning">{{ item.action.name }}</span>
+                  <span v-if="item.action.value === 'create'" class="badge badge-warning">{{ item.action.name }}</span>
                   <span v-if="item.action.value === 'read'" class="badge badge-info">{{ item.action.name }}</span>
                   <span v-if="item.action.value === 'complete'" class="badge badge-success">{{ item.action.name }}</span>
                 </template>

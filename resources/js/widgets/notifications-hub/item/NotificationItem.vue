@@ -26,7 +26,6 @@ const emit = defineEmits(['click'])
 const classObject = computed(() => {
   return {
     'active': props.active,
-    'viewed': props.item.isViewed,
   }
 })
 
@@ -73,11 +72,6 @@ const handleClick = () => {
   &.active {
     background-color: #f5f5f5;
     border-left: 3px solid #cccccc;
-  }
-
-  &.viewed .notification-item-title {
-    font-weight: 400 !important;
-    color: #535353 !important;
   }
 }
 

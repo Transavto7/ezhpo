@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Src\Reminders\Repositories\Mysql;
 
-use App\Employee;
+use App\User;
 use Illuminate\Support\Facades\DB;
 use Src\Core\ValueObjects\ClassifierViewModel;
 use Src\Core\ValueObjects\Uuid;
@@ -99,9 +99,10 @@ final class MysqlRemindersRepository implements RemindersRepository, GetReminder
         if ($rawReminder->users_to_notify) {
             $usersToNotify = json_decode($rawReminder->users_to_notify, true);
             $usersToNotify = array_reduce($usersToNotify, function (array $carry, string $id) {
-                $employee = Employee::withTrashed()->find($id);
+                $users = User::withTrashed()->find($id);
+                $employee = $users->relatedEmployee;
 
-                if (! $employee) {
+                if (! $users) {
                     return $carry;
                 }
 
@@ -109,7 +110,7 @@ final class MysqlRemindersRepository implements RemindersRepository, GetReminder
                     new ClassifierViewModel(
                         $id,
                         "[$employee->hash_id] $employee->name"
-                    )
+                    ),
                 ]);
             }, []);
         }
