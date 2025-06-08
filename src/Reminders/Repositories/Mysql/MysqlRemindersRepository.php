@@ -39,7 +39,10 @@ final class MysqlRemindersRepository implements RemindersRepository, GetReminder
 
     public function findById(Uuid $reminderId): ?Reminder
     {
-        $rawReminder = DB::table('reminders')->where('id', '=', $reminderId->value())->first();
+        $rawReminder = DB::table('reminders')
+            ->where('id', '=', $reminderId->value())
+            ->whereNull('deleted_at')
+            ->first();
 
         if ($rawReminder === null) {
             return null;
@@ -57,14 +60,24 @@ final class MysqlRemindersRepository implements RemindersRepository, GetReminder
 
     public function remove(Uuid $reminderId): void
     {
-        DB::table('reminders')->where('id', '=', $reminderId->value())->delete();
+        $now = new \DateTimeImmutable();
+
+        DB::table('reminders')
+            ->where('id', '=', $reminderId->value())
+            ->whereNull('deleted_at')
+            ->update([
+                'deleted_at' => $now,
+            ]);
     }
 
     public function getReminderViewModelById(Uuid $reminderId): ?ReminderViewModel
     {
         /** @var Condition[] $availableConditions */
         $availableConditions = [];
-        $rawReminderBuilder = DB::table('reminders')->where('reminders.id', '=', $reminderId->value());
+        $rawReminderBuilder = DB::table('reminders')
+            ->where('reminders.id', '=', $reminderId->value())
+            ->whereNull('reminders.deleted_at');
+
         $selectArray = ['reminders.*'];
         foreach (AvailableConditions::AVAILABLE_CONDITIONS as $conditionClass) {
             /** @var class-string<Condition> $conditionClass */

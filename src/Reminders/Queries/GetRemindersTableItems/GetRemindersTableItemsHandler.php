@@ -34,7 +34,7 @@ final class GetRemindersTableItemsHandler
 
     public function handle(GetRemindersTableItemsQuery $query): TableItems
     {
-        $builder = DB::table('reminders');
+        $builder = DB::table('reminders')->whereNull('reminders.deleted_at');
         $availableConditions = [];
         $selectArray = ['reminders.*'];
         foreach (AvailableConditions::AVAILABLE_CONDITIONS as $conditionClass) {
