@@ -12,11 +12,11 @@ use Src\Notifications\Entities\NotificationsBuilder;
 use Src\Notifications\Enums\NotificationLogAction;
 use Src\Notifications\Repositories\NotificationRepository;
 use Src\Reminders\ConditionBuilder\ContextConditionBuilder;
-use Src\Reminders\Repositories\GetReminderByContextRepository;
+use Src\Reminders\Repositories\GetRemindersByContextRepository;
 
 final class CreateNotificationsByContextHandler
 {
-    /** @var GetReminderByContextRepository */
+    /** @var GetRemindersByContextRepository */
     private $getReminderByContextRepository;
 
     /**
@@ -35,16 +35,16 @@ final class CreateNotificationsByContextHandler
     private $dispatcher;
 
     /**
-     * @param GetReminderByContextRepository $getReminderByContextRepository
+     * @param GetRemindersByContextRepository $getReminderByContextRepository
      * @param NotificationRepository $notificationRepository
      * @param ContextConditionBuilder $conditionBuilder
      * @param Dispatcher $dispatcher
      */
     public function __construct(
-        GetReminderByContextRepository $getReminderByContextRepository,
-        NotificationRepository $notificationRepository,
-        ContextConditionBuilder $conditionBuilder,
-        Dispatcher $dispatcher
+        GetRemindersByContextRepository $getReminderByContextRepository,
+        NotificationRepository          $notificationRepository,
+        ContextConditionBuilder         $conditionBuilder,
+        Dispatcher                      $dispatcher
     ) {
         $this->getReminderByContextRepository = $getReminderByContextRepository;
         $this->notificationRepository = $notificationRepository;
@@ -61,7 +61,7 @@ final class CreateNotificationsByContextHandler
         $sender = $command->getUser();
         $context = $this->conditionBuilder->build(array_merge($command->getContext(), ['user' => $command->getUser()->id]));
 
-        $reminders = $this->getReminderByContextRepository->getReminderByContext($command->getAction(), $context);
+        $reminders = $this->getReminderByContextRepository->getRemindersByContext($command->getAction(), $context);
 
         foreach ($reminders as $reminder) {
             if (! $reminder->isHiddenFromInitiator() && $command->getUser()) {

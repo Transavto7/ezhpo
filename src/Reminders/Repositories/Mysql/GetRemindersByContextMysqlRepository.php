@@ -7,17 +7,17 @@ use Src\Core\ValueObjects\Uuid;
 use Src\Reminders\Conditions\Condition;
 use Src\Reminders\Enums\ReminderAction;
 use Src\Reminders\Enums\ReminderStatus;
-use Src\Reminders\Repositories\GetReminderByContextRepository;
+use Src\Reminders\Repositories\GetRemindersByContextRepository;
 use Src\Reminders\ValueObjects\ReminderByContext;
 
-final class GetReminderByContextMysqlRepository implements GetReminderByContextRepository
+final class GetRemindersByContextMysqlRepository implements GetRemindersByContextRepository
 {
     /**
      * @param ReminderAction $action
      * @param Condition[] $context
      * @return ReminderByContext[]
      */
-    public function getReminderByContext(ReminderAction $action, array $context): array
+    public function getRemindersByContext(ReminderAction $action, array $context): array
     {
         $builder = DB::table('reminders')
             ->select([
@@ -29,8 +29,9 @@ final class GetReminderByContextMysqlRepository implements GetReminderByContextR
                 'reminders.hidden_from_initiator',
                 'reminders.users_to_notify',
             ])
-            ->where('action', '=', $action->value())
-            ->where('status', '=', ReminderStatus::ENABLE)
+            ->where('reminders.action', '=', $action->value())
+            ->where('reminders.status', '=', ReminderStatus::ENABLE)
+            ->whereNull('reminders.deleted_at')
             ->orderBy('reminders.created_at', 'desc');
 
         foreach ($context as $condition) {

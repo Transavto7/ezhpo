@@ -9,8 +9,8 @@ use Illuminate\Support\ServiceProvider;
 use Src\Reminders\Commands\SwitchReminderStatus\SwitchReminderStatusCommand;
 use Src\Reminders\Commands\SwitchReminderStatus\SwitchReminderStatusHandler;
 use Src\Reminders\Queries\GetReminderById\GetReminderRepositoryInterface;
-use Src\Reminders\Repositories\GetReminderByContextRepository;
-use Src\Reminders\Repositories\Mysql\GetReminderByContextMysqlRepository;
+use Src\Reminders\Repositories\GetRemindersByContextRepository;
+use Src\Reminders\Repositories\Mysql\GetRemindersByContextMysqlRepository;
 use Src\Reminders\Repositories\Mysql\MysqlRemindersRepository;
 use Src\Reminders\Repositories\RemindersRepository;
 
@@ -20,7 +20,7 @@ final class RemindersProvider extends ServiceProvider
     {
         $this->app->bind(RemindersRepository::class, MysqlRemindersRepository::class);
         $this->app->bind(GetReminderRepositoryInterface::class, MysqlRemindersRepository::class);
-        $this->app->bind(GetReminderByContextRepository::class, GetReminderByContextMysqlRepository::class);
+        $this->app->bind(GetRemindersByContextRepository::class, GetRemindersByContextMysqlRepository::class);
     }
 
     public function boot(): void

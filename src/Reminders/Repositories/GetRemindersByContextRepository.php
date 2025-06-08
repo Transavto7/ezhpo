@@ -8,12 +8,12 @@ use Src\Reminders\Conditions\Condition;
 use Src\Reminders\Enums\ReminderAction;
 use Src\Reminders\ValueObjects\ReminderByContext;
 
-interface GetReminderByContextRepository
+interface GetRemindersByContextRepository
 {
     /**
      * @param ReminderAction $action
      * @param Condition[] $context
      * @return ReminderByContext[]
      */
-    public function getReminderByContext(ReminderAction $action, array $context): array;
+    public function getRemindersByContext(ReminderAction $action, array $context): array;
 }
