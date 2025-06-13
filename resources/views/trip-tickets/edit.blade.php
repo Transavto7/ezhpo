@@ -194,8 +194,7 @@
                   <select id="transportation_type" name="transportation_type" required class="form-control type-view">
                     @foreach(\App\Enums\TripTicket\TransportationTypeEnum::labels() as $key => $label)
                       <option value="{{ $key }}"
-                              class="{{ (in_array($key, \App\Enums\TripTicket\TransportationTypeEnum::forTemplate4C()) ? 'pl-'.\App\Enums\TripTicket\TripTicketTemplateEnum::S4 : '').' '.
-                          (in_array($key, \App\Enums\TripTicket\TransportationTypeEnum::forTemplate3()) ? 'pl-'.\App\Enums\TripTicket\TripTicketTemplateEnum::_3 : '') }}"
+                              class="{{ \App\Services\TripTicketExporter\TransportationTypeOptionClass::getClassName($key) }}"
                       @if(! in_array($key, \App\Enums\TripTicket\TransportationTypeEnum::forTemplate4C())) disabled @endif
                       @if($tripTicket->transportation_type === $key)
                         {{'selected'}}
