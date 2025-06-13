@@ -26,6 +26,24 @@ final class SheetWriterStrategy
             case $templateCode->value() === TripTicketTemplateEnum::_3:
                 $this->sheetWriter = new SheetWriter3($qrCodeGenerator);
                 break;
+            case $templateCode->value() === TripTicketTemplateEnum::_4P:
+                $this->sheetWriter = new SheetWriter4P($qrCodeGenerator);
+                break;
+            case $templateCode->value() === TripTicketTemplateEnum::PG1:
+                $this->sheetWriter = new SheetWriterPG1($qrCodeGenerator);
+                break;
+            case $templateCode->value() === TripTicketTemplateEnum::_6C:
+                $this->sheetWriter = new SheetWriter6C($qrCodeGenerator);
+                break;
+            case $templateCode->value() === TripTicketTemplateEnum::_3C:
+                $this->sheetWriter = new SheetWriter3C($qrCodeGenerator);
+                break;
+            case $templateCode->value() === TripTicketTemplateEnum::_4O:
+                $this->sheetWriter = new SheetWriter4O($qrCodeGenerator);
+                break;
+            case $templateCode->value() === TripTicketTemplateEnum::ECM2:
+                $this->sheetWriter = new SheetWriterECM2($qrCodeGenerator);
+                break;
             default:
                 throw new DomainException('Unsupported trip ticket template code' . $templateCode->value());
         }

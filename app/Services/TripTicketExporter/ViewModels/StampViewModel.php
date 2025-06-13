@@ -59,8 +59,8 @@ final class StampViewModel
     public static function default(): self
     {
         return new self(
-            config('trip-ticket.print.4s.stamps.medic.reqName'),
-            config('trip-ticket.print.4s.stamps.medic.license'),
+            config('trip-ticket.print.stamps.medic.reqName'),
+            config('trip-ticket.print.stamps.medic.license'),
         );
     }
 

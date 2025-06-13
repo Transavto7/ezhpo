@@ -112,8 +112,7 @@ class TransportationTypeEnum
             self::CHILD_TRANSPORTATION => 'Организованная перевозка группы детей',
             self::SELF_NEEDS => 'Перевозка для собственных нужд',
             self::SPECIAL_VEHICLE => 'Передвижение и работа специальных транспортных средств',
-            self::CONTRACT => 'Перевозка грузов на основании договора перевозки грузов или договора фрахтования
-            (в т.ч. по договору аренды ТС с экипажем)',
+            self::CONTRACT => 'Перевозка грузов на основании договора перевозки грузов или договора фрахтования (в т.ч. по договору аренды ТС с экипажем)',
         ];
     }
 
@@ -127,6 +126,61 @@ class TransportationTypeEnum
         return [
             self::SELF_NEEDS,
             self::SPECIAL_VEHICLE,
+            self::CONTRACT,
+        ];
+    }
+
+    public static function forTemplate4P(): array
+    {
+        return [
+            self::SELF_NEEDS,
+            self::SPECIAL_VEHICLE,
+            self::CONTRACT,
+        ];
+    }
+
+    public static function forTemplatePG1(): array
+    {
+        return [
+            self::SELF_NEEDS,
+            self::SPECIAL_VEHICLE,
+            self::CONTRACT,
+        ];
+    }
+
+    public static function forTemplate6C(): array
+    {
+        return [
+            self::ORDER,
+            self::CHILD_TRANSPORTATION,
+            self::SELF_NEEDS,
+        ];
+    }
+
+    public static function forTemplate3C(): array
+    {
+        return [
+            self::REGULAR,
+            self::ORDER,
+            self::SELF_NEEDS,
+            self::SPECIAL_VEHICLE,
+            self::CONTRACT,
+        ];
+    }
+
+    public static function forTemplate4O(): array
+    {
+        return [
+            self::SELF_NEEDS,
+            self::SPECIAL_VEHICLE,
+            self::CONTRACT,
+        ];
+    }
+
+    public static function forTemplateECM2(): array
+    {
+        return [
+            self::SELF_NEEDS,
             self::CONTRACT,
         ];
     }

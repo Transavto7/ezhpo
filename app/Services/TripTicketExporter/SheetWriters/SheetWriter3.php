@@ -118,6 +118,9 @@ final class SheetWriter3 implements SheetWriterInterface
                 ->fillTechStamp(false)
                 ->fillLogisticMethod(false)
                 ->fillTransportationType(false);
+        } else {
+            $this->sheet->getStyle('DH36:EP44')->getFill()->setFillType(Fill::FILL_NONE);
+            $this->sheet->getStyle('FE36:GM44')->getFill()->setFillType(Fill::FILL_NONE);
         }
 
         return $spreadsheet;
@@ -155,7 +158,10 @@ final class SheetWriter3 implements SheetWriterInterface
         $externalNumber = $this->data->getTripTicket()->getExternalTicketNumber();
 
         $this->sheet->setCellValue($left ? 'BD2' : 'EY2', $externalNumber ?: $number);
-        $this->sheet->setCellValue($left ? 'BD3' : 'EY3', $number);
+
+        if ($externalNumber !== null) {
+            $this->sheet->setCellValue($left ? 'BD3' : 'EY3', $number);
+        }
 
         return $this;
     }
@@ -297,7 +303,7 @@ final class SheetWriter3 implements SheetWriterInterface
 
         $medicStamp = $stamp->getReqName() . "\n";
         $medicStamp .= wordwrap($stamp->getLicense(), 55) . "\n";
-        $medicStamp .= config('trip-ticket.print.3.stamps.medic.comment');
+        $medicStamp .= config('trip-ticket.print.stamps.medic.comment');
 
         $medicForm = $this->data->getMedicForm();
 
@@ -328,7 +334,7 @@ final class SheetWriter3 implements SheetWriterInterface
 
     private function fillTechStamp(bool $left = true): self
     {
-        $techStamp = config('trip-ticket.print.3.stamps.tech');
+        $techStamp = config('trip-ticket.print.stamps.tech');
 
         $techForm = $this->data->getTechForm();
 
