@@ -1,0 +1,163 @@
+<?php
+
+namespace App\Services\TripTicketExporter\Mappers;
+
+use App\Enums\TripTicket\LogisticsMethodEnum;
+use App\Enums\TripTicket\TransportationTypeEnum;
+use App\Models\Forms\MedicForm;
+use App\Models\Forms\TechForm;
+use App\Models\TripTicket;
+use App\Req;
+use App\Services\TripTicketExporter\ViewModels\CarViewModel;
+use App\Services\TripTicketExporter\ViewModels\CompanyViewModel;
+use App\Services\TripTicketExporter\ViewModels\DriverViewModel;
+use App\Services\TripTicketExporter\ViewModels\ExportedItem;
+use App\Services\TripTicketExporter\ViewModels\ExportedItemPG1;
+use App\Services\TripTicketExporter\ViewModels\MedicFormViewModel;
+use App\Services\TripTicketExporter\ViewModels\StampViewModel;
+use App\Services\TripTicketExporter\ViewModels\TechFormViewModel;
+use App\Services\TripTicketExporter\ViewModels\TripTicketViewModel;
+use Illuminate\Support\Carbon;
+
+final class ItemMapperPG1 implements ItemMapperInterface
+{
+    /**
+     * @param TripTicket $tripTicket
+     * @return ExportedItemPG1
+     */
+    public function fromEloquent(TripTicket $tripTicket): ExportedItem
+    {
+        $tripTicketViewModel = new TripTicketViewModel(
+            $tripTicket->ticket_number,
+            $tripTicket->external_number,
+            $tripTicket->start_date
+                ? Carbon::parse($tripTicket->start_date)
+                : null,
+            $tripTicket->period_pl
+                ? Carbon::parse($tripTicket->period_pl)
+                : null,
+            $tripTicket->validity_period,
+            LogisticsMethodEnum::fromString($tripTicket->logistics_method),
+            TransportationTypeEnum::fromString($tripTicket->transportation_type)
+        );
+
+        $companyViewModel = $this->mapCompany($tripTicket);
+        $driverViewModel = $this->mapDriver($tripTicket);
+        $carViewModel = $this->mapCar($tripTicket);
+        $medicFormViewModel = $this->mapMedic($tripTicket);
+        $techFormViewModel = $this->mapTechForm($tripTicket);
+
+        return new ExportedItemPG1(
+            $tripTicketViewModel,
+            $companyViewModel,
+            $driverViewModel,
+            $carViewModel,
+            $medicFormViewModel,
+            $techFormViewModel
+        );
+    }
+
+    private function mapCompany(TripTicket $tripTicket): ?CompanyViewModel
+    {
+        if (!$tripTicket->company) {
+            return null;
+        }
+
+        $reqName = null;
+        $req = Req::find($tripTicket->company->req_id);
+
+        if ($req) {
+            $reqName = $req->name;
+        }
+
+        $company = $tripTicket->company;
+
+        return new CompanyViewModel(
+            $company->official_name,
+            $company->where_call,
+            $reqName,
+            $company->address,
+            $company->ogrn
+        );
+    }
+
+    private function mapDriver(TripTicket $tripTicket): ?DriverViewModel
+    {
+        if (!$tripTicket->driver) {
+            return null;
+        }
+
+        $driverLicenseDate = null;
+        if ($tripTicket->driver->driver_license_issued_at) {
+            $driverLicenseDate = Carbon::parse($tripTicket->driver->driver_license_issued_at);
+        }
+
+        return new DriverViewModel(
+            $tripTicket->driver->hash_id,
+            $tripTicket->driver->fio,
+            $tripTicket->driver->driver_license,
+            $driverLicenseDate,
+            $tripTicket->driver->snils,
+        );
+    }
+
+    private function mapCar(TripTicket $tripTicket): ?CarViewModel
+    {
+        if (!$tripTicket->car) {
+            return null;
+        }
+
+        return new CarViewModel(
+            $tripTicket->car->hash_id,
+            $tripTicket->car->gos_number,
+            $tripTicket->car->mark_model,
+            $tripTicket->car->official_type_auto ?? '',
+        );
+    }
+
+    private function mapMedic(TripTicket $tripTicket): ?MedicFormViewModel
+    {
+        if (!$tripTicket->medicForm) {
+            return null;
+        }
+
+        $form = $tripTicket->medicForm;
+
+        /** @var MedicForm $details */
+        $details = $form->details;
+        $stamp = $details->getStamp();
+
+        return new MedicFormViewModel(
+            $form->uuid,
+            $form->date ? Carbon::parse($form->date) : null,
+            $details->period_pl ? Carbon::parse($details->period_pl) : null,
+            $form->user ? $form->user->name : null,
+            $stamp ? StampViewModel::fromStampOrDefault($stamp) : null
+        );
+    }
+
+    private function mapTechForm(TripTicket $tripTicket): ?TechFormViewModel
+    {
+        if (!$tripTicket->techForm) {
+            return null;
+        }
+
+        $form = $tripTicket->techForm;
+
+        $odometer = null;
+        $periodPl = null;
+        $techForm = TechForm::where('forms_uuid', '=', $form->uuid)->first();
+
+        if ($techForm) {
+            $odometer = $techForm->odometer;
+            $periodPl = $techForm->period_pl;
+        }
+
+        return new TechFormViewModel(
+            $form->date ? Carbon::parse($form->date) : null,
+            $periodPl ? Carbon::parse($periodPl) : null,
+            $form->user ? $form->user->name : null,
+            $odometer,
+        );
+    }
+}

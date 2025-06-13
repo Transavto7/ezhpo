@@ -29,6 +29,24 @@ final class ItemMapperStrategy
             case $tripTicket->template_code === TripTicketTemplateEnum::_3:
                 $this->mapper = new ItemMapper3();
                 break;
+            case $tripTicket->template_code === TripTicketTemplateEnum::_4P:
+                $this->mapper = new ItemMapper4P();
+                break;
+            case $tripTicket->template_code === TripTicketTemplateEnum::PG1:
+                $this->mapper = new ItemMapperPG1();
+                break;
+            case $tripTicket->template_code === TripTicketTemplateEnum::_6C:
+                $this->mapper = new ItemMapper6C();
+                break;
+            case $tripTicket->template_code === TripTicketTemplateEnum::_3C:
+                $this->mapper = new ItemMapper3C();
+                break;
+            case $tripTicket->template_code === TripTicketTemplateEnum::_4O:
+                $this->mapper = new ItemMapper4O();
+                break;
+            case $tripTicket->template_code === TripTicketTemplateEnum::ECM2:
+                $this->mapper = new ItemMapperECM2();
+                break;
             default:
                 throw new DomainException('Unsupported trip ticket template code' . $tripTicket->template_code);
         }

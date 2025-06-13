@@ -6,7 +6,7 @@ use App\Enums\TripTicket\LogisticsMethodEnum;
 use App\Enums\TripTicket\TransportationTypeEnum;
 use App\Services\QRCode\QRCodeGeneratorInterface;
 use App\Services\TripTicketExporter\ViewModels\ExportedItem;
-use App\Services\TripTicketExporter\ViewModels\ExportedItem4S;
+use App\Services\TripTicketExporter\ViewModels\ExportedItemECM2;
 use App\Services\TripTicketExporter\ViewModels\MedicFormViewModel;
 use App\Services\TripTicketExporter\ViewModels\TechFormViewModel;
 use Carbon\Carbon;
@@ -18,14 +18,14 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-final class SheetWriter4S implements SheetWriterInterface
+final class SheetWriterECM2 implements SheetWriterInterface
 {
     /**
      * @var Worksheet
      */
     private $sheet;
     /**
-     * @var ExportedItem4S
+     * @var ExportedItemECM2
      */
     private $data;
 
@@ -44,12 +44,12 @@ final class SheetWriter4S implements SheetWriterInterface
 
     public function templateSheetName(): string
     {
-        return config('trip-ticket.print.4s.template.front.sheet');
+        return config('trip-ticket.print.ecm2.template.front.sheet');
     }
 
     /**
      * @param Spreadsheet $spreadsheet
-     * @param ExportedItem4S $item
+     * @param ExportedItemECM2 $item
      * @param int $number
      * @return Spreadsheet
      * @throws Exception
@@ -58,7 +58,7 @@ final class SheetWriter4S implements SheetWriterInterface
     {
         $this->sheet = clone $spreadsheet->getSheetByName($this->templateSheetName());
 
-        $title = $number . '. ' . config('trip-ticket.print.4s.template.front.prefix');
+        $title = $number . '. ' . config('trip-ticket.print.ecm2.template.front.prefix');
 
         $title .= $item->getTripTicket()->getExternalTicketNumber()
             ? ' (' . $item->getTripTicket()->getExternalTicketNumber() . ')'
@@ -101,7 +101,7 @@ final class SheetWriter4S implements SheetWriterInterface
             $value .= 'ID - ' . $car->getId() . ' Автомобиль';
         }
 
-        $this->sheet->setCellValue('DZ1', $value);
+        $this->sheet->setCellValue('W2', $value);
 
         return $this;
     }
@@ -111,8 +111,8 @@ final class SheetWriter4S implements SheetWriterInterface
         $number = $this->data->getTripTicket()->getTicketNumber();
         $externalNumber = $this->data->getTripTicket()->getExternalTicketNumber();
 
-        $this->sheet->setCellValue('CZ3', $externalNumber ?: $number);
-        $this->sheet->setCellValue('CZ4', $number);
+        $this->sheet->setCellValue('P2', $externalNumber ?: $number);
+        $this->sheet->setCellValue('P3', $number);
 
         return $this;
     }
@@ -124,21 +124,21 @@ final class SheetWriter4S implements SheetWriterInterface
             $startDate = $this->data->getTripTicket()->getStartDate();
             $endDate = $startDate->copy()->addDays($period - 1);
 
-            $this->sheet->setCellValue('AV5', $startDate->day);
-            $this->sheet->setCellValue('CT5', $endDate->day);
+            $this->sheet->setCellValue('H4', $startDate->day);
+            $this->sheet->setCellValue('O4', $endDate->day);
         } else {
             $startDate = $this->data->getTripTicket()->getPeriodPl();
             $endDate = $startDate;
 
-            $this->sheet->setCellValue('AV5', null);
-            $this->sheet->setCellValue('CT5', null);
+            $this->sheet->setCellValue('H4', null);
+            $this->sheet->setCellValue('O4', null);
         }
 
-        $this->sheet->setCellValue('BF5', trans('date.months_genitive.' . $startDate->month));
-        $this->sheet->setCellValue('BY5', $startDate->year);
+        $this->sheet->setCellValue('J4', trans('date.months_genitive.' . $startDate->month));
+        $this->sheet->setCellValue('M4', $startDate->year);
 
-        $this->sheet->setCellValue('DC5', trans('date.months_genitive.' . $endDate->month));
-        $this->sheet->setCellValue('DU5', $endDate->year);
+        $this->sheet->setCellValue('Q4', trans('date.months_genitive.' . $endDate->month));
+        $this->sheet->setCellValue('T4', $endDate->year);
 
         return $this;
     }
@@ -165,7 +165,7 @@ final class SheetWriter4S implements SheetWriterInterface
 
         $value = implode(", ", $companyStringItems);
 
-        $this->sheet->setCellValue('J6', $value);
+        $this->sheet->setCellValue('D5', $value);
 
         return $this;
     }
@@ -178,8 +178,8 @@ final class SheetWriter4S implements SheetWriterInterface
             return $this;
         }
 
-        $this->sheet->setCellValue('R8', $car->getTypeAuto() . ', ' . $car->getMarkModel());
-        $this->sheet->setCellValue('AE9', $car->getGosNumber());
+        $this->sheet->setCellValue('D9', $car->getTypeAuto() . ', ' . $car->getMarkModel());
+        $this->sheet->setCellValue('Z9', $car->getGosNumber());
 
         return $this;
     }
@@ -201,9 +201,9 @@ final class SheetWriter4S implements SheetWriterInterface
             $driverLicense .= ' от ' . $driver->getDriverLicenseDate()->format('d.m.Y');
         }
 
-        $this->sheet->setCellValue('H10', $driver->getFio());
-        $this->sheet->setCellValue('Y12', $driverLicense);
-        $this->sheet->setCellValue('S13', $driver->getSnils() ?? '');
+        $this->sheet->setCellValue('D11', $driver->getFio());
+        $this->sheet->setCellValue('G14', $driverLicense);
+        $this->sheet->setCellValue('S11', $driver->getSnils() ?? '');
 
         return $this;
     }
@@ -212,7 +212,7 @@ final class SheetWriter4S implements SheetWriterInterface
     {
         $techForm = $this->data->getTechForm();
         if ($techForm) {
-            $this->sheet->setCellValue('EO13', $techForm->getOdometer() ?? '');
+            $this->sheet->setCellValue('Q25', $techForm->getOdometer() ?? '');
         }
 
         return $this;
@@ -222,18 +222,18 @@ final class SheetWriter4S implements SheetWriterInterface
     {
         $medicForm = $this->data->getMedicForm();
         if ($medicForm) {
-            $this->sheet->setCellValue('Z52', $medicForm->getUsername() ?? '');
+            $this->sheet->setCellValue('H49', $medicForm->getUsername() ?? '');
         }
 
         $techForm = $this->data->getTechForm();
         if ($techForm) {
-            $this->sheet->setCellValue('CG52', $techForm->getUsername() ?? '');
+            $this->sheet->setCellValue('Z48', $techForm->getUsername() ?? '');
         }
 
         $driver = $this->data->getDriver();
         if ($driver) {
-            $this->sheet->setCellValue('EY47', $driver->getFio());
-            $this->sheet->setCellValue('EY52', $driver->getFio());
+//            $this->sheet->setCellValue('EY47', $driver->getFio());
+//            $this->sheet->setCellValue('EY52', $driver->getFio());
         }
 
         return $this;
@@ -247,8 +247,8 @@ final class SheetWriter4S implements SheetWriterInterface
         }
 
         if (! $stamp) {
-            $this->sheet->getStyle('Q43:BA50')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
-            $this->sheet->getStyle('Q43:BA50')->getFill()->setFillType(Fill::FILL_NONE);
+            $this->sheet->getStyle('L46:R51')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
+            $this->sheet->getStyle('L46:R51')->getFill()->setFillType(Fill::FILL_NONE);
 
             return $this;
         }
@@ -261,7 +261,7 @@ final class SheetWriter4S implements SheetWriterInterface
 
         $date = $this->getDateString($medicForm);
 
-        $this->sheet->setCellValue('R44', $medicStamp . "\n" . $date);
+        $this->sheet->setCellValue('M47', $medicStamp . "\n" . $date);
 
         $url = route('anketa.verification.page', [
             'uuid' => $this->data->getMedicForm()->getUuid(),
@@ -276,11 +276,11 @@ final class SheetWriter4S implements SheetWriterInterface
         $drawing->setName('Маркировка осмотра');
         $drawing->setDescription('Маркировка осмотра');
         $drawing->setPath($qrCodeFilePath);
-        $drawing->setCoordinates('A43');
-        $drawing->setWidth(70);
-        $drawing->setHeight(70);
-        $drawing->setOffsetX(15);
-        $drawing->setOffsetY(10);
+        $drawing->setCoordinates('J47');
+        $drawing->setWidth(50);
+        $drawing->setHeight(50);
+        $drawing->setOffsetX(10);
+        $drawing->setOffsetY(5);
         $drawing->setWorksheet($this->sheet);
 
         return $this;
@@ -293,15 +293,15 @@ final class SheetWriter4S implements SheetWriterInterface
         $techForm = $this->data->getTechForm();
 
         if (! $techForm) {
-            $this->sheet->getStyle('BX43:DH50')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
-            $this->sheet->getStyle('BX43:DH50')->getFill()->setFillType(Fill::FILL_NONE);
+            $this->sheet->getStyle('AF46:AN51')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
+            $this->sheet->getStyle('AF46:AN51')->getFill()->setFillType(Fill::FILL_NONE);
 
             return $this;
         }
 
         $date = $this->getDateString($techForm);
 
-        $this->sheet->setCellValue('BY44', $techStamp . "\n\n" . $date);
+        $this->sheet->setCellValue('AG47', $techStamp . "\n\n" . $date);
 
         return $this;
     }
@@ -312,13 +312,13 @@ final class SheetWriter4S implements SheetWriterInterface
 
         switch (true) {
             case $value === LogisticsMethodEnum::URBAN:
-                $this->sheet->setCellValue('A22', '+');
+                $this->sheet->setCellValue('A17', '+');
                 break;
             case $value === LogisticsMethodEnum::SUBURBAN:
-                $this->sheet->setCellValue('A25', '+');
+                $this->sheet->setCellValue('A18', '+');
                 break;
             case $value === LogisticsMethodEnum::LONG_DISTANCE:
-                $this->sheet->setCellValue('A27', '+');
+                $this->sheet->setCellValue('A19', '+');
                 break;
             default:
         }
@@ -332,13 +332,10 @@ final class SheetWriter4S implements SheetWriterInterface
 
         switch (true) {
             case $value === TransportationTypeEnum::SELF_NEEDS:
-                $this->sheet->setCellValue('T22', '+');
-                break;
-            case $value === TransportationTypeEnum::SPECIAL_VEHICLE:
-                $this->sheet->setCellValue('T25', '+');
+                $this->sheet->setCellValue('E17', '+');
                 break;
             case $value === TransportationTypeEnum::CONTRACT:
-                $this->sheet->setCellValue('BJ22', '+');
+                $this->sheet->setCellValue('E18', '+');
                 break;
             default:
         }

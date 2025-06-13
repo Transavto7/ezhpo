@@ -297,7 +297,7 @@ final class SheetWriter3 implements SheetWriterInterface
 
         $medicStamp = $stamp->getReqName() . "\n";
         $medicStamp .= wordwrap($stamp->getLicense(), 55) . "\n";
-        $medicStamp .= config('trip-ticket.print.3.stamps.medic.comment');
+        $medicStamp .= config('trip-ticket.print.stamps.medic.comment');
 
         $medicForm = $this->data->getMedicForm();
 
@@ -328,7 +328,7 @@ final class SheetWriter3 implements SheetWriterInterface
 
     private function fillTechStamp(bool $left = true): self
     {
-        $techStamp = config('trip-ticket.print.3.stamps.tech');
+        $techStamp = config('trip-ticket.print.stamps.tech');
 
         $techForm = $this->data->getTechForm();
 

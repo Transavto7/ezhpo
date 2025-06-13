@@ -30,6 +30,26 @@ final class ExcelGenerator
     private $reader;
 
     /**
+     * @var Spreadsheet
+     */
+    private $spreadsheet;
+
+    /**
+     * @var array
+     */
+    private $usedTemplates = [];
+
+    /**
+     * @var int
+     */
+    private $globalIndex = 1;
+
+    /**
+     * @var TripTicket[]
+     */
+    private $tripTickets = [];
+
+    /**
      * @throws Exception
      */
     public function __construct()
@@ -107,92 +127,34 @@ final class ExcelGenerator
     public function generate(array $ids): Xlsx
     {
         $templatePath = config('trip-ticket.print.template');
-        $spreadsheet = $this->reader->load($templatePath);
+        $this->spreadsheet = $this->reader->load($templatePath);
 
-        $this->validateTemplate($spreadsheet);
+        $this->validateTemplate($this->spreadsheet);
 
-        $tripTickets = [];
-        $tripTickets4C = TripTicket::query()
-            ->whereIn('uuid', $ids)
-            ->where('template_code', '=', TripTicketTemplateEnum::S4)
-            ->orderBy('start_date')
-            ->orderBy('period_pl')
-            ->get();
+        $this->create($ids, TripTicketTemplateEnum::s4());
+        $this->create($ids, TripTicketTemplateEnum::_4p());
+        $this->create($ids, TripTicketTemplateEnum::pg1());
+        $this->create($ids, TripTicketTemplateEnum::_6c());
+        $this->create($ids, TripTicketTemplateEnum::_3c());
+        $this->create($ids, TripTicketTemplateEnum::_4o());
+        $this->create($ids, TripTicketTemplateEnum::ecm2());
 
-        $tripTickets3 = TripTicket::query()
-            ->whereIn('uuid', $ids)
-            ->where('template_code', '=', TripTicketTemplateEnum::_3)
-            ->orderBy('start_date')
-            ->orderBy('period_pl')
-            ->get();
-
-        $globalIndex = 0;
-        $usedTemplates = [];
-        if ($tripTickets4C->count()) {
-            $usedTemplates[] = TripTicketTemplateEnum::S4;
-
-            foreach ($tripTickets4C as $index => $tripTicket) {
-                $mapper = new ItemMapperStrategy($tripTicket);
-                $writer = new SheetWriterStrategy(TripTicketTemplateEnum::s4());
-
-                $item = $mapper->map();
-                $spreadsheet = $writer->createSheets($spreadsheet, $item, $index + 1);
-
-                $globalIndex = $index;
-                $tripTickets[] = $tripTicket;
-            }
-            $globalIndex++;
-        }
-        if ($tripTickets3->count()) {
-            $usedTemplates[] = TripTicketTemplateEnum::_3;
-
-            foreach ($tripTickets3->chunk(2) as $couple) {
-                $first = $couple->values()[0];
-                $second = $couple->values()[1] ?? null;
-
-                $leftMapper = new ItemMapperStrategy($first);
-                $rightMapper = null;
-                if ($second) {
-                    $rightMapper = new ItemMapperStrategy($second);
-                }
-
-                $leftItem = $leftMapper->map();
-                $rightItem = null;
-                if ($rightMapper) {
-                    $rightItem = $rightMapper->map();
-                }
-
-                $writer = new SheetWriterStrategy(TripTicketTemplateEnum::_3());
-                $spreadsheet = $writer->createSheets(
-                    $spreadsheet,
-                    new ExportedItem3(
-                        $leftItem,
-                        $rightItem
-                    ),
-                    $globalIndex + 1);
-
-                $globalIndex += 2;
-                $tripTickets[] = $first;
-                if ($second) {
-                    $tripTickets[] = $second;
-                }
-            }
-        }
+        $this->create3($ids);
 
         // copy reverse sheets
-        foreach ($this->reverseSheetNames($usedTemplates) as $sheetName => $sheetPrefix) {
-            $sheet = clone $spreadsheet->getSheetByName($sheetName);
+        foreach ($this->reverseSheetNames($this->usedTemplates) as $sheetName => $sheetPrefix) {
+            $sheet = clone $this->spreadsheet->getSheetByName($sheetName);
             $sheet->setTitle($sheetPrefix);
-            $spreadsheet->addSheet($sheet);
+            $this->spreadsheet->addSheet($sheet);
         }
 
         // delete template sheets
         foreach ($this->templateSheetNames() as $sheetName) {
-            $sheet = $spreadsheet->getSheetByName($sheetName);
-            $spreadsheet->removeSheetByIndex($spreadsheet->getIndex($sheet));
+            $sheet = $this->spreadsheet->getSheetByName($sheetName);
+            $this->spreadsheet->removeSheetByIndex($this->spreadsheet->getIndex($sheet));
         }
 
-        foreach ($tripTickets as $tripTicket) {
+        foreach ($this->tripTickets as $tripTicket) {
             if ($tripTicket->type === TripTicketType::IN_ADVANCE && in_array($tripTicket->status, [TripTicketStatus::ACTIVATED, TripTicketStatus::APPROVED])) {
                 continue;
             }
@@ -204,7 +166,7 @@ final class ExcelGenerator
             }
         }
 
-        return new Xlsx($spreadsheet);
+        return new Xlsx($this->spreadsheet);
     }
 
     private function validateTemplate(Spreadsheet $spreadsheet)
@@ -224,6 +186,10 @@ final class ExcelGenerator
     private function reverseSheetNames(array $usedTemplates): array
     {
         return array_reduce($usedTemplates, function (array $carry, string $template) {
+            if ($template === TripTicketTemplateEnum::PG1) {
+                return $carry;
+            }
+
             $carry[config("trip-ticket.print.$template.template.reverse.sheet")] = config("trip-ticket.print.$template.template.reverse.prefix");
 
             return $carry;
@@ -237,6 +203,88 @@ final class ExcelGenerator
             config('trip-ticket.print.4s.template.reverse.sheet'),
             config('trip-ticket.print.3.template.front.sheet'),
             config('trip-ticket.print.3.template.reverse.sheet'),
+            config('trip-ticket.print.4p.template.front.sheet'),
+            config('trip-ticket.print.4p.template.reverse.sheet'),
+            config('trip-ticket.print.pg1.template.front.sheet'),
+            config('trip-ticket.print.6c.template.front.sheet'),
+            config('trip-ticket.print.6c.template.reverse.sheet'),
+            config('trip-ticket.print.3c.template.front.sheet'),
+            config('trip-ticket.print.3c.template.reverse.sheet'),
+            config('trip-ticket.print.4o.template.front.sheet'),
+            config('trip-ticket.print.4o.template.reverse.sheet'),
+            config('trip-ticket.print.ecm2.template.front.sheet'),
+            config('trip-ticket.print.ecm2.template.reverse.sheet'),
         ];
+    }
+
+    private function create(array $ids, TripTicketTemplateEnum $template)
+    {
+        $tripTickets = TripTicket::query()
+            ->whereIn('uuid', $ids)
+            ->where('template_code', '=', $template->value())
+            ->orderBy('start_date')
+            ->orderBy('period_pl')
+            ->get();
+
+        if ($tripTickets->count()) {
+            $this->usedTemplates[] = $template->value();
+
+            foreach ($tripTickets as $tripTicket) {
+                $mapper = new ItemMapperStrategy($tripTicket);
+                $writer = new SheetWriterStrategy($template);
+
+                $item = $mapper->map();
+                $this->spreadsheet = $writer->createSheets($this->spreadsheet, $item, $this->globalIndex);
+
+                $this->globalIndex++;
+                $this->tripTickets[] = $tripTicket;
+            }
+        }
+    }
+
+    private function create3(array $ids)
+    {
+        $tripTickets3 = TripTicket::query()
+            ->whereIn('uuid', $ids)
+            ->where('template_code', '=', TripTicketTemplateEnum::_3)
+            ->orderBy('start_date')
+            ->orderBy('period_pl')
+            ->get();
+
+        if ($tripTickets3->count()) {
+            $this->usedTemplates[] = TripTicketTemplateEnum::_3;
+
+            foreach ($tripTickets3->chunk(2) as $couple) {
+                $first = $couple->values()[0];
+                $second = $couple->values()[1] ?? null;
+
+                $leftMapper = new ItemMapperStrategy($first);
+                $rightMapper = null;
+                if ($second) {
+                    $rightMapper = new ItemMapperStrategy($second);
+                }
+
+                $leftItem = $leftMapper->map();
+                $rightItem = null;
+                if ($rightMapper) {
+                    $rightItem = $rightMapper->map();
+                }
+
+                $writer = new SheetWriterStrategy(TripTicketTemplateEnum::_3());
+                $this->spreadsheet = $writer->createSheets(
+                    $this->spreadsheet,
+                    new ExportedItem3(
+                        $leftItem,
+                        $rightItem
+                    ),
+                    $this->globalIndex);
+
+                $this->globalIndex += 2;
+                $this->tripTickets[] = $first;
+                if ($second) {
+                    $this->tripTickets[] = $second;
+                }
+            }
+        }
     }
 }
