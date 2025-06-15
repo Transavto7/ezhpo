@@ -89,12 +89,6 @@
   svg {
     display: none;
   }
-
-  &:after {
-    display: inline-block;
-    content: "\00d7";
-    font-size: 16px;
-  }
 }
 
 .vs__selected {

@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import VSwitcher from '@/ui/VSwitcher.vue'
 import VTinyMce from '@/ui/VTinyMce.vue'
+import VFlatPickr from '@/ui/datepickers/VFlatPickr.vue'
 import VSelectRemote from '@/ui/select/VSelectRemote.vue'
 import { SelectOption } from '@/ui/select/types'
 import ErrorsList from '@/widgets/reminders/shared/form/ErrorsList.vue'
@@ -156,8 +157,8 @@ const disableSubject = computed(() => {
     <div class="row">
       <div class="col-12">
         <b-form-group
-          id="name"
           label="Срок выполнения:"
+          label-for="test"
           style="font-size: 13px"
         >
           <div
@@ -168,14 +169,15 @@ const disableSubject = computed(() => {
               <label
                 for="expiresAt"
                 style="font-size: 11px"
-                >Дата</label
               >
-              <input
-                id="expiresAt"
+                Дата и время
+              </label>
+              <v-flat-pickr
                 v-model="reminder.expiresAt"
-                class="form-control"
-                type="date"
-                @input="() => {}"
+                alt-format="d.m.Y H:i"
+                date-format="Y-m-d h:i"
+                enable-time
+                placeholder="Выберите дату и время"
               />
             </div>
             <div>
