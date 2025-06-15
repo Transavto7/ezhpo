@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./",
+        "esModuleInterop": true,
+        "target": "es6",
+        "strict": true,
+        "sourceMap": false,
+        "allowJs": true,
+        "checkJs": false,
+        "module": "es2015",
+        "moduleResolution": "node",
+        "skipLibCheck": true,
+        "paths": {
+            "@/*": ["./resources/js/*"]
+        },
+    },
+    "include": ["resources/js/**/*"],
+    "exclude": ["vendor"]
+}
