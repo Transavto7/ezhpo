@@ -4,7 +4,7 @@ import {
   fetchUsersForSelect
 } from "../shared/api";
 import {computed} from "vue";
-import VSelectRemote from "@/ui/VSelectRemote.vue";
+import VSelectRemote from "@/ui/select/VSelectRemote.vue";
 
 const props = defineProps({
   search: {

@@ -1,20 +1,13 @@
-<script setup>
-const props = defineProps({
-  value: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
-  label: {
-    type: String,
-    required: false,
-    default: null,
-  },
-})
+<script setup lang="ts">
+
+const props = defineProps<{
+  value: boolean,
+  label?: string,
+}>()
 
 const emit = defineEmits(['input'])
 
-const handleInput = (e) => {
+const handleInput = (e: Event) => {
   if (e.target instanceof HTMLInputElement) {
     emit('input', e.target.checked)
   }

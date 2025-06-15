@@ -1,11 +1,11 @@
-<script setup>
-import {computed} from "vue";
+<script setup lang="ts">
+import { PropType, computed } from 'vue'
 
 const props = defineProps({
   type: {
-    type: String,
-    default: 'primary'
-  }
+    type: String as PropType<'primary' | 'warning' | 'info' | 'success' | 'danger' | 'secondary'>,
+    default: 'primary',
+  },
 })
 
 const classObject = computed(() => ({
@@ -21,12 +21,11 @@ const classObject = computed(() => ({
 <template>
   <div
     class="badge text-white"
-    style="font-size: 11px"
     :class="classObject"
+    style="font-size: 11px"
   >
     <slot></slot>
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

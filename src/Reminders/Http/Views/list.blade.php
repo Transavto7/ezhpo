@@ -21,10 +21,7 @@
                 </div>
             </div>
         @endif
-        <div class="card">
-            <div class="col-md-12 p-4">
-                <reminders-list-widget></reminders-list-widget>
-            </div>
-        </div>
+
+        <reminders-list-widget></reminders-list-widget>
     </div>
 @endsection
