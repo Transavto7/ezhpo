@@ -41,6 +41,10 @@ class MarkNotificationAsReadHandler
             throw new Exception('Уведомление с указанным ID не найдено');
         }
 
+        if ($notification->getReadAt() !== null) {
+            return;
+        }
+
         $now = new DateTimeImmutable();
 
         $notification->read($now);

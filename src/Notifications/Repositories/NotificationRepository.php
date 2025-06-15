@@ -2,6 +2,7 @@
 
 namespace Src\Notifications\Repositories;
 
+use Src\Core\ValueObjects\Uuid;
 use Src\Notifications\Entities\Notification;
 
 interface NotificationRepository
@@ -15,4 +16,17 @@ interface NotificationRepository
      * @return Notification|null
      */
     public function findById(string $id): ?Notification;
+
+
+    /**
+     * @param Uuid[] $reminderIds
+     * @return Uuid[]
+     */
+    public function getReminderIdsWithCompletedNotifications(array $reminderIds): array;
+
+    /**
+     * @param Uuid[] $reminderIds
+     * @return Uuid[]
+     */
+    public function getReminderIdsWithViewedNotificationsByUser(array $reminderIds, int $userId): array;
 }

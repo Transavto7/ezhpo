@@ -148,7 +148,9 @@ final class MysqlRemindersRepository implements RemindersRepository, GetReminder
                 $type->getTitle()
             ),
             $rawReminder->hidden_from_initiator !== 0,
-            $usersToNotify
+            $usersToNotify,
+            $rawReminder->one_time_per_user !== 0,
+            $rawReminder->until_any_user_completes !== 0,
         );
     }
 }

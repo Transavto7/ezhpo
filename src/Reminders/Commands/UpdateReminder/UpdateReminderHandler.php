@@ -45,8 +45,10 @@ final class UpdateReminderHandler
         $reminder->setAction($command->getAction());
         $reminder->setStatus($command->getStatus());
         $reminder->setType($command->getType());
-        $reminder->setHiddenFromInitiator($command->hiddenFromInitiator());
+        $reminder->setHiddenFromInitiator($command->isHiddenFromInitiator());
         $reminder->setUsersToNotify($command->getUsersToNotify());
+        $reminder->setOneTimePerUser($command->isOneTimePerUser());
+        $reminder->setUntilAnyUserCompletes($command->isUntilAnyUserCompletes());
         $reminder->setExpiresAt($command->getExpiresAt());
         $reminder->setExpiresInMinutes($command->getExpiresInMinutes());
 

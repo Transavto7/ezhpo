@@ -42,6 +42,8 @@ final class ReminderDatabaseNormalizer
             'expires_in_minutes' => $reminder->getExpiresInMinutes(),
             'hidden_from_initiator' => $reminder->isHiddenFromInitiator(),
             'users_to_notify' => json_encode($reminder->getUsersToNotify()),
+            'one_time_per_user' => $reminder->isOneTimePerUser(),
+            'until_any_user_completes' => $reminder->isUntilAnyUserCompletes(),
         ];
     }
 
@@ -63,6 +65,8 @@ final class ReminderDatabaseNormalizer
             ReminderType::from($reminder['type']),
             (bool) $reminder['hidden_from_initiator'] ?? false,
             json_decode($reminder['users_to_notify'] ?? '[]', true),
+            (bool) $reminder['one_time_per_user'] ?? false,
+            (bool) $reminder['until_any_user_completes'] ?? false,
             $reminder['expires_at'] ? DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $reminder['expires_at']) : null,
             $reminder['expires_in_minutes'] ?? null
         );

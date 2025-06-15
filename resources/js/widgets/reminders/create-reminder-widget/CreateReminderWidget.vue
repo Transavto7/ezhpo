@@ -18,6 +18,8 @@ const reminder = ref<Reminder>({
   expiresInMinutes: null,
   hiddenFromInitiator: false,
   usersToNotify: [],
+  oneTimePerUser: false,
+  untilAnyUserCompletes: false,
   conditions: {
     subject: null,
     subject_type: null,
@@ -43,7 +45,7 @@ const handleSubmit = async (form: Reminder) => {
       return
     }
 
-    Notify.error('Ошибка запроса!')
+    Notify.error('Ошибка при создании напоминания!')
   } finally {
     loading.value = false
   }

@@ -32,6 +32,8 @@ final class CreateReminderRequest extends FormRequest
             'expiresAt' => ['nullable', 'date_format:Y-m-d H:i'],
             'expiresInMinutes' => ['nullable', 'integer', 'min:0', 'max:43200'],
             'hiddenFromInitiator' => ['required', 'boolean'],
+            'oneTimePerUser' => ['required', 'boolean'],
+            'untilAnyUserCompletes' => ['required', 'boolean'],
         ];
     }
 }

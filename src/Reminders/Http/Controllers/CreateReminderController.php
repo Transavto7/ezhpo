@@ -45,7 +45,9 @@ final class CreateReminderController
                 filter_var($request->input('hiddenFromInitiator'), FILTER_VALIDATE_BOOLEAN),
                 $usersToNotify,
                 $request->input('expiresAt') ? \DateTimeImmutable::createFromFormat('Y-m-d H:i', $request->input('expiresAt')) : null,
-                $expiresInMinutes
+                $expiresInMinutes,
+                filter_var($request->input('oneTimePerUser'), FILTER_VALIDATE_BOOLEAN),
+                filter_var($request->input('untilAnyUserCompletes'), FILTER_VALIDATE_BOOLEAN)
             ));
 
             DB::commit();

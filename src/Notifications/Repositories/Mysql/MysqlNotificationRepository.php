@@ -3,6 +3,7 @@
 namespace Src\Notifications\Repositories\Mysql;
 
 use Illuminate\Support\Facades\DB;
+use Src\Core\ValueObjects\Uuid;
 use Src\Notifications\Entities\Notification;
 use Src\Notifications\Normalizer\NotificationDatabaseNormalizer;
 use Src\Notifications\Queries\GetUnreadUserNotifications\GetUnreadUserNotificationsRepository;
@@ -77,5 +78,36 @@ class MysqlNotificationRepository implements NotificationRepository, GetUnreadUs
         }
 
         return $this->normalizer->denormalize((array) $notification);
+    }
+
+    public function getReminderIdsWithCompletedNotifications(array $reminderIds): array
+    {
+        $items = DB::table('notifications')
+            ->select(['reminder_id'])
+            ->whereIn('reminder_id', $reminderIds)
+            ->whereNotNull('completed_at')
+            ->distinct()
+            ->get()
+            ->toArray();
+
+        return array_map(function ($item) {
+            return Uuid::fromString($item->reminder_id);
+        }, $items);
+    }
+
+    public function getReminderIdsWithViewedNotificationsByUser(array $reminderIds, int $userId): array
+    {
+        $items = DB::table('notifications')
+            ->select(['reminder_id'])
+            ->whereIn('reminder_id', $reminderIds)
+            ->where('user_id', $userId)
+            ->whereNotNull('read_at')
+            ->distinct()
+            ->get()
+            ->toArray();
+
+        return array_map(function ($item) {
+            return Uuid::fromString($item->reminder_id);
+        }, $items);
     }
 }

@@ -39,8 +39,14 @@ final class CreateReminderCommand
     /** @var DateTimeImmutable|null */
     private $expiresAt;
 
-    /** * @var int|null */
+    /** @var int|null */
     private $expiresInMinutes;
+
+    /** @var bool */
+    private $oneTimePerUser;
+
+    /** @var bool */
+    private $untilAnyUserCompletes;
 
     /**
      * @param string $title
@@ -53,6 +59,8 @@ final class CreateReminderCommand
      * @param array $usersToNotify
      * @param DateTimeImmutable|null $expiresAt
      * @param int|null $expiresInMinutes
+     * @param bool $oneTimePerUser
+     * @param bool $untilAnyUserCompletes
      */
     public function __construct(
         string $title,
@@ -64,7 +72,9 @@ final class CreateReminderCommand
         bool $hiddenFromInitiator,
         array $usersToNotify,
         ?DateTimeImmutable $expiresAt,
-        ?int $expiresInMinutes
+        ?int $expiresInMinutes,
+        bool $oneTimePerUser,
+        bool $untilAnyUserCompletes
     ) {
         $this->title = $title;
         $this->content = $content;
@@ -76,6 +86,8 @@ final class CreateReminderCommand
         $this->usersToNotify = $usersToNotify;
         $this->expiresAt = $expiresAt;
         $this->expiresInMinutes = $expiresInMinutes;
+        $this->oneTimePerUser = $oneTimePerUser;
+        $this->untilAnyUserCompletes = $untilAnyUserCompletes;
     }
 
     public function getTitle(): string
@@ -109,14 +121,6 @@ final class CreateReminderCommand
     }
 
     /**
-     * @return bool
-     */
-    public function hiddenFromInitiator(): bool
-    {
-        return $this->hiddenFromInitiator;
-    }
-
-    /**
      * @return array
      */
     public function getUsersToNotify(): array
@@ -138,5 +142,20 @@ final class CreateReminderCommand
     public function getExpiresInMinutes(): ?int
     {
         return $this->expiresInMinutes;
+    }
+
+    public function isHiddenFromInitiator(): bool
+    {
+        return $this->hiddenFromInitiator;
+    }
+
+    public function isOneTimePerUser(): bool
+    {
+        return $this->oneTimePerUser;
+    }
+
+    public function isUntilAnyUserCompletes(): bool
+    {
+        return $this->untilAnyUserCompletes;
     }
 }

@@ -28,6 +28,8 @@ final class GetRemindersByContextMysqlRepository implements GetRemindersByContex
                 'reminders.expires_in_minutes',
                 'reminders.hidden_from_initiator',
                 'reminders.users_to_notify',
+                'reminders.one_time_per_user',
+                'reminders.until_any_user_completes',
             ])
             ->where('reminders.action', '=', $action->value())
             ->where('reminders.status', '=', ReminderStatus::ENABLE)
@@ -46,10 +48,12 @@ final class GetRemindersByContextMysqlRepository implements GetRemindersByContex
                 Uuid::fromString($reminder->id),
                 $reminder->title,
                 $reminder->content,
-                ((bool) $reminder->hidden_from_initiator) ?? false,
-                json_decode($reminder->users_to_notify ?? '[]', true),
                 $reminder->expires_at ? \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $reminder->expires_at) : null,
                 $reminder->expires_in_minutes,
+                ((bool) $reminder->hidden_from_initiator) ?? false,
+                json_decode($reminder->users_to_notify ?? '[]', true),
+                $reminder->one_time_per_user,
+                $reminder->until_any_user_completes,
             );
         }, $rawReminders);
     }

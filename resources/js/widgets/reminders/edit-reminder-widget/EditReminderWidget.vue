@@ -14,7 +14,7 @@ const handleSubmit = async (form: Reminder) => {
   loading.value = true
 
   try {
-    updateReminder(form)
+    await updateReminder(form)
 
     Notify.success('Напоминание успешно обновлено!')
     reminder.value = form
@@ -24,7 +24,7 @@ const handleSubmit = async (form: Reminder) => {
       return
     }
 
-    Notify.error('Ошибка запроса!')
+    Notify.error('Ошибка обновления напоминания!')
   } finally {
     loading.value = false
   }
