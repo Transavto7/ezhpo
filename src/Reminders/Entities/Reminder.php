@@ -45,6 +45,14 @@ final class Reminder
 
     /** @var int[] */
     private $usersToNotify;
+    /**
+     * @var bool
+     */
+    private $oneTimePerUser;
+    /**
+     * @var bool
+     */
+    private $untilAnyUserCompletes;
 
     /**
      * @param Uuid $id
@@ -56,6 +64,8 @@ final class Reminder
      * @param ReminderType $type
      * @param bool $hiddenFromInitiator
      * @param array $usersToNotify
+     * @param bool $oneTimePerUser
+     * @param bool $untilAnyUserCompletes
      * @param DateTimeImmutable|null $expiresAt
      * @param int|null $expiresInMinutes
      */
@@ -69,6 +79,8 @@ final class Reminder
         ReminderType $type,
         bool $hiddenFromInitiator,
         array $usersToNotify,
+        bool $oneTimePerUser,
+        bool $untilAnyUserCompletes,
         ?DateTimeImmutable $expiresAt = null,
         ?int $expiresInMinutes = null
     ) {
@@ -81,55 +93,15 @@ final class Reminder
         $this->type = $type;
         $this->hiddenFromInitiator = $hiddenFromInitiator;
         $this->usersToNotify = $usersToNotify;
+        $this->oneTimePerUser = $oneTimePerUser;
+        $this->untilAnyUserCompletes = $untilAnyUserCompletes;
         $this->expiresAt = $expiresAt;
         $this->expiresInMinutes = $expiresInMinutes;
-    }
-
-    /**
-     * @param DateTimeImmutable|null $expiresAt
-     */
-    public function setExpiresAt(?DateTimeImmutable $expiresAt): void
-    {
-        $this->expiresAt = $expiresAt;
-    }
-
-    /**
-     * @param int|null $expiresInMinutes
-     */
-    public function setExpiresInMinutes(?int $expiresInMinutes): void
-    {
-        $this->expiresInMinutes = $expiresInMinutes;
-    }
-
-    /**
-     * @param bool $hiddenFromInitiator
-     */
-    public function setHiddenFromInitiator(bool $hiddenFromInitiator): void
-    {
-        $this->hiddenFromInitiator = $hiddenFromInitiator;
-    }
-
-    /**
-     * @param array|int[] $usersToNotify
-     */
-    public function setUsersToNotify(array $usersToNotify): void
-    {
-        $this->usersToNotify = $usersToNotify;
     }
 
     public function getId(): Uuid
     {
         return $this->id;
-    }
-
-    public function getAction(): ReminderAction
-    {
-        return $this->action;
-    }
-
-    public function getContext(): array
-    {
-        return $this->context;
     }
 
     public function getTitle(): string
@@ -142,6 +114,16 @@ final class Reminder
         return $this->content;
     }
 
+    public function getAction(): ReminderAction
+    {
+        return $this->action;
+    }
+
+    public function getContext(): array
+    {
+        return $this->context;
+    }
+
     public function getStatus(): ReminderStatus
     {
         return $this->status;
@@ -150,6 +132,36 @@ final class Reminder
     public function getType(): ReminderType
     {
         return $this->type;
+    }
+
+    public function isHiddenFromInitiator(): bool
+    {
+        return $this->hiddenFromInitiator;
+    }
+
+    public function getUsersToNotify(): array
+    {
+        return $this->usersToNotify;
+    }
+
+    public function isOneTimePerUser(): bool
+    {
+        return $this->oneTimePerUser;
+    }
+
+    public function isUntilAnyUserCompletes(): bool
+    {
+        return $this->untilAnyUserCompletes;
+    }
+
+    public function getExpiresAt(): ?DateTimeImmutable
+    {
+        return $this->expiresAt;
+    }
+
+    public function getExpiresInMinutes(): ?int
+    {
+        return $this->expiresInMinutes;
     }
 
     public function setTitle(string $title): self
@@ -171,6 +183,17 @@ final class Reminder
         $this->action = $action;
     }
 
+    /**
+     * @param array<Condition> $contexts
+     * @return self
+     */
+    public function setContext(array $contexts): self
+    {
+        $this->context = $contexts;
+
+        return $this;
+    }
+
     public function setStatus(ReminderStatus $status): self
     {
         $this->status = $status;
@@ -186,33 +209,44 @@ final class Reminder
     }
 
     /**
-     * @param array<Condition> $contexts
-     * @return self
+     * @param bool $hiddenFromInitiator
      */
-    public function setContext(array $contexts): self
+    public function setHiddenFromInitiator(bool $hiddenFromInitiator): void
     {
-        $this->context = $contexts;
-
-        return $this;
+        $this->hiddenFromInitiator = $hiddenFromInitiator;
     }
 
-    public function getExpiresAt(): ?DateTimeImmutable
+    /**
+     * @param array|int[] $usersToNotify
+     */
+    public function setUsersToNotify(array $usersToNotify): void
     {
-        return $this->expiresAt;
+        $this->usersToNotify = $usersToNotify;
     }
 
-    public function getExpiresInMinutes(): ?int
+    public function setOneTimePerUser(bool $oneTimePerUser): void
     {
-        return $this->expiresInMinutes;
+        $this->oneTimePerUser = $oneTimePerUser;
     }
 
-    public function isHiddenFromInitiator(): bool
+    public function setUntilAnyUserCompletes(bool $untilAnyUserCompletes): void
     {
-        return $this->hiddenFromInitiator;
+        $this->untilAnyUserCompletes = $untilAnyUserCompletes;
     }
 
-    public function getUsersToNotify(): array
+    /**
+     * @param DateTimeImmutable|null $expiresAt
+     */
+    public function setExpiresAt(?DateTimeImmutable $expiresAt): void
     {
-        return $this->usersToNotify;
+        $this->expiresAt = $expiresAt;
+    }
+
+    /**
+     * @param int|null $expiresInMinutes
+     */
+    public function setExpiresInMinutes(?int $expiresInMinutes): void
+    {
+        $this->expiresInMinutes = $expiresInMinutes;
     }
 }

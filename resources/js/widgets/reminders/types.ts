@@ -30,4 +30,6 @@ export type Reminder = {
   type: Classifier | null
   hiddenFromInitiator: boolean
   usersToNotify: Classifier[]
+  oneTimePerUser: boolean
+  untilAnyUserCompletes: boolean
 }

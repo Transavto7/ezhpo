@@ -47,6 +47,15 @@ final class ReminderViewModel
     private $usersToNotify;
 
     /**
+     * @var bool
+     */
+    private $oneTimePerUser;
+    /**
+     * @var bool
+     */
+    private $untilAnyUserCompletes;
+
+    /**
      * @param Uuid $id
      * @param string $title
      * @param string $content
@@ -58,6 +67,8 @@ final class ReminderViewModel
      * @param ClassifierViewModel $type
      * @param bool $hiddenFromInitiator
      * @param ClassifierViewModel[] $usersToNotify
+     * @param bool $oneTimePerUser
+     * @param bool $untilAnyUserCompletes
      */
     public function __construct(
         Uuid $id,
@@ -70,7 +81,9 @@ final class ReminderViewModel
         ClassifierViewModel $action,
         ClassifierViewModel $type,
         bool $hiddenFromInitiator,
-        array $usersToNotify
+        array $usersToNotify,
+        bool $oneTimePerUser,
+        bool $untilAnyUserCompletes
     ) {
         $this->id = $id;
         $this->title = $title;
@@ -83,6 +96,8 @@ final class ReminderViewModel
         $this->type = $type;
         $this->hiddenFromInitiator = $hiddenFromInitiator;
         $this->usersToNotify = $usersToNotify;
+        $this->oneTimePerUser = $oneTimePerUser;
+        $this->untilAnyUserCompletes = $untilAnyUserCompletes;
     }
 
     public function toArray(): array
@@ -101,6 +116,8 @@ final class ReminderViewModel
             'usersToNotify' => array_map(function (ClassifierViewModel $user) {
                 return $user->toArray();
             }, $this->usersToNotify),
+            'oneTimePerUser' => $this->oneTimePerUser,
+            'untilAnyUserCompletes' => $this->untilAnyUserCompletes,
         ];
     }
 }

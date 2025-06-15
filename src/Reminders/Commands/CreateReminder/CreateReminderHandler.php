@@ -36,8 +36,10 @@ final class CreateReminderHandler
             $command->getContext(),
             $command->getStatus(),
             $command->getType(),
-            $command->hiddenFromInitiator(),
+            $command->isHiddenFromInitiator(),
             $command->getUsersToNotify(),
+            $command->isOneTimePerUser(),
+            $command->isUntilAnyUserCompletes(),
             $command->getExpiresAt(),
             $command->getExpiresInMinutes(),
         );

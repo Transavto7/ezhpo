@@ -6,4 +6,5 @@ use Src\Reminders\Enums\ReminderAction;
 
 return [
     ReminderAction::CREATE_INSPECTION => 'Создание осмотра',
+    ReminderAction::AUTH => 'Авторизация',
 ];

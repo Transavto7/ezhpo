@@ -4,9 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Services\UserService;
+use App\User;
+use Illuminate\Bus\Dispatcher;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Lang;
+use Src\Notifications\Commands\CreateNotificationsByContext\CreateNotificationsByContextCommand;
+use Src\Reminders\Enums\ReminderAction;
 
 class LoginController extends Controller
 {
@@ -108,5 +112,25 @@ class LoginController extends Controller
     public function username()
     {
         return 'login';
+    }
+
+    protected function authenticated(Request $request, $user)
+    {
+        $dispatcher = app()->make(Dispatcher::class);
+
+        /**
+         * @var User $user
+         */
+        if ($user->isEmployee()) {
+            $employee = $user->relatedEmployee;
+
+            $dispatcher->dispatch(new CreateNotificationsByContextCommand(
+                ReminderAction::auth(),
+                [
+                    'point' => $employee->pv_id,
+                ],
+                $user,
+            ));
+        }
     }
 }

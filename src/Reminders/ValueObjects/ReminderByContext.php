@@ -20,10 +20,12 @@ final class ReminderByContext
 
     /** @var DateTimeImmutable|null */
     private $expiresAt;
+
     /**
      * @var DateTimeImmutable|null
      */
     private $expiresInMinutes;
+
     /**
      * @var bool
      */
@@ -35,23 +37,46 @@ final class ReminderByContext
     private $usersToNotify;
 
     /**
+     * @var bool
+     */
+    private $oneTimePerUser;
+
+    /**
+     * @var bool
+     */
+    private $untilAnyUserCompletes;
+
+    /**
      * @param Uuid $id
      * @param string $name
      * @param string $content
-     * @param bool $hiddenFromInitiator
-     * @param int[] $usersToNotify
      * @param DateTimeImmutable|null $expiresAt
-     * @param int|null $expiresInMinutes
+     * @param DateTimeImmutable|null $expiresInMinutes
+     * @param bool $hiddenFromInitiator
+     * @param array $usersToNotify
+     * @param bool $oneTimePerUser
+     * @param bool $untilAnyUserCompletes
      */
-    public function __construct(Uuid $id, string $name, string $content, bool $hiddenFromInitiator, array $usersToNotify, ?DateTimeImmutable $expiresAt, ?int $expiresInMinutes)
-    {
+    public function __construct(
+        Uuid $id,
+        string $name,
+        string $content,
+        ?DateTimeImmutable $expiresAt,
+        ?DateTimeImmutable $expiresInMinutes,
+        bool $hiddenFromInitiator,
+        array $usersToNotify,
+        bool $oneTimePerUser,
+        bool $untilAnyUserCompletes
+    ) {
         $this->id = $id;
         $this->name = $name;
         $this->content = $content;
-        $this->hiddenFromInitiator = $hiddenFromInitiator;
-        $this->usersToNotify = $usersToNotify;
         $this->expiresAt = $expiresAt;
         $this->expiresInMinutes = $expiresInMinutes;
+        $this->hiddenFromInitiator = $hiddenFromInitiator;
+        $this->usersToNotify = $usersToNotify;
+        $this->oneTimePerUser = $oneTimePerUser;
+        $this->untilAnyUserCompletes = $untilAnyUserCompletes;
     }
 
     public function getId(): Uuid
@@ -99,5 +124,15 @@ final class ReminderByContext
     public function getUsersToNotify(): array
     {
         return $this->usersToNotify;
+    }
+
+    public function isOneTimePerUser(): bool
+    {
+        return $this->oneTimePerUser;
+    }
+
+    public function isUntilAnyUserCompletes(): bool
+    {
+        return $this->untilAnyUserCompletes;
     }
 }

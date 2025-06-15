@@ -44,6 +44,10 @@ class MarkNotificationAsCompletedHandler
             throw new Exception('Уведомление с указанным ID не найдено');
         }
 
+        if ($notification->getCompletedAt() !== null) {
+            return;
+        }
+
         $now = new DateTimeImmutable();
 
         $notification->read($now);

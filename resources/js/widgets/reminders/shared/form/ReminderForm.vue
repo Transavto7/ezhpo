@@ -157,13 +157,33 @@ const disableSubject = computed(() => {
     </div>
 
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 mb-1">
         <div
           class="d-flex align-items-center"
           style="gap: 8px"
         >
           <v-switcher v-model="reminder.hiddenFromInitiator" />
-          <label style="margin-bottom: 0">Не уведомлять пользователей, совершивших действие:</label>
+          <label style="margin-bottom: 0">Не уведомлять пользователей, совершивших действие</label>
+        </div>
+      </div>
+      <div class="col-12 mb-1">
+        <div
+          class="d-flex align-items-center"
+          style="gap: 8px"
+        >
+          <v-switcher v-model="reminder.oneTimePerUser" />
+          <label style="margin-bottom: 0">Показывать только 1 раз для каждого сотрудника</label>
+        </div>
+      </div>
+      <div class="col-12">
+        <div
+          class="d-flex align-items-center"
+          style="gap: 8px"
+        >
+          <v-switcher v-model="reminder.untilAnyUserCompletes" />
+          <label style="margin-bottom: 0">
+            Не показывать уведомления после выполнения хотя бы одним сотрудником
+          </label>
         </div>
       </div>
     </div>

@@ -51,7 +51,9 @@ final class UpdateReminderController
                 $usersToNotify,
                 $request->input('expiresAt') ? \DateTimeImmutable::createFromFormat('Y-m-d H:i', $request->input('expiresAt')) : null,
                 $expiresInMinutes,
-                $user->id
+                filter_var($request->input('oneTimePerUser'), FILTER_VALIDATE_BOOLEAN),
+                filter_var($request->input('untilAnyUserCompletes'), FILTER_VALIDATE_BOOLEAN),
+                $user->id,
             ));
 
             DB::commit();

@@ -7,12 +7,14 @@ namespace Src\Notifications\Commands\CreateNotificationsByContext;
 use App\User;
 use DateTimeImmutable;
 use Illuminate\Bus\Dispatcher;
+use Src\Core\ValueObjects\Uuid;
 use Src\Notifications\Commands\LogNotificationActivity\LogNotificationActivityCommand;
 use Src\Notifications\Entities\NotificationsBuilder;
 use Src\Notifications\Enums\NotificationLogAction;
 use Src\Notifications\Repositories\NotificationRepository;
 use Src\Reminders\ConditionBuilder\ContextConditionBuilder;
 use Src\Reminders\Repositories\GetRemindersByContextRepository;
+use Src\Reminders\ValueObjects\ReminderByContext;
 
 final class CreateNotificationsByContextHandler
 {
@@ -42,9 +44,9 @@ final class CreateNotificationsByContextHandler
      */
     public function __construct(
         GetRemindersByContextRepository $getReminderByContextRepository,
-        NotificationRepository          $notificationRepository,
-        ContextConditionBuilder         $conditionBuilder,
-        Dispatcher                      $dispatcher
+        NotificationRepository $notificationRepository,
+        ContextConditionBuilder $conditionBuilder,
+        Dispatcher $dispatcher
     ) {
         $this->getReminderByContextRepository = $getReminderByContextRepository;
         $this->notificationRepository = $notificationRepository;
@@ -62,22 +64,37 @@ final class CreateNotificationsByContextHandler
         $context = $this->conditionBuilder->build(array_merge($command->getContext(), ['user' => $command->getUser()->id]));
 
         $reminders = $this->getReminderByContextRepository->getRemindersByContext($command->getAction(), $context);
+        $reminderIds = array_map(function (ReminderByContext $reminder) {
+            return $reminder->getId();
+        }, $reminders);
+
+        $completedReminderIds = $this->getReminderIdsWithCompletedNotifications($reminderIds);
 
         foreach ($reminders as $reminder) {
+            if ($reminder->isUntilAnyUserCompletes() && in_array($reminder->getId(), $completedReminderIds)) {
+                continue;
+            }
+
             if (! $reminder->isHiddenFromInitiator() && $command->getUser()) {
-                $notification = NotificationsBuilder::fromReminder($reminder, $now, $sender, $sender);
+                if (! $reminder->isOneTimePerUser() || ! in_array($reminder->getId(), $this->getReminderIdsWithViewedNotificationsByUser($reminderIds, $command->getUser()->id))) {
+                    $notification = NotificationsBuilder::fromReminder($reminder, $now, $sender, $sender);
 
-                $this->notificationRepository->add($notification);
+                    $this->notificationRepository->add($notification);
 
-                $this->dispatcher->dispatch(new LogNotificationActivityCommand(
-                    $notification->getId(),
-                    NotificationLogAction::create(),
-                    $command->getUser()->id,
-                ));
+                    $this->dispatcher->dispatch(new LogNotificationActivityCommand(
+                        $notification->getId(),
+                        NotificationLogAction::create(),
+                        $command->getUser()->id,
+                    ));
+                }
             }
 
             foreach ($reminder->getUsersToNotify() as $userId) {
                 if ($sender && ($sender->getAttribute('id') == $userId)) {
+                    continue;
+                }
+
+                if ($reminder->isOneTimePerUser() && in_array($reminder->getId(), $this->getReminderIdsWithViewedNotificationsByUser($reminderIds, $userId))) {
                     continue;
                 }
 
@@ -99,5 +116,23 @@ final class CreateNotificationsByContextHandler
                 ));
             }
         }
+    }
+
+    /**
+     * @param Uuid[] $reminderIds
+     * @return Uuid[]
+     */
+    private function getReminderIdsWithCompletedNotifications(array $reminderIds): array
+    {
+        return $this->notificationRepository->getReminderIdsWithCompletedNotifications($reminderIds);
+    }
+
+    /**
+     * @param Uuid[] $reminderIds
+     * @return Uuid[]
+     */
+    private function getReminderIdsWithViewedNotificationsByUser(array $reminderIds, int $userId): array
+    {
+        return $this->notificationRepository->getReminderIdsWithViewedNotificationsByUser($reminderIds, $userId);
     }
 }
