@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AddExpiresColumnsToRemindersTable extends Migration
 {
@@ -33,7 +33,7 @@ class AddExpiresColumnsToRemindersTable extends Migration
                 'expires_at',
                 'expires_in_minutes',
                 'hidden_from_initiator',
-                'users_to_notify'
+                'users_to_notify',
             ]);
         });
     }

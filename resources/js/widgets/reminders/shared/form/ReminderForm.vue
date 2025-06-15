@@ -87,6 +87,22 @@ const innerFetchSubjectsForSelect = (params: { search: string | null }) => {
   })
 }
 
+const handleExpiresAtInput = (value: string | null) => {
+  reminder.value.expiresAt = value
+
+  if (value) {
+    reminder.value.expiresInMinutes = null
+  }
+}
+
+const handleExpiresInMinutesInput = (value: number | null) => {
+  reminder.value.expiresInMinutes = value
+
+  if (value) {
+    reminder.value.expiresAt = null
+  }
+}
+
 const disableSubject = computed(() => {
   return reminder.value.conditions.subject_type === null
 })
@@ -173,27 +189,29 @@ const disableSubject = computed(() => {
                 Дата и время
               </label>
               <v-flat-pickr
-                v-model="reminder.expiresAt"
                 alt-format="d.m.Y H:i"
-                date-format="Y-m-d h:i"
+                date-format="Y-m-d H:i"
                 enable-time
                 placeholder="Выберите дату и время"
+                :value="reminder.expiresAt"
+                @input="handleExpiresAtInput"
               />
             </div>
             <div>
               <label
                 for="expiresInMinutes"
                 style="font-size: 11px"
-                >Кол-во минут</label
               >
+                Кол-во минут
+              </label>
               <b-form-input
                 id="expiresInMinutes"
-                v-model="reminder.expiresInMinutes"
-                :disabled="!!reminder.expiresAt"
                 :min="1"
                 placeholder="Введите значение"
                 required
                 type="number"
+                :value="reminder.expiresInMinutes"
+                @input="handleExpiresInMinutesInput"
               />
             </div>
           </div>

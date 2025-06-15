@@ -3,7 +3,7 @@ const props = defineProps({
   expiresAt: {
     type: String,
     required: true,
-  }
+  },
 })
 </script>
 
