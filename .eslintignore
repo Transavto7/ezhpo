@@ -1,0 +1,7 @@
+node_modules
+resources/js/front.js
+vendor
+public
+.eslintrc.js
+webpack.config.js
+webpack.mix.js
