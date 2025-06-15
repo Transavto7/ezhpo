@@ -1,7 +1,7 @@
 <script setup>
 import {fetchNotificationsForSelect, fetchRemindersForSelect, fetchUsersForSelect} from "../shared/api";
-import VSelectRemote from "@/ui/VSelectRemote.vue";
-import VSelect from "@/ui/VSelect.vue";
+import VSelectRemote from "@/ui/select/VSelectRemote.vue";
+import VSelect from "@/ui/select/VSelect.vue";
 import {usePageSetup} from "@/widgets/notifications/notifications-list-widget/usePageSetup";
 
 const props = defineProps({

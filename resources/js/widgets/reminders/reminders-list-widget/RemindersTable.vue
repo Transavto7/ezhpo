@@ -1,7 +1,7 @@
 <script setup>
-import tableFields from "./tableFields";
-import ContextReminderCell from "./ContextReminderCell.vue";
-import {usePageSetup} from "@/widgets/reminders/reminders-list-widget/usePageSetup";
+import { usePageSetup } from '@/widgets/reminders/reminders-list-widget/usePageSetup'
+import ContextReminderCell from './ContextReminderCell.vue'
+import tableFields from './tableFields'
 
 const props = defineProps({
   items: {
@@ -27,14 +27,9 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits([
-  'update:sort-by',
-  'update:sort-desc',
-  'delete',
-  'switch-status',
-])
+const emit = defineEmits(['update:sort-by', 'update:sort-desc', 'delete', 'switch-status'])
 
-const {canEdit, canDelete} = usePageSetup()
+const { canEdit, canDelete } = usePageSetup()
 
 const handleSortUpdate = (e) => {
   emit('update:sort-by', e.sortBy)
@@ -57,14 +52,15 @@ const handleSwitchStatus = (id, enable) => {
   <div class="card table-card">
     <div class="card-body pt-0">
       <b-table
-        :fields="tableFields"
-        :items="props.items"
         :busy="props.busy"
+        :current-page="props.currentPage"
+        :fields="tableFields"
+        hover
+        :items="props.items"
+        no-local-sorting
         :sort-by="props.sortBy"
         :sort-desc="props.sortDesc"
-        :current-page="props.currentPage"
-        striped hover
-        no-local-sorting
+        striped
         @sort-changed="handleSortUpdate"
       >
         <template #cell(title)="{ item }">
@@ -76,12 +72,20 @@ const handleSwitchStatus = (id, enable) => {
         </template>
 
         <template #cell(context)="{ item }">
-          <context-reminder-cell :context="item.context"/>
+          <context-reminder-cell :context="item.context" />
         </template>
 
         <template #cell(enabled)="{ item }">
-          <span v-if="item.enabled" class="badge badge-success">да</span>
-          <span v-else class="badge badge-warning">нет</span>
+          <span
+            v-if="item.enabled"
+            class="badge badge-success"
+            >да</span
+          >
+          <span
+            v-else
+            class="badge badge-warning"
+            >нет</span
+          >
         </template>
 
         <template #cell(updated_at)="{ item }">
@@ -97,20 +101,29 @@ const handleSwitchStatus = (id, enable) => {
                 'btn-warning': item.enabled,
                 'btn-success': !item.enabled,
               }"
-              @click.prevent="handleSwitchStatus(item.id, !item.enabled)">
-              <span v-if="item.enabled" class="fa fa-lock"></span>
-              <span v-else class="fa fa-unlock"></span>
+              @click.prevent="handleSwitchStatus(item.id, !item.enabled)"
+            >
+              <span
+                v-if="item.enabled"
+                class="fa fa-lock"
+              ></span>
+              <span
+                v-else
+                class="fa fa-unlock"
+              ></span>
             </button>
             <a
               v-if="canEdit"
               class="btn btn-sm btn-success action-btn mr-2"
-              :href="`/reminders/${item.id}`">
+              :href="`/reminders/${item.id}`"
+            >
               <span class="fa fa-edit"></span>
             </a>
             <button
               v-if="canDelete"
               class="btn btn-sm btn-danger action-btn"
-              @click.prevent="handleDeleteButtonClick(item.id)">
+              @click.prevent="handleDeleteButtonClick(item.id)"
+            >
               <span class="fa fa-trash"></span>
             </button>
           </div>

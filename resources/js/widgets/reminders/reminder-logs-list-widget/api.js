@@ -1,3 +1,3 @@
 export const fetchRemindersTableItems = async (params) => {
-    return await axios.post(`/reminders/logs`, params);
+  return axios.post(`/reminders/logs`, params)
 }

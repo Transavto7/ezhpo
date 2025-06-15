@@ -1,5 +1,5 @@
 <script setup>
-import VSelectRemote from "@/ui/VSelectRemote.vue";
+import VSelectRemote from "@/ui/select/VSelectRemote.vue";
 import {
   fetchActionsForSelect, fetchCompanyForSelect,
   fetchPointsForSelect, fetchRemindersForSelect,
