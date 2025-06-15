@@ -92,7 +92,7 @@ final class ReminderViewModel
             'title' => $this->title,
             'content' => $this->content,
             'conditions' => $this->conditions,
-            'expiresAt' => $this->expiresAt ? $this->expiresAt->format('Y-m-d H:i:s') : null,
+            'expiresAt' => $this->expiresAt ? $this->expiresAt->format('Y-m-d H:i') : null,
             'expiresInMinutes' => $this->expiresInMinutes,
             'status' => $this->status->toArray(),
             'action' => $this->action->toArray(),

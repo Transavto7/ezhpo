@@ -48,7 +48,7 @@ final class GetRemindersByContextMysqlRepository implements GetRemindersByContex
                 $reminder->content,
                 ((bool) $reminder->hidden_from_initiator) ?? false,
                 json_decode($reminder->users_to_notify ?? '[]', true),
-                $reminder->expires_at ? \DateTimeImmutable::createFromFormat('Y-m-d H:i', $reminder->expires_at) : null,
+                $reminder->expires_at ? \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $reminder->expires_at) : null,
                 $reminder->expires_in_minutes,
             );
         }, $rawReminders);
