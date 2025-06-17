@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { PropType, computed, ref } from 'vue'
 import { VueSelect } from 'vue-select'
+import { PropType, computed, ref } from 'vue'
 import debounce from '@/helpers/debounce'
 import { SelectOption } from '@/ui/select/types'
 import { Deselect, OpenIndicator } from './conf'
@@ -11,7 +11,9 @@ const props = defineProps({
     default: null,
   },
   fetchOptionsAction: {
-    type: Function as PropType<(params: { search: string | null }) => Promise<SelectOption[]>>,
+    type: Function as PropType<
+      (params: { search: string | null }) => Promise<{ data: SelectOption[] }>
+    >,
     required: true,
   },
   label: {
@@ -73,7 +75,7 @@ const fuseSearch = (o: SelectOption[]) => {
 
 const fetchOptions = debounce(async function fetchOptions(search: string | null) {
   loading.value = true
-  const data = await props.fetchOptionsAction({
+  const { data } = await props.fetchOptionsAction({
     search: (search ?? '').trim(),
   })
 
