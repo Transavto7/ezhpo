@@ -22,7 +22,7 @@ abstract class StringFilter implements Filter
 
     public function apply($query)
     {
-        $query->where($this->column, 'ilike', '%'.$this->value.'%');
+        $query->where($this->column, 'like', '%'.$this->value.'%');
     }
 
     public static function create($value): Filter

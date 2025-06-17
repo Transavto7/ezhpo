@@ -3,11 +3,6 @@ export type Classifier = {
   name: string
 }
 
-type SelectFnParams = { search: string | null } & Record<string, unknown>
-export type SelectFn<T extends SelectFnParams = SelectFnParams> = (
-  params: T,
-) => Promise<Classifier[]>
-
 export type ReminderConditions = {
   city: Classifier | null
   company: Classifier | null
