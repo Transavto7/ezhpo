@@ -6,15 +6,21 @@ use App\Car;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
+use App\Events\Forms\DriverDismissed;
 use App\Models\Forms\Form;
 use App\Models\Forms\TechForm;
 use App\Services\DuplicatesCheckerService;
-use App\Events\Forms\DriverDismissed;
 use App\Services\FormHash\FormHashGenerator;
 use App\Services\FormHash\TechHashData;
+use App\User;
 use DateTimeImmutable;
+use Illuminate\Bus\Dispatcher;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
+use Src\Notifications\Commands\CreateNotificationsByContext\ContextBuilder;
+use Src\Notifications\Commands\CreateNotificationsByContext\CreateNotificationsByContextCommand;
+use Src\Reminders\Enums\ReminderAction;
+use Src\Reminders\Enums\ReminderSubjectType;
 
 class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
 {
@@ -37,7 +43,7 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         $defaultData = [
             'date' => date('Y-m-d H:i:s'),
             'realy' => 'нет',
-            'created_at' => $this->time
+            'created_at' => $this->time,
         ];
 
         $form = $this->mergeFormData($form, $defaultData);
@@ -47,48 +53,56 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         $companyId = $form['company_id'] ?? null;
         if ($formIsDop && empty($companyId)) {
             $this->errors[] = 'Не указана компания.';
+
             return;
         }
 
-        if (!empty($companyId)) {
+        if (! empty($companyId)) {
             $company = Company::where('hash_id', $companyId)->first();
-            if (!$company) {
+            if (! $company) {
                 $this->errors[] = 'Компания не найдена.';
+
                 return;
             }
 
             if ($company->dismissed === 'Да') {
                 $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+
                 return;
             }
         }
 
         $driverId = $form['driver_id'] ?? null;
-        if (!$formIsDop && empty($driverId)) {
+        if (! $formIsDop && empty($driverId)) {
             $this->errors[] = 'Не указан Водитель.';
+
             return;
         }
 
-        if (!empty($driverId)) {
+        if (! empty($driverId)) {
             $driver = Driver::where('hash_id', $driverId)->first();
 
-            if (!$driver) {
+            if (! $driver) {
                 $this->errors[] = 'Водитель не найден.';
+
                 return;
             }
 
             if ($driver->dismissed === 'Да') {
                 $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::DRIVER_BLOCK);
+
                 return;
             }
 
-            if (!$driver->company_id || !$driver->company) {
+            if (! $driver->company_id || ! $driver->company) {
                 $this->errors[] = 'У Водителя не найдена Компания';
+
                 return;
             }
 
-            if (!empty($companyId) && ($driver->company->hash_id !== $companyId)) {
+            if (! empty($companyId) && ($driver->company->hash_id !== $companyId)) {
                 $this->errors[] = 'Компания Водителя не совпадает с Компанией осмотра.';
+
                 return;
             }
 
@@ -99,6 +113,7 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
             if ($driver->company->dismissed === 'Да') {
                 $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+
                 return;
             }
 
@@ -106,31 +121,36 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         }
 
         $carId = $form['car_id'] ?? null;
-        if (!$formIsDop && empty($carId)) {
+        if (! $formIsDop && empty($carId)) {
             $this->errors[] = 'Не указан Автомобиль.';
+
             return;
         }
 
-        if (!empty($carId)) {
+        if (! empty($carId)) {
             $car = Car::where('hash_id', $carId)->first();
 
-            if (!$car) {
+            if (! $car) {
                 $this->errors[] = 'Автомобиль не найдено.';
+
                 return;
             }
 
             if ($car->dismissed === 'Да') {
                 $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::CAR_BLOCK);
+
                 return;
             }
 
-            if (!$car->company_id || !$car->company) {
+            if (! $car->company_id || ! $car->company) {
                 $this->errors[] = 'У Автомобиля не найдена Компания';
+
                 return;
             }
 
-            if (!empty($companyId) && ($car->company->hash_id !== $companyId)) {
+            if (! empty($companyId) && ($car->company->hash_id !== $companyId)) {
                 $this->errors[] = 'Компания Автомобиля не совпадает с Компанией осмотра / Водителя.';
+
                 return;
             }
 
@@ -141,6 +161,7 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
             if ($car->company->dismissed === 'Да') {
                 $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+
                 return;
             }
 
@@ -157,12 +178,12 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         }
 
         $isFormUnique = $this->findDuplicates($form);
-        if (!$isFormUnique) {
+        if (! $isFormUnique) {
             return;
         }
 
         $date = $form['date'] ?? null;
-        if (!$formIsDop && empty($date)) {
+        if (! $formIsDop && empty($date)) {
             $this->errors[] = 'Не указана дата осмотра!';
 
             return;
@@ -193,8 +214,8 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         /**
          * Генерация номера ПЛ
          */
-        if (empty($form['number_list_road']) && !$formIsDop && !empty($carId) && $date) {
-            $form['number_list_road'] = $carId . '-' . date('d.m.Y', strtotime($date));
+        if (empty($form['number_list_road']) && ! $formIsDop && ! empty($carId) && $date) {
+            $form['number_list_road'] = $carId.'-'.date('d.m.Y', strtotime($date));
         }
 
         if ($formIsDop) {
@@ -207,7 +228,7 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         $diffDateCheck = Carbon::now()
             ->addHours($user->entity->timezone ?? 3)
             ->diffInMinutes($date);
-        if ($date && $diffDateCheck <= 60*12) {
+        if ($date && $diffDateCheck <= 60 * 12) {
             $form['realy'] = 'да';
         }
 
@@ -233,6 +254,31 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
         if ($form['point_reys_control'] === 'Не пройден') {
             event(new DriverDismissed($formModel));
+        }
+    }
+
+    protected function createNotifications(array $forms, User $user)
+    {
+        $dispatcher = app()->make(Dispatcher::class);
+
+        foreach ($forms as $form) {
+            $companyId = $form->company ? $form->company->id : null;
+            $carId = $form->car ? $form->car->id : null;
+
+            /**
+             * @var TechForm $techForm
+             */
+            $techForm = $form->details;
+
+            $dispatcher->dispatch(new CreateNotificationsByContextCommand(
+                ReminderAction::createInspection(),
+                $user,
+                ContextBuilder::create()
+                    ->point($form->point_id)
+                    ->company($companyId)
+                    ->subjectType(ReminderSubjectType::car())
+                    ->subject($carId)
+            ));
         }
     }
 }

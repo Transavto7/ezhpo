@@ -8,22 +8,28 @@ use App\Enums\BlockActionReasonsEnum;
 use App\Models\Forms\BddForm;
 use App\Models\Forms\Form;
 use App\Point;
+use App\User;
+use Illuminate\Bus\Dispatcher;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
+use Src\Notifications\Commands\CreateNotificationsByContext\ContextBuilder;
+use Src\Notifications\Commands\CreateNotificationsByContext\CreateNotificationsByContextCommand;
+use Src\Reminders\Enums\ReminderAction;
+use Src\Reminders\Enums\ReminderSubjectType;
 
 class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
 {
     protected function validateData()
     {
         $driverId = $this->data['driver_id'] ?? null;
-        if (!$driverId) {
+        if (! $driverId) {
             $this->errors[] = 'Не указан водитель.';
 
             return;
         }
 
         $driver = Driver::where('hash_id', $driverId)->first();
-        if (!$driver){
+        if (! $driver) {
             $this->errors[] = 'Не найден водитель.';
         }
     }
@@ -36,7 +42,7 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
         $defaultData = [
             'date' => date('Y-m-d H:i:s'),
             'realy' => 'нет',
-            'created_at' => $this->time
+            'created_at' => $this->time,
         ];
 
         $form = $this->mergeFormData($form, $defaultData);
@@ -47,7 +53,7 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
             } else {
                 $point = Point::find($form['point_id']);
 
-                if (!$point) {
+                if (! $point) {
                     $errMsg = 'ПВ не найден';
 
                     $this->errors[] = $errMsg;
@@ -70,7 +76,7 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
             }
         }
 
-        if (!$driver) {
+        if (! $driver) {
             $errMsg = 'Водитель не найден';
 
             $this->errors[] = $errMsg;
@@ -81,11 +87,11 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
         /**
          * Проверка водителя по: тесту наркотиков, возрасту
          */
-        if($driver->dismissed === 'Да') {
+        if ($driver->dismissed === 'Да') {
             $this->errors[] = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
         }
 
-        if (!$driver->company_id) {
+        if (! $driver->company_id) {
             $this->errors[] = 'У Водителя не найдена компания';
 
             return;
@@ -93,7 +99,7 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
 
         $company = Company::find($driver->company_id);
 
-        if (!$company) {
+        if (! $company) {
             $this->errors[] = 'У Водителя не верно указано ID компании';
 
             return;
@@ -107,8 +113,7 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
 
         if ($form['point_id']) {
             $point = Point::find($form['point_id']);
-            if (!$point) {
-
+            if (! $point) {
             }
         }
 
@@ -125,7 +130,7 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
             ->addHours($user->entity->timezone ?? 3)
             ->diffInMinutes($date);
 
-        if ($date && $diffDateCheck <= 60*12) {
+        if ($date && $diffDateCheck <= 60 * 12) {
             $form['realy'] = 'да';
         }
 
@@ -137,5 +142,25 @@ class CreateBddFormHandler extends AbstractCreateFormHandler implements CreateFo
         $formDetailsModel->save();
 
         $this->createdForms->push($formModel);
+    }
+
+    protected function createNotifications(array $forms, User $user)
+    {
+        $dispatcher = app()->make(Dispatcher::class);
+
+        foreach ($forms as $form) {
+            $companyId = $form->company ? $form->company->id : null;
+            $driverId = $form->driver ? $form->driver->id : null;
+
+            $dispatcher->dispatch(new CreateNotificationsByContextCommand(
+                ReminderAction::createInspection(),
+                $user,
+                ContextBuilder::create()
+                    ->point($form->point_id)
+                    ->company($companyId)
+                    ->subjectType(ReminderSubjectType::driver())
+                    ->subject($driverId)
+            ));
+        }
     }
 }

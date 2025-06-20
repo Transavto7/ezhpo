@@ -12,20 +12,18 @@ final class CreateNotificationsByContextCommand
     /** @var ReminderAction */
     private $action;
 
-    /** @var array */
+    /** @var User */
+    private $user;
+
+    /** @var ContextBuilder */
     private $context;
 
     /**
-     * @var User
-     */
-    private $user;
-
-    /**
      * @param ReminderAction $action
-     * @param array $context
      * @param User $user
+     * @param ContextBuilder $context
      */
-    public function __construct(ReminderAction $action, array $context, User $user)
+    public function __construct(ReminderAction $action, User $user, ContextBuilder $context)
     {
         $this->action = $action;
         $this->context = $context;
@@ -37,13 +35,13 @@ final class CreateNotificationsByContextCommand
         return $this->action;
     }
 
-    public function getContext(): array
-    {
-        return $this->context;
-    }
-
     public function getUser(): User
     {
         return $this->user;
+    }
+
+    public function getContext(): ContextBuilder
+    {
+        return $this->context;
     }
 }

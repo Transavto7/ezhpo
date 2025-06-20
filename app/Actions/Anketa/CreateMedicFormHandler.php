@@ -13,6 +13,7 @@ use App\Models\Forms\MedicForm;
 use App\Services\DuplicatesCheckerService;
 use App\Services\FormHash\FormHashGenerator;
 use App\Services\FormHash\MedicHashData;
+use App\User;
 use App\ValueObjects\ForeignDevice\PressureLimit;
 use App\ValueObjects\ForeignDevice\Pulse;
 use App\ValueObjects\ForeignDevice\PulseLimit;
@@ -20,8 +21,13 @@ use App\ValueObjects\ForeignDevice\Temperature;
 use App\ValueObjects\ForeignDevice\Tonometer;
 use DateTimeImmutable;
 use Exception;
+use Illuminate\Bus\Dispatcher;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
+use Src\Notifications\Commands\CreateNotificationsByContext\ContextBuilder;
+use Src\Notifications\Commands\CreateNotificationsByContext\CreateNotificationsByContextCommand;
+use Src\Reminders\Enums\ReminderAction;
+use Src\Reminders\Enums\ReminderSubjectType;
 
 class CreateMedicFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
 {
@@ -61,48 +67,56 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         $companyId = $form['company_id'] ?? null;
         if ($formIsDop && empty($companyId)) {
             $this->errors[] = 'Не указана компания.';
+
             return;
         }
 
-        if (!empty($companyId)) {
+        if (! empty($companyId)) {
             $company = Company::where('hash_id', $companyId)->first();
-            if (!$company) {
+            if (! $company) {
                 $this->errors[] = 'Компания не найдена.';
+
                 return;
             }
 
             if ($company->dismissed === 'Да') {
                 $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+
                 return;
             }
         }
 
         $driverId = $form['driver_id'] ?? null;
-        if (!$formIsDop && empty($driverId)) {
+        if (! $formIsDop && empty($driverId)) {
             $this->errors[] = 'Не указан Водитель.';
+
             return;
         }
 
-        if (!empty($driverId)) {
+        if (! empty($driverId)) {
             $driver = Driver::where('hash_id', $driverId)->first();
 
-            if (!$driver) {
+            if (! $driver) {
                 $this->errors[] = 'Водитель не найден.';
+
                 return;
             }
 
             if ($driver->dismissed === 'Да') {
                 $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::DRIVER_BLOCK);
+
                 return;
             }
 
-            if (!$driver->company_id || !$driver->company) {
+            if (! $driver->company_id || ! $driver->company) {
                 $this->errors[] = 'У Водителя не найдена Компания';
+
                 return;
             }
 
-            if (!empty($companyId) && ($driver->company->hash_id !== $companyId)) {
+            if (! empty($companyId) && ($driver->company->hash_id !== $companyId)) {
                 $this->errors[] = 'Компания Водителя не совпадает с Компанией осмотра.';
+
                 return;
             }
 
@@ -113,11 +127,13 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
 
             if ($driver->company->dismissed === 'Да') {
                 $this->errors[] = BlockActionReasonsEnum::getLabel(BlockActionReasonsEnum::COMPANY_BLOCK);
+
                 return;
             }
 
             if ($driver->end_of_ban && $this->time < $driver->end_of_ban) {
-                $this->errors[] = 'Водитель отстранен до ' . Carbon::parse($driver->end_of_ban);
+                $this->errors[] = 'Водитель отстранен до '.Carbon::parse($driver->end_of_ban);
+
                 return;
             }
 
@@ -137,12 +153,12 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         }
 
         $isFormUnique = $this->findDuplicates($form);
-        if (!$isFormUnique) {
+        if (! $isFormUnique) {
             return;
         }
 
         $date = $form['date'] ?? null;
-        if (!$formIsDop && empty($date)) {
+        if (! $formIsDop && empty($date)) {
             $this->errors[] = 'Не указана дата осмотра!';
 
             return;
@@ -173,7 +189,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         /**
          * ПРОВЕРЯЕМ статус для поля "Заключение"
          */
-        if (!$formIsDop && !$this->admit($form, $driver ?? null)) {
+        if (! $formIsDop && ! $this->admit($form, $driver ?? null)) {
             $form['admitted'] = 'Не допущен';
         }
 
@@ -183,7 +199,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         $diffDateCheck = Carbon::now()
             ->addHours($user->entity->timezone ?? 3)
             ->diffInMinutes($date);
-        if ($date && $diffDateCheck <= 60*12) {
+        if ($date && $diffDateCheck <= 60 * 12) {
             $form['realy'] = 'да';
         }
 
@@ -230,7 +246,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
         }
 
         $proba_alko = $form['proba_alko'];
-        if ($proba_alko === "Положительно") {
+        if ($proba_alko === 'Положительно') {
             $admitted = false;
             $driver->end_of_ban = Carbon::parse($this->time)->addMinutes($driver->getTimeOfAlcoholBan());
             $driver->save();
@@ -243,7 +259,7 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
 
         $pressure = Tonometer::fromString($form['tonometer']);
         $pressureLimits = PressureLimit::create($driver);
-        if (!$pressure->isAdmitted($pressureLimits)) {
+        if (! $pressure->isAdmitted($pressureLimits)) {
             $admitted = false;
             $driver->end_of_ban = Carbon::parse($this->time)->addMinutes($driver->getTimeOfPressureBan());
             $driver->save();
@@ -252,14 +268,34 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
 
         $pulse = new Pulse(intval($form['pulse']));
         $pulseLimits = PulseLimit::create($driver);
-        if (!$pulse->isAdmitted($pulseLimits)) {
+        if (! $pulse->isAdmitted($pulseLimits)) {
             $admitted = false;
         }
 
-        if (!(new Temperature(floatval($form['t_people'])))->isAdmitted()) {
+        if (! (new Temperature(floatval($form['t_people'])))->isAdmitted()) {
             $admitted = false;
         }
 
         return $admitted;
+    }
+
+    protected function createNotifications(array $forms, User $user)
+    {
+        $dispatcher = app()->make(Dispatcher::class);
+
+        foreach ($forms as $form) {
+            $companyId = $form->company ? $form->company->id : null;
+            $driverId = $form->driver ? $form->driver->id : null;
+
+            $dispatcher->dispatch(new CreateNotificationsByContextCommand(
+                ReminderAction::createInspection(),
+                $user,
+                ContextBuilder::create()
+                    ->point($form->point_id)
+                    ->company($companyId)
+                    ->subjectType(ReminderSubjectType::driver())
+                    ->subject($driverId)
+            ));
+        }
     }
 }

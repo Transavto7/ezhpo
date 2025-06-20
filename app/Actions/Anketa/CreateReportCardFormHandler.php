@@ -8,10 +8,16 @@ use App\Enums\BlockActionReasonsEnum;
 use App\Enums\FormTypeEnum;
 use App\Models\Forms\Form;
 use App\Models\Forms\ReportCartForm;
+use App\User;
+use Illuminate\Bus\Dispatcher;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Ramsey\Uuid\Uuid;
+use Src\Notifications\Commands\CreateNotificationsByContext\ContextBuilder;
+use Src\Notifications\Commands\CreateNotificationsByContext\CreateNotificationsByContextCommand;
+use Src\Reminders\Enums\ReminderAction;
+use Src\Reminders\Enums\ReminderSubjectType;
 use Storage;
 
 class CreateReportCardFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
@@ -21,14 +27,14 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
     protected function validateData()
     {
         $driverId = $this->data['driver_id'] ?? null;
-        if (!$driverId) {
+        if (! $driverId) {
             $this->errors[] = 'Не указан водитель.';
 
             return;
         }
 
         $driver = Driver::where('hash_id', $driverId)->first();
-        if (!$driver){
+        if (! $driver) {
             $this->errors[] = 'Не найден водитель.';
         }
     }
@@ -62,7 +68,7 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
             }
         }
 
-        if (!$driver) {
+        if (! $driver) {
             $this->errors[] = 'Водитель не найден';
 
             return;
@@ -72,11 +78,11 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
          * Проверка водителя по: тесту наркотиков, возрасту
          */
         if ($driver) {
-            if($driver->dismissed === 'Да') {
+            if ($driver->dismissed === 'Да') {
                 $this->errors[] = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
             }
 
-            if (!$driver->company_id) {
+            if (! $driver->company_id) {
                 $this->errors[] = 'У Водителя не найдена компания';
 
                 return;
@@ -84,7 +90,7 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
 
             $company = Company::find($driver->company_id);
 
-            if (!$company) {
+            if (! $company) {
                 $this->errors[] = 'У Водителя не верно указано ID компании';
 
                 return;
@@ -119,14 +125,14 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
             ->addHours($user->entity->timezone ?? 3)
             ->diffInMinutes($date);
 
-        if ($date && $diffDateCheck <= 60*12) {
+        if ($date && $diffDateCheck <= 60 * 12) {
             $form['realy'] = 'да';
         }
 
         $attachment = $form['attachment'];
         if (! $this->isValidAttachment($attachment)) {
             return;
-        } else if ($attachment) {
+        } elseif ($attachment) {
             $path = Uuid::uuid4().'.'.ReportCartForm::FILE_EXTENSION;
             $filename = $attachment->getClientOriginalName();
 
@@ -162,11 +168,31 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
         }
 
         if ($attachment->getSize() > 100000) {
-            $this->errors[] = 'Размер файла отчета не должен превышать 100 кБ. Получено: '. ($attachment->getSize() / 1000.0);
+            $this->errors[] = 'Размер файла отчета не должен превышать 100 кБ. Получено: '.($attachment->getSize() / 1000.0);
 
             return false;
         }
 
         return true;
+    }
+
+    protected function createNotifications(array $forms, User $user)
+    {
+        $dispatcher = app()->make(Dispatcher::class);
+
+        foreach ($forms as $form) {
+            $companyId = $form->company ? $form->company->id : null;
+            $driverId = $form->driver ? $form->driver->id : null;
+
+            $dispatcher->dispatch(new CreateNotificationsByContextCommand(
+                ReminderAction::createInspection(),
+                $user,
+                ContextBuilder::create()
+                    ->point($form->point_id)
+                    ->company($companyId)
+                    ->subjectType(ReminderSubjectType::driver())
+                    ->subject($driverId)
+            ));
+        }
     }
 }

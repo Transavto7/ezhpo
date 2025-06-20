@@ -9,6 +9,7 @@ use Illuminate\Bus\Dispatcher;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Lang;
+use Src\Notifications\Commands\CreateNotificationsByContext\ContextBuilder;
 use Src\Notifications\Commands\CreateNotificationsByContext\CreateNotificationsByContextCommand;
 use Src\Reminders\Enums\ReminderAction;
 
@@ -91,7 +92,7 @@ class LoginController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return bool
      */
     private function isBlocked(Request $request): bool
@@ -126,10 +127,8 @@ class LoginController extends Controller
 
             $dispatcher->dispatch(new CreateNotificationsByContextCommand(
                 ReminderAction::auth(),
-                [
-                    'point' => $employee->pv_id,
-                ],
                 $user,
+                ContextBuilder::create()->point($employee->pv_id)
             ));
         }
     }

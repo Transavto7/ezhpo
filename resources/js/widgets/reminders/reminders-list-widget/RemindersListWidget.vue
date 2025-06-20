@@ -113,11 +113,6 @@ onMounted(async () => {
             @click="handleFilterReset"
             >Сбросить
           </b-btn>
-          <b-btn
-            class="btn btn-sm btn-danger ml-2"
-            @click="handleSend"
-            >Эвент</b-btn
-          >
         </div>
       </div>
     </div>

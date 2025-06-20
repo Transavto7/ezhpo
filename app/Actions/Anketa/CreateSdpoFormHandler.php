@@ -231,4 +231,9 @@ class CreateSdpoFormHandler extends CreateMedicFormHandler
         $formDetailsModel->setAttribute('forms_uuid', $formModel->uuid);
         $formDetailsModel->save();
     }
+
+    protected function createNotifications(array $forms, User $user)
+    {
+        // TODO: Implement createNotifications() method.
+    }
 }

@@ -2,19 +2,15 @@
 
 namespace App\Actions\Anketa;
 
-use App\Enums\FormTypeEnum;
 use App\Models\Forms\Form;
 use App\Services\DuplicatesCheckerService;
 use App\Services\RedDatesCheckerService;
 use App\User;
 use DateTime;
 use Exception;
-use Illuminate\Bus\Dispatcher;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Src\Notifications\Commands\CreateNotificationsByContext\CreateNotificationsByContextCommand;
-use Src\Reminders\Enums\ReminderAction;
 use Throwable;
 
 abstract class AbstractCreateFormHandler
@@ -96,25 +92,8 @@ abstract class AbstractCreateFormHandler
             $responseData['is_dop'] = 1;
         }
 
-        $form = $this->createdForms->first();
         date_default_timezone_set($originalTz);
-
-        if ($form && $data['type_anketa'] === FormTypeEnum::MEDIC) {
-            /**
-             * @var Form $form
-             */
-            $dispatcher = app()->make(Dispatcher::class);
-            $dispatcher->dispatch(new CreateNotificationsByContextCommand(
-                ReminderAction::createInspection(),
-                [
-                    'subject_type' => 'driver',
-                    'subject' => $form->driver_id,
-                    'point' => $form->point_id,
-                    'company' => $form->company_id,
-                ],
-                $user,
-            ));
-        }
+        $this->createNotifications($this->createdForms->all(), $user);
 
         return $responseData;
     }
@@ -265,4 +244,11 @@ abstract class AbstractCreateFormHandler
 
         return true;
     }
+
+    /**
+     * @param Form[] $forms
+     * @param User $user
+     * @return mixed
+     */
+    abstract protected function createNotifications(array $forms, User $user);
 }

@@ -7,6 +7,7 @@ use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
 use App\Models\Forms\Form;
 use App\Models\Forms\PrintPlForm;
+use App\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 
@@ -20,7 +21,7 @@ class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements Crea
         $defaultData = [
             'date' => date('Y-m-d H:i:s'),
             'realy' => 'нет',
-            'created_at' => $this->time
+            'created_at' => $this->time,
         ];
 
         $form = $this->mergeFormData($form, $defaultData);
@@ -51,7 +52,7 @@ class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements Crea
             }
         }
 
-        if (!$driver) {
+        if (! $driver) {
             $this->errors[] = 'Водитель не найден';
 
             return;
@@ -61,7 +62,7 @@ class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements Crea
             $this->errors[] = 'Водитель уволен. Осмотр зарегистрирован. Обратитесь к менеджеру';
         }
 
-        if (!$driver->company_id) {
+        if (! $driver->company_id) {
             $this->errors[] = 'У Водителя не найдена компания';
 
             return;
@@ -69,7 +70,7 @@ class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements Crea
 
         $company = Company::find($driver->company_id);
 
-        if (!$company) {
+        if (! $company) {
             $this->errors[] = 'У Водителя не верно указано ID компании';
 
             return;
@@ -90,7 +91,7 @@ class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements Crea
         $diffDateCheck = Carbon::now()
             ->addHours($user->entity->timezone ?? 3)
             ->diffInMinutes($date);
-        if ($date && $diffDateCheck <= 60*12) {
+        if ($date && $diffDateCheck <= 60 * 12) {
             $form['realy'] = 'да';
         }
 
@@ -102,5 +103,9 @@ class CreatePrintPlFormHandler extends AbstractCreateFormHandler implements Crea
         $formDetailsModel->save();
 
         $this->createdForms->push($formModel);
+    }
+
+    protected function createNotifications(array $forms, User $user)
+    {
     }
 }

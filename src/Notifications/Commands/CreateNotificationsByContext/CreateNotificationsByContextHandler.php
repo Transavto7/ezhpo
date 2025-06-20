@@ -61,7 +61,10 @@ final class CreateNotificationsByContextHandler
     {
         $now = new DateTimeImmutable();
         $sender = $command->getUser();
-        $context = $this->conditionBuilder->build(array_merge($command->getContext(), ['user' => $command->getUser()->id]));
+        $context = $this->conditionBuilder->build(array_merge(
+            $command->getContext()->toArray(),
+            ['user' => $command->getUser()->id])
+        );
 
         $reminders = $this->getReminderByContextRepository->getRemindersByContext($command->getAction(), $context);
         $reminderIds = array_map(function (ReminderByContext $reminder) {
