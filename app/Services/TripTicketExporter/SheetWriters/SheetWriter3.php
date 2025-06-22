@@ -155,7 +155,10 @@ final class SheetWriter3 implements SheetWriterInterface
         $externalNumber = $this->data->getTripTicket()->getExternalTicketNumber();
 
         $this->sheet->setCellValue($left ? 'BD2' : 'EY2', $externalNumber ?: $number);
-        $this->sheet->setCellValue($left ? 'BD3' : 'EY3', $number);
+
+        if ($externalNumber !== null) {
+            $this->sheet->setCellValue($left ? 'BD3' : 'EY3', $number);
+        }
 
         return $this;
     }

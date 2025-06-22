@@ -112,7 +112,10 @@ final class SheetWriter4O implements SheetWriterInterface
         $externalNumber = $this->data->getTripTicket()->getExternalTicketNumber();
 
         $this->sheet->setCellValue('CZ3', $externalNumber ?: $number);
-        $this->sheet->setCellValue('CZ4', $number);
+
+        if ($externalNumber !== null) {
+            $this->sheet->setCellValue('CZ4', $number);
+        }
 
         return $this;
     }

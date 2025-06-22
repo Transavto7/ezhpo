@@ -113,8 +113,11 @@ final class SheetWriter6C implements SheetWriterInterface
 
         $this->sheet->setCellValue('AE2', $externalNumber ?: $number);
         $this->sheet->setCellValue('BL3', $externalNumber ?: $number);
-        $this->sheet->setCellValue('AE3', $number);
-        $this->sheet->setCellValue('BL4', $number);
+
+        if ($externalNumber !== null) {
+            $this->sheet->setCellValue('AE3', $number);
+            $this->sheet->setCellValue('BL4', $number);
+        }
 
         return $this;
     }

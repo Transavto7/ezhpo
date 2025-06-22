@@ -111,7 +111,10 @@ final class SheetWriter4P implements SheetWriterInterface
         $this->sheet->setCellValue('CY3', $externalNumber ?: $number);
         $this->sheet->setCellValue('X56', $externalNumber ?: $number);
         $this->sheet->setCellValue('DQ56', $externalNumber ?: $number);
-        $this->sheet->setCellValue('CY4', $number);
+
+        if ($externalNumber !== null) {
+            $this->sheet->setCellValue('CY4', $number);
+        }
 
         return $this;
     }
@@ -231,7 +234,7 @@ final class SheetWriter4P implements SheetWriterInterface
     {
         $medicForm = $this->data->getMedicForm();
         if ($medicForm) {
-            $this->sheet->setCellValue('V46', $medicForm->getUsername() ?? '');
+            $this->sheet->setCellValue('V48', $medicForm->getUsername() ?? '');
         }
 
         $techForm = $this->data->getTechForm();

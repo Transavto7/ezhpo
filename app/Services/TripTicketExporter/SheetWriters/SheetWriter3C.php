@@ -114,7 +114,10 @@ final class SheetWriter3C implements SheetWriterInterface
         $this->sheet->setCellValue('BM2', $externalNumber ?: $number);
         $this->sheet->setCellValue('FK4', $externalNumber ?: $number);
         $this->sheet->setCellValue('FP32', $externalNumber ?: $number);
-        $this->sheet->setCellValue('BM5', $number);
+
+        if ($externalNumber !== null) {
+            $this->sheet->setCellValue('BM5', $number);
+        }
 
         return $this;
     }
@@ -246,7 +249,7 @@ final class SheetWriter3C implements SheetWriterInterface
 
         $techForm = $this->data->getTechForm();
         if ($techForm) {
-            $this->sheet->setCellValue('BS56', $techForm->getUsername() ?? '');
+            $this->sheet->setCellValue('BS54', $techForm->getUsername() ?? '');
         }
 
         $driver = $this->data->getDriver();

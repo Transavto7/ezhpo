@@ -221,12 +221,12 @@ final class SheetWriterPG1 implements SheetWriterInterface
     {
         $medicForm = $this->data->getMedicForm();
         if ($medicForm) {
-            $this->sheet->setCellValue('Z26', $medicForm->getUsername() ?? '');
+            $this->sheet->setCellValue('Y26', $medicForm->getUsername() ?? '');
         }
 
         $techForm = $this->data->getTechForm();
         if ($techForm) {
-            $this->sheet->setCellValue('BX27', $techForm->getUsername() ?? '');
+            $this->sheet->setCellValue('BQ27', $techForm->getUsername() ?? '');
         }
 
         return $this;

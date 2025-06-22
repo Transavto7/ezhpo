@@ -112,7 +112,10 @@ final class SheetWriterECM2 implements SheetWriterInterface
         $externalNumber = $this->data->getTripTicket()->getExternalTicketNumber();
 
         $this->sheet->setCellValue('P2', $externalNumber ?: $number);
-        $this->sheet->setCellValue('P3', $number);
+
+        if ($externalNumber !== null) {
+            $this->sheet->setCellValue('P3', $number);
+        }
 
         return $this;
     }
@@ -222,7 +225,7 @@ final class SheetWriterECM2 implements SheetWriterInterface
     {
         $medicForm = $this->data->getMedicForm();
         if ($medicForm) {
-            $this->sheet->setCellValue('H49', $medicForm->getUsername() ?? '');
+            $this->sheet->setCellValue('G49', $medicForm->getUsername() ?? '');
         }
 
         $techForm = $this->data->getTechForm();
