@@ -118,6 +118,8 @@ final class SheetWriter3 implements SheetWriterInterface
                 ->fillTechStamp(false)
                 ->fillLogisticMethod(false)
                 ->fillTransportationType(false);
+        } else {
+            $this->sheet->getStyle('DH36:EP44')->getFill()->setFillType(Fill::FILL_NONE);
         }
 
         return $spreadsheet;
