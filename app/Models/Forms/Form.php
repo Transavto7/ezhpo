@@ -5,7 +5,6 @@ namespace App\Models\Forms;
 use App\Company;
 use App\Driver;
 use App\Enums\FormTypeEnum;
-use App\Enums\UserEntityType;
 use App\Models\TripTicket;
 use App\Point;
 use App\User;
@@ -15,7 +14,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 
 class Form extends Model
@@ -29,7 +27,7 @@ class Form extends Model
         FormTypeEnum::TECH => TechForm::class,
         FormTypeEnum::BDD => BddForm::class,
         FormTypeEnum::PRINT_PL => PrintPlForm::class,
-        FormTypeEnum::REPORT_CARD => ReportCartForm::class
+        FormTypeEnum::REPORT_CARD => ReportCartForm::class,
     ];
 
     public static $relatedTables = [
@@ -39,7 +37,7 @@ class Form extends Model
         FormTypeEnum::TECH => 'tech_forms',
         FormTypeEnum::BDD => 'bdd_forms',
         FormTypeEnum::PRINT_PL => 'print_pl_forms',
-        FormTypeEnum::REPORT_CARD => 'report_cart_forms'
+        FormTypeEnum::REPORT_CARD => 'report_cart_forms',
     ];
 
     public $fillable
@@ -59,7 +57,7 @@ class Form extends Model
             'driver_id',
             'point_id',
             'company_id',
-            'realy'
+            'realy',
         ];
 
     protected static function boot()
@@ -137,8 +135,7 @@ class Form extends Model
         $query->where('forms.type_anketa', FormTypeEnum::PAK_QUEUE);
 
         if ($user->access('approval_queue_view_all')) {
-
-        } else if ($user->hasRole('head_operator_sdpo')) {
+        } elseif ($user->hasRole('head_operator_sdpo')) {
             $employee = $user->relatedEmployee;
 
             $query->join('points_to_employees', function ($join) use ($employee) {

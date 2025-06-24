@@ -187,6 +187,7 @@ return [
         Src\Notifications\NotificationsProvider::class,
         Src\Verification\VerificationProvider::class,
         Src\Users\UsersProvider::class,
+        Src\DocsGeneration\DocsGenerationProvider::class,
 
         Maatwebsite\Excel\ExcelServiceProvider::class,
 

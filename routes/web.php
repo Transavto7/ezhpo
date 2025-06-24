@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('show-video', 'IndexController@showVideo')->name('showVideo');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'web'])->group(function () {
     Route::post('show-edit-element-modal/{model}/{id}', 'IndexController@showEditModal')->name('showEditElementModal');
 
     Route::get('/', 'IndexController@index')->name('index');
@@ -81,13 +81,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'PakController@index')->name('index');
             Route::get('list', 'PakController@list')->name('list');
             Route::get('clear', 'PakController@clear')->name('clear');
-        });
-
-        Route::prefix('docs')->as('docs.')->group(function () {
-            Route::get('{type}/{anketa_id}/pdf', 'DocsController@getPdf')->name('get.pdf');
-            Route::post('{type}/{anketa_id}/set', 'DocsController@setPdf')->name('add.pdf');
-            Route::any('{type}/{anketa_id}/delete', 'DocsController@delete')->name('delete');
-            Route::get('{type}/{anketa_id}', 'DocsController@Get')->name('get');
         });
 
         /**

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\User;
 use App\Point;
+use Src\DocsGeneration\Http\Controllers\UpdateDocController;
 
 /*
 |--------------------------------------------------------------------------
@@ -99,7 +100,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/get-previous-odometer/', 'ApiController@getPreviousOdometer');
 
     Route::put('/update-ddate/{item_model}/{item_id}/{item_field}', 'ApiController@UpdateProperty')->name('updateDDate');
-    Route::put('/update-doc/{type}', 'DocsController@update')->name('docs.update');
 
     Route::post('/fields/visible', 'ApiController@saveFieldsVisible');
 

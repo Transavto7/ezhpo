@@ -42,7 +42,7 @@ class ChangeResultDopHandler
         /** @var TechForm $details */
         $details = $form->details;
 
-        if (!$form->date || !$details->car_id) {
+        if (! $form->date || ! $details->car_id) {
             throw new Exception('Указаны не полные данные осмотра');
         }
 
@@ -51,7 +51,7 @@ class ChangeResultDopHandler
         DuplicatesCheckerService::checkExist($existForms, Carbon::parse($form->date)->timestamp);
 
         if ($details->number_list_road === null) {
-            $details->number_list_road = $details->car_id . '-' . date('d.m.Y', strtotime($form->date));
+            $details->number_list_road = $details->car_id.'-'.date('d.m.Y', strtotime($form->date));
         }
 
         $details->result_dop = $result;
@@ -70,7 +70,7 @@ class ChangeResultDopHandler
     {
         $this->validate($form);
 
-        $existForms = DuplicatesCheckerService::getExistTechForms([$form->driver_id]);;
+        $existForms = DuplicatesCheckerService::getExistTechForms([$form->driver_id]);
 
         DuplicatesCheckerService::checkExist($existForms, Carbon::parse($form->date)->timestamp);
 
