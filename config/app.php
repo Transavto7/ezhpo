@@ -188,6 +188,7 @@ return [
         Src\Verification\VerificationProvider::class,
         Src\Users\UsersProvider::class,
         Src\DocsGeneration\DocsGenerationProvider::class,
+        Src\Signatures\SignaturesProvider::class,
 
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
