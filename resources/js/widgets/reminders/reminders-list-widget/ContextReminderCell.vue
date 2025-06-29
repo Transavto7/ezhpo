@@ -32,9 +32,10 @@ const getName = (key) => {
     <template v-for="key in keys">
       <span
         v-if="context[key]"
+        :key="key"
         class="mr-2"
       >
-        {{ getName(key) }}: {{ context[key].name }}
+        <b>{{ getName(key) }}:</b> {{ context[key].name }}
       </span>
     </template>
   </div>

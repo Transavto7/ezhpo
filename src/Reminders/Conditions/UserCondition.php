@@ -12,6 +12,7 @@ use Src\Reminders\Conditions\BaseConditions\IntCondition;
 final class UserCondition extends IntCondition
 {
     public const TABLE_NAME = 'users';
+
     public const FIELD_NAME = "concat(users.name, ' (', users.login , ')')";
 
     protected $conditionName = 'user';
@@ -30,12 +31,16 @@ final class UserCondition extends IntCondition
 
     public function getSelectFields(): array
     {
-        return ['users.id as user_id', DB::raw("concat(users.name, ' (', users.login , ')') as user_name")];
+        return [
+            'users.id as user_id',
+            DB::raw("concat('[', employees.hash_id, '] ', users.name) as user_name"),
+        ];
     }
 
     public function addJoin(Builder $query): Builder
     {
         return $query
-            ->leftJoin('users', 'users.id', '=', DB::raw('JSON_EXTRACT(context, "$.'.$this->conditionName.'")'));
+            ->leftJoin('users', 'users.id', '=', DB::raw('JSON_EXTRACT(context, "$.'.$this->conditionName.'")'))
+            ->leftJoin('employees', 'employees.related_user_id', '=', 'users.id');
     }
 }

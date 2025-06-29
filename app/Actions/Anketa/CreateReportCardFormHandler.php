@@ -178,21 +178,6 @@ class CreateReportCardFormHandler extends AbstractCreateFormHandler implements C
 
     protected function createNotifications(array $forms, User $user)
     {
-        $dispatcher = app()->make(Dispatcher::class);
-
-        foreach ($forms as $form) {
-            $companyId = $form->company ? $form->company->id : null;
-            $driverId = $form->driver ? $form->driver->id : null;
-
-            $dispatcher->dispatch(new CreateNotificationsByContextCommand(
-                ReminderAction::createInspection(),
-                $user,
-                ContextBuilder::create()
-                    ->point($form->point_id)
-                    ->company($companyId)
-                    ->subjectType(ReminderSubjectType::driver())
-                    ->subject($driverId)
-            ));
-        }
+        // TODO: Implement createNotifications() method.
     }
 }

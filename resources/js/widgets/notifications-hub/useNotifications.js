@@ -1,10 +1,9 @@
-import {useSidebarCounter} from "@/widgets/notifications-hub/useSidebarCounter";
-import {ref} from "vue";
-import {fetchNotifications, markAsRead, markAsCompleted} from "@/widgets/notifications-hub/api";
-import {onMounted, onUnmounted, watch} from "vue";
-import {useAppPageSetup} from "@/composables/useAppPageSetup";
-import Notify from "@/components/notify";
-import {formatCreatedAt} from "@/widgets/notifications-hub/formatCreatedAt";
+import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { useAppPageSetup } from '@/composables/useAppPageSetup'
+import Notify from '@/components/notify'
+import { fetchNotifications, markAsCompleted, markAsRead } from '@/widgets/notifications-hub/api'
+import { formatCreatedAt } from '@/widgets/notifications-hub/formatCreatedAt'
+import { useSidebarCounter } from '@/widgets/notifications-hub/useSidebarCounter'
 
 export const useNotifications = () => {
   const { notificationsPoolingInterval } = useAppPageSetup()
@@ -42,18 +41,13 @@ export const useNotifications = () => {
 
       const active = activeNotification.value
 
-      const restNotifications = active
-        ? data.filter((item) => item.id !== active.id)
-        : data
+      const restNotifications = active ? data.filter((item) => item.id !== active.id) : data
 
-      notifications.value = [
-        ...(active ? [active] : []),
-        ...restNotifications,
-      ]
+      notifications.value = [...(active ? [active] : []), ...restNotifications]
 
       notifications.value = notifications.value.map((item) => ({
         ...item,
-        createdAtFormatted: formatCreatedAt(item.createdAt)
+        createdAtFormatted: formatCreatedAt(item.createdAt),
       }))
 
       if (notifications.value.length) {
@@ -62,7 +56,8 @@ export const useNotifications = () => {
 
       const immediateNotification = notifications.value.find((item) => item.isImmediate)
 
-      isShowModal.value = !!immediateNotification || (!!notifications.value.length && isNotificationMode.value)
+      isShowModal.value =
+        !!immediateNotification || (!!notifications.value.length && isNotificationMode.value)
     } catch (e) {
       console.error('Ошибка при загрузке уведомлений', e)
     }
@@ -101,7 +96,7 @@ export const useNotifications = () => {
         count: notifications.value.length,
         countExpired: notifications.value.filter((item) => item.isExpired).length,
       })
-    }
+    },
   )
 
   onMounted(async () => {

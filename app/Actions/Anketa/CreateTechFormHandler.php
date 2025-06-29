@@ -262,13 +262,13 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
         $dispatcher = app()->make(Dispatcher::class);
 
         foreach ($forms as $form) {
-            $companyId = $form->company ? $form->company->id : null;
-            $carId = $form->car ? $form->car->id : null;
-
             /**
              * @var TechForm $techForm
              */
             $techForm = $form->details;
+
+            $companyId = $form->company ? $form->company->id : null;
+            $carId = $techForm->car ? $techForm->car->id : null;
 
             $dispatcher->dispatch(new CreateNotificationsByContextCommand(
                 ReminderAction::createInspection(),

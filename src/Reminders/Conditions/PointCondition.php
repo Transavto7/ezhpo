@@ -30,7 +30,10 @@ final class PointCondition extends IntCondition
 
     public function getSelectFields(): array
     {
-        return ['points.id as point_id', 'points.name as point_name'];
+        return [
+            'points.id as point_id',
+            DB::raw("concat('[', points.hash_id, '] ', points.name) as point_name"),
+        ];
     }
 
     public function addJoin(Builder $query): Builder

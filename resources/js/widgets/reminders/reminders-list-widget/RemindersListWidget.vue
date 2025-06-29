@@ -1,8 +1,5 @@
 <script setup>
-import { GLOBAL_EVENTS } from '@/conf'
 import { onMounted, watch } from 'vue'
-import { useGlobalEvent } from '@/composables/useGlobalEvent'
-import { ACTIONS, CONDITIONS, SUBJECT_TYPES } from '@/common/reminderContextEnums'
 import { switchReminderStatus } from '@/widgets/reminders/reminders-list-widget/api'
 import Notify from '../../../components/notify'
 import debounce from '../../../helpers/debounce'
@@ -21,8 +18,6 @@ const {
   performDeleteReminder,
 } = useRemindersTable()
 
-const { dispatchGlobalEvent } = useGlobalEvent()
-
 const handleFilterApply = async () => {
   params.page = 1
   await fetchRemindersTable()
@@ -33,27 +28,19 @@ const handleFilterReset = async () => {
   await fetchRemindersTable()
 }
 
-const handleSend = async () => {
-  dispatchGlobalEvent(GLOBAL_EVENTS.showModalNotificationWindow, {
-    context: {
-      [CONDITIONS.SUBJECT_TYPE]: SUBJECT_TYPES.CAR,
-    },
-    action: ACTIONS.CREATE_INSPECTION,
-  })
-}
-
 const handleDelete = async (id) => {
   performDeleteReminder(id)
     .then(async () => {
       await fetchRemindersTable()
     })
-    .catch((error) => {
+    .catch((e) => {
+      console.error(e)
       Notify.error('Ошибка сервера')
     })
 }
 
 const handleSwitchStatus = async (payload) => {
-  await switchReminderStatus(payload.id, payload.enable)
+  await switchReminderStatus(payload.id, payload.enabled)
   await fetchRemindersTable()
 }
 
@@ -105,13 +92,15 @@ onMounted(async () => {
             class="btn btn-sm btn-success"
             :disabled="fetchTablePending"
             @click="handleFilterApply"
-            >Поиск</b-btn
           >
+            Поиск
+          </b-btn>
           <b-btn
             class="btn btn-sm btn-danger ml-2"
             :disabled="fetchTablePending"
             @click="handleFilterReset"
-            >Сбросить
+          >
+            Сбросить
           </b-btn>
         </div>
       </div>

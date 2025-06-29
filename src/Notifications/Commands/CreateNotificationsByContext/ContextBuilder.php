@@ -21,45 +21,45 @@ final class ContextBuilder
         return new self();
     }
 
-    public function city(?int $id): self
+    public function city(?int $value): self
     {
-        $this->context['city_id'] = $id;
+        $this->context['city'] = $value;
         return $this;
     }
 
-    public function company(?int $id): self
+    public function company(?int $value): self
     {
-        $this->context['company'] = $id;
+        $this->context['company'] = $value;
         return $this;
     }
 
-    public function point(?int $id): self
+    public function point(?int $value): self
     {
-        $this->context['point'] = $id;
+        $this->context['point'] = $value;
         return $this;
     }
 
-    public function roles(?array $ids): self
+    public function roles(?array $value): self
     {
-        $this->context['roles'] = $ids;
+        $this->context['role'] = $value;
         return $this;
     }
 
-    public function role(?array $id): self
+    public function role(?int $value): self
     {
-        $this->context['role'] = $id;
+        $this->context['role'] = $value;
         return $this;
     }
 
-    public function subject(?int $id): self
+    public function subject(?int $value): self
     {
-        $this->context['subject'] = $id;
+        $this->context['subject'] = $value;
         return $this;
     }
 
-    public function subjectType(ReminderSubjectType $type): self
+    public function subjectType(?ReminderSubjectType $value): self
     {
-        $this->context['subject_type'] = $type->value();
+        $this->context['subject_type'] = $value->value();
         return $this;
     }
 

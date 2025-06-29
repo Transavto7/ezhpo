@@ -30,7 +30,10 @@ final class CityCondition extends IntCondition
 
     public function getSelectFields(): array
     {
-        return ['towns.id as city_id', 'towns.name as city_name'];
+        return [
+            'towns.id as city_id',
+            DB::raw("concat('[', towns.hash_id, '] ', towns.name) as city_name"),
+        ];
     }
 
     public function addJoin(Builder $query): Builder

@@ -35,6 +35,6 @@ export default [
     sortable: true,
     thClass: 'text-center',
     tdClass: 'text-center',
-    thStyle: { width: '150px' },
+    thStyle: { width: '100px' },
   },
 ]

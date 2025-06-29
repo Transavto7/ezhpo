@@ -40,10 +40,10 @@ const handleDeleteButtonClick = (id) => {
   emit('delete', id)
 }
 
-const handleSwitchStatus = (id, enable) => {
+const handleSwitchStatus = (id, enabled) => {
   emit('switch-status', {
     id,
-    enable,
+    enabled,
   })
 }
 </script>
@@ -79,13 +79,15 @@ const handleSwitchStatus = (id, enable) => {
           <span
             v-if="item.enabled"
             class="badge badge-success"
-            >да</span
           >
+            активно
+          </span>
           <span
             v-else
             class="badge badge-warning"
-            >нет</span
           >
+            неактивно
+          </span>
         </template>
 
         <template #cell(updated_at)="{ item }">
@@ -98,9 +100,10 @@ const handleSwitchStatus = (id, enable) => {
               v-if="canEdit"
               class="btn btn-sm action-btn mr-2"
               :class="{
-                'btn-warning': item.enabled,
-                'btn-success': !item.enabled,
+                'btn-warning': !item.enabled,
+                'btn-success': item.enabled,
               }"
+              :title="item.enabled ? 'Деактивировать' : 'Активировать'"
               @click.prevent="handleSwitchStatus(item.id, !item.enabled)"
             >
               <span
@@ -114,7 +117,7 @@ const handleSwitchStatus = (id, enable) => {
             </button>
             <a
               v-if="canEdit"
-              class="btn btn-sm btn-success action-btn mr-2"
+              class="btn btn-sm btn-info action-btn mr-2"
               :href="`/reminders/${item.id}`"
             >
               <span class="fa fa-edit"></span>

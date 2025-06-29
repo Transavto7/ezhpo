@@ -1,13 +1,17 @@
 <script setup>
-import VSelectRemote from "@/ui/select/VSelectRemote.vue";
+import { computed } from 'vue'
+import VSelectRemote from '@/ui/select/VSelectRemote.vue'
 import {
-  fetchActionsForSelect, fetchCompanyForSelect,
-  fetchPointsForSelect, fetchRemindersForSelect,
-  fetchRolesForSelect, fetchSubjectsForSelect, fetchSubjectTypesForSelect,
+  fetchActionsForSelect,
+  fetchCompanyForSelect,
+  fetchPointsForSelect,
+  fetchRemindersForSelect,
+  fetchRolesForSelect,
+  fetchSubjectTypesForSelect,
+  fetchSubjectsForSelect,
   fetchTownsForSelect,
-  fetchUsersForSelect
-} from "../shared/api";
-import {computed} from "vue";
+  fetchUsersForSelect,
+} from '../shared/api'
 
 const props = defineProps({
   search: {
@@ -75,7 +79,6 @@ const emit = defineEmits([
   'update:subjects',
 ])
 
-
 const handleInputSearch = (e) => {
   emit('update:search', e.target.value)
 }
@@ -116,120 +119,125 @@ const handleChangeSubjects = (value) => {
   emit('update:subjects', value)
 }
 
-const innerFetchSubjectsForSelect = ({search}) => {
+const innerFetchSubjectsForSelect = ({ search }) => {
   return fetchSubjectsForSelect(search, props.subject_type.id)
 }
 
 const disableSubjectFilter = computed(() => {
-  return props.subject_type === null;
+  return props.subject_type === null
 })
 </script>
 
 <template>
   <div>
     <div class="row">
-      <div class="col-12 col-md-4 col-lg-3 form-group">
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3 form-group">
         <label for="">Поиск</label>
-        <input class="form-control" type="text" :value="props.search" placeholder="Введите значение для поиска"
-               @input="handleInputSearch">
+        <input
+          class="form-control"
+          placeholder="Введите значение для поиска"
+          type="text"
+          :value="props.search"
+          @input="handleInputSearch"
+        />
       </div>
-      <div class="col-12 col-md-4 col-lg-3 form-group">
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3 form-group">
         <v-select-remote
           id="actions"
-          :value="actions"
-          label="Действия(триггеры)"
-          @input="handleChangeActions"
-          :fetch-options-action="fetchActionsForSelect"
-          multiple
           clearable
+          :fetch-options-action="fetchActionsForSelect"
+          label="Действия (триггеры)"
+          multiple
+          :value="actions"
+          @input="handleChangeActions"
         />
       </div>
-      <div class="col-12 col-md-4 col-lg-3 form-group">
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3 form-group">
         <v-select-remote
           id="reminders"
-          :value="reminders"
-          label="Напоминание"
-          @input="handleChangeReminders"
-          :fetch-options-action="fetchRemindersForSelect"
-          multiple
           clearable
+          :fetch-options-action="fetchRemindersForSelect"
+          label="Напоминание"
+          multiple
+          :value="reminders"
+          @input="handleChangeReminders"
         />
       </div>
-      <div class="col-12 col-md-4 col-lg-3 form-group">
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3 form-group">
         <v-select-remote
           id="cities"
-          :value="cities"
-          label="Город"
-          @input="handleChangeCities"
-          :fetch-options-action="fetchTownsForSelect"
-          multiple
           clearable
+          :fetch-options-action="fetchTownsForSelect"
+          label="Город"
+          multiple
+          :value="cities"
+          @input="handleChangeCities"
         />
       </div>
-      <div class="col-12 col-md-4 col-lg-3 form-group">
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3 form-group">
         <v-select-remote
           id="points"
-          :value="points"
-          label="ПВ"
-          @input="handleChangePoints"
-          :fetch-options-action="fetchPointsForSelect"
-          multiple
           clearable
+          :fetch-options-action="fetchPointsForSelect"
+          label="ПВ"
+          multiple
+          :value="points"
+          @input="handleChangePoints"
         />
       </div>
-      <div class="col-12 col-md-4 col-lg-3 form-group">
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3 form-group">
         <v-select-remote
           id="users"
-          :value="users"
-          label="Пользователи"
-          @input="handleChangeUsers"
-          :fetch-options-action="fetchUsersForSelect"
-          multiple
           clearable
+          :fetch-options-action="fetchUsersForSelect"
+          label="Пользователи"
+          multiple
+          :value="users"
+          @input="handleChangeUsers"
         />
       </div>
-      <div class="col-12 col-md-4 col-lg-3 form-group">
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3 form-group">
         <v-select-remote
           id="roles"
-          :value="roles"
-          label="Роли"
-          @input="handleChangeRoles"
-          :fetch-options-action="fetchRolesForSelect"
-          multiple
           clearable
+          :fetch-options-action="fetchRolesForSelect"
+          label="Роли"
+          multiple
+          :value="roles"
+          @input="handleChangeRoles"
         />
       </div>
-      <div class="col-12 col-md-4 col-lg-3 form-group">
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3 form-group">
         <v-select-remote
           id="companies"
-          :value="companies"
-          label="Компании"
-          @input="handleChangeCompanies"
-          :fetch-options-action="fetchCompanyForSelect"
-          multiple
           clearable
+          :fetch-options-action="fetchCompanyForSelect"
+          label="Компании"
+          multiple
+          :value="companies"
+          @input="handleChangeCompanies"
         />
       </div>
-      <div class="col-12 col-md-4 col-lg-3 form-group">
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3 form-group">
         <v-select-remote
           id="subject_types"
-          :value="subject_type"
-          label="Тип субъекта"
-          @input="handleChangeSubjectTypes"
-          :fetch-options-action="fetchSubjectTypesForSelect"
           clearable
+          :fetch-options-action="fetchSubjectTypesForSelect"
+          label="Тип субъекта"
+          :value="subject_type"
+          @input="handleChangeSubjectTypes"
         />
       </div>
-      <div class="col-12 col-md-4 col-lg-3 form-group">
+      <div class="col-12 col-md-6 col-lg-4 col-xl-3 form-group">
         <v-select-remote
           id="subjects"
-          :value="subjects"
-          label="Субъект"
-          @input="handleChangeSubjects"
-          :fetch-options-action="innerFetchSubjectsForSelect"
-          :disabled="disableSubjectFilter"
           clearable
+          :disabled="disableSubjectFilter"
+          :fetch-options-action="innerFetchSubjectsForSelect"
+          label="Субъект"
           multiple
+          :value="subjects"
+          @input="handleChangeSubjects"
         />
       </div>
     </div>

@@ -30,7 +30,10 @@ final class CompanyCondition extends IntCondition
 
     public function getSelectFields(): array
     {
-        return ['companies.id as company_id', 'companies.name as company_name'];
+        return [
+            'companies.id as company_id',
+            DB::raw("concat('[', companies.hash_id, '] ', companies.name) as company_name"),
+        ];
     }
 
     public function addJoin(Builder $query): Builder

@@ -1,13 +1,13 @@
 <script setup>
-import {watch} from "vue";
-import HubOverlay from "./HubOverlay.vue";
-import {useGlobalEvent} from "@/composables/useGlobalEvent";
-import {GLOBAL_EVENTS} from "@/conf";
-import ModeSwitcher from "@/widgets/notifications-hub/ModeSwitcher.vue";
-import {useNotifications} from "@/widgets/notifications-hub/useNotifications";
-import {createNotificationsByContext} from "@/widgets/notifications-hub/api";
+import { watch } from 'vue'
+import { GlobalEvent } from '@/types'
+import { useGlobalEvent } from '@/services/global-events/useGlobalEvent'
+import ModeSwitcher from '@/widgets/notifications-hub/ModeSwitcher.vue'
+import { createNotificationsByContext } from '@/widgets/notifications-hub/api'
+import { useNotifications } from '@/widgets/notifications-hub/useNotifications'
+import HubOverlay from './HubOverlay.vue'
 
-const {bindGlobalEventHandler} = useGlobalEvent()
+const { bindGlobalEventHandler } = useGlobalEvent()
 const {
   isNotificationMode,
   isShowModal,
@@ -19,7 +19,7 @@ const {
   performMarkAsRead,
 } = useNotifications()
 
-bindGlobalEventHandler(GLOBAL_EVENTS.showModalNotificationWindow, async (event) => {
+bindGlobalEventHandler(GlobalEvent.SEND_NOTIFICATION, async (event) => {
   await createNotificationsByContext(event.detail)
   await fetchNotificationItems()
 })
@@ -40,34 +40,36 @@ const handleMarkAsCompleted = async (id) => {
   await performMarkAsCompleted(id)
 }
 
-watch(() => isShowModal.value, (newValue) => {
-  if (newValue) {
-    document.body.classList.add('overflow-hidden')
-  } else {
-    document.body.classList.remove('overflow-hidden')
+watch(
+  () => isShowModal.value,
+  (newValue) => {
+    if (newValue) {
+      document.body.classList.add('overflow-hidden')
+    } else {
+      document.body.classList.remove('overflow-hidden')
 
-    activeNotification.value = null
-    notifications.value = []
-  }
-})
+      activeNotification.value = null
+      notifications.value = []
+    }
+  },
+)
 </script>
 
 <template>
   <div class="mr-4">
-    <mode-switcher v-model="isNotificationMode"/>
+    <mode-switcher v-model="isNotificationMode" />
 
     <hub-overlay
-      :is-show="isShowModal"
       :active-notification="activeNotification"
+      :is-show="isShowModal"
       :notifications="notifications"
       :pending="pendingPerform"
       @close="handleClose"
-      @select="handleSelect"
-      @mark-as-read="handleMarkAsRead"
       @mark-as-completed="handleMarkAsCompleted"
+      @mark-as-read="handleMarkAsRead"
+      @select="handleSelect"
     />
   </div>
 </template>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

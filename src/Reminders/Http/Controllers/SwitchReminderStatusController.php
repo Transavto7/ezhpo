@@ -17,7 +17,7 @@ final class SwitchReminderStatusController
         $user = Auth::user();
 
         try {
-            $status = $request->input('enable') ? ReminderStatus::enable() : ReminderStatus::disable();
+            $status = $request->input('enabled') ? ReminderStatus::enable() : ReminderStatus::disable();
 
             $dispatcher->dispatch(new SwitchReminderStatusCommand(Uuid::fromString($id), $user->id, $status));
 

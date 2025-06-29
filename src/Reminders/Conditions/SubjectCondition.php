@@ -41,9 +41,9 @@ final class SubjectCondition extends IntCondition
     {
         return [
             'subject_drivers.id as subject_driver_id',
-            'subject_drivers.fio as subject_driver_name',
+            DB::raw("concat('[', subject_drivers.hash_id, '] ', subject_drivers.fio) as subject_driver_name"),
             'subject_cars.id as subject_car_id',
-            'subject_cars.gos_number as subject_car_name',
+            DB::raw("concat('[', subject_cars.hash_id, '] ', subject_cars.gos_number) as subject_car_name"),
         ];
     }
 
