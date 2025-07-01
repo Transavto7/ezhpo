@@ -5,6 +5,7 @@ namespace App\Actions\Anketa;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
+use App\Enums\FeaturesEnum;
 use App\Enums\FlagPakEnum;
 use App\Events\Forms\DriverDismissed;
 use App\MedicFormNormalizedPressure;
@@ -28,6 +29,7 @@ use Src\Notifications\Commands\CreateNotificationsByContext\ContextBuilder;
 use Src\Notifications\Commands\CreateNotificationsByContext\CreateNotificationsByContextCommand;
 use Src\Reminders\Enums\ReminderAction;
 use Src\Reminders\Enums\ReminderSubjectType;
+use Unleash\Client\Unleash;
 
 class CreateMedicFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
 {
@@ -281,7 +283,12 @@ class CreateMedicFormHandler extends AbstractCreateFormHandler implements Create
 
     protected function createNotifications(array $forms, User $user)
     {
-        $dispatcher = app()->make(Dispatcher::class);
+        $dispatcher = app(Dispatcher::class);
+        $unleash = app(Unleash::class);
+
+        if (! $unleash->isEnabled(FeaturesEnum::REMINDERS_ENABLED)) {
+            return;
+        }
 
         foreach ($forms as $form) {
             $companyId = $form->company ? $form->company->id : null;

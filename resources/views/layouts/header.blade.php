@@ -1,3 +1,7 @@
+@php
+    $unleash = app(Unleash\Client\Unleash::class);
+@endphp
+
 <!-- Main Navbar-->
 <header class="header no-print">
     <nav class="navbar">
@@ -17,7 +21,7 @@
                 <!-- Navbar Menu -->
                 <ul class="nav-menu list-unstyled d-flex flex-md-row align-items-md-center">
 
-                    @if(\Illuminate\Support\Facades\Auth::user())
+                    @if(\Illuminate\Support\Facades\Auth::user() && $unleash->isEnabled(\App\Enums\FeaturesEnum::NOTIFICATIONS_ENABLED))
                         <notifications-hub></notifications-hub>
                     @endif
 

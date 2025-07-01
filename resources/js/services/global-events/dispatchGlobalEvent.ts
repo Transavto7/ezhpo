@@ -2,9 +2,9 @@ import { GlobalEventDispatcher } from '@/services/global-events/types'
 
 /**
  * Этот хелпер нужен исключительно для того, чтобы эмитить глобальные события из блейдов или старых компонентов с Options API.
- * В идеале вообще его не использовать и переходить на useGlobalEvents.
+ * В идеале вообще его не использовать и переходить на useGlobalEvent.
  *
- * А вот обработка глобальных событий предоставляется только хуком useGlobalEvents
+ * А вот обработка глобальных событий предоставляется только хуком useGlobalEvent
  *
  * @param eventName
  * @param detail

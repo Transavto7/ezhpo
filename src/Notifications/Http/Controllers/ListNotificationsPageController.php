@@ -2,14 +2,20 @@
 
 namespace Src\Notifications\Http\Controllers;
 
+use App\Enums\FeaturesEnum;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Src\Notifications\Enums\NotificationFilterStatus;
+use Unleash\Client\Unleash;
 
 final class ListNotificationsPageController extends Controller
 {
-    public function __invoke()
+    public function __invoke(Unleash $unleash)
     {
+        if (! $unleash->isEnabled(FeaturesEnum::NOTIFICATIONS_ENABLED)) {
+            return view('common.disabled-feature-page', ['title' => 'Уведомления']);
+        }
+
         $user = Auth::user();
 
         $canViewOther = $user->access('notifications_view_other');

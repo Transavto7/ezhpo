@@ -6,6 +6,7 @@ use App\Car;
 use App\Company;
 use App\Driver;
 use App\Enums\BlockActionReasonsEnum;
+use App\Enums\FeaturesEnum;
 use App\Events\Forms\DriverDismissed;
 use App\Models\Forms\Form;
 use App\Models\Forms\TechForm;
@@ -21,6 +22,7 @@ use Src\Notifications\Commands\CreateNotificationsByContext\ContextBuilder;
 use Src\Notifications\Commands\CreateNotificationsByContext\CreateNotificationsByContextCommand;
 use Src\Reminders\Enums\ReminderAction;
 use Src\Reminders\Enums\ReminderSubjectType;
+use Unleash\Client\Unleash;
 
 class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateFormHandlerInterface
 {
@@ -259,7 +261,12 @@ class CreateTechFormHandler extends AbstractCreateFormHandler implements CreateF
 
     protected function createNotifications(array $forms, User $user)
     {
-        $dispatcher = app()->make(Dispatcher::class);
+        $dispatcher = app(Dispatcher::class);
+        $unleash = app(Unleash::class);
+
+        if (! $unleash->isEnabled(FeaturesEnum::REMINDERS_ENABLED)) {
+            return;
+        }
 
         foreach ($forms as $form) {
             /**

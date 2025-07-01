@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\FeaturesEnum;
 use App\Http\Controllers\Controller;
 use App\Services\UserService;
 use App\User;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Lang;
 use Src\Notifications\Commands\CreateNotificationsByContext\ContextBuilder;
 use Src\Notifications\Commands\CreateNotificationsByContext\CreateNotificationsByContextCommand;
 use Src\Reminders\Enums\ReminderAction;
+use Unleash\Client\Unleash;
 
 class LoginController extends Controller
 {
@@ -117,12 +119,13 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request, $user)
     {
-        $dispatcher = app()->make(Dispatcher::class);
+        $dispatcher = app(Dispatcher::class);
+        $unleash = app(Unleash::class);
 
         /**
          * @var User $user
          */
-        if ($user->isEmployee()) {
+        if ($unleash->isEnabled(FeaturesEnum::REMINDERS_ENABLED) && $user->isEmployee()) {
             $employee = $user->relatedEmployee;
 
             $dispatcher->dispatch(new CreateNotificationsByContextCommand(
