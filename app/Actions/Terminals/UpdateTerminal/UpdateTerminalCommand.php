@@ -8,50 +8,52 @@ final class UpdateTerminalCommand
      * @var int
      */
     private $id;
+
     /**
      * @var string
      */
     private $name;
+
     /**
      * @var string
      */
     private $timezone;
+
     /**
      * @var int
      */
     private $companyId;
+
     /**
      * @var int
      */
     private $blocked;
+
     /**
      * @var int
      */
     private $pvId;
+
     /**
      * @var int|null
      */
     private $stampId;
 
     /**
-     * @param int $id
-     * @param string $name
-     * @param string $timezone
-     * @param int $companyId
-     * @param int $blocked
-     * @param int $pvId
-     * @param int|null $stampId
+     * @var string|null
      */
+    private $description;
+
     public function __construct(
-        int    $id,
+        int $id,
         string $name,
         string $timezone,
-        int    $companyId,
-        int    $blocked,
-        int    $pvId,
-        ?int   $stampId
-    )
-    {
+        int $companyId,
+        int $blocked,
+        int $pvId,
+        ?int $stampId,
+        ?string $description
+    ) {
         $this->id = $id;
         $this->name = $name;
         $this->timezone = $timezone;
@@ -59,6 +61,7 @@ final class UpdateTerminalCommand
         $this->blocked = $blocked;
         $this->pvId = $pvId;
         $this->stampId = $stampId;
+        $this->description = $description;
     }
 
     public function getId(): int
@@ -94,5 +97,10 @@ final class UpdateTerminalCommand
     public function getStampId(): ?int
     {
         return $this->stampId;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
     }
 }

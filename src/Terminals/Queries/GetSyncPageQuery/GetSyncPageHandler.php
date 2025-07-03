@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Src\Terminals\Queries\GetSyncPageQuery;
@@ -23,7 +24,8 @@ final class GetSyncPageHandler
                     'terminals.id',
                     'terminals.hash_id',
                     'terminal_checks.serial_number as serial_number',
-                    'terminals.name'
+                    'terminals.name',
+                    'terminals.description',
                 ])
                 ->leftJoin('terminal_checks', 'terminals.id', '=', 'terminal_checks.terminal_id')
                 ->whereIn('terminals.id', $query->getTerminalIds())
@@ -35,8 +37,9 @@ final class GetSyncPageHandler
                             '[%s] %s %s',
                             $model->hash_id,
                             $model->name,
-                            $model->serial_number ? "s/n: " . $model->serial_number : ""
-                        )
+                            $model->serial_number ? 's/n: '.$model->serial_number : ''
+                        ),
+                        $model->description
                     );
                 })
                 ->toArray();
@@ -48,7 +51,7 @@ final class GetSyncPageHandler
                 'user',
                 'user.roles',
                 'point:id,name,pv_id',
-                'point.town:id,name'
+                'point.town:id,name',
             ])
             ->whereHas('user.roles', function ($q) {
                 $q->where('roles.id', UserRoleEnum::MEDIC);

@@ -17,12 +17,11 @@ use Symfony\Component\HttpFoundation\Response;
 final class CreateTerminalController
 {
     public function __invoke(
-        Request                      $request,
-        CreateTerminalHandler        $createTerminalHandler,
-        CheckTerminalHandler         $checkTerminalHandler,
+        Request $request,
+        CreateTerminalHandler $createTerminalHandler,
+        CheckTerminalHandler $checkTerminalHandler,
         UpdateTerminalDevicesHandler $updateTerminalDevicesHandler
-    )
-    {
+    ) {
         DB::beginTransaction();
 
         try {
@@ -32,7 +31,8 @@ final class CreateTerminalController
                 $request->input('company_id'),
                 $request->input('blocked'),
                 $request->input('pv_id'),
-                $request->input('stamp_id')
+                $request->input('stamp_id'),
+                $request->input('description'),
             ));
 
             $checkTerminalHandler->handle(new CheckTerminalCommand(

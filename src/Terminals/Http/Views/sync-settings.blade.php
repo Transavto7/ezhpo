@@ -21,7 +21,7 @@
                             @endforeach
                         </div>
                     </div>
-                    <main-settings />
+                    <main-settings/>
                 </div>
             </div>
         </div>

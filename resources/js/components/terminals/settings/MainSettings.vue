@@ -15,6 +15,21 @@ export default {
             medics: window.PAGE_SETUP.medics,
         }
     },
+    computed: {
+        terminalsByDescriptions() {
+            return this.terminals.reduce((acc, item) => {
+                if (!item.description) {
+                    return acc;
+                }
+
+                if (!acc[item.description]) {
+                    acc[item.description] = [];
+                }
+                acc[item.description].push(item);
+                return acc;
+            }, {});
+        }
+    },
     methods: {
         save() {
             this.pending = true;
@@ -272,12 +287,26 @@ export default {
             </div>
         </div>
 
-        <div class="admin__system-footer g10">
+        <div class="admin__system-card g10">
+            <div class="admin__system-card__title">
+                Описание выбранных терминалов
+            </div>
+            <div class="admin__system-card__description-item">
+                <div class="mr-2" v-for="(description, idx) in Object.keys(terminalsByDescriptions)" :key="idx">
+                    <b>{{ description }}:</b>
+                    <div v-for="(terminal, terminalId) in terminalsByDescriptions[description]" :key="terminalId">
+                        {{ terminal.text }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin__system-footer g11">
             <a href="/terminals" class="btn btn-default mr-2">Назад</a>
 
             <button-with-pending @click="save" class="btn btn-success" :pending="pending" description="Сохранить">
-                <template v-slot:loading> Сохранение... </template>
-                <template v-slot:default> Сохранить </template>
+                <template v-slot:loading> Сохранение...</template>
+                <template v-slot:default> Сохранить</template>
             </button-with-pending>
         </div>
     </div>
@@ -324,6 +353,10 @@ export default {
     grid-area: g10;
 }
 
+.g11 {
+    grid-area: g11;
+}
+
 .admin {
     &__system {
         display: grid;
@@ -335,7 +368,8 @@ export default {
             "g1 g2 g3 g4"
             "g1 g5 g6 g7"
             "g8 g8 g9 g9"
-            "g10 g10 g10 g10";
+            "g10 g10 g10 g10"
+            "g11 g11 g11 g11";
     }
 
     &__system-card {
@@ -367,6 +401,16 @@ export default {
             font-size: 15px;
             gap: 20px;
             justify-content: space-between;
+        }
+
+        &__description-item {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+            gap: 20px;
+            justify-content: start;
+            text-transform:none;
         }
 
         input {

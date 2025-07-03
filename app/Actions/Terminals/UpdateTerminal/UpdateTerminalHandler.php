@@ -43,6 +43,7 @@ final class UpdateTerminalHandler
         $terminal->stamp_id = $command->getStampId();
         $terminal->timezone = $command->getTimezone();
         $terminal->company_id = $command->getCompanyId();
+        $terminal->description = $command->getDescription();
 
         $terminal->save();
 

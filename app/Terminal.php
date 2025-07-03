@@ -23,6 +23,7 @@ final class Terminal extends Model
         'stamp_id',
         'company_id',
         'last_connection_at',
+        'description',
         'auto_created',
         'deleted_at',
         'deleted_id',

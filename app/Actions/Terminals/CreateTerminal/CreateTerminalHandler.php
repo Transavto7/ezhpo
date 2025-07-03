@@ -35,8 +35,8 @@ final class CreateTerminalHandler
 
         $user = $this->dispatcher->dispatch(new CreateUserCommand(
             UserEntityType::terminal(),
-            time() . '@ta-7.ru',
-            time() . '@ta-7.ru',
+            time().'@ta-7.ru',
+            time().'@ta-7.ru',
             $apiToken,
             $apiToken,
         ));
@@ -62,6 +62,7 @@ final class CreateTerminalHandler
             'pv_id' => $command->getPvId(),
             'stamp_id' => $command->getStampId(),
             'company_id' => $command->getCompanyId(),
+            'description' => $command->getDescription(),
         ]);
 
         return $terminal->id;

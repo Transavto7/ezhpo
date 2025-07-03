@@ -60,6 +60,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('to-check', 'Terminals\GetTerminalsToCheckController')->name('to-check');
         Route::get('/{id}/item', 'Terminals\GetTerminalItemController')->name('item');
         Route::post('/', 'Terminals\CreateTerminalController')->name('store');
+        Route::post('/update-description', 'Terminals\SetManyTerminalsDescriptionController')->name('update-description');
         Route::put('/{id}', 'Terminals\UpdateTerminalController')->name('update');
         Route::delete('/{id}', 'Terminals\DeleteTerminalController')->name('delete');
         Route::post('/status', 'Terminals\GetTerminalsConnectionStatusController')->name('status');
@@ -213,4 +214,3 @@ Route::get('/anketa-verification/{uuid}', 'AnketsController@verificationPage')->
 Route::get('/anketa-verification/{uuid}/history', 'AnketsController@verificationHistory')->name('anketa.verification.history');
 
 Auth::routes();
-

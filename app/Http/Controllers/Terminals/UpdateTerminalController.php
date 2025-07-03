@@ -10,6 +10,7 @@ use App\Actions\Terminals\UpdateTerminalDevices\TerminalDeviceItem;
 use App\Actions\Terminals\UpdateTerminalDevices\UpdateTerminalDevicesCommand;
 use App\Actions\Terminals\UpdateTerminalDevices\UpdateTerminalDevicesHandler;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,13 +19,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final class UpdateTerminalController
 {
     public function __invoke(
-        int                          $id,
-        Request                      $request,
-        UpdateTerminalHandler        $updateTerminalHandler,
-        CheckTerminalHandler         $checkTerminalHandler,
+        int $id,
+        Request $request,
+        UpdateTerminalHandler $updateTerminalHandler,
+        CheckTerminalHandler $checkTerminalHandler,
         UpdateTerminalDevicesHandler $updateTerminalDevicesHandler
-    )
-    {
+    ): JsonResponse {
         DB::beginTransaction();
 
         try {
@@ -35,7 +35,8 @@ final class UpdateTerminalController
                 $request->input('company_id'),
                 $request->input('blocked'),
                 $request->input('pv_id'),
-                $request->input('stamp_id')
+                $request->input('stamp_id'),
+                $request->input('description'),
             ));
 
             $checkTerminalHandler->handle(new CheckTerminalCommand(
@@ -70,7 +71,7 @@ final class UpdateTerminalController
 
             return response()
                 ->json([
-                    'errors' => [$exception->getMessage()]
+                    'errors' => [$exception->getMessage()],
                 ])
                 ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         }

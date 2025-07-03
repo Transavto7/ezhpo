@@ -17,6 +17,10 @@ export const createTerminal = async (params) => {
   return await axios.post(`/terminals`, params)
 }
 
+export const updateTerminalDescription = async (params) => {
+    return await axios.post(`/terminals/update-description`, params)
+}
+
 export const updateTerminal = async (id, params) => {
   return await axios.put(`/terminals/${id}`, params)
 }
