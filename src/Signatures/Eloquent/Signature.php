@@ -7,6 +7,7 @@ namespace Src\Signatures\Eloquent;
 use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
 use Illuminate\Database\Eloquent\Model;
 use Ramsey\Uuid\Uuid;
+use Src\Signatures\Enums\SignatureStatus;
 
 /**
  * @property string id
@@ -37,7 +38,12 @@ final class Signature extends Model
         parent::boot();
 
         self::creating(function ($model) {
-            $model->uuid = $model->uuid ?? Uuid::uuid4();
+            $model->id = $model->id ?? Uuid::uuid4();
         });
+    }
+
+    public function canDownload(): bool
+    {
+        return $this->status === SignatureStatus::SIGNED;
     }
 }

@@ -20,5 +20,6 @@ final class SignaturesProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/Migrations');
+        $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
     }
 }

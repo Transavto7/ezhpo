@@ -10,6 +10,8 @@ use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Src\DocsGeneration\DocDataService;
+use Src\Signatures\Enums\DocumentType;
+use Src\Signatures\Services\SignatureWorker;
 
 final class UpdateDocController extends Controller
 {
@@ -31,5 +33,12 @@ final class UpdateDocController extends Controller
         $details->update([
             $type.'_path' => $path,
         ]);
+
+        SignatureWorker::create(
+            null,
+            $form->id,
+            DocumentType::from($type),
+            $path
+        );
     }
 }

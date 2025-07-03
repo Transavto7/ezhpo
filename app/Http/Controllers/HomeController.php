@@ -86,6 +86,16 @@ class HomeController extends Controller
             ->leftJoin('users', 'forms.user_id', '=', 'users.id')
             ->leftJoin('employees as user_employees', 'user_employees.related_user_id', '=', 'forms.user_id');
 
+        foreach (Form::$docVariants as $docs) {
+            $table = $docs.'_signature';
+            $forms = $forms->leftJoin('signatures as '.$table, function (JoinClause $query) use ($docs, $table) {
+                $query->where($table.'.document_type', '=', $docs)
+                    ->on($table.'.form_id', '=', 'forms.id');
+
+                return $query;
+            });
+        }
+
         if ($trash) {
             $forms = $forms->leftJoin('users as delete_users', 'forms.deleted_id', '=', 'delete_users.id');
         }
@@ -395,6 +405,13 @@ class HomeController extends Controller
             'companies.name as company_name',
             'user_employees.name as user_name',
         ];
+
+        foreach (Form::$docVariants as $docs) {
+            $table = $docs.'_signature';
+
+            $defaultFieldsToSelect[] = "$table.id as {$table}_id";
+            $defaultFieldsToSelect[] = "$table.status as {$table}_status";
+        }
 
         /**
          * Обогащение данных

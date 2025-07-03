@@ -25,15 +25,14 @@ final class SignatureService
         $signature->document_type = $documentType->getValue();
         $signature->form_id = $formId;
         $signature->status = SignatureStatus::NEED_SIGN()->getValue();
-
         if ($signatureFile instanceof UploadedFile) {
+            $signature->document_hash = $this->getFileHashByPath($documentPath);
             $signature->path = Storage::disk('public')
                 ->putFileAs(
                     $documentType->getValue(),
                     $signatureFile,
-                    $signature->document_hash.'.'.$signatureFile->extension()
+                    $signature->document_hash.'.'.$signatureFile->getClientOriginalExtension()
                 );
-            $signature->document_hash = $this->getFileHashByPath($documentPath);
             $signature->status = SignatureStatus::SIGNED()->getValue();
         }
 
@@ -57,7 +56,7 @@ final class SignatureService
     {
         $signature = $this->get($formId, $documentType);
 
-        if ($signature === null) {
+        if ($signature === null || $signature->status === SignatureStatus::NEED_SIGN()->getValue()) {
             return false;
         }
 
@@ -76,6 +75,8 @@ final class SignatureService
 
     private function getFileHashByPath(string $filePath): string
     {
-        return hash_file(self::HASH_ALGORITHM, $filePath);
+        $path = Storage::disk('public')->path($filePath);
+
+        return hash_file(self::HASH_ALGORITHM, $path);
     }
 }

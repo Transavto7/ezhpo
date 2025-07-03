@@ -1,3 +1,8 @@
+@php
+    /**
+     * @var \Src\Signatures\Eloquent\Signature|null $signature
+     */
+@endphp
 @extends('layouts.app')
 @section('class-page', 'page-protokol')
 
@@ -129,6 +134,14 @@
                     <div class="d-flex mt-2" style="gap: 10px;">
                         <a target="_blank" href="{{ route('docs.get.pdf', ['type' => 'protokol', 'anketa_id' => $id]) }}" class="btn btn-info w-100">Открыть</a>
                         <a href="{{ route('docs.delete', ['type' => 'protokol', 'anketa_id' => $id]) }}" class="btn btn-danger w-100">Удалить</a>
+                        @if(!$signature || !$signature->canDownload())
+                            <a href="#"
+                               class="btn btn-success w-100" id="signBtn">Подписать PDF</a>
+                        @endif
+                        @if($signature && $signature->canDownload())
+                            <a href="{{ route('signatures.download', ['type' => 'protokol', 'formId' => $id]) }}"
+                               class="btn btn-info w-100">Скачать подпись документа</a>
+                        @endif
                     </div>
                 @else
                     <h3 class="no-print text-center text-danger">Протокол ранее не сохранен</h3>
@@ -155,4 +168,17 @@
             </div>
         </form>
     </div>
+@endsection
+
+@section('custom-scripts')
+    <script>
+        window.PAGE_SETUP.SIGN_URLS = {
+            getPDF: '{{ route('docs.get.pdf', ['type' => 'protokol', 'anketa_id' => $id]) }}',
+            uploadSignature: '{{ route('signatures.upload', ['type' => 'protokol', 'formId' => $id]) }}',
+        }
+    </script>
+    <script src="{{ mix('/js/signature.js') }}"></script>
+    <script>
+        initSignPlugin();
+    </script>
 @endsection

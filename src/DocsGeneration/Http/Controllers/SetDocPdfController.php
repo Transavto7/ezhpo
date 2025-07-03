@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Src\DocsGeneration\Http\Controllers;
 
-use App\Enums\UserActionTypesEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Forms\Form;
-use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Src\DocsGeneration\DocDataService;
+use Src\Signatures\Enums\DocumentType;
+use Src\Signatures\Services\SignatureWorker;
 
 final class SetDocPdfController extends Controller
 {
@@ -41,6 +40,13 @@ final class SetDocPdfController extends Controller
         $form->details->update([
             $type.'_path' => $path,
         ]);
+
+        SignatureWorker::create(
+            null,
+            $form->id,
+            DocumentType::from($type),
+            $path
+        );
 
         return back();
     }

@@ -15,7 +15,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Ramsey\Uuid\Uuid;
+use Src\Signatures\Enums\DocumentType;
 
+/**
+ * @property int $id
+ */
 class Form extends Model
 {
     use SoftDeletes;
@@ -38,6 +42,11 @@ class Form extends Model
         FormTypeEnum::BDD => 'bdd_forms',
         FormTypeEnum::PRINT_PL => 'print_pl_forms',
         FormTypeEnum::REPORT_CARD => 'report_cart_forms',
+    ];
+
+    public static $docVariants = [
+        DocumentType::PROTOKOL,
+        DocumentType::CLOSING,
     ];
 
     public $fillable

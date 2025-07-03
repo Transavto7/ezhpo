@@ -882,6 +882,13 @@
                                                                 <i class="fa fa-eye"></i>
                                                             </a>
                                                         @endif
+
+                                                        @if($anketa['closing_signature_id'] && $anketa['closing_signature_status'] === \Src\Signatures\Enums\SignatureStatus::SIGNED)
+                                                            <a class="btn primary btn-sm btn-table"
+                                                               href="{{ route('signatures.download', ['type' => 'closing', 'formId' => $anketa->id]) }}">
+                                                                <i class="fa fa-lock"></i>
+                                                            </a>
+                                                        @endif
                                                     </div>
                                                 @else
                                                     <div class="row d-flex"

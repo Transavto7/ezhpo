@@ -3,9 +3,9 @@
 namespace App\Services\FormsLabelingPDFGenerator;
 
 use App\Enums\FormLabelingType;
+use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Response;
-use Barryvdh\DomPDF\Facade as PDF;
 
 final class FormsLabelingPDFGenerator
 {
@@ -30,7 +30,7 @@ final class FormsLabelingPDFGenerator
                 FormLabelingType::TECH => 'TO',
             ];
 
-            $id = $prefixes[$item->getAnketType()->value()] . '-' . $item->getId();
+            $id = $prefixes[$item->getAnketType()->value()].'-'.$item->getId();
 
             $pages[] = [
                 'qrCode' => $item->getQrCode(),
@@ -56,6 +56,6 @@ final class FormsLabelingPDFGenerator
         $imageData = file_get_contents($imagePath);
         $base64Image = base64_encode($imageData);
 
-        return 'data:image/png;base64,' . $base64Image;
+        return 'data:image/png;base64,'.$base64Image;
     }
 }

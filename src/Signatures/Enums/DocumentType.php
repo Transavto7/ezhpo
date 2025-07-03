@@ -12,6 +12,6 @@ use MyCLabs\Enum\Enum;
  */
 final class DocumentType extends Enum
 {
-    private const CLOSING = 'closing';
-    private const PROTOKOL = 'protokol';
+    public const CLOSING = 'closing';
+    public const PROTOKOL = 'protokol';
 }

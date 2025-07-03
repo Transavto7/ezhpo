@@ -1,3 +1,9 @@
+@php use Src\Signatures\Enums\SignatureStatus; @endphp
+@php
+    /**
+     * @var \Src\Signatures\Eloquent\Signature|null $signature
+     */
+@endphp
 @extends('layouts.app')
 @section('class-page', 'page-protokol')
 
@@ -10,7 +16,8 @@
             <table class="protokol">
                 <tr>
                     <th class="head" colspan="4">
-                        Заключение по результатам прохождения предсменного, предрейсового и послесменного, послерейсового медицинского осмотра
+                        Заключение по результатам прохождения предсменного, предрейсового и послесменного,
+                        послерейсового медицинского осмотра
                     </th>
                 </tr>
                 <tr>
@@ -23,7 +30,8 @@
                         <textarea rows="1" class="doc-input" name="date_str">от {{ date('d.m.Y', strtotime($date)) }} года</textarea>
                     </td>
                     <td rowspan="2">
-                        <textarea rows="1" class="doc-input" name="time">{{ date('Hч iмин', strtotime($date)) }}</textarea>
+                        <textarea rows="1" class="doc-input"
+                                  name="time">{{ date('Hч iмин', strtotime($date)) }}</textarea>
                     </td>
 
                     <td class="head" style="width: 50px">Город</td>
@@ -46,7 +54,8 @@
                         <textarea rows="1" class="doc-input" name="driver_fio">{{ $driver_fio }}</textarea>
                     </td>
                     <td>
-                        <textarea rows="1" class="doc-input" name="driver_year_birthday">{{ $driver_year_birthday }}</textarea>
+                        <textarea rows="1" class="doc-input"
+                                  name="driver_year_birthday">{{ $driver_year_birthday }}</textarea>
                     </td>
                 </tr>
                 <tr>
@@ -116,19 +125,31 @@
                     </td>
                 </tr>
                 @if($comment_rows)
-                <tr>
-                    <td colspan="4" style="border:0;">
-                        <textarea rows="{{ $comment_rows }}" name="comment" class="doc-input">{{ $comment }}</textarea>
-                    </td>
-                </tr>
+                    <tr>
+                        <td colspan="4" style="border:0;">
+                            <textarea rows="{{ $comment_rows }}" name="comment"
+                                      class="doc-input">{{ $comment }}</textarea>
+                        </td>
+                    </tr>
                 @endif
             </table>
             <div class="mt-3">
                 @if($closing_path)
-                    <h3 class="no-print text-center text-success">Данные подгружены из ранее созданного мед. заключения</h3>
+                    <h3 class="no-print text-center text-success">Данные подгружены из ранее созданного мед.
+                        заключения</h3>
                     <div class="d-flex mt-2" style="gap: 10px;">
-                        <a target="_blank" href="{{ route('docs.get.pdf', ['type' => 'closing', 'anketa_id' => $id]) }}" class="btn btn-info w-100">Открыть</a>
-                        <a href="{{ route('docs.delete', ['type' => 'closing', 'anketa_id' => $id]) }}" class="btn btn-danger w-100">Удалить</a>
+                        <a target="_blank" href="{{ route('docs.get.pdf', ['type' => 'closing', 'anketa_id' => $id]) }}"
+                           class="btn btn-info w-100">Открыть</a>
+                        <a href="{{ route('docs.delete', ['type' => 'closing', 'anketa_id' => $id]) }}"
+                           class="btn btn-danger w-100">Удалить</a>
+                        @if(!$signature || !$signature->canDownload())
+                            <a href="#"
+                               class="btn btn-success w-100" id="signBtn">Подписать PDF</a>
+                        @endif
+                        @if($signature && $signature->canDownload())
+                            <a href="{{ route('signatures.download', ['type' => 'closing', 'formId' => $id]) }}"
+                               class="btn btn-info w-100">Скачать подпись документа</a>
+                        @endif
                     </div>
                 @else
                     <h3 class="no-print text-center text-danger">Мед. заключение ранее не сохранялось</h3>
@@ -137,4 +158,17 @@
             </div>
         </form>
     </div>
+@endsection
+
+@section('custom-scripts')
+    <script>
+        window.PAGE_SETUP.SIGN_URLS = {
+            getPDF: '{{ route('docs.get.pdf', ['type' => 'closing', 'anketa_id' => $id]) }}',
+            uploadSignature: '{{ route('signatures.upload', ['type' => 'closing', 'formId' => $id]) }}',
+        }
+    </script>
+    <script src="{{ mix('/js/signature.js') }}"></script>
+    <script>
+        initSignPlugin();
+    </script>
 @endsection

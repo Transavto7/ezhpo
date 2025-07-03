@@ -3,6 +3,7 @@ import swal from 'sweetalert2'
 import Swal2 from 'sweetalert2'
 import {v4 as uidv4} from 'uuid'
 import {ApiController} from "./components/ApiController";
+import {signPDF} from "@/helpers/signature";
 
 require('./init-plugins')
 require('chosen-js')
@@ -331,8 +332,10 @@ $(document).ready(function () {
                         }
                     })
 
-                    API_CONTROLLER.saveDoc(field, data).then(response => {
-                        location.reload();
+                    API_CONTROLLER.saveDoc(field, data).then((response) => {
+                        signPDF().then(() => {
+                            location.reload();
+                        })
                     })
                 })
             })

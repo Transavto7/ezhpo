@@ -1,19 +1,20 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Src\DocsGeneration\Http\Controllers;
 
-use App\Enums\UserActionTypesEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Forms\Form;
-use Barryvdh\DomPDF\Facade as PDF;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Src\DocsGeneration\DocDataService;
+use Src\Signatures\Enums\DocumentType;
+use Src\Signatures\Services\SignatureWorker;
 
 final class DeleteDocController extends Controller
 {
-    public function __invoke($type, $anketaId)
+    /**
+     * @throws \Exception
+     */
+    public function __invoke(string $type, int $anketaId)
     {
         $form = Form::withTrashed()->find($anketaId);
 
@@ -24,6 +25,11 @@ final class DeleteDocController extends Controller
         $form->details->update([
             $type.'_path' => null,
         ]);
+
+        $signature = SignatureWorker::get($anketaId, DocumentType::from($type));
+        if ($signature !== null) {
+            $signature->delete();
+        }
 
         return back();
     }

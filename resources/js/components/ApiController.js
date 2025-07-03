@@ -57,4 +57,8 @@ export class ApiController {
             params,
         });
     }
+
+    getClient() {
+        return this.client
+    }
 }
