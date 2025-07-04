@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Terminals;
 
-use App\Models\Forms\MedicForm;
 use App\Terminal;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Src\Terminals\Eloquent\TerminalsCounters;
+use Src\Terminals\Enums\TerminalsCounterTypeEnum;
 
 final class GetTerminalsTableItemsController
 {
@@ -100,38 +100,45 @@ final class GetTerminalsTableItemsController
             }
         }
 
-        $lastMonthAmount = MedicForm::query()
+        $lastMonthAmount = TerminalsCounters::query()
             ->select([
-                DB::raw('count(forms.id) as count'),
-                'medic_forms.terminal_id',
+                'count',
+                'terminal_id',
+                'created_at'
             ])
-            ->leftJoin('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
-            ->where('forms.created_at', '>=', Carbon::now()->subMonth()->startOfMonth())
-            ->where('forms.created_at', '<=', Carbon::now()->startOfMonth())
-            ->whereNotNull('medic_forms.terminal_id')
-            ->groupBy(['medic_forms.terminal_id'])
-            ->get()
+            ->where('type', TerminalsCounterTypeEnum::lastMonthAmount())
+            ->get();
+
+        $lastMonthAmountCounters = $lastMonthAmount
             ->pluck('count', 'terminal_id')
             ->toArray();
 
-        $monthAmount = MedicForm::query()
+        $lastMonthAmountCreatedAt = $lastMonthAmount
+            ->pluck('created_at', 'terminal_id')
+            ->toArray();
+
+        $monthAmount = TerminalsCounters::query()
             ->select([
-                DB::raw('count(forms.id) as count'),
-                'medic_forms.terminal_id',
+                'count',
+                'terminal_id',
+                'created_at'
             ])
-            ->leftJoin('forms', 'forms.uuid', '=', 'medic_forms.forms_uuid')
-            ->where('forms.created_at', '>', Carbon::now()->startOfMonth())
-            ->whereNotNull('medic_forms.terminal_id')
-            ->groupBy(['medic_forms.terminal_id'])
-            ->get()
+            ->where('type', TerminalsCounterTypeEnum::currentMonthAmount())
+            ->get();
+
+        $monthAmountCounters = $monthAmount
             ->pluck('count', 'terminal_id')
+            ->toArray();
+
+        $monthAmountCreatedAt = $monthAmount
+            ->pluck('created_at', 'terminal_id')
             ->toArray();
 
         $paginator = $builder->paginate(100);
 
         $terminals = $paginator
             ->getCollection()
-            ->map(function (Terminal $terminal) use ($lastMonthAmount, $monthAmount) {
+            ->map(function (Terminal $terminal) use ($lastMonthAmountCounters, $lastMonthAmountCreatedAt, $monthAmountCounters, $monthAmountCreatedAt) {
                 $whoDeleted = null;
                 if ($terminal->whoDeleted) {
                     $whoDeleted = $terminal->whoDeleted->name;
@@ -157,6 +164,14 @@ final class GetTerminalsTableItemsController
                     $dateEndCheck = $terminal->terminalCheck->date_end_check;
                 }
 
+                $monthAmountUpdatedAt = isset($monthAmountCreatedAt[$terminal->id])
+                    ? $monthAmountCreatedAt[$terminal->id]->format('d.m.Y H:i:s')
+                    : null;
+
+                $lastMonthAmountUpdatedAt = isset($lastMonthAmountCreatedAt[$terminal->id])
+                    ? $lastMonthAmountCreatedAt[$terminal->id]->format('d.m.Y H:i:s')
+                    : null;
+
                 return [
                     'id' => $terminal->id,
                     'hash_id' => $terminal->hash_id,
@@ -174,8 +189,10 @@ final class GetTerminalsTableItemsController
                     'who_deleted' => $whoDeleted,
                     'deleted_at' => $deletedAt,
                     'date_end_check' => $dateEndCheck,
-                    'month_amount' => $monthAmount[$terminal->id] ?? 0,
-                    'last_month_amount' => $lastMonthAmount[$terminal->id] ?? 0,
+                    'month_amount' => $monthAmountCounters[$terminal->id] ?? 0,
+                    'month_amount_updated_at' => $monthAmountUpdatedAt,
+                    'last_month_amount' => $lastMonthAmountCounters[$terminal->id] ?? 0,
+                    'last_month_amount_updated_at' => $lastMonthAmountUpdatedAt
                 ];
             });
 

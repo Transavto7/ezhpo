@@ -238,6 +238,28 @@ const handleCheckItem = (id) => {
           {{ item.api_token ?? '' }}
         </template>
 
+        <template #cell(month_amount)="{ item }">
+          <a
+            class="text-body"
+            href="javascript:void(0);"
+            data-toggle="tooltip"
+            :title="item.month_amount_updated_at ?? ''"
+            :data-original-title="item.month_amount_updated_at ?? ''">
+            {{ item.month_amount ?? 0 }}
+          </a>
+        </template>
+
+        <template #cell(last_month_amount)="{ item }">
+          <a
+             class="text-body"
+             href="javascript:void(0);"
+             data-toggle="tooltip"
+             :title="item.last_month_amount_updated_at ?? ''"
+             :data-original-title="item.last_month_amount_updated_at ?? ''">
+             {{ item.last_month_amount ?? 0 }}
+          </a>
+        </template>
+
         <template #cell(buttons)="row">
           <div class="d-flex" style="gap: 5px">
             <b-btn
