@@ -1,6 +1,6 @@
 @foreach ($fields as $k => $v)
     @php if ($k == 'hash_id') continue; @endphp
-    @if($k == 'products_id' && user()->hasRole('client'))
+    @if(user()->hasRole('client') && in_array($k, ['products_id', 'pressure_systolic', 'pressure_diastolic']))
         @continue
     @endif
     @if($k == 'where_call_name' && !user()->access('companies_access_field_where_call_name'))

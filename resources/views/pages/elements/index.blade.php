@@ -159,6 +159,8 @@
             || user()->access('service_logs_read') && $model == 'Product'
         );
 
+        $hiddenForClientFields = ['products_id', 'services', 'pressure_systolic', 'pressure_diastolic'];
+
         $permissionToGenerateMetricLKK = ($model === 'Company' && user()->access('generate_metric_lkk'));
         $permissionToViewContract = user()->access('contract_read');
         $permissionToSyncCompany = ($model === 'Company' && user()->access('company_sync'));
@@ -265,6 +267,8 @@
                                     @continue
                                 @elseif(isset($fv['hideFilter']) && $fv['hideFilter'])
                                     @continue
+                                @elseif(user()->hasRole('client') && in_array($fk, $hiddenForClientFields))
+                                    @continue
                                 @endif
 
                                 @php $fv['multiple'] = true; @endphp
@@ -338,7 +342,7 @@
                     <thead>
                     <tr>
                         @foreach ($fieldPrompts as $field)
-                            @if(($field->field === 'products_id' || $field->field === 'services') && user()->hasRole('client'))
+                            @if(user()->hasRole('client') && in_array($field->field, $hiddenForClientFields))
                                 @continue
                             @elseif($field->field === 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
                                 @continue
@@ -402,10 +406,7 @@
                     @foreach ($elements as $el)
                         <tr>
                             @foreach ($fieldPrompts as $field)
-                                @if($field->field === 'products_id' && user()->hasRole('client'))
-                                    @continue
-                                @endif
-                                @if($field->field === 'services' && user()->hasRole('client'))
+                                @if(user()->hasRole('client') && in_array($field->field, $hiddenForClientFields))
                                     @continue
                                 @endif
                                 @if($field->field === 'where_call_name' && !user()->access('companies_access_field_where_call_name'))
