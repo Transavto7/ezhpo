@@ -4,7 +4,7 @@ stages:
   - deploy
   - notify
 
-default:
+.ssh_setup:
   before_script:
     - apk add --no-cache openssh coreutils tar
     - mkdir -p ~/.ssh
@@ -27,6 +27,7 @@ build_frontend:
 
 upload_dev:
   stage: upload
+  extends: .ssh_setup
   variables:
     DEPLOY_HOST: 91.106.207.85
     DEPLOY_USER: admint4n
@@ -38,6 +39,7 @@ upload_dev:
 
 deploy_dev:
   stage: deploy
+  extends: .ssh_setup
   variables:
     DEPLOY_HOST: 91.106.207.85
     DEPLOY_USER: admint4n
@@ -49,6 +51,7 @@ deploy_dev:
 
 upload_master:
   stage: upload
+  extends: .ssh_setup
   variables:
     DEPLOY_HOST: 213.139.210.53
     DEPLOY_USER: root
@@ -60,6 +63,7 @@ upload_master:
 
 deploy_clients:
   stage: deploy
+  extends: .ssh_setup
   parallel:
     matrix:
       - PROJECT: [09vk, alekseeva, alkomed, alt-era, atp, avtodoctor69, avto-med, babichev, chinara, demo,
