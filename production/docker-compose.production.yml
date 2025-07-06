@@ -1,0 +1,103 @@
+version: "3.9"
+name: ehzpo
+
+networks:
+  ehzpo-network:
+    external: false
+  traefik-network:
+    external: true
+
+volumes:
+  db-data:
+
+services:
+  nginx:
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    networks:
+      - traefik-network
+      - ehzpo-network
+    volumes:
+      - storage:/usr/share/nginx/html/storage:rw
+      - public:/usr/share/nginx/html/public:ro
+    labels:
+      # Enable Traefik for this container
+      - "traefik.enable=true"
+      # Match incoming requests on a specific hostname
+      - "traefik.http.routers.nginx.rule=Host(`test.ta-7.ru/<MR_NUMBER>`)"
+      # Assign the router to a named Traefik service
+      - "traefik.http.routers.nginx.service=nginx"
+      # Use the 'websecure' (HTTPS) entry point
+      - "traefik.http.routers.nginx.entrypoints=websecure"
+      # Define the internal container port for routing
+      - "traefik.http.services.nginx.loadbalancer.server.port=80"
+      # Enable TLS on this router
+      - "traefik.http.routers.nginx.tls=true"
+      # Use Let's Encrypt for certificate management
+      - "traefik.http.routers.nginx.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.nginx.tls=true"
+      # Pass the original Host header to the container
+      - "traefik.http.services.nginx.loadbalancer.passhostheader=true"
+      # Apply a compression middleware
+      - "traefik.http.routers.nginx.middlewares=compresstraefik"
+      # Define settings for the compression middleware
+      - "traefik.http.middlewares.compresstraefik.compress=true"
+      # Specify which Docker network Traefik should use for routing
+      - "traefik.docker.network=traefik-network"
+
+#  php-fpm:
+#    image: docker.registry.ta-7.ru/ehzpo:0.0.1
+#    restart: unless-stopped
+#    networks:
+#      - ehzpo-network
+#    depends_on:
+#      mysql:
+#        condition: service_healthy
+#    env_file:
+#      - .env.production
+#    volumes:
+#      - storage:/usr/share/nginx/html/storage:rw
+#      - public:/usr/share/nginx/html/public:rw
+
+  php-fpm:
+    build:
+      context: ../
+      dockerfile: production/php-fpm/Dockerfile
+    restart: unless-stopped
+    networks:
+      - ehzpo-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+    env_file:
+      - ../.env.production
+    volumes:
+      - ../:/usr/share/nginx/html/
+
+  mysql:
+    image: mysql:8.0.29
+    restart: unless-stopped
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    networks:
+      - ehzpo-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-psecret" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - ./mysql:/etc/mysql/conf.d/
+      - db-data:/var/lib/mysql
+      - ./template.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=ezhpo_registry

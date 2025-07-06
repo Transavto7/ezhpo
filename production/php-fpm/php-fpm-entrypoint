@@ -1,0 +1,66 @@
+#!/bin/sh
+
+main() {
+    if [ "$IS_WORKER" = "true" ]; then
+        exec "$@"
+    else
+        prepare_file_permissions
+        prepare_storage
+        wait_for_db
+        run_migrations
+        build_front
+        optimize_app
+        run_server "$@"
+    fi
+}
+
+
+build_front() {
+    echo "Running NPM clean install"
+    npm ci
+    echo "Running NPM build"
+    npm run production
+    rm -rf node_modules
+}
+
+prepare_file_permissions() {
+    chmod a+x ./artisan
+}
+
+prepare_storage() {
+    # Create required directories for Laravel
+    mkdir -p /usr/share/nginx/html/storage/framework/cache/data
+    mkdir -p /usr/share/nginx/html/storage/framework/sessions
+    mkdir -p /usr/share/nginx/html/storage/framework/views
+
+    # Set permissions for the storage directory
+    chown -R www-data:www-data /usr/share/nginx/html/storage
+    chmod -R 775 /usr/share/nginx/html/storage
+
+    # Ensure the symlink exists
+    php artisan storage:link
+}
+
+wait_for_db() {
+    echo "Waiting for DB to be ready"
+    until ./artisan migrate:status 2>&1 | grep -q -E "(Ran\?|Migration table not found|No migrations found)"; do
+        echo "Waiting for migrations to stabilize..."
+        sleep 1
+    done
+}
+
+run_migrations() {
+    ./artisan migrate --force
+}
+
+optimize_app() {
+    ./artisan cache:clear
+    ./artisan view:clear
+    ./artisan config:clear
+}
+
+run_server() {
+    exec /usr/local/bin/docker-php-entrypoint "$@"
+}
+
+main "$@"

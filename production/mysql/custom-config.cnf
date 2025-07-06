@@ -1,0 +1,5 @@
+[mysqld]
+innodb_file_per_table=1
+innodb_data_file_path = ibdata1:4G:autoextend
+tmp_table_size=4G
+max_heap_table_size=4G

@@ -1,0 +1,39 @@
+version: "3.9"
+
+networks:
+  traefik-network:
+    external: true
+
+volumes:
+  traefik-certificates:
+
+services:
+  registry:
+    restart: unless-stopped
+    image: registry:2
+    networks:
+      - traefik-network
+    labels:
+      # Enable Traefik for this container
+      - "traefik.enable=true"
+      # Match incoming requests on a specific hostname
+      - "traefik.http.routers.registry.rule=Host(`docker.registry.ta-7.ru`)"
+      # Assign the router to a named Traefik service
+      - "traefik.http.routers.registry.service=registry"
+      # Use the 'websecure' (HTTPS) entry point
+      - "traefik.http.routers.registry.entrypoints=websecure"
+      # Define the internal container port for routing
+      - "traefik.http.services.registry.loadbalancer.server.port=5000"
+      # Enable TLS on this router
+      - "traefik.http.routers.registry.tls=true"
+      # Use Let's Encrypt for certificate management
+      - "traefik.http.routers.registry.tls.certresolver=letsencrypt"
+      # Pass the original Host header to the container
+      - "traefik.http.services.registry.loadbalancer.passhostheader=true"
+      - "traefik.http.middlewares.auth-registry.basicauth.users=<ADMIN-USER>"
+      # Apply a compression middleware
+      - "traefik.http.routers.registry.middlewares=compresstraefik,auth-registry"
+      # Define settings for the compression middleware
+      - "traefik.http.middlewares.compresstraefik.compress=true"
+      # Specify which Docker network Traefik should use for routing
+      - "traefik.docker.network=traefik-network"

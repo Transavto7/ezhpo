@@ -73,16 +73,16 @@ jobs:
           - trans-kontinent
           - tverkooptrans
     steps:
-    - name: Update domains
-      uses: appleboy/ssh-action@master
-      env:
-        GITHUB_SHA: ${{ github.sha }}
-        PROJECT_PATH: /home/admin/web/${{ matrix.server }}.ta-7.ru/public_html
-      with:
-        host: 213.139.210.53
-        username: root
-        key: ${{ secrets.CLIENTS_SSHKEY }}
-        port: 22
-        envs: PROJECT_PATH,GITHUB_SHA
-        script: |
+      - name: Update domains
+        uses: appleboy/ssh-action@master
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          PROJECT_PATH: /home/admin/web/${{ matrix.server }}.ta-7.ru/public_html
+        with:
+          host: 213.139.210.53
+          username: root
+          key: ${{ secrets.CLIENTS_SSHKEY }}
+          port: 22
+          envs: PROJECT_PATH,GITHUB_SHA
+          script: |
             ${PROJECT_PATH}/.scripts/deploy-master.sh
