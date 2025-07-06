@@ -20,4 +20,6 @@ yarn-error.log
 /public/mix-manifest.json
 /public/assets/
 docker/
+production/.env.production
+production/template.sql
 .php-cs-fixer.cache
