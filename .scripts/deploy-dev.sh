@@ -2,8 +2,10 @@
 set -e
 
 echo "Deployment started ..."
+ls -al "../artifacts/public-${CI_COMMIT_SHA}.tar.gz"
+echo "$CI_COMMIT_SHA"
 
-cd ~/crm.ta-7.ru/public_html
+exit 1
 
 # Проверить, что текущая ветка - дев
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
@@ -12,7 +14,7 @@ if [[ "$BRANCH" != "dev" ]]; then
   exit 1;
 fi
 
-GITHUB_CURRENT_SHA="$(git rev-parse HEAD)"
+CURRENT_SHA="$(git rev-parse HEAD)"
 
 PHP_VERSION=php7.3
 
@@ -44,9 +46,9 @@ then
   # Дамп БД
   DATE=$(date '+%Y%m%d_%H%M%S')
 
-  GITHUB_CURRENT_SHA="$(git rev-parse HEAD)"
+  CURRENT_SHA="$(git rev-parse HEAD)"
 
-  DUMP_NAME="../backups/db/${DATE}_${GITHUB_CURRENT_SHA}.sql.gz"
+  DUMP_NAME="../backups/db/${DATE}_${CURRENT_SHA}.sql.gz"
 
   export $(cat .env | sed 's/#.*//g' | xargs)
 
@@ -61,7 +63,7 @@ then
 fi
 
 # Разархивирование билда фронта
-PUBLIC="../artifacts/public-${GITHUB_SHA}.tar.gz"
+PUBLIC="../artifacts/public-${CI_COMMIT_SHA}.tar.gz"
 if [ -f "$PUBLIC" ]; then
     tar xvfz ${PUBLIC} public/
 fi

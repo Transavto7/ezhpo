@@ -40,9 +40,9 @@ then
   # Дамп БД
   DATE=$(date '+%Y%m%d_%H%M%S')
 
-  GITHUB_CURRENT_SHA="$(git rev-parse HEAD)"
+  CURRENT_SHA="$(git rev-parse HEAD)"
 
-  DUMP_NAME="../backups/db/${DATE}_${GITHUB_CURRENT_SHA}.sql.gz"
+  DUMP_NAME="../backups/db/${DATE}_${CURRENT_SHA}.sql.gz"
 
   export $(cat .env | sed 's/#.*//g' | xargs)
 
@@ -55,7 +55,7 @@ then
 fi
 
 # Разархивирование билда фронта
-PUBLIC="/home/admin/web/artifacts/public-${GITHUB_SHA}.tar.gz"
+PUBLIC="/home/admin/web/artifacts/public-${CI_COMMIT_SHA}.tar.gz"
 if [ -f "$PUBLIC" ]; then
     tar xvfz ${PUBLIC} public/
 fi

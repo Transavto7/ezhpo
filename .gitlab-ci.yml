@@ -23,7 +23,7 @@ build_frontend:
     paths:
       - public-${CI_COMMIT_SHA}.tar.gz
   rules:
-    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "master"'
+    - if: '$CI_COMMIT_BRANCH == "dev-1" || $CI_COMMIT_BRANCH == "master"'
 
 upload_dev:
   stage: upload
@@ -32,10 +32,10 @@ upload_dev:
     DEPLOY_HOST: 91.106.207.85
     DEPLOY_USER: admint4n
   script:
-    - scp public-${CI_COMMIT_SHA}.tar.gz $DEPLOY_USER@$DEPLOY_HOST:/root/
+    - scp -i ~/.ssh/id_rsa public-${CI_COMMIT_SHA}.tar.gz $DEPLOY_USER@$DEPLOY_HOST:/home/a/admint4n/crm.ta-7.ru/artifacts
   needs: [build_frontend]
   rules:
-    - if: '$CI_COMMIT_BRANCH == "dev"'
+    - if: '$CI_COMMIT_BRANCH == "dev-1"'
 
 deploy_dev:
   stage: deploy
@@ -44,10 +44,10 @@ deploy_dev:
     DEPLOY_HOST: 91.106.207.85
     DEPLOY_USER: admint4n
   script:
-    - ssh $DEPLOY_USER@$DEPLOY_HOST "bash /root/deploy-dev.sh $CI_COMMIT_SHA"
+    - ssh $DEPLOY_USER@$DEPLOY_HOST "CI_COMMIT_SHA=${CI_COMMIT_SHA} .scripts/deploy-dev.sh"
   needs: [upload_dev]
   rules:
-    - if: '$CI_COMMIT_BRANCH == "dev"'
+    - if: '$CI_COMMIT_BRANCH == "dev-1"'
 
 upload_master:
   stage: upload
@@ -73,21 +73,21 @@ deploy_clients:
     DEPLOY_HOST: 213.139.210.53
     DEPLOY_USER: root
   script:
-    - ssh $DEPLOY_USER@$DEPLOY_HOST "bash /home/admin/web/$PROJECT.ta-7.ru/public_html/.scripts/deploy-master.sh $CI_COMMIT_SHA"
+    - ssh $DEPLOY_USER@$DEPLOY_HOST "GITHUB_SHA=${CI_COMMIT_SHA} /home/admin/web/$PROJECT.ta-7.ru/public_html/.scripts/deploy-master.sh" # ЗАМЕНИТЬ GITHUB_SHA ПЕРЕМЕННУЮ НА CI_COMMIT_SHA после первого выполнения!
   needs: [upload_master]
   rules:
     - if: '$CI_COMMIT_BRANCH == "master"'
 
-notify:
-  stage: notify
-  image: curlimages/curl:latest
-  script:
-    - |
-      BRANCH=$CI_COMMIT_BRANCH
-      STATUS=$CI_JOB_STATUS
-      curl -s -X POST https://api.telegram.org/${TELEGRAM_BOT_TOKEN}/sendMessage \
-        -d chat_id="${TELEGRAM_CHAT_ID}" \
-        -d text="[$CI_PROJECT_NAME] CI/CD завершен на ветке *$BRANCH*\nСтатус: *$STATUS*" \
-        -d parse_mode="Markdown"
-  rules:
-    - when: always
+#notify:
+#  stage: notify
+#  image: curlimages/curl:latest
+#  script:
+#    - |
+#      BRANCH=$CI_COMMIT_BRANCH
+#      STATUS=$CI_JOB_STATUS
+#      curl -s -X POST https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage \
+#        -d chat_id="${TELEGRAM_CHAT_ID}" \
+#        -d text="[$CI_PROJECT_NAME] CI/CD завершен на ветке *$BRANCH*\nСтатус: *$STATUS*" \
+#        -d parse_mode="Markdown"
+#  rules:
+#    - when: always
