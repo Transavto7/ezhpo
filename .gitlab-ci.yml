@@ -32,7 +32,7 @@ upload_dev:
     DEPLOY_HOST: 91.106.207.85
     DEPLOY_USER: admint4n
   script:
-    - scp -i ~/.ssh/id_rsa public-${CI_COMMIT_SHA}.tar.gz $DEPLOY_USER@$DEPLOY_HOST:/home/a/admint4n/crm.ta-7.ru/artifacts
+    - scp public-${CI_COMMIT_SHA}.tar.gz $DEPLOY_USER@$DEPLOY_HOST:/home/a/admint4n/crm.ta-7.ru/artifacts
   needs: [build_frontend]
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev-1"'
