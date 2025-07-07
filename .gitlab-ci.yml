@@ -8,8 +8,8 @@ stages:
   before_script:
     - apk add --no-cache openssh coreutils tar
     - mkdir -p ~/.ssh
-    - echo "$SSH_KEY_B64" | base64 -d > ~/.ssh/deploy_key
-    - chmod 600 ~/.ssh/deploy_key
+    - echo "$SSH_KEY_B64" | base64 -d > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
     - ssh-keyscan -H $DEPLOY_HOST >> ~/.ssh/known_hosts || true
 
 build_frontend:
@@ -73,7 +73,7 @@ deploy_clients:
     DEPLOY_HOST: 213.139.210.53
     DEPLOY_USER: root
   script:
-    - ssh $DEPLOY_USER@$DEPLOY_HOST "GITHUB_SHA=${CI_COMMIT_SHA} /home/admin/web/$PROJECT.ta-7.ru/public_html/.scripts/deploy-master.sh" # ЗАМЕНИТЬ GITHUB_SHA ПЕРЕМЕННУЮ НА CI_COMMIT_SHA после первого выполнения!
+    - ssh $DEPLOY_USER@$DEPLOY_HOST "CI_COMMIT_SHA=${CI_COMMIT_SHA} /home/admin/web/$PROJECT.ta-7.ru/public_html/.scripts/deploy-master.sh"
   needs: [upload_master]
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
