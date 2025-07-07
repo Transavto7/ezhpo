@@ -8,8 +8,8 @@ stages:
   before_script:
     - apk add --no-cache openssh coreutils tar
     - mkdir -p ~/.ssh
-    - echo "$SSH_KEY_B64" | base64 -d > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
+    - echo "$SSH_KEY_B64" | base64 -d > ~/.ssh/deploy_key
+    - chmod 600 ~/.ssh/deploy_key
     - ssh-keyscan -H $DEPLOY_HOST >> ~/.ssh/known_hosts || true
 
 build_frontend:
