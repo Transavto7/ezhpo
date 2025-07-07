@@ -35,7 +35,7 @@ upload_dev:
     - scp public-${CI_COMMIT_SHA}.tar.gz $DEPLOY_USER@$DEPLOY_HOST:/home/a/admint4n/crm.ta-7.ru/artifacts
   needs: [build_frontend]
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "dev"'
 
 deploy_dev:
   stage: deploy
@@ -47,36 +47,36 @@ deploy_dev:
     - ssh $DEPLOY_USER@$DEPLOY_HOST "CI_COMMIT_SHA=${CI_COMMIT_SHA} .scripts/deploy-dev.sh"
   needs: [upload_dev]
   rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+
+upload_master:
+  stage: upload
+  extends: .ssh_setup
+  variables:
+    DEPLOY_HOST: 213.139.210.53
+    DEPLOY_USER: root
+  script:
+    - scp public-${CI_COMMIT_SHA}.tar.gz $DEPLOY_USER@$DEPLOY_HOST:/home/admin/web/artifacts/
+  needs: [build_frontend]
+  rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
-#upload_master:
-#  stage: upload
-#  extends: .ssh_setup
-#  variables:
-#    DEPLOY_HOST: 213.139.210.53
-#    DEPLOY_USER: root
-#  script:
-#    - scp public-${CI_COMMIT_SHA}.tar.gz $DEPLOY_USER@$DEPLOY_HOST:/home/admin/web/artifacts/
-#  needs: [build_frontend]
-#  rules:
-#    - if: '$CI_COMMIT_BRANCH == "main"'
-#
-#deploy_clients:
-#  stage: deploy
-#  extends: .ssh_setup
-#  parallel:
-#    matrix:
-#      - PROJECT: [09vk, alekseeva, alkomed, alt-era, atp, avtodoctor69, avto-med, babichev, chinara, demo,
-#                  dopusk, eurobas, meduslugi, medzenklinik, mt, oreltaxi, pomosh, p-osmotr, puti-nn,
-#                  soyuzmed, tomilko, trans-kontinent, tverkooptrans]
-#  variables:
-#    DEPLOY_HOST: 213.139.210.53
-#    DEPLOY_USER: root
-#  script:
-#    - ssh $DEPLOY_USER@$DEPLOY_HOST "CI_COMMIT_SHA=${CI_COMMIT_SHA} /home/admin/web/$PROJECT.ta-7.ru/public_html/.scripts/deploy-master.sh"
-#  needs: [upload_master]
-#  rules:
-#    - if: '$CI_COMMIT_BRANCH == "main"'
+deploy_clients:
+  stage: deploy
+  extends: .ssh_setup
+  parallel:
+    matrix:
+      - PROJECT: [09vk, alekseeva, alkomed, alt-era, atp, avtodoctor69, avto-med, babichev, chinara, demo,
+                  dopusk, eurobas, meduslugi, medzenklinik, mt, oreltaxi, pomosh, p-osmotr, puti-nn,
+                  soyuzmed, tomilko, trans-kontinent, tverkooptrans]
+  variables:
+    DEPLOY_HOST: 213.139.210.53
+    DEPLOY_USER: root
+  script:
+    - ssh $DEPLOY_USER@$DEPLOY_HOST "GITHUB_SHA=${CI_COMMIT_SHA} /home/admin/web/$PROJECT.ta-7.ru/public_html/.scripts/deploy-master.sh" # ЗАМЕНИТЬ GITHUB_SHA ПЕРЕМЕННУЮ НА CI_COMMIT_SHA после первого выполнения!
+  needs: [upload_master]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 #notify:
 #  stage: notify
