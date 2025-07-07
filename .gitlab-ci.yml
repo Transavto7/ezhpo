@@ -85,7 +85,7 @@ notify:
     - |
       BRANCH=$CI_COMMIT_BRANCH
       STATUS=$CI_JOB_STATUS
-      curl -s -X POST https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage \
+      curl -s -X POST https://api.telegram.org/${TELEGRAM_BOT_TOKEN}/sendMessage \
         -d chat_id="${TELEGRAM_CHAT_ID}" \
         -d text="[$CI_PROJECT_NAME] CI/CD завершен на ветке *$BRANCH*\nСтатус: *$STATUS*" \
         -d parse_mode="Markdown"
