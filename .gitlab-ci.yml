@@ -23,7 +23,7 @@ build_frontend:
     paths:
       - public-${CI_COMMIT_SHA}.tar.gz
   rules:
-    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "master"'
 
 upload_dev:
   stage: upload
@@ -59,7 +59,7 @@ upload_master:
     - scp public-${CI_COMMIT_SHA}.tar.gz $DEPLOY_USER@$DEPLOY_HOST:/home/admin/web/artifacts/
   needs: [build_frontend]
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "master"'
 
 deploy_clients:
   stage: deploy
@@ -77,7 +77,7 @@ deploy_clients:
     - ssh $DEPLOY_USER@$DEPLOY_HOST "GITHUB_SHA=${CI_COMMIT_SHA} PROJECT_PATH=${PROJECT_PATH} /home/admin/web/$PROJECT.ta-7.ru/public_html/.scripts/deploy-master.sh" # ЗАМЕНИТЬ GITHUB_SHA ПЕРЕМЕННУЮ НА CI_COMMIT_SHA после первого выполнения!
   needs: [upload_master]
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "master"'
 
 #notify:
 #  stage: notify
