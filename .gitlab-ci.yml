@@ -74,7 +74,7 @@ deploy_clients:
     DEPLOY_USER: root
     PROJECT_PATH: /home/admin/web/$PROJECT.ta-7.ru/public_html
   script:
-    - ssh $DEPLOY_USER@$DEPLOY_HOST "GITHUB_SHA=${CI_COMMIT_SHA} PROJECT_PATH=${PROJECT_PATH} /home/admin/web/$PROJECT.ta-7.ru/public_html/.scripts/deploy-master.sh" # ЗАМЕНИТЬ GITHUB_SHA ПЕРЕМЕННУЮ НА CI_COMMIT_SHA после первого выполнения!
+    - ssh $DEPLOY_USER@$DEPLOY_HOST "CI_COMMIT_SHA=${CI_COMMIT_SHA} PROJECT_PATH=${PROJECT_PATH} /home/admin/web/$PROJECT.ta-7.ru/public_html/.scripts/deploy-master.sh"
   needs: [upload_master]
   rules:
     - if: '$CI_COMMIT_BRANCH == "master"'
