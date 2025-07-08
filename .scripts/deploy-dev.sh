@@ -2,10 +2,6 @@
 set -e
 
 echo "Deployment started ..."
-ls -al "../artifacts/public-${CI_COMMIT_SHA}.tar.gz"
-echo "$CI_COMMIT_SHA"
-
-exit 1
 
 # Проверить, что текущая ветка - дев
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
